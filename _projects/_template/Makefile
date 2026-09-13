@@ -74,6 +74,7 @@ assets:
 	@
 	@# Images
 	@if [ -d "images" ]; then mkdir -p $(IMAGES_DEST); cp -r images/* $(IMAGES_DEST)/ 2>/dev/null || true; fi
+	@if [ -f "favicon.png" ]; then mkdir -p $(IMAGES_DEST); cp favicon.png $(IMAGES_DEST)/favicon.png; fi
 	@
 	@# Native Jekyll SASS processing
 	@if [ -d "sass" ]; then \

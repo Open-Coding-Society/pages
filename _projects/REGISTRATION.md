@@ -233,6 +233,23 @@ the standard project Makefile:
 - `.html` files go to `_includes/projects/<project-name>/`.
 - `.ipynb` files go to `_notebooks/projects/<project-name>/` with the navigation date prefix.
 
+### Game Catalog Images
+
+For a game with `game_directory: true`, add a project-root `favicon.png`:
+
+```text
+_projects/games/<project-name>/favicon.png
+```
+
+The project Makefile publishes it to:
+
+```text
+images/projects/<project-name>/favicon.png
+```
+
+The games catalog uses that file automatically unless the page frontmatter
+provides an explicit `image:` value.
+
 ### Games Directory Metadata
 
 Converted game pages can opt into the shared Jekyll games directory through

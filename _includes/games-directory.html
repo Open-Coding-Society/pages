@@ -7,9 +7,15 @@
   <div class="ocs__grid ocs__grid--card">
     {% for game in games %}
     <article class="ocs__grid-cell games-directory__card">
-      {% if game.image %}
-      <img class="ocs__image-frame ocs__image-frame--thumbnail" src="{{ game.image | relative_url }}" alt="{{ game.title }}">
-      {% endif %}
+      {% assign game_image = game.image %}
+      {% unless game_image %}
+        {% assign project_path = game.path | split: '/' %}
+        {% assign project_name = project_path[2] %}
+        {% assign favicon_path = '/images/projects/' | append: project_name | append: '/favicon.png' %}
+        {% assign favicon_file = site.static_files | where: 'path', favicon_path | first %}
+        {% if favicon_file %}{% assign game_image = favicon_path %}{% endif %}
+      {% endunless %}
+      {% if game_image %}<img class="ocs__image-frame ocs__image-frame--thumbnail" src="{{ game_image | relative_url }}" alt="{{ game.title }}">{% endif %}
       <h3>{{ game.title }}</h3>
       {% if game.game_category %}<span class="ocs__status-pill ocs__status-pill--neutral">{{ game.game_category }}</span>{% endif %}
       {% if game.description %}<p>{{ game.description }}</p>{% endif %}
