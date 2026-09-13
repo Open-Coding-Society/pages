@@ -794,15 +794,6 @@ def get_relative_output_path(notebook_file):
     return os.path.join(destination_directory, markdown_filename)
 
 
-def inject_games_directory(markdown, front_matter):
-    """Add the generated games directory to the CS Pathway page."""
-    if front_matter.get('permalink') != '/cs-pathway':
-        return markdown
-
-    include = "\n{% include projects/cs-pathway/cs-pathway-menu.html %}\n"
-    return markdown.rstrip() + include
-
-
 def fix_js_code_blocks(markdown):
     # This regex finds ```python blocks starting with %%js and replaces with ```javascript
     # but keeps the %%js line for developers to see
@@ -1288,7 +1279,6 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
         
         # Inject code-runner includes (and submit buttons if challenge_submit is enabled)
         markdown = inject_code_runners(markdown, notebook, front_matter)
-        markdown = inject_games_directory(markdown, front_matter)
         
         front_matter_content = (
             "---\n"
