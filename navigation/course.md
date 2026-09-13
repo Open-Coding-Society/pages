@@ -9,6 +9,7 @@ permalink: /navigation/courses/
 
 ## My Courses
 
+<!-- markdownlint-disable MD033 MD046 -->
 <div id="userCourses" style="text-align:center;">
     <p>Loading your courses...</p>
 </div>
@@ -18,7 +19,7 @@ permalink: /navigation/courses/
 
     async function displayUserCourses() {
         const container = document.getElementById('userCourses');
-        
+
         try {
             const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions );
 
@@ -62,3 +63,5 @@ permalink: /navigation/courses/
 
     displayUserCourses();
 </script>
+
+<!-- markdownlint-enable MD033 MD046 -->
