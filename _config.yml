@@ -142,4 +142,5 @@ minima:
   nav_pages:
     - navigation/blog.md
     - navigation/courses.md
+    - navigation/capstone.md
     - navigation/search.md

@@ -1,17 +1,13 @@
 ---
-microblog: false
-toc: False
 layout: post
-tailwind: True
-infoGraph: capstone_infograph
-title: Capstone Projects
+title: Capstone
 description: Explore student-led capstone projects, their real-world problems, technical solutions, teams, and project resources.
 type: capstone
-categories: Capstone
 permalink: /capstone/
-sticky_rank: 1
+show_reading_time: false
 ---
 
+<!-- markdownlint-disable MD033 MD046 -->
 <link rel="stylesheet" href="/assets/css/new-capstone.css">
 
 <div class="capstone-action-buttons">
@@ -40,7 +36,6 @@ sticky_rank: 1
     <p id="search-status" class="text-xs text-gray-500" style="margin: 0.25rem 0 0;">Showing all projects.</p>
   </div>
 </div>
-
 
 <script>
 // Full project data sourced from _data/*_infograph.yml files via Liquid
@@ -1353,3 +1348,5 @@ document.addEventListener('DOMContentLoaded', function(){
 
 })();
 </script>
+
+  <!-- markdownlint-enable MD033 MD046 -->
