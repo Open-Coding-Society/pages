@@ -46,6 +46,7 @@ _docx/~$*
 *.tmp
 
 # Project distributions (auto-generated from _projects/ source)
+_includes/projects/
 _notebooks/projects/
 _posts/projects/
 _sass/projects/
