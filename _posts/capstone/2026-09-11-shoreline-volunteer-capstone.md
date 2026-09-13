@@ -5,19 +5,8 @@ layout: post
 title: Shoreline Community Services, Volunteer Page
 permalink: /capstone/shoreline-volunteer/
 ---
+<!-- markdownlint-disable MD033 -->
 <style>
-.shoreline-capstone-card .ocs__grid {
-    justify-content: center;
-}
-.shoreline-capstone-card .ocs__grid--card {
-    grid-template-columns: repeat(3, 1fr);
-    justify-content: center;
-}
-@media (max-width: 700px) {
-    .shoreline-capstone-card .ocs__grid--card {
-        grid-template-columns: 1fr;
-    }
-}
 .shoreline-capstone-card .ocs__grid-cell:not(.ocs__grid-cell--header) {
     text-align: center;
     font-size: 0.82rem;
@@ -25,15 +14,6 @@ permalink: /capstone/shoreline-volunteer/
 }
 .shoreline-capstone-card .ocs__grid-cell:not(.ocs__grid-cell--header) strong {
     font-size: 1rem;
-}
-.shoreline-capstone-card .ocs__grid--card .ocs__grid-cell:not(.ocs__grid-cell--header) {
-    background: var(--panel);
-    border: 1px solid var(--pref-accent-color);
-    box-shadow: 0 0 22px color-mix(in srgb, var(--pref-accent-color) 40%, transparent);
-}
-.shoreline-capstone-card .ocs__grid--card .ocs__grid-cell.ocs__grid-cell--header {
-    background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
-    border-color: var(--pref-accent-color);
 }
 </style>
 
@@ -49,9 +29,8 @@ permalink: /capstone/shoreline-volunteer/
 
 ---
 
-<div class="ocs__grid ocs__grid--card">
+<div class="ocs__grid ocs__grid--card cols-3">
     <div class="ocs__grid-cell ocs__grid-cell--header">How We Are Going to Change the Website</div>
-
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Homelessness Hotspot</strong>
         <p>Selecting the "volunteer" option shows a homelessness hotspot map highlighting the most concentrated homeless areas and the places most in need of volunteers, directing them to greater need instead of random centers and automating the process instead of a human contacting each volunteer.</p>
@@ -60,7 +39,6 @@ permalink: /capstone/shoreline-volunteer/
         <strong>Volunteer Shift Calendar</strong>
         <p>Volunteers can see which shift slots are already taken instead of being contacted by a team member, and fewer available spots create urgency that encourages more people to sign up.</p>
     </div>
-
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Donations Page</strong>
         <p>Currently, the only way to donate is through an Instagram link in their bio. Adding a donation page makes it easier to contribute, with amounts tied to impact like "$50 = 1 meal + supplies" and "$200 = 1 night hotel stay," so donors see exactly what their money does and want to give more.</p>
@@ -69,7 +47,6 @@ permalink: /capstone/shoreline-volunteer/
         <strong>Needs Right Now Page</strong>
         <p>Money doesn't have to be the only thing people donate. A "needs right now" page opens up more ways to give, since most people can afford to donate items like toys, old clothes, or food, showing exactly what nearby shelters need most and guiding donors on how to give it.</p>
     </div>
-
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Service Navigation</strong>
         <p>A homeless person visiting the website can click a "Need Help?" button to get detailed directions to the nearest shelter and its facilities, plus the outreach team's contact information for extra support.</p>
@@ -86,7 +63,7 @@ permalink: /capstone/shoreline-volunteer/
 
 ---
 
-<div class="ocs__grid ocs__grid--card">
+<div class="ocs__grid ocs__grid--card cols-3">
     <div class="ocs__grid-cell ocs__grid-cell--header">Teammates/Collaborators</div>
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Nitya Hamsini Kasse</strong>
@@ -109,3 +86,4 @@ permalink: /capstone/shoreline-volunteer/
 </div>
 
 </div>
+<!-- markdownlint-enable MD033 -->
