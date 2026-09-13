@@ -1,9 +1,6 @@
 {% assign games = site.posts | where: "game_directory", true | where_exp: "game", "game.exclude_from_games != true" | sort: "game_order" %}
 
 {% if games.size > 0 %}
-<div class="ocs__container games-directory">
-  <h2 class="ocs__section-title">{{ site.games_directory.title | default: "Games &amp; Interactive Projects" }}</h2>
-  <p class="ocs__description">{{ site.games_directory.description | default: "Explore playable projects and lessons built with the Open Coding Society game systems." }}</p>
   <div class="ocs__grid ocs__grid--card">
     {% for game in games %}
     <article class="ocs__grid-cell games-directory__card">
@@ -23,5 +20,4 @@
     </article>
     {% endfor %}
   </div>
-</div>
 {% endif %}
