@@ -8,17 +8,35 @@ permalink: /capstone/oak/
 
 ---
 
-## The Basics and What It Aims to Do
+<div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
 
-This capstone project is designed to connect and educate cancer patients and their families through a more engaging, accessible digital experience. Our goal is to create a platform that helps users understand cancer at a biological level through interactive educational modules while also creating opportunities for connection and community through multiplayer games and collaborative experiences. Rather than relying on long text-heavy pages, the project aims to make information easier to navigate, more visually engaging, and more approachable for users of all ages.
+    <div class="ocs__grid-cell ocs__grid-cell--header">About the Project</div>
 
-## Why We Chose This Project
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>The Basics and What It Aims to Do</strong>
+        <p>This capstone project is designed to connect and educate cancer patients and their families through a more engaging, accessible digital experience. Our goal is to create a platform that helps users understand cancer at a biological level through interactive educational modules while also creating opportunities for connection and community through multiplayer games and collaborative experiences. Rather than relying on long text-heavy pages, the project aims to make information easier to navigate, more visually engaging, and more approachable for users of all ages.</p>
+        <a class="ocs__btn alert-green fill small" href="#about-the-project">
+            Project Overview
+        </a>
+    </div>
 
-We chose this project because we wanted to help children with cancer feel more included, informed, and supported. Many young patients spend significant time in hospitals, at home, or away from school and their peers, which can make them feel isolated. We wanted to build a website that provides both education and connection, giving children a place to learn, play, and engage with others who understand their experiences. We also wanted to create something more interactive and welcoming than a standard informational cancer website.
+    <div class="ocs__grid-cell">
+        <strong>Why We Chose This Project</strong>
+        <p>We chose this project because we wanted to help children with cancer feel more included, informed, and supported. Many young patients spend significant time in hospitals, at home, or away from school and their peers, which can make them feel isolated. We wanted to build a website that provides both education and connection, giving children a place to learn, play, and engage with others who understand their experiences. We also wanted to create something more interactive and welcoming than a standard informational cancer website.</p>
+        <a class="ocs__btn alert-yellow fill small" href="#why-we-chose-this-project">
+            Why This Project
+        </a>
+    </div>
 
-## Our Team
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Our Team</strong>
+        <p>Our team consists of Salma, Isha, Aashi, and Emily. Salma serves as our Scrum Master, helping guide project organization, communication, and team coordination. Isha, Aashi, and Emily are our developers and programmers, and together we are responsible for building the website, designing educational content, and creating interactive features that support the project’s goals.</p>
+        <a class="ocs__btn alert-green fill small" href="#our-team">
+            Meet the Team
+        </a>
+    </div>
 
-Our team consists of Salma, Isha, Aashi, and Emily. Salma serves as our Scrum Master, helping guide project organization, communication, and team coordination. Isha, Aashi, and Emily are our developers and programmers, and together we are responsible for building the website, designing educational content, and creating interactive features that support the project’s goals.
+</div>
 
 <div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
 
