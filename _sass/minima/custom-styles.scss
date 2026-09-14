@@ -13,11 +13,8 @@
 // All individual capstone infograph SCSS has been unified into one file to provide a consistent B/W theme.
 @import "capstone/infograph";
 
-// Mentor capstone project view (/mentor)
+// Sitewide "signed in as Mentor" badge and mentor sidebar layout push
 @import "mentor";
-
-// Mentor Portal project discovery / swipe deck (/projects)
-@import "mentor-portal";
 
 // RPN Calculator Lesson Interactives
 @import "nighthawk/rpn-interactive";
