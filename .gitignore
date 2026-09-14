@@ -62,6 +62,7 @@ _projects/*/*/Makefile
 # Multi-notebook lesson projects use custom Makefiles rather than the template.
 !_projects/lessons/python/Makefile
 !_projects/lessons/javascript/Makefile
+!_projects/lessons/java/Makefile
 
 # Project pages (deployed from _projects/ at build time to _posts/)
 _posts/projects/
