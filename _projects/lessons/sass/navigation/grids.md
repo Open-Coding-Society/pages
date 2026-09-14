@@ -7,6 +7,7 @@ lesson_language: SASS
 lesson_topic: Grids
 lesson_part: interactive
 lesson_type: lesson
+microblog: true
 permalink: /navigation/sass/grids/
 ---
 
