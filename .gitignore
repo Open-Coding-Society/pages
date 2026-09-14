@@ -46,6 +46,7 @@ _docx/~$*
 *.tmp
 
 # Project distributions (auto-generated from _projects/ source)
+_includes/projects/
 _notebooks/projects/
 _posts/projects/
 _sass/projects/
@@ -58,6 +59,10 @@ _projects/*/Makefile
 _projects/*/*/Makefile
 # Except the template itself (single source of truth)
 !_projects/_template/Makefile
+# Multi-notebook lesson projects use custom Makefiles rather than the template.
+!_projects/lessons/python/Makefile
+!_projects/lessons/javascript/Makefile
+!_projects/lessons/java/Makefile
 
 # Project pages (deployed from _projects/ at build time to _posts/)
 _posts/projects/

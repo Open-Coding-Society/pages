@@ -11,6 +11,36 @@
 
   {% include ocs-intelligence-nav.html %}
 
+  <div class="ocs-intelligence-card">
+    <p class="ocs-intelligence-gift-kicker">{{ data.problemStatement.kicker }}</p>
+    <h3 class="ocs-intelligence-section-title">{{ data.problemStatement.title }}</h3>
+    <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.problemStatement.body }}</p>
+    <div class="ocs-intelligence-diagram" role="img" aria-label="Comparison: a paid AI subscription serves one seat, versus OCS Intelligence LLM which serves every student off donated hardware.">
+      <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit;">
+        <rect x="8" y="8" width="270" height="204" rx="14" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.14)"/>
+        <text x="143" y="34" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">Paid subscription</text>
+        <rect x="125" y="70" width="36" height="30" rx="4" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="2"/>
+        <path d="M132 70 v-14 a11 11 0 0 1 22 0 v14" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="2"/>
+        <circle cx="143" cy="85" r="3" fill="rgba(255,255,255,0.65)"/>
+        <text x="143" y="138" text-anchor="middle" fill="#fff" font-size="20" font-weight="800">~$20/mo</text>
+        <text x="143" y="160" text-anchor="middle" fill="rgba(255,255,255,0.65)" font-size="12">one seat</text>
+        <text x="143" y="196" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="12">Can't pay? No help.</text>
+
+        <text x="320" y="93" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="22">→</text>
+
+        <rect x="362" y="8" width="270" height="204" rx="14" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.28)"/>
+        <text x="497" y="34" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">OCS Intelligence LLM</text>
+        <rect x="468" y="70" width="10" height="30" rx="2" fill="rgba(255,255,255,0.65)"/>
+        <rect x="484" y="70" width="10" height="30" rx="2" fill="rgba(255,255,255,0.65)"/>
+        <rect x="500" y="70" width="10" height="30" rx="2" fill="rgba(255,255,255,0.65)"/>
+        <rect x="516" y="70" width="10" height="30" rx="2" fill="rgba(255,255,255,0.65)"/>
+        <text x="497" y="138" text-anchor="middle" fill="#fff" font-size="20" font-weight="800">Shared compute</text>
+        <text x="497" y="160" text-anchor="middle" fill="rgba(255,255,255,0.65)" font-size="12">every student</text>
+        <text x="497" y="196" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="12">Donated GPUs, shared.</text>
+      </svg>
+    </div>
+  </div>
+
   <div class="ocs-intelligence-card ocs-intelligence-gift">
     <p class="ocs-intelligence-gift-kicker">{{ gift.kicker }}</p>
     <h3 class="ocs-intelligence-section-title">{{ gift.title }}</h3>
@@ -31,11 +61,15 @@
     <p class="ocs-intelligence-about">Two pictures: the path from gift to classroom service, and how a student actually reaches it.</p>
     <div class="ocs-intelligence-diagram-stack">
       <div class="ocs-intelligence-diagram-block">
-        <h4 class="ocs-intelligence-diagram-title">From donation to two phases</h4>
+        <h4 class="ocs-intelligence-diagram-title">From donation to three phases</h4>
         <div class="ocs-intelligence-diagram">
           <pre class="mermaid">flowchart LR
-    A[Donated 8x GTX 1070 rack] --> B[Phase 1]
+    A[Donated 8x GTX 1070 rack] --> P0[Phase 0]
+    P0 --> B[Phase 1]
     B --> C[Phase 2]
+    P0 --> P01[Problem and research questions]
+    P0 --> P02[Literature review]
+    P0 --> P03[Pick a candidate model]
     B --> B1[Build rack]
     B --> B2[Ollama and llama.cpp]
     B --> B3[Stream and keys]
@@ -48,19 +82,43 @@
         <h4 class="ocs-intelligence-diagram-title">How a student reaches the model</h4>
         <div class="ocs-intelligence-diagram">
           <pre class="mermaid">flowchart TD
-    A[Student harness on another network] --> B[Issued key]
-    B --> C[Live stream]
-    C --> D[Production rack - Team 1]
-    D --> E[Shared open model]
-    D --> F[~5 concurrent users]</pre>
+    A[Student at school or home] --> B[Authenticated OCS API]
+    B --> C[Broker and request queue]
+    C --> D[Mini prepares session context]
+    D --> E[GPU worker generates answer]
+    E --> F[Stream returned to student]</pre>
         </div>
       </div>
     </div>
   </div>
 
+  <section aria-labelledby="ocs-implementation-title">
+    <div class="ocs-intelligence-card">
+      <h2 id="ocs-implementation-title" class="ocs-intelligence-section-title">{{ data.implementation.title }}</h2>
+      <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.implementation.introduction }}</p>
+      <div class="ocs-intelligence-diagram">
+        <pre class="mermaid">{{ data.implementation.diagram | escape }}</pre>
+      </div>
+    </div>
+    {% for section in data.implementation.sections %}
+    <div class="ocs-intelligence-card">
+      <h3 class="ocs-intelligence-section-title">{{ section.title }}</h3>
+      <p class="ocs-intelligence-about">{{ section.body }}</p>
+      <ul class="ocs-intelligence-about">
+        {% for step in section.steps %}
+        <li>{{ step }}</li>
+        {% endfor %}
+      </ul>
+      <p class="ocs-intelligence-about"><strong>How we will verify it:</strong> {{ section.evidence }}</p>
+    </div>
+    {% endfor %}
+  </section>
+
+  <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.researchQuestionsNote }}</p>
+
   {% for item in data.researchQuestions %}
   <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">{{ item.label }}</h3>
+    <h3 class="ocs-intelligence-section-title">{{ item.label }}{% if item.priority %} · {{ item.priority }}{% endif %}</h3>
     <p class="ocs-intelligence-question">{{ item.question }}</p>
     <div class="ocs-intelligence-facts">
       {% for fact in item.facts %}
@@ -70,12 +128,15 @@
       </div>
       {% endfor %}
     </div>
+    {% if item.endpoint %}
+    <p class="ocs-intelligence-about"><strong>Research endpoint:</strong> {{ item.endpoint }}</p>
+    {% endif %}
   </div>
   {% endfor %}
 
   <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Two phases, one promise</h3>
-    <p class="ocs-intelligence-about">The tabs are the implementation path. First the gift becomes a live service. Then that service has to survive a class.</p>
+    <h3 class="ocs-intelligence-section-title">Three phases, one promise</h3>
+    <p class="ocs-intelligence-about">The tabs are the implementation path. First we name the problem and pick a direction. Then the gift becomes a live service. Then that service has to survive a class.</p>
     <div class="ocs-intelligence-phase-grid">
       {% for stage in data.stages %}
       <a href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/" class="ocs-intelligence-phase-card">
@@ -104,16 +165,21 @@
   </div>
 
   <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Justification</h3>
-    <div class="ocs-intelligence-diagram">
-      <pre class="mermaid">flowchart TD
-    A[Paid subscriptions] --> B[Donated GPU rack]
-    B --> C[Host open models locally]
-    C --> D[Electricity only]
-    D --> E[Stream, keys, harness]
-    E --> F[Student on another network]
-    F --> G[Same chance to code with a model]</pre>
+    <p class="ocs-intelligence-gift-kicker">{{ data.communication.kicker }}</p>
+    <h3 class="ocs-intelligence-section-title">{{ data.communication.title }}</h3>
+    <p class="ocs-intelligence-about">{{ data.communication.body }}</p>
+    <div class="ocs-intelligence-facts">
+      {% for channel in data.communication.channels %}
+      <div class="ocs-intelligence-visual">
+        <span class="ocs-intelligence-team-label">{{ channel.label }}</span>
+        <p class="ocs-intelligence-about">{{ channel.text }}</p>
+      </div>
+      {% endfor %}
     </div>
+  </div>
+
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Justification</h3>
     <p class="ocs-intelligence-about">{{ data.harnesses }}</p>
   </div>
 
@@ -154,7 +220,7 @@
       </div>
 
       <div class="ocs-intelligence-details">
-        <h3 class="ocs-intelligence-section-title">Why this is important</h3>
+        <h3 class="ocs-intelligence-section-title">Why this is challenging</h3>
         <p class="ocs-intelligence-about">{{ topic.description }}</p>
 
         <h3 class="ocs-intelligence-section-title">Goal</h3>

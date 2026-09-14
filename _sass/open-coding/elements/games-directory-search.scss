@@ -1,0 +1,41 @@
+// Search bar and topic filter for the games directory grid.
+
+.games-directory__search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.games-directory__search-input {
+  flex: 1 1 220px;
+  min-width: 200px;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.4rem;
+  background: var(--ui-bg);
+  color: var(--pref-text-color);
+  font-size: 0.9rem;
+}
+
+.games-directory__topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.js-games-topic-filter {
+  cursor: pointer;
+  background: none;
+}
+
+.games-directory__topic--active {
+  background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
+  border-color: var(--pref-accent-color);
+  color: var(--pref-accent-color);
+}
+
+.games-directory__empty {
+  color: var(--text-muted);
+}

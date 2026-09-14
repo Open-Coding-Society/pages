@@ -1,0 +1,14 @@
+// Shared page container for document-style elements.
+
+.ocs__container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: var(--pref-font-family);
+  color: var(--pref-text-color);
+}
+
+.ocs__container,
+.ocs__container * {
+  box-sizing: border-box;
+}

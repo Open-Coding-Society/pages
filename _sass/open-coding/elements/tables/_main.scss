@@ -1,0 +1,36 @@
+// Reusable table element classes.
+// Use .ocs__table-wrap around .ocs__table when horizontal scrolling is needed.
+
+.ocs__table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.ocs__table {
+  @include themed-table;
+  color: var(--pref-text-color);
+
+  th,
+  td {
+    color: var(--pref-text-color);
+    border-color: var(--ui-border);
+  }
+
+  th {
+    background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
+    color: var(--pref-text-color);
+  }
+
+  tbody tr {
+    background: var(--panel);
+
+    &:nth-child(even) {
+      background: color-mix(in srgb, var(--pref-text-color) 4%, var(--panel));
+    }
+
+    &:hover,
+    &:nth-child(even):hover {
+      background: color-mix(in srgb, var(--pref-accent-color) 10%, var(--panel));
+    }
+  }
+}

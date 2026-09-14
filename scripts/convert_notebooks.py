@@ -1262,7 +1262,7 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
     with open(notebook_file, "r", encoding="utf-8") as file:
         notebook = nbformat.read(file, as_version=nbformat.NO_CONVERT)
         front_matter = extract_front_matter(notebook_file, notebook.cells[0])
-        
+
         # Get permalink for runner_id generation
         permalink = front_matter.get('permalink', '')
         

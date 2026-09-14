@@ -9,4 +9,3 @@ description: Redirect to Gamified Home Pilot.
 <script>
   window.location.replace("{{ site.baseurl }}/cs-pathway");
 </script>
-
