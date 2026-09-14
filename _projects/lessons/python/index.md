@@ -31,7 +31,11 @@ permalink: /navigation/py-reference/
         </nav>
     </div>
 
-    {% assign lessons = site.categories.Python | where_exp: "lesson", "lesson.hide != true" | sort: "title" %}
+        {% if site.categories.Python %}
+            {% assign lessons = site.categories.Python | where_exp: "lesson", "lesson.hide != true" | sort: "title" %}
+        {% else %}
+            {% assign lessons = "" | split: "" %}
+        {% endif %}
     <div class="ocs__grid ocs__grid--card cols-3">
         {% for lesson in lessons %}
         <article class="ocs__grid-cell">
