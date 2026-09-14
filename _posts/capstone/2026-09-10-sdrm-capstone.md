@@ -101,4 +101,4 @@ permalink: /capstone/sdrm/
 
 </div>
 
-[San Diego Rescue Mission](https://www.sdrescue.org/) | [Buttons]({{site.baseurl}}/index2) | [Grids]({{site.baseurl}}/index4)
+[San Diego Rescue Mission](https://www.sdrescue.org/) | [Buttons]({{ '/navigation/sass/buttons/' | relative_url }}) | [Grids]({{ '/navigation/sass/grids/' | relative_url }})

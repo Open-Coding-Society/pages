@@ -10,9 +10,9 @@ CSS. Start with the existing classes and composition patterns. Add project CSS
 only for an exceptional visual or interaction that the shared grammar cannot
 express yet.
 
-The examples are demonstrated in [`index2.md`](../../index2.md) for buttons,
-[`index4.md`](../../index4.md) for grids, and [`index5.md`](../../index5.md) for
-container composition.
+The examples are demonstrated in [`buttons.md`](../../navigation/sass/buttons.md) for buttons,
+[`grids.md`](../../navigation/sass/grids.md) for grids, and
+[`containers.md`](../../navigation/sass/containers.md) for container composition.
 
 ## Composition relationship
 
@@ -41,7 +41,7 @@ the grid. Images belong inside the card or grid cell that explains them. Buttons
 belong beside the content they act on, while navigation buttons belong in an
 `ocs__links` group or a capstone navigation wrapper.
 
-Example composition, also demonstrated live in [`index5.md`](../../index5.md).
+Example composition, also demonstrated live in [`containers.md`](../../navigation/sass/containers.md).
 This is the sensible default for a project or nonprofit hub; use a different
 composition only when the content requires it:
 
@@ -151,7 +151,7 @@ Common button classes:
 - `small`, `medium`, `large`: button-scoped sizes
 - `ocs__btn--icon`, `ocs__btn-icon`: icon buttons
 
-See [`elements/buttons`](elements/buttons) and [`index2.md`](../../index2.md).
+See [`elements/buttons`](elements/buttons) and [`buttons.md`](../../navigation/sass/buttons.md).
 
 ### Layout and containers
 
@@ -176,7 +176,7 @@ Common layout classes:
 - `ocs__grid-cell--header`, `--accent`, `--muted`, `--wide`: cell modifiers
 
 See [`elements/containers`](elements/containers), [`elements/grids`](elements/grids),
-and [`index4.md`](../../index4.md).
+and [`grids.md`](../../navigation/sass/grids.md).
 
 ### Tables
 

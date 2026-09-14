@@ -148,4 +148,4 @@ This PR updates the capstone overview only. Feature implementation and stakehold
 
 **Powered by OCS grids and buttons**
 
-[Buttons]({{ '/index2' | relative_url }}) | [Grids]({{ '/index4' | relative_url }})
+[Buttons]({{ '/navigation/sass/buttons/' | relative_url }}) | [Grids]({{ '/navigation/sass/grids/' | relative_url }})

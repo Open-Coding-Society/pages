@@ -1,11 +1,15 @@
 ---
-layout: post 
-title: Portfolio Home 4
+layout: post
+title: SASS Grids Grammar
+description: Explore the Open Coding Society grid grammar through living examples.
 hide: true
 show_reading_time: false
+permalink: /navigation/sass/grids/
 ---
 
 <!-- markdownlint-disable MD033 MD046 -->
+
+{% include sass-nav.html %}
 
 Hi! My name is [Your Full Name]
 

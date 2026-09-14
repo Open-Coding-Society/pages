@@ -103,4 +103,4 @@ permalink: /capstone/poway-scripps-rotary/
 
 **Powered by OCS grids and buttons**
 
-[Buttons]({{site.baseurl}}/index2) | [Grids]({{site.baseurl}}/index4)
+[Buttons]({{ '/navigation/sass/buttons/' | relative_url }}) | [Grids]({{ '/navigation/sass/grids/' | relative_url }})
