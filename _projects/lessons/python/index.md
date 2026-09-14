@@ -1,5 +1,6 @@
 ---
 layout: opencs
+courses: { csp: {week: 1} }
 title: Python Reference
 description: Search and browse Python lessons, references, and interactive examples.
 search_exclude: true
