@@ -2,10 +2,11 @@ PROJECT_NAME = javascript
 WORKSPACE_ROOT = ../../..
 WORKSPACE_ROOT_ABS = $(abspath $(WORKSPACE_ROOT))
 SOURCE_ROOT = notebooks
-DEST_ROOT = $(WORKSPACE_ROOT)/_notebooks/CSSE/JavaScriptLessons
+DEST_ROOT = $(WORKSPACE_ROOT)/_notebooks/projects/javascript
 DEST_ROOT_ABS = $(abspath $(DEST_ROOT))
 PAGE_DEST = $(WORKSPACE_ROOT)/_posts/projects/2026-09-13-javascript.md
 STALE_PAGE_DEST = $(WORKSPACE_ROOT)/_posts/projects/2026-04-15-javascript.md
+LEGACY_DEST_ROOT = $(WORKSPACE_ROOT)/_notebooks/CSSE/JavaScriptLessons
 
 NOTEBOOKS = $(shell find $(SOURCE_ROOT) -maxdepth 1 -type f -name '*.ipynb')
 
@@ -36,4 +37,5 @@ clean:
 	@for notebook in $(NOTEBOOKS); do \
 		filename=$$(basename "$$notebook"); \
 		rm -f "$(DEST_ROOT)/$$filename"; \
+		rm -f "$(LEGACY_DEST_ROOT)/$$filename"; \
 	done
