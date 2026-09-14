@@ -24,7 +24,7 @@ permalink: /capstone/oak/
     </div>
 
     <div class="ocs__grid-cell">
-        <img src="{{ '/images/capstone/oak.png' | relative_url }}" alt="Oncology and Kids capstone project" loading="lazy">
+        <img src="{{ '/images/capstone/oak.png' | relative_url }}" alt="Oncology and Kids capstone project" loading="lazy" style="max-width: 220px; width: 100%; height: auto; display: block; margin: 0 auto;">
         <p><strong>Project focus:</strong> educational modules, community support, mood check-ins, interactive games, reading level filters, risk education, and a kid-friendly learning experience.</p>
     </div>
 </div>
@@ -32,42 +32,12 @@ permalink: /capstone/oak/
 <br>
 
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://oncologyandkids.org/" target="_blank" rel="noreferrer noopener">
-        <span>Official Website</span>
+    <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://github.com/undergroundrapclub/oak_spring" target="_blank" rel="noreferrer noopener">
+        <span>Backend Repository</span>
     </a>
-    <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="#core-experience">
-        <span>Core Experience</span>
+    <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="https://oncologyandkids.org/" target="_blank" rel="noreferrer noopener">
+        <span>Frontend</span>
     </a>
-</div>
-
-<br>
-
----
-
-## Core experience
-
-> Four connected parts of the user journey, from learning about cancer to feeling supported and included in a community.
-
-<div class="ocs__grid ocs__grid--card">
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>01 · Learn in a simpler way</strong>
-        <p>Provide accessible learning modules that explain cancer in a more understandable and age-appropriate way through interactive content.</p>
-    </div>
-
-    <div class="ocs__grid-cell">
-        <strong>02 · Connect with others</strong>
-        <p>Create a supportive space where children, families, and patients can engage with a community and find encouragement through shared experiences.</p>
-    </div>
-
-    <div class="ocs__grid-cell">
-        <strong>03 · Play and explore</strong>
-        <p>Include games and interactive activities that make the experience more engaging, uplifting, and enjoyable for users of all ages.</p>
-    </div>
-
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>04 · Feel informed and supported</strong>
-        <p>Use tools like reading level filters, check-ins, and educational activities to help users understand what they are experiencing with less stress and more confidence.</p>
-    </div>
 </div>
 
 <br>
@@ -226,7 +196,3 @@ permalink: /capstone/oak/
 </div>
 
 <br>
-
-<div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn large alert-green iridescent" href="https://oncologyandkids.org/" target="_blank" rel="noreferrer noopener">Official Website</a>
-</div>
