@@ -4,7 +4,7 @@ This project contains the living SASS grammar lessons for the Open Coding Societ
 
 ## Source layout
 
-- `index.ipynb` is the lesson hub and is converted by the notebook pipeline.
+- `index.md` is the SASS reference catalog and project hub.
 - `navigation/` contains the button, grid, and container lesson pages plus their shared navigation include.
 - `_sass/open-coding/README.md` remains the reusable grammar reference.
 

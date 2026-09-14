@@ -1,10 +1,9 @@
 ---
 layout: opencs
-courses: { csse: {week: 5} }
-title: JavaScript Reference
-description: Search and browse JavaScript lessons, references, and interactive examples.
+title: SASS Reference
+description: Search and browse SASS grammar lessons and living examples.
 search_exclude: true
-permalink: /navigation/js-reference/
+permalink: /navigation/sass/
 ---
 
 <!-- markdownlint-disable MD033 MD046 -->
@@ -13,25 +12,29 @@ permalink: /navigation/js-reference/
 <script type="text/javascript" src="{{ '/assets/js/vendor/lunr.min.js' | relative_url }}"></script>
 
 <div class="ocs__container" id="language-reference">
-    <div class="ocs__badge">Lessons · JavaScript</div>
-    <h1>JavaScript Reference</h1>
+    <div class="ocs__badge">Lessons · SASS</div>
+    <h1>SASS Reference</h1>
 
     <div class="language-reference__toolbar">
-        <div class="language-reference__search search" aria-label="Search JavaScript lessons">
+        <div class="language-reference__search search" aria-label="Search SASS lessons">
             <div class="search-input-wrap">
-                <input type="text" class="js-search-input search-input input-block form-control" placeholder="Search JavaScript lessons" aria-label="Search JavaScript lessons" autocomplete="off">
+                <input type="text" class="js-search-input search-input input-block form-control" placeholder="Search SASS lessons" aria-label="Search SASS lessons" autocomplete="off">
             </div>
             <div class="js-search-results search-results-wrap"></div>
         </div>
         <nav class="ocs__links ocs__links--wide" aria-label="Language reference navigation">
-            <a class="ocs__btn pill accent fill" href="{{ '/navigation/js-reference/' | relative_url }}" aria-current="page">JavaScript</a>
+            <a class="ocs__btn pill" href="{{ '/navigation/js-reference/' | relative_url }}">JavaScript</a>
             <a class="ocs__btn pill" href="{{ '/navigation/py-reference/' | relative_url }}">Python</a>
             <a class="ocs__btn pill" href="{{ '/navigation/java-reference/' | relative_url }}">Java</a>
-            <a class="ocs__btn pill" href="{{ '/navigation/sass/' | relative_url }}">SASS</a>
+            <a class="ocs__btn pill accent fill" href="{{ '/navigation/sass/' | relative_url }}" aria-current="page">SASS</a>
         </nav>
     </div>
 
-    {% assign lessons = site.categories.JavaScript | where_exp: "lesson", "lesson.hide != true" | sort: "title" %}
+    {% if site.categories.SASS %}
+      {% assign lessons = site.categories.SASS | where_exp: "lesson", "lesson.hide != true" | sort: "title" %}
+    {% else %}
+      {% assign lessons = "" | split: "" %}
+    {% endif %}
     <div class="ocs__grid ocs__grid--card cols-3">
         {% for lesson in lessons %}
         <article class="ocs__grid-cell">
