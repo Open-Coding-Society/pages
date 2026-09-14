@@ -14,19 +14,19 @@ permalink: /navigation/java-reference/
 <div class="ocs__container" id="language-reference">
     <div class="ocs__badge">Lessons · Java</div>
     <h1>Java Reference</h1>
-    <p class="ocs__description">Browse Java reference material and interactive examples.</p>
 
-    <nav class="ocs__links ocs__links--wide" aria-label="Language reference navigation">
-        <a class="ocs__btn pill" href="{{ '/navigation/js-reference/' | relative_url }}">JavaScript</a>
-        <a class="ocs__btn pill" href="{{ '/navigation/py-reference/' | relative_url }}">Python</a>
-        <a class="ocs__btn pill accent fill" href="{{ '/navigation/java-reference/' | relative_url }}" aria-current="page">Java</a>
-    </nav>
-
-    <div class="search" aria-label="Search Java lessons">
-        <div class="search-input-wrap">
-            <input type="text" class="js-search-input search-input input-block form-control" placeholder="Search Java lessons" aria-label="Search Java lessons" autocomplete="off">
+    <div class="language-reference__toolbar">
+        <div class="language-reference__search search" aria-label="Search Java lessons">
+            <div class="search-input-wrap">
+                <input type="text" class="js-search-input search-input input-block form-control" placeholder="Search Java lessons" aria-label="Search Java lessons" autocomplete="off">
+            </div>
+            <div class="js-search-results search-results-wrap"></div>
         </div>
-        <div class="js-search-results search-results-wrap"></div>
+        <nav class="ocs__links ocs__links--wide" aria-label="Language reference navigation">
+            <a class="ocs__btn pill" href="{{ '/navigation/js-reference/' | relative_url }}">JavaScript</a>
+            <a class="ocs__btn pill" href="{{ '/navigation/py-reference/' | relative_url }}">Python</a>
+            <a class="ocs__btn pill accent fill" href="{{ '/navigation/java-reference/' | relative_url }}" aria-current="page">Java</a>
+        </nav>
     </div>
 
     {% assign lessons = site.categories.Java | where_exp: "lesson", "lesson.hide != true" | sort: "title" %}
