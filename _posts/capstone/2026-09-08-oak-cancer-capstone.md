@@ -87,9 +87,3 @@ permalink: /capstone/oak/
     </div>
 
 </div>
-
-**Powered by OCS grids and buttons**
-
-[Open project]({{ site.baseurl }}/capstone/oak/)
-
-[Buttons]({{ '/navigation/sass/buttons/' | relative_url }}) | [Grids]({{ '/navigation/sass/grids/' | relative_url }})
