@@ -8,7 +8,7 @@ lesson_topic: Buttons
 lesson_part: interactive
 lesson_type: lesson
 microblog: true
-permalink: /navigation/sass/buttons/
+permalink: /sass/buttons/
 ---
 
 <!-- markdownlint-disable MD033 MD046 -->

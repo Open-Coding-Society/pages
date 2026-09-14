@@ -1,14 +1,17 @@
 ---
 layout: post
-title: Aesthetihawk Guide - Toggles
-categories: [SASS]
-permalink: /aesthetihawk-guide-toggles
+title: Toggles Guide Aesthetihawk
+categories: [SASS, Toggles]
+lesson_language: SASS
+lesson_topic: Toggles
+lesson_part: interactive
+lesson_type: lesson
+microblog: true
 author: Aashray Reddy
-menu: nav/aesthetihawk-guide.html
-toc: false
+permalink: /sass/toggles
 ---
 
-## Switches (Toggles)
+## Switches (refactor Toggles for open-coding)
 
 ### How to Use
 

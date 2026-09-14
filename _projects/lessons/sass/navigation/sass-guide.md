@@ -1,16 +1,17 @@
 ---
 layout: post
-title: Converting CSS to SASS Guide
+title: CSS to SASS Guide (refactor for OCS)
 description: How to properly convert CSS files to SASS in this website
 categories: [SASS]
-permalink: /css-to-sass-guide
+microblog: true
 author: Ahaan
-toc: true
+permalink: /sass/guide
 ---
 
-## What is SASS and Why Use It?
+## What is SASS and Why Use It? (refactor for opencoding)
 
 **SASS** (Syntactically Awesome Style Sheets) is a CSS preprocessor that makes your styles:
+
 - **Easier to maintain** - Use variables for colors, sizes, fonts
 - **More organized** - Nest selectors logically
 - **Reusable** - Create mixins and functions
@@ -32,7 +33,7 @@ toc: true
 
 ### The Import Chain (How Files Connect)
 
-```
+```text
 _sass/minima/custom-styles.scss  ← ENTRY POINT (Jekyll starts here)
     ↓
 imports opencs-color-map.scss    ← Maps variables to CSS custom properties
@@ -47,6 +48,7 @@ imports all component .scss files ← Your styles end up here
 ### What This Means For You
 
 When you create a new `.scss` file, you need to:
+
 1. Put it in the right folder (`_sass/open-coding/`)
 2. Import it in `_main.scss` so Jekyll knows about it
 3. Jekyll will automatically compile everything into one CSS file
@@ -62,6 +64,7 @@ Let's convert a real CSS file to SASS. We'll use `leaderboard.css` as our exampl
 First, locate the CSS file you want to convert.
 
 **Common locations for CSS files:**
+
 - `assets/css/your-file.css`
 - Inline `<style>` tags in HTML/Markdown files
 
@@ -164,11 +167,10 @@ Now that it works, let's make it *better* using SASS features.
 
 ### Improvement 1: Replace Hardcoded Colors
 
-### Improvement 1: Replace Hardcoded Colors
-
 Find hex codes and replace with variables:
 
 **Before:**
+
 ```scss
 .button {
     background: #4CAFEF;
@@ -178,6 +180,7 @@ Find hex codes and replace with variables:
 ```
 
 **After:**
+
 ```scss
 .button {
     background: $accent;      // #4CAFEF
@@ -191,6 +194,7 @@ Find hex codes and replace with variables:
 Group related selectors together:
 
 **Before (CSS):**
+
 ```css
 .card { background: #1F1F1F; }
 .card .header { font-size: 20px; }
@@ -200,6 +204,7 @@ Group related selectors together:
 ```
 
 **After (SASS):**
+
 ```scss
 .card {
     background: $bg-2;
@@ -229,6 +234,7 @@ Group related selectors together:
 For values used multiple times in your file:
 
 **Before:**
+
 ```scss
 .box1 { border-radius: 16px; padding: 20px; }
 .box2 { border-radius: 16px; padding: 20px; }
@@ -236,6 +242,7 @@ For values used multiple times in your file:
 ```
 
 **After:**
+
 ```scss
 // Local variables (at top of file)
 $card-radius: 16px;
@@ -293,7 +300,7 @@ These are defined in `_sass/root-color-map.scss` - use them instead of hex codes
 
 ## File Structure Overview
 
-```
+```text
 _sass/
 ├── root-color-map.scss      ← All color variables defined here
 ├── opencs-color-map.scss    ← Maps SASS vars → CSS custom properties
@@ -327,29 +334,35 @@ _sass/
 Use this checklist every time you convert a file:
 
 ### Before Starting
+
 - [ ] Identify the CSS file to convert
 - [ ] Note where it's currently loaded (which pages use it)
 
 ### Creating the SCSS File
+
 - [ ] Create new file: `_sass/open-coding/your-file.scss`
 - [ ] Add `@import "materials/main.scss";` at the top
 - [ ] Copy CSS content into the file
 
 ### Registering the File
+
 - [ ] Open `_sass/open-coding/_main.scss`
 - [ ] Add `@import "your-file";` (no .scss extension)
 
 ### Cleanup
+
 - [ ] Delete old CSS file from `assets/css/`
 - [ ] Remove any `<link>` tags loading the old CSS
 - [ ] Search for inline styles that could be moved
 
 ### Testing
+
 - [ ] Run `make` or `bundle exec jekyll serve`
 - [ ] Check terminal for SASS errors
 - [ ] View the page in browser to verify styles work
 
 ### Optional Improvements
+
 - [ ] Replace hex colors with `$variables`
 - [ ] Add nesting for cleaner code
 - [ ] Create local variables for repeated values
@@ -360,11 +373,12 @@ Use this checklist every time you convert a file:
 
 ### Error: "File to import not found"
 
-```
+```text
 Error: File to import not found or unreadable: materials/main.scss
 ```
 
 **Fix:** Check your import path. From `_sass/open-coding/`, use:
+
 ```scss
 @import "materials/main.scss";  // Correct
 @import "../materials/main.scss";  // Wrong
@@ -372,22 +386,24 @@ Error: File to import not found or unreadable: materials/main.scss
 
 ### Error: "Undefined variable"
 
-```
+```text
 Error: Undefined variable: "$accent"
 ```
 
 **Fix:** Make sure you have the import at the top of your file:
+
 ```scss
 @import "materials/main.scss";  // This gives you access to variables
 ```
 
 ### Error: "Invalid CSS"
 
-```
+```text
 Error: Invalid CSS after "..."
 ```
 
 **Fix:** SASS is stricter than browsers. Check for:
+
 - Missing semicolons
 - Unclosed brackets
 - Invalid property values
@@ -395,6 +411,7 @@ Error: Invalid CSS after "..."
 ### Styles Not Showing Up
 
 **Possible causes:**
+
 1. Forgot to add import in `_main.scss`
 2. Old CSS file still being loaded (check for `<link>` tags)
 3. Browser cache - try hard refresh (`Cmd+Shift+R`)
@@ -450,6 +467,7 @@ Let's see a complete before/after conversion:
 ```
 
 ### Converted SASS File
+
 **`_sass/open-coding/leaderboard.scss`**
 
 ```scss
@@ -530,6 +548,7 @@ Converting CSS to SASS is a 7-step process:
 7. **Build** and test
 
 Then optionally improve with:
+
 - Variable substitution
 - Nesting
 - Local variables

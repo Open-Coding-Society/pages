@@ -1,14 +1,16 @@
 ---
 layout: post
-title: Aesthetihawk Guide - Typography
+title: SASS Typpography Aesthetihawk
 categories: [SASS]
-permalink: /aesthetihawk-guide-typography
+lesson_topic: Typpography
+lesson_part: interactive
+lesson_type: lesson
+microblog: true
 author: Aashray Reddy
-menu: nav/aesthetihawk-guide.html
-toc: false
+permalink: /sass/typography
 ---
 
-## Typography
+## Typography (refactor for opencoding)
 
 ### How to Use
 

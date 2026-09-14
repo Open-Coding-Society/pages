@@ -8,7 +8,7 @@ lesson_topic: Grids
 lesson_part: interactive
 lesson_type: lesson
 microblog: true
-permalink: /navigation/sass/grids/
+permalink: /sass/grids/
 ---
 
 <!-- markdownlint-disable MD033 MD046 -->
