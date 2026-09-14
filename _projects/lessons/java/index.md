@@ -1,6 +1,6 @@
 ---
 layout: opencs
-courses: { csa: {week: 1} }
+courses: { csa: {week: 5} }
 title: Java Reference
 description: Search and browse Java lessons, references, and interactive examples.
 search_exclude: true
