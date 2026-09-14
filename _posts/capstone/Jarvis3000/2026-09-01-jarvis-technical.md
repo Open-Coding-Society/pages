@@ -21,14 +21,14 @@ rp_active: technical
 
   <!-- Header -->
   <div class="jv-header">
-    <div class="jv-badge">Technical Specification · Architecture &amp; Lifecycle</div>
-    <h1 class="jv-page-title">Technical Detail &amp; System Flow</h1>
-    <p class="jv-description">In-depth state machines, capture loops, data schemas, and privacy governance models underpinning the Jarvis classroom perception pipeline.</p>
+    <div class="ocs__badge">Technical Specification · Architecture &amp; Lifecycle</div>
+    <h1 class="jv-title">Technical Detail &amp; System Flow</h1>
+    <p class="ocs__description">In-depth state machines, capture loops, data schemas, and privacy governance models underpinning the Jarvis classroom perception pipeline.</p>
   </div>
 
   <!-- Capture and processing loop -->
-  <div class="jv-section-label">Capture &amp; Processing Logic</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Capture &amp; Processing Logic</h2>
+  <div class="ocs__card">
     <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 0.25rem;">Each capture cycle creates a timestamped observation. Jarvis preserves the original frame, processes it through YOLO and SAM 3, and compares the result with recent observations before changing the room model.</p>
     <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">sequenceDiagram
@@ -51,8 +51,8 @@ rp_active: technical
   </div>
 
   <!-- Detection and tracking lifecycle -->
-  <div class="jv-section-label">Detection &amp; Tracking Lifecycle</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Detection &amp; Tracking Lifecycle</h2>
+  <div class="ocs__card">
     <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">flowchart LR
     A[YOLO detection] --> B["SAM 3 mask
@@ -83,8 +83,8 @@ and observation record"]
   </div>
 
   <!-- Design decisions -->
-  <div class="jv-section-label">Design Decisions &amp; Rationale</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Design Decisions &amp; Rationale</h2>
+  <div class="ocs__card">
     <div class="jv-decision-grid">
       <div class="jv-decision-card">
         <span class="jv-decision-title">Two cameras, opposite sides</span>
@@ -138,8 +138,8 @@ and observation record"]
   </div>
 
   <!-- Privacy / governance -->
-  <div class="jv-section-label">Privacy, Scope &amp; Governance</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Privacy, Scope &amp; Governance</h2>
+  <div class="ocs__card">
     <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Jarvis is designed to understand classroom objects, not identify or monitor individual people:</p>
     <div class="ocs__table-wrap">
       <table class="ocs__table">
@@ -154,14 +154,14 @@ and observation record"]
         </tbody>
       </table>
     </div>
-    <div class="ocs__callout ocs__callout">
+    <div class="ocs__callout">
       <span>A generic person mask may explain why a previously confirmed object is temporarily invisible. In that case, Jarvis should prefer <span class="jv-code">OCCLUDED</span> over immediately changing the object to <span class="jv-code">MISSING</span>.</span>
     </div>
   </div>
 
   <!-- People Occupancy Tracking -->
-  <div class="jv-section-label">People Occupancy Tracking</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">People Occupancy Tracking</h2>
+  <div class="ocs__card">
     <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Generic <span class="jv-code">person</span> detections are counted, not identified, to produce a room occupancy number and flag presence at unexpected hours.</p>
     <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">flowchart LR
@@ -190,14 +190,14 @@ occupancy"]</pre>
         <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">0</span><div class="jv-occupancy-bar-fill" style="height:1%;background:var(--jv-red);"></div><span class="jv-occupancy-bar-label">9p+</span></div>
       </div>
     </div>
-    <div class="ocs__callout ocs__callout">
+    <div class="ocs__callout">
       <span>Counts only, no identity &mdash; consistent with the privacy design above.</span>
     </div>
   </div>
 
   <!-- Hardware / Bill of Materials -->
-  <div class="jv-section-label">Hardware / Bill of Materials</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Hardware / Bill of Materials</h2>
+  <div class="ocs__card">
     <div class="jv-bom-grid">
       <div class="jv-bom-card">
         <div class="jv-bom-thumb"><img src="/images/capstone/jarvis-bom/brio-webcam.png" alt="Logitech BRIO webcam"></div>
@@ -242,17 +242,17 @@ occupancy"]</pre>
         <p class="jv-bom-note">Cross-network SSH + transfer.</p>
       </div>
     </div>
-    <div class="ocs__callout ocs__callout">
+    <div class="ocs__callout">
       <span>Costs are rough estimates; camera mount and Linux computer photos are representative, not the exact model.</span>
     </div>
-    <div class="ocs__callout ocs__callout">
+    <div class="ocs__callout">
       <span><strong style="color:var(--jv-text);">Open problem:</strong> camera height, angle, overlap, and cable routing still need on-site testing.</span>
     </div>
   </div>
 
   <!-- In-Depth Timeline -->
-  <div class="jv-section-label">In-Depth Timeline</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">In-Depth Timeline</h2>
+  <div class="ocs__card">
     <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Build schedule through end of November. First two weeks are camera research only, no recognition work.</p>
     <div class="jv-timeline-bar">
       <div class="jv-timeline-seg" style="flex:14 1 0%;background:var(--jv-accent);">Phase 1</div>
@@ -267,7 +267,7 @@ occupancy"]</pre>
       <div class="jv-timeline-legend-item"><span class="jv-timeline-legend-dot" style="background:var(--jv-amber);"></span>Phase 2 &middot; Recognition &amp; segmentation</div>
       <div class="jv-timeline-legend-item"><span class="jv-timeline-legend-dot" style="background:var(--jv-purple);"></span>Phase 3 &middot; Tracking &amp; room model</div>
     </div>
-    <div class="ocs__callout ocs__callout">
+    <div class="ocs__callout">
       <span>Dates track the <a href="/capstone/jarvis/" style="color:var(--jv-accent);">Project Phases</a> on the Overview tab and may shift with CPU benchmarking results.</span>
     </div>
   </div>

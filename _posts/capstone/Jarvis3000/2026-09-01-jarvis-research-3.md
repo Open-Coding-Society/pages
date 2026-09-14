@@ -21,27 +21,27 @@ rp_active: research-3
 
   <!-- Header -->
   <div class="jv-header">
-    <div class="jv-badge">Research Area 3 · Computer Vision · Spatial Awareness · Classroom Safety</div>
-    <h1 class="jv-page-title">Multi-Camera Spatial Perception &amp; Distance Estimation</h1>
-    <p class="jv-description">Two Logitech BRIO 4K cameras, mounted on opposite sides of the room.</p>
+    <div class="ocs__badge">Research Area 3 · Computer Vision · Spatial Awareness · Classroom Safety</div>
+    <h1 class="jv-title">Multi-Camera Spatial Perception &amp; Distance Estimation</h1>
+    <p class="ocs__description">Two Logitech BRIO 4K cameras, mounted on opposite sides of the room.</p>
     <p style="font-size:0.8rem;color:var(--jv-text-muted);margin-top:0.5rem;">Individual research by <strong style="color:var(--jv-text);">Sonika Dhenuva Konda</strong></p>
   </div>
 
   <!-- Problem Statement -->
-  <div class="jv-section-label">Problem Statement</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Problem Statement</h2>
+  <div class="ocs__card">
     <p style="font-size:0.9rem;line-height:1.7;color:var(--jv-text-muted);margin:0;">People and equipment constantly move around a busy classroom. A standard camera can see what's in the room, but not how far away it is or where it sits in 3D. Two wide-spaced cameras, fused with depth models and geometry, can fix that.</p>
   </div>
 
   <!-- Research Question -->
-  <div class="jv-section-label">Research Question</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Research Question</h2>
+  <div class="ocs__card">
     <p class="jv-question">How can a setup of two wide-spaced 4K cameras combine separate 2D video feeds using deep learning models and geometry to accurately measure real-world distances and build a continuous 3D spatial map of a classroom?</p>
   </div>
 
   <!-- Pipeline diagram -->
-  <div class="jv-section-label">Pipeline</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Pipeline</h2>
+  <div class="ocs__card">
     <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">flowchart TD
     C1["Camera 1, BRIO
@@ -67,8 +67,8 @@ Object boxes"]
   </div>
 
   <!-- Equipment, Libraries, AI Models -->
-  <div class="jv-section-label">Equipment, Libraries &amp; AI Models</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Equipment, Libraries &amp; AI Models</h2>
+  <div class="ocs__card">
     <div class="jv-decision-grid">
       <div class="jv-decision-card">
         <span class="jv-decision-title">2× Logitech BRIO 4K</span>
@@ -106,8 +106,8 @@ Object boxes"]
   </div>
 
   <!-- Background Research: depth-sensing approaches -->
-  <div class="jv-section-label">Background: How Machines Sense Depth</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Background: How Machines Sense Depth</h2>
+  <div class="ocs__card">
     <div class="jv-decision-grid">
       <div class="jv-decision-card">
         <span class="jv-decision-title">Stereo Vision (chosen)</span>
@@ -129,8 +129,8 @@ Object boxes"]
   </div>
 
   <!-- Academic Research Papers -->
-  <div class="jv-section-label">Academic Research Papers</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Academic Research Papers</h2>
+  <div class="ocs__card">
     <div class="jv-paper-grid">
       <div class="jv-paper-card">
         <a class="jv-paper-title" href="https://arxiv.org/abs/2406.09414" target="_blank" rel="noopener">Depth Anything V2</a>
@@ -186,8 +186,8 @@ Object boxes"]
   </div>
 
   <!-- Patent Reference -->
-  <div class="jv-section-label">Patent Reference</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Patent Reference</h2>
+  <div class="ocs__card">
     <div class="jv-paper-grid">
       <div class="jv-paper-card">
         <a class="jv-paper-title" href="https://patents.google.com/patent/US11321876B2" target="_blank" rel="noopener">Non-rigid Stereo Vision Camera System</a>
@@ -203,8 +203,8 @@ Object boxes"]
   </div>
 
   <!-- Online Sources -->
-  <div class="jv-section-label">Online Sources</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Online Sources</h2>
+  <div class="ocs__card">
     <div class="jv-paper-grid">
       <div class="jv-paper-card">
         <a class="jv-paper-title" href="https://www.e-consystems.com/blog/camera/technology/the-ultimate-guide-to-depth-perception-and-3d-imaging-technologies/" target="_blank" rel="noopener">e-con Systems: Depth Perception &amp; 3D Imaging</a>
