@@ -4,98 +4,229 @@ microblog: true
 toc: false
 layout: post
 title: Oncology and Kids
+description: >
+  Capstone project creating an interactive and educational website for cancer patients
+  and families, with community support, learning modules, and games.
+categories: [Capstone]
 permalink: /capstone/oak/
 
 ---
 
-<div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
+> **Student capstone · In development.** This project aims to create a more engaging, supportive, and educational digital experience for cancer patients and their families. It is a student-built concept and is not a medical platform or official cancer-care service.
 
-    <div class="ocs__grid-cell ocs__grid-cell--header">About the Project</div>
+<div class="ocs__grid ocs__grid--standard cols-2">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Oncology and Kids · Capstone</div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>The Basics and What It Aims to Do</strong>
-        <p>This capstone project is designed to connect and educate cancer patients and their families through a more engaging, accessible digital experience. Our goal is to create a platform that helps users understand cancer at a biological level through interactive educational modules while also creating opportunities for connection and community through multiplayer games and collaborative experiences. Rather than relying on long text-heavy pages, the project aims to make information easier to navigate, more visually engaging, and more approachable for users of all ages.</p>
-        <a class="ocs__btn alert-green fill small" href="#about-the-project">
-            Project Overview
-        </a>
+        <strong>Connecting learning, care, and community</strong>
+        <p>This capstone project is designed to make cancer education and support more accessible, interactive, and welcoming. The goal is to help patients and families learn about cancer in an easier way while also creating a space for connection, play, and encouragement.</p>
+        <p><strong>Experience:</strong> learn → connect → explore → play → feel supported</p>
     </div>
 
     <div class="ocs__grid-cell">
-        <strong>Why We Chose This Project</strong>
-        <p>We chose this project because we wanted to help children with cancer feel more included, informed, and supported. Many young patients spend significant time in hospitals, at home, or away from school and their peers, which can make them feel isolated. We wanted to build a website that provides both education and connection, giving children a place to learn, play, and engage with others who understand their experiences. We also wanted to create something more interactive and welcoming than a standard informational cancer website.</p>
-        <a class="ocs__btn alert-yellow fill small" href="#why-we-chose-this-project">
-            Why This Project
-        </a>
+        <img src="{{ '/images/capstone/oak.png' | relative_url }}" alt="Oncology and Kids capstone project" loading="lazy">
+        <p><strong>Project focus:</strong> educational modules, community support, mood check-ins, interactive games, reading level filters, risk education, and a kid-friendly learning experience.</p>
+    </div>
+</div>
+
+<br>
+
+<div class="ocs__links ocs__links--wide">
+    <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://oncologyandkids.org/" target="_blank" rel="noreferrer noopener">
+        <span>Official Website</span>
+    </a>
+    <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="#core-experience">
+        <span>Core Experience</span>
+    </a>
+</div>
+
+<br>
+
+---
+
+## Core experience
+
+> Four connected parts of the user journey, from learning about cancer to feeling supported and included in a community.
+
+<div class="ocs__grid ocs__grid--card">
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>01 · Learn in a simpler way</strong>
+        <p>Provide accessible learning modules that explain cancer in a more understandable and age-appropriate way through interactive content.</p>
+    </div>
+
+    <div class="ocs__grid-cell">
+        <strong>02 · Connect with others</strong>
+        <p>Create a supportive space where children, families, and patients can engage with a community and find encouragement through shared experiences.</p>
+    </div>
+
+    <div class="ocs__grid-cell">
+        <strong>03 · Play and explore</strong>
+        <p>Include games and interactive activities that make the experience more engaging, uplifting, and enjoyable for users of all ages.</p>
     </div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Our Team</strong>
-        <p>Our team consists of Salma, Isha, Aashi, and Emily. Salma serves as our Scrum Master, helping guide project organization, communication, and team coordination. Isha, Aashi, and Emily are our developers and programmers, and together we are responsible for building the website, designing educational content, and creating interactive features that support the project’s goals.</p>
-        <a class="ocs__btn alert-green fill small" href="#our-team">
-            Meet the Team
-        </a>
+        <strong>04 · Feel informed and supported</strong>
+        <p>Use tools like reading level filters, check-ins, and educational activities to help users understand what they are experiencing with less stress and more confidence.</p>
     </div>
-
 </div>
 
-<div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
+<br>
 
-    <div class="ocs__grid-cell ocs__grid-cell--header">Core Features</div>
+---
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent" id="community-support">
-        <strong>Community Support</strong>
+## From problem to product direction
+
+<div class="ocs__grid ocs__grid--standard cols-2">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Why we are building it</div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Current challenge</strong>
+        <p>Many cancer resources are difficult to navigate, overly text-heavy, or not designed to feel welcoming for younger patients. Kids with cancer often need a space that is both informative and emotionally supportive.</p>
+    </div>
+
+    <div class="ocs__grid-cell">
+        <strong>Project direction</strong>
+        <p>Build a more engaging and inclusive website that combines education, community support, and interactive play in a way that feels friendly, understandable, and empowering.</p>
+    </div>
+</div>
+
+<br>
+
+---
+
+## Core features
+
+<div class="ocs__grid ocs__grid--card">
+    <div class="ocs__grid-cell">
+        <strong>Community support</strong>
         <p>Create a welcoming space for kids and families to feel connected, supported, and less isolated while navigating cancer treatment and recovery.</p>
-        <a class="ocs__btn alert-green fill small" href="#community-support">
-            Community Support
-        </a>
     </div>
 
-    <div class="ocs__grid-cell" id="daily-check-in">
-        <strong>Daily Check-In</strong>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Daily check-in</strong>
         <p>Offer a simple daily mood check-in so users can share how they are feeling and connect with others in a supportive, low-pressure way.</p>
-        <a class="ocs__btn alert-yellow fill small" href="#daily-check-in">
-            Daily Check-In
-        </a>
     </div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent" id="interactive-games">
-        <strong>Interactive Games</strong>
-        <p>Include fun learning-based games such as puzzles and memory activities to keep the experience engaging, uplifting, and interactive.</p>
-        <a class="ocs__btn alert-green fill small" href="#interactive-games">
-            Interactive Games
-        </a>
+    <div class="ocs__grid-cell">
+        <strong>Interactive games</strong>
+        <p>Include puzzles, memory activities, and playful educational tools that make the experience more enjoyable and interactive.</p>
     </div>
 
-    <div class="ocs__grid-cell" id="reading-levels">
-        <strong>Reading Level Filters</strong>
-        <p>Sort educational content by reading level so children, teens, and parents can access information that feels understandable and age-appropriate.</p>
-        <a class="ocs__btn alert-yellow fill small" href="#reading-levels">
-            Reading Level Filters
-        </a>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Reading level filters</strong>
+        <p>Organize information by age or reading level so kids, teens, and parents can access content that is easier to understand.</p>
     </div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent" id="risk-calculator">
-        <strong>Risk Calculator</strong>
-        <p>Build an educational risk tool that helps users explore health information in a guided and accessible way while encouraging learning.</p>
-        <a class="ocs__btn alert-green fill small" href="#risk-calculator">
-            Risk Calculator
-        </a>
+    <div class="ocs__grid-cell">
+        <strong>Risk calculator</strong>
+        <p>Provide educational guidance through a risk-informed feature that helps users explore relevant health information in a clearer way.</p>
     </div>
 
-    <div class="ocs__grid-cell" id="cell-lab">
-        <strong>Cell Lab</strong>
-        <p>Refresh the old cell lab into a clearer, more engaging learning experience that helps users understand cancer-related science in a simpler way.</p>
-        <a class="ocs__btn alert-yellow fill small" href="#cell-lab">
-            Cell Lab
-        </a>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Cell lab</strong>
+        <p>Refresh the past cell lab concept into a more accessible, interactive learning experience that explains cancer science in a simpler format.</p>
     </div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent" id="body-map">
-        <strong>Body Map</strong>
-        <p>Create a kid-friendly body map tool that makes complex health concepts easier to explore and understand through interaction.</p>
-        <a class="ocs__btn alert-green fill small" href="#body-map">
-            Body Map
-        </a>
+    <div class="ocs__grid-cell">
+        <strong>Body map</strong>
+        <p>Create a kid-friendly body map tool that helps users better understand cancer-related health information through interaction and visual learning.</p>
+    </div>
+</div>
+
+<br>
+
+---
+
+## System flow
+
+> The project is designed as a connected experience where educational content, community features, and interactive tools work together.
+
+<div class="ocs__grid ocs__grid--standard cols-4">
+    <div class="ocs__grid-cell ocs__grid-cell--header">One connected support and learning workflow</div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>1 · User interface</strong>
+        <p>Visitors access educational modules, games, check-ins, and support features through a welcoming and easy-to-navigate website.</p>
     </div>
 
+    <div class="ocs__grid-cell">
+        <strong>2 · User actions</strong>
+        <p>Users explore information, interact with content, participate in activities, and connect with a community designed around support and understanding.</p>
+    </div>
+
+    <div class="ocs__grid-cell">
+        <strong>3 · Content and tools</strong>
+        <p>Educational content, risk-related guidance, and interactive features help make cancer information more helpful and approachable.</p>
+    </div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>4 · Community value</strong>
+        <p>Users leave with more knowledge, stronger support, and a more engaging experience that encourages learning and connection.</p>
+    </div>
+</div>
+
+<br>
+
+---
+
+## Technical foundation
+
+<div class="ocs__grid ocs__grid--card">
+    <div class="ocs__grid-cell">
+        <strong>Frontend</strong>
+        <p>Jekyll, HTML, JavaScript, and accessible web design for a child-friendly learning and support platform.</p>
+    </div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Backend</strong>
+        <p>Python Flask services can support data-backed information, user interactions, and future community or educational workflows.</p>
+    </div>
+
+    <div class="ocs__grid-cell">
+        <strong>Content</strong>
+        <p>Educational modules, reading-level filters, and interactive learning features are designed to make complex information easier to understand.</p>
+    </div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Project goal</strong>
+        <p>Turn the strongest ideas from earlier work into a clear, maintainable product direction focused on inclusion, education, and support.</p>
+    </div>
+</div>
+
+<br>
+
+---
+
+## Our team
+
+> The project brings together a small team focused on building a supportive and engaging educational platform.
+
+<div class="ocs__grid ocs__grid--standard cols-2">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Current project team</div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Salma</strong>
+        <p>Scrum Master</p>
+    </div>
+
+    <div class="ocs__grid-cell">
+        <strong>Isha</strong>
+        <p>Developer</p>
+    </div>
+
+    <div class="ocs__grid-cell">
+        <strong>Aashi</strong>
+        <p>Developer</p>
+    </div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Emily</strong>
+        <p>Developer</p>
+    </div>
+</div>
+
+<br>
+
+<div class="ocs__links ocs__links--wide">
+    <a class="ocs__btn large alert-green iridescent" href="https://oncologyandkids.org/" target="_blank" rel="noreferrer noopener">Official Website</a>
 </div>
