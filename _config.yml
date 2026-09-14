@@ -22,10 +22,15 @@ github_username: open-coding-society
 github_repo: "pages"
 baseurl: ""
 future: true
-# Single source of truth for the Google OAuth client id -- assets/js/api/config.js's
-# GOOGLE_CLIENT_ID and login.md's #g_id_onload data-client_id both pull from this at
-# build time via Liquid, so the two can never drift out of sync with each other again.
-google_client_id: "65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com"
+# google_client_id is intentionally NOT set here -- per John Mortensen's review on
+# PR #1371, it must not be committed to the public repo. It's injected at build time
+# into a gitignored override config instead: locally into _config.local.yml via
+# scripts/generate_local_config_override.sh reading .env (see .env.example), in CI
+# into _config.override.yml via the "Compute and apply baseurl" step in
+# .github/workflows/jekyll-gh-pages.yml (which already generates that file for
+# baseurl) reading a repository secret. Either way, assets/js/api/config.js's
+# GOOGLE_CLIENT_ID and login.md's #g_id_onload data-client_id pull the same
+# google_client_id key via Liquid -- one source of truth, just never a committed one.
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts
 # This prevents double-regeneration when saving notebooks/docx files
