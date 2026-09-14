@@ -9,7 +9,7 @@ permalink: /navigation/sass/containers/
 
 <!-- markdownlint-disable MD033 MD046 -->
 
-{% include sass-nav.html %}
+{% include projects/sass/sass-nav.html %}
 
 > Build a complete page with OCS grammar before writing custom CSS. Containers establish the page boundary; cards, grids, tables, images, and buttons organize the content inside it.
 
