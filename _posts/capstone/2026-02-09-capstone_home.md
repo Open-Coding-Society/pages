@@ -730,17 +730,21 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
-        <!-- SD Auto 2.0 (CSP, 2026-2027) -->
-         <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
-           <a href="{% post_url capstone/2026-09-09-sd-auto-2-capstone %}">
-             <div class="w-28 h-28 flex items-center justify-center bg-blue-600 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">SD Auto 2.0</div>
-           </a>
-           <div>
-             <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-09-sd-auto-2-capstone %}">SD Auto 2.0</a></h3>
-             <p class="text-sm text-gray-700">A full-stack intelligent routing platform that enhances daily commutes in San Diego through real-time traffic data, community hazard reporting, and AI-driven route optimization.</p>
-             <p class="text-xs text-gray-500 mt-2">Team: Yiming, Noor, Luke</p>
-           </div>
-         </div>
+      <!-- Poway Woman's Club 2.0 (CSP, 2026-2027) -->
+<div class="ocs__grid-cell CSP"
+     data-year="2026-2027"
+     data-page-url="{{ '/capstone/poway-womans-club-2/' | relative_url }}"
+     data-frontend-url="https://github.com/YOUR-ORG/poway-womans-club-2"
+     data-backend-url="https://github.com/YOUR-ORG/poway-womans-club-2-backend">
+    <a href="{% post_url capstone/2026-09-09-poway-womans-club-2 %}">
+        <div class="ocs__image-frame ocs__image-frame--thumbnail capstone-card-placeholder" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">PWC 2.0</div>
+    </a>
+    <div>
+        <h3><a href="{% post_url capstone/2026-09-09-poway-womans-club-2 %}">Poway Woman's Club 2.0</a></h3>
+        <p>Refining the Poway Woman's Club website to make it easier for visitors to understand the organization, find ways to get involved, and reflect the club's focus on women's rights, community, and support — with clearer navigation and a more welcoming design.</p>
+        <p>Team: Yiming, Noor, Luke</p>
+    </div>
+</div>
 
   <!-- FOPS (2025-2026) -->
  <div class="ocs__grid-cell CSP" data-year="2025-2026">
