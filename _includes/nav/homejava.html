@@ -60,12 +60,7 @@
                         teacherToolkitLink.innerHTML = `<a href="{{site.baseurl}}/teacher">Teacher Toolkit</a>`;
                     }
 
-                    // Mentors get a link to just the capstone projects they are attached to.
-                    if (roles.includes('ROLE_MENTOR')) {
-                        mentorLink.innerHTML = `<a href="{{site.baseurl}}/mentor">My Projects</a>`;
-                    } else {
-                        mentorLink.style.display = 'none';
-                    }
+                    mentorLink.style.display = 'none';
 
                     // Display logout link
                     logoutLink.innerHTML = `<a href="{{site.baseurl}}/logoutjava">Logout of Toolkit</a>`;
