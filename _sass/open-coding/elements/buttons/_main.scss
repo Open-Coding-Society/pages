@@ -5,3 +5,14 @@
 @import "hacks-button.scss";
 @import "iridescent.scss";
 @import "runner-buttons.scss";
+
+// "ocs__btn" / "ocs__links" grammar (used by the redesigned /capstone grid)
+// api.scss needs the inline-container mixin, which isn't loaded yet this early
+// in the overall stylesheet (bathroom.scss pulls this file in before anything
+// else imports mixins/container) -- so pull it in directly, same as upstream's
+// elements/buttons/_includes.scss does.
+@import "../../mixins/container";
+@import "../../mixins/buttons";
+@import "tokens.scss";
+@import "api.scss";
+@import "utilities.scss";
