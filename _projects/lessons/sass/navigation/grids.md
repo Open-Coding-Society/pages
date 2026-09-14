@@ -9,7 +9,7 @@ permalink: /navigation/sass/grids/
 
 <!-- markdownlint-disable MD033 MD046 -->
 
-{% include sass-nav.html %}
+{% include projects/sass/sass-nav.html %}
 
 Hi! My name is [Your Full Name]
 
