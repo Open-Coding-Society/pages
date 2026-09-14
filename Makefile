@@ -1,7 +1,7 @@
 HOST ?= localhost
 PORT ?= 4500
 LOG_FILE = /tmp/jekyll$(PORT).log
-PYTHON := venv/bin/python3
+PYTHON := $(if $(wildcard venv/bin/python3),venv/bin/python3,python3)
 
 SHELL = /bin/bash -c
 .SHELLFLAGS = -e
