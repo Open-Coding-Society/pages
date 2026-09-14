@@ -101,6 +101,16 @@ jobs:
 
           echo "baseurl: \"$BASEURL\"" > _config.override.yml
 
+          # google_client_id must never be committed to the repo (see the comment on
+          # it in _config.yml) -- injected here from a repository secret instead,
+          # into the same gitignored override file used for baseurl above. Requires
+          # a repo admin to add the GOOGLE_CLIENT_ID secret in Settings > Secrets and
+          # variables > Actions; the site builds fine without it, the Google sign-in
+          # button just won't render until it's set.
+          if [ -n "${{ secrets.GOOGLE_CLIENT_ID }}" ]; then
+            echo "google_client_id: \"${{ secrets.GOOGLE_CLIENT_ID }}\"" >> _config.override.yml
+          fi
+
       - name: Generate dynamic SASS imports
         run: |
           source venv/bin/activate
