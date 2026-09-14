@@ -27,6 +27,7 @@ permalink: /navigation/java-reference/
             <a class="ocs__btn pill" href="{{ '/navigation/js-reference/' | relative_url }}">JavaScript</a>
             <a class="ocs__btn pill" href="{{ '/navigation/py-reference/' | relative_url }}">Python</a>
             <a class="ocs__btn pill accent fill" href="{{ '/navigation/java-reference/' | relative_url }}" aria-current="page">Java</a>
+            <a class="ocs__btn pill" href="{{ '/navigation/sass/' | relative_url }}">SASS</a>
         </nav>
     </div>
 

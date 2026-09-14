@@ -2,14 +2,15 @@
 layout: post
 title: SASS Containers Grammar
 description: Explore the Open Coding Society container grammar through living examples.
-hide: true
-show_reading_time: false
+categories: [SASS, Containers]
+lesson_language: SASS
+lesson_topic: Containers
+lesson_part: interactive
+lesson_type: lesson
 permalink: /navigation/sass/containers/
 ---
 
 <!-- markdownlint-disable MD033 MD046 -->
-
-{% include projects/sass/sass-nav.html %}
 
 > Build a complete page with OCS grammar before writing custom CSS. Containers establish the page boundary; cards, grids, tables, images, and buttons organize the content inside it.
 
