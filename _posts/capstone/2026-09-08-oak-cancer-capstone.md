@@ -22,66 +22,62 @@ Our team consists of Salma, Isha, Aashi, and Emily. Salma serves as our Scrum Ma
 
 <div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
 
-    <div class="ocs__grid-cell ocs__grid-cell--header">Project Goals and Core Features</div>
+    <div class="ocs__grid-cell ocs__grid-cell--header">Core Features</div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Community Support and Inclusion</strong>
-        <p>Our goal is to create a space where young patients feel seen, supported, and part of a broader community. By combining learning, play, and interaction, we hope to reduce feelings of isolation and help users feel more connected to others navigating similar experiences.</p>
+    <div class="ocs__grid-cell ocs__grid-cell--accent" id="community-support">
+        <strong>Community Support</strong>
+        <p>Create a welcoming space for kids and families to feel connected, supported, and less isolated while navigating cancer treatment and recovery.</p>
         <a class="ocs__btn alert-green fill small" href="#community-support">
-            Implementation Goal
+            Community Support
         </a>
     </div>
 
-    <div class="ocs__grid-cell">
-        <strong>Daily Check-In and Emotional Support</strong>
-        <p>A daily check-in feature where users can share how they are feeling and interact with members of the cancer community. The prompt can remain consistent or rotate daily, creating a simple way for users to reflect on their emotional wellbeing and connect with others.</p>
+    <div class="ocs__grid-cell" id="daily-check-in">
+        <strong>Daily Check-In</strong>
+        <p>Offer a simple daily mood check-in so users can share how they are feeling and connect with others in a supportive, low-pressure way.</p>
         <a class="ocs__btn alert-yellow fill small" href="#daily-check-in">
-            Planned Feature
+            Daily Check-In
         </a>
     </div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Interactive Educational Games</strong>
-        <p>We aim to include engaging games that make the website more enjoyable and interactive. These could include puzzles, memory exercises, and other activities designed to entertain users while supporting learning and encouraging healthy engagement.</p>
+    <div class="ocs__grid-cell ocs__grid-cell--accent" id="interactive-games">
+        <strong>Interactive Games</strong>
+        <p>Include fun learning-based games such as puzzles and memory activities to keep the experience engaging, uplifting, and interactive.</p>
         <a class="ocs__btn alert-green fill small" href="#interactive-games">
-            Feature Concept
+            Interactive Games
         </a>
     </div>
 
-    <div class="ocs__grid-cell">
-        <strong>Accessible Information by Reading Level</strong>
-        <p>Content can be organized by reading level so that children, teens, and parents can access information that is clear and appropriately tailored to their needs. This approach makes medical and scientific information easier to understand and less overwhelming.</p>
+    <div class="ocs__grid-cell" id="reading-levels">
+        <strong>Reading Level Filters</strong>
+        <p>Sort educational content by reading level so children, teens, and parents can access information that feels understandable and age-appropriate.</p>
         <a class="ocs__btn alert-yellow fill small" href="#reading-levels">
-            Planned Feature
+            Reading Level Filters
         </a>
     </div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Risk Calculator and Educational Guidance</strong>
-        <p>We also hope to include a research-based risk calculator that allows users to input symptoms and receive information about possible concerns. This feature would help connect patients with relevant information and support them in learning more about their health in a guided, informative way.</p>
+    <div class="ocs__grid-cell ocs__grid-cell--accent" id="risk-calculator">
+        <strong>Risk Calculator</strong>
+        <p>Build an educational risk tool that helps users explore health information in a guided and accessible way while encouraging learning.</p>
         <a class="ocs__btn alert-green fill small" href="#risk-calculator">
-            Implementation Goal
+            Risk Calculator
         </a>
     </div>
 
-    <div class="ocs__grid-cell">
-        <strong>Cell Lab and Interactive Learning</strong>
-        <p>Incorporating a more accessible and engaging version of the previous cell lab interface would create a stronger educational experience. This feature would support learning by allowing users to explore scientific concepts in a way that is clearer and easier to understand.</p>
+    <div class="ocs__grid-cell" id="cell-lab">
+        <strong>Cell Lab</strong>
+        <p>Refresh the old cell lab into a clearer, more engaging learning experience that helps users understand cancer-related science in a simpler way.</p>
         <a class="ocs__btn alert-yellow fill small" href="#cell-lab">
-            Feature Concept
+            Cell Lab
         </a>
     </div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Body Map Learning Tool</strong>
-        <p>A body map feature inspired by previous cancer education work could provide a cleaner, more intuitive, and child-friendly way for users to learn about the body and different aspects of cancer care.</p>
+    <div class="ocs__grid-cell ocs__grid-cell--accent" id="body-map">
+        <strong>Body Map</strong>
+        <p>Create a kid-friendly body map tool that makes complex health concepts easier to explore and understand through interaction.</p>
         <a class="ocs__btn alert-green fill small" href="#body-map">
-            Planned Feature
+            Body Map
         </a>
     </div>
 
 </div>
-
-## Future Directions
-
-As the project continues to develop, we plan to expand the platform with additional educational resources, more inclusive community features, and stronger interactive tools that support both learning and emotional wellbeing. Our aim is to create a site that is informative, supportive, and engaging for the families and patients it serves.
