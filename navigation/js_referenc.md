@@ -53,10 +53,24 @@ permalink: /navigation/js-reference/
 
     <section id="python" aria-labelledby="python-title">
         <h2 class="ocs__section-title" id="python-title">Python</h2>
-        <div class="ocs__card">
-            <span class="ocs__status-pill ocs__status-pill--warn">Coming soon</span>
-            <p>Python reference and interactive Code Runner lessons will be added here.</p>
+        <p class="ocs__description">Reference material and interactive examples from the Python lesson collection.</p>
+
+        {% assign python_lessons = site.categories.Python | where_exp: "lesson", "lesson.hide != true" | sort: "title" %}
+        {% if python_lessons.size > 0 %}
+        <div class="ocs__grid ocs__grid--card cols-3">
+            {% for lesson in python_lessons %}
+            <article class="ocs__grid-cell">
+                <span class="ocs__status-pill ocs__status-pill--neutral">{{ lesson.lesson_part | default: "reference" }}</span>
+                <h3>{{ lesson.title }}</h3>
+                {% if lesson.description %}<p>{{ lesson.description }}</p>{% endif %}
+                {% if lesson.lesson_topic %}<p><strong>Topic:</strong> {{ lesson.lesson_topic }}</p>{% endif %}
+                <a class="ocs__btn accent fill" href="{{ lesson.url | relative_url }}">Open lesson</a>
+            </article>
+            {% endfor %}
         </div>
+        {% else %}
+        <div class="ocs__callout">Python lesson cards will appear here as categorized source notebooks are published.</div>
+        {% endif %}
     </section>
 
     <section id="java" aria-labelledby="java-title">
