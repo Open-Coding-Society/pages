@@ -1,14 +1,17 @@
 ---
 layout: post
-title: Aesthetihawk Guide - Buttons
-categories: [SASS]
-permalink: /aesthetihawk-guide-buttons
+title: SASS Buttons Aesthetihawk
+description: Explore the Aesthetihawk button examples.
+categories: [SASS, Buttons]
+lesson_language: SASS
+lesson_topic: Buttons
+lesson_part: interactive
+lesson_type: lesson
 author: Aashray Reddy
-menu: nav/aesthetihawk-guide.html
-toc: false
+permalink: /sass/buttons/
 ---
 
-## Buttons
+## Buttons (combine with open-coding buttons)
 
 ### How to Use
 

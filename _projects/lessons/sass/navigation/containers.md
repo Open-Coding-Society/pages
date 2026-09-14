@@ -8,7 +8,7 @@ lesson_topic: Containers
 lesson_part: interactive
 lesson_type: lesson
 microblog: true
-permalink: /navigation/sass/containers/
+permalink: /sass/containers/
 ---
 
 <!-- markdownlint-disable MD033 MD046 -->

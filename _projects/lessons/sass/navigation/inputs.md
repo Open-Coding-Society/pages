@@ -1,11 +1,14 @@
 ---
 layout: post
-title: Aesthetihawk Guide - Inputs
-categories: [SASS]
-permalink: /aesthetihawk-guide-inputs
+title: SASS Inputs Aesthetihawk
+categories: [SASS, Inputs]
+lesson_language: SASS
+lesson_topic: Inputs
+lesson_part: interactive
+lesson_type: lesson
+microblog: true 
+permalink: /sass/inputs/
 author: Aashray Reddy
-menu: nav/aesthetihawk-guide.html
-toc: false
 ---
 
 ## Inputs
