@@ -1,18 +1,22 @@
 ---
 layout: post
-title: Portfolio Home 5
+title: SASS Containers Grammar
+description: Explore the Open Coding Society container grammar through living examples.
 hide: true
 show_reading_time: false
+permalink: /navigation/sass/containers/
 ---
 
 <!-- markdownlint-disable MD033 MD046 -->
 
+{% include sass-nav.html %}
+
 > Build a complete page with OCS grammar before writing custom CSS. Containers establish the page boundary; cards, grids, tables, images, and buttons organize the content inside it.
 
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn" href="{{site.baseurl}}/index2">Button Grammar</a>
-    <a class="ocs__btn" href="{{site.baseurl}}/index4">Grid Grammar</a>
-    <a class="ocs__btn accent fill" href="{{site.baseurl}}/index5">Container Grammar</a>
+    <a class="ocs__btn" href="{{ '/navigation/sass/buttons/' | relative_url }}">Button Grammar</a>
+    <a class="ocs__btn" href="{{ '/navigation/sass/grids/' | relative_url }}">Grid Grammar</a>
+    <a class="ocs__btn accent fill" href="{{ '/navigation/sass/containers/' | relative_url }}">Container Grammar</a>
 </div>
 
 ## The Container Relationship
