@@ -14,19 +14,19 @@ permalink: /navigation/py-reference/
 <div class="ocs__container" id="language-reference">
     <div class="ocs__badge">Lessons · Python</div>
     <h1>Python Reference</h1>
-    <p class="ocs__description">Browse Python reference material and interactive examples.</p>
 
-    <nav class="ocs__links ocs__links--wide" aria-label="Language reference navigation">
-        <a class="ocs__btn pill" href="{{ '/navigation/js-reference/' | relative_url }}">JavaScript</a>
-        <a class="ocs__btn pill accent fill" href="{{ '/navigation/py-reference/' | relative_url }}" aria-current="page">Python</a>
-        <a class="ocs__btn pill" href="{{ '/navigation/java-reference/' | relative_url }}">Java</a>
-    </nav>
-
-    <div class="search" aria-label="Search Python lessons">
-        <div class="search-input-wrap">
-            <input type="text" class="js-search-input search-input input-block form-control" placeholder="Search Python lessons" aria-label="Search Python lessons" autocomplete="off">
+    <div class="language-reference__toolbar">
+        <div class="language-reference__search search" aria-label="Search Python lessons">
+            <div class="search-input-wrap">
+                <input type="text" class="js-search-input search-input input-block form-control" placeholder="Search Python lessons" aria-label="Search Python lessons" autocomplete="off">
+            </div>
+            <div class="js-search-results search-results-wrap"></div>
         </div>
-        <div class="js-search-results search-results-wrap"></div>
+        <nav class="ocs__links ocs__links--wide" aria-label="Language reference navigation">
+            <a class="ocs__btn pill" href="{{ '/navigation/js-reference/' | relative_url }}">JavaScript</a>
+            <a class="ocs__btn pill accent fill" href="{{ '/navigation/py-reference/' | relative_url }}" aria-current="page">Python</a>
+            <a class="ocs__btn pill" href="{{ '/navigation/java-reference/' | relative_url }}">Java</a>
+        </nav>
     </div>
 
     {% assign lessons = site.categories.Python | where_exp: "lesson", "lesson.hide != true" | sort: "title" %}

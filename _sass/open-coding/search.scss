@@ -1,5 +1,56 @@
 @import "materials/main.scss";
 
+.language-reference__toolbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 1.5rem 0;
+}
+
+.language-reference__toolbar .ocs__links {
+    margin: 0;
+}
+
+.language-reference__search {
+    position: relative;
+    flex: 1 1 18rem;
+    max-width: 30rem;
+    margin: 0;
+    order: 1;
+}
+
+.language-reference__search .search-results-wrap {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    max-height: 24rem;
+    overflow-y: auto;
+    background: var(--panel, var(--pref-bg-color, #fff));
+    border: 1px solid var(--ui-border, currentColor);
+    box-shadow: 0 0.75rem 1.5rem color-mix(in srgb, var(--pref-text-color, #000) 18%, transparent);
+}
+
+.language-reference__toolbar .ocs__links {
+    order: 2;
+    margin-left: auto;
+}
+
+@media (max-width: 48rem) {
+    .language-reference__search {
+        flex-basis: 100%;
+        max-width: none;
+    }
+
+    .language-reference__toolbar .ocs__links {
+        margin-left: 0;
+    }
+}
+
 .search-result-preview {
     // the text
 
