@@ -1,7 +1,6 @@
 ---
-microblog: true
-toc: false
 layout: post
+microblog: true
 title: 'OCS Intelligence LLM — Phase 2: Deploy, monitor & access'
 description: Deploy the shared LLM, watch it under class load, and make sure every OCS student can reach it.
 permalink: "/capstone/ocs-intelligence/phase-2/"
