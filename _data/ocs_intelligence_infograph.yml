@@ -201,7 +201,7 @@ literature:
 stages:
   - slug: phase-0
     title: "Phase 0 — Define the problem, pick a direction"
-    navLabel: "Phase 0: Problem & research"
+    navLabel: "Problem & research"
     navKicker: "Phase 0"
     status: "Ongoing — research questions still evolving"
     summary: "Name the problem without jumping to a solution, read the serving literature, and pick a candidate model class — before any hardware work locks in an approach."
@@ -239,7 +239,7 @@ stages:
 
   - slug: phase-1
     title: "Phase 1 — Build the rack, run inference, open the stream"
-    navLabel: "Phase 1: Rack, inference & access"
+    navLabel: "Rack, inference & access"
     navKicker: "Phase 1"
     status: "In progress"
     summary: "Physically stand up the donated GPU rack, put Ollama and llama.cpp in production, and stream answers to student harnesses on other networks — with keys."
@@ -303,7 +303,7 @@ stages:
 
   - slug: phase-2
     title: "Phase 2 — Deploy, watch, and make sure the class can get in"
-    navLabel: "Phase 2: Deploy, monitor & access"
+    navLabel: "Deploy, monitor & access"
     navKicker: "Phase 2"
     status: "Next"
     summary: "Put the service in front of real students, watch it under load, and keep it reachable so access is a class right — not a lucky connection."
