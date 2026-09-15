@@ -5,7 +5,7 @@ layout: post
 title: Shoreline Community Services, Volunteer Page 2026-2027
 permalink: /capstone/shoreline-volunteer/
 year: "2026-2027"
----
+---> **CSP 2026–2027 · Vanshika K, Nitya Kasse, Hsu-Cheng Lin.**
 <style>
 .shoreline-blue   { background: #DCEBFC !important; border-color: #3B82F6 !important; color: #1E3A8A !important; }
 .shoreline-green  { background: #D7F5E3 !important; border-color: #22C55E !important; color: #14532D !important; }
