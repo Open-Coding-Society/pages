@@ -98,30 +98,36 @@ year: 2026-2027
       <div class="ocs__diagram-block">
         <h4 class="ocs__diagram-title">From donation to three phases</h4>
         <div class="ocs__diagram">
-          <pre class="mermaid">flowchart LR
-    A[Donated 8x GTX 1070 rack] --> P0[Phase 0]
-    P0 --> B[Phase 1]
-    B --> C[Phase 2]
-    P0 --> P01[Problem and research questions]
-    P0 --> P02[Literature review]
-    P0 --> P03[Pick a candidate model]
-    B --> B1[Build rack]
-    B --> B2[Ollama and llama.cpp]
-    B --> B3[Stream and keys]
-    C --> C1[Deploy service]
-    C --> C2[Monitor under load]
-    C --> C3[Every student gets in]</pre>
+          <pre class="mermaid">flowchart TD
+          A[8x GTX 1070 rack] --> P0[Phase 0]
+          P0 --> P01[Problem and RQs]
+          P0 --> P02[Literature review]
+          P0 --> P03[Pick a model]
+          P01 --> H0[Phase 0 handoff]
+          P02 --> H0
+          P03 --> H0
+          H0 --> P1[Phase 1]
+          P1 --> P11[Build rack]
+          P1 --> P12[Ollama llama.cpp]
+          P1 --> P13[Stream and keys]
+          P11 --> H1[Phase 1 service]
+          P12 --> H1
+          P13 --> H1
+          H1 --> P2[Phase 2]
+          P2 --> P21[Deploy service]
+          P2 --> P22[Monitor load]
+          P2 --> P23[Every student in]</pre>
         </div>
       </div>
       <div class="ocs__diagram-block">
         <h4 class="ocs__diagram-title">How a student reaches the model</h4>
         <div class="ocs__diagram">
           <pre class="mermaid">flowchart TD
-    A[Student at school or home] --> B[Authenticated OCS API]
-    B --> C[Broker and request queue]
-    C --> D[Mini prepares session context]
-    D --> E[GPU worker generates answer]
-    E --> F[Stream returned to student]</pre>
+          A[Student at school or home] --> B[Authenticated OCS API]
+          B --> C[Broker and request queue]
+          C --> D[Mini prepares session context]
+          D --> E[GPU worker generates answer]
+          E --> F[Stream returned to student]</pre>
         </div>
       </div>
     </div>
