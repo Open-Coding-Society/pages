@@ -1,0 +1,127 @@
+# AP Computer Science A course framework -- four units, 53 topics.
+#
+# Topic numbers and titles are the College Board's (2025 revision). One source of
+# truth for two screens: the Unit and Chapter dropdowns on a lesson's submission
+# form read it, and the submissions dashboard groups its rows by it. A lesson can
+# name its own default with `unit:` and `chapter:` in front matter.
+#
+# "4.2" means unit 4, chapter 2 -- Introduction to Using Data Sets.
+units:
+- number: 1
+  title: Using Objects and Methods
+  chapters:
+  - number: 1
+    title: Introduction to Algorithms, Programming, and Compilers
+  - number: 2
+    title: Variables and Data Types
+  - number: 3
+    title: Expressions and Output
+  - number: 4
+    title: Assignment Statements and Input
+  - number: 5
+    title: Casting and Range of Variables
+  - number: 6
+    title: Compound Assignment Operators
+  - number: 7
+    title: Application Program Interface (API) and Libraries
+  - number: 8
+    title: Documentation with Comments
+  - number: 9
+    title: Method Signatures
+  - number: 10
+    title: Calling Class Methods
+  - number: 11
+    title: Math Class
+  - number: 12
+    title: 'Objects: Instances of Classes'
+  - number: 13
+    title: Object Creation and Storage (Instantiation)
+  - number: 14
+    title: Calling Instance Methods
+  - number: 15
+    title: String Manipulation
+- number: 2
+  title: Selection and Iteration
+  chapters:
+  - number: 1
+    title: Algorithms with Selection and Repetition
+  - number: 2
+    title: Boolean Expressions
+  - number: 3
+    title: if Statements
+  - number: 4
+    title: Nested if Statements
+  - number: 5
+    title: Compound Boolean Expressions
+  - number: 6
+    title: Comparing Boolean Expressions
+  - number: 7
+    title: while Loops
+  - number: 8
+    title: for Loops
+  - number: 9
+    title: Implementing Selection and Iteration Algorithms
+  - number: 10
+    title: Implementing String Algorithms
+  - number: 11
+    title: Nested Iteration
+  - number: 12
+    title: Informal Run-Time Analysis
+- number: 3
+  title: Class Creation
+  chapters:
+  - number: 1
+    title: Abstraction and Program Design
+  - number: 2
+    title: Impact of Program Design
+  - number: 3
+    title: Anatomy of a Class
+  - number: 4
+    title: Constructors
+  - number: 5
+    title: 'Methods: How to Write Them'
+  - number: 6
+    title: 'Methods: Passing and Returning References of an Object'
+  - number: 7
+    title: Class Variables and Methods
+  - number: 8
+    title: Scope and Access
+  - number: 9
+    title: this Keyword
+- number: 4
+  title: Data Collections
+  chapters:
+  - number: 1
+    title: Ethical and Social Issues Around Data Collection
+  - number: 2
+    title: Introduction to Using Data Sets
+  - number: 3
+    title: Array Creation and Access
+  - number: 4
+    title: Array Traversals
+  - number: 5
+    title: Implementing Array Algorithms
+  - number: 6
+    title: Using Text Files
+  - number: 7
+    title: Wrapper Classes
+  - number: 8
+    title: ArrayList Methods
+  - number: 9
+    title: ArrayList Traversals
+  - number: 10
+    title: Implementing ArrayList Algorithms
+  - number: 11
+    title: 2D Array Creation and Access
+  - number: 12
+    title: 2D Array Traversals
+  - number: 13
+    title: Implementing 2D Array Algorithms
+  - number: 14
+    title: Searching Algorithms
+  - number: 15
+    title: Sorting Algorithms
+  - number: 16
+    title: Recursion
+  - number: 17
+    title: Recursive Searching and Sorting

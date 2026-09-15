@@ -1,0 +1,114 @@
+// =============================================================================
+// ASSIGNMENT DETAILS — page layer
+// =============================================================================
+// The unit / chapter / due-date block that sits above the Submit Assignment box
+// on any lesson with `assignment: true`. Layout only; every colour, size and
+// radius comes from the token functions, so it moves when the system moves.
+//
+// Loaded by `_layouts/post.html` and only on pages that render the block.
+// Compiled by `_sass/ocs/tools/build.sh` to assets/css/ocs-assignment-meta.css.
+//
+// A lesson page is not built on the design system — it carries the site's older
+// stylesheet. So nothing here styles a bare element: a rule on `select` or `h3`
+// would reach out of this block and into the lesson body around it.
+// =============================================================================
+@use "../core/functions" as fn;
+
+.amet {
+  margin-block: fn.space(6) fn.space(4);
+  padding: fn.space(4) fn.space(5);
+  border: 1px solid var(--ocs-border);
+  border-radius: fn.radius(xl);
+  background: var(--ocs-surface-raised);
+  color: var(--ocs-text);
+  font-family: var(--ocs-font-sans);
+}
+
+.amet__h {
+  display: flex;
+  align-items: center;
+  gap: fn.space(2);
+  margin: 0 0 fn.space(4);
+  color: var(--ocs-text);
+  font-size: fn.typo(h4);
+  font-weight: fn.typo(h4, weight);
+}
+
+.amet__icon {
+  flex: 0 0 auto;
+  color: var(--ocs-text-muted);
+}
+
+// Three controls across on a desktop, stacking one per line when the lesson
+// column narrows. `minmax(0, …)` because a grid track's default `min-width:auto`
+// refuses to shrink below the longest option label, which here is a full topic
+// title and would push the row wider than the lesson body.
+.amet__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.8fr) minmax(0, 0.9fr);
+  gap: fn.space(3);
+  align-items: start;
+}
+
+.amet__field {
+  min-width: 0;
+  margin-block-end: 0;
+
+  .ocs-select,
+  .ocs-input { width: 100%; }
+}
+
+// The resolved topic, e.g. "This lesson is 4.2 Introduction to Using Data Sets".
+// Appears only once both dropdowns are set, so it reads as confirmation rather
+// than as another empty field.
+.amet__topic {
+  margin: fn.space(4) 0 0;
+  color: var(--ocs-text-secondary);
+  font-size: fn.typo(small);
+}
+
+.amet__code {
+  display: inline-block;
+  padding: 0.1rem fn.space(2);
+  margin-inline-end: fn.space(1);
+  border-radius: fn.radius(sm);
+  background: var(--ocs-surface-elevated);
+  color: var(--ocs-text);
+  font-family: var(--ocs-font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+// `.ocs-help` here is a <div>, not a <p>: the site stylesheet the lesson page
+// loads sets `p { color: ... !important }`, which would win over the design
+// system's muted grey and over the error colour below.
+.amet .ocs-help {
+  margin-block-start: fn.space(2);
+  margin-block-end: 0;
+  font-size: fn.typo(small);
+}
+
+// The due-date rule is the one thing here that can be wrong rather than just
+// empty, so it gets a colour and a border when it is.
+//
+// Both selectors are needed: `.amet .ocs-help` above is two classes deep, so a
+// single-class rule loses to it and the text stays grey. Colour is not carrying
+// this alone -- the help line also rewrites itself to name the earliest date,
+// and the field gets a border, so it reads without colour vision.
+.amet .ocs-help.amet__help--error {
+  color: var(--ocs-danger);
+}
+
+.amet__field--due .ocs-input:invalid {
+  border-color: var(--ocs-danger-border);
+}
+
+@media (max-width: fn.breakpoint(mobile)) {
+  .amet {
+    padding: fn.space(4);
+  }
+
+  .amet__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

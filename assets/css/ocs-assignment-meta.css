@@ -1,0 +1,90 @@
+/*!
+ * OCS Design System -- GENERATED FILE, DO NOT EDIT
+ *
+ * Source:    _sass/ocs/pages/_assignment-meta.scss
+ * Generator: _sass/ocs/tools/build.sh
+ * Rebuild:   bash _sass/ocs/tools/build.sh
+ *
+ * Hand-edits here are destroyed on the next build. Change the SCSS instead.
+ */
+.amet {
+  margin-block: 1.5rem 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--ocs-border);
+  border-radius: 14px;
+  background: var(--ocs-surface-raised);
+  color: var(--ocs-text);
+  font-family: var(--ocs-font-sans);
+}
+
+.amet__h {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  color: var(--ocs-text);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.amet__icon {
+  flex: 0 0 auto;
+  color: var(--ocs-text-muted);
+}
+
+.amet__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.8fr) minmax(0, 0.9fr);
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.amet__field {
+  min-width: 0;
+  margin-block-end: 0;
+}
+.amet__field .ocs-select,
+.amet__field .ocs-input {
+  width: 100%;
+}
+
+.amet__topic {
+  margin: 1rem 0 0;
+  color: var(--ocs-text-secondary);
+  font-size: 0.875rem;
+}
+
+.amet__code {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  margin-inline-end: 0.25rem;
+  border-radius: 4px;
+  background: var(--ocs-surface-elevated);
+  color: var(--ocs-text);
+  font-family: var(--ocs-font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.amet .ocs-help {
+  margin-block-start: 0.5rem;
+  margin-block-end: 0;
+  font-size: 0.875rem;
+}
+
+.amet .ocs-help.amet__help--error {
+  color: var(--ocs-danger);
+}
+
+.amet__field--due .ocs-input:invalid {
+  border-color: var(--ocs-danger-border);
+}
+
+@media (max-width: 768px) {
+  .amet {
+    padding: 1rem;
+  }
+  .amet__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
