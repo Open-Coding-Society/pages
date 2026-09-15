@@ -1,21 +1,71 @@
 ---
 layout: post
-title: SASS Typpography Aesthetihawk
+title: Aesthetihawk Guide - Typography
 categories: [SASS]
 permalink: /aesthetihawk-guide-typography
-author: Aashray Reddy
+author: Tristan Chiu, Mateo Durand Amador, Barbara Zhao
 menu: nav/aesthetihawk-guide.html
 toc: false
 ---
 
-## Typography
+# Sprint Lesson: SASS Typography & Semantic HTML
 
-### How to Use
+## 1. LxD Cycle Process
 
-Our site uses **semantic HTML tags** to control text styling. Instead of applying custom classes, developers should use the appropriate tags like `<h1>`, `<h2>`, and `<p>`. These tags are automatically styled through our global styles to ensure visual consistency, accessibility, and responsive behavior.
+**Empathize:** I noticed a lot of students try to manually style text using custom classes (like `<p class="big-bold">Main Heading</p>`) instead of letting the global SASS theme handle it through proper HTML structure. This breaks our site's visual consistency and messes up accessibility.
 
-**✅ Correct usage:**
+**Define:** 
+* **POV:** CSP students need a way to build web pages using semantic HTML because relying on manual CSS classes creates messy code and inaccessible design.
+* **Learning Goal:** Students will understand how to use global SASS typography styling by applying the correct semantic HTML tags (`<h1>`, `<h2>`, `<p>`, `<strong>`, etc.) instead of custom classes.
 
+**Ideate:** 
+* **HMW Question:** How might we teach students to trust global SASS styles and stop hardcoding text appearance? 
+* **Activity:** Refactoring a poorly written HTML snippet into clean, semantic HTML that automatically inherits our SASS theme.
+
+**Prototype & Test:** I taught a trial run to my project team. They felt the original homework was too long, so I revised it to be a single, focused refactoring task (documented below).
+
+---
+
+## 2. Lesson Plan
+
+**Learning Objective:** By the end of this lesson, you will be able to structure text using semantic HTML tags so it automatically inherits our global SASS typography styles without using custom classes. 
+
+**Success Criteria:** You can take an unformatted block of text, apply the correct headings, paragraphs, and list tags, and have it match our site's design system perfectly.
+
+### Tech Talk (3 minutes)
+We are using a global SASS typography system. This means **you don't need to write CSS for your text**. Instead of styling text to look a certain way, you just need to tell the browser *what* the text is. There’s already a global system to take care of the styling.
+
+* **The Rule:** Use semantic HTML tags. Let the system handle the look.
+* ✅ **Do this:** `<h1>Main Heading</h1>` or `<strong>Important</strong>`
+* ❌ **Don't do this:** `<div class="title-text">Main Heading</div>` or `<p class="bold">Important</p>`
+
+Why do we do this? It ensures our whole project looks consistent, makes our code cleaner, and is essential for screen readers and SEO.
+
+### Supported Tags Reference Guide
+
+Before we jump into the examples, here is a quick cheat sheet of the tags we use to build our visual hierarchy. 
+
+| Tag | Purpose | Usage Example |
+| :--- | :--- | :--- |
+| `<h1>` | Page title | Used once per page (top-level heading) |
+| `<h2>` | Section titles | Major sections within a page |
+| `<h3>` | Sub-sections or card headers | Grouping inside `<h2>` sections |
+| `<h4>` | Minor headings | Optional for smaller sub-sections |
+| `<p>` | Paragraphs and body content | Default for most content text |
+| `<strong>` | Emphasis or importance | Highlights key words/phrases |
+| `<em>` | Subtle emphasis or tone shift | Used for soft emphasis (like italics) |
+| `<ul>`, `<ol>`, `<li>` | Lists | Use for bullets or ordered items |
+
+### Code Examples
+
+**1. Simple: Basic Headings and Paragraphs**
+```html
+<!-- We use h1 for the single page title, h2 for major sections, and p for body text. -->
+<h1>About Our Project</h1>
+<h2>The Team</h2>
+<p>We are a group of CSP students building a cool web app.</p>
+
+**2. Intermediate: Adding Emphasis**
 ```html
 <!-- Don't use bold or italics classes. Use semantic meaning. -->
 <p>You <strong>must</strong> commit your code daily.</p>
