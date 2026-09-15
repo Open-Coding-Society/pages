@@ -1,7 +1,6 @@
 ---
-microblog: true
-toc: false
 layout: post
+microblog: true
 title: 'OCS Intelligence LLM — Phase 0: Problem & research'
 description: Name the problem without jumping to a solution, review the serving literature, and pick a candidate model — before any hardware work locks in an approach.
 permalink: "/capstone/ocs-intelligence/phase-0/"

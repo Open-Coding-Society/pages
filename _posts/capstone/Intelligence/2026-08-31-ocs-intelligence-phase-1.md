@@ -1,7 +1,6 @@
 ---
-microblog: true
-toc: false
 layout: post
+microblog: true
 title: 'OCS Intelligence LLM — Phase 1: Rack, inference & access'
 description: Build the donated GPU rack, run Ollama and llama.cpp, and stream models to student harnesses with keys.
 permalink: "/capstone/ocs-intelligence/phase-1/"
