@@ -1,8 +1,12 @@
 ---
 layout: post
-title: SASS Typpography Aesthetihawk
+title: SASS Typography Aesthetihawk
 categories: [SASS]
-permalink: /aesthetihawk-guide-typography
+lesson_topic: Typography
+lesson_part: interactive
+lesson_type: lesson
+microblog: true
+permalink: /sass/typography
 author: Tristan Chiu, Mateo Durand Amador, Barbara Zhao
 menu: nav/aesthetihawk-guide.html
 toc: false
