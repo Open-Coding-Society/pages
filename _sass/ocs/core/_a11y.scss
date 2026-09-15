@@ -29,6 +29,20 @@
 }
 
 // -----------------------------------------------------------------------------
+// HIDDEN
+// -----------------------------------------------------------------------------
+// `[hidden]` is a rule in the UA stylesheet, and EVERY author declaration
+// outranks the UA sheet -- so `.ocs-field[hidden]`, which sets `display: flex`,
+// renders in full. Nine components here set their own `display`, which means
+// the attribute silently does nothing on most of the system. Toggling `el.hidden`
+// is the standard way to show and hide a panel, so it has to work.
+//
+// This is the case `!important` exists for: `hidden` means hidden, and no
+// component's own layout should be able to argue with it. Anything that needs
+// to stay in the layout should not be carrying the attribute in the first place.
+[hidden] { display: none !important; }
+
+// -----------------------------------------------------------------------------
 // SCREEN-READER-ONLY
 // -----------------------------------------------------------------------------
 // Namespaced. A bare `.sr-only` would collide with Bootstrap, which the sibling

@@ -88,3 +88,6 @@ _notebooks/**/*_content.md
 
 # Claude Code session artifacts
 .claude/
+
+# Local render of a layout against fixture data (_sass/ocs/tools/preview_*.py)
+.preview/

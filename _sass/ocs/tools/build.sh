@@ -31,6 +31,13 @@
 # you can actually run. This one does, and --check fails the build when the two
 # drift apart.
 #
+# PAGE STYLESHEETS
+#
+# `_sass/ocs/pages/_<name>.scss` is a stylesheet for ONE page. Each compiles to
+# its own `assets/css/ocs-<name>.css` and the layout links the one it needs.
+# They are deliberately outside `@use "ocs"`: putting the submissions table in
+# the global bundle would ship it to every lesson on the site.
+#
 # USAGE
 #     bash _sass/ocs/tools/build.sh            # build + verify
 #     bash _sass/ocs/tools/build.sh --check    # verify only, non-zero on drift
@@ -39,7 +46,6 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 OUT="$REPO_ROOT/assets/css/ocs.css"
-ENTRY="$(mktemp -t ocs-entry-XXXX).scss"
 CHECK_ONLY="${1:-}"
 
 # --- locate a Dart Sass ------------------------------------------------------
@@ -66,46 +72,76 @@ echo "==> Verifying contrast guarantees"
 python3 "$REPO_ROOT/_sass/ocs/tools/contrast.py" --quiet
 
 # --- 2. compile --------------------------------------------------------------
-echo '@use "ocs";' > "$ENTRY"
-TMP_OUT="$(mktemp -t ocs-css-XXXX).css"
+# build <scss-to-@use> <output-path> <source-label>
+#
+# Writes the file, or under --check compares and exits non-zero on drift. Both
+# paths go through the same compile so --check can never pass on a stale file
+# that a different code path happened to produce.
+FAILED=0
 
-$SASS --load-path="$REPO_ROOT/_sass" --no-source-map --style=expanded \
-      "$ENTRY" "$TMP_OUT"
+build() {
+  local use="$1" out="$2" source_label="$3"
+  local entry tmp header
+  entry="$(mktemp -t ocs-entry-XXXX).scss"
+  tmp="$(mktemp -t ocs-css-XXXX).css"
 
-# Header so nobody hand-edits the output the way style.css was hand-edited
-# in the spring repo.
-HEADER="/*!
+  echo "@use \"$use\";" > "$entry"
+  $SASS --load-path="$REPO_ROOT/_sass" --no-source-map --style=expanded \
+        "$entry" "$tmp"
+
+  # Header so nobody hand-edits the output the way style.css was hand-edited
+  # in the spring repo.
+  header="/*!
  * OCS Design System -- GENERATED FILE, DO NOT EDIT
  *
- * Source:    _sass/ocs/
+ * Source:    $source_label
  * Generator: _sass/ocs/tools/build.sh
  * Rebuild:   bash _sass/ocs/tools/build.sh
  *
  * Hand-edits here are destroyed on the next build. Change the SCSS instead.
  */
 "
-mkdir -p "$(dirname "$OUT")"
+  mkdir -p "$(dirname "$out")"
+  printf '%s' "$header" | cat - "$tmp" > "$tmp.final"
+
+  if [ "$CHECK_ONLY" = "--check" ]; then
+    if ! diff -q "$out" "$tmp.final" >/dev/null 2>&1; then
+      echo "FAIL: ${out#$REPO_ROOT/} is out of date with $source_label."
+      FAILED=1
+    else
+      echo "==> OK: ${out#$REPO_ROOT/} matches its source."
+    fi
+  else
+    cp "$tmp.final" "$out"
+    local bytes lines
+    bytes=$(wc -c < "$out" | tr -d ' ')
+    lines=$(wc -l < "$out" | tr -d ' ')
+    echo "==> Wrote ${out#$REPO_ROOT/}  ($bytes bytes / $lines lines)"
+  fi
+
+  rm -f "$entry" "$tmp" "$tmp.final"
+}
+
+build "ocs" "$OUT" "_sass/ocs/"
+
+# --- 3. page stylesheets -----------------------------------------------------
+# One file per page. The glob is nullglob-guarded so an empty pages/ directory
+# does not compile a file literally named "_*.scss".
+shopt -s nullglob
+for page in "$REPO_ROOT"/_sass/ocs/pages/_*.scss; do
+  name="$(basename "$page" .scss)"      # _submissions
+  name="${name#_}"                      # submissions
+  build "ocs/pages/$name" "$REPO_ROOT/assets/css/ocs-$name.css" \
+        "_sass/ocs/pages/_$name.scss"
+done
+shopt -u nullglob
 
 if [ "$CHECK_ONLY" = "--check" ]; then
-  printf '%s' "$HEADER" | cat - "$TMP_OUT" > "$TMP_OUT.final"
-  if ! diff -q "$OUT" "$TMP_OUT.final" >/dev/null 2>&1; then
-    echo "FAIL: assets/css/ocs.css is out of date with _sass/ocs/."
+  if [ "$FAILED" -ne 0 ]; then
     echo "      Run: bash _sass/ocs/tools/build.sh"
     exit 1
   fi
-  echo "==> OK: committed CSS matches the source."
   exit 0
 fi
 
-printf '%s' "$HEADER" | cat - "$TMP_OUT" > "$OUT"
-rm -f "$ENTRY" "$TMP_OUT"
-
-# --- 3. report ---------------------------------------------------------------
-BYTES=$(wc -c < "$OUT" | tr -d ' ')
-LINES=$(wc -l < "$OUT" | tr -d ' ')
-IMPORTS=$(grep -c "@import" "$OUT" || true)
-
-echo "==> Wrote assets/css/ocs.css"
-echo "      $BYTES bytes / $LINES lines"
-echo "      @import in output: $IMPORTS"
 echo "==> Done."
