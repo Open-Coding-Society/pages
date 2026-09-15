@@ -578,10 +578,13 @@ Check if this is a course lesson and determine which course context to use
   }
 
   async function submitLinkToBackend(link, description) {
-    const assignmentId = await ensureAssignmentId();
-    const { uid, personId } = await resolveCurrentUser();
+    // First, before any network call. The date is wrong on the page in front
+    // of the student; making them wait on two API round-trips to be told so is
+    // the wrong order, and the API being down would hide the real problem.
     const meta = readAssignmentMeta();
     if (meta === null) throw new Error('Fix the due date before submitting.');
+    const assignmentId = await ensureAssignmentId();
+    const { uid, personId } = await resolveCurrentUser();
     const content = withAssignmentMeta({ type: 'link', url: link, notes: description }, meta);
     const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
       ...fetchOptions,
@@ -609,11 +612,14 @@ Check if this is a course lesson and determine which course context to use
   }
 
   async function submitFilesToBackend(files, notes) {
+    // First, before any network call. The date is wrong on the page in front
+    // of the student; making them wait on two API round-trips to be told so is
+    // the wrong order, and the API being down would hide the real problem.
+    const meta = readAssignmentMeta();
+    if (meta === null) throw new Error('Fix the due date before submitting.');
     const assignmentId = await ensureAssignmentId();
     const { uid, personId } = await resolveCurrentUser();
     const assignmentName = await resolveAssignmentName();
-    const meta = readAssignmentMeta();
-    if (meta === null) throw new Error('Fix the due date before submitting.');
     for (const file of files) {
       const content = withAssignmentMeta({ type: 'file', filename: file.name, notes: notes || '' }, meta);
       const fd = new FormData();
@@ -1579,10 +1585,11 @@ Check if this is a course lesson and determine which course context to use
         btn.disabled = true;
         showStatusBlog('loading', 'Submitting...');
         try {
-          const assignmentId = await ensureAssignmentIdBlog();
-          const { uid, personId } = await resolveCurrentUserBlog();
+          // First, before any network call -- see submitLinkToBackend.
           const meta = readAssignmentMeta();
           if (meta === null) throw new Error('Fix the due date before submitting.');
+          const assignmentId = await ensureAssignmentIdBlog();
+          const { uid, personId } = await resolveCurrentUserBlog();
           const content = withAssignmentMeta({ type: 'link', url: link, notes: description }, meta);
           const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
             ...fetchOptions,
@@ -1629,6 +1636,10 @@ Check if this is a course lesson and determine which course context to use
         btn.disabled = true;
         showStatusBlog('loading', 'Uploading...');
         try {
+          // First, before any network call -- see submitLinkToBackend.
+          const meta = readAssignmentMeta();
+          if (meta === null) throw new Error('Fix the due date before submitting.');
+
           const assignmentId = await ensureAssignmentIdBlog();
           const { uid, personId } = await resolveCurrentUserBlog();
           // Resolve assignment name for the file upload endpoint
@@ -1645,8 +1656,6 @@ Check if this is a course lesson and determine which course context to use
             if (!nameRes.ok) throw new Error('Assignment not found on server.');
             assignmentName = await nameRes.text();
           }
-          const meta = readAssignmentMeta();
-          if (meta === null) throw new Error('Fix the due date before submitting.');
           for (const file of selectedFilesBlog) {
             if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} exceeds 10MB limit.`);
             const content = withAssignmentMeta({ type: 'file', filename: file.name, notes: notes || '' }, meta);
