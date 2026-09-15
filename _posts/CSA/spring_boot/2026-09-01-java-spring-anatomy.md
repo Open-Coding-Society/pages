@@ -1,5 +1,6 @@
 ---
 layout: post
+assignment: true
 title: Anatomy of a Spring Boot Project
 description: A discussion of key elements in a Java Spring Boot backend project.  This includes preparing a project for deployment.
 permalink: /java/spring/anatomy

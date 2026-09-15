@@ -1,5 +1,6 @@
 ---
 layout: post
+assignment: true
 title: Introduction Java Spring Framework
 description: Introduction to API, JPA, ORM, POJOs in Java Spring Framework
 permalink: /java/spring/intro/

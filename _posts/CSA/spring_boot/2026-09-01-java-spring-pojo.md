@@ -1,5 +1,6 @@
 ---
 layout: post
+assignment: true
 title: Plain Old Java Objects (POJO)
 description: A short reference for defining a Spring data object and JPA entity.
 permalink: /java/spring/pojo/

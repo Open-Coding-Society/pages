@@ -1,5 +1,6 @@
 ---
 layout: post
+assignment: true
 title: API Controller
 description: A short reference for Spring REST controllers and API endpoints.
 permalink: /java/spring/api/

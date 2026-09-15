@@ -1,5 +1,6 @@
 ---
 layout: post
+assignment: true
 title: Java Persistence API (JPA)
 description: A short reference for persisting Spring entities with JPA and SQLite.
 permalink: /java/spring/jpa/

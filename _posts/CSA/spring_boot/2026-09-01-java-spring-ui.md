@@ -1,5 +1,6 @@
 ---
 layout: post
+assignment: true
 title: Frontend UI
 description: A short reference for connecting a frontend to Spring Boot.
 permalink: /java/spring/ui/
