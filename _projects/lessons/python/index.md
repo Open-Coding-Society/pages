@@ -1,6 +1,6 @@
 ---
 layout: opencs
-courses: { csp: {week: 1} }
+courses: { csp: {week: 5} }
 title: Python Reference
 description: Search and browse Python lessons, references, and interactive examples.
 search_exclude: true
@@ -31,7 +31,11 @@ permalink: /navigation/py-reference/
         </nav>
     </div>
 
-    {% assign lessons = site.categories.Python | where_exp: "lesson", "lesson.hide != true" | sort: "title" %}
+        {% if site.categories.Python %}
+            {% assign lessons = site.categories.Python | where_exp: "lesson", "lesson.hide != true" | sort: "title" %}
+        {% else %}
+            {% assign lessons = "" | split: "" %}
+        {% endif %}
     <div class="ocs__grid ocs__grid--card cols-3">
         {% for lesson in lessons %}
         <article class="ocs__grid-cell">

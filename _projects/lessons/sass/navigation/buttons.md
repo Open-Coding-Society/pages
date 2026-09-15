@@ -7,7 +7,8 @@ lesson_language: SASS
 lesson_topic: Buttons
 lesson_part: interactive
 lesson_type: lesson
-permalink: /navigation/sass/buttons/
+microblog: true
+permalink: /sass/buttons/
 ---
 
 <!-- markdownlint-disable MD033 MD046 -->
