@@ -32,11 +32,23 @@ active_tab: submissions
 <link rel="stylesheet" href="{{ '/assets/css/ocs.css' | relative_url }}">
 <link rel="stylesheet" href="{{ '/assets/css/ocs-submissions.css' | relative_url }}">
 
+{% comment %}
+  Text below uses <div>, not <p>. assets/css/style.css -- which every layout on
+  this site loads -- carries `p { color: ... !important }` so the site's theme
+  can beat Tailwind. That rule also beats anything the design system sets on a
+  paragraph, which flattens muted help text to the same brightness as body copy.
+  Matching the escalation would mean another !important; changing the element
+  sidesteps it.
+{% endcomment %}
 <div class="subs">
+  {% comment %}
+    No <h1> here. _layouts/aesthetihawk.html already renders one from
+    `page.title` for every page that uses it, so a heading in this file would be
+    the second one on screen. The page is titled "My Submissions" instead.
+  {% endcomment %}
   <div class="subs__head">
     <div>
-      <h1 class="subs__title">My Submissions</h1>
-      <p class="subs__subtitle" id="subs-subtitle">Everything you have turned in, and what the grader said about it.</p>
+      <div class="subs__subtitle" id="subs-subtitle">Everything you have turned in, and what the grader said about it.</div>
     </div>
     <div class="ocs-cluster">
       <a class="ocs-btn ocs-btn--ghost ocs-btn--sm" href="{{ site.baseurl }}/java/spring/hacks/">
@@ -56,10 +68,10 @@ active_tab: submissions
       <p class="ocs-alert__title" id="subs-alert-title"></p>
       <p>Open the feedback on each one and do what it asks, then bring them to your next check-in.
          Your teacher sets the grade that counts &mdash; the AI writes the first draft.</p>
-      <p class="subs__scale">Scale: <strong>Exceeds</strong> 90&ndash;100 &middot;
+      <div class="subs__scale">Scale: <strong>Exceeds</strong> 90&ndash;100 &middot;
         <strong>Meets</strong> 80&ndash;89 &middot;
         <strong>Approaching</strong> 70&ndash;79 &middot;
-        <strong>Not yet</strong> below 70. Each one is a word and a shape, not colour alone.</p>
+        <strong>Not yet</strong> below 70. Each one is a word and a shape, not colour alone.</div>
     </div>
   </div>
 
@@ -96,6 +108,14 @@ active_tab: submissions
         <label class="ocs-sr-only" for="mine-q">Search my submissions</label>
         <input class="ocs-input" id="mine-q" type="search" placeholder="Search assignments">
       </div>
+      <label class="ocs-sr-only" for="mine-unit">Filter by unit</label>
+      <select class="ocs-select" id="mine-unit" style="width:auto">
+        <option value="all">All units</option>
+        {% for unit in site.data.csa_units.units %}
+        <option value="{{ unit.number }}">Unit {{ unit.number }} &middot; {{ unit.title }}</option>
+        {% endfor %}
+        <option value="none">No unit set</option>
+      </select>
       <label class="ocs-sr-only" for="mine-status">Filter by status</label>
       <select class="ocs-select" id="mine-status" style="width:auto">
         <option value="all">All statuses</option>
@@ -115,7 +135,7 @@ active_tab: submissions
         <p style="margin-top:.75rem">Loading your submissions&hellip;</p>
       </div>
     </div>
-    <p class="ocs-help subs-foot" id="mine-foot" hidden></p>
+    <div class="ocs-help subs-foot" id="mine-foot" hidden></div>
   </div>
 
   <!-- ==================== ALL SUBMISSIONS (admin) ==================== -->
@@ -148,7 +168,7 @@ active_tab: submissions
       <span class="subs__spacer"></span>
       <button class="ocs-btn ocs-btn--secondary ocs-btn--sm" id="summarize-batch-btn" type="button">Run AI check</button>
     </div>
-    <p class="ocs-help" id="summarize-batch-status" aria-live="polite" style="margin-bottom:.75rem"></p>
+    <div class="ocs-help" id="summarize-batch-status" aria-live="polite" style="margin-bottom:.75rem"></div>
 
     <div id="all-body" aria-live="polite">
       <div class="subs-empty" id="all-loading">
@@ -156,7 +176,7 @@ active_tab: submissions
         <p style="margin-top:.75rem">Loading submissions&hellip;</p>
       </div>
     </div>
-    <p class="ocs-help subs-foot" id="all-foot" hidden></p>
+    <div class="ocs-help subs-foot" id="all-foot" hidden></div>
   </div>
 </div>
 
@@ -173,11 +193,11 @@ active_tab: submissions
       <button class="ocs-modal__close" value="cancel" aria-label="Close">&times;</button>
     </header>
     <div class="ocs-modal__body">
-      <p class="fb-assignment">
+      <div class="fb-assignment">
         <span class="subs-kind" id="fb-kind">link</span>
         <span id="fb-name">Assignment</span>
-      </p>
-      <p class="fb-meta" id="fb-meta">&nbsp;</p>
+      </div>
+      <div class="fb-meta" id="fb-meta">&nbsp;</div>
 
       <div class="fb-score">
         <div>
@@ -188,16 +208,16 @@ active_tab: submissions
       </div>
 
       <h3 class="fb-h">What you turned in</h3>
-      <p class="fb-body" id="fb-content">&nbsp;</p>
+      <div class="fb-body" id="fb-content">&nbsp;</div>
 
       <h3 class="fb-h">AI check</h3>
-      <p class="fb-body" id="fb-ai">&nbsp;</p>
+      <div class="fb-body" id="fb-ai">&nbsp;</div>
 
       <h3 class="fb-h">Teacher feedback</h3>
-      <p class="fb-teacher" id="fb-feedback">&nbsp;</p>
+      <div class="fb-teacher" id="fb-feedback">&nbsp;</div>
 
       <h3 class="fb-h">Your comment</h3>
-      <p class="fb-body" id="fb-comment">&nbsp;</p>
+      <div class="fb-body" id="fb-comment">&nbsp;</div>
     </div>
     <footer class="ocs-modal__footer">
       <button class="ocs-btn ocs-btn--ghost" value="cancel">Close</button>
@@ -218,7 +238,7 @@ active_tab: submissions
     <header class="ocs-modal__header">
       <div>
         <h2 class="ocs-modal__title" id="edit-modal-title">Update your submission</h2>
-        <p class="fb-meta" id="edit-modal-subtitle" style="margin:.25rem 0 0"></p>
+        <div class="fb-meta" id="edit-modal-subtitle" style="margin:.25rem 0 0"></div>
       </div>
       <button class="ocs-modal__close" type="button" value="cancel" data-close-edit-modal aria-label="Close edit dialog">&times;</button>
     </header>
@@ -229,11 +249,11 @@ active_tab: submissions
 
       <div class="ocs-field">
         <span class="ocs-label">Assignment</span>
-        <p id="edit-assignment-name" style="margin:0"></p>
+        <div id="edit-assignment-name"></div>
       </div>
       <div class="ocs-field">
         <span class="ocs-label">Submission type</span>
-        <p id="edit-submission-type" style="margin:0"></p>
+        <div id="edit-submission-type"></div>
       </div>
 
       <div id="edit-link-fields" class="ocs-field">
@@ -242,7 +262,7 @@ active_tab: submissions
       </div>
 
       <div id="edit-file-fields" class="ocs-field" hidden>
-        <p class="ocs-help" id="edit-current-file"></p>
+        <div class="ocs-help" id="edit-current-file"></div>
         <label class="ocs-label" for="edit-file">Replace file</label>
         <input type="file" id="edit-file" class="ocs-input">
       </div>
@@ -265,8 +285,8 @@ active_tab: submissions
         <textarea id="edit-feedback" class="ocs-textarea" rows="3" placeholder="Feedback for the student"></textarea>
       </div>
 
-      <p class="ocs-help" id="edit-modal-status" aria-live="polite"></p>
-      <p class="ocs-help">Saving clears the current grade and feedback so the updated submission can be reviewed again.</p>
+      <div class="ocs-help" id="edit-modal-status" aria-live="polite"></div>
+      <div class="ocs-help">Saving clears the current grade and feedback so the updated submission can be reviewed again.</div>
     </div>
 
     <footer class="ocs-modal__footer">
@@ -468,6 +488,19 @@ active_tab: submissions
         return `<span class="ocs-badge ocs-badge--${band.tone} ocs-badge--dot">${band.label}</span>${late}`;
     }
 
+    // The unit and chapter a submission was filed under. They ride inside
+    // `content`, which the lesson's submission form fills in and the API stores
+    // and returns verbatim -- so this needs no backend field of its own.
+    // Older submissions predate the form and have neither; they report "none".
+    function topicOf(submission) {
+        const content = submission.content;
+        if (!content || typeof content === 'string') return null;
+        const unit = Number(content.unit);
+        const chapter = Number(content.chapter);
+        if (!unit || !chapter) return null;
+        return { unit, chapter, code: content.topic || (unit + '.' + chapter), title: content.topicTitle || '' };
+    }
+
     function contentKind(submission) {
         const content = submission.content || {};
         const type = (content.type || (content.filename ? 'file' : 'link') || '').toString().toLowerCase();
@@ -502,9 +535,17 @@ active_tab: submissions
         const nameEl = openable
             ? `<button type="button" class="subs-linkish" data-fb="${submission.id}">${name}</button>`
             : `<span class="subs-name">${name}</span>`;
+        const topic = topicOf(submission);
+        // The chip carries the topic code when the submission has one, because
+        // "4.2" locates the work in the course and "link" does not. The kind is
+        // still on the row, one column over, as the link or the filename.
+        const chip = topic ? escapeHtml(topic.code) : contentKind(submission);
+        const sub = topic && topic.title
+            ? escapeHtml(topic.title)
+            : '#' + escapeHtml(String(submission.id));
         return `<span class="subs-cell">
-            <span class="subs-kind" aria-hidden="true">${contentKind(submission)}</span>
-            <span>${nameEl}<span class="subs-sub">#${escapeHtml(String(submission.id))}</span></span>
+            <span class="subs-kind" aria-hidden="true">${chip}</span>
+            <span>${nameEl}<span class="subs-sub">${sub}</span></span>
           </span>`;
     }
 
@@ -549,8 +590,11 @@ active_tab: submissions
 
         const rows = mySubmissions.map(submission => {
             const band = bandFor(submission);
-            const search = `${submission.assignmentName || ''} ${band.label}`.toLowerCase();
-            return `<tr data-band="${band.key}" data-late="${submission.isLate ? 1 : 0}" data-text="${escapeHtml(search)}">
+            const t = topicOf(submission);
+            const search = `${submission.assignmentName || ''} ${band.label} ${t ? t.code + ' ' + t.title : ''}`.toLowerCase();
+            const topic = topicOf(submission);
+            return `<tr data-band="${band.key}" data-late="${submission.isLate ? 1 : 0}"
+                        data-unit="${topic ? topic.unit : 'none'}" data-text="${escapeHtml(search)}">
                 <th scope="row">${assignmentCell(submission, band !== AWAITING)}</th>
                 <td>${turnedInCell(submission)}</td>
                 <td>${aiCheckCell(submission)}</td>
@@ -588,7 +632,7 @@ active_tab: submissions
     }
 
     function setupMineFilters() {
-        ['mine-q', 'mine-status', 'mine-late'].forEach(id => {
+        ['mine-q', 'mine-unit', 'mine-status', 'mine-late'].forEach(id => {
             const el = document.getElementById(id);
             if (!el) return;
             ['input', 'change'].forEach(ev => el.addEventListener(ev, applyMineFilters));
@@ -602,12 +646,14 @@ active_tab: submissions
 
         const needle = (document.getElementById('mine-q').value || '').trim().toLowerCase();
         const want = document.getElementById('mine-status').value;
+        const wantUnit = document.getElementById('mine-unit').value;
         const showLate = document.getElementById('mine-late').checked;
 
         let shown = 0;
         rows.forEach(row => {
             const ok = (!needle || row.dataset.text.indexOf(needle) > -1) &&
                        (want === 'all' || row.dataset.band === want) &&
+                       (wantUnit === 'all' || row.dataset.unit === wantUnit) &&
                        (showLate || row.dataset.late !== '1');
             row.hidden = !ok;
             if (ok) shown++;

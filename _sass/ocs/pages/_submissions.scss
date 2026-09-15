@@ -36,25 +36,6 @@
   margin-bottom: fn.space(5);
 }
 
-.subs__title {
-  display: flex;
-  align-items: center;
-  gap: fn.space(3);
-  flex-wrap: wrap;
-  margin: 0 0 fn.space(1);
-  color: var(--ocs-text);
-  font-size: fn.typo(h2);
-  font-weight: fn.typo(h2, weight);
-  letter-spacing: fn.typo(h1, tracking);
-
-  // The badge rides the heading, so it must not inherit the heading's size.
-  .ocs-badge {
-    font-size: fn.typo(small);
-    font-weight: 400;
-    letter-spacing: 0;
-  }
-}
-
 .subs__subtitle {
   margin: 0;
   color: var(--ocs-text-muted);

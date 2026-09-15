@@ -1,6 +1,6 @@
 ---
 layout: submissions
-title: Submissions
+title: My Submissions
 permalink: /submissions
 comments: false
 ---

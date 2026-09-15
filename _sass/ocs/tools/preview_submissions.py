@@ -24,13 +24,17 @@ import shutil
 
 REPO = pathlib.Path(__file__).resolve().parents[3]
 OUT = REPO / ".preview"
+# Where to look for a Jekyll build, for the generated stylesheet below.
+SITE_DIRS = [REPO / "_site", pathlib.Path("/tmp/subs-site")]
 
 # One row per state the table can render, so a glance at the preview covers the
 # whole matrix rather than whichever case the fixture happened to include.
 FIXTURE = [
     {"id": 101, "assignmentName": "Java Spring Hacks - Sprint 1 Final",
      "submitterName": "achen", "submitterId": 1,
-     "content": {"type": "link", "url": "https://github.com/achen/spring-sprint1"},
+     "content": {"type": "link", "url": "https://github.com/achen/spring-sprint1",
+                 "unit": 4, "chapter": 5, "topic": "4.5", "topicTitle": "Implementing Array Algorithms",
+                 "dueDate": "2026-01-16"},
      "grade": 95, "feedback": "Strong work. The API layer is clean and the POJO maps exactly to the table.",
      "comment": "Deployed to AWS, endpoint in the README.",
      "aiSummary": "Full CRUD controller with a matching JPA entity. Error handling covers the 404 path.",
@@ -39,20 +43,25 @@ FIXTURE = [
      "submitterName": "achen", "submitterId": 1,
      "content": {"type": "file", "filename": "ApiController.java",
                  "storagePath": "achen/ApiController.java", "contentType": "text/x-java", "size": 4120,
+                 "unit": 3, "chapter": 3, "topic": "3.3", "topicTitle": "Anatomy of a Class",
+                 "dueDate": "2026-01-09",
                  "notes": "Second attempt after the boundary fix."},
      "grade": 84, "feedback": "", "comment": "",
      "aiSummary": "Endpoints are correct. Two methods have no Javadoc and one returns a raw entity.",
      "qualityScore": 4, "isLate": False},
     {"id": 103, "assignmentName": "Java Persistence API (JPA)",
      "submitterName": "achen", "submitterId": 1,
-     "content": {"type": "link", "url": "https://github.com/achen/jpa-lesson"},
+     "content": {"type": "link", "url": "https://github.com/achen/jpa-lesson",
+                 "unit": 4, "chapter": 6, "topic": "4.6", "topicTitle": "Using Text Files",
+                 "dueDate": "2026-01-12"},
      "grade": 74, "feedback": "Bring this one to Thursday's check-in.",
      "comment": "Not sure the relationship mapping is right.",
      "aiSummary": "The entity persists, but the one-to-many is mapped on the wrong side, so the join table is unused.",
      "qualityScore": 3, "isLate": True},
     {"id": 104, "assignmentName": "Plain Old Java Objects (POJO)",
      "submitterName": "achen", "submitterId": 1,
-     "content": {"type": "link", "url": "https://github.com/achen/pojo"},
+     "content": {"type": "link", "url": "https://github.com/achen/pojo",
+                 "unit": 3, "chapter": 4, "topic": "3.4", "topicTitle": "Constructors"},
      "grade": 55, "feedback": "This needs another attempt before it counts.",
      "comment": "",
      "aiSummary": "The class compiles but has no no-arg constructor, so JPA cannot instantiate it.",
@@ -60,7 +69,8 @@ FIXTURE = [
     {"id": 105, "assignmentName": "Frontend UI",
      "submitterName": "achen", "submitterId": 1,
      "content": {"type": "file", "filename": "ui-notes.pdf", "storagePath": "achen/ui-notes.pdf",
-                 "contentType": "application/pdf", "size": 88210},
+                 "contentType": "application/pdf", "size": 88210,
+                 "unit": 1, "chapter": 12, "topic": "1.12", "topicTitle": "Objects: Instances of Classes"},
      "grade": None, "feedback": None, "comment": "Turned in right before the deadline.",
      "aiSummary": None, "qualityScore": None, "isLate": False},
     {"id": 106, "assignmentName": "Anatomy of a Spring Boot Project",
@@ -71,19 +81,52 @@ FIXTURE = [
      "qualityScore": 4, "isLate": False},
     {"id": 107, "assignmentName": "Introduction Java Spring Framework",
      "submitterName": "mlopez", "submitterId": 3,
+     # No unit or chapter: a submission made before the form asked for them.
      "content": {"type": "link", "url": "https://github.com/mlopez/spring-intro"},
      "grade": None, "feedback": None, "comment": "", "aiSummary": None,
      "qualityScore": None, "isLate": True},
 ]
 
 
+def units():
+    """The course units, straight from the file Jekyll reads."""
+    import yaml
+    doc = yaml.safe_load((REPO / "_data/csa_units.yml").read_text())
+    return doc["units"]
+
+
 def strip_liquid(html, baseurl=""):
-    """Turn the layout into a plain page: drop frontmatter and comments, and
-    resolve the handful of Liquid expressions that produce URLs."""
+    """Turn the layout into a plain page: drop frontmatter and comments, expand
+    the one data loop, and resolve the Liquid expressions that produce URLs.
+
+    This is a stand-in for Liquid, not an implementation of it. It handles
+    exactly what this layout uses; anything else would pass through as literal
+    text, which is loud enough to notice.
+    """
     html = re.sub(r"\A---\n.*?\n---\n", "", html, flags=re.S)
     html = re.sub(r"\{%\s*comment\s*%\}.*?\{%\s*endcomment\s*%\}", "", html, flags=re.S)
+
+    # {% for unit in site.data.csa_units.units %} ... {% endfor %}
+    def expand(match):
+        body = match.group(1)
+        out = []
+        for unit in units():
+            piece = body
+            piece = piece.replace("{{ unit.number }}", str(unit["number"]))
+            piece = piece.replace("{{ unit.title }}", unit["title"])
+            out.append(piece)
+        return "".join(out)
+
+    html = re.sub(
+        r"\{%\s*for\s+unit\s+in\s+site\.data\.csa_units\.units\s*%\}(.*?)\{%\s*endfor\s*%\}",
+        expand, html, flags=re.S)
+
     html = re.sub(r"\{\{\s*'([^']+)'\s*\|\s*relative_url\s*\}\}", rf"{baseurl}\1", html)
     html = re.sub(r"\{\{\s*site\.baseurl\s*\}\}", baseurl, html)
+
+    leftover = re.findall(r"\{%.*?%\}|\{\{.*?\}\}", html, flags=re.S)
+    if leftover:
+        print(f"  warning: {len(leftover)} Liquid tag(s) not handled: {leftover[:3]}")
     return html
 
 
@@ -102,6 +145,21 @@ def build(is_admin):
     (OUT / "assets/js").mkdir(parents=True, exist_ok=True)
     for name in ("ocs.css", "ocs-submissions.css"):
         shutil.copy(REPO / "assets/css" / name, OUT / "assets/css" / name)
+
+    # style.css is pulled in on purpose, from a Jekyll build rather than the
+    # source tree -- it is generated, not committed. It carries
+    # `p { color: ... !important }`, and a preview without it shows a text
+    # hierarchy the real page does not have. That is not hypothetical: it is how
+    # a flattened-help-text bug reached a screenshot once already.
+    built = next((d / "assets/css/style.css" for d in SITE_DIRS
+                  if (d / "assets/css/style.css").exists()), None)
+    if built:
+        shutil.copy(built, OUT / "assets/css/style.css")
+    else:
+        print("  warning: no built style.css found in " +
+              ", ".join(str(d) for d in SITE_DIRS) +
+              " -- run `bundle exec jekyll build` first, or this preview will "
+              "overstate the text hierarchy")
     shutil.copy(REPO / "assets/js/ocs.js", OUT / "assets/js/ocs.js")
 
     (OUT / "mock-config.js").write_text(
@@ -115,6 +173,7 @@ def build(is_admin):
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Submissions preview</title>
+<link rel="stylesheet" href="assets/css/style.css">
 <style>
   body {{ margin: 0; padding: 2rem; background: #121212; color: #fff;
           font-family: Inter, system-ui, sans-serif; }}

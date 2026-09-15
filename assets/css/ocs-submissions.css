@@ -22,23 +22,6 @@
   margin-bottom: 1.25rem;
 }
 
-.subs__title {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  margin: 0 0 0.25rem;
-  color: var(--ocs-text);
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-.subs__title .ocs-badge {
-  font-size: 0.875rem;
-  font-weight: 400;
-  letter-spacing: 0;
-}
-
 .subs__subtitle {
   margin: 0;
   color: var(--ocs-text-muted);
