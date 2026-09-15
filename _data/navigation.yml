@@ -8,7 +8,9 @@
   url: /navigation/courses/csh/
 - title: Blog
   url: /navigation/blogs/
+- title: Lessons
+  url: /navigation/js-reference/
 - title: Search
-  url: /navigation/search/
+  url: /search/
 - title: Login
   url: /login/
