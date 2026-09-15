@@ -1,0 +1,12 @@
+<!-- Course Navigation Pill Menu -->
+{% assign current_course = page.course | downcase %}
+<div class="ocs__grid course-pill-nav" style="margin-bottom: 1.25rem;">
+  <div class="ocs__grid-cell">
+    <div class="ocs__links ocs__links--wide">
+      <a href="{{ site.baseurl }}/navigation/courses/csse" class="ocs__btn pill{% if current_course == 'csse' %} alert-green fill{% endif %}"{% if current_course == 'csse' %} aria-current="page"{% endif %}>CSSE</a>
+      <a href="{{ site.baseurl }}/navigation/courses/csp" class="ocs__btn pill{% if current_course == 'csp' %} alert-green fill{% endif %}"{% if current_course == 'csp' %} aria-current="page"{% endif %}>CSP</a>
+      <a href="{{ site.baseurl }}/navigation/courses/csa" class="ocs__btn pill{% if current_course == 'csa' %} alert-green fill{% endif %}"{% if current_course == 'csa' %} aria-current="page"{% endif %}>CSA</a>
+      <a href="{{ site.baseurl }}/navigation/courses/csh" class="ocs__btn pill{% if current_course == 'csh' %} alert-green fill{% endif %}"{% if current_course == 'csh' %} aria-current="page"{% endif %}>CSH</a>
+    </div>
+  </div>
+</div>

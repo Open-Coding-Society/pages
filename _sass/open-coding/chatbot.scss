@@ -1,8 +1,6 @@
 @import "materials/main";
-@import "root-color-map"; // central color variables (do not duplicate)
+@import "theme/legacy/root-color-map.scss"; // central color variables (do not duplicate)
 
-// note: # is used for id, . used for classes
-// Color variables are defined centrally in root-color-map.scss / user-colors.scss
 $spacing-unit: 2rem;
 
 //mixin for button

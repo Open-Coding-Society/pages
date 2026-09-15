@@ -215,6 +215,59 @@ make -C _projects/games/my-new-game build
 
 The template Makefile will be automatically copied on first build!
 
+The games catalog is placed by the page author. For a notebook page, add this
+Liquid include inside an HTML/UI runner cell where the catalog should appear:
+
+```liquid
+{% include games-directory.html %}
+```
+
+The catalog heading and description are configured in `_config.yml` under
+`games_directory`; game visibility is controlled by each converted page's
+`game_directory: true` frontmatter.
+
+Project files placed in a project's `navigation/` directory are published by
+the standard project Makefile:
+
+- `.md` files go to `_posts/projects/<project-name>/` with the navigation date prefix.
+- `.html` files go to `_includes/projects/<project-name>/`.
+- `.ipynb` files go to `_notebooks/projects/<project-name>/` with the navigation date prefix.
+
+### Game Catalog Images
+
+For a game with `game_directory: true`, add a project-root `favicon.png`:
+
+```text
+_projects/games/<project-name>/favicon.png
+```
+
+The project Makefile publishes it to:
+
+```text
+images/projects/<project-name>/favicon.png
+```
+
+The games catalog uses that file automatically unless the page frontmatter
+provides an explicit `image:` value.
+
+### Games Directory Metadata
+
+Converted game pages can opt into the shared Jekyll games directory through
+frontmatter in the source notebook or Markdown page:
+
+```yaml
+game_directory: true
+game_order: 10
+game_category: "Game"
+image: "/images/projects/my-new-game/thumbnail.png"
+```
+
+Use `exclude_from_games: true` when a registered project should not appear in
+the directory. The reusable include is `_includes/games-directory.html`; add it
+to the HTML content of a page such as CS Pathway after the project page has
+been converted. The include reads `site.posts`, so it requires no generated
+game list or manual link maintenance.
+
 ## Managing Projects
 
 ### List Registered Projects
