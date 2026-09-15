@@ -94,3 +94,24 @@
 
   &--wide { gap: fn.space(4); }
 }
+
+// -----------------------------------------------------------------------------
+// LINK-SHAPED BUTTONS
+// -----------------------------------------------------------------------------
+// assets/css/style.css, which every layout on this site loads, contains:
+//
+//   a { color: <theme link colour> !important; }
+//
+// It is !important so the user-preference theme can beat the Tailwind CDN build
+// that several layouts pull in. The side effect is that `<a class="ocs-btn">`
+// renders in link blue instead of the button's own foreground, on every page.
+//
+// This is the one place in the system that answers !important with !important,
+// and it is deliberate: the compat layer exists to reconcile this system with
+// the stylesheet that came before it, and the alternative is telling every
+// author to use a <button> for navigation, which is worse HTML. One property,
+// one selector. Delete it when style.css stops shouting.
+a.ocs-btn,
+a.ocs__btn {
+  color: var(--btn-fg) !important;
+}

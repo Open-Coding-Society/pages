@@ -2153,3 +2153,8 @@
 .ocs__links--wide {
   gap: 1rem;
 }
+
+a.ocs-btn,
+a.ocs__btn {
+  color: var(--btn-fg) !important;
+}

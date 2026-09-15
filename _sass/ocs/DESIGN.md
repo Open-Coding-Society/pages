@@ -309,3 +309,21 @@ a second full copy of Bootstrap nested under `.dark-mode`.
 - **`--ocs-accent-contrast` is a fixed value.** Under a user theme it can fall
   below AA against a light custom accent. Fixing it properly needs either
   `color-contrast()` (not yet reliable) or a JS-computed value.
+
+## Do not put system text colours on a `<p>`
+
+`assets/css/style.css` — loaded by every layout on this site — contains:
+
+```css
+p { color: var(--pref-text-color) !important; }
+```
+
+It is `!important` so the user-preference theme can beat the Tailwind CDN build
+that several layouts pull in. The side effect is that **any colour this design
+system sets on a paragraph loses**. `.ocs-help` on a `<p>` renders at body
+brightness instead of muted, and the whole hierarchy of a page flattens.
+
+Use a `<div>` for text that needs a system colour. Adding a second `!important`
+to win the fight makes the next override harder for everyone.
+
+This bites only on colour. Size, spacing and weight on a `<p>` are unaffected.
