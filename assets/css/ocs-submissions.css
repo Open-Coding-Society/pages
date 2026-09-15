@@ -1,0 +1,355 @@
+/*!
+ * OCS Design System -- GENERATED FILE, DO NOT EDIT
+ *
+ * Source:    _sass/ocs/pages/_submissions.scss
+ * Generator: _sass/ocs/tools/build.sh
+ * Rebuild:   bash _sass/ocs/tools/build.sh
+ *
+ * Hand-edits here are destroyed on the next build. Change the SCSS instead.
+ */
+.subs {
+  max-width: 1400px;
+  color: var(--ocs-text);
+  font-family: var(--ocs-font-sans);
+}
+
+.subs__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.subs__title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0 0 0.25rem;
+  color: var(--ocs-text);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.subs__title .ocs-badge {
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.subs__subtitle {
+  margin: 0;
+  color: var(--ocs-text-muted);
+  font-size: 0.875rem;
+}
+
+.subs__scale {
+  margin-block-start: 0.5rem;
+  color: var(--ocs-text-muted);
+  font-size: 0.875rem;
+}
+
+.subs__stats {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  margin-bottom: 1.25rem;
+}
+
+.subs__toolbar {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+}
+.subs__toolbar .subs__spacer {
+  margin-inline-start: auto;
+}
+
+.subs__search {
+  position: relative;
+  flex: 0 1 260px;
+}
+.subs__search svg {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 0.6rem;
+  transform: translateY(-50%);
+  color: var(--ocs-text-muted);
+  pointer-events: none;
+}
+.subs__search .ocs-input {
+  padding-inline-start: 2rem;
+}
+
+.subs-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 15rem;
+}
+
+.subs-kind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 2.6rem;
+  height: 1.5rem;
+  padding-inline: 0.3rem;
+  border-radius: 4px;
+  background: var(--ocs-surface-elevated);
+  color: var(--ocs-text-secondary);
+  font-family: var(--ocs-font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+}
+
+.subs-name {
+  display: block;
+  color: var(--ocs-text);
+  font-weight: 500;
+}
+
+.subs-linkish {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ocs-text);
+  font: inherit;
+  font-weight: 500;
+  text-align: start;
+  cursor: pointer;
+}
+.subs-linkish:hover, .subs-linkish:focus-visible {
+  color: var(--ocs-brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.subs-linkish:focus-visible {
+  outline: 2px solid var(--ocs-brand-border);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.subs-sub {
+  display: block;
+  font-family: var(--ocs-font-mono);
+  font-size: 0.7rem;
+  color: var(--ocs-text-muted);
+}
+
+.subs-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 130px;
+}
+.subs-bar .ocs-progress {
+  flex: 1 1 auto;
+}
+
+.subs-pct {
+  font-size: 0.75rem;
+  color: var(--ocs-text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 2.6em;
+  text-align: end;
+}
+
+.subs-blank {
+  display: inline-block;
+  min-width: 130px;
+  color: var(--ocs-text-muted);
+}
+
+.subs-pips {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.subs-pip {
+  width: 6px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--ocs-surface-elevated);
+}
+.subs-pip[data-on="1"] {
+  background: var(--ocs-text-secondary);
+}
+
+.subs-pips__label {
+  margin-inline-start: 0.5rem;
+  color: var(--ocs-text-muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.subs-link {
+  display: inline-block;
+  max-width: 28ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+  color: var(--ocs-info);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.subs-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.subs-table {
+  min-width: 1020px;
+}
+
+.subs-table--admin {
+  min-width: 1420px;
+}
+
+.subs-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-width: 18rem;
+  max-width: 34ch;
+  color: var(--ocs-text-secondary);
+  font-size: 0.875rem;
+}
+
+.subs-muted {
+  color: var(--ocs-text-muted);
+  font-style: italic;
+}
+
+.subs-empty {
+  padding-block: 2.5rem;
+  color: var(--ocs-text-muted);
+  text-align: center;
+}
+
+.subs-foot {
+  margin-block-start: 0.75rem;
+  max-width: 72ch;
+}
+
+.subs-grade-input {
+  width: 5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.subs-feedback-input {
+  min-width: 16rem;
+  min-height: 3.5rem;
+  resize: vertical;
+}
+
+.subs-rowactions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.subs-rowstatus {
+  font-size: 0.75rem;
+  color: var(--ocs-text-muted);
+}
+
+.fb-assignment {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.25rem;
+  color: var(--ocs-text);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.fb-meta {
+  margin: 0 0 1rem;
+  color: var(--ocs-text-muted);
+  font-size: 0.875rem;
+}
+
+.fb-score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--ocs-border);
+  border-radius: 10px;
+  background: var(--ocs-surface-raised);
+  margin-bottom: 1rem;
+}
+
+.fb-score__value {
+  display: block;
+  color: var(--ocs-text);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.fb-score__label {
+  display: block;
+  margin-block-start: 0.25rem;
+  color: var(--ocs-text-muted);
+  font-size: 0.875rem;
+}
+
+.fb-h {
+  margin: 0 0 0.5rem;
+  color: var(--ocs-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fb-body {
+  margin: 0 0 1.25rem;
+  color: var(--ocs-text-secondary);
+  max-width: 68ch;
+}
+
+.fb-teacher {
+  margin: 0 0 1.25rem;
+  padding-inline-start: 1rem;
+  border-inline-start: 2px solid var(--ocs-brand-border);
+  color: var(--ocs-text-secondary);
+  max-width: 68ch;
+}
+
+.fb-teacher--empty {
+  border-inline-start-color: var(--ocs-border);
+  color: var(--ocs-text-muted);
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .subs__head {
+    gap: 0.75rem;
+  }
+  .fb-score {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .subs-clamp {
+    max-width: none;
+  }
+}

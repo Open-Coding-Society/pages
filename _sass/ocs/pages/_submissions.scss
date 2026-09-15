@@ -1,0 +1,410 @@
+// =============================================================================
+// SUBMISSIONS DASHBOARD — page layer
+// =============================================================================
+// Layout and the handful of cells the component library does not cover. Every
+// colour, size, radius and breakpoint comes from the token functions, so this
+// page moves when the design system moves.
+//
+// It is NOT part of `@use "ocs"`. A page stylesheet belongs to one page; adding
+// it to the global bundle would ship the submissions table to every lesson on
+// the site. `_sass/ocs/tools/build.sh` compiles each file in this directory to
+// its own `assets/css/ocs-<name>.css`, and the layout links the one it needs.
+//
+// The page renders inside `_layouts/aesthetihawk.html`, which loads Tailwind
+// from a CDN. Nothing here styles a bare element for that reason -- a rule on
+// `table` or `h1` would reach out of this page and into the rest of the shell.
+// =============================================================================
+@use "../core/functions" as fn;
+
+.subs {
+  // The aesthetihawk shell already supplies the outer page padding, so this
+  // only has to bound the line length of the widest thing on the page.
+  max-width: 1400px;
+  color: var(--ocs-text);
+  font-family: var(--ocs-font-sans);
+}
+
+// -----------------------------------------------------------------------------
+// HEAD
+// -----------------------------------------------------------------------------
+.subs__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: fn.space(4);
+  flex-wrap: wrap;
+  margin-bottom: fn.space(5);
+}
+
+.subs__title {
+  display: flex;
+  align-items: center;
+  gap: fn.space(3);
+  flex-wrap: wrap;
+  margin: 0 0 fn.space(1);
+  color: var(--ocs-text);
+  font-size: fn.typo(h2);
+  font-weight: fn.typo(h2, weight);
+  letter-spacing: fn.typo(h1, tracking);
+
+  // The badge rides the heading, so it must not inherit the heading's size.
+  .ocs-badge {
+    font-size: fn.typo(small);
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+}
+
+.subs__subtitle {
+  margin: 0;
+  color: var(--ocs-text-muted);
+  font-size: fn.typo(small);
+}
+
+// The band cut-points, set inside the alert. A reader needs the scale once, not
+// on every glance, so it is quieter than the sentence above it.
+.subs__scale {
+  margin-block-start: fn.space(2);
+  color: var(--ocs-text-muted);
+  font-size: fn.typo(small);
+}
+
+.subs__stats {
+  display: grid;
+  gap: fn.space(3);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  margin-bottom: fn.space(5);
+}
+
+// -----------------------------------------------------------------------------
+// TOOLBAR
+// -----------------------------------------------------------------------------
+.subs__toolbar {
+  display: flex;
+  gap: fn.space(2) + 0.1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: fn.space(3) + 0.15rem;
+
+  .subs__spacer { margin-inline-start: auto; }
+}
+
+// The magnifier is decoration sitting on top of the input, so it is taken out
+// of the flow and the input is padded to leave room for it. Without the
+// pointer-events reset a click on the icon would miss the field.
+.subs__search {
+  position: relative;
+  flex: 0 1 260px;
+
+  svg {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: fn.space(2) + 0.1rem;
+    transform: translateY(-50%);
+    color: var(--ocs-text-muted);
+    pointer-events: none;
+  }
+
+  .ocs-input { padding-inline-start: fn.space(8); }
+}
+
+// -----------------------------------------------------------------------------
+// TABLE CELLS
+// -----------------------------------------------------------------------------
+.subs-cell {
+  display: flex;
+  align-items: center;
+  gap: fn.space(2) + 0.1rem;
+  // Without a floor the browser hands this column whatever is left over, and
+  // "Java Spring Hacks - Sprint 1 Final" stacks four words deep.
+  min-width: 15rem;
+}
+
+// The submission kind, in the slot a roster table would give an avatar. A
+// rounded rectangle rather than a circle because the words are "link" and
+// "file", and the height matches the avatar so the row rhythm is unchanged.
+.subs-kind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 2.6rem;
+  height: 1.5rem;
+  padding-inline: fn.space(1) + 0.05rem;
+  border-radius: fn.radius(sm);
+  background: var(--ocs-surface-elevated);
+  color: var(--ocs-text-secondary);
+  font-family: var(--ocs-font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+}
+
+.subs-name {
+  display: block;
+  color: var(--ocs-text);
+  font-weight: 500;
+}
+
+// A graded submission opens its feedback from the assignment name, so the name
+// is a button. It is styled back down to look like the plain text beside it
+// until you point at it -- a table of underlined links is unreadable.
+.subs-linkish {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ocs-text);
+  font: inherit;
+  font-weight: 500;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--ocs-brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ocs-brand-border);
+    outline-offset: 2px;
+    border-radius: fn.radius(sm);
+  }
+}
+
+.subs-sub {
+  display: block;
+  font-family: var(--ocs-font-mono);
+  font-size: 0.7rem;
+  color: var(--ocs-text-muted);
+}
+
+.subs-bar {
+  display: flex;
+  align-items: center;
+  gap: fn.space(2);
+  min-width: 130px;
+
+  .ocs-progress { flex: 1 1 auto; }
+}
+
+// tabular-nums keeps the percentage column from shifting as values change.
+.subs-pct {
+  font-size: 0.75rem;
+  color: var(--ocs-text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 2.6em;
+  text-align: end;
+}
+
+// A submission with no grade has no bar to draw. An em dash in the muted colour
+// holds the column width without pretending the value is zero.
+.subs-blank {
+  display: inline-block;
+  min-width: 130px;
+  color: var(--ocs-text-muted);
+}
+
+// The AI quality score is 1-5, not a percentage, so it is shown as five pips
+// rather than a bar -- a five-step scale drawn as a bar reads as "20% done".
+.subs-pips {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.subs-pip {
+  width: 6px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--ocs-surface-elevated);
+
+  &[data-on="1"] { background: var(--ocs-text-secondary); }
+}
+
+.subs-pips__label {
+  margin-inline-start: fn.space(2);
+  color: var(--ocs-text-muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+// A URL is shown without its scheme and clamped to one line. `break-all` was
+// splitting "github.com/achen/jpa-lesson" mid-word across two rows, which is
+// harder to read than an ellipsis and made every row a different height.
+.subs-link {
+  display: inline-block;
+  max-width: 28ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+  color: var(--ocs-info);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+// The two row buttons sit side by side. Without this they wrap to two lines as
+// soon as the column narrows, and every row grows a second line of height.
+.subs-actions {
+  display: flex;
+  align-items: center;
+  gap: fn.space(1);
+  white-space: nowrap;
+}
+
+// A table of six to nine columns cannot be squeezed into a phone; below this
+// width the wrapper scrolls instead of crushing every column to three letters.
+.subs-table { min-width: 1020px; }
+.subs-table--admin { min-width: 1420px; }
+
+// Long free text in a cell is clamped rather than wrapped: two submissions with
+// paragraph-length comments would otherwise set the height of every row.
+.subs-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  // A floor as well as a ceiling: squeezed to eight characters the AI summary
+  // says nothing, and the full text is on the element's title either way.
+  min-width: 18rem;
+  max-width: 34ch;
+  color: var(--ocs-text-secondary);
+  font-size: fn.typo(small);
+}
+
+.subs-muted {
+  color: var(--ocs-text-muted);
+  font-style: italic;
+}
+
+.subs-empty {
+  padding-block: fn.space(10);
+  color: var(--ocs-text-muted);
+  text-align: center;
+}
+
+.subs-foot {
+  margin-block-start: fn.space(3);
+  max-width: 72ch;
+}
+
+// -----------------------------------------------------------------------------
+// ADMIN GRADING CELLS
+// -----------------------------------------------------------------------------
+.subs-grade-input {
+  width: 5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.subs-feedback-input {
+  min-width: 16rem;
+  min-height: 3.5rem;
+  resize: vertical;
+}
+
+.subs-rowactions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: fn.space(1);
+}
+
+.subs-rowstatus {
+  font-size: 0.75rem;
+  color: var(--ocs-text-muted);
+}
+
+// -----------------------------------------------------------------------------
+// FEEDBACK DIALOG — the part of the screen that is actually the point
+// -----------------------------------------------------------------------------
+.fb-assignment {
+  display: flex;
+  align-items: center;
+  gap: fn.space(2) + 0.1rem;
+  margin: 0 0 fn.space(1);
+  color: var(--ocs-text);
+  font-size: fn.typo(h4);
+  font-weight: fn.typo(h4, weight);
+}
+
+.fb-meta {
+  margin: 0 0 fn.space(4);
+  color: var(--ocs-text-muted);
+  font-size: fn.typo(small);
+}
+
+.fb-score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: fn.space(4);
+  padding: fn.space(3) fn.space(4);
+  border: 1px solid var(--ocs-border);
+  border-radius: fn.radius(lg);
+  background: var(--ocs-surface-raised);
+  margin-bottom: fn.space(4);
+}
+
+.fb-score__value {
+  display: block;
+  color: var(--ocs-text);
+  font-size: fn.typo(h1);
+  font-weight: fn.typo(h1, weight);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.fb-score__label {
+  display: block;
+  margin-block-start: fn.space(1);
+  color: var(--ocs-text-muted);
+  font-size: fn.typo(small);
+}
+
+.fb-h {
+  margin: 0 0 fn.space(2);
+  color: var(--ocs-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fb-body {
+  margin: 0 0 fn.space(5);
+  color: var(--ocs-text-secondary);
+  max-width: 68ch;
+}
+
+// The teacher's word is the last one on the screen, so it is set apart rather
+// than running on as another paragraph.
+.fb-teacher {
+  margin: 0 0 fn.space(5);
+  padding-inline-start: fn.space(4);
+  border-inline-start: 2px solid var(--ocs-brand-border);
+  color: var(--ocs-text-secondary);
+  max-width: 68ch;
+}
+
+.fb-teacher--empty {
+  border-inline-start-color: var(--ocs-border);
+  color: var(--ocs-text-muted);
+  font-style: italic;
+}
+
+// -----------------------------------------------------------------------------
+// NARROW
+// -----------------------------------------------------------------------------
+@media (max-width: fn.breakpoint(mobile)) {
+  .subs__head { gap: fn.space(3); }
+
+  .fb-score {
+    flex-wrap: wrap;
+    gap: fn.space(2);
+  }
+
+  .subs-clamp { max-width: none; }
+}
