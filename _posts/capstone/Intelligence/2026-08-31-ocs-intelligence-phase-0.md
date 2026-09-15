@@ -23,10 +23,10 @@ year: 2026-2027
 {% else %}
 <div class="ocs-intelligence-infograph">
   <div class="ocs-intelligence-header">
-    <div class="ocs-intelligence-badge">{{ stage.navKicker }} of {{ data.stages | size }} · Implementation</div>
+    <div class="ocs__badge">{{ stage.navKicker }} of {{ data.stages | size }} · Implementation</div>
     <h1 class="ocs-intelligence-title">{{ stage.title }}</h1>
-    <p class="ocs-intelligence-description">{{ stage.summary }}</p>
-    <div class="ocs-intelligence-status ocs-intelligence-stage-status">{{ stage.status }}</div>
+    <p class="ocs__description">{{ stage.summary }}</p>
+    <div class="ocs__status ocs-intelligence-stage-status">{{ stage.status }}</div>
   </div>
 
   {% assign current_stage = page.ocs_stage | default: "" %}
@@ -57,16 +57,16 @@ year: 2026-2027
 
   {% if stage.showDonation %}
   {% assign gift = data.donation %}
-  <div class="ocs-intelligence-card ocs-intelligence-gift">
+  <div class="ocs__card ocs-intelligence-gift">
     <p class="ocs-intelligence-gift-kicker">{{ gift.kicker }}</p>
-    <h3 class="ocs-intelligence-section-title">{{ gift.title }}</h3>
+    <h3 class="ocs__section-title">{{ gift.title }}</h3>
     <p class="ocs-intelligence-about">{{ gift.body }}</p>
     <p class="ocs-intelligence-cost-line">{{ gift.costLine }}</p>
   </div>
   {% endif %}
 
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">What this phase is for</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">What this phase is for</h3>
     <div class="ocs-intelligence-keypoints">
       {% for goal in stage.goals %}
       <div class="ocs-intelligence-keypoint">
@@ -78,19 +78,19 @@ year: 2026-2027
     {% if stage.tech %}
     <div class="ocs-intelligence-tech-stack">
       {% for tech in stage.tech %}
-      <span class="ocs-intelligence-tech-tag">{{ tech }}</span>
+      <span class="ocs__status-pill">{{ tech }}</span>
       {% endfor %}
     </div>
     {% endif %}
   </div>
 
   {% if stage.workstreams %}
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">How the work shows up</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">How the work shows up</h3>
     <div class="ocs-intelligence-facts">
       {% for item in stage.workstreams %}
       <div class="ocs-intelligence-visual">
-        <span class="ocs-intelligence-team-label">{{ item.title }}</span>
+        <span class="ocs__team-label">{{ item.title }}</span>
         <p class="ocs-intelligence-about">{{ item.detail }}</p>
       </div>
       {% endfor %}
@@ -99,8 +99,8 @@ year: 2026-2027
   {% endif %}
 
   {% if stage.doneWhen %}
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Done when</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Done when</h3>
     <div class="ocs-intelligence-keypoints">
       {% for item in stage.doneWhen %}
       <div class="ocs-intelligence-keypoint">
@@ -115,14 +115,14 @@ year: 2026-2027
   {% if stage.showAllResearchQuestions %}
   <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.researchQuestionsNote }}</p>
   {% for item in data.researchQuestions %}
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">{{ item.label }}{% if item.priority %} · {{ item.priority }}{% endif %}</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">{{ item.label }}{% if item.priority %} · {{ item.priority }}{% endif %}</h3>
     <p class="ocs-intelligence-question">{{ item.question }}</p>
     <div class="ocs-intelligence-facts">
       {% for fact in item.facts %}
       <div class="ocs-intelligence-visual">
-        <span class="ocs-intelligence-team-label">{{ fact.label }}</span>
-        <span class="ocs-intelligence-team-name">{{ fact.text }}</span>
+        <span class="ocs__team-label">{{ fact.label }}</span>
+        <span class="ocs__team-name">{{ fact.text }}</span>
       </div>
       {% endfor %}
     </div>
@@ -134,14 +134,14 @@ year: 2026-2027
   {% elsif stage.showResearchQuestion %}
   {% assign rq_index = stage.showResearchQuestion | minus: 1 %}
   {% assign item = data.researchQuestions[rq_index] %}
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">{{ item.label }}{% if item.priority %} · {{ item.priority }}{% endif %}</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">{{ item.label }}{% if item.priority %} · {{ item.priority }}{% endif %}</h3>
     <p class="ocs-intelligence-question">{{ item.question }}</p>
     <div class="ocs-intelligence-facts">
       {% for fact in item.facts %}
       <div class="ocs-intelligence-visual">
-        <span class="ocs-intelligence-team-label">{{ fact.label }}</span>
-        <span class="ocs-intelligence-team-name">{{ fact.text }}</span>
+        <span class="ocs__team-label">{{ fact.label }}</span>
+        <span class="ocs__team-name">{{ fact.text }}</span>
       </div>
       {% endfor %}
     </div>
@@ -152,13 +152,13 @@ year: 2026-2027
   {% endif %}
 
   {% if stage.priorities %}
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Priorities for this phase</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Priorities for this phase</h3>
     <div class="ocs-intelligence-facts">
       {% for item in stage.priorities %}
       <div class="ocs-intelligence-visual">
-        <span class="ocs-intelligence-team-label">{{ item.priority }}</span>
-        <span class="ocs-intelligence-team-name">{{ item.text }}</span>
+        <span class="ocs__team-label">{{ item.priority }}</span>
+        <span class="ocs__team-name">{{ item.text }}</span>
       </div>
       {% endfor %}
     </div>
@@ -166,11 +166,11 @@ year: 2026-2027
   {% endif %}
 
   {% if stage.apiEndpoints %}
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Serving endpoints</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Serving endpoints</h3>
     <p class="ocs-intelligence-about">The literal endpoints student harnesses talk to once a model is loaded on the rack.</p>
-    <div class="ocs-intelligence-table-wrap">
-      <table class="ocs-intelligence-table">
+    <div class="ocs__table-wrap">
+      <table class="ocs__table">
         <thead>
           <tr>
             <th scope="col">Endpoint</th>
@@ -182,7 +182,7 @@ year: 2026-2027
           {% for ep in stage.apiEndpoints %}
           <tr>
             <td>{{ ep.method }} {{ ep.path }}</td>
-            <td><span class="ocs-intelligence-tech-tag">{{ ep.engine }}</span></td>
+            <td><span class="ocs__status-pill">{{ ep.engine }}</span></td>
             <td>{{ ep.text }}</td>
           </tr>
           {% endfor %}
@@ -193,9 +193,9 @@ year: 2026-2027
   {% endif %}
 
   {% if stage.showJustification %}
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Why electricity is the whole bill</h3>
-    <div class="ocs-intelligence-diagram">
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Why electricity is the whole bill</h3>
+    <div class="ocs__diagram">
       <pre class="mermaid">flowchart TD
     A[Paid subscriptions] --> B[Donated GPU rack]
     B --> C[Host open models locally]
@@ -209,8 +209,8 @@ year: 2026-2027
   {% endif %}
 
   {% if stage.impact %}
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">If this phase works</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">If this phase works</h3>
     <div class="ocs-intelligence-impact-list">
       {% for item in stage.impact %}
       <div class="ocs-intelligence-impact-item">{{ item }}</div>
@@ -220,8 +220,8 @@ year: 2026-2027
   {% endif %}
 
   {% if stage.showInventory %}
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">What we were given to work with</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">What we were given to work with</h3>
     <div class="ocs-intelligence-stats">
       {% for stat in data.inventory %}
       <div class="ocs-intelligence-stat">
@@ -234,22 +234,22 @@ year: 2026-2027
   {% endif %}
 
   {% if stage.showRigs %}
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Who carries the donated rack</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Who carries the donated rack</h3>
     <p class="ocs-intelligence-about">Team 1 puts the gifted production box in front of students. Team 2 keeps experiments off that path.</p>
     <div class="ocs-intelligence-split">
       {% for rig in data.rigs %}
       <div class="ocs-intelligence-visual">
-        <div class="ocs-intelligence-status">{{ rig.status }}</div>
+        <div class="ocs__status">{{ rig.status }}</div>
         <h2 class="ocs-intelligence-project-title">{{ rig.name }}</h2>
         <p class="ocs-intelligence-subtitle">{{ rig.role }}</p>
-        <div class="ocs-intelligence-team">
-          <span class="ocs-intelligence-team-label">{{ rig.team }}</span>
-          <span class="ocs-intelligence-team-name">{{ rig.members }}</span>
+        <div class="ocs__team">
+          <span class="ocs__team-label">{{ rig.team }}</span>
+          <span class="ocs__team-name">{{ rig.members }}</span>
         </div>
         <div class="ocs-intelligence-tech-stack">
-          <span class="ocs-intelligence-tech-tag">{{ rig.storage }}</span>
-          <span class="ocs-intelligence-tech-tag">{{ rig.stack }}</span>
+          <span class="ocs__status-pill">{{ rig.storage }}</span>
+          <span class="ocs__status-pill">{{ rig.stack }}</span>
         </div>
       </div>
       {% endfor %}
@@ -258,10 +258,10 @@ year: 2026-2027
   {% endif %}
 
   {% if stage.showAllLiterature or stage.literatureTitles.size > 0 %}
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Literature</h3>
-    <div class="ocs-intelligence-table-wrap">
-      <table class="ocs-intelligence-table">
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Literature</h3>
+    <div class="ocs__table-wrap">
+      <table class="ocs__table">
         <thead>
           <tr>
             <th scope="col">Resource</th>
@@ -276,7 +276,7 @@ year: 2026-2027
             <td>
               <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
             </td>
-            <td><span class="ocs-intelligence-tech-tag">{{ item.type }}</span></td>
+            <td><span class="ocs__status-pill">{{ item.type }}</span></td>
             <td>{{ item.description }}</td>
           </tr>
             {% endfor %}
@@ -288,7 +288,7 @@ year: 2026-2027
             <td>
               <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
             </td>
-            <td><span class="ocs-intelligence-tech-tag">{{ item.type }}</span></td>
+            <td><span class="ocs__status-pill">{{ item.type }}</span></td>
             <td>{{ item.description }}</td>
           </tr>
                 {% endif %}

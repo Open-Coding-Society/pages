@@ -15,9 +15,9 @@ year: 2026-2027
 
 <div class="ocs-intelligence-infograph">
   <div class="ocs-intelligence-header">
-    <div class="ocs-intelligence-badge">Design-Based Research Capstone</div>
+    <div class="ocs__badge">Design-Based Research Capstone</div>
     <h1 class="ocs-intelligence-title">{{ data.Title }}</h1>
-    <p class="ocs-intelligence-description">{{ data.Description }}</p>
+    <p class="ocs__description">{{ data.Description }}</p>
   </div>
 
   {% assign current_stage = page.ocs_stage | default: "" %}
@@ -46,11 +46,11 @@ year: 2026-2027
 </nav>
 
 
-  <div class="ocs-intelligence-card">
+  <div class="ocs__card">
     <p class="ocs-intelligence-gift-kicker">{{ data.problemStatement.kicker }}</p>
-    <h3 class="ocs-intelligence-section-title">{{ data.problemStatement.title }}</h3>
+    <h3 class="ocs__section-title">{{ data.problemStatement.title }}</h3>
     <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.problemStatement.body }}</p>
-    <div class="ocs-intelligence-diagram" role="img" aria-label="Comparison: a paid AI subscription serves one seat, versus OCS Intelligence LLM which serves every student off donated hardware.">
+    <div class="ocs__diagram" role="img" aria-label="Comparison: a paid AI subscription serves one seat, versus OCS Intelligence LLM which serves every student off donated hardware.">
       <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit;">
         <rect x="8" y="8" width="270" height="204" rx="14" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.14)"/>
         <text x="143" y="34" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">Paid subscription</text>
@@ -76,9 +76,9 @@ year: 2026-2027
     </div>
   </div>
 
-  <div class="ocs-intelligence-card ocs-intelligence-gift">
+  <div class="ocs__card ocs-intelligence-gift">
     <p class="ocs-intelligence-gift-kicker">{{ gift.kicker }}</p>
-    <h3 class="ocs-intelligence-section-title">{{ gift.title }}</h3>
+    <h3 class="ocs__section-title">{{ gift.title }}</h3>
     <p class="ocs-intelligence-about ocs-intelligence-lead">{{ gift.body }}</p>
     <p class="ocs-intelligence-cost-line">{{ gift.costLine }}</p>
     <div class="ocs-intelligence-stats">
@@ -91,13 +91,13 @@ year: 2026-2027
     </div>
   </div>
 
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">How this works</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">How this works</h3>
     <p class="ocs-intelligence-about">Two pictures: the path from gift to classroom service, and how a student actually reaches it.</p>
-    <div class="ocs-intelligence-diagram-stack">
-      <div class="ocs-intelligence-diagram-block">
-        <h4 class="ocs-intelligence-diagram-title">From donation to three phases</h4>
-        <div class="ocs-intelligence-diagram">
+    <div class="ocs__diagram-stack">
+      <div class="ocs__diagram-block">
+        <h4 class="ocs__diagram-title">From donation to three phases</h4>
+        <div class="ocs__diagram">
           <pre class="mermaid">flowchart LR
     A[Donated 8x GTX 1070 rack] --> P0[Phase 0]
     P0 --> B[Phase 1]
@@ -113,9 +113,9 @@ year: 2026-2027
     C --> C3[Every student gets in]</pre>
         </div>
       </div>
-      <div class="ocs-intelligence-diagram-block">
-        <h4 class="ocs-intelligence-diagram-title">How a student reaches the model</h4>
-        <div class="ocs-intelligence-diagram">
+      <div class="ocs__diagram-block">
+        <h4 class="ocs__diagram-title">How a student reaches the model</h4>
+        <div class="ocs__diagram">
           <pre class="mermaid">flowchart TD
     A[Student at school or home] --> B[Authenticated OCS API]
     B --> C[Broker and request queue]
@@ -128,16 +128,16 @@ year: 2026-2027
   </div>
 
   <section aria-labelledby="ocs-implementation-title">
-    <div class="ocs-intelligence-card">
-      <h2 id="ocs-implementation-title" class="ocs-intelligence-section-title">{{ data.implementation.title }}</h2>
+    <div class="ocs__card">
+      <h2 id="ocs-implementation-title" class="ocs__section-title">{{ data.implementation.title }}</h2>
       <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.implementation.introduction }}</p>
-      <div class="ocs-intelligence-diagram">
+      <div class="ocs__diagram">
         <pre class="mermaid">{{ data.implementation.diagram | escape }}</pre>
       </div>
     </div>
     {% for section in data.implementation.sections %}
-    <div class="ocs-intelligence-card">
-      <h3 class="ocs-intelligence-section-title">{{ section.title }}</h3>
+    <div class="ocs__card">
+      <h3 class="ocs__section-title">{{ section.title }}</h3>
       <p class="ocs-intelligence-about">{{ section.body }}</p>
       <ul class="ocs-intelligence-about">
         {% for step in section.steps %}
@@ -152,14 +152,14 @@ year: 2026-2027
   <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.researchQuestionsNote }}</p>
 
   {% for item in data.researchQuestions %}
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">{{ item.label }}{% if item.priority %} · {{ item.priority }}{% endif %}</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">{{ item.label }}{% if item.priority %} · {{ item.priority }}{% endif %}</h3>
     <p class="ocs-intelligence-question">{{ item.question }}</p>
     <div class="ocs-intelligence-facts">
       {% for fact in item.facts %}
       <div class="ocs-intelligence-visual">
-        <span class="ocs-intelligence-team-label">{{ fact.label }}</span>
-        <span class="ocs-intelligence-team-name">{{ fact.text }}</span>
+        <span class="ocs__team-label">{{ fact.label }}</span>
+        <span class="ocs__team-name">{{ fact.text }}</span>
       </div>
       {% endfor %}
     </div>
@@ -169,13 +169,13 @@ year: 2026-2027
   </div>
   {% endfor %}
 
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Three phases, one promise</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Three phases, one promise</h3>
     <p class="ocs-intelligence-about">The tabs are the implementation path. First we name the problem and pick a direction. Then the gift becomes a live service. Then that service has to survive a class.</p>
     <div class="ocs-intelligence-phase-grid">
       {% for stage in data.stages %}
       <a href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/" class="ocs-intelligence-phase-card">
-        <span class="ocs-intelligence-status">{{ stage.navKicker }} · {{ stage.status }}</span>
+        <span class="ocs__status">{{ stage.navKicker }} · {{ stage.status }}</span>
         <h2 class="ocs-intelligence-project-title">{{ stage.title }}</h2>
         <p class="ocs-intelligence-about">{{ stage.summary }}</p>
         <span class="ocs-intelligence-phase-cta">Open this phase</span>
@@ -184,14 +184,14 @@ year: 2026-2027
     </div>
   </div>
 
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Team split</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Team split</h3>
     <div class="ocs-intelligence-split">
       {% for team in data.teams %}
       <div class="ocs-intelligence-visual">
-        <div class="ocs-intelligence-status">{{ team.name }}</div>
-        <div class="ocs-intelligence-team">
-          <span class="ocs-intelligence-team-name">{{ team.members }}</span>
+        <div class="ocs__status">{{ team.name }}</div>
+        <div class="ocs__team">
+          <span class="ocs__team-name">{{ team.members }}</span>
           <p class="ocs-intelligence-about">{{ team.role }}</p>
         </div>
       </div>
@@ -199,27 +199,27 @@ year: 2026-2027
     </div>
   </div>
 
-  <div class="ocs-intelligence-card">
+  <div class="ocs__card">
     <p class="ocs-intelligence-gift-kicker">{{ data.communication.kicker }}</p>
-    <h3 class="ocs-intelligence-section-title">{{ data.communication.title }}</h3>
+    <h3 class="ocs__section-title">{{ data.communication.title }}</h3>
     <p class="ocs-intelligence-about">{{ data.communication.body }}</p>
     <div class="ocs-intelligence-facts">
       {% for channel in data.communication.channels %}
       <div class="ocs-intelligence-visual">
-        <span class="ocs-intelligence-team-label">{{ channel.label }}</span>
+        <span class="ocs__team-label">{{ channel.label }}</span>
         <p class="ocs-intelligence-about">{{ channel.text }}</p>
       </div>
       {% endfor %}
     </div>
   </div>
 
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Justification</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Justification</h3>
     <p class="ocs-intelligence-about">{{ data.harnesses }}</p>
   </div>
 
-  <div class="ocs-intelligence-card">
-    <div class="ocs-intelligence-card-grid">
+  <div class="ocs__card">
+    <div class="ocs__card-grid">
       <div class="ocs-intelligence-visual">
         <h2 class="ocs-intelligence-project-title">{{ topic.visualTitle }}</h2>
         <div class="ocs-intelligence-impact-list">
@@ -227,10 +227,10 @@ year: 2026-2027
           <a href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/" class="ocs-intelligence-impact-item ocs-intelligence-stack-link">{{ stage.navLabel }}</a>
           {% endfor %}
         </div>
-        <div class="ocs-intelligence-status">{{ topic.status }}</div>
-        <div class="ocs-intelligence-team">
-          <span class="ocs-intelligence-team-label">Primary audience</span>
-          <span class="ocs-intelligence-team-name">{{ topic.audience }}</span>
+        <div class="ocs__status">{{ topic.status }}</div>
+        <div class="ocs__team">
+          <span class="ocs__team-label">Primary audience</span>
+          <span class="ocs__team-name">{{ topic.audience }}</span>
         </div>
       </div>
 
@@ -249,19 +249,19 @@ year: 2026-2027
 
         <div class="ocs-intelligence-tech-stack">
           {% for tech in topic.tech %}
-          <span class="ocs-intelligence-tech-tag">{{ tech }}</span>
+          <span class="ocs__status-pill">{{ tech }}</span>
           {% endfor %}
         </div>
       </div>
 
       <div class="ocs-intelligence-details">
-        <h3 class="ocs-intelligence-section-title">Why this is challenging</h3>
+        <h3 class="ocs__section-title">Why this is challenging</h3>
         <p class="ocs-intelligence-about">{{ topic.description }}</p>
 
-        <h3 class="ocs-intelligence-section-title">Goal</h3>
+        <h3 class="ocs__section-title">Goal</h3>
         <p class="ocs-intelligence-about">{{ topic.candidateModel }}</p>
 
-        <h3 class="ocs-intelligence-section-title">Impact</h3>
+        <h3 class="ocs__section-title">Impact</h3>
         <div class="ocs-intelligence-impact-list">
           {% for item in topic.impact %}
           <div class="ocs-intelligence-impact-item">{{ item }}</div>
@@ -270,7 +270,7 @@ year: 2026-2027
 
         <a
           href="{{ topic.link }}"
-          class="ocs-intelligence-btn"
+          class="ocs__btn accent fill"
           target="_blank"
           rel="noopener noreferrer"
         >{{ topic.linkLabel }}</a>
@@ -278,30 +278,30 @@ year: 2026-2027
     </div>
   </div>
 
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Two rigs</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Two rigs</h3>
     <p class="ocs-intelligence-about">The donated production rack is the student-facing gift. A second box holds experiments so the class path stays calm.</p>
     <div class="ocs-intelligence-split">
       {% for rig in data.rigs %}
       <div class="ocs-intelligence-visual">
-        <div class="ocs-intelligence-status">{{ rig.status }}</div>
+        <div class="ocs__status">{{ rig.status }}</div>
         <h2 class="ocs-intelligence-project-title">{{ rig.name }}</h2>
         <p class="ocs-intelligence-subtitle">{{ rig.role }}</p>
-        <div class="ocs-intelligence-team">
-          <span class="ocs-intelligence-team-label">{{ rig.team }}</span>
-          <span class="ocs-intelligence-team-name">{{ rig.members }}</span>
+        <div class="ocs__team">
+          <span class="ocs__team-label">{{ rig.team }}</span>
+          <span class="ocs__team-name">{{ rig.members }}</span>
         </div>
         <div class="ocs-intelligence-tech-stack">
-          <span class="ocs-intelligence-tech-tag">{{ rig.storage }}</span>
-          <span class="ocs-intelligence-tech-tag">{{ rig.stack }}</span>
+          <span class="ocs__status-pill">{{ rig.storage }}</span>
+          <span class="ocs__status-pill">{{ rig.stack }}</span>
         </div>
       </div>
       {% endfor %}
     </div>
   </div>
 
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Capability we want in the room</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Capability we want in the room</h3>
     <p class="ocs-intelligence-about">{{ data.chartsIntro }}</p>
     <div class="ocs-intelligence-split">
       {% for chart in data.charts %}
