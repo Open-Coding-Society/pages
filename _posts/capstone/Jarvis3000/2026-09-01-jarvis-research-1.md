@@ -21,14 +21,14 @@ rp_active: research-1
 
   <!-- Header -->
   <div class="jv-header">
-    <div class="jv-badge">Research Area 1 · Hardware &amp; Acquisition</div>
-    <h1 class="jv-page-title">Research 1: Camera Setup &amp; Hardware Pipeline</h1>
-    <p class="jv-description">Investigating multi-viewpoint optical coverage, synchronized frame capture, network transfer across Linux host nodes, and hardware bill of materials.</p>
+    <div class="ocs__badge">Research Area 1 · Hardware &amp; Acquisition</div>
+    <h1 class="jv-title">Research 1: Camera Setup &amp; Hardware Pipeline</h1>
+    <p class="ocs__description">Investigating multi-viewpoint optical coverage, synchronized frame capture, network transfer across Linux host nodes, and hardware bill of materials.</p>
   </div>
 
   <!-- Research Question -->
-  <div class="jv-section-label">Research Question 1</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Research Question 1</h2>
+  <div class="ocs__card">
     <p class="jv-question">How reliably can timestamped frames from opposing viewpoints across two networked Linux nodes be synchronized and transferred at configurable intervals without frame drops, latency spikes, or timestamp drift?</p>
     <h3 style="margin-top:1.5rem;">Acceptance &amp; Test Cases</h3>
     <ul class="ocs__checklist">
@@ -41,8 +41,8 @@ rp_active: research-1
   </div>
 
   <!-- Hardware / BOM -->
-  <div class="jv-section-label">Bill of Materials &amp; Hardware Status</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Bill of Materials &amp; Hardware Status</h2>
+  <div class="ocs__card">
     <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">The current testbed uses one Logitech BRIO connected to a primary Linux machine. The target multi-view setup introduces a second camera node.</p>
     <div class="ocs__table-wrap">
       <table class="ocs__table">
@@ -86,14 +86,14 @@ rp_active: research-1
         </tbody>
       </table>
     </div>
-    <div class="ocs__callout ocs__callout">
+    <div class="ocs__callout">
       <span><strong style="color:var(--jv-text);">Camera Placement Rationale:</strong> Mounting two cameras on opposing diagonal corners maximizes surface visibility across desks while providing redundant observations when students or chairs block a single line of sight.</span>
     </div>
   </div>
 
   <!-- Dependencies & Open Issues -->
-  <div class="jv-section-label">Open Issues &amp; Next Milestones</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Open Issues &amp; Next Milestones</h2>
+  <div class="ocs__card">
     <ul class="ocs__checklist">
       <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Mounting &amp; Calibration:</strong> Finalize non-invasive mounting fixtures and measure lens distortion across wide-angle FOV settings.</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Lighting Variations:</strong> Evaluate sensor auto-exposure adjustments during morning sunlight vs. artificial overhead fluorescent lighting.</span></li>

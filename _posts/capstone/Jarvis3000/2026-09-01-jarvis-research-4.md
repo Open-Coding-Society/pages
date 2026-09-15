@@ -21,14 +21,14 @@ rp_active: research-4
 
   <!-- Header -->
   <div class="jv-header">
-    <div class="jv-badge">Research Area 4 · Visual Memory &amp; Scene Comparison</div>
-    <h1 class="jv-page-title">Research 4: Visual Memory &amp; Scene Comparison</h1>
-    <p class="jv-description">Investigating interval-based change detection, structural gradient matching for illumination/shadow invariance, and lightweight edge-AI vs. cloud-dependent architectures.</p>
+    <div class="ocs__badge">Research Area 4 · Visual Memory &amp; Scene Comparison</div>
+    <h1 class="jv-title">Research 4: Visual Memory &amp; Scene Comparison</h1>
+    <p class="ocs__description">Investigating interval-based change detection, structural gradient matching for illumination/shadow invariance, and lightweight edge-AI vs. cloud-dependent architectures.</p>
   </div>
 
   <!-- Research Question -->
-  <div class="jv-section-label">Research Question 4</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Research Question 4</h2>
+  <div class="ocs__card">
     <p class="jv-question">How can an AI camera system spot real changes in a room (like a moved or missing object) every 10 seconds without being fooled by shadows or light changes?</p>
     <div style="margin-top:1.25rem;text-align:center;">
       <img src="https://github.com/user-attachments/assets/d326d254-c8b8-48c3-976f-8248f82aba0a" alt="Visual Memory Scene Comparison" style="max-width:100%;border-radius:0.75rem;border:1px solid var(--jv-card-border);display:block;margin:0 auto;">
@@ -36,8 +36,8 @@ rp_active: research-4
   </div>
 
   <!-- Problem Statement & Architecture -->
-  <div class="jv-section-label">Specific Problem Statement &amp; Strategy</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Specific Problem Statement &amp; Strategy</h2>
+  <div class="ocs__card">
     <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:0 0 1.25rem;">
       Conventional security cameras often produce false alarms from shifting sunlight, moving shadows, and transient ambient motion, while struggling to reliably detect permanent, meaningful changes in physical room state (such as moved, missing, or newly introduced equipment).
     </p>
@@ -71,8 +71,8 @@ rp_active: research-4
   </div>
 
   <!-- Academic Literature -->
-  <div class="jv-section-label">Scholarly Research &amp; Academic Baseline</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Scholarly Research &amp; Academic Baseline</h2>
+  <div class="ocs__card">
     <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Analysis of recent peer-reviewed change-detection architectures and visual memory frameworks:</p>
 
     <div class="ocs__table-wrap">
@@ -109,7 +109,7 @@ rp_active: research-4
       </table>
     </div>
 
-    <div class="ocs__callout ocs__callout" style="margin-top:1rem;">
+    <div class="ocs__callout" style="margin-top:1rem;">
       <strong style="color:var(--jv-text);">Consolidated Synthesis:</strong> Academic research confirms that feature-aggregation models coupled with persistent visual memory reliably isolate genuine structural changes from lighting noise. Jarvis fills the gap by packaging these principles into a standalone, edge-based framework operating at discrete 10-second intervals.
     </div>
 
@@ -119,8 +119,8 @@ rp_active: research-4
   </div>
 
   <!-- Patent Research -->
-  <div class="jv-section-label">Patent Research &amp; Prior IP</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Patent Research &amp; Prior IP</h2>
+  <div class="ocs__card">
     <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Patented machine vision techniques addressing illumination invariance and background subtraction:</p>
 
     <div class="ocs__table-wrap">
@@ -163,8 +163,8 @@ rp_active: research-4
   </div>
 
   <!-- Commercial Product Research -->
-  <div class="jv-section-label">Commercial Products &amp; Competitive Analysis</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Commercial Products &amp; Competitive Analysis</h2>
+  <div class="ocs__card">
     <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1.25rem;">Evaluation of existing consumer and enterprise camera systems:</p>
 
     <div class="ocs__table-wrap">

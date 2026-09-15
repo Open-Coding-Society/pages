@@ -21,29 +21,29 @@ rp_active: research-2
 
   <!-- Header -->
   <div class="jv-header">
-    <div class="jv-badge">Research Area 2 · Object Detection &amp; Instance Segmentation</div>
-    <h1 class="jv-page-title">Research 2: YOLO Object Detection &amp; SAM 3 Segmentation</h1>
-    <p class="jv-description">Converting classroom images into structured object detections, then refining each bounding box into a pixel-level segmentation mask for tracking, inventory, and scene comparison.</p>
+    <div class="ocs__badge">Research Area 2 · Object Detection &amp; Instance Segmentation</div>
+    <h1 class="jv-title">Research 2: YOLO Object Detection &amp; SAM 3 Segmentation</h1>
+    <p class="ocs__description">Converting classroom images into structured object detections, then refining each bounding box into a pixel-level segmentation mask for tracking, inventory, and scene comparison.</p>
     <p style="font-size:0.8rem;color:var(--jv-text-muted);margin-top:0.5rem;">Individual research by <strong style="color:var(--jv-text);">Shriya Paladugu</strong></p>
   </div>
 
   <!-- Problem Statement -->
-  <div class="jv-section-label">Problem Statement</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Problem Statement</h2>
+  <div class="ocs__card">
     <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:0;">
       A classroom is a constantly changing environment where people and equipment enter, leave, or move locations. A camera records pixels, but raw images alone do not tell the system what objects are present or where each object appears. The project therefore needs a computer-vision pipeline that identifies classroom objects, records their confidence scores and image locations, and separates them from the surrounding background.
     </p>
   </div>
 
   <!-- Research Question -->
-  <div class="jv-section-label">Research Question 2</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Research Question 2</h2>
+  <div class="ocs__card">
     <p class="jv-question">How accurately and efficiently can a locally executed YOLO and SAM 3 pipeline detect, classify, locate, and segment important classroom objects under changing lighting, viewing angles, distance, and partial occlusion while remaining within the target 10-second processing cycle?</p>
   </div>
 
   <!-- Role in the Full System -->
-  <div class="jv-section-label">Role in the Full System</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Role in the Full System</h2>
+  <div class="ocs__card">
     <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">flowchart TD
     CAP["Camera capture\nTimestamped frame"] --> PRE["OpenCV / FFmpeg\nResize + preprocessing"]
@@ -52,14 +52,14 @@ rp_active: research-2
     SAM --> OUT["Structured observation\nDetection + mask + timestamp"]
     OUT --> TRACK["Tracking / inventory /\nscene comparison"]</pre>
     </div>
-    <div class="ocs__callout ocs__callout">
+    <div class="ocs__callout">
       <span><strong style="color:var(--jv-text);">Why both models?</strong> YOLO identifies what an object is and provides its bounding box. SAM 3 uses that box as a prompt to trace the object's more precise pixel boundary. The segmentation mask can then support spatial comparison and object-state tracking.</span>
     </div>
   </div>
 
   <!-- Target Classes -->
-  <div class="jv-section-label">Initial Target Object Classes</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Initial Target Object Classes</h2>
+  <div class="ocs__card">
     <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">The initial prototype will evaluate six common classroom classes that can support people counting and basic equipment inventory.</p>
     <div class="jv-decision-grid">
       <div class="jv-decision-card"><span class="jv-decision-title">Person</span><p class="jv-decision-why">Supports occupancy counting without facial recognition.</p></div>
@@ -72,8 +72,8 @@ rp_active: research-2
   </div>
 
   <!-- Structured Output -->
-  <div class="jv-section-label">Detection Output</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Detection Output</h2>
+  <div class="ocs__card">
     <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Instead of passing only raw images to later components, the pipeline creates a structured observation for every detected object.</p>
     <pre class="jv-code" style="display:block;white-space:pre-wrap;overflow-x:auto;padding:1rem;margin:0;">{
   "timestamp": "2026-09-07T10:15:20.000Z",
@@ -83,14 +83,14 @@ rp_active: research-2
   "bounding_box": [120, 80, 420, 350],
   "mask_reference": "camera_1_20260907_101520_laptop_01"
 }</pre>
-    <div class="ocs__callout ocs__callout">
+    <div class="ocs__callout">
       <span><strong style="color:var(--jv-text);">Important limitation:</strong> A detection such as “laptop” identifies an object category, not a specific physical device such as “Laptop #3.” Persistent identity must be added later through temporal tracking, cross-camera matching, visual features, or an external identifier.</span>
     </div>
   </div>
 
   <!-- Model Decisions -->
-  <div class="jv-section-label">Model Selection &amp; Technical Rationale</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Model Selection &amp; Technical Rationale</h2>
+  <div class="ocs__card">
     <div class="jv-decision-grid">
       <div class="jv-decision-card">
         <span class="jv-decision-title">YOLO Object Detection</span>
@@ -120,16 +120,16 @@ rp_active: research-2
   </div>
 
   <!-- Why Object Detection -->
-<div class="jv-section-label">Why YOLO Instead of Image Classification?</div>
-<div class="jv-card">
-  <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:0;">
-    A standard image-classification model can predict that a classroom image contains a laptop, but it does not identify every separate laptop or show where each one is located. YOLO performs both classification and localization, allowing the system to detect multiple objects in one frame and return an individual class label, confidence score, and bounding box for each object. This makes YOLO more suitable for classroom inventory, people counting, tracking, and scene comparison.
-  </p>
-</div>
+  <h2 class="ocs__section-title">Why YOLO Instead of Image Classification?</h2>
+  <div class="ocs__card">
+    <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:0;">
+      A standard image-classification model can predict that a classroom image contains a laptop, but it does not identify every separate laptop or show where each one is located. YOLO performs both classification and localization, allowing the system to detect multiple objects in one frame and return an individual class label, confidence score, and bounding box for each object. This makes YOLO more suitable for classroom inventory, people counting, tracking, and scene comparison.
+    </p>
+  </div>
 
   <!-- Acceptance Tests -->
-  <div class="jv-section-label">Acceptance Criteria &amp; Test Cases</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Acceptance Criteria &amp; Test Cases</h2>
+  <div class="ocs__card">
     <ul class="ocs__checklist">
       <li class="open"><span class="ocs__checklist-box"></span><span>Capture a timestamped classroom frame and return a class label, confidence score, and bounding box for every accepted YOLO detection</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span>Evaluate all six target classes using a separate held-out test set that was not used for training</span></li>
@@ -143,9 +143,9 @@ rp_active: research-2
   </div>
 
   <!-- Compute Plan -->
-  <div class="jv-section-label">Compute Constraints &amp; Benchmark Plan</div>
-  <div class="jv-card">
-    <div class="ocs__callout ocs__callout" style="margin-top:0;">
+  <h2 class="ocs__section-title">Compute Constraints &amp; Benchmark Plan</h2>
+  <div class="ocs__card">
+    <div class="ocs__callout" style="margin-top:0;">
       <span><strong style="color:var(--jv-text);">Current constraint:</strong> The primary Linux host does not have a dedicated NVIDIA GPU. All latency values must therefore be measured on the actual project hardware rather than treated as guaranteed model performance.</span>
     </div>
     <div class="ocs__table-wrap" style="margin-top:1rem;">
@@ -161,8 +161,8 @@ rp_active: research-2
   </div>
 
   <!-- Risks and Next Steps -->
-  <div class="jv-section-label">Open Questions &amp; Next Steps</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Open Questions &amp; Next Steps</h2>
+  <div class="ocs__card">
     <ul class="ocs__checklist">
       <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Baseline Test:</strong> Determine which target classes are already supported reliably by the pretrained YOLO model.</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Dataset:</strong> Collect representative classroom images across both camera viewpoints and split them into training, validation, and held-out test sets.</span></li>
@@ -173,8 +173,8 @@ rp_active: research-2
   </div>
 
   <!-- Sources -->
-  <div class="jv-section-label">Technical Sources</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Technical Sources</h2>
+  <div class="ocs__card">
     <div class="jv-paper-grid">
       <div class="jv-paper-card">
         <a class="jv-paper-title" href="https://docs.ultralytics.com/tasks/detect/" target="_blank" rel="noopener">Ultralytics Object Detection Documentation</a>
