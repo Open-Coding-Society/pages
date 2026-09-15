@@ -24,23 +24,23 @@ year: 2026-2027
 {% assign overview_url = "/capstone/ocs-intelligence/" %}
 
 
-<nav class="ocs-intelligence-stage-nav" aria-label="OCS Intelligence LLM implementation phases">
+<nav class="ocs__nav-grid" aria-label="OCS Intelligence LLM implementation phases">
   <a
     href="{{ site.baseurl }}{{ overview_url }}"
-    class="ocs-intelligence-stage-nav-link{% if current_stage == '' %} is-active{% endif %}"
+    class="ocs__nav-card{% if current_stage == '' %} is-active{% endif %}"
     {% if current_stage == '' %}aria-current="page"{% endif %}
   >
-    <span class="ocs-intelligence-stage-nav-kicker">Story</span>
-    <span class="ocs-intelligence-stage-nav-title">Overview</span>
+    <span class="ocs__nav-card-kicker">Story</span>
+    <span class="ocs__nav-card-title">Overview</span>
   </a>
   {% for stage in data.stages %}
   <a
     href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/"
-    class="ocs-intelligence-stage-nav-link{% if current_stage == stage.slug %} is-active{% endif %}"
+    class="ocs__nav-card{% if current_stage == stage.slug %} is-active{% endif %}"
     {% if current_stage == stage.slug %}aria-current="page"{% endif %}
   >
-    <span class="ocs-intelligence-stage-nav-kicker">{{ stage.navKicker }}</span>
-    <span class="ocs-intelligence-stage-nav-title">{{ stage.navLabel }}</span>
+    <span class="ocs__nav-card-kicker">{{ stage.navKicker }}</span>
+    <span class="ocs__nav-card-title">{{ stage.navLabel }}</span>
   </a>
   {% endfor %}
 </nav>
@@ -172,13 +172,13 @@ year: 2026-2027
   <div class="ocs__card">
     <h3 class="ocs__section-title">Three phases, one promise</h3>
     <p class="ocs__text">The tabs are the implementation path. First we name the problem and pick a direction. Then the gift becomes a live service. Then that service has to survive a class.</p>
-    <div class="ocs-intelligence-phase-grid">
+    <div class="ocs__nav-grid ocs__nav-grid--in-card">
       {% for stage in data.stages %}
-      <a href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/" class="ocs-intelligence-phase-card">
+      <a href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/" class="ocs__nav-card">
         <span class="ocs__status">{{ stage.navKicker }} · {{ stage.status }}</span>
-        <h2 class="ocs-intelligence-project-title">{{ stage.title }}</h2>
+        <h2 class="ocs__nav-card-title">{{ stage.title }}</h2>
         <p class="ocs__text">{{ stage.summary }}</p>
-        <span class="ocs-intelligence-phase-cta">Open this phase</span>
+        <span class="ocs__nav-card-cta">Open this phase</span>
       </a>
       {% endfor %}
     </div>

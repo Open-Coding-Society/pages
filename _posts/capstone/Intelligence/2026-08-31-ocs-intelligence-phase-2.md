@@ -33,23 +33,23 @@ year: 2026-2027
 {% assign overview_url = "/capstone/ocs-intelligence/" %}
 
 
-<nav class="ocs-intelligence-stage-nav" aria-label="OCS Intelligence LLM implementation phases">
+<nav class="ocs__nav-grid" aria-label="OCS Intelligence LLM implementation phases">
   <a
     href="{{ site.baseurl }}{{ overview_url }}"
-    class="ocs-intelligence-stage-nav-link{% if current_stage == '' %} is-active{% endif %}"
+    class="ocs__nav-card{% if current_stage == '' %} is-active{% endif %}"
     {% if current_stage == '' %}aria-current="page"{% endif %}
   >
-    <span class="ocs-intelligence-stage-nav-kicker">Story</span>
-    <span class="ocs-intelligence-stage-nav-title">Overview</span>
+    <span class="ocs__nav-card-kicker">Story</span>
+    <span class="ocs__nav-card-title">Overview</span>
   </a>
   {% for stage in data.stages %}
   <a
     href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/"
-    class="ocs-intelligence-stage-nav-link{% if current_stage == stage.slug %} is-active{% endif %}"
+    class="ocs__nav-card{% if current_stage == stage.slug %} is-active{% endif %}"
     {% if current_stage == stage.slug %}aria-current="page"{% endif %}
   >
-    <span class="ocs-intelligence-stage-nav-kicker">{{ stage.navKicker }}</span>
-    <span class="ocs-intelligence-stage-nav-title">{{ stage.navLabel }}</span>
+    <span class="ocs__nav-card-kicker">{{ stage.navKicker }}</span>
+    <span class="ocs__nav-card-title">{{ stage.navLabel }}</span>
   </a>
   {% endfor %}
 </nav>
