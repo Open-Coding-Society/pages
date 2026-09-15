@@ -30,31 +30,22 @@
   height: 100%;
 }
 
-.ocs-intelligence-infograph .ocs-intelligence-team .ocs-intelligence-about {
+.ocs-intelligence-infograph .ocs__team .ocs-intelligence-about {
   margin: 0.35rem 0 0;
   text-align: center;
 }
 
-.ocs-intelligence-infograph .ocs-intelligence-diagram {
-  margin: 1rem 0 1.25rem;
-  padding: 1.25rem;
-  overflow-x: auto;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-diagram-stack {
+.ocs-intelligence-infograph .ocs__diagram-stack {
   display: grid;
   gap: 1.5rem;
   margin-top: 1rem;
 }
 
-.ocs-intelligence-infograph .ocs-intelligence-diagram-block .ocs-intelligence-diagram {
+.ocs-intelligence-infograph .ocs__diagram-block .ocs__diagram {
   margin-bottom: 0;
 }
 
-.ocs-intelligence-infograph .ocs-intelligence-diagram-title {
+.ocs-intelligence-infograph .ocs__diagram-title {
   margin: 0 0 0.5rem;
   font-size: 0.95rem;
   font-weight: 700;
@@ -64,20 +55,14 @@
 }
 
 @media (min-width: 900px) {
-  .ocs-intelligence-infograph .ocs-intelligence-diagram-stack {
+  .ocs-intelligence-infograph .ocs__diagram-stack {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
   }
 }
 
-.ocs-intelligence-infograph .ocs-intelligence-diagram .mermaid {
-  display: flex;
-  justify-content: center;
-  margin: 0;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-diagram .mermaid,
-.ocs-intelligence-infograph .ocs-intelligence-diagram .mermaid * {
+.ocs-intelligence-infograph .ocs__diagram .mermaid,
+.ocs-intelligence-infograph .ocs__diagram .mermaid * {
   box-sizing: content-box;
 }
 
@@ -106,64 +91,18 @@
   text-underline-offset: 2px;
 }
 
-.ocs-intelligence-infograph .ocs-intelligence-table-wrap {
-  overflow-x: auto;
+.ocs-intelligence-infograph .ocs__table-wrap {
   margin-top: 1rem;
 }
 
-.ocs-intelligence-infograph .ocs-intelligence-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table th,
-.ocs-intelligence-infograph .ocs-intelligence-table td {
-  text-align: left;
-  padding: 0.9rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  vertical-align: top;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table th {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table td {
-  color: rgba(255, 255, 255, 0.75);
-  line-height: 1.5;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table td:first-child {
+.ocs-intelligence-infograph .ocs__table td:first-child {
   font-weight: 600;
   min-width: 12rem;
 }
 
-.ocs-intelligence-infograph .ocs-intelligence-table td:nth-child(2) {
+.ocs-intelligence-infograph .ocs__table td:nth-child(2) {
   white-space: nowrap;
   width: 8rem;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table a {
-  text-decoration: none;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table a:hover {
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table tr:last-child td {
-  border-bottom: none;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table .ocs-intelligence-tech-tag {
-  display: inline-block;
-  margin: 0;
 }
 
 .ocs-intelligence-infograph .ocs-intelligence-stats {
@@ -219,11 +158,11 @@
   letter-spacing: 0.02em;
 }
 
-.ocs-intelligence-infograph .ocs-intelligence-card-grid + .ocs-intelligence-stats {
+.ocs-intelligence-infograph .ocs__card-grid + .ocs-intelligence-stats {
   margin-top: 1.75rem;
 }
 
-.ocs-intelligence-infograph .ocs-intelligence-card-grid + .ocs-intelligence-stats + .ocs-intelligence-section-title {
+.ocs-intelligence-infograph .ocs__card-grid + .ocs-intelligence-stats + .ocs__section-title {
   margin-top: 1.75rem;
 }
 
