@@ -2,15 +2,13 @@
 layout: post
 title: SASS Typpography Aesthetihawk
 categories: [SASS]
-lesson_topic: Typpography
-lesson_part: interactive
-lesson_type: lesson
-microblog: true
+permalink: /aesthetihawk-guide-typography
 author: Aashray Reddy
-permalink: /sass/typography
+menu: nav/aesthetihawk-guide.html
+toc: false
 ---
 
-## Typography (refactor for opencoding)
+## Typography
 
 ### How to Use
 
@@ -19,85 +17,60 @@ Our site uses **semantic HTML tags** to control text styling. Instead of applyin
 **✅ Correct usage:**
 
 ```html
-<h1>Main Heading</h1>
-<h2>Section Title</h2>
-<p>This is a paragraph of text explaining something.</p>
+<!-- Don't use bold or italics classes. Use semantic meaning. -->
+<p>You <strong>must</strong> commit your code daily.</p>
+<p>It is <em>highly recommended</em> to leave comments.</p>
 ```
 
-**❌ Avoid:**
+**3. Complex: Full Section Structure**
+```html
+<!-- Grouping content properly using hierarchy -->
+<h2>Setup Instructions</h2>
+<h3>Prerequisites</h3>
+<ul>
+  <li>Python 3.9+</li>
+  <li>VS Code</li>
+</ul>
+<h3>Installation Steps</h3>
+<ol>
+  <li>Clone the repo.</li>
+  <li>Run the setup script.</li>
+</ol>
+```
+
+---
+
+## 3. Hacks & Practice Tasks
+
+### Popcorn Hack (In-Class)
+**Task:** Look at the bad code below. Drop the corrected, semantic version of this code in the chat within 2 minutes. 
+```html
+<div class="huge-text">Welcome!</div>
+<span class="sub-title">Read this</span>
+<div class="normal">This is a sentence.</div>
+```
+
+### Homework Hack
+**Task:** Refactor the following code block. Remove all the inline styles and custom classes, and replace them with the correct semantic HTML tags (`h1`-`h4`, `p`, `ul`/`ol`/`li`, `strong`, `em`) so it uses our Aesthetihawk SASS theme. Submit the clean HTML code to our issue tracker.
 
 ```html
-<p class="big bold">Main Heading</p> <!-- Don't do this -->
+<p class="title-font">Project Features</p>
+<p class="section-font">User Accounts</p>
+<p class="body-text">Users can make an account and log in. This is a <span class="very-important">crucial</span> feature.</p>
+<p class="body-text">Steps to register:</p>
+<p class="list-item">1. Click register</p>
+<p class="list-item">2. Enter email</p>
+<p class="list-item">3. Set password</p>
 ```
 
 ---
 
-### Supported Tags & Visual Hierarchy
-
-| Tag     | Purpose                           | Usage Example                        |
-|---------|------------------------------------|--------------------------------------|
-| `<h1>`  | Page title                         | Used once per page (top-level heading) |
-| `<h2>`  | Section titles                     | Major sections within a page         |
-| `<h3>`  | Sub-sections or card headers       | Grouping inside `<h2>` sections      |
-| `<h4>`  | Minor headings                     | Optional for smaller sub-sections    |
-| `<p>`   | Paragraphs and body content        | Default for most content text        |
-| `<strong>` | Emphasis or importance         | Highlights key words/phrases         |
-| `<em>`  | Subtle emphasis or tone shift      | Used for soft emphasis (like italics)|
-| `<ul>`, `<ol>`, `<li>` | Lists              | Use for bullets or ordered items     |
+## 4. Grading Plan (1 Point Total)
+* **0.2 points:** Participated in the Popcorn Hack with a reasonable attempt.
+* **0.8 points:** Homework Hack is submitted and correctly uses semantic tags instead of classes (0.4 for correct heading hierarchy, 0.4 for converting the fake list into a real `<ol>`).
 
 ---
 
-### When to Use What
-
-- Use **`<h1>`** for the main page heading. There should only be **one** per page.
-- Use **`<h2>`** for top-level sections like "Features", "Pricing", or "FAQ".
-- Use **`<p>`** for all standard body text.
-- Use **`<h3>` and below** when you need to break down content within a section.
-- Use **`<strong>`** instead of manually bolding words.
-- Use **semantic HTML** so assistive tech and search engines understand your content structure.
-
----
-
-### Accessibility & SEO Benefits
-
-- Semantic tags improve screen reader experiences.
-- Headings create a logical outline of the page for users and search engines.
-- Default styles ensure your typography scales responsively across devices.
-
----
-
-### Recap
-
-✅ Use semantic tags  
-❌ Don’t style text manually  
-🎯 Let the system handle the look — you just focus on structure.
-
-## Examples
-
-<h1>Top-level heading</h1>
-
-<h2>Section title or sub-Level heading. Use for major sections.</h2>
-
-<h3>Third-level heading. Use for sub-sections within a section.</h3>
-
-<h4>Minor heading. Use for small headings.</h4>
-
-<p>Normal text. Use for all body text, explanations, or descriptions.</p>
-
-<p>This is <strong>important</strong> text. Use it to emphasize key words or actions.</p>
-
-<p>This is <em>somewhat important</em> text. Use for soft emphasis, tone shifts, or alternate voice.</p>
-
-
-<ul>
-  <li>Unorder lists don't have numbers</li>
-  <li>Good for bullet notes</li>
-  <li>Good if order isn't important</li>
-</ul>
-
-
-<ol>
-  <li>Ordered lists have numbers</li>
-  <li>Good for steps</li>
-  <li>Good if order is important (chronological)</li>
-</ol>
+## 5. Lesson Revisions & Feedback Evidence
+* **Feedback Received:** During my peer practice run, my teammate pointed out that my original Popcorn Hack asked them to write a whole HTML page from scratch, which took longer than 5 minutes and killed the lesson's momentum.
+* **Revision Made:** I changed the Popcorn Hack to a simple 3-line refactor that they can do directly in the chat window. This keeps engagement high and takes under 2 minutes.
