@@ -6,7 +6,7 @@ permalink: /capstone/dad/
 categories: [capstone]
 ---
 
-> D.A.D. is a 501(c)(3) nonprofit whose text-heavy site buries its programs and donation flow. This capstone redesigns it into an impact-driven, high-converting community portal with clearer navigation, in-page giving, and dynamic metrics.
+> D.A.D. is a 501(c)(3) nonprofit whose text-heavy site buries its programs and donation flow. This capstone redesigns it into an impact-driven, high-converting community portal with clearer navigation, in-page giving, and dynamic metrics .
 
 ## D.A.D. (Doing Exceptional Deeds) Website Redesign 2026-27
 
