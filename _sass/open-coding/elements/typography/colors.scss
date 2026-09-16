@@ -1,21 +1,17 @@
 @import "../../materials/main.scss";
 
 h1, h2, h3, h4 {
-    color: $white1 !important;
+  color: var(--pref-text-color, $white1);
 }
 
-p {
-    color: $white3 !important;
+p, li, ul, ol {
+  color: var(--text-muted, var(--pref-text-color, $white3));
 }
 
 a {
-    color: $lightBlue1 !important;
+  color: var(--pref-accent-color, $lightBlue1);
 
-    &:hover {
-        color: $white2 !important;
-    }
-}
-
-li, ul, ol {
-    color: $white3 !important;
+  &:hover {
+    color: var(--pref-text-color, $white2);
+  }
 }
