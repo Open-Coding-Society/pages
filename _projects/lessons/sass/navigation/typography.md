@@ -15,7 +15,7 @@ author: Tristan Chiu, Mateo Durand Amador, Barbara Zhao
 Use HTML for meaning and OCS classes for reusable layout or component roles. This example shows how an OCS class gives a paragraph a defined role.
 
 ```html
-<h1>OCS Typography Reference</h1>
+<h2>OCS Typography</h2>
 <p class="ocs__lead">Use semantic HTML and OCS classes to structure your page.</p>
 
 <ol>
