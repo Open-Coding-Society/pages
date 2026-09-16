@@ -1,5 +1,6 @@
 ---
 layout: post
+assignment: true
 title: OCS Semantic HTML & Typography Grammar 
 categories: [SASS, Typography]
 lesson_language: SASS
@@ -131,21 +132,67 @@ Why do we do this? It ensures our whole project looks consistent, makes our code
 
 ## 3. Hacks & Practice Tasks
 
+### Prepare your submission IPYNB
+
+Complete this quick-start flow so you can begin in about 2 minutes.
+
+1. Create a new notebook in your portfolio homework area: `_notebooks/homework`.
+2. Add one markdown cell at the top with the frontmatter below.
+3. Add code cells for Popcorn and Homework. Keep the `%%html` and `UI_RUNNER` comment in each code cell.
+4. Run each cell and verify the rendered output before submitting.
+
+```raw
+---
+layout: post
+title: OCS Semantic HTML & Typography Grammar HW 
+categories: [SASS]
+lesson_language: SASS
+lesson_topic: Typography HW
+lesson_part: interactive
+lesson_type: lesson
+permalink: /sass/typography-hw
+author: githubID
+---
+```
+
+### Submission Safety Rules (Read First)
+
+> [!IMPORTANT]
+> To avoid grading errors, follow these rules exactly:
+>
+> * Submit only your final semantic HTML for each hack.
+> * Do not add custom CSS, inline styles, or extra classes.
+> * Keep `%%html` and the `UI_RUNNER` comment line in each submission cell.
+> * Use only allowed semantic tags for this lesson: `h1`-`h4`, `p`, `ul`/`ol`/`li`, `strong`, `em`.
+> * For this notebook assignment, treat your notebook content as the student artifact, while site pages still reserve the single top-level h1 for frontmatter title.
+
 ### Popcorn Hack (In-Class)
 
-**Task:** Look at the bad code below. Drop the corrected, semantic version of this code in the chat within 2 minutes.
+> [!TIP]
+> 2-minute challenge: refactor and run, then paste only your corrected code in chat.
+
+**Task:** Look at the bad code below. Replace non-semantic elements with semantic tags and run it with UI_RUNNER.
 
 ```html
+%%html
+
+<!-- UI_RUNNER: Typography Popcorn Base--> 
+
 <div class="huge-text">Welcome!</div>
 <span class="sub-title">Read this</span>
 <div class="normal">This is a sentence.</div>
 ```
 
+**Expected direction:** one heading, one supporting heading/subheading, and one paragraph.
+
 ### Homework Hack
 
-**Task:** Refactor the following code block. Remove all the inline styles and custom classes, and replace them with the correct semantic HTML tags (`h1`-`h4`, `p`, `ul`/`ol`/`li`, `strong`, `em`) so it uses our Aesthetihawk SASS theme. Submit the clean HTML code to our issue tracker.
+**Task:** Refactor the following code block. Remove all custom classes and replace them with the correct semantic HTML tags (`h1`-`h4`, `p`, `ul`/`ol`/`li`, `strong`, `em`) so it uses our Aesthetihawk SASS theme. Run with UI_RUNNER, then submit the clean HTML in your notebook.
 
 ```html
+%%html
+
+<!-- UI_RUNNER: Typography Homework Base --> 
 <p class="title-font">Project Features</p>
 <p class="section-font">User Accounts</p>
 <p class="body-text">Users can make an account and log in. This is a <span class="very-important">crucial</span> feature.</p>
@@ -159,8 +206,23 @@ Why do we do this? It ensures our whole project looks consistent, makes our code
 
 ## 4. Grading Plan (1 Point Total)
 
-* **0.2 points:** Participated in the Popcorn Hack with a reasonable attempt.
-* **0.7 points:** Homework Hack is submitted and correctly uses semantic tags instead of classes (0.4 for correct heading hierarchy, 0.4 for converting the fake list into a real `<ol>`).
+### Classroom Rubric
+
+* **0.2 points: Popcorn completion**
+  Student submitted a semantic refactor attempt and kept the code runnable with `%%html`.
+* **0.8 points: Homework completion**
+  * **0.4 heading and paragraph semantics:** Uses heading hierarchy correctly and keeps descriptive text in paragraphs.
+  * **0.3 list semantics:** Converts fake numbered paragraph lines into one real ordered list (`<ol>` with three `<li>` items).
+  * **0.1 emphasis semantics:** Converts purely visual emphasis to semantic emphasis (`<strong>` or `<em>`).
+
+### Quick Validation Checklist
+
+
+* Present: `%%html` and `UI_RUNNER` comment line.
+* Absent: class attributes, inline style attributes, and span-based fake emphasis.
+* Present: at least one heading tag, paragraph tags, ordered list tags, and list item tags.
+* Present: semantic emphasis tag for the word that was previously marked as visually important.
+
 
 ---
 
