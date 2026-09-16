@@ -466,8 +466,25 @@ show_reading_time: false
         }
     });
 
+    // Local-only preview: typing "mentor" as the GitHub ID skips both real backends
+    // entirely and drops you straight on /capstone/ flagged as an approved mentor, so
+    // the mentor hover actions (see navigation/capstone.md) can be checked without a
+    // real Spring account working through OAuth signup + admin approval. Gated to
+    // localhost so it can never fire against the deployed site. Remove once the mentor
+    // feature no longer needs this shortcut to preview.
+    function isDevMentorPreview(uid) {
+        const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        return isLocalhost && uid.trim().toLowerCase() === 'mentor';
+    }
+
     // Function to handle both Python and Java login simultaneously
     window.loginBoth = function () {
+        if (isDevMentorPreview(document.getElementById('uid').value)) {
+            localStorage.setItem('ocsDevMentorPreview', 'true');
+            window.location.href = '{{site.baseurl}}/capstone/';
+            return;
+        }
+
         // Wrap both logins in Promises and only redirect after both finish
         let javaPromise = new Promise((resolve) => {
             window.javaLogin(resolve);
