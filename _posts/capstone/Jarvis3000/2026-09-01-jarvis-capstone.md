@@ -140,6 +140,7 @@ Sept - Nov 2026"]
 Multi-Camera Tracking &amp; Room Model
 Nov 2026"]
     style P1 fill:#3b82f622,stroke:#3b82f6
+    style P2 fill:#f59e0b22,stroke:#f59e0b
     style P3 fill:#a855f722,stroke:#a855f7</pre>
     </div>
     <div class="ocs__hub-grid" style="margin-top:1.25rem;">

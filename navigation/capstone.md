@@ -708,6 +708,34 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
+    <!-- Doing Exceptional Deeds Website Redesign (CSP, 2026/2027) -->
+  <div class="ocsgrid-cell CSP"
+      data-year="2026-2027"
+      data-page-url="{{ '/capstone/doingexceptionaldeeds/' | relative_url }}">
+
+      <a href="{{ '/capstone/doingexceptionaldeeds/' | relative_url }}">
+          <div class="ocsimage-frame ocs__image-frame--thumbnail capstone-card-placeholder">
+              D.A.D.
+          </div>
+      </a>
+
+      <div>
+          <h3>
+              <a href="{{ '/capstone/doingexceptionaldeeds/' | relative_url }}">
+                  Doing Exceptional Deeds
+              </a>
+          </h3>
+
+          <p>
+              A website redesign focused on simpler navigation, shorter content,
+              student and teacher accounts, teacher profiles, and an easier
+              events and calendar experience.
+          </p>
+
+          <p>Team: Jake, Noah, Ishaan</p>
+      </div>
+    </div>
+
    <!-- DSA Website Redesign (CSP) -->
    <div class="ocs__grid-cell CSP">
        <a href="{% post_url 2026-03-09-dsa-website-redesign-blog %}">
@@ -861,6 +889,18 @@ document.addEventListener('DOMContentLoaded', function(){
            <h3><a href="{% post_url 2026-09-10-poway-scripps-rotary-capstone %}">Poway Rotary Club</a></h3>
            <p>Helping the Poway Scripps Rotary Club improve their website. With better organization, search feachures, and UI, we're helping the non-profit club manage the many activities they do to help others.</p>
            <p>Team: Samarth H, Rigved G, Rohan S</p>
+       </div>
+   </div>
+
+   <!-- Shoreline Project Outreach (CSP, 2026/2027) -->
+   <div class="ocs__grid-cell CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-09-11-shoreline-volunteer-capstone %}">
+           <img src="/images/capstone/shoreline.jpeg" alt="Shoreline Community Services logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{% post_url 2026-09-11-shoreline-volunteer-capstone %}">Shoreline Community Services</a></h3>
+           <p>Extending Shoreline Community Services' outreach through smarter volunteer coordination and easier giving, this capstone project bridges technology and grassroots community care in San Diego.</p>
+           <p>Team: Vanshika Keswani, Nitya Kasse, Hsu-Cheng Lin</p>
        </div>
    </div>
 
