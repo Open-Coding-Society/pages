@@ -1,5 +1,5 @@
 /**
- * Base Typography Styles
+ * Base code formatting
  * Override default code and text formatting with user preferences
  */
 
@@ -16,7 +16,7 @@ pre {
   padding: 1rem;
   border: 1px solid var(--ui-border);
   overflow-x: auto;
-  
+
   code {
     background-color: transparent !important;
     padding: 0;
