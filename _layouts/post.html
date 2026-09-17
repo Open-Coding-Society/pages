@@ -1,6 +1,9 @@
 ---
 layout: opencs
 ---
+{% if page.assignment and page.courses.csa %}
+<link rel="stylesheet" href="{{ '/assets/css/ocs-assignment-meta.css' | relative_url }}">
+{% endif %}
 
 {% comment %}
 Check if this is a course lesson and determine which course context to use
@@ -85,6 +88,7 @@ Check if this is a course lesson and determine which course context to use
           {% endif %}
 
           {% if page.assignment %}
+          {% if page.courses.csa %}{% include lesson-assignment-meta.html %}{% endif %}
           {% include lesson-submission-form.html %}
           <p style="margin-top: 12px; color: #9ca3af; font-size: 0.95rem;">
             Need to update a submission later? Open the <a href="{{ site.baseurl }}/submissions" style="color: #60a5fa; text-decoration: underline;">submissions dashboard</a>.
@@ -527,10 +531,61 @@ Check if this is a course lesson and determine which course context to use
     return CURRENT_ASSIGNMENT_ID;
   }
 
+  /**
+   * ============================================
+   * ASSIGNMENT DETAILS: unit, chapter, due date
+   * ============================================
+   * Reads the block rendered by _includes/lesson-assignment-meta.html.
+   *
+   * Returns {} when the block is absent, so a page that does not render it
+   * submits exactly as it did before. Returns null when the block IS present
+   * and its due date is invalid -- callers abort on null rather than send a
+   * date the form has already rejected.
+   */
+  function readAssignmentMeta() {
+    if (typeof window.OCS_ASSIGNMENT_META !== 'function') return {};
+    return window.OCS_ASSIGNMENT_META();
+  }
+
+  /**
+   * Merge the details into a submission's `content`. The API stores and returns
+   * `content` verbatim, so extra keys round-trip without a backend change --
+   * which is what lets the dashboard group by unit today.
+   */
+  function withAssignmentMeta(content, meta) {
+    if (!meta || !meta.topic) return content;
+    return Object.assign({}, content, {
+      unit: Number(meta.unit),
+      chapter: Number(meta.chapter),
+      topic: meta.topic,
+      topicTitle: meta.topicTitle,
+      dueDate: meta.dueDate || null,
+      course: meta.course || null
+    });
+  }
+
+  /**
+   * The file endpoint takes multipart rather than JSON, so the details go on as
+   * their own parts. A backend ignores parts it does not know, so this is
+   * harmless until it learns them.
+   */
+  function appendAssignmentMeta(formData, meta) {
+    if (!meta || !meta.topic) return;
+    formData.append('unit', meta.unit);
+    formData.append('chapter', meta.chapter);
+    formData.append('topic', meta.topic);
+    if (meta.dueDate) formData.append('dueDate', meta.dueDate);
+  }
+
   async function submitLinkToBackend(link, description) {
+    // First, before any network call. The date is wrong on the page in front
+    // of the student; making them wait on two API round-trips to be told so is
+    // the wrong order, and the API being down would hide the real problem.
+    const meta = readAssignmentMeta();
+    if (meta === null) throw new Error('Fix the due date before submitting.');
     const assignmentId = await ensureAssignmentId();
     const { uid, personId } = await resolveCurrentUser();
-    const content = { type: 'link', url: link, notes: description };
+    const content = withAssignmentMeta({ type: 'link', url: link, notes: description }, meta);
     const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
       ...fetchOptions,
       method: 'POST',
@@ -557,13 +612,19 @@ Check if this is a course lesson and determine which course context to use
   }
 
   async function submitFilesToBackend(files, notes) {
+    // First, before any network call. The date is wrong on the page in front
+    // of the student; making them wait on two API round-trips to be told so is
+    // the wrong order, and the API being down would hide the real problem.
+    const meta = readAssignmentMeta();
+    if (meta === null) throw new Error('Fix the due date before submitting.');
     const assignmentId = await ensureAssignmentId();
     const { uid, personId } = await resolveCurrentUser();
     const assignmentName = await resolveAssignmentName();
     for (const file of files) {
-      const content = { type: 'file', filename: file.name, notes: notes || '' };
+      const content = withAssignmentMeta({ type: 'file', filename: file.name, notes: notes || '' }, meta);
       const fd = new FormData();
       fd.append('assignmentName', assignmentName);
+      appendAssignmentMeta(fd, meta);
       fd.append('assignmentId', String(assignmentId));
       fd.append('userId', personId);
       fd.append('username', uid);
@@ -1326,6 +1387,7 @@ Check if this is a course lesson and determine which course context to use
     {% endif %}
 
     {% if page.assignment %}
+    {% if page.courses.csa %}{% include lesson-assignment-meta.html %}{% endif %}
     <div class="assignment-submission">
       <h3>
         <i class="fas fa-upload assignment-submission-icon"></i>
@@ -1523,9 +1585,12 @@ Check if this is a course lesson and determine which course context to use
         btn.disabled = true;
         showStatusBlog('loading', 'Submitting...');
         try {
+          // First, before any network call -- see submitLinkToBackend.
+          const meta = readAssignmentMeta();
+          if (meta === null) throw new Error('Fix the due date before submitting.');
           const assignmentId = await ensureAssignmentIdBlog();
           const { uid, personId } = await resolveCurrentUserBlog();
-          const content = { type: 'link', url: link, notes: description };
+          const content = withAssignmentMeta({ type: 'link', url: link, notes: description }, meta);
           const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
             ...fetchOptions,
             method: 'POST',
@@ -1571,6 +1636,10 @@ Check if this is a course lesson and determine which course context to use
         btn.disabled = true;
         showStatusBlog('loading', 'Uploading...');
         try {
+          // First, before any network call -- see submitLinkToBackend.
+          const meta = readAssignmentMeta();
+          if (meta === null) throw new Error('Fix the due date before submitting.');
+
           const assignmentId = await ensureAssignmentIdBlog();
           const { uid, personId } = await resolveCurrentUserBlog();
           // Resolve assignment name for the file upload endpoint
@@ -1589,9 +1658,10 @@ Check if this is a course lesson and determine which course context to use
           }
           for (const file of selectedFilesBlog) {
             if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} exceeds 10MB limit.`);
-            const content = { type: 'file', filename: file.name, notes: notes || '' };
+            const content = withAssignmentMeta({ type: 'file', filename: file.name, notes: notes || '' }, meta);
             const fd = new FormData();
             fd.append('assignmentName', assignmentName);
+            appendAssignmentMeta(fd, meta);
             fd.append('assignmentId', String(assignmentId));
             fd.append('userId', personId);
             fd.append('username', uid);

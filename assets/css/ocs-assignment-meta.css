@@ -1,0 +1,156 @@
+/* The tokens this block's controls resolve against. The lesson page loads
+   only this stylesheet, so they are declared here rather than assumed. */
+:root {
+  --ocs-accent: var(--ocs-brand);
+  --ocs-border: #444448;
+  --ocs-border-strong: #59595D;
+  --ocs-brand: #EA706E;
+  --ocs-danger: #FF5E4D;
+  --ocs-danger-border: #FF453A;
+  --ocs-duration-fast: 120ms;
+  --ocs-ease: cubic-bezier(0.2, 0, 0, 1);
+  --ocs-font-mono: Menlo, Monaco, Consolas, Roboto Mono, Ubuntu Mono, Liberation Mono, Courier New, monospace;
+  --ocs-font-sans: var(--pref-font-family, Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif);
+  --ocs-radius-md: 6px;
+  --ocs-surface-base: #121212;
+  --ocs-surface-elevated: #2C2C2E;
+  --ocs-surface-raised: #1C1C1E;
+  --ocs-text: #FFFFFF;
+  --ocs-text-muted: #949498;
+  --ocs-text-secondary: #E1E1E6;
+}
+
+/* Base styles for this block's own controls. The lesson page loads only
+   this stylesheet, so the controls cannot rely on a shared one. */
+.subm-input, .subm-select, .subm-textarea { border: 1px solid ButtonBorder; }
+.subm-input:focus-visible { outline: 2px solid Highlight; }
+.subm-field { display: flex; flex-direction: column; gap: 0.5rem; margin-block-end: 1rem; }
+.subm-label { font-family: var(--ocs-font-sans); font-size: 0.875rem; font-weight: 600; line-height: 1.5; color: var(--ocs-text-secondary); }
+.subm-input { width: 100%; min-height: 2.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--ocs-border); border-radius: var(--ocs-radius-md); background: var(--ocs-surface-raised); color: var(--ocs-text); }
+.subm-input.subm-input { border: 1px solid var(--ocs-border); background: var(--ocs-surface-raised); color: var(--ocs-text); }
+.subm-input { font-family: var(--ocs-font-sans); font-size: 0.875rem; line-height: 1.5; transition: border-color var(--ocs-duration-fast) var(--ocs-ease), background-color var(--ocs-duration-fast) var(--ocs-ease); }
+.subm-input::placeholder { color: var(--ocs-text-muted); opacity: 1; }
+.subm-input:hover:not(:disabled) { border-color: var(--ocs-border-strong); }
+.subm-input:focus { outline: none; }
+.subm-input:focus-visible { border-color: var(--ocs-accent); outline: 2px solid var(--ocs-accent); outline-offset: 1px; box-shadow: 0 0 0 1px var(--ocs-surface-base); }
+.subm-input:disabled { opacity: 0.5; cursor: not-allowed; background: var(--ocs-surface-base); }
+.subm-input[aria-invalid=true] { border-color: var(--ocs-danger-border); }
+.subm-input[aria-invalid=true]:focus-visible { outline-color: var(--ocs-danger-border); }
+.subm-input[readonly] { background: var(--ocs-surface-base); color: var(--ocs-text-secondary); }
+.subm-textarea { width: 100%; min-height: 2.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--ocs-border); border-radius: var(--ocs-radius-md); background: var(--ocs-surface-raised); color: var(--ocs-text); }
+.subm-textarea.subm-textarea { border: 1px solid var(--ocs-border); background: var(--ocs-surface-raised); color: var(--ocs-text); }
+.subm-textarea { font-family: var(--ocs-font-sans); font-size: 0.875rem; line-height: 1.5; transition: border-color var(--ocs-duration-fast) var(--ocs-ease), background-color var(--ocs-duration-fast) var(--ocs-ease); }
+.subm-textarea::placeholder { color: var(--ocs-text-muted); opacity: 1; }
+.subm-textarea:hover:not(:disabled) { border-color: var(--ocs-border-strong); }
+.subm-textarea:focus { outline: none; }
+.subm-textarea:focus-visible { border-color: var(--ocs-accent); outline: 2px solid var(--ocs-accent); outline-offset: 1px; box-shadow: 0 0 0 1px var(--ocs-surface-base); }
+.subm-textarea:disabled { opacity: 0.5; cursor: not-allowed; background: var(--ocs-surface-base); }
+.subm-textarea[aria-invalid=true] { border-color: var(--ocs-danger-border); }
+.subm-textarea[aria-invalid=true]:focus-visible { outline-color: var(--ocs-danger-border); }
+.subm-textarea[readonly] { background: var(--ocs-surface-base); color: var(--ocs-text-secondary); }
+.subm-textarea { min-height: 5rem; resize: vertical; line-height: 1.6; }
+.subm-select { width: 100%; min-height: 2.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--ocs-border); border-radius: var(--ocs-radius-md); background: var(--ocs-surface-raised); color: var(--ocs-text); }
+.subm-select.subm-select { border: 1px solid var(--ocs-border); background: var(--ocs-surface-raised); color: var(--ocs-text); }
+.subm-select { font-family: var(--ocs-font-sans); font-size: 0.875rem; line-height: 1.5; transition: border-color var(--ocs-duration-fast) var(--ocs-ease), background-color var(--ocs-duration-fast) var(--ocs-ease); }
+.subm-select::placeholder { color: var(--ocs-text-muted); opacity: 1; }
+.subm-select:hover:not(:disabled) { border-color: var(--ocs-border-strong); }
+.subm-select:focus { outline: none; }
+.subm-select:focus-visible { border-color: var(--ocs-accent); outline: 2px solid var(--ocs-accent); outline-offset: 1px; box-shadow: 0 0 0 1px var(--ocs-surface-base); }
+.subm-select:disabled { opacity: 0.5; cursor: not-allowed; background: var(--ocs-surface-base); }
+.subm-select[aria-invalid=true] { border-color: var(--ocs-danger-border); }
+.subm-select[aria-invalid=true]:focus-visible { outline-color: var(--ocs-danger-border); }
+.subm-select[readonly] { background: var(--ocs-surface-base); color: var(--ocs-text-secondary); }
+.subm-select { appearance: none; padding-inline-end: 2rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23949498' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 12px 8px; cursor: pointer; }
+.subm-select option { background: var(--ocs-surface-elevated); color: var(--ocs-text); }
+.subm-help { margin: 0; font-family: var(--ocs-font-sans); font-size: 0.8125rem; line-height: 1.5; color: var(--ocs-text-muted); }
+
+/*!
+ * OCS Design System -- GENERATED FILE, DO NOT EDIT
+ *
+ * Source:    _sass/ocs/pages/_assignment-meta.scss
+ * Generator: _sass/ocs/tools/build.sh
+ * Rebuild:   bash _sass/ocs/tools/build.sh
+ *
+ * Hand-edits here are destroyed on the next build. Change the SCSS instead.
+ */
+.amet {
+  margin-block: 1.5rem 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--ocs-border);
+  border-radius: 14px;
+  background: var(--ocs-surface-raised);
+  color: var(--ocs-text);
+  font-family: var(--ocs-font-sans);
+}
+
+.amet__h {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  color: var(--ocs-text);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.amet__icon {
+  flex: 0 0 auto;
+  color: var(--ocs-text-muted);
+}
+
+.amet__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.8fr) minmax(0, 0.9fr);
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.amet__field {
+  min-width: 0;
+  margin-block-end: 0;
+}
+.amet__field .subm-select,
+.amet__field .subm-input {
+  width: 100%;
+}
+
+.amet__topic {
+  margin: 1rem 0 0;
+  color: var(--ocs-text-secondary);
+  font-size: 0.875rem;
+}
+
+.amet__code {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  margin-inline-end: 0.25rem;
+  border-radius: 4px;
+  background: var(--ocs-surface-elevated);
+  color: var(--ocs-text);
+  font-family: var(--ocs-font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.amet .subm-help {
+  margin-block-start: 0.5rem;
+  margin-block-end: 0;
+  font-size: 0.875rem;
+}
+
+.amet .subm-help.amet__help--error {
+  color: var(--ocs-danger);
+}
+
+.amet__field--due .subm-input:invalid {
+  border-color: var(--ocs-danger-border);
+}
+
+@media (max-width: 768px) {
+  .amet {
+    padding: 1rem;
+  }
+  .amet__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

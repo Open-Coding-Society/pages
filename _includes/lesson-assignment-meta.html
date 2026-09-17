@@ -1,0 +1,211 @@
+<!-- ASSIGNMENT DETAILS -- unit, chapter, due date -->
+{% comment %}
+  Renders above the Submit Assignment box on any page with `assignment: true`.
+
+  Two things a submission needs that the old form never asked for:
+
+  1. WHERE IT SITS IN THE COURSE. "4.2" means unit 4, chapter 2. The submissions
+     dashboard groups by unit, so without this every submission lands in one
+     undifferentiated list and a student cannot see how a whole unit went.
+
+  2. WHEN IT IS DUE. The date input refuses today and anything earlier -- work
+     set at 8am and due at 3pm is not an assignment, it is an ambush. The floor
+     is tomorrow, enforced both by the `min` attribute and by a check on submit,
+     because `min` alone is advisory in some browsers.
+
+  A lesson can fill these in ahead of time with `unit:`, `chapter:` and `due:`
+  in its front matter. When it does not, the fields start empty and whoever is
+  running the lesson picks. Nothing here is required to submit -- a student who
+  just wants to hand work in can ignore the whole block.
+
+  The options come from _data/csa_units.yml, which the dashboard reads too.
+{% endcomment %}
+
+<section class="amet" aria-labelledby="amet-h">
+  <h3 class="amet__h" id="amet-h">
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" class="amet__icon">
+      <rect x="2.2" y="3.2" width="11.6" height="10.6" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+      <path d="M2.2 6.4h11.6M5.5 1.8v2.4M10.5 1.8v2.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+    Assignment details
+  </h3>
+
+  <div class="amet__row">
+    <div class="subm-field amet__field">
+      <label class="subm-label" for="amet-unit">Unit</label>
+      <select class="subm-select" id="amet-unit">
+        <option value="">Select a unit</option>
+        {% for unit in site.data.csa_units.units %}
+        <option value="{{ unit.number }}"{% if page.unit == unit.number %} selected{% endif %}>
+          Unit {{ unit.number }} &middot; {{ unit.title }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="subm-field amet__field">
+      <label class="subm-label" for="amet-chapter">Chapter</label>
+      {% comment %}
+        Disabled until a unit is chosen: the chapter list is different per unit,
+        so an enabled-but-empty select is a dead control.
+      {% endcomment %}
+      <select class="subm-select" id="amet-chapter" disabled>
+        <option value="">Pick a unit first</option>
+      </select>
+    </div>
+
+    <div class="subm-field amet__field amet__field--due">
+      <label class="subm-label" for="amet-due">Due</label>
+      <input class="subm-input" type="date" id="amet-due"{% if page.due %} value="{{ page.due }}"{% endif %}>
+    </div>
+  </div>
+
+  {% comment %}
+    <div>, not <p>. assets/css/style.css carries `p { color: ... !important }` so
+    the site's own theme can beat Tailwind, and that rule also beats anything the
+    design system sets on a paragraph. Matching the escalation would mean another
+    !important; changing the element sidesteps it.
+  {% endcomment %}
+  <div class="amet__topic" id="amet-topic" hidden>
+    This lesson is <span class="amet__code" id="amet-code"></span>
+    <span id="amet-title"></span>
+  </div>
+  <div class="subm-help" id="amet-help">Pick the unit and chapter this work belongs to.
+     A due date has to be at least a day out.</div>
+</section>
+
+<script>
+  // ==========================================================================
+  // ASSIGNMENT DETAILS
+  // ==========================================================================
+  // Fills the chapter list from the unit, keeps the "4.2" label in step, and
+  // holds the floor under the due date. The values are read back by
+  // window.OCS_ASSIGNMENT_META(), which the submission handlers in post.html
+  // call so the choices ride along with the POST.
+  (function () {
+    var UNITS = {{ site.data.csa_units.units | jsonify }};
+    var unitEl = document.getElementById('amet-unit');
+    var chapterEl = document.getElementById('amet-chapter');
+    var dueEl = document.getElementById('amet-due');
+    var topicEl = document.getElementById('amet-topic');
+    var codeEl = document.getElementById('amet-code');
+    var titleEl = document.getElementById('amet-title');
+    var helpEl = document.getElementById('amet-help');
+    if (!unitEl || !chapterEl || !dueEl) return;
+
+    var PRESET_CHAPTER = {{ page.chapter | default: 'null' }};
+
+    // Local midnight, not UTC: toISOString() on a Date built from the local
+    // clock shifts the day backwards for anyone west of Greenwich, which would
+    // let an 8pm PDT user set a due date of "today".
+    function isoDay(date) {
+      var y = date.getFullYear();
+      var m = String(date.getMonth() + 1).padStart(2, '0');
+      var d = String(date.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + d;
+    }
+
+    var tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    var FLOOR = isoDay(tomorrow);
+    dueEl.min = FLOOR;
+
+    function unitFor(number) {
+      for (var i = 0; i < UNITS.length; i++) {
+        if (String(UNITS[i].number) === String(number)) return UNITS[i];
+      }
+      return null;
+    }
+
+    function fillChapters(keepValue) {
+      var unit = unitFor(unitEl.value);
+      chapterEl.innerHTML = '';
+      if (!unit) {
+        chapterEl.disabled = true;
+        chapterEl.appendChild(new Option('Pick a unit first', ''));
+        return;
+      }
+      chapterEl.disabled = false;
+      chapterEl.appendChild(new Option('Select a chapter', ''));
+      unit.chapters.forEach(function (chapter) {
+        var label = unit.number + '.' + chapter.number + '  ' + chapter.title;
+        chapterEl.appendChild(new Option(label, String(chapter.number)));
+      });
+      if (keepValue) chapterEl.value = String(keepValue);
+    }
+
+    function currentTopic() {
+      var unit = unitFor(unitEl.value);
+      if (!unit || !chapterEl.value) return null;
+      var n = Number(chapterEl.value);
+      var chapter = unit.chapters.filter(function (c) { return c.number === n; })[0];
+      if (!chapter) return null;
+      return { unit: unit.number, chapter: n, code: unit.number + '.' + n, title: chapter.title };
+    }
+
+    function render() {
+      var topic = currentTopic();
+      if (topic) {
+        codeEl.textContent = topic.code;
+        titleEl.textContent = topic.title;
+        topicEl.hidden = false;
+      } else {
+        topicEl.hidden = true;
+      }
+    }
+
+    function checkDue() {
+      if (!dueEl.value) {
+        dueEl.setCustomValidity('');
+        helpEl.classList.remove('amet__help--error');
+        return true;
+      }
+      // String comparison is safe here: both sides are YYYY-MM-DD, which sorts
+      // chronologically, and it sidesteps timezone parsing entirely.
+      if (dueEl.value < FLOOR) {
+        dueEl.setCustomValidity('Pick a date at least one day out.');
+        helpEl.textContent = 'A due date has to be at least a day after today. ' +
+          'The earliest you can pick is ' + FLOOR + '.';
+        helpEl.classList.add('amet__help--error');
+        return false;
+      }
+      dueEl.setCustomValidity('');
+      helpEl.textContent = 'Pick the unit and chapter this work belongs to. ' +
+        'A due date has to be at least a day out.';
+      helpEl.classList.remove('amet__help--error');
+      return true;
+    }
+
+    unitEl.addEventListener('change', function () { fillChapters(null); render(); });
+    chapterEl.addEventListener('change', render);
+    ['change', 'input', 'blur'].forEach(function (ev) {
+      dueEl.addEventListener(ev, checkDue);
+    });
+
+    // Front matter can preset all three; the preset chapter only makes sense
+    // once its unit's list exists, so it is applied after the first fill.
+    fillChapters(PRESET_CHAPTER);
+    render();
+    checkDue();
+
+    // The contract with post.html. Returns null when the due date is invalid so
+    // a submission cannot carry a date the form has already rejected.
+    window.OCS_ASSIGNMENT_META = function () {
+      if (!checkDue()) {
+        dueEl.reportValidity();
+        return null;
+      }
+      var topic = currentTopic();
+      return {
+        unit: topic ? String(topic.unit) : '',
+        chapter: topic ? String(topic.chapter) : '',
+        topic: topic ? topic.code : '',
+        topicTitle: topic ? topic.title : '',
+        dueDate: dueEl.value || '',
+        // Which course this lesson belongs to, so the dashboard can show one
+        // course at a time without inferring it from the presence of a unit.
+        course: 'csa'
+      };
+    };
+  })();
+</script>

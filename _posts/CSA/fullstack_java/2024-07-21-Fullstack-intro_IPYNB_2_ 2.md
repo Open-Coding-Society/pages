@@ -1,5 +1,6 @@
 ---
 layout: post
+assignment: true
 title: Fullstack Development (Student Thinking)
 description: A reminder and guide to full stack development, aka learn how to do everyone job
 type: coding 
