@@ -3,7 +3,6 @@ title: Fetch of Spring Backend Jokes
 layout: post
 description: An introductory example of Frontend talking to Backend Java Spring application serving jokes.  
 permalink: /java/spring/jokes
-menu: nav/java_spring.html
 image: /images/jokes.png
 ---
 
