@@ -22,6 +22,7 @@ github_username: open-coding-society
 github_repo: "pages"
 baseurl: ""
 future: true
+
 # Single source of truth for the Google OAuth client id -- assets/js/api/config.js's
 # GOOGLE_CLIENT_ID and login.md's #g_id_onload data-client_id both pull from this at
 # build time via Liquid, so the two can never drift out of sync with each other again.
@@ -132,4 +133,5 @@ minima:
   nav_pages:
     - navigation/blog.md
     - navigation/courses.md
+    - navigation/capstone.md
     - navigation/search.md

@@ -5,33 +5,28 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --rp-bg: #0f0f12;
-  --rp-card: #16161a;
-  --rp-card-border: #2a2a2e;
-  --rp-text: #e4e4e7;
-  --rp-text-muted: #a1a1aa;
-  --rp-accent: #3b82f6;
-  --rp-accent-soft: rgba(59, 130, 246, 0.15);
-  --rp-success: #22c55e;
-  --rp-success-soft: rgba(34, 197, 94, 0.12);
-  --rp-tag: #27272a;
-  --rp-gradient-start: #3b82f6;
-  --rp-gradient-end: #06b6d4;
-  --rp-purple: #a855f7;
-  --rp-amber: #f59e0b;
-  --rp-amber-soft: rgba(245, 158, 11, 0.12);
-  --rp-red: #ef4444;
-  --rp-red-soft: rgba(239, 68, 68, 0.12);
-}
-
 * { box-sizing: border-box; }
 
 .rp-container {
+  --rp-bg: var(--pref-bg-color);
+  --rp-card: var(--pref-bg-color);
+  --rp-card-border: var(--ui-border);
+  --rp-text: var(--pref-text-color);
+  --rp-text-muted: var(--text-muted);
+  --rp-accent: var(--pref-accent-color);
+  --rp-accent-soft: color-mix(in srgb, var(--pref-accent-color) 15%, transparent);
+  --rp-success: var(--pref-accent-color);
+  --rp-success-soft: color-mix(in srgb, var(--pref-accent-color) 12%, transparent);
+  --rp-tag: var(--ui-bg);
+  --rp-purple: var(--pref-accent-color);
+  --rp-amber: var(--pref-accent-color);
+  --rp-amber-soft: color-mix(in srgb, var(--pref-accent-color) 12%, transparent);
+  --rp-red: var(--pref-accent-color);
+  --rp-red-soft: color-mix(in srgb, var(--pref-accent-color) 12%, transparent);
   max-width: 900px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
-  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-family: var(--pref-font-family);
   color: var(--rp-text);
 }
 
@@ -60,10 +55,7 @@
   font-weight: 700;
   margin: 0 0 0.75rem;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, var(--rp-gradient-start), var(--rp-gradient-end));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--rp-accent);
 }
 
 .rp-description {
