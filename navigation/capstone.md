@@ -708,6 +708,34 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
+    <!-- Doing Exceptional Deeds Website Redesign (CSP, 2026/2027) -->
+  <div class="ocsgrid-cell CSP"
+      data-year="2026-2027"
+      data-page-url="{{ '/capstone/doingexceptionaldeeds/' | relative_url }}">
+
+      <a href="{{ '/capstone/doingexceptionaldeeds/' | relative_url }}">
+          <div class="ocsimage-frame ocs__image-frame--thumbnail capstone-card-placeholder">
+              D.A.D.
+          </div>
+      </a>
+
+      <div>
+          <h3>
+              <a href="{{ '/capstone/doingexceptionaldeeds/' | relative_url }}">
+                  Doing Exceptional Deeds
+              </a>
+          </h3>
+
+          <p>
+              A website redesign focused on simpler navigation, shorter content,
+              student and teacher accounts, teacher profiles, and an easier
+              events and calendar experience.
+          </p>
+
+          <p>Team: Jake, Noah, Ishaan</p>
+      </div>
+    </div>
+
    <!-- DSA Website Redesign (CSP) -->
    <div class="ocs__grid-cell CSP">
        <a href="{% post_url 2026-03-09-dsa-website-redesign-blog %}">
