@@ -38,6 +38,9 @@ show_reading_time: false
             </p>
             <div id="reset-g_id_signin_container" class="support-g-signin-container"></div>
             <div id="reset-oauth-status" class="support-oauth-status"></div>
+            <p id="reset-ticket-row" class="support-ticket-row">
+                <button type="button" class="large secondary submit-button" onclick="requestResetTicket(this)">Request a Ticket Instead</button>
+            </p>
         </div>
         <div id="reset-step-password" class="support-step">
             <div class="form-group">
@@ -94,6 +97,7 @@ show_reading_time: false
         document.getElementById('resetConfirmPassword').value = '';
         document.getElementById('reset-message').textContent = '';
         document.getElementById('reset-oauth-status').innerHTML = '';
+        document.getElementById('reset-ticket-row').style.display = 'none';
         goToResetStep('reset-step-uid');
     }
 
@@ -171,7 +175,8 @@ show_reading_time: false
         })
         .then(res => {
             if (res.status === 429) {
-                showResetOAuthStatus('❌ Too many reset attempts. Please try again later.', true);
+                showResetOAuthStatus('❌ Too many reset attempts. Please try again later, or request a ticket below.', true);
+                document.getElementById('reset-ticket-row').style.display = 'block';
                 return null;
             }
             if (!res.ok) {
@@ -191,6 +196,32 @@ show_reading_time: false
         .catch(error => {
             console.error('Reset verification failed:', error);
             showResetOAuthStatus('❌ Something went wrong verifying your account. Please try again.', true);
+        });
+    }
+
+    // Fires when a rate-limited user asks for admin help instead of waiting out the
+    // window. Creates (or reuses, if one's already open) a ResetTicket for this uid; an
+    // admin resolves it from the Spring person/read portal, granting a batch of 5 extra
+    // attempts. Doesn't require the OAuth step to have succeeded, since the whole point
+    // is to cover the case where the user can't get through it right now.
+    window.requestResetTicket = function(btn) {
+        if (!resetUidValue) return;
+        btn.disabled = true;
+
+        fetch(`${javaURI}/mvc/person/reset/ticket`, {
+            ...fetchOptions,
+            method: 'POST',
+            body: JSON.stringify({ uid: resetUidValue }),
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('ticket-failed');
+            showResetOAuthStatus('✅ Ticket submitted! An admin will grant you more attempts soon.');
+            btn.style.display = 'none';
+        })
+        .catch(error => {
+            console.error('Reset ticket request failed:', error);
+            showResetOAuthStatus('❌ Could not submit a ticket. Please try again.', true);
+            btn.disabled = false;
         });
     }
 
