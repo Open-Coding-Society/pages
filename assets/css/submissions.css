@@ -1,17 +1,13 @@
 /* Styles for the submissions dashboard (/submissions).
    Only the rules that page uses -- pruned from a larger set, not a
-   general-purpose stylesheet. Nothing else on the site loads this. */
+   general-purpose stylesheet. Nothing else on the site loads this.
+
+   This file is hand-maintained; edit it directly. It is in two parts: the
+   tokens and primitives the page needs, then the page's own rules. Every
+   custom property it defines is prefixed --subm- so nothing here can reach
+   another page. */
 
 /* --- shared primitives used by this page --- */
-/*!
- * OCS Design System -- GENERATED FILE, DO NOT EDIT
- *
- * Source:    _sass/ocs/
- * Generator: _sass/ocs/tools/build.sh
- * Rebuild:   bash _sass/ocs/tools/build.sh
- *
- * Hand-edits here are destroyed on the next build. Change the SCSS instead.
- */
 :root {
   --subm-surface-base: #121212;
   --subm-surface-raised: #1C1C1E;
@@ -874,15 +870,6 @@
 
 
 /* --- page-specific --- */
-/*!
- * OCS Design System -- GENERATED FILE, DO NOT EDIT
- *
- * Source:    _sass/ocs/pages/_submissions.scss
- * Generator: _sass/ocs/tools/build.sh
- * Rebuild:   bash _sass/ocs/tools/build.sh
- *
- * Hand-edits here are destroyed on the next build. Change the SCSS instead.
- */
 .subs {
   max-width: 1400px;
   color: var(--subm-text);
@@ -1211,4 +1198,53 @@
   .subs-clamp {
     max-width: none;
   }
+}
+
+/* --- making the shared components feel like this page --- */
+
+/*
+ * The table and buttons here are ocs__table and ocs__btn from
+ * _sass/open-coding/elements. They are not restyled anywhere in this file --
+ * they read site variables, so pointing those variables at this page's own
+ * tokens makes them match without copying or overriding a single one of their
+ * rules.
+ *
+ * The accent needs bridging because the two sides disagree about what to fall
+ * back to when a student has saved no theme. This page falls back to the OCS
+ * brand coral (--subm-brand); user-preferences.scss falls back to #3b82f6. The
+ * result was one page wearing two accents at once: coral tabs and headings
+ * above a blue table header and blue buttons.
+ *
+ * This does not override a student's choice. When a preference is saved,
+ * user-preferences.js puts .user-theme-active on <html>, and --subm-accent is
+ * already defined there as var(--pref-accent-color). That is computed on <html>,
+ * above this rule, so the value flows down and the buttons follow the student's
+ * colour along with everything else. Only the unset default changes.
+ *
+ * --pref-text-color and --pref-bg-color are left alone. They already agree.
+ */
+.subs {
+  --panel: var(--subm-surface-raised);
+  --ui-border: var(--subm-border);
+  --pref-accent-color: var(--subm-accent);
+  --accent: var(--subm-accent);
+}
+
+/*
+ * assets/css/style.css carries a bare `th, tr, td { font-family: "Lucida Sans" ... }`
+ * with no class on it, so it reaches every table on the site. That left the
+ * header row in Lucida while the rest of the page was Inter. Scoping the font
+ * back to this table is narrower than the rule it is correcting, so it only
+ * ever applies here.
+ */
+.subs th,
+.subs td {
+  font-family: var(--subm-font-sans);
+}
+
+/* The table sits inside the page's own surface, so it should share its edge. */
+.subs .ocs__table-wrap {
+  border: 1px solid var(--subm-border);
+  border-radius: var(--subm-radius-lg, 10px);
+  overflow: hidden;
 }
