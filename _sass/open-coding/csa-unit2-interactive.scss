@@ -1,0 +1,953 @@
+// AP CSA Unit 2 (Selection and Iteration) - Interactive Lesson Styles
+// Follows the frq-interactive.scss card patterns and the project theme
+// variables/mixins. Widgets are wired up by assets/js/csa-lessons/unit2-interactives.js
+
+@import "mixins/buttons";
+@import "mixins/panel";
+@import "mixins/container";
+@import "mixins/variables";
+
+// ===========================
+// Animations
+// ===========================
+@keyframes u2SlideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes u2Shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+@keyframes u2Pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+// ===========================
+// Shared patterns
+// ===========================
+@mixin u2-feedback {
+  display: none;
+  margin-top: $spacing-sm;
+  padding: $spacing-sm;
+  border-radius: $radius-xs;
+  @include responsive-text($text-md);
+  line-height: 1.5;
+  color: var(--pref-text-color);
+
+  code {
+    background: var(--pref-bg-color);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--pref-text-color);
+  }
+
+  &--correct {
+    display: block;
+    background: rgba($green, 0.12);
+    border-left: 4px solid $green;
+    animation: u2SlideDown $transition-slow ease;
+  }
+
+  &--incorrect {
+    display: block;
+    background: rgba($red, 0.12);
+    border-left: 4px solid $red;
+    animation: u2Shake 0.4s ease;
+  }
+
+  &--info {
+    display: block;
+    background: rgba($teal, 0.12);
+    border-left: 4px solid $teal;
+    animation: u2SlideDown $transition-slow ease;
+  }
+}
+
+@mixin u2-option-btn {
+  @include base-button;
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-sm;
+  border-width: 2px;
+  line-height: 1.4;
+  transition: all $transition-base;
+
+  code {
+    font-family: $mono-font;
+    background: transparent;
+    padding: 0;
+    color: inherit;
+  }
+
+  &--correct {
+    border-color: $green !important;
+    background: rgba($green, 0.12) !important;
+  }
+
+  &--incorrect {
+    border-color: $red !important;
+    background: rgba($red, 0.12) !important;
+  }
+
+  &--disabled {
+    pointer-events: none;
+    opacity: 0.55;
+  }
+}
+
+// ===========================
+// Card shell used by every widget
+// ===========================
+.u2-card {
+  @include main-container;
+  max-width: 880px;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  position: relative;
+
+  &__header {
+    background: var(--pref-accent-color);
+    padding: $spacing-md $spacing-lg;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    margin: 0;
+    color: var(--pref-bg-color);
+    font-weight: 700;
+    @include responsive-text($text-xl);
+  }
+
+  &__subtitle {
+    margin: 4px 0 0;
+    color: var(--pref-bg-color);
+    opacity: 0.85;
+    @include responsive-text($text-md);
+    flex-basis: 100%;
+  }
+
+  &__badge {
+    display: none;
+    background: var(--pref-bg-color);
+    color: $green;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-weight: 700;
+    @include responsive-text($text-sm);
+    white-space: nowrap;
+  }
+
+  &--done &__badge {
+    display: inline-block;
+    animation: u2Pop 0.4s ease;
+  }
+
+  &__body {
+    background: var(--pref-bg-color);
+    padding: $spacing-lg;
+  }
+
+  &__prompt {
+    color: var(--pref-text-color);
+    @include responsive-text($text-md);
+    line-height: 1.6;
+    margin: 0 0 $spacing-sm;
+
+    code {
+      font-family: $mono-font;
+      background: var(--panel-mid);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: var(--pref-text-color);
+    }
+  }
+
+  &__hint {
+    color: var(--text-muted);
+    @include responsive-text($text-sm);
+    margin: $spacing-xxs 0 0;
+    font-style: italic;
+  }
+}
+
+// ===========================
+// Buttons
+// ===========================
+.u2-btn {
+  @include text-button;
+  font-weight: 600;
+  padding: $spacing-xxs $spacing-md;
+  gap: 6px;
+
+  &--primary {
+    background: var(--pref-accent-color);
+    border-color: var(--pref-accent-color);
+    color: var(--pref-bg-color);
+  }
+
+  &--success {
+    background: $green;
+    border-color: $green;
+    color: var(--pref-bg-color);
+  }
+
+  &--warn {
+    background: $orange;
+    border-color: $orange;
+    color: var(--pref-bg-color);
+  }
+
+  &--ghost {
+    background: var(--panel-mid);
+    border-color: var(--ui-border);
+    color: var(--pref-text-color);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.u2-controls {
+  @include inline-container(flex, $spacing-xs);
+  flex-wrap: wrap;
+  margin-top: $spacing-md;
+}
+
+.u2-feedback { @include u2-feedback; }
+
+// ===========================
+// Code display with line highlighting
+// ===========================
+.u2-code {
+  background: var(--panel-mid);
+  border: 1px solid var(--ui-border);
+  border-radius: $radius-sm;
+  padding: $spacing-xs 0;
+  margin: 0 0 $spacing-sm;
+  font-family: $mono-font;
+  @include responsive-text($text-md);
+  line-height: 1.6;
+  overflow-x: auto;
+  counter-reset: u2line;
+
+  &__line {
+    display: flex;
+    white-space: pre;
+    padding: 1px $spacing-sm 1px 0;
+    color: var(--pref-text-color);
+    border-left: 4px solid transparent;
+    transition: background $transition-fast, border-color $transition-fast;
+
+    &::before {
+      counter-increment: u2line;
+      content: counter(u2line);
+      display: inline-block;
+      width: 2.2em;
+      margin-right: $spacing-xs;
+      text-align: right;
+      color: var(--text-muted);
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    &--active {
+      background: rgba($warn, 0.18);
+      border-left-color: $warn;
+    }
+
+    &--taken {
+      background: rgba($green, 0.14);
+      border-left-color: $green;
+    }
+
+    &--skipped {
+      opacity: 0.45;
+    }
+  }
+}
+
+// ===========================
+// Output console
+// ===========================
+.u2-console {
+  background: var(--bg-0);
+  color: var(--pref-text-color);
+  border: 1px solid var(--ui-border);
+  border-left: 3px solid $green;
+  border-radius: $radius-sm;
+  padding: $spacing-xs $spacing-sm;
+  font-family: $mono-font;
+  @include responsive-text($text-md);
+  white-space: pre-wrap;
+  min-height: 48px;
+  max-height: 220px;
+  overflow-y: auto;
+
+  &__label {
+    color: var(--text-muted);
+    @include responsive-text($text-xs);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 4px;
+    font-family: var(--pref-font-family);
+  }
+
+  &__empty {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+}
+
+// ===========================
+// 1. Multiple choice (predict the output, quick checks)
+// ===========================
+.u2-mcq {
+  &__q {
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px dashed var(--ui-border);
+
+    &:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  &__number {
+    color: var(--pref-accent-color);
+    font-weight: 700;
+    @include responsive-text($text-sm);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: $spacing-xxs;
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xxs;
+  }
+
+  &__option { @include u2-option-btn; }
+
+  &__feedback { @include u2-feedback; }
+}
+
+// ===========================
+// 2. Short answer (fill in)
+// ===========================
+.u2-fill {
+  &__row {
+    @include inline-container(flex, $spacing-xs);
+    flex-wrap: wrap;
+  }
+
+  &__input {
+    @include base-button;
+    cursor: text;
+    padding: $spacing-xxs $spacing-sm;
+    border-radius: $radius-xs;
+    font-family: $mono-font;
+    min-width: 140px;
+    flex: 1 1 200px;
+
+    &--correct { border-color: $green !important; }
+    &--incorrect { border-color: $red !important; }
+  }
+
+  &__feedback { @include u2-feedback; }
+}
+
+// ===========================
+// 3. Ordering (Parsons style)
+// ===========================
+.u2-order {
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xxs;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    background: var(--panel-mid);
+    border: 2px solid var(--ui-border);
+    border-radius: $radius-sm;
+    padding: $spacing-xxs $spacing-sm;
+    cursor: grab;
+    user-select: none;
+    color: var(--pref-text-color);
+    transition: border-color $transition-base, background $transition-base;
+
+    &:hover { border-color: var(--pref-accent-color); }
+    &.dragging { opacity: 0.4; cursor: grabbing; }
+    &.drag-over { border-color: var(--pref-accent-color); border-style: dashed; }
+
+    &--correct { border-color: $green; background: rgba($green, 0.1); }
+    &--incorrect { border-color: $red; background: rgba($red, 0.1); }
+  }
+
+  &__handle {
+    color: var(--text-muted);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  &__code {
+    font-family: $mono-font;
+    @include responsive-text($text-md);
+    white-space: pre;
+    flex: 1;
+    overflow-x: auto;
+  }
+
+  &__moves {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+
+    button {
+      @include base-button;
+      padding: 2px 8px;
+      border-radius: $radius-xxs;
+      line-height: 1;
+      font-size: 12px;
+    }
+  }
+
+  &__feedback { @include u2-feedback; }
+}
+
+// ===========================
+// 4. Sorting into buckets (classification)
+// ===========================
+.u2-sort {
+  &__pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xxs;
+    min-height: 44px;
+    padding: $spacing-xs;
+    background: var(--panel-mid);
+    border: 2px dashed var(--ui-border);
+    border-radius: $radius-sm;
+    margin-bottom: $spacing-md;
+  }
+
+  &__item {
+    @include base-button;
+    padding: 6px $spacing-sm;
+    border-radius: $radius-xs;
+    border-width: 2px;
+    @include responsive-text($text-md);
+    cursor: grab;
+    user-select: none;
+
+    code { font-family: $mono-font; color: inherit; background: transparent; padding: 0; }
+
+    &--selected {
+      border-color: var(--pref-accent-color);
+      background: var(--panel-mid);
+      box-shadow: 0 0 0 2px var(--pref-accent-color);
+    }
+
+    &--correct { border-color: $green !important; background: rgba($green, 0.12) !important; }
+    &--incorrect { border-color: $red !important; background: rgba($red, 0.12) !important; }
+    &.dragging { opacity: 0.4; }
+  }
+
+  &__buckets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: $spacing-sm;
+  }
+
+  &__bucket {
+    background: var(--panel-mid);
+    border: 2px solid var(--ui-border);
+    border-radius: $radius-sm;
+    padding: $spacing-xs;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xxs;
+    cursor: pointer;
+    transition: border-color $transition-base;
+
+    &:hover, &.drag-over { border-color: var(--pref-accent-color); }
+  }
+
+  &__bucket-title {
+    color: var(--pref-accent-color);
+    font-weight: 700;
+    @include responsive-text($text-md);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  &__help {
+    color: var(--text-muted);
+    @include responsive-text($text-sm);
+    margin: 0 0 $spacing-xxs;
+  }
+
+  &__feedback { @include u2-feedback; }
+}
+
+// ===========================
+// 5. Step-by-step trace (code + variables + output)
+// ===========================
+.u2-trace {
+  &__params {
+    @include inline-container(flex, $spacing-sm);
+    flex-wrap: wrap;
+    margin-bottom: $spacing-sm;
+
+    label {
+      color: var(--pref-text-color);
+      font-family: $mono-font;
+      @include responsive-text($text-md);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    input, select {
+      @include base-button;
+      cursor: text;
+      padding: 4px $spacing-xxs;
+      border-radius: $radius-xxs;
+      width: 80px;
+      font-family: $mono-font;
+    }
+
+    select { cursor: pointer; width: auto; }
+  }
+
+  &__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: $spacing-md;
+
+    @media (max-width: $breakpoint-mobile) { grid-template-columns: 1fr; }
+  }
+
+  &__state {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__vars {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: $mono-font;
+    @include responsive-text($text-md);
+
+    th, td {
+      border: 1px solid var(--ui-border);
+      padding: 4px $spacing-xxs;
+      text-align: left;
+      color: var(--pref-text-color);
+    }
+
+    th {
+      background: var(--panel-mid);
+      color: var(--text-muted);
+      font-weight: 600;
+      @include responsive-text($text-xs);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    td.changed {
+      background: rgba($warn, 0.2);
+      font-weight: 700;
+    }
+  }
+
+  &__extra {
+    margin-top: 2px;
+  }
+
+  &__note {
+    margin-top: $spacing-sm;
+    padding: $spacing-sm;
+    background: var(--panel-mid);
+    border-radius: $radius-sm;
+    border-left: 3px solid var(--pref-accent-color);
+    color: var(--text-muted);
+    @include responsive-text($text-md);
+    line-height: 1.5;
+    min-height: 40px;
+
+    strong { color: var(--pref-accent-color); }
+    code {
+      background: var(--pref-bg-color);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: var(--pref-text-color);
+      font-family: $mono-font;
+    }
+  }
+
+  &__counter {
+    color: var(--text-muted);
+    @include responsive-text($text-sm);
+    font-family: $mono-font;
+    margin-left: auto;
+  }
+
+  // Letter/cell strips used by string and grid traces
+  &__cells {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  &__cell {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--ui-border);
+    border-radius: $radius-xxs;
+    background: var(--panel-mid);
+    color: var(--pref-text-color);
+    font-family: $mono-font;
+    @include responsive-text($text-md);
+    transition: all $transition-fast;
+
+    &--active {
+      background: var(--pref-accent-color);
+      color: var(--pref-bg-color);
+      border-color: var(--pref-accent-color);
+      transform: scale(1.1);
+    }
+
+    &--hit { background: rgba($green, 0.35); border-color: $green; }
+    &--done { background: rgba($green, 0.2); border-color: $green; }
+    &--dim { opacity: 0.35; }
+  }
+
+  &__grid {
+    display: grid;
+    gap: 4px;
+    width: max-content;
+  }
+}
+
+// ===========================
+// 6. Truth table builder
+// ===========================
+.u2-truth {
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: $mono-font;
+    @include responsive-text($text-md);
+    margin-bottom: $spacing-sm;
+
+    th, td {
+      border: 1px solid var(--ui-border);
+      padding: 6px $spacing-xxs;
+      text-align: center;
+      color: var(--pref-text-color);
+    }
+
+    th {
+      background: var(--panel-mid);
+      @include responsive-text($text-sm);
+    }
+
+    th.expr { color: var(--pref-accent-color); }
+  }
+
+  &__given { color: var(--text-muted); }
+
+  &__cell {
+    cursor: pointer;
+    user-select: none;
+    min-width: 48px;
+    transition: background $transition-fast;
+
+    &:hover { background: var(--panel-mid); }
+    &--t { color: $green; font-weight: 700; }
+    &--f { color: $orange; font-weight: 700; }
+    &--correct { background: rgba($green, 0.18) !important; }
+    &--incorrect { background: rgba($red, 0.18) !important; }
+  }
+
+  &__feedback { @include u2-feedback; }
+}
+
+// ===========================
+// 7. Live sandbox (inputs drive the code path)
+// ===========================
+.u2-live {
+  &__inputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 150px;
+
+    label {
+      color: var(--pref-text-color);
+      font-family: $mono-font;
+      @include responsive-text($text-md);
+    }
+
+    input[type="number"], input[type="text"], select {
+      @include base-button;
+      cursor: text;
+      padding: 4px $spacing-xxs;
+      border-radius: $radius-xxs;
+      font-family: $mono-font;
+    }
+
+    select { cursor: pointer; }
+    input[type="range"] { accent-color: var(--pref-accent-color); width: 180px; }
+    input[type="checkbox"] { accent-color: var(--pref-accent-color); width: 18px; height: 18px; }
+  }
+
+  &__value {
+    color: var(--pref-accent-color);
+    font-weight: 700;
+  }
+
+  &__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: $spacing-md;
+
+    @media (max-width: $breakpoint-mobile) { grid-template-columns: 1fr; }
+  }
+
+  &__explain {
+    margin-top: $spacing-sm;
+    color: var(--text-muted);
+    @include responsive-text($text-md);
+    line-height: 1.5;
+
+    strong { color: var(--pref-accent-color); }
+    code {
+      background: var(--panel-mid);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: var(--pref-text-color);
+      font-family: $mono-font;
+    }
+  }
+}
+
+// ===========================
+// 8. Flowchart walkthrough
+// ===========================
+.u2-flow {
+  &__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: $spacing-md;
+
+    @media (max-width: $breakpoint-mobile) { grid-template-columns: 1fr; }
+  }
+
+  &__chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  &__node {
+    width: 100%;
+    max-width: 320px;
+    padding: $spacing-xs $spacing-sm;
+    border: 2px solid var(--ui-border);
+    background: var(--panel-mid);
+    color: var(--pref-text-color);
+    text-align: center;
+    @include responsive-text($text-md);
+    transition: all $transition-base;
+    box-sizing: border-box;
+
+    &--start, &--end { border-radius: 999px; }
+    &--process { border-radius: $radius-xs; }
+    &--decision {
+      border-radius: $radius-xs;
+      border-style: dashed;
+      color: var(--pref-accent-color);
+      font-weight: 600;
+    }
+    &--active {
+      border-color: $warn;
+      background: rgba($warn, 0.18);
+      transform: scale(1.03);
+      box-shadow: $shadow-md;
+    }
+    &--visited { border-color: $green; }
+  }
+
+  &__arrow {
+    color: var(--text-muted);
+    line-height: 1;
+    padding: 2px 0;
+    @include responsive-text($text-lg);
+  }
+
+  &__jump {
+    color: var(--text-muted);
+    @include responsive-text($text-xs);
+    font-style: italic;
+  }
+
+  &__panel {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__question {
+    color: var(--pref-text-color);
+    @include responsive-text($text-md);
+    padding: $spacing-sm;
+    background: var(--panel-mid);
+    border-radius: $radius-sm;
+    border-left: 3px solid var(--pref-accent-color);
+    min-height: 40px;
+  }
+
+  &__log {
+    background: var(--panel-mid);
+    border: 1px solid var(--ui-border);
+    border-radius: $radius-sm;
+    padding: $spacing-xs $spacing-sm;
+    max-height: 240px;
+    overflow-y: auto;
+    color: var(--text-muted);
+    @include responsive-text($text-sm);
+    font-family: $mono-font;
+
+    div { padding: 1px 0; }
+    strong { color: var(--pref-text-color); }
+  }
+}
+
+// ===========================
+// 9. Execution counter (informal run-time analysis)
+// ===========================
+.u2-count {
+  &__row {
+    @include inline-container(flex, $spacing-xs);
+    flex-wrap: wrap;
+    margin-top: $spacing-sm;
+  }
+
+  &__input {
+    @include base-button;
+    cursor: text;
+    padding: $spacing-xxs $spacing-sm;
+    border-radius: $radius-xs;
+    font-family: $mono-font;
+    width: 140px;
+
+    &--correct { border-color: $green !important; }
+    &--incorrect { border-color: $red !important; }
+  }
+
+  &__display {
+    display: flex;
+    gap: $spacing-md;
+    align-items: stretch;
+    margin-top: $spacing-sm;
+    flex-wrap: wrap;
+  }
+
+  &__meter {
+    min-width: 150px;
+    text-align: center;
+    background: var(--panel-mid);
+    border: 2px solid var(--pref-accent-color);
+    border-radius: $radius-sm;
+    padding: $spacing-sm;
+
+    .count-value {
+      color: var(--pref-text-color);
+      font-family: $mono-font;
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .count-label {
+      color: var(--text-muted);
+      @include responsive-text($text-xs);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 6px;
+    }
+  }
+
+  &__console { flex: 1 1 200px; }
+
+  &__feedback { @include u2-feedback; }
+}
+
+// ===========================
+// 10. Quiz scoreboard
+// ===========================
+.u2-quiz {
+  &__score {
+    text-align: center;
+    padding: $spacing-md;
+    background: var(--panel-mid);
+    border-radius: $radius-md;
+    margin-top: $spacing-md;
+
+    .score-label { color: var(--text-muted); @include responsive-text($text-md); margin-bottom: 4px; }
+    .score-value { color: var(--pref-text-color); font-size: 30px; font-weight: 700; }
+    .score-sub { color: var(--text-muted); @include responsive-text($text-sm); margin-top: 4px; }
+
+    .score-bar {
+      margin-top: $spacing-xs;
+      height: 8px;
+      background: var(--ui-border);
+      border-radius: $radius-xxs;
+      overflow: hidden;
+
+      .score-fill {
+        height: 100%;
+        background: var(--pref-accent-color);
+        border-radius: $radius-xxs;
+        transition: width 0.5s ease;
+      }
+    }
+  }
+}
