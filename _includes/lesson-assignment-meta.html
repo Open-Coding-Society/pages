@@ -72,6 +72,42 @@
   </div>
   <div class="subm-help" id="amet-help">Pick the unit and chapter this work belongs to.
      A due date has to be at least a day out.</div>
+
+  {% comment %}
+    Self-assessment. The API rejects a submission without all four ratings and a
+    reflection, so these are part of turning work in rather than an extra step.
+
+    Radios rather than selects: five options each, four times over, on every
+    submission. A radio row is one click; a select is two plus a scan.
+  {% endcomment %}
+  <fieldset class="amet__self" id="amet-self">
+    <legend class="amet__h">How did this go?</legend>
+
+    <div class="amet__rate" data-rating="technicalExcellence">
+      <span class="amet__rate-label" id="lbl-technicalExcellence">Technical excellence</span>
+      <div class="amet__scale" role="radiogroup" aria-labelledby="lbl-technicalExcellence"></div>
+    </div>
+    <div class="amet__rate" data-rating="communication">
+      <span class="amet__rate-label" id="lbl-communication">Communication</span>
+      <div class="amet__scale" role="radiogroup" aria-labelledby="lbl-communication"></div>
+    </div>
+    <div class="amet__rate" data-rating="workHabits">
+      <span class="amet__rate-label" id="lbl-workHabits">Work habits</span>
+      <div class="amet__scale" role="radiogroup" aria-labelledby="lbl-workHabits"></div>
+    </div>
+    <div class="amet__rate" data-rating="aiOrchestration">
+      <span class="amet__rate-label" id="lbl-aiOrchestration">Use of AI</span>
+      <div class="amet__scale" role="radiogroup" aria-labelledby="lbl-aiOrchestration"></div>
+    </div>
+
+    <div class="subm-field amet__field amet__field--wide">
+      <label class="subm-label" for="amet-reflection">One thing you would do differently</label>
+      <textarea class="subm-textarea" id="amet-reflection" rows="2"
+                placeholder="A sentence is enough."></textarea>
+    </div>
+
+    <div class="subm-help" id="amet-self-help">1 is rough, 5 is your best work. All five are required.</div>
+  </fieldset>
 </section>
 
 <script>
@@ -188,6 +224,64 @@
     render();
     checkDue();
 
+    // ---------------------------------------------------------------- self
+    // Five points per row, built here rather than in markup so the row is one
+    // place to change if the scale ever moves.
+    var RATINGS = ['technicalExcellence', 'communication', 'workHabits', 'aiOrchestration'];
+
+    RATINGS.forEach(function (key) {
+      var scale = document.querySelector('[data-rating="' + key + '"] .amet__scale');
+      if (!scale) return;
+      for (var n = 1; n <= 5; n++) {
+        var id = 'amet-' + key + '-' + n;
+        var wrap = document.createElement('label');
+        wrap.className = 'amet__point';
+        wrap.setAttribute('for', id);
+        wrap.innerHTML = '<input type="radio" id="' + id + '" name="amet-' + key + '" value="' + n + '">' +
+                         '<span>' + n + '</span>';
+        scale.appendChild(wrap);
+      }
+    });
+
+    var reflectionEl = document.getElementById('amet-reflection');
+    var selfHelpEl = document.getElementById('amet-self-help');
+
+    function selfHelp(message, bad) {
+      if (!selfHelpEl) return;
+      selfHelpEl.textContent = message;
+      selfHelpEl.classList.toggle('amet__help--bad', Boolean(bad));
+    }
+
+    /**
+     * The four ratings and the reflection, or null when something is missing.
+     * Says which one rather than failing as a whole, so a student is not left
+     * hunting a blank row.
+     */
+    function readSelfAssessment() {
+      var out = {};
+      for (var i = 0; i < RATINGS.length; i++) {
+        var key = RATINGS[i];
+        var picked = document.querySelector('input[name="amet-' + key + '"]:checked');
+        if (!picked) {
+          var label = document.getElementById('lbl-' + key);
+          selfHelp('Give yourself a score for ' + (label ? label.textContent.toLowerCase() : key) + '.', true);
+          var row = document.querySelector('[data-rating="' + key + '"]');
+          if (row && row.scrollIntoView) row.scrollIntoView({ block: 'center' });
+          return null;
+        }
+        out[key] = Number(picked.value);
+      }
+      var reflection = reflectionEl ? reflectionEl.value.trim() : '';
+      if (!reflection) {
+        selfHelp('Add one sentence on what you would do differently.', true);
+        if (reflectionEl) reflectionEl.focus();
+        return null;
+      }
+      out.selfAssessmentReflection = reflection;
+      selfHelp('1 is rough, 5 is your best work. All five are required.', false);
+      return out;
+    }
+
     // The contract with post.html. Returns null when the due date is invalid so
     // a submission cannot carry a date the form has already rejected.
     window.OCS_ASSIGNMENT_META = function () {
@@ -195,6 +289,8 @@
         dueEl.reportValidity();
         return null;
       }
+      var self = readSelfAssessment();
+      if (self === null) return null;
       var topic = currentTopic();
       return {
         unit: topic ? String(topic.unit) : '',
@@ -204,7 +300,8 @@
         dueDate: dueEl.value || '',
         // Which course this lesson belongs to, so the dashboard can show one
         // course at a time without inferring it from the presence of a unit.
-        course: 'csa'
+        course: 'csa',
+        selfAssessment: self
       };
     };
   })();

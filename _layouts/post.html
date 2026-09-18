@@ -565,12 +565,28 @@ Check if this is a course lesson and determine which course context to use
   }
 
   /**
+   * The self-assessment values the API wants alongside the submission. They are
+   * real columns on AssignmentSubmission, so they go at the top level of the
+   * request rather than inside the free-form content map.
+   */
+  function selfAssessmentFields(meta) {
+    return (meta && meta.selfAssessment) ? meta.selfAssessment : {};
+  }
+
+  /**
    * The file endpoint takes multipart rather than JSON, so the details go on as
    * their own parts. A backend ignores parts it does not know, so this is
    * harmless until it learns them.
    */
   function appendAssignmentMeta(formData, meta) {
-    if (!meta || !meta.topic) return;
+    if (!meta) return;
+    // The self-assessment is required whether or not a topic was picked, so it
+    // is appended before the topic check rather than after it.
+    const self = selfAssessmentFields(meta);
+    Object.keys(self).forEach(function (key) {
+      formData.append(key, String(self[key]));
+    });
+    if (!meta.topic) return;
     formData.append('unit', meta.unit);
     formData.append('chapter', meta.chapter);
     formData.append('topic', meta.topic);
@@ -589,14 +605,14 @@ Check if this is a course lesson and determine which course context to use
     const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
       ...fetchOptions,
       method: 'POST',
-      body: JSON.stringify({
+      body: JSON.stringify(Object.assign({
         assignmentId: assignmentId,
         submitterId: personId,
         isGroupSubmission: false,
         content,
         comment: description,
         isLate: false
-      })
+      }, selfAssessmentFields(meta)))
     });
     if (!res.ok) {
       const e = await res.json().catch(() => ({}));
