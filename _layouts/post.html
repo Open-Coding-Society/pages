@@ -553,15 +553,22 @@ Check if this is a course lesson and determine which course context to use
    * which is what lets the dashboard group by unit today.
    */
   function withAssignmentMeta(content, meta) {
-    if (!meta || !meta.topic) return content;
-    return Object.assign({}, content, {
-      unit: Number(meta.unit),
-      chapter: Number(meta.chapter),
-      topic: meta.topic,
-      topicTitle: meta.topicTitle,
-      dueDate: meta.dueDate || null,
-      course: meta.course || null
-    });
+    if (!meta) return content;
+    var out = Object.assign({}, content);
+    // The course comes from the lesson's front matter, not from a dropdown, so
+    // it is recorded even when the student leaves the unit and chapter alone --
+    // those are optional on purpose, and tying the course marker to them meant a
+    // student who skipped them vanished from the course view of the dashboard.
+    if (meta.course) out.course = meta.course;
+    // The topic fields only describe a topic, so they wait until one is picked.
+    if (meta.topic) {
+      out.unit = Number(meta.unit);
+      out.chapter = Number(meta.chapter);
+      out.topic = meta.topic;
+      out.topicTitle = meta.topicTitle;
+      out.dueDate = meta.dueDate || null;
+    }
+    return out;
   }
 
   /**
@@ -580,12 +587,17 @@ Check if this is a course lesson and determine which course context to use
    */
   function appendAssignmentMeta(formData, meta) {
     if (!meta) return;
-    // The self-assessment is required whether or not a topic was picked, so it
-    // is appended before the topic check rather than after it.
+    // Worth knowing before relying on any of this: /api/assignment-submissions/upload
+    // reads assignmentName, assignmentId, userId, username, file and notes, and
+    // nothing else. Every field below is dropped by that endpoint today, so a file
+    // submission carries no unit, chapter or course. These are sent so they are
+    // already in place if the endpoint starts reading them; they are not a
+    // working path, and the dashboard's course view cannot see file submissions.
     const self = selfAssessmentFields(meta);
     Object.keys(self).forEach(function (key) {
       formData.append(key, String(self[key]));
     });
+    if (meta.course) formData.append('course', meta.course);
     if (!meta.topic) return;
     formData.append('unit', meta.unit);
     formData.append('chapter', meta.chapter);
