@@ -2,10 +2,21 @@
    Only the rules that page uses -- pruned from a larger set, not a
    general-purpose stylesheet. Nothing else on the site loads this.
 
-   This file is hand-maintained; edit it directly. It is in two parts: the
-   tokens and primitives the page needs, then the page's own rules. Every
-   custom property it defines is prefixed --subm- so nothing here can reach
-   another page. */
+   Where it comes from. The rules are generated, but not by anything in this
+   repository: the SCSS source and its build script live in UGRC-CSA/Pages, as
+   _sass/ocs/ and _sass/ocs/tools/build.sh. That script emits two files there,
+   assets/css/ocs.css and assets/css/ocs-submissions.css. This file is those
+   two merged and cut down to only the rules this page uses, so no path here
+   is one build.sh writes to, and nothing in this repository regenerates it.
+
+   What that means for editing. A change made here is safe -- no build in this
+   repository will overwrite it -- but it does not travel back to the SCSS. Any
+   fix worth keeping should also go into _sass/ocs/ in UGRC-CSA, or the next
+   regeneration will not have it.
+
+   It is in two parts: the tokens and primitives the page needs, then the
+   page's own rules. Every custom property it defines is prefixed --subm- so
+   nothing here can reach another page. */
 
 /* --- shared primitives used by this page --- */
 :root {
