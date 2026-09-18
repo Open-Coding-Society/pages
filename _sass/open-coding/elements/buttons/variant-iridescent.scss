@@ -1,0 +1,70 @@
+// Iridescent Button Variant
+// Provides a shimmer animation effect for interactive elements
+
+.iridescent {
+  @extend .ocs__btn;
+
+  --ocs-btn-tone: var(--ocs-btn-tone, var(--pref-accent-color, var(--accent)));
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ocs-btn-tone) 88%, #ffffff),
+    color-mix(in srgb, var(--ocs-btn-tone) 74%, #000000)
+  );
+  color: var(--pref-bg-color, var(--white1, #ffffff));
+  border-color: var(--ocs-btn-tone);
+  transition: filter 0.2s ease, opacity 0.2s ease;
+
+  // Shimmer overlay effect
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.34) 50%,
+      rgba(255, 255, 255, 0.08) 100%
+    );
+    background-size: 200% 200%;
+    animation: shimmer 3s infinite linear;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--ocs-btn-tone) 90%, #ffffff),
+      color-mix(in srgb, var(--ocs-btn-tone) 72%, #000000)
+    );
+    filter: brightness(1.06);
+  }
+
+  &:active {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--ocs-btn-tone) 84%, #ffffff),
+      color-mix(in srgb, var(--ocs-btn-tone) 68%, #000000)
+    );
+    filter: brightness(0.94);
+  }
+
+  // Ensure content stays above the shimmer effect
+  span,
+  a {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// Shimmer animation keyframes
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}

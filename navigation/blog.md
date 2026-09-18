@@ -11,15 +11,16 @@ permalink: /navigation/blogs/
 - Review your course regularly to align with Sprint Objectives
 - Each section organizes content into focused sprints with specific timelines
 
-<div id="courseLinks" style="text-align:center;">
-    <table style="width:100%; text-align:center;">
-        <tr>
-            <td><a href="{{site.baseurl}}/navigation/courses/csse">CSSE</a></td>
-            <td><a href="{{site.baseurl}}/navigation/courses/csp">APCSP</a></td>
-            <td><a href="{{site.baseurl}}/navigation/courses/csa">APCSA</a></td>
-            <td><a href="{{site.baseurl}}/navigation/courses/csh">CSH</a></td>
-        </tr>
-    </table>
+<!-- markdownlint-disable MD033 MD046 MD009 -->
+<div id="courseLinks" class="ocs__grid" style="margin-bottom: 1.25rem;">
+  <div class="ocs__grid-cell">
+    <div class="ocs__links ocs__links--wide">
+      <a href="{{site.baseurl}}/navigation/courses/csse" class="ocs__btn pill">CSSE</a>
+      <a href="{{site.baseurl}}/navigation/courses/csp" class="ocs__btn pill">CSP</a>
+      <a href="{{site.baseurl}}/navigation/courses/csa" class="ocs__btn pill">CSA</a>
+      <a href="{{site.baseurl}}/navigation/courses/csh" class="ocs__btn pill">CSH</a>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -28,63 +29,47 @@ permalink: /navigation/blogs/
     async function displayUserCourses() {
         const container = document.getElementById('courseLinks');
 
-        // Function to show all courses (default)
-        function showAllCourses() {
-            container.innerHTML = `
-                <table style="width:100%; text-align:center;">
-                    <tr>
-                        <td><a href="{{site.baseurl}}/navigation/courses/csse">CSSE</a></td>
-                        <td><a href="{{site.baseurl}}/navigation/courses/csp">APCSP</a></td>
-                        <td><a href="{{site.baseurl}}/navigation/courses/csa">APCSA</a></td>
-                        <td><a href="{{site.baseurl}}/navigation/courses/csh">CSH</a></td>
-                    </tr>
-                </table>
-            `;
+        function renderCourses(courseList) {
+            const courseMap = {
+                'CSSE': { name: 'CSSE', url: '{{site.baseurl}}/navigation/courses/csse' },
+                'CSP':  { name: 'CSP',  url: '{{site.baseurl}}/navigation/courses/csp' },
+                'APCSP':{ name: 'CSP',  url: '{{site.baseurl}}/navigation/courses/csp' },
+                'CSA':  { name: 'CSA',  url: '{{site.baseurl}}/navigation/courses/csa' },
+                'APCSA':{ name: 'CSA',  url: '{{site.baseurl}}/navigation/courses/csa' },
+                'CSH':  { name: 'CSH',  url: '{{site.baseurl}}/navigation/courses/csh' }
+            };
+
+            const order = ['CSSE', 'CSP', 'CSA', 'CSH'];
+            const displayCourses = courseList.length > 0
+                ? order.filter(c => courseList.includes(c))
+                : order;
+
+            let html = '<div class="ocs__grid-cell"><div class="ocs__links ocs__links--wide">';
+            displayCourses.forEach(cls => {
+                if (courseMap[cls]) {
+                    html += `<a href="${courseMap[cls].url}" class="ocs__btn pill">${courseMap[cls].name}</a>`;
+                }
+            });
+            html += '</div></div>';
+            container.innerHTML = html;
         }
 
         try {
-            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions );
-
-            // If not logged in or error, show all courses
-            if (!response.ok) {
-                showAllCourses();
-                return;
-            }
+            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions);
+            if (!response.ok) return;
 
             const data = await response.json();
             const classes = data.class || [];
-
-            // If no classes enrolled, show all courses
-            if (classes.length === 0) {
-                showAllCourses();
-                return;
+            if (classes.length > 0) {
+                renderCourses(classes);
             }
-
-            // User is logged in and has classes - show only their courses
-            const courseMap = {
-                'CSSE': { name: 'CSSE', url: '{{site.baseurl}}/navigation/courses/csse' },
-                'CSP': { name: 'APCSP', url: '{{site.baseurl}}/navigation/courses/csp' },
-                'CSA': { name: 'APCSA', url: '{{site.baseurl}}/navigation/courses/csa' },
-                'CSH': { name: 'CSH', url: '{{site.baseurl}}/navigation/courses/csh' }
-            };
-
-            let tableHTML = '<table style="width:100%; text-align:center;"><tr>';
-            classes.forEach(cls => {
-                if (courseMap[cls]) {
-                    tableHTML += `<td><a href="${courseMap[cls].url}">${courseMap[cls].name}</a></td>`;
-                }
-            });
-            tableHTML += '</tr></table>';
-            container.innerHTML = tableHTML;
-
         } catch (error) {
-            console.error('Error:', error);
-            // On error, show all courses
-            showAllCourses();
+            console.error('Error fetching user courses:', error);
         }
     }
 
     displayUserCourses();
 </script>
+<!-- markdownlint-enable MD033 MD046 MD009 -->
 
 ## Course Materials

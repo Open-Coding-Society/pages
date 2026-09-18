@@ -109,8 +109,8 @@ Run these commands to set up your Ubuntu developer tools for the first time.
 mkdir opencs
 cd opencs
 git config --global credential.helper "/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager.exe"
-git clone https://github.com/Open-Coding-Society/student.git
-cd student/
+git clone https://github.com/Open-Coding-Society/portfolio.git
+cd portfolio/
 ./scripts/activate_ubuntu.sh # prompts for your recently created WSL Ubuntu password
 ./scripts/activate.sh # prompts for Git UID and Personal Email
 ./scripts/venv.sh
@@ -135,10 +135,10 @@ git config --global --list
 
 Open Terminal by right clicking on Terminal in Taskbar and selecting Ubuntu 24.04
 
-Each time you open a new terminal session, run these commands to activate your environment and start working on the student project in VS Code.
+Each time you open a new Terminal to work, run:
 
 ```bash
-cd opencs/student
+cd opencs/portfolio
 source venv/bin/activate
 code .
 ```

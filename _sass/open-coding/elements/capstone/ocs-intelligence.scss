@@ -1,0 +1,160 @@
+// OCS Intelligence capstone page composition.
+// Markup is inline in the four Intelligence posts; shared content remains in _data/ocs_intelligence_infograph.yml.
+
+.ocs-intelligence-infograph .ocs-intelligence-question {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.ocs-intelligence-infograph .ocs__team .ocs__text {
+  margin: 0.35rem 0 0;
+  text-align: center;
+}
+
+.ocs-intelligence-infograph .ocs__diagram-stack {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.ocs-intelligence-infograph .ocs__diagram-block .ocs__diagram {
+  margin-bottom: 0;
+}
+
+.ocs-intelligence-infograph .ocs__diagram-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+@media (min-width: 900px) {
+  .ocs-intelligence-infograph .ocs__diagram-stack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+.ocs-intelligence-infograph .ocs__diagram .mermaid,
+.ocs-intelligence-infograph .ocs__diagram .mermaid * {
+  box-sizing: content-box;
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-figure {
+  margin: 0;
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-figure figcaption {
+  margin-top: 0.55rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-figure a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ocs-intelligence-infograph .ocs__table-wrap {
+  margin-top: 1rem;
+}
+
+.ocs-intelligence-infograph .ocs__table td:first-child {
+  font-weight: 600;
+  min-width: 12rem;
+}
+
+.ocs-intelligence-infograph .ocs__table td:nth-child(2) {
+  white-space: nowrap;
+  width: 8rem;
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-gpu-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.45rem;
+  width: 100%;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-gpu {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.ocs-intelligence-infograph .ocs__card-grid + .ocs__stats {
+  margin-top: 1.75rem;
+}
+
+.ocs-intelligence-infograph .ocs__card-grid + .ocs__stats + .ocs__section-title {
+  margin-top: 1.75rem;
+}
+
+@media (max-width: 520px) {
+  .ocs-intelligence-infograph .ocs-intelligence-gpu-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-gift-kicker,
+.ocs-intelligence-infograph .ocs-intelligence-cost-line {
+  letter-spacing: 0.04em;
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-gift-kicker {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-cost-line {
+  margin: 1.25rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-gift .ocs__stats {
+  margin-top: 1.75rem;
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-stage-status {
+  display: inline-block;
+  margin-top: 1rem;
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-stack-link {
+  display: block;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.ocs-intelligence-infograph .ocs-intelligence-stack-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+}

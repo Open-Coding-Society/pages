@@ -348,7 +348,7 @@ clean: stop
 	@echo "Removing _site directory..."
 	@rm -rf _site
 	@echo "Cleaning auto-generated Makefiles..."
-	@find _projects -name "Makefile" ! -path "*/_template/*" -type f -exec rm {} +
+	@find _projects -name "Makefile" ! -path "*/_template/*" ! -path "_projects/lessons/python/Makefile" ! -path "_projects/lessons/javascript/Makefile" ! -path "_projects/lessons/java/Makefile" -type f -exec rm {} +
 
 stop:
 	@echo "Stopping server..."

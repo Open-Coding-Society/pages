@@ -19,7 +19,7 @@ title: Open Coding
 description: "Class of 2026"
 owner_name: Open Coding Society 
 github_username: open-coding-society 
-github_repo: "pages" 
+github_repo: "pages"
 baseurl: ""
 future: true
 # google_client_id is intentionally NOT set here -- per John Mortensen's review on
@@ -31,6 +31,11 @@ future: true
 # baseurl) reading a repository secret. Either way, assets/js/api/config.js's
 # GOOGLE_CLIENT_ID and login.md's #g_id_onload data-client_id pull the same
 # google_client_id key via Liquid -- one source of truth, just never a committed one.
+
+# Shared games catalog labels. Placement stays page-controlled via the include.
+games_directory:
+  title: "Games & Interactive Projects"
+  description: "Explore playable projects and lessons built with the Open Coding Society game systems."
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts
 # This prevents double-regeneration when saving notebooks/docx files
@@ -137,4 +142,5 @@ minima:
   nav_pages:
     - navigation/blog.md
     - navigation/courses.md
+    - navigation/capstone.md
     - navigation/search.md
