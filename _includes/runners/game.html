@@ -7,10 +7,10 @@
   {% include runners/fragments/challenge-box.html challenge=include.challenge %}
 
   {% capture game_runner_top_controls %}
-      <button type="button" class="runBtn" title="Start Game">▶ Start</button>
-      <button type="button" class="pauseBtn" title="Pause Game">⏸ Pause</button>
-      <button type="button" class="stopBtn" title="Stop Game">■ Stop</button>
-      <button type="button" class="fullscreenBtn" title="Toggle Fullscreen">⛶ Fullscreen</button>
+      <button type="button" class="ocs__btn utility run" data-hook="run" title="Start Game" aria-label="Start Game"></button>
+      <button type="button" class="ocs__btn utility pause" data-hook="pause" title="Pause Game" aria-label="Pause Game"></button>
+      <button type="button" class="ocs__btn utility stop" data-hook="stop" title="Stop Game" aria-label="Stop Game"></button>
+      <button type="button" class="ocs__btn utility fullscreen" data-hook="fullscreen" title="Toggle Fullscreen" aria-label="Toggle Fullscreen"></button>
       <select class="engineVersionSelect" title="Select Game Engine Version">
         <option value="GameEnginev1">Engine v1</option>
         <option value="GameEnginev1.1" selected>Engine v1.1</option>
@@ -20,9 +20,9 @@
       </select>
   {% endcapture %}
   {% capture game_runner_bottom_actions %}
-      <button type="button" class="copyBtn" title="Copy Code">📋 Copy</button>
-      <button type="button" class="saveBtn" title="Save Code">💾 Save</button>
-      <button type="button" class="clearStorageBtn" title="Clear Storage">🗑️ Clear</button>
+      <button type="button" class="ocs__btn utility copy" data-hook="copy" title="Copy Code" aria-label="Copy Code"></button>
+      <button type="button" class="ocs__btn utility save" data-hook="save" title="Save Code" aria-label="Save Code"></button>
+      <button type="button" class="ocs__btn utility clear" data-hook="clear" title="Clear Storage" aria-label="Clear Storage"></button>
   {% endcapture %}
   {% capture game_runner_bottom_controls %}
     {% include runners/fragments/editor-stats.html extra_controls=game_runner_bottom_actions %}
@@ -34,10 +34,10 @@
   {% else %}
   <!-- Compact controls for hide_edit mode -->
   <div class="compact-controls">
-    <button type="button" class="runBtn" title="Start Game">▶ Play</button>
-    <button type="button" class="pauseBtn" title="Pause Game">⏸ Pause</button>
-    <button type="button" class="stopBtn" title="Stop Game">■ Stop</button>
-    <button type="button" class="fullscreenBtn" title="Toggle Fullscreen">⛶ Fullscreen</button>
+    <button type="button" class="ocs__btn utility run" data-hook="run" title="Start Game" aria-label="Start Game"></button>
+    <button type="button" class="ocs__btn utility pause" data-hook="pause" title="Pause Game" aria-label="Pause Game"></button>
+    <button type="button" class="ocs__btn utility stop" data-hook="stop" title="Stop Game" aria-label="Stop Game"></button>
+    <button type="button" class="ocs__btn utility fullscreen" data-hook="fullscreen" title="Toggle Fullscreen" aria-label="Toggle Fullscreen"></button>
     <select class="engineVersionSelect" title="Select Game Engine Version">
       <option value="GameEnginev1">Engine v1</option>
       <option value="GameEnginev1.1" selected>Engine v1.1</option>
@@ -76,6 +76,7 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
   const defaultCode = `{{ include.code }}`.trim();
   const editorHeight = "{{ include.editor_height }}";
   const canvasHeight = "{{ include.height }}";
+  const autostart = "{{ include.autostart | default: 'false' }}" === "true";
   const levelClasses = `{{ include.levels }}`.trim().split(',').map(s => s.trim()).filter(Boolean);
   const storageKey = container.dataset.storageKey;
 
@@ -113,10 +114,10 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
   });
 
   // Get UI elements
-  const runBtn = container.querySelector('.runBtn');
-  const pauseBtn = container.querySelector('.pauseBtn');
-  const stopBtn = container.querySelector('.stopBtn');
-  const fullscreenBtn = container.querySelector('.fullscreenBtn');
+  const runButton = container.querySelector('[data-hook="run"]');
+  const pauseButton = container.querySelector('[data-hook="pause"]');
+  const stopButton = container.querySelector('[data-hook="stop"]');
+  const fullscreenButton = container.querySelector('[data-hook="fullscreen"]');
   const engineVersionSelect = container.querySelector('.engineVersionSelect');
   const levelSelect = container.querySelector('.levelSelect');
   const gameOutput = container.querySelector('.game-output');
@@ -125,10 +126,10 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
   const gameExecutor = new GameExecutor({
     getCode: () => runner.getValue(),
     updateStatus: (status) => runner.updateStatus(status),
-    runBtn,
-    pauseBtn,
-    stopBtn,
-    fullscreenBtn,
+    runButton,
+    pauseButton,
+    stopButton,
+    fullscreenButton,
     levelSelect,
     engineVersionSelect,
     getGameContainer: () => document.getElementById('game-container-{{ include.runner_id }}'),
@@ -139,9 +140,9 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
   });
 
   // Disable game controls initially
-  pauseBtn.disabled = true;
-  stopBtn.disabled = true;
-  if (fullscreenBtn) fullscreenBtn.disabled = true;
+  pauseButton.disabled = true;
+  stopButton.disabled = true;
+  if (fullscreenButton) fullscreenButton.disabled = true;
 
   // Update status
   function updateStatus(status) {
@@ -172,13 +173,13 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
   }
 
   // Event listeners
-  if (!runner.bindButton('.runBtn', runGame)) {
+  if (!runner.bindButton('', runGame, 'run')) {
     console.error('Game runner {{ include.runner_id }}: run button not found');
   }
 
-  runner.bindButton('.pauseBtn', togglePause);
+  runner.bindButton('', togglePause, 'pause');
 
-  if (!runner.bindButton('.stopBtn', stopGame)) {
+  if (!runner.bindButton('', stopGame, 'stop')) {
     console.error('Game runner {{ include.runner_id }}: stop button not found');
   }
 
@@ -188,8 +189,8 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
     gameExecutor.toggleFullscreen();
   }
 
-  if (fullscreenBtn) {
-    fullscreenBtn.addEventListener('click', toggleFullscreen);
+  if (fullscreenButton) {
+    fullscreenButton.addEventListener('click', toggleFullscreen);
   }
 
   // Level selector
@@ -197,6 +198,15 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
 
   // Keyboard shortcuts (only if editor exists)
   runner.bindShortcut(runGame);
+
+  if (autostart) {
+    // Defer by one tick so DOM/layout/controls are fully attached before boot.
+    setTimeout(() => {
+      runGame().catch((error) => {
+        console.error('Game runner {{ include.runner_id }} autostart failed:', error);
+      });
+    }, 0);
+  }
 
 })();
 </script>

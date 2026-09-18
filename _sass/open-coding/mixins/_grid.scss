@@ -1,0 +1,181 @@
+/**
+ * Grid Mixins
+ * Follows the same pattern as _buttons.scss:
+ * - plain &:hover (no @media wrapper)
+ * - theme vars: --pref-bg-color, --pref-text-color, --pref-accent-color, --panel, --panel-mid, --ui-border
+ */
+
+// ===========================
+// Base Grid
+// ===========================
+
+@mixin base-grid($cols: 3, $gap: $spacing-md) {
+  display: grid;
+  grid-template-columns: repeat($cols, 1fr);
+  gap: $gap;
+}
+
+// ===========================
+// Standard Grid
+// ===========================
+
+/**
+ * Standard Grid — fixed columns, collapses to 2 on mobile.
+ *
+ * @param {Number} $cols - Column count (default: 3)
+ * @param {Number} $gap  - Gap (default: $spacing-md)
+ */
+@mixin standard-grid($cols: 3, $gap: $spacing-md) {
+  @include base-grid($cols, $gap);
+
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-columns: repeat(min(2, $cols), 1fr);
+  }
+}
+
+// ===========================
+// Card Grid
+// ===========================
+
+/**
+ * Card Grid — auto-fill responsive.
+ *
+ * @param {Number} $min-cell - Min cell width before wrap (default: 200px)
+ * @param {Number} $gap      - Gap (default: $spacing-lg)
+ */
+@mixin card-grid($min-cell: 200px, $gap: $spacing-lg) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($min-cell, 1fr));
+  gap: $gap;
+}
+
+/**
+ * Grid Card Cell — themed card with hover lift.
+ */
+@mixin grid-card-cell {
+  background: var(--panel);
+  border: 1px solid var(--ui-border);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  color: var(--pref-text-color);
+  transition: all $transition-base ease;
+
+  &:hover {
+    background: var(--panel-mid);
+    border-color: var(--pref-accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  }
+}
+
+// ===========================
+// Calculator-Style Grid
+// ===========================
+
+/**
+ * Calculator Grid — equal square tiles.
+ *
+ * @param {Number} $cols - Column count (default: 4)
+ * @param {Number} $gap  - Gap (default: $spacing-sm)
+ */
+@mixin calculator-grid($cols: 4, $gap: $spacing-sm) {
+  display: grid;
+  grid-template-columns: repeat($cols, 1fr);
+  gap: $gap;
+
+  @media (max-width: $breakpoint-mobile) {
+    gap: $spacing-xxs;
+  }
+}
+
+/**
+ * Grid Key Cell — square themed tile.
+ */
+@mixin grid-key-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel);
+  border: 1px solid var(--ui-border);
+  border-radius: $radius-lg;
+  color: var(--pref-text-color);
+  font-size: $text-xl;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $transition-fast ease;
+  user-select: none;
+
+  &:hover {
+    background: var(--panel-mid);
+    border-color: var(--pref-accent-color);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    font-size: $text-lg;
+    border-radius: $radius-md;
+  }
+}
+
+/**
+ * Grid Key Cell — Accent (primary action tile, e.g. =).
+ */
+@mixin grid-key-cell--accent {
+  @include grid-key-cell;
+  background: var(--pref-accent-color);
+  border-color: var(--pref-accent-color);
+  color: var(--pref-bg-color);
+
+  &:hover {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+}
+
+/**
+ * Grid Key Cell — Muted (utility tile, e.g. clear).
+ */
+@mixin grid-key-cell--muted {
+  @include grid-key-cell;
+  background: var(--panel-mid);
+  border-color: var(--ui-border);
+}
+
+// ===========================
+// Gallery Grid
+// ===========================
+
+/**
+ * Gallery Grid — auto-fill square tiles.
+ *
+ * @param {Number} $min-size - Min cell size (default: 160px)
+ * @param {Number} $gap      - Gap (default: $spacing-sm)
+ */
+@mixin gallery-grid($min-size: 160px, $gap: $spacing-sm) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($min-size, 1fr));
+  gap: $gap;
+}
+
+/**
+ * Gallery Cell — square themed tile.
+ */
+@mixin gallery-cell {
+  aspect-ratio: 1;
+  background: var(--panel);
+  border: 1px solid var(--ui-border);
+  border-radius: $radius-md;
+  overflow: hidden;
+  transition: all $transition-base ease;
+
+  &:hover {
+    border-color: var(--pref-accent-color);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}

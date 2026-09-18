@@ -19,7 +19,24 @@
       // Chat state
       let activeChatGroupId = null;
       let activeChatGroupName = '';
-      let stompClient = null;
+      let chatOpenOperationSequence = 0;
+      const groupChatState = {
+        stompClient: null,
+        subscription: null,
+        socket: null,
+        connected: false,
+        connecting: false,
+        reconnectTimer: null,
+        reconnectDelayMs: 3000,
+        heartbeatTimer: null,
+        selfTyping: false,
+        typingStopTimer: null,
+        typingUsers: new Set(),
+        participants: [],
+        seenEventKeys: new Set(),
+        connectPromise: null,
+        allowReconnect: false
+      };
       let currentUser = null;
       let currentUserDisplayName = 'You';
       let pendingChatImageBase64 = null;
@@ -305,6 +322,7 @@
           return;
         }
 
+        const openOperationToken = ++chatOpenOperationSequence;
         activeChatGroupId = groupId;
         activeChatGroupName = groupName;
 
@@ -326,11 +344,17 @@
 
         showChatTab();
         clearChatImagePreview();
+        clearChatStateForGroupSwitch();
+        setConnectionStatus('Connecting', 'connecting');
 
         try {
           await fetchChatMessages();
+          if (!isCurrentChatOpenOperation(openOperationToken, groupId)) return;
+
           await fetchSharedFiles();
-          startChatPolling();
+          if (!isCurrentChatOpenOperation(openOperationToken, groupId)) return;
+
+          await startChatPolling(openOperationToken, groupId);
         } catch (err) {
           console.error('Failed to open chat', err);
         }
@@ -338,11 +362,16 @@
 
       // Close group chat modal
       window.closeGroupChat = function () {
+        chatOpenOperationSequence += 1;
+        if (activeChatGroupId && groupChatState.connected) {
+          sendGroupEvent('leaveGroup', {}, true);
+        }
         document.getElementById('chatModal').classList.add('hidden');
         document.body.classList.remove('modal-open');
         stopChatPolling();
         activeChatGroupId = null;
         activeChatGroupName = '';
+        clearChatStateForGroupSwitch();
         clearChatImagePreview();
       }
 
@@ -1404,6 +1433,111 @@
       // ================================
       const slashCommands = ['/calendar', '/adduser'];
       let selectedCommandIndex = 0;
+      const chatSocketPort = 8589;
+
+      function buildChatSocketEndpoint() {
+        // JUST FOR TESTING, needs to be replaced in config.js for a more permanent implementation
+        const uri = new URL(javaURI);
+        if (uri.hostname === 'localhost' || uri.hostname === '127.0.0.1') {
+          return `${uri.protocol}//${uri.hostname}:${chatSocketPort}/ws-chat`;
+        }
+        return javaURI + '/ws-chat';
+      }
+
+      function setConnectionStatus(text, type = 'idle') {
+        const el = document.getElementById('chatConnectionStatus');
+        if (!el) return;
+        const classMap = {
+          idle: 'bg-neutral-700 text-gray-300',
+          connecting: 'bg-amber-600/20 text-amber-300',
+          connected: 'bg-emerald-600/20 text-emerald-300',
+          disconnected: 'bg-neutral-700 text-gray-300'
+        };
+        el.className = `text-xs px-2 py-1 rounded ${classMap[type] || classMap.idle}`;
+        el.textContent = text;
+      }
+
+      function refreshParticipants() {
+        const el = document.getElementById('chatParticipants');
+        if (!el) return;
+        if (!groupChatState.participants.length) {
+          el.textContent = 'Participants: none';
+          return;
+        }
+        el.textContent = `Participants: ${groupChatState.participants.join(', ')}`;
+      }
+
+      function refreshTypingIndicator() {
+        const el = document.getElementById('chatTypingIndicator');
+        if (!el) return;
+        const names = Array.from(groupChatState.typingUsers);
+        if (names.length === 0) {
+          el.textContent = '';
+        } else if (names.length === 1) {
+          el.textContent = `${names[0]} is typing...`;
+        } else {
+          el.textContent = `${names.join(', ')} are typing...`;
+        }
+      }
+
+      function addTypingUser(name) {
+        if (!name) return;
+        groupChatState.typingUsers.add(String(name));
+        refreshTypingIndicator();
+      }
+
+      function removeTypingUser(name) {
+        if (!name) {
+          groupChatState.typingUsers.clear();
+        } else {
+          groupChatState.typingUsers.delete(String(name));
+        }
+        refreshTypingIndicator();
+      }
+
+      function clearChatStateForGroupSwitch() {
+        groupChatState.participants = [];
+        groupChatState.typingUsers.clear();
+        groupChatState.seenEventKeys.clear();
+        refreshParticipants();
+        refreshTypingIndicator();
+      }
+
+      function getEventKey(event) {
+        return JSON.stringify([
+          event?.context || '',
+          event?.sender || event?.name || '',
+          event?.date || '',
+          event?.message || '',
+          event?.image || '',
+          event?.filename || '',
+          event?.base64Data ? String(event.base64Data).slice(0, 32) : ''
+        ]);
+      }
+
+      function markSeenEvent(event) {
+        const key = getEventKey(event);
+        if (!key) return false;
+        if (groupChatState.seenEventKeys.has(key)) return true;
+        groupChatState.seenEventKeys.add(key);
+        if (groupChatState.seenEventKeys.size > 1500) {
+          const first = groupChatState.seenEventKeys.values().next().value;
+          if (first) groupChatState.seenEventKeys.delete(first);
+        }
+        return false;
+      }
+
+      function appendSystemMessage(text) {
+        const chatMessages = document.getElementById('chatMessages');
+        if (!chatMessages) return;
+        const emptyState = document.getElementById('chatEmptyState');
+        if (emptyState) emptyState.classList.add('hidden');
+        const line = document.createElement('div');
+        line.className = 'text-xs text-gray-400 italic';
+        line.textContent = text;
+        chatMessages.appendChild(line);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
 
       async function initializeChatUser() {
         try {
@@ -1492,10 +1626,13 @@
 
       function getChatMessageKey(msg) {
         return JSON.stringify([
+          msg?.context || '',
+          msg?.sender || msg?.name || '',
           msg?.name || '',
           msg?.date || '',
           msg?.message || '',
-          msg?.image || ''
+          msg?.image || '',
+          msg?.filename || ''
         ]);
       }
 
@@ -1528,9 +1665,11 @@
         const header = document.createElement('div');
         header.className = 'flex items-baseline gap-2 mb-1';
 
+        const senderName = msg.sender || msg.name || 'Unknown';
+
         const nameEl = document.createElement('span');
         nameEl.className = 'text-white font-semibold text-sm';
-        nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
+        nameEl.textContent = senderName === currentUserDisplayName ? 'You' : senderName;
 
         const timeEl = document.createElement('span');
         timeEl.className = 'text-gray-500 text-xs';
@@ -1589,8 +1728,237 @@
           if (!res.ok) throw new Error('Failed to load chat messages');
           const messages = await res.json();
           renderChatMessages(messages);
+          (messages || []).forEach((message) => {
+            markSeenEvent({
+              context: 'sendMessageServer',
+              sender: message.name || 'Unknown',
+              message: message.message || '',
+              image: message.image || null,
+              date: message.date
+            });
+          });
         } catch (err) {
           console.error('Chat fetch failed', err);
+        }
+      }
+
+      function ensureConnected() {
+        if (groupChatState.connected) {
+          return Promise.resolve(true);
+        }
+        if (groupChatState.connecting && groupChatState.connectPromise) {
+          return groupChatState.connectPromise;
+        }
+        if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
+          console.error('SockJS/STOMP dependencies are not available');
+          setConnectionStatus('Unavailable', 'disconnected');
+          return Promise.resolve(false);
+        }
+
+        groupChatState.connecting = true;
+        setConnectionStatus('Connecting', 'connecting');
+
+        const socket = new SockJS(buildChatSocketEndpoint());
+        const client = Stomp.over(socket);
+        client.debug = null;
+
+        groupChatState.socket = socket;
+        groupChatState.stompClient = client;
+
+        groupChatState.connectPromise = new Promise((resolve) => {
+          let settled = false;
+          const finish = (ok) => {
+            if (settled) return;
+            settled = true;
+            groupChatState.connectPromise = null;
+            resolve(ok);
+          };
+
+          socket.onclose = () => {
+            if (groupChatState.connected || groupChatState.connecting) {
+              handleDisconnect();
+            }
+            finish(false);
+          };
+
+          client.connect({}, () => {
+            groupChatState.connected = true;
+            groupChatState.connecting = false;
+            setConnectionStatus('Connected', 'connected');
+            startHeartbeat();
+            subscribeToActiveGroup();
+            finish(true);
+          }, (err) => {
+            console.error('WebSocket connection failed', err);
+            handleDisconnect();
+            finish(false);
+          });
+        });
+
+        return groupChatState.connectPromise;
+      }
+
+      function handleDisconnect() {
+        stopHeartbeat();
+        groupChatState.connected = false;
+        groupChatState.connecting = false;
+        if (groupChatState.subscription) {
+          try {
+            groupChatState.subscription.unsubscribe();
+          } catch (err) {
+            console.warn('Subscription cleanup failed', err);
+          }
+          groupChatState.subscription = null;
+        }
+        groupChatState.stompClient = null;
+        groupChatState.socket = null;
+        setConnectionStatus('Disconnected', 'disconnected');
+        if (groupChatState.allowReconnect) {
+          scheduleReconnect();
+        }
+      }
+
+      function scheduleReconnect() {
+        if (groupChatState.reconnectTimer) return;
+        groupChatState.reconnectTimer = window.setTimeout(() => {
+          groupChatState.reconnectTimer = null;
+          if (!groupChatState.allowReconnect) return;
+          ensureConnected();
+        }, groupChatState.reconnectDelayMs);
+      }
+
+      function startHeartbeat() {
+        stopHeartbeat();
+        groupChatState.heartbeatTimer = window.setInterval(() => {
+          if (activeChatGroupId) {
+            sendGroupEvent('heartbeat', {}, true);
+          }
+        }, 25000);
+      }
+
+      function stopHeartbeat() {
+        if (groupChatState.heartbeatTimer) {
+          window.clearInterval(groupChatState.heartbeatTimer);
+          groupChatState.heartbeatTimer = null;
+        }
+      }
+
+      function sendGroupEvent(context, extraPayload = {}, silent = false) {
+        if (!groupChatState.connected || !groupChatState.stompClient) {
+          if (!silent) {
+            alert('Chat socket is not connected yet. Try again in a moment.');
+          }
+          return false;
+        }
+        if (!activeChatGroupId) {
+          if (!silent) {
+            alert('Please open a group chat first.');
+          }
+          return false;
+        }
+
+        const payload = {
+          context,
+          groupId: activeChatGroupId,
+          sender: currentUserDisplayName || 'anonymous',
+          ...extraPayload
+        };
+
+        try {
+          groupChatState.stompClient.send('/app/groups.chat', {}, JSON.stringify(payload));
+          return true;
+        } catch (err) {
+          console.error('Failed to send websocket event', err);
+          if (!silent) {
+            alert('Failed to send chat event. Please retry.');
+          }
+          return false;
+        }
+      }
+
+      function subscribeToActiveGroup() {
+        if (!groupChatState.connected || !groupChatState.stompClient || !activeChatGroupId) return;
+
+        if (groupChatState.subscription) {
+          try {
+            groupChatState.subscription.unsubscribe();
+          } catch (err) {
+            console.warn('Unsubscribe failed', err);
+          }
+          groupChatState.subscription = null;
+        }
+
+        groupChatState.subscription = groupChatState.stompClient.subscribe(`/topic/group/${activeChatGroupId}`, (frame) => {
+          try {
+            const event = JSON.parse(frame.body);
+            handleIncomingEvent(event);
+          } catch (err) {
+            console.error('Failed to parse incoming chat event', err);
+          }
+        });
+
+        sendGroupEvent('joinGroup', {}, true);
+      }
+
+      function handleIncomingEvent(event) {
+        if (!event || !event.context) return;
+
+        switch (event.context) {
+          case 'sendMessageServer': {
+            if (markSeenEvent(event)) return;
+            appendSingleMessage({
+              sender: event.sender || 'Unknown',
+              message: event.message || '',
+              date: event.date,
+              image: event.image || null,
+              context: event.context
+            });
+            removeTypingUser(event.sender || '');
+            break;
+          }
+          case 'sendFileServer': {
+            if (markSeenEvent(event)) return;
+            appendSystemMessage(`${event.sender || 'Someone'} shared file: ${event.filename || 'file'}`);
+            removeTypingUser(event.sender || '');
+            fetchSharedFiles();
+            break;
+          }
+          case 'joinGroupServer':
+          case 'leaveGroupServer': {
+            if (!markSeenEvent(event)) {
+              const verb = event.context === 'joinGroupServer' ? 'joined' : 'left';
+              appendSystemMessage(`${event.sender || 'Someone'} ${verb} the chat`);
+            }
+            groupChatState.participants = Array.isArray(event.participants) ? event.participants : [];
+            refreshParticipants();
+            if (event.context === 'leaveGroupServer') {
+              removeTypingUser(event.sender || '');
+            }
+            break;
+          }
+          case 'heartbeatServer': {
+            groupChatState.participants = Array.isArray(event.participants) ? event.participants : [];
+            refreshParticipants();
+            break;
+          }
+          case 'typingStartServer': {
+            if ((event.sender || '') !== currentUserDisplayName) {
+              addTypingUser(event.sender || 'Someone');
+            }
+            break;
+          }
+          case 'typingStopServer': {
+            if ((event.sender || '') !== currentUserDisplayName) {
+              removeTypingUser(event.sender || '');
+            }
+            break;
+          }
+          case 'errorServer': {
+            appendSystemMessage(`Error: ${event.error || 'Unknown websocket error'}`);
+            break;
+          }
+          default:
+            break;
         }
       }
 
@@ -1605,78 +1973,58 @@
 
         if (!text && !image) return;
 
-        const payload = {
-          name: currentUserDisplayName,
+        const sent = sendGroupEvent('sendMessage', {
           message: text,
-          date: new Date().toISOString(),
-          image: image
-        };
+          image: image,
+          date: new Date().toISOString()
+        });
 
-        // Clear UI immediately for responsive UX; rendering is handled by WebSocket broadcast.
+        if (!sent) return;
         chatInput.value = '';
         clearChatImagePreview();
-
-        try {
-          const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/messages`, {
-            ...fetchOptions,
-            method: 'POST',
-            headers: {
-              ...(fetchOptions.headers || {}),
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-          });
-
-          if (!res.ok) throw new Error('Failed to send message');
-        } catch (err) {
-          console.error('Send message failed', err);
-        }
+        groupChatState.selfTyping = false;
+        sendGroupEvent('typingStop', {}, true);
       };
 
-      function startChatPolling() {
-        if (!activeChatGroupId) return;
+      function isCurrentChatOpenOperation(openOperationToken, groupId) {
+        return chatOpenOperationSequence === openOperationToken && activeChatGroupId === groupId;
+      }
 
-        if (stompClient) {
-          stopChatPolling();
-        }
+      async function startChatPolling(openOperationToken, groupId) {
+        if (!isCurrentChatOpenOperation(openOperationToken, groupId)) return;
 
-        if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
-          console.error('SockJS/STOMP dependencies are not available');
+        groupChatState.allowReconnect = true;
+        if (groupChatState.connected) {
+          subscribeToActiveGroup();
           return;
         }
-
-        console.log(`Attempting WebSocket connection to ${javaURI}/ws-chat`);
-        const socket = new SockJS(`${javaURI}/ws-chat`);
-        stompClient = Stomp.over(socket);
-        stompClient.debug = console.log;
-
-        stompClient.connect({}, () => {
-          if (!stompClient || !activeChatGroupId) return;
-
-          console.log('WebSocket Connected Successfully!');
-          const topic = `/topic/group/${activeChatGroupId}`;
-          console.log(`Subscribing to topic: ${topic}`);
-
-          stompClient.subscribe(topic, (message) => {
-            try {
-              console.log('Incoming WebSocket payload:', message.body);
-              const payload = JSON.parse(message.body);
-              appendSingleMessage(payload);
-            } catch (err) {
-              console.error('Failed to parse incoming chat message', err);
-            }
-          });
-        }, (err) => {
-          console.error('WebSocket connection failed', err);
-        });
+        await ensureConnected();
       }
 
       function stopChatPolling() {
-        if (stompClient) {
-          const clientToDisconnect = stompClient;
-          stompClient = null;
+        groupChatState.allowReconnect = false;
+        stopHeartbeat();
+        if (groupChatState.subscription) {
+          try {
+            groupChatState.subscription.unsubscribe();
+          } catch (err) {
+            console.warn('Subscription cleanup failed', err);
+          }
+          groupChatState.subscription = null;
+        }
+        if (groupChatState.stompClient) {
+          const clientToDisconnect = groupChatState.stompClient;
+          groupChatState.stompClient = null;
+          groupChatState.connected = false;
+          groupChatState.connecting = false;
           clientToDisconnect.disconnect(() => { });
         }
+        if (groupChatState.reconnectTimer) {
+          window.clearTimeout(groupChatState.reconnectTimer);
+          groupChatState.reconnectTimer = null;
+        }
+        groupChatState.socket = null;
+        setConnectionStatus('Disconnected', 'disconnected');
       }
 
       function downloadBase64File(filename, base64Data) {
@@ -1780,19 +2128,13 @@
 
         try {
           const base64Data = await fileToBase64(file);
-          const payload = { filename: file.name, base64Data };
-
-          const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/files`, {
-            ...fetchOptions,
-            method: 'POST',
-            headers: {
-              ...(fetchOptions.headers || {}),
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
+          const sent = sendGroupEvent('sendFile', {
+            filename: file.name,
+            base64Data,
+            date: new Date().toISOString()
           });
 
-          if (!res.ok) throw new Error('Failed to upload file');
+          if (!sent) throw new Error('Failed to upload file');
           input.value = '';
           await fetchSharedFiles();
         } catch (err) {
@@ -1881,6 +2223,19 @@
              return;
           }
           window.sendChatMessage();
+          return;
+        } else {
+          if (!groupChatState.selfTyping) {
+            groupChatState.selfTyping = true;
+            sendGroupEvent('typingStart', {}, true);
+          }
+          if (groupChatState.typingStopTimer) {
+            window.clearTimeout(groupChatState.typingStopTimer);
+          }
+          groupChatState.typingStopTimer = window.setTimeout(() => {
+            groupChatState.selfTyping = false;
+            sendGroupEvent('typingStop', {}, true);
+          }, 700);
         }
       }
 
@@ -2041,4 +2396,11 @@
         if (typeof window.handlePastedChatImage === 'function') {
           window.handlePastedChatImage(event);
         }
+      });
+
+      window.addEventListener('beforeunload', () => {
+        if (activeChatGroupId && groupChatState.connected) {
+          sendGroupEvent('leaveGroup', {}, true);
+        }
+        stopHeartbeat();
       });
