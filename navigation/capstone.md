@@ -779,6 +779,46 @@ document.addEventListener('DOMContentLoaded', function(){
             <p>Team: Nitya, Vivian, Virginia</p>
         </div>
     </div>
+     <!-- Friends of the Poway Library  (CSP) -->
+   <div class="ocs__grid-cell CSP">
+       <a href="{% post_url 2026-03-09-poway-library %}">
+           <img src="/images/capstone/poway_library.png" alt="Friends of the Poway Library" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{% post_url 2026-03-09-poway-library %}">Friends of the Poway Library</a></h3>
+           <p>Rebuilding the Friends of the Poway Library website with a live events calendar, volunteer portal, and donation flow.</p>
+           <p>Team: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe</p>
+       </div>
+   </div>
+
+    <!-- Doing Exceptional Deeds Website Redesign (CSP, 2026/2027) -->
+  <div class="ocsgrid-cell CSP"
+      data-year="2026-2027"
+      data-page-url="{{ '/capstone/doingexceptionaldeeds/' | relative_url }}">
+
+      <a href="{{ '/capstone/doingexceptionaldeeds/' | relative_url }}">
+          <div class="ocsimage-frame ocs__image-frame--thumbnail capstone-card-placeholder">
+              D.A.D.
+          </div>
+      </a>
+
+      <div>
+          <h3>
+              <a href="{{ '/capstone/doingexceptionaldeeds/' | relative_url }}">
+                  Doing Exceptional Deeds
+              </a>
+          </h3>
+
+          <p>
+              A website redesign focused on simpler navigation, shorter content,
+              student and teacher accounts, teacher profiles, and an easier
+              events and calendar experience.
+          </p>
+
+          <p>Team: Jake, Noah, Ishaan</p>
+      </div>
+    </div>
+
 
    <!-- FOPS (2026-2027) -->
  <div class="ocs__grid-cell CSP" data-year="2026-2027">
