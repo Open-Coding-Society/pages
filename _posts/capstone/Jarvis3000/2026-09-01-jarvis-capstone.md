@@ -35,7 +35,7 @@ rp_active: overview
     </div>
     <span class="jv-flow-arrow">→</span>
     <div class="jv-flow-node active">
-      <span class="jv-flow-node-label">YOLO</span>
+      <span class="jv-flow-node-label">Object Detector</span>
       <span class="jv-flow-node-sub">Object Detection</span>
     </div>
     <span class="jv-flow-arrow">→</span>
@@ -69,9 +69,9 @@ Timestamped frame"]
     C2["Camera 2
 Second Linux computer"] --> TX["SSH / NetBird"]
     TX --> CAP
-    CAP --> YOLO["YOLO
+    CAP --> DETECT["Object detector
 Object detection"]
-    YOLO --> SAM["SAM 3
+    DETECT --> SAM["SAM 3
 Object segmentation"]
     SAM --> FUSE["Multi-camera matching
 and temporal tracking"]
@@ -99,7 +99,7 @@ Identity + location + history"]</pre>
       <div class="jv-flow-node active">
         <div class="jv-flow-node-photo"><img src="/images/capstone/jarvis-bom/mac-mini.jpg" alt="Main Linux computer"></div>
         <span class="jv-flow-node-label">Main Linux Computer</span>
-        <span class="jv-flow-node-sub">Capture + YOLO + SAM 3</span>
+        <span class="jv-flow-node-sub">Capture + Detection + SAM 3</span>
       </div>
       <span class="jv-flow-arrow">→</span>
       <div class="jv-flow-node">
@@ -152,7 +152,7 @@ Nov 2026"]
       <div class="ocs__hub-card">
         <span class="ocs__status-pill ocs__status-pill--warn" style="width:fit-content;margin-bottom:0.6rem;">Planned</span>
         <span class="ocs__hub-card-title">Phase 2: Object Recognition &amp; Segmentation</span>
-        <p>Annotate the dataset, train and evaluate YOLO on the six core classroom classes, and integrate SAM 3 segmentation, targeting the 80% classification threshold on held-out images.</p>
+        <p>Annotate the dataset, train and evaluate an object-detection model on the six core classroom classes, and integrate SAM 3 segmentation, targeting the 80% classification threshold on held-out images.</p>
       </div>
       <div class="ocs__hub-card">
         <span class="ocs__status-pill ocs__status-pill--neutral" style="width:fit-content;margin-bottom:0.6rem;">Planned</span>
@@ -179,7 +179,7 @@ Nov 2026"]
       <span>Explore Research 1</span>
     </a>
     <a href="/capstone/jarvis/research-2/" class="ocs__hub-card">
-      <span class="ocs__hub-card-title">Research 2: YOLO Object Detection &amp; SAM 3 Segmentation</span>
+      <span class="ocs__hub-card-title">Research 2: Object Detection &amp; SAM 3 Segmentation</span>
       <p>Object classification, confidence scoring, bounding-box localization, and pixel-precise mask generation for classroom objects.</p>
       <span>Explore Research 2</span>
     </a>

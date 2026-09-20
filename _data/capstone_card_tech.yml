@@ -161,7 +161,7 @@
   - "Distributed Inference"
   - "Observability"
 
-"Communication System":
+"OCS Communication System":
   - "Spring Boot / Java"
   - "STOMP over SockJS"
   - "REST at /api/groups"

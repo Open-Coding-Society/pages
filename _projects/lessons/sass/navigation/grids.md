@@ -9,6 +9,7 @@ lesson_part: interactive
 lesson_type: lesson
 permalink: /sass/grids/
 author: Aryan M, Raymond L, Pranay K
+microblog: true 
 ---
 
 ## The Core Rule

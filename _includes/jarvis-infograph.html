@@ -415,7 +415,7 @@
     </div>
     <span class="rp-flow-arrow">→</span>
     <div class="rp-flow-node">
-      <span class="rp-flow-node-label">YOLO</span>
+      <span class="rp-flow-node-label">Object Detector</span>
       <span class="rp-flow-node-sub">Object Recognition</span>
     </div>
     <span class="rp-flow-arrow">→</span>
@@ -433,15 +433,15 @@
   <!-- Research Question -->
   <div class="rp-section-label">Research Question</div>
   <div class="rp-card">
-    <p class="rp-question">Can Jarvis use a low-cost, multi-camera computer-vision pipeline—combining timestamped classroom images, YOLO object recognition, and SAM 3 segmentation—to reliably identify classroom objects, determine where they are located, and track meaningful changes over time, while establishing a foundation for later material recognition?</p>
+    <p class="rp-question">Can Jarvis use a low-cost, multi-camera computer-vision pipeline—combining timestamped classroom images, object recognition, and SAM 3 segmentation—to reliably identify classroom objects, determine where they are located, and track meaningful changes over time, while establishing a foundation for later material recognition?</p>
     <h3 style="margin-top:1.5rem;">Acceptance / Test Cases</h3>
     <ul class="rp-checklist">
       <li class="open"><span class="rp-box"></span><span>Capture timestamped images from the classroom camera system at a configurable interval, beginning with one image every 10 seconds</span></li>
       <li class="open"><span class="rp-box"></span><span>Receive images from cameras on opposite sides of the room, including footage transferred from a second Linux computer to the main processing computer</span></li>
-      <li class="open"><span class="rp-box"></span><span>Use YOLO to detect supported classroom object classes and record a confidence score for every prediction</span></li>
+      <li class="open"><span class="rp-box"></span><span>Use an object-detection model to detect supported classroom object classes and record a confidence score for every prediction</span></li>
       <li class="open"><span class="rp-box"></span><span>Evaluate the first model on six core classes: chair, table/desk, laptop, backpack, bottle, and book</span></li>
       <li class="open"><span class="rp-box"></span><span>Reach at least 80% correct object classifications on a held-out, manually labeled set of classroom images</span></li>
-      <li class="open"><span class="rp-box"></span><span>Use SAM 3 to refine YOLO detections into usable object masks without treating segmentation itself as recognition</span></li>
+      <li class="open"><span class="rp-box"></span><span>Use SAM 3 to refine object detections into usable object masks without treating segmentation itself as recognition</span></li>
       <li class="open"><span class="rp-box"></span><span>Record each detected object's camera, timestamp, label, confidence, mask, and estimated location in the room</span></li>
       <li class="open"><span class="rp-box"></span><span>Match repeated observations across frames so Jarvis can distinguish a continuing object from a new, removed, or moved object</span></li>
       <li class="open"><span class="rp-box"></span><span>Reach at least 80% correct object-state decisions across held-out new, continuing, moved, missing, and occluded-object test scenarios</span></li>
@@ -460,7 +460,7 @@
           <tr><td>Use <strong>two cameras on opposite sides</strong> of the room</td><td>A second viewpoint reduces blind spots and gives Jarvis another observation when an object is blocked or unclear in one camera.</td></tr>
           <tr><td>Capture <strong>timestamped still images</strong> instead of processing continuous 4K video</td><td>Periodic frames reduce storage and CPU demand while preserving the time information needed to compare changes.</td></tr>
           <tr><td>Begin at a <strong>10-second capture interval</strong></td><td>This is frequent enough for initial room-change experiments and can be adjusted after measuring processing time and missed events.</td></tr>
-          <tr><td>Use <strong>YOLO for object recognition first</strong></td><td>The first version focuses on reliable object classes, bounding boxes, and confidence scores. Material recognition remains a later extension after the object pipeline works.</td></tr>
+          <tr><td>Use <strong>object recognition first</strong></td><td>The first version focuses on reliable object classes, bounding boxes, and confidence scores. Material recognition remains a later extension after the object pipeline works.</td></tr>
           <tr><td>Start with <strong>six core classroom classes</strong></td><td>Chair, table/desk, laptop, backpack, bottle, and book provide a manageable first dataset while testing fixed furniture, portable equipment, and small objects.</td></tr>
           <tr><td>Use <strong>SAM 3 for segmentation</strong></td><td>SAM 3 supplies precise object masks, separating the pixels belonging to an object from its background; it does not replace the recognition model.</td></tr>
           <tr><td>Defer <strong>material classification</strong></td><td>Material labels such as wood, metal, plastic, glass, and fabric require separate training or classification work and are outside the first implementation milestone.</td></tr>
@@ -510,9 +510,9 @@ SSH / NetBird"]
     TX --> CAP
     CAP --> CV["OpenCV
 Load and preprocess"]
-    CV --> YOLO["YOLO
+    CV --> DETECT["Object detector
 Class + box + confidence"]
-    YOLO --> SAM["SAM 3
+    DETECT --> SAM["SAM 3
 Pixel-level object mask"]
     SAM --> FUSE["Multi-camera matching
 and temporal tracking"]
@@ -524,12 +524,12 @@ Identity + location + history"]</pre>
   <!-- Capture and processing loop -->
   <div class="rp-section-label">Capture &amp; Processing Logic</div>
   <div class="rp-card">
-    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 0.25rem;">Each capture cycle creates a timestamped observation. Jarvis preserves the original frame, processes it through YOLO and SAM 3, and compares the result with recent observations before changing the room model.</p>
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 0.25rem;">Each capture cycle creates a timestamped observation. Jarvis preserves the original frame, processes it through the object detector and SAM 3, and compares the result with recent observations before changing the room model.</p>
     <div class="rp-diagram">
       <pre class="mermaid" style="margin:0;">sequenceDiagram
     participant Cam as Classroom Cameras
     participant Cap as FFmpeg Capture
-    participant AI as YOLO + SAM 3
+    participant AI as Object Detection + SAM 3
     participant Track as Tracking Logic
     participant Room as Room Model
 
@@ -571,7 +571,7 @@ Identity + location + history"]</pre>
   <div class="rp-card">
     <div class="rp-diagram">
       <pre class="mermaid" style="margin:0;">flowchart LR
-    A[YOLO detection] --> B["SAM 3 mask
+    A[Object detection] --> B["SAM 3 mask
 and observation record"]
     B --> C{Matches an existing track?}
     C -->|Yes| D[Update object history]
@@ -587,7 +587,7 @@ and observation record"]
     <ul class="rp-entity-list">
       <li><strong>Cameras</strong> — id, device name, host computer, viewpoint, resolution, status</li>
       <li><strong>Frames</strong> — id, camera, capture timestamp, original-file path, processing status</li>
-      <li><strong>YOLO Classes</strong> — class id, object label, and training-version metadata</li>
+      <li><strong>Object Classes</strong> — class id, object label, and training-version metadata</li>
       <li><strong>Detections</strong> — frame, class, confidence, bounding box, model version</li>
       <li><strong>Segmentation Masks</strong> — detection, mask-file path or encoded mask, SAM 3 model version</li>
       <li><strong>Object Tracks</strong> — persistent object id, current class, state, first seen, last seen</li>
@@ -614,7 +614,7 @@ and observation record"]
           <tr>
             <td>Main Linux computer</td>
             <td><span class="rp-pill rp-pill-good">CURRENT</span></td>
-            <td>Captures images, stores the central footage directory, runs the Python pipeline, and performs YOLO/SAM 3 inference.</td>
+            <td>Captures images, stores the central footage directory, runs the Python pipeline, and performs object-detection and SAM 3 inference.</td>
           </tr>
           <tr>
             <td>Second Logitech BRIO camera</td>
@@ -651,7 +651,7 @@ and observation record"]
       <span><strong style="color:var(--rp-text);">Open problem — camera placement:</strong> camera height, angle, overlap, lighting, and cable routes still need to be tested in the actual room. Moving either camera after calibration may reduce location and cross-camera matching accuracy.</span>
     </div>
     <div class="rp-callout rp-callout-note">
-      <span><strong style="color:var(--rp-text);">Prototype sequence:</strong> validate capture, YOLO recognition, SAM 3 masks, and temporal tracking with the current single camera first. Add the second viewpoint only after the one-camera pipeline produces measurable results.</span>
+      <span><strong style="color:var(--rp-text);">Prototype sequence:</strong> validate capture, object recognition, SAM 3 masks, and temporal tracking with the current single camera first. Add the second viewpoint only after the one-camera pipeline produces measurable results.</span>
     </div>
   </div>
 
@@ -659,8 +659,8 @@ and observation record"]
   <div class="rp-section-label">Dependencies &amp; Open Questions</div>
   <div class="rp-card">
     <ul class="rp-checklist">
-      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Dataset and annotation:</strong> collect representative classroom images for chair, table/desk, laptop, backpack, bottle, and book, then define a consistent YOLO annotation and train/validation/test split.</span></li>
-      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">CPU performance:</strong> benchmark YOLO and SAM 3 at several resolutions to determine whether the 10-second capture interval is sustainable on the main Linux computer.</span></li>
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Dataset and annotation:</strong> collect representative classroom images for chair, table/desk, laptop, backpack, bottle, and book, then define a consistent object-detection annotation and train/validation/test split.</span></li>
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">CPU performance:</strong> benchmark object detection and SAM 3 at several resolutions to determine whether the 10-second capture interval is sustainable on the main Linux computer.</span></li>
       <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Tracking thresholds:</strong> define how many matching or missing frames are required to confirm an object, movement, occlusion, or removal.</span></li>
       <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Camera calibration:</strong> establish how observations from opposite viewpoints map into shared classroom locations without counting the same object twice.</span></li>
       <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Second-camera hardware:</strong> confirm the second BRIO, Linux capture computer, mount, cable route, and reliable automatic file-transfer method.</span></li>

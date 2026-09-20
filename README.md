@@ -2,7 +2,7 @@
 
 Founded and maintained by John Mortensen.
 
-Open Coding Society `Pages` is a project designed to support students in their Computer Science and Software Engineering education. It offers a wide range of resources including tech talks, code examples, and educational blogs.
+Open Coding Society `Pages` is a project designed to support students in their Computer Science education. It offers a wide range of resources including tech talks, code examples, and educational blogs.
 
 This GitHub Pages repository can be customized by the blogger to support computer science learning as the student works through the pathways of using Javascript, Python/Flask, Java/Spring. It is intended to support course work for Computer Science and Software Engineering (CSSE), AP Computer Science Principles (APCSP or CSP), AP Computer Science 'A' (APCSA or CSA), and Computer Science Honors (CSH).
 
@@ -15,9 +15,8 @@ In general, students and instructors are expected to use GitHub Pages to build l
 Exchange of information from this repository to you personal GitHub Pages can be done in many ways...
 
 1. sharing a file, ie: `wget "raw-link.ipynb"`
-2. creating a template from this repository
-3. creating a fork to be shared by you and team members
-4. etc.
+2. creating a template from this repository to break off into custom projects
+3. creating a fork to be shared by you and team members to contribute back to OCS `pages`
 
 ---
 
@@ -25,7 +24,7 @@ Exchange of information from this repository to you personal GitHub Pages can be
 
 This project is in its 4th revision (aka 4.0).
 
-The project was initially based on a project called Fastpages. But this project has diverged from those roots into an independent entity, in fact most things (like the build system), are completely different.  The decision to separate from Fastpages was influenced by it's deprecation by the authors.  It is believed by our community that the authors of Fastpages turned toward the support of Quatro.  After that change of direction Fastpages did not align with the Instructors's goals. Thus, Open Coding Society 'Pages' has more of a raw development and classroom blogging purpose. But, we are grateful to Fastpages for their inspiration.  But, we are grateful to Fastpages for their inspiration.
+The project was initially based on a project called Fastpages. But this project has diverged from those roots into an independent entity, in fact most things (like the build system), are completely different.  The decision to separate from Fastpages was influenced by it's deprecation by the original authors.  It is believed by our community that the authors of Fastpages turned toward the support of Quatro.  After that change of direction Fastpages did not align with the OCS `pages` goals. Thus, `pages` has more of a raw development and classroom blogging purpose. But, as we parted we were grateful to Fastpages for their inspiration.  Also, this project originations were focused around the GitHub Pages Minima theme and still uses it as a remote.
 
 ### License
 
