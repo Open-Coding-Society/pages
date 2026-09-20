@@ -349,6 +349,7 @@ body:has(.lesson-player) {
 }
 
 /* Assignment Submission Widget */
+/* Remove these legacy rules:
 .assignment-submission {
   margin-top: 48px;
   padding: 24px;
@@ -364,6 +365,7 @@ body:has(.lesson-player) {
   align-items: center;
   gap: 8px;
 }
+*/
 
 .assignment-submission-icon {
   color: $accent;

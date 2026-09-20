@@ -4,17 +4,17 @@
   Includes both link and file submission options
 {% endcomment %}
 
-<div class="assignment-submission">
-  <h3>
-    <i class="fas fa-upload assignment-submission-icon"></i>
+<section class="ocs__card" aria-labelledby="assignment-submission-title">  
+  <h2 id="assignment-submission-title" class="ocs__section-title">
+    <i class="fas fa-upload assignment-submission-icon" aria-hidden="true"></i>
     Submit Assignment
-  </h3>
+  </h2>
 
   <div class="submission-options">
-    <button class="submission-tab" onclick="switchSubmissionType('link')" type="button">
+    <button class="ocs__btn ocs__btn--icon" onclick="switchSubmissionType('link')" type="button">
       <i class="fas fa-link"></i> Link Submission
     </button>
-    <button class="submission-tab" onclick="switchSubmissionType('file')" type="button">
+    <button class="ocs__btn ocs__btn--icon" onclick="switchSubmissionType('file')" type="button">
       <i class="fas fa-file-upload"></i> File Upload
     </button>
   </div>
@@ -29,7 +29,7 @@
       <label for="link-description">Description</label>
       <textarea id="link-description" placeholder="Describe what you're submitting..." required></textarea>
     </div>
-    <button type="submit" class="submit-btn">
+    <button type="submit" class="ocs__btn ocs__btn--icon">
       <i class="fas fa-check"></i>
       Submit Link
     </button>

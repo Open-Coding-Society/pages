@@ -4,12 +4,79 @@ title: SASS Buttons Grammar
 description: Explore the Open Coding Society button grammar through living examples.
 categories: [SASS, Buttons]
 lesson_language: SASS
-lesson_topic: Buttons
+lesson_topic: Buttons Grammar
 lesson_part: interactive
 lesson_type: lesson
 microblog: true
-permalink: /sass/buttons/
+permalink: /sass/buttons-grammar
+author: Rashi, Aashni, and Kelervia
 ---
+
+# OCS SASS Buttons & Button Grammar
+
+### The Core Rule
+Buttons must use semantic HTML (`<button>` or `<a>`) paired with **OCS SASS button classes** (`ocs__btn`). Never use custom hardcoded CSS or inline `style=""` attributes to style buttons—let your global SASS variables, mixins, and theme classes handle all colors, hover states, and borders.
+
+---
+
+## 1. SASS Button Grammar Reference
+
+Use standard OCS class modifiers to express button roles and visual states cleanly:
+
+| SASS Class / Modifier | Visual Role / Purpose | Example Usage |
+| :--- | :--- | :--- |
+| `ocs__btn` | **Base Button Role:** Standard button reset, layout, and font rules | `<button class="ocs__btn">Click</button>` |
+| `ocs__btn fill` | **Filled Solid Variant:** High-emphasis primary action | `<button class="ocs__btn fill">Submit</button>` |
+| `ocs__btn outline` | **Outlined Variant:** Secondary or low-emphasis action | `<button class="ocs__btn outline">Cancel</button>` |
+| `ocs__btn small` | **Size Modifier:** Compact button for tight layouts | `<button class="ocs__btn small">Edit</button>` |
+| `alert-green` | **Status Modifier (Success):** Confirmation or success actions | `<a class="ocs__btn alert-green fill">Save</a>` |
+| `alert-yellow` | **Status Modifier (Warning):** Caution or pending state | `<button class="ocs__btn alert-yellow">Caution</button>` |
+| `alert-red` | **Status Modifier (Danger):** Destructive actions (delete, remove) | `<button class="ocs__btn alert-red fill">Delete</button>` |
+
+---
+
+## 2. LxD Cycle Process
+
+* **Empathize:** Many CSP students try to style buttons using custom classes or inline CSS (e.g., `<button style="background: blue; color: white;">Submit</button>`), or they use fake `<div>` buttons. This breaks accessibility, ruins site consistency, and duplicates SASS code that already exists globally.
+* **Define:**
+  * **POV:** CSP students need a clear system for creating interactive buttons using semantic tags and OCS SASS utility classes so their project code remains clean, accessible, and theme-compliant.
+  * **Learning Goal:** Students will learn how SASS variables, mixins, and state modifiers (`&:hover`, `&:active`) power global button design, and how to apply predefined OCS classes without writing custom CSS.
+* **Ideate:**
+  * **HMW Question:** How might we teach students to use semantic button elements and OCS SASS button modifier classes instead of writing custom CSS rules?
+  * **Activity:** Refactoring "fake" or hardcoded inline-styled buttons into clean semantic HTML with OCS SASS button modifiers.
+* **Prototype & Test:** We tested a trial run with our team and revised the practice into a quick **Popcorn Hack** (2-minute class refactor) and one targeted **Homework Refactor**.
+
+---
+
+## 3. Lesson Plan
+
+### Learning Objective
+By the end of this lesson, you will be able to construct functional, accessible buttons using semantic HTML tags (`<button>`, `<a>`) and OCS SASS button classes (`ocs__btn`, `fill`, `outline`, `small`, `alert-*`) without writing manual CSS styling.
+
+### Success Criteria
+You can refactor broken, non-semantic, inline-styled button markup into clean, accessible OCS SASS buttons that automatically inherit hover states, active transitions, and theme consistency.
+
+### Tech Talk (3 minutes)
+Under the hood, our global SASS system compiles reusable button styles using **Variables** (e.g., `$btn-radius`, `$primary-color`) and **Mixins** with state operators (`&:hover`, `&:active`). 
+
+As a frontend developer, your job is not to re-invent the button stylesheet. Your job is to select the right **semantic element** and append the correct **OCS button grammar class**.
+
+* **The Rule:** Use `<button>` for in-page actions (forms, submissions, toggles) and `<a>` for navigational links. Apply `ocs__btn` plus visual modifiers.
+* **✅ Do this:** `<button class="ocs__btn alert-green fill small">Save Changes</button>`
+* **❌ Don't do this:** `<div onclick="save()" style="background: green; padding: 10px;">Save Changes</div>`
+
+---
+
+### Code Examples
+
+#### A. Basic Buttons (Semantic Tags + Base Role)
+```html
+<!-- Action button for form submissions or Javascript triggers -->
+<button class="ocs__btn">Standard Action</button>
+
+<!-- Navigation link styled as a button -->
+<a href="/capstone/goodbrain/" class="ocs__btn">View Project ↗</a>
+
 
 <!-- markdownlint-disable MD033 MD046 -->
 

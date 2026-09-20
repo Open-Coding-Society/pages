@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function(){
       frontendUrl: "http://sfifoundation.opencodingsociety.com",
       backendUrl: "https://greppers-be.opencodingsociety.com/"
     },
-    "Communication System": {
+    "OCS Communication Systems": {
       pageUrl: "https://pages.opencodingsociety.com/capstone/communication-system/",
       frontendUrl: "https://github.com/UGRC-CSA/Pages",
       backendUrl: "https://github.com/Open-Coding-Society/spring"
@@ -326,8 +326,8 @@ document.addEventListener('DOMContentLoaded', function(){
            <div class="ocs__image-frame ocs__image-frame--thumbnail capstone-card-placeholder" style="background: linear-gradient(135deg, #06b6d4, #0f172a);">SUB</div>
        </a>
        <div>
-           <h3><a href="{% post_url capstone/2026-08-31-submissions-capstone %}">OCS Submissions</a></h3>
-           <p>Umbrella capstone covering three groups' work on the assignment/submission system: assignment creator permissions, submission analytics, and AI grading.</p>
+           <h3><a href="{% post_url capstone/2026-08-31-submissions-capstone %}">OCS Assignments System</a></h3>
+           <p>Students are extending the OCS assignment lifecycle from creation through submission, analytics, and grading. The system supports inserting rubrics directly into assignments, providing immediate AI evaluation, and assigning student-generated lessons for peer review and grading. After initial automated evaluation, live review sessions follow, allowing students and graders to discuss challenges, successes, and the work. A grader assignment view supports this process by giving graders a place to review submissions, record observations, and provide an overall assessment. The work integrates OCS interfaces with the Java/Spring backend, AWS S3, and AWS RDS/SQL, moving assignment data, student activity, scores, and feedback into a shared system rather than separate tools and spreadsheets.</p>
            <p>Groups: Assignment Creator Permissions, Submission Analytics, AI Grading</p>
        </div>
    </div>
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function(){
          <img src="{{ '/images/' | append: site.data.toolchain-trail-capstone.Logo | relative_url }}" alt="{{ site.data.toolchain-trail-capstone.Title }} logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-         <h3><a href="{% post_url capstone/2026-08-28-toolchain-trail %}">Toolchain Trail</a></h3>
+         <h3><a href="{% post_url capstone/2026-08-28-toolchain-trail %}"></a>{{ site.data.toolchain-trail-capstone.Title }}</h3>
          <p>{{ site.data.toolchain-trail-capstone.Overview }}</p>
        </div>
    </div>
@@ -912,14 +912,14 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
-   <!-- Communication System (CSA) -->
+   <!-- OCS Communication Systems (CSA) -->
   <div class="ocs__grid-cell CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">
-           <img src="/images/csa-chat/announcement-chat.png" alt="Communication System - class announcement chat on the CSA course page" class="ocs__image-frame ocs__image-frame--thumbnail" />
+           <img src="/images/csa-chat/announcement-chat.png" alt="OCS Communication System - class announcement chat on the CSA course page" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">Communication System</a></h3>
-           <p>Moving class discussion out of Slack and onto the course site — class-wide announcements, per-week chat, and a rich-text composer with emoji already ship, with per-assignment threads, 1:1 direct messages, GIFs, Slack-style emoji reactions, and teacher moderation still to build.</p>
+           <h3><a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">OCS Communication Systems</a></h3>
+           <p>Students are extending the OCS communication system with chat, announcements, assignment discussions, direct messaging, calendar integration, and reusable presentation components. The work includes maintaining the real-time WebSocket service and connecting these features to the existing course site, backend APIs, security, and data model. Students will also develop the OCS SASS grammar—a small, purpose-built styling system for consistent, responsive, reusable components across the OCS GitHub Pages ecosystem.</p>
            <p>Team: Akhil, Syown, Leon, Perry, Skandan, Sathwik, Akshajh, Tarun, Samarth</p>
        </div>
    </div>

@@ -54,11 +54,11 @@ Check if this is a course lesson and determine which course context to use
           <h1>{{ page.title | escape }}</h1>
           <div class="lesson-meta">
             {%- if page.show_reading_time != false -%}
-            <span><i class="fas fa-clock"></i> {% include reading_time.html %}</span>
+            <span><i class="fa-solid fa-clock"></i> {% include reading_time.html %}</span>
             {%- endif -%}
             {% if page.assignment %}
             <span>•</span>
-            <span><i class="fas fa-file-alt"></i> Assignment</span>
+            <span><i class="fa-solid fa-file-alt"></i> Assignment</span>
             {% endif %}
           </div>
         </div>
@@ -392,7 +392,7 @@ Check if this is a course lesson and determine which course context to use
       const sprintId = sprintTitle.replace(/\s+/g, '-').toLowerCase();
       const lessonHTML = lessons.map(lesson => `
         <a href="${lesson.url}" class="modal-lesson-item ${lesson.active ? 'active' : ''}">
-          <i class="fas ${lesson.completed ? 'fa-circle-check' : 'fa-circle'} modal-lesson-status ${lesson.completed ? 'completed' : 'incomplete'}"></i>
+          <i class="fa-solid ${lesson.completed ? 'fa-circle-check' : 'fa-circle'} modal-lesson-status ${lesson.completed ? 'completed' : 'incomplete'}"></i>
           <span class="modal-lesson-title">${lesson.title}</span>
         </a>
       `).join('');
@@ -402,7 +402,7 @@ Check if this is a course lesson and determine which course context to use
           <div class="modal-sprint-header">
             <h3 class="modal-sprint-title">${sprintTitle}</h3>
             <button class="modal-sprint-toggle" onclick="toggleModalSprint('${sprintId}')">
-              <i class="fas fa-chevron-down"></i> View Lessons
+              <i class="fa-solid fa-chevron-down"></i> View Lessons
             </button>
           </div>
           <div class="modal-lessons" id="modal-${sprintId}">
@@ -628,7 +628,7 @@ Check if this is a course lesson and determine which course context to use
     if (!status) return;
     const icon = type === 'success' ? 'check-circle' : type === 'loading' ? 'spinner fa-spin' : 'exclamation-circle';
     status.className = `submission-status ${type}`;
-    status.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+    status.innerHTML = `<i class="fa-solid fa-${icon}"></i> ${message}`;
     status.style.display = 'block';
     if (type !== 'loading') {
       setTimeout(() => {
@@ -694,14 +694,14 @@ Check if this is a course lesson and determine which course context to use
     fileList.innerHTML = Array.from(fileInput.files).map((file, index) => `
       <div class="file-item">
         <div class="file-info">
-          <i class="fas fa-file"></i>
+          <i class="fa-solid fa-file"></i>
           <div>
             <div class="file-name">${file.name}</div>
             <div class="file-size">${formatFileSize(file.size)}</div>
           </div>
         </div>
         <button type="button" class="remove-file" onclick="removeFile(${index})">
-          <i class="fas fa-times"></i>
+          <i class="fa-solid fa-times"></i>
         </button>
       </div>
     `).join('');
@@ -1004,6 +1004,7 @@ Check if this is a course lesson and determine which course context to use
   }
 
   /* Assignment Submission Widget */
+  /* Remove these legacy rules:
   .assignment-submission {
     margin-top: 48px;
     padding: 24px;
@@ -1020,6 +1021,7 @@ Check if this is a course lesson and determine which course context to use
     align-items: center;
     gap: 8px;
   }
+  */
 
   .assignment-submission-icon {
     color: #2563eb;
@@ -1032,6 +1034,7 @@ Check if this is a course lesson and determine which course context to use
     flex-wrap: wrap;
   }
 
+  /*
   .submission-tab {
     padding: 8px 16px;
     background: white;
@@ -1052,6 +1055,7 @@ Check if this is a course lesson and determine which course context to use
     color: white;
     border-color: #2563eb;
   }
+  */
 
   .submission-form {
     display: none;
@@ -1179,6 +1183,7 @@ Check if this is a course lesson and determine which course context to use
     color: #dc2626;
   }
 
+  /*
   .submit-btn {
     padding: 12px 24px;
     background: #2563eb;
@@ -1203,6 +1208,7 @@ Check if this is a course lesson and determine which course context to use
     color: #999;
     cursor: not-allowed;
   }
+  */
 
   .submission-status {
     margin-top: 16px;
@@ -1328,16 +1334,16 @@ Check if this is a course lesson and determine which course context to use
     {% if page.assignment %}
     <div class="assignment-submission">
       <h3>
-        <i class="fas fa-upload assignment-submission-icon"></i>
+        <i class="fa-solid fa-upload assignment-submission-icon"></i>
         Submit Assignment
       </h3>
 
       <div class="submission-options">
         <button class="submission-tab" onclick="switchSubmissionType('link')">
-          <i class="fas fa-link"></i> Link Submission
+          <i class="fa-solid fa-link"></i> Link Submission
         </button>
         <button class="submission-tab" onclick="switchSubmissionType('file')">
-          <i class="fas fa-file-upload"></i> File Upload
+          <i class="fa-solid fa-file-upload"></i> File Upload
         </button>
       </div>
 
@@ -1352,8 +1358,8 @@ Check if this is a course lesson and determine which course context to use
           <label for="link-description-blog">Description</label>
           <textarea id="link-description-blog" placeholder="Describe what you're submitting..." required></textarea>
         </div>
-        <button type="submit" class="submit-btn">
-          <i class="fas fa-check"></i>
+        <button type="submit" class="ocs__btn ocs__btn--icon">
+          <i class="fa-solid fa-check"></i>
           Submit Link
         </button>
       </form>
@@ -1365,7 +1371,7 @@ Check if this is a course lesson and determine which course context to use
           <div class="file-upload-area" id="file-upload-area-blog">
             <input type="file" id="file-input-blog" multiple style="display: none;">
             <div class="file-upload-icon">
-              <i class="fas fa-cloud-upload-alt"></i>
+              <i class="fa-solid fa-cloud-upload-alt"></i>
             </div>
             <div class="file-upload-text">Click to upload or drag and drop</div>
             <div class="file-upload-hint">PDF, ZIP, images, or documents (Max 10MB per file)</div>
@@ -1377,7 +1383,7 @@ Check if this is a course lesson and determine which course context to use
           <textarea id="file-notes-blog" placeholder="Add any additional comments..."></textarea>
         </div>
         <button type="submit" class="submit-btn" id="file-submit-btn-blog" disabled>
-          <i class="fas fa-check"></i>
+          <i class="fa-solid fa-check"></i>
           Submit Files
         </button>
       </form>
@@ -1475,14 +1481,14 @@ Check if this is a course lesson and determine which course context to use
           fileItem.className = 'file-item';
           fileItem.innerHTML = `
               <div class="file-info">
-                <i class="fas fa-file"></i>
+                <i class="fa-solid fa-file"></i>
                 <div>
                   <div class="file-name">${file.name}</div>
                   <div class="file-size">${formatFileSizeBlog(file.size)}</div>
                 </div>
               </div>
               <button type="button" class="remove-file" onclick="removeFileBlog(${index})">
-                <i class="fas fa-times"></i>
+                <i class="fa-solid fa-times"></i>
               </button>
             `;
           fileListBlog.appendChild(fileItem);
@@ -1632,7 +1638,7 @@ Check if this is a course lesson and determine which course context to use
         const status = document.getElementById('submission-status-blog');
         const icon = type === 'success' ? 'check-circle' : type === 'loading' ? 'spinner fa-spin' : 'exclamation-circle';
         status.className = `submission-status ${type}`;
-        status.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+        status.innerHTML = `<i class="fa-solid fa-${icon}"></i> ${message}`;
         status.style.display = 'block';
         if (type !== 'loading') {
           setTimeout(() => {
