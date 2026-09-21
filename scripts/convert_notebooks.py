@@ -8,7 +8,7 @@ import sys
 import subprocess
 from hashlib import sha256
 import concurrent.futures, traceback, re
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import Any, Optional
 
 if __name__ == "__main__":
@@ -143,6 +143,8 @@ class CodeRunner:
     code: str
     options: dict[str, Any]
     custom_cell_id: str
+    # Optional matching sources restrict the selector to languages the lesson teaches.
+    variants: dict[str, str] = field(default_factory=dict)
 
     @staticmethod
     def extract_challenge_and_options(cell_source: str, language: str) -> Optional[tuple[str, dict[str, Any]]]:
@@ -228,6 +230,13 @@ class CodeRunner:
 
         challenge, options = parsed
 
+        variants = dict(cell.get('metadata', {}).get('code_variants', {}))
+        for variant_language, source in variants.items():
+            if variant_language not in {*CODE_RUNNER_PATTERNS, 'pseudocode'} or not isinstance(source, str) or not source.strip():
+                raise ValueError(f"Invalid CODE_RUNNER variant: {variant_language}")
+        if variants:
+            variants[language] = cls.clean_code(cell.source, language)
+
         return cls(
             challenge=challenge,
             language=language,
@@ -235,6 +244,7 @@ class CodeRunner:
             code=cls.clean_code(cell.source, language),
             options=options,
             custom_cell_id=get_custom_cell_id(cell),
+            variants=variants,
         )
 
     def to_metadata(self) -> dict[str, Any]:
@@ -251,11 +261,19 @@ class CodeRunner:
             code=metadata['code'],
             options=metadata.get('options', {}),
             custom_cell_id=metadata.get('custom_cell_id', ''),
+            variants=metadata.get('variants', {}),
         )
 
     def liquid_lines(self, code_fence_lines: list[str], code_runner_count: int) -> list[str]:
         """Render Jekyll Liquid captures/includes for embedding the code runner widget."""
-        lines = [
+        lines = []
+        for language, source in self.variants.items():
+            lines.extend([
+                '{% capture variant_' + language + str(code_runner_count) + ' %}',
+                source,
+                '{% endcapture %}',
+            ])
+        lines.extend([
             '',
             '{% capture challenge' + str(code_runner_count) + ' %}',
             self.challenge,
@@ -275,7 +293,10 @@ class CodeRunner:
             '   challenge=challenge' + str(code_runner_count),
             '   code=code' + str(code_runner_count),
             '   source=source' + str(code_runner_count),
-        ]
+        ])
+
+        for language in self.variants:
+            lines.append('   ' + language + '_code=variant_' + language + str(code_runner_count))
 
         if self.options.get('autostart') or self.options.get('auto_start'):
             lines.append('   autostart="true"')

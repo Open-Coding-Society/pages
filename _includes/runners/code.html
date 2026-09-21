@@ -1,8 +1,18 @@
 <!-- Reusable Code Runner Component -->
+{% assign has_variants = false %}
+{% if include.python_code or include.pseudocode_code or include.java_code or include.javascript_code %}
+  {% assign has_variants = true %}
+{% endif %}
 <div class="code-runner-container"
   id="runner-{{ include.runner_id }}"
   data-runner-id="{{ include.runner_id }}"
   data-default-code="{{ include.code | jsonify | escape }}"
+  {% if has_variants %}
+  data-python-code="{{ include.python_code | jsonify | escape }}"
+  data-pseudocode-code="{{ include.pseudocode_code | jsonify | escape }}"
+  data-java-code="{{ include.java_code | jsonify | escape }}"
+  data-javascript-code="{{ include.javascript_code | jsonify | escape }}"
+  {% endif %}
   data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
   {% capture code_runner_title %}Code Runner Challenge {% if include.challenge_number %}#{{ include.challenge_number }}{% endif %}{% endcapture %}
   {% include runners/fragments/challenge-box.html title=code_runner_title challenge=include.challenge %}
@@ -23,11 +33,18 @@
       <button type="button" class="ocs__btn utility copy" data-hook="copy" title="Copy Code" aria-label="Copy Code"></button>
       <button type="button" class="ocs__btn utility save" data-hook="save" title="Save Code" aria-label="Save Code"></button>
       <button type="button" class="ocs__btn utility clear" data-hook="clear" title="Clear Storage" aria-label="Clear Storage"></button>
-      <select class="languageSelect">
+      <select class="languageSelect" aria-label="Code language">
+        {% if has_variants %}
+        {% if include.python_code %}<option value="python">Python</option>{% endif %}
+        {% if include.pseudocode_code %}<option value="pseudocode">Pseudocode</option>{% endif %}
+        {% if include.java_code %}<option value="java">Java</option>{% endif %}
+        {% if include.javascript_code %}<option value="javascript">JavaScript</option>{% endif %}
+        {% else %}
         <option value="python">Python</option>
         <option value="java">Java</option>
         <option value="javascript">JavaScript</option>
         <option value="pseudocode">Pseudocode</option>
+        {% endif %}
       </select>
       <select class="fontSizeSelect">
         <option value="14">14px</option>
@@ -114,7 +131,7 @@ if (typeof CodeMirror !== 'undefined' && !CodeMirror.modes['pseudocode']) {
 </script>
 
 <script type="module">
-import { BaseRunner, CodeExecutor, PseudocodeExecutor, RobotExecutor } from '{{site.baseurl}}/assets/js/pages/runners/index.js';
+import { BaseRunner, CodeExecutor, PseudocodeExecutor, RobotExecutor, LanguageVariantManager, PyodideExecutor } from '{{site.baseurl}}/assets/js/pages/runners/index.js';
 import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
 (function() {
@@ -126,6 +143,7 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   const defaultCode = JSON.parse(container.dataset.defaultCode || "\"\"");
   const editorHeight = "{{ include.height }}";
   const storageKey = container.dataset.storageKey;
+  const localPython = {{ page.local_python | default: false | jsonify }};
   const runner = new BaseRunner(container, { storageKey });
 
   const editor = runner.initializeEditor({
@@ -134,6 +152,7 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     fallbackCode: "print('Hello, world!')",
     codeMirrorOptions: {
       lineNumbers: true,
+      lineWrapping: {{ has_variants | jsonify }},
       mode: initialLang === "java" ? "text/x-java" : (initialLang || "python"),
       theme: "darcula",
       indentUnit: 4,
@@ -146,6 +165,17 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   const fontSizeSelect = container.querySelector('.fontSizeSelect');
   const outputDiv = container.querySelector('.output-content');
   const execTimeSpan = container.querySelector('.execTime');
+  const variants = {};
+  for (const language of ['python', 'pseudocode', 'java', 'javascript']) {
+    const source = JSON.parse(container.dataset[language + 'Code'] || 'null');
+    if (source !== null) variants[language] = source;
+  }
+  const languageVariants = Object.keys(variants).length ? new LanguageVariantManager({
+    editor, languageSelect: langSelect, variants, storageKey, initialLanguage: initialLang,
+  }) : null;
+  const pythonExecutor = localPython ? new PyodideExecutor({
+    outputElement: outputDiv, execTimeElement: execTimeSpan,
+  }) : null;
   const codeExecutor = new CodeExecutor({
     editor,
     outputElement: outputDiv,
@@ -170,13 +200,17 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   if (initialLang) {
     langSelect.value = initialLang;
   }
+  languageVariants?.activateInitial();
 
   runner.bindEditorButtons({
     resetValue: defaultCode || "print('Hello, world!')",
     onClear: () => {
+      languageVariants?.clearAll();
+      languageVariants?.resetCurrent();
       outputDiv.textContent = 'Storage cleared. Code reset to default.';
       execTimeSpan.textContent = '';
-    }
+    },
+    onSave: () => languageVariants?.saveCurrent(),
   });
 
   // Font size changer
@@ -205,6 +239,11 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   // Language switcher
   langSelect.addEventListener("change", () => {
     const lang = langSelect.value;
+    if (languageVariants?.switchTo(lang)) {
+      outputDiv.textContent = 'Click "Run" to execute this language.';
+      execTimeSpan.textContent = '';
+      return;
+    }
     if (lang === "python") {
       editor.setOption("mode", "python");
     } else if (lang === "java") {
@@ -219,13 +258,27 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   codeExecutor.bindCopyOutput(container.querySelector('[data-hook="copy-output"]'));
 
   // Run button logic
-  function runCode() {
-    if (langSelect.value === "pseudocode") {
-      const src = editor.getValue();
-      if (RobotExecutor.detect(src)) return robotExecutor.run(src);
-      return pseudoExecutor.run(src);
+  let running = false;
+  async function runCode() {
+    if (running) return;
+    running = true;
+    const runButton = container.querySelector('[data-hook="run"]');
+    const clearButton = container.querySelector('[data-hook="clear"]');
+    runButton.disabled = langSelect.disabled = clearButton.disabled = true;
+    try {
+      if (langSelect.value === "pseudocode") {
+        const src = editor.getValue();
+        if (RobotExecutor.detect(src)) return await robotExecutor.run(src);
+        return pseudoExecutor.run(src);
+      }
+      if (langSelect.value === 'python' && pythonExecutor) {
+        return await pythonExecutor.run(editor.getValue());
+      }
+      return await codeExecutor.run();
+    } finally {
+      running = false;
+      runButton.disabled = langSelect.disabled = clearButton.disabled = false;
     }
-    return codeExecutor.run();
   }
 
   runner.bindButton('', runCode, 'run');
