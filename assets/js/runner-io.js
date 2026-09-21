@@ -66,7 +66,7 @@ export function readRunners(opts = {}) {
 
     let content = code;
     if (includeQuestion) {
-      const box = container.querySelector('.challenge-box');
+      const box = container.querySelector('.runner-challenge-box');
       const title = box?.querySelector('h3')?.textContent.trim() || `Part ${index + 1}`;
       const desc = box?.querySelector('p')?.textContent.trim() || '';
       content = `Question: ${title}\n${desc}\n\nAnswer (runner: ${runnerId}):\n\n${code}`;
