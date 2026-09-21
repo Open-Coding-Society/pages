@@ -720,23 +720,79 @@ import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.j
         organization:  "organization"
     };
 
+    // ── Mentor role helpers ──────────────────────────────────────
+    // Students authenticate with a @stu.powayusd.com school account
+    // (see navigation/authentication/login.md); the mentor role must
+    // never be assignable to that kind of login.
+    function isStudentLogin(person) {
+        return (person.email || '').toLowerCase().endsWith('@stu.powayusd.com');
+    }
+
     // ── generatePeopleCards ─────────────────────────────────────
     // Builds a clickable card for every person and appends it to
     // the #admin-people-list container.  Each card opens the
-    // evaluation modal on click.
+    // evaluation modal on click, and (for non-student logins) shows
+    // a button letting an admin manually assign the mentor role.
     function generatePeopleCards() {
         peopleList.innerHTML = '';
         people.forEach(person => {
+            const isMentor = person.role === 'mentor';
+            const studentLogin = isStudentLogin(person);
+
             const card = document.createElement('div');
             card.className = 'cursor-pointer border border-neutral-700 bg-neutral-800 rounded-xl p-5 shadow hover:border-blue-500 transition';
             card.innerHTML = `
                 <div class="font-semibold text-lg mb-1">${person.name || 'No Name'}</div>
                 <div class="text-sm text-neutral-400 mb-1">UID: <span class="font-mono">${person.uid}</span></div>
-                <div class="text-xs text-neutral-500">ID: ${person.id}</div>
+                <div class="text-xs text-neutral-500 mb-2">ID: ${person.id}</div>
+                <div class="text-xs text-neutral-400 mb-3">Role: <span class="font-semibold ${isMentor ? 'text-emerald-400' : 'text-neutral-300'}">${person.role || 'none'}</span></div>
+                ${isMentor
+                    ? `<span class="inline-block text-xs px-2 py-1 rounded bg-emerald-900 text-emerald-300">Mentor</span>`
+                    : studentLogin
+                        ? `<button type="button" disabled title="Student (stu.powayusd.com) accounts cannot be assigned the mentor role" class="mentor-assign-btn text-xs px-2 py-1 rounded bg-neutral-700 text-neutral-500 cursor-not-allowed">Assign Mentor</button>`
+                        : `<button type="button" class="mentor-assign-btn text-xs px-2 py-1 rounded bg-purple-600 hover:bg-purple-700 text-white">Assign Mentor</button>`
+                }
             `;
             card.addEventListener('click', () => openEvalModal(person));
+
+            const mentorBtn = card.querySelector('.mentor-assign-btn:not([disabled])');
+            if (mentorBtn) {
+                mentorBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    assignMentorRole(person);
+                });
+            }
+
             peopleList.appendChild(card);
         });
+    }
+
+    // ── assignMentorRole ─────────────────────────────────────────
+    // Lets an admin manually grant the mentor role to a person.
+    // Guarded both here and in generatePeopleCards() against
+    // student (stu.powayusd.com) logins, which must never receive
+    // the mentor role.
+    async function assignMentorRole(person) {
+        if (isStudentLogin(person)) {
+            alert(`${person.name || person.uid} signs in with a student (stu.powayusd.com) account and cannot be made a mentor.`);
+            return;
+        }
+        if (person.role === 'mentor') return;
+        if (!confirm(`Assign the mentor role to ${person.name || person.uid}?`)) return;
+
+        try {
+            const res = await fetch(`${javaURI}/api/person/role/${person.id}`, {
+                ...fetchOptions,
+                method: 'PUT',
+                body: JSON.stringify({ role: 'mentor' })
+            });
+            if (!res.ok) throw new Error('Failed to assign mentor role');
+            person.role = 'mentor';
+            generatePeopleCards();
+        } catch (e) {
+            console.error(e);
+            alert('Error assigning mentor role.');
+        }
     }
 
     // ── fetchPeople ─────────────────────────────────────────────
@@ -756,7 +812,8 @@ import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.j
                 name: person.name,
                 email: person.email,
                 uid: person.uid,
-                sid: person.sid
+                sid: person.sid,
+                role: person.role
             }));
 
             // Render the cards into the grid
