@@ -69,6 +69,47 @@ $mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
 /**
+ * Info Callout
+ * Plain left-accent-border callout, matching the site-wide .info-box
+ * pattern used for lesson content (no full border, no shadow).
+ *
+ * @example
+ *   .runner-challenge-box {
+ *     @include info-callout;
+ *   }
+ */
+@mixin info-callout($padding: 1.25rem, $margin-bottom: 1rem) {
+  // Layout & Spacing
+  padding: $padding;
+  margin: 0 0 $margin-bottom 0;
+  border-radius: 0 8px 8px 0;
+
+  // Colors & Styling
+  border-left: 4px solid $panel-accent;
+
+  h3 {
+    // Layout & Spacing
+    margin: 0 0 0.5rem 0;
+
+    // Typography
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: $panel-accent;
+  }
+
+  p {
+    // Layout & Spacing
+    margin: 0;
+    line-height: 1.5;
+
+    // Typography
+    font-size: 1rem;
+    color: $panel-text;
+    opacity: 0.95;
+  }
+}
+
+/**
  * Output Panel
  * Panel optimized for code/content display with scrolling
  *
