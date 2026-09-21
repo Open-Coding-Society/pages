@@ -10,9 +10,9 @@
 @mixin runner-base {
   @include main-container;
 
-  // Code challenge box styling
-  .challenge-box {
-    @include info-panel;
+  // Code challenge box styling - matches the site-wide .info-box look
+  .runner-challenge-box {
+    @include info-callout;
   }
 
   // Editor container
