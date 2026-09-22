@@ -176,6 +176,19 @@ Check if this is a course lesson and determine which course context to use
     chevron.classList.toggle('fa-chevron-down', isHidden);
   };
 
+  window.toggleWeek = function (weekId) {
+    const body = document.getElementById(`week-${weekId}-body`);
+    const chevron = document.getElementById(`week-chevron-${weekId}`);
+    const control = document.getElementById(`week-toggle-${weekId}`);
+    if (!body || !chevron) return;
+
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? 'block' : 'none';
+    chevron.classList.toggle('fa-chevron-right', !isHidden);
+    chevron.classList.toggle('fa-chevron-down', isHidden);
+    if (control) control.setAttribute('aria-expanded', isHidden.toString());
+  };
+
   /**
    * ============================================
    * COMPLETION DATA LAYER: LocalStorage operations
@@ -382,11 +395,22 @@ Check if this is a course lesson and determine which course context to use
   function expandCurrentSprint() {
     const activeLesson = document.querySelector('.lesson-item.active');
     if (!activeLesson) return;
-    
+
     const sprintSection = activeLesson.closest('.sprint-section');
     if (sprintSection) {
       const sprintToggle = sprintSection.querySelector('.sprint-toggle');
       if (sprintToggle) sprintToggle.click();
+    }
+  }
+
+  function expandCurrentWeek() {
+    const activeLesson = document.querySelector('.lesson-item.active');
+    if (!activeLesson) return;
+
+    const weekGroup = activeLesson.closest('.week-group');
+    if (weekGroup) {
+      const weekToggle = weekGroup.querySelector('.week-toggle');
+      if (weekToggle) weekToggle.click();
     }
   }
 
@@ -893,6 +917,7 @@ Check if this is a course lesson and determine which course context to use
     // Lesson player setup
     initLessonPlayer();
     expandCurrentSprint();
+    expandCurrentWeek();
     syncCompletionUI();
     fillLessonPager();
     setupSyncListeners();

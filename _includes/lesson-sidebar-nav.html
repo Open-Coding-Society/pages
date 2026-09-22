@@ -85,12 +85,16 @@
             {%- if weekPosts.size > 0 -%}
             {%- assign weekData = sprint[week] -%}
             <div class="week-group">
-              <div class="week-group-header">
-                <span class="ocs__status-pill ocs__status-pill--good">W{{ week }}</span>
-                <span class="ocs__status-pill ocs__status-pill--neutral" data-week-count data-week-total="{{ weekPosts.size }}">0/{{ weekPosts.size }}</span>
-              </div>
-              <span class="week-name">Week {{ week }}{% if weekData.theme %}: {{ weekData.theme }}{% endif %}</span>
+              <button class="week-toggle" onclick="toggleWeek('{{ week }}')" type="button" aria-expanded="false" id="week-toggle-{{ week }}">
+                <span class="week-toggle-row">
+                  <i class="fas fa-chevron-right week-chevron" id="week-chevron-{{ week }}"></i>
+                  <span class="ocs__status-pill ocs__status-pill--good">W{{ week }}</span>
+                  <span class="ocs__status-pill ocs__status-pill--neutral" data-week-count data-week-total="{{ weekPosts.size }}">0/{{ weekPosts.size }}</span>
+                </span>
+                <span class="week-name">Week {{ week }}{% if weekData.theme %}: {{ weekData.theme }}{% endif %}</span>
+              </button>
 
+              <div class="week-body" id="week-{{ week }}-body" style="display: none;">
               {%- if weekData.goals -%}
               <div class="week-goals">
                 <span class="ocs__section-title">Learning Goals</span>
@@ -127,6 +131,7 @@
                 </span>
               </div>
               {%- endif -%}
+              </div>
             </div>
             {%- endif -%}
 

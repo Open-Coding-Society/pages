@@ -197,12 +197,43 @@ body:has(.lesson-player) {
   border-left-color: transparent;
 }
 
-.week-group-header {
+/* Week toggle follows .sprint-toggle above: full width, transparent, chevron
+   swapped by toggleWeek() in _layouts/post.html. */
+.week-toggle {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 4px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+.week-toggle:hover {
+  background: rgba($accent, 0.06);
+}
+
+.week-toggle-row {
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
-  margin-bottom: 6px;
+}
+
+.week-chevron {
+  width: 10px;
+  font-size: 10px;
+  color: $text-muted;
+  flex-shrink: 0;
+}
+
+.week-toggle-row .ocs__status-pill--neutral {
+  margin-left: auto;
 }
 
 .week-name {
@@ -211,7 +242,10 @@ body:has(.lesson-player) {
   font-size: 13px;
   font-weight: 600;
   line-height: 1.35;
-  margin-bottom: 8px;
+}
+
+.week-body {
+  margin-top: 8px;
 }
 
 .week-goals {
