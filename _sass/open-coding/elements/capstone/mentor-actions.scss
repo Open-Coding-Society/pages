@@ -1,0 +1,233 @@
+// Mentor capstone actions: hover-reveal Apply / Interested / Skip controls on
+// each capstone card, a top-right widget summarizing a mentor's picks, and a
+// lightweight per-project comment popover (backed by the existing microblog API).
+// Reuses ocs__btn grammar, ocs__card surfaces, and the tintedGlass dropdown look —
+// no new visual system.
+
+.mentor-capstone-card {
+  position: relative;
+}
+
+.mentor-card-actions {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  border-radius: 0 0 $radius-lg $radius-lg;
+  background: linear-gradient(to top, color-mix(in srgb, var(--pref-bg-color) 92%, transparent) 60%, transparent);
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity $transition-base ease, transform $transition-base ease;
+  z-index: 5;
+}
+
+.mentor-capstone-card:hover .mentor-card-actions,
+.mentor-capstone-card:focus-within .mentor-card-actions {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.mentor-card-actions .ocs__btn {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mentor-card-actions .ocs__btn.mentor-comment-btn {
+  flex: 0 0 auto;
+}
+
+.mentor-card-actions .ocs__btn.is-active {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ocs-btn-tone, var(--pref-accent-color)) 45%, transparent);
+}
+
+// ---------------------------------------------------------------------------
+// Top-right "Mentor Picks" widget
+// ---------------------------------------------------------------------------
+
+.mentor-widget {
+  position: fixed;
+  top: 5rem;
+  right: 2rem;
+  z-index: $z-fixed;
+}
+
+.mentor-widget-toggle {
+  display: inline-flex;
+  align-items: center;
+}
+
+.mentor-widget-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  margin-left: 0.4rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--pref-accent-color);
+  color: var(--pref-bg-color);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.mentor-widget-panel {
+  @extend .tintedGlass;
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  width: 21rem;
+  max-height: 24rem;
+  overflow-y: auto;
+  padding: $spacing-lg;
+  border: 1px solid var(--ui-border);
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+}
+
+.mentor-widget.open .mentor-widget-panel {
+  display: block;
+  animation: mentorWidgetIn $transition-slow ease forwards;
+}
+
+@keyframes mentorWidgetIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mentor-widget-section + .mentor-widget-section {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 1px solid var(--ui-border);
+}
+
+.mentor-widget-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// Each pick renders as its own bordered row (same treatment as .ocs__entity-list)
+// instead of bare stacked text, so entries read as distinct items.
+.mentor-widget-list li:not(.mentor-widget-empty) {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: $radius-sm;
+  background: color-mix(in srgb, var(--pref-text-color) 5%, var(--panel));
+  transition: border-color $transition-base ease, background $transition-base ease;
+}
+
+.mentor-widget-list li:not(.mentor-widget-empty):hover {
+  border-color: var(--pref-accent-color);
+  background: color-mix(in srgb, var(--pref-accent-color) 8%, var(--panel));
+}
+
+.mentor-widget-list a {
+  display: block;
+  color: var(--pref-text-color);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.mentor-widget-list a:hover {
+  color: var(--pref-accent-color);
+}
+
+.mentor-widget-empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.mentor-widget-sync-note {
+  margin: $spacing-lg 0 0;
+  padding-top: $spacing-sm;
+  border-top: 1px dashed var(--ui-border);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+// ---------------------------------------------------------------------------
+// Per-project comment popover (microblog, scoped per project)
+// ---------------------------------------------------------------------------
+
+.mentor-comment-popover {
+  @extend .ocs__card;
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  right: 0;
+  width: 18rem;
+  max-height: 20rem;
+  overflow-y: auto;
+  z-index: 20;
+  margin: 0;
+  box-shadow: $shadow-lg;
+}
+
+.mentor-comment-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.mentor-comment-item {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--ui-border);
+  border-radius: $radius-sm;
+  background: color-mix(in srgb, var(--pref-text-color) 5%, var(--panel));
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.mentor-comment-item strong {
+  color: var(--pref-text-color);
+}
+
+.mentor-comment-form {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.mentor-comment-form textarea {
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--ui-border);
+  border-radius: $radius-sm;
+  background: var(--pref-bg-color);
+  color: var(--pref-text-color);
+  font: inherit;
+  resize: vertical;
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .mentor-widget {
+    top: 4.5rem;
+    right: 1rem;
+  }
+
+  .mentor-widget-panel,
+  .mentor-comment-popover {
+    width: calc(100vw - 2rem);
+  }
+}

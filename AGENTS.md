@@ -146,6 +146,13 @@ while preserving all critical instructions. The agent must still communicate wit
 * **代码重复警告：** 聊天逻辑存在于多处——规范源是 [assets/js/projects/student-management-groups/groups.js](assets/js/projects/student-management-groups/groups.js)（"CHAT FUNCTIONALITY" 段），但 [_includes/group_dashboard.html](_includes/group_dashboard.html) 与 [_includes/lesson_chat.html](_includes/lesson_chat.html) 内嵌了副本；修改后必须手动同步这些 include，否则行为不一致。
 * **课程聊天约定：** lesson 页面通过 frontmatter `chat: true` 启用，共享 backbone 群组 `"lessons"`，以 `[[lesson:<url>]]` 标记按页面隔离。
 
+## 导师（Mentor）功能与 Capstone 页
+
+* **角色来源：** `ROLE_MENTOR` 定义在 Spring 端（外部仓库 `Open-Coding-Society/spring`），不在本仓库；Flask 侧的角色是单一字符串列（无 `ROLE_MENTOR`）。前端一律通过 `GET {javaURI}/api/person/get` 检查 `roles.some(r => r.name === 'ROLE_MENTOR')`（同 `_includes/nav/homejava.html` 的 `getCredentialsJava()` 模式），不要在 Flask 侧另建一套角色判断。
+* **Capstone 卡片无稳定 ID：** `navigation/capstone.md` 里 ~90 张卡片没有统一的 `id` 字段。涉及"按项目持久化数据"的功能（如导师的 Interested/Skip 状态、按项目分组的评论）一律通过标题 slugify 派生 id（见 `assets/js/mentor-capstone.js` 的 `slugify()`），除非未来给卡片手工加上 `data-project-id`。
+* **该 Capstone 页尚无真实后端持久化：** `assets/js/new-capstone.js` 与 `navigation/capstone.md` 内联的"新建/编辑 capstone"仅写入 `sessionStorage`，并非真实后端。新增任何"保存到账号"的功能前，先确认 Spring 端点是否存在；若不存在，参照 `assets/js/mentor-capstone.js` 的模式——本地 `localStorage` 缓存 + 尝试远程同步 + 失败时 `console.error`/`console.warn` 记录上下文（不要静默吞掉），并在 `mentor-capstone-api.md` 这类文档里写清所需的端点契约。
+* **评论/微博客复用：** 需要"按某个实体加评论"的功能，优先复用现有 `assets/js/api/microblog.js`（Flask `/api/microblog`），通过自定义 `topicPath`（如 `capstone:<slug>`）隔离范围，而不是新建评论后端；若要复用完整侧边面板 UI，注意 `_includes/microblog_foundation.html` 被多个页面共享，谨慎直接改动，优先新建轻量组件调用同一套 API。
+
 ## 反模式
 
 ### 上帝函数

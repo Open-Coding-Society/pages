@@ -137,6 +137,13 @@ Names should:
 
 * **Update this file:** As you iterate, make mistakes, and learn new system patterns or constraints, actively update `AGENTS.md` (and its optimized counterpart) with important notes so the system improves over time.
 
+## Mentor Feature & the Capstone Page
+
+* **Role source:** `ROLE_MENTOR` is defined on the Spring side (external repo `Open-Coding-Society/spring`), not in this repo; Flask's role model is a single string column (no `ROLE_MENTOR`). The frontend always checks mentor status via `GET {javaURI}/api/person/get` and `roles.some(r => r.name === 'ROLE_MENTOR')` (same pattern as `getCredentialsJava()` in `_includes/nav/homejava.html`) — don't build a parallel role check on the Flask side.
+* **Capstone cards have no stable id:** the ~90 cards in `navigation/capstone.md` have no unified `id` field. Anything that persists data per-project (mentor Interested/Skip status, per-project comments) derives an id by slugifying the title (see `slugify()` in `assets/js/mentor-capstone.js`), unless the cards are later given an explicit `data-project-id`.
+* **The capstone page has no real backend persistence yet:** the inline "create/edit capstone" flow in `assets/js/new-capstone.js` and `navigation/capstone.md` only writes to `sessionStorage`. Before adding any "save to account" feature, check whether the Spring endpoint actually exists; if not, follow the pattern in `assets/js/mentor-capstone.js` — `localStorage` cache plus a best-effort remote sync, with failures logged via `console.error`/`console.warn` (never swallowed silently) — and document the needed endpoint contract (see `mentor-capstone-api.md`).
+* **Reuse the microblog for comments:** for any "add comments to an entity" feature, prefer the existing `assets/js/api/microblog.js` (Flask `/api/microblog`) with a custom `topicPath` (e.g. `capstone:<slug>`) to scope it, rather than building a new comment backend. If you want the full slide-out panel UI, note `_includes/microblog_foundation.html` is shared by several pages — prefer a small dedicated component calling the same API over editing that include directly.
+
 ## Anti-Patterns
 
 ### God Functions
