@@ -86,17 +86,19 @@
             {%- assign weekData = sprint[week] -%}
             <div class="week-group">
               <div class="week-group-header">
-                <span class="week-badge">W{{ week }}</span>
-                <span class="week-count" data-week-count data-week-total="{{ weekPosts.size }}">0/{{ weekPosts.size }}</span>
+                <span class="ocs__status-pill ocs__status-pill--good">W{{ week }}</span>
+                <span class="ocs__status-pill ocs__status-pill--neutral" data-week-count data-week-total="{{ weekPosts.size }}">0/{{ weekPosts.size }}</span>
               </div>
               <span class="week-name">Week {{ week }}{% if weekData.theme %}: {{ weekData.theme }}{% endif %}</span>
 
               {%- if weekData.goals -%}
               <div class="week-goals">
-                <span class="week-goals-label">Learning Goals</span>
-                {%- for goal in weekData.goals -%}
-                <span class="week-goal">{{ goal }}</span>
-                {%- endfor -%}
+                <span class="ocs__section-title">Learning Goals</span>
+                <div class="ocs__keypoints">
+                  {%- for goal in weekData.goals -%}
+                  <div class="ocs__keypoint"><span class="ocs__check">&rarr;</span>{{ goal }}</div>
+                  {%- endfor -%}
+                </div>
               </div>
               {%- endif -%}
 
@@ -120,8 +122,9 @@
 
               {%- if assignmentCount > 0 -%}
               <div class="week-due">
-                <i class="fas fa-calendar"></i>
-                <span>{{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due</span>
+                <span class="ocs__status-pill ocs__status-pill--warn">
+                  <i class="fas fa-calendar"></i> {{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due
+                </span>
               </div>
               {%- endif -%}
             </div>

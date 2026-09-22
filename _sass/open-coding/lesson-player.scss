@@ -183,11 +183,11 @@ body:has(.lesson-player) {
 }
 
 /* WEEK GROUPS IN SIDEBAR
-   Same information as the week cards on the course timeline page: week badge,
-   theme title, completion count, learning goals, lessons, assignments due.
-   The timeline styles are scoped under .timeline-page, so they are restated
-   here and stacked instead of laid out in a row, because the sidebar is a
-   fixed 250px column (see _sass/minima/lessonbase.scss). */
+   Same information as the week cards on the course timeline page. The chips,
+   the goals list and its label are OCS components (ocs__status-pill,
+   ocs__keypoints, ocs__section-title); only the grouping and the narrow-column
+   spacing live here, because the sidebar is a fixed 250px column
+   (see _sass/minima/lessonbase.scss). */
 .week-group {
   padding: 10px 0 10px 10px;
   border-left: 1px solid $bg-3;
@@ -205,30 +205,6 @@ body:has(.lesson-player) {
   margin-bottom: 6px;
 }
 
-.week-badge {
-  min-width: 26px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 10px;
-  border: 1px solid $bg-3;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: $accent;
-  font-weight: 600;
-  font-size: 11px;
-  flex-shrink: 0;
-}
-
-.week-count {
-  border: 1px solid $bg-3;
-  border-radius: 4px;
-  color: $text-muted;
-  padding: 1px 6px;
-  font-size: 11px;
-  flex-shrink: 0;
-}
-
 .week-name {
   display: block;
   color: var(--pref-accent-color);
@@ -244,38 +220,19 @@ body:has(.lesson-player) {
   border-bottom: 1px solid $bg-3;
 }
 
-.week-goals-label {
-  display: block;
-  color: $text-muted;
-  font-size: 0.65rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
-}
-
-.week-goal {
-  display: block;
-  position: relative;
-  padding-left: 14px;
-  color: $text;
-  font-size: 0.78rem;
-  line-height: 1.45;
-}
-
-.week-goal::before {
-  content: '→';
-  position: absolute;
-  left: 0;
-  color: $accent;
-  font-weight: bold;
-  opacity: 0.7;
+.week-due {
+  margin-top: 6px;
 }
 
 .week-group .lesson-item {
   gap: 8px;
   padding: 6px 8px;
   align-items: flex-start;
+}
+
+.week-group .lesson-title {
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 .lesson-type-icon {
@@ -290,22 +247,29 @@ body:has(.lesson-player) {
 }
 
 .lesson-type-icon.assignment {
-  color: #f59e0b;
+  color: var(--warn, #f59e0b);
 }
 
-.week-group .lesson-title {
-  font-size: 13px;
-  line-height: 1.4;
+/* The OCS chips and goals list are built for full-width pages. Tighten their
+   spacing for the sidebar column without changing their colours or shape. */
+.lesson-sidebar .ocs__section-title {
+  margin: 0 0 4px;
+  font-size: 0.65rem;
 }
 
-.week-due {
-  display: flex;
-  align-items: center;
+.lesson-sidebar .ocs__keypoints {
+  gap: 2px;
+}
+
+.lesson-sidebar .ocs__keypoint {
   gap: 6px;
-  margin-top: 6px;
-  padding-left: 8px;
-  color: #f59e0b;
-  font-size: 11px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.lesson-sidebar .ocs__status-pill {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.45rem;
 }
 
 /* MAIN CONTENT AREA */

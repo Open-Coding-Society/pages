@@ -94,6 +94,12 @@ Check if this is a course lesson and determine which course context to use
           {% if page.chat %}
           {% include lesson_chat.html %}
           {% endif %}
+
+          <!-- Previous / next lesson, filled in from the sidebar order by fillLessonPager() -->
+          <div class="ocs__pager" id="lesson-pager" hidden>
+            <a href="#" class="ocs__pager-link" id="pager-prev"></a>
+            <a href="#" class="ocs__pager-link next" id="pager-next"></a>
+          </div>
         </div>
 
         {%- if page.comments -%}
@@ -322,6 +328,44 @@ Check if this is a course lesson and determine which course context to use
       alert('You\'ve reached the last lesson!');
     }
   };
+
+  /**
+   * ============================================
+   * LESSON PAGER: Fill the prev/next links at the
+   * end of the lesson from the sidebar order
+   * ============================================
+   */
+  function fillLessonPager() {
+    const pager = document.getElementById('lesson-pager');
+    if (!pager) return;
+
+    const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
+    const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
+    if (currentIndex === -1) return;
+
+    const prev = lessonItems[currentIndex - 1];
+    const next = lessonItems[currentIndex + 1];
+    const titleOf = item => item.querySelector('.lesson-title').textContent.trim();
+
+    const prevLink = document.getElementById('pager-prev');
+    const nextLink = document.getElementById('pager-next');
+
+    if (prev) {
+      prevLink.href = prev.href;
+      prevLink.innerHTML = `&#8592; ${titleOf(prev)}`;
+    } else {
+      prevLink.replaceWith(document.createElement('span'));
+    }
+
+    if (next) {
+      nextLink.href = next.href;
+      nextLink.innerHTML = `Next: ${titleOf(next)} &rarr;`;
+    } else {
+      nextLink.replaceWith(document.createElement('span'));
+    }
+
+    pager.hidden = false;
+  }
 
   /**
    * ============================================
@@ -850,6 +894,7 @@ Check if this is a course lesson and determine which course context to use
     initLessonPlayer();
     expandCurrentSprint();
     syncCompletionUI();
+    fillLessonPager();
     setupSyncListeners();
     
     // Mobile enhancements
