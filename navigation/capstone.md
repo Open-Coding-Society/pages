@@ -257,6 +257,9 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
+<!-- Mentor Apply/Interested/Skip actions, picks widget, and per-project comments -->
+<script type="module" src="{{ site.baseurl }}/assets/js/mentor-capstone.js"></script>
+
 <div id="capstone-grid" class="ocs__grid ocs__grid--card cols-3">
 
    <!-- SFI Foundation 2026–27 (CSP) -->
