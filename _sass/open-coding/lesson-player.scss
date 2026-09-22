@@ -126,7 +126,7 @@ body:has(.lesson-player) {
 }
 
 .lesson-list {
-  margin-left: 24px;
+  margin-left: 12px;
   margin-top: 4px;
 }
 
@@ -179,6 +179,133 @@ body:has(.lesson-player) {
   color: $text-muted;
   font-size: 14px;
   flex: 1;
+  min-width: 0;
+}
+
+/* WEEK GROUPS IN SIDEBAR
+   Same information as the week cards on the course timeline page: week badge,
+   theme title, completion count, learning goals, lessons, assignments due.
+   The timeline styles are scoped under .timeline-page, so they are restated
+   here and stacked instead of laid out in a row, because the sidebar is a
+   fixed 250px column (see _sass/minima/lessonbase.scss). */
+.week-group {
+  padding: 10px 0 10px 10px;
+  border-left: 1px solid $bg-3;
+}
+
+.week-group:last-child {
+  border-left-color: transparent;
+}
+
+.week-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.week-badge {
+  min-width: 26px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  border: 1px solid $bg-3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $accent;
+  font-weight: 600;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.week-count {
+  border: 1px solid $bg-3;
+  border-radius: 4px;
+  color: $text-muted;
+  padding: 1px 6px;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.week-name {
+  display: block;
+  color: var(--pref-accent-color);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.week-goals {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid $bg-3;
+}
+
+.week-goals-label {
+  display: block;
+  color: $text-muted;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.week-goal {
+  display: block;
+  position: relative;
+  padding-left: 14px;
+  color: $text;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.week-goal::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: $accent;
+  font-weight: bold;
+  opacity: 0.7;
+}
+
+.week-group .lesson-item {
+  gap: 8px;
+  padding: 6px 8px;
+  align-items: flex-start;
+}
+
+.lesson-type-icon {
+  width: 14px;
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.lesson-type-icon.lesson {
+  color: $accent;
+}
+
+.lesson-type-icon.assignment {
+  color: #f59e0b;
+}
+
+.week-group .lesson-title {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.week-due {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding-left: 8px;
+  color: #f59e0b;
+  font-size: 11px;
 }
 
 /* MAIN CONTENT AREA */

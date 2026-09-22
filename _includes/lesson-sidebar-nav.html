@@ -1,7 +1,25 @@
 <!-- LESSON PLAYER SIDEBAR NAVIGATION -->
 {% comment %}
-  Shows course progress and sprint/lesson list for navigation
-  Course data and posts must be available in page context
+  Shows course progress and sprint/week/lesson list for navigation.
+  Course data and posts must be available in page context.
+
+  Weeks mirror the course timeline page: week badge, theme title, completion
+  count, learning goals, then the lessons for that week.
+
+  Week themes and goals come from _data/<course>.yml, e.g.
+
+    Sprint1:
+      start: 0
+      end: 4
+      0:
+        theme: "Onboarding & Readiness"
+        goals: ["Tool Setup", "Scrum Habits"]
+
+  Contracts used by the sidebar script in _layouts/post.html:
+    - #sprint-{i}-lessons and #chevron-{i}  -> toggleSprint()
+    - .lesson-item[data-lesson-id]          -> completion tracking
+    - .lesson-status-icon                   -> per-lesson complete/incomplete
+    - [data-week-count][data-week-total]    -> per-week completion count
 {% endcomment %}
 
 <div class="lesson-sidebar">
@@ -54,17 +72,61 @@
 
         <div class="lesson-list" id="sprint-{{ i }}-lessons" style="display: none;">
           {%- for week in (sprint.start..sprint.end) -%}
+
+            {%- comment -%} Collect this week's lessons first, so empty weeks are skipped. {%- endcomment -%}
+            {%- assign weekPosts = "" | split: "" -%}
             {%- for post in coursePosts -%}
               {%- assign postWeek = post.courses[current_course].week | plus: 0 -%}
               {%- if postWeek == week -%}
+                {%- assign weekPosts = weekPosts | push: post -%}
+              {%- endif -%}
+            {%- endfor -%}
+
+            {%- if weekPosts.size > 0 -%}
+            {%- assign weekData = sprint[week] -%}
+            <div class="week-group">
+              <div class="week-group-header">
+                <span class="week-badge">W{{ week }}</span>
+                <span class="week-count" data-week-count data-week-total="{{ weekPosts.size }}">0/{{ weekPosts.size }}</span>
+              </div>
+              <span class="week-name">Week {{ week }}{% if weekData.theme %}: {{ weekData.theme }}{% endif %}</span>
+
+              {%- if weekData.goals -%}
+              <div class="week-goals">
+                <span class="week-goals-label">Learning Goals</span>
+                {%- for goal in weekData.goals -%}
+                <span class="week-goal">{{ goal }}</span>
+                {%- endfor -%}
+              </div>
+              {%- endif -%}
+
+              {%- assign assignmentCount = 0 -%}
+              {%- for post in weekPosts -%}
+                {%- if post.assignment == true -%}
+                  {%- assign assignmentCount = assignmentCount | plus: 1 -%}
+                {%- endif -%}
               <a href="{{ site.baseurl }}{{ post.url }}"
                  class="lesson-item {% if page.url == post.url %}active{% endif %}"
                  data-lesson-id="{{ post.url }}">
                 <i class="fas fa-circle lesson-status-icon incomplete"></i>
+                {%- if post.assignment == true -%}
+                <i class="fas fa-file-alt lesson-type-icon assignment"></i>
+                {%- else -%}
+                <i class="fas fa-code lesson-type-icon lesson"></i>
+                {%- endif -%}
                 <span class="lesson-title">{{ post.title }}</span>
               </a>
+              {%- endfor -%}
+
+              {%- if assignmentCount > 0 -%}
+              <div class="week-due">
+                <i class="fas fa-calendar"></i>
+                <span>{{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due</span>
+              </div>
               {%- endif -%}
-            {%- endfor -%}
+            </div>
+            {%- endif -%}
+
           {%- endfor -%}
         </div>
       </div>

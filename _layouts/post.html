@@ -252,10 +252,26 @@ Check if this is a course lesson and determine which course context to use
     return { total: lessonItems.length, completed };
   }
 
+  function updateWeekCounts(completionData) {
+    document.querySelectorAll('.week-group').forEach(group => {
+      const counter = group.querySelector('[data-week-count]');
+      if (!counter) return;
+
+      const items = group.querySelectorAll('.lesson-item');
+      let completed = 0;
+      items.forEach(item => {
+        if (completionData[item.dataset.lessonId]) completed++;
+      });
+
+      counter.textContent = `${completed}/${items.length}`;
+    });
+  }
+
   function updateProgressBars(completionData) {
     const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
     const stats = updateLessonItems(completionData);
-    
+    updateWeekCounts(completionData);
+
     const sidebarProgress = document.getElementById('sidebar-progress');
     if (sidebarProgress) {
       const sidebarPercent = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
