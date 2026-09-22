@@ -6,6 +6,8 @@ title: UESL Foundation — CSP Capstone Project
 description: How our team built an AI chatbot, accessible game engine, and social platform to extend UESL's mission for individuals with intellectual and developmental disabilities across San Diego.
 permalink: /capstone/uesl/
 sticky_rank: 8
+images:
+  - /images/capstone/uesl_foundation.svg
 ---
 
 <div style="background: linear-gradient(135deg, #0f0a1e 0%, #1a1033 100%); border-radius: 16px; padding: 2.5rem; margin-bottom: 2rem; border: 1px solid rgba(124,58,237,0.3);">

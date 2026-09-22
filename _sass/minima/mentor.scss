@@ -1,0 +1,70 @@
+// Sitewide "you're signed in as a mentor" bar on every aesthetihawk page
+// (see _layouts/aesthetihawk.html), not just the mentor-specific pages.
+// Full-width and right under the header, so it's impossible to miss --
+// hidden entirely for anyone without ROLE_MENTOR, students included.
+.mentor-badge {
+  position: fixed;
+  top: 53px;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(76, 175, 239, 0.14);
+  border-bottom: 1px solid rgba(76, 175, 239, 0.3);
+  color: $accent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.mentor-badge strong {
+  color: $text;
+}
+
+.mentor-badge__dot {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: $success-green;
+}
+
+// Shown instead of the green "signed in as Mentor" bar for a ROLE_PENDING
+// account -- someone who signed up as a mentor but hasn't been approved by
+// an admin yet. Same shape as .mentor-badge, tinted amber, so the two states
+// are visually distinct rather than the pending case looking like nothing
+// happened at all.
+.mentor-badge--pending {
+  background: rgba(230, 168, 66, 0.14);
+  border-bottom-color: rgba(230, 168, 66, 0.35);
+  color: $warn;
+}
+
+.mentor-badge--pending .mentor-badge__dot {
+  background: $warn;
+}
+
+@media (max-width: 640px) {
+  .mentor-badge {
+    font-size: 0.78rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+// Push the fixed sidebar and the main content wrapper down by the bar's
+// actual height (set as --mentor-bar-h by the JS that shows the bar), so
+// nothing sits underneath it. !important beats the Tailwind CDN utility
+// classes (top-[53px] / mt-[53px]) those elements also carry.
+:root { --mentor-bar-h: 0px; }
+
+body.mentor-bar-active .theme-inner {
+  margin-top: calc(53px + var(--mentor-bar-h)) !important;
+}
+
+body.mentor-bar-active .lesson-sidebar {
+  top: calc(53px + var(--mentor-bar-h)) !important;
+}

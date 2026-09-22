@@ -24,6 +24,20 @@
     <!-- navbar -->
     {%- include aesthetihawk/header-shared.html -%}
 
+    <!-- Full-width bar shown right under the header on every aesthetihawk page
+         once a signed-in ROLE_MENTOR user is confirmed (see the role-check
+         script below); hidden entirely for everyone else, students included. -->
+    <div id="mentor-badge" class="mentor-badge" style="display:none;">
+        <span class="mentor-badge__dot"></span>
+        <span id="mentor-badge-text">You're signed in as a <strong>Mentor</strong> &mdash; showing mentor tools instead of student tools</span>
+    </div>
+
+    {% if page.microblog %}
+      <div class="micro-actions-wrapper">
+        {% include microblog_foundation.html %}
+      </div>
+    {% endif %}
+
     <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased mt-[53px] theme-inner">
 
         <!-- Sidebar -->
@@ -61,4 +75,62 @@
     // tmport handlelogout from external file and attach to window for onclick usage
     import { handleLogout } from '{{site.baseurl}}/assets/js/api/logout.js';
     window.handleLogout = handleLogout;
+
+    // Swap in the reduced mentor sidebar for signed-in ROLE_MENTOR users; everyone
+    // else (including logged-out visitors) keeps the normal OCS sidebar untouched.
+    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    (async function () {
+        const defaultEl = document.getElementById('sidebar-role-default');
+        const mentorEl = document.getElementById('sidebar-role-mentor');
+        const badgeEl = document.getElementById('mentor-badge');
+        const badgeTextEl = document.getElementById('mentor-badge-text');
+        const MENTOR_TEXT = 'You\'re signed in as a <strong>Mentor</strong> &mdash; showing mentor tools instead of student tools';
+        const PENDING_TEXT = 'Your <strong>mentor application</strong> is pending review &mdash; you\'ll see mentor tools once an admin approves it';
+        // isMentor drives the sidebar swap; isPending only ever changes which bar
+        // (if any) is shown -- a pending applicant still sees the normal student
+        // sidebar since they aren't a mentor yet.
+        function applySidebar(isMentor, isPending) {
+            defaultEl.style.display = isMentor ? 'none' : 'block';
+            mentorEl.style.display = isMentor ? 'block' : 'none';
+            badgeEl.style.display = (isMentor || isPending) ? 'flex' : 'none';
+            badgeEl.classList.toggle('mentor-badge--pending', !isMentor && isPending);
+            badgeTextEl.innerHTML = isMentor ? MENTOR_TEXT : PENDING_TEXT;
+            // The bar takes up real height, so push the fixed sidebar and the
+            // main content wrapper down by exactly that much (see the
+            // .mentor-bar-active rules in mentor.scss).
+            document.body.classList.toggle('mentor-bar-active', isMentor || isPending);
+            if (isMentor || isPending) {
+                document.documentElement.style.setProperty('--mentor-bar-h', badgeEl.offsetHeight + 'px');
+            }
+            try { localStorage.setItem('ocsMentorSidebar', isMentor ? 'mentor' : 'default'); }
+            catch (e) { /* localStorage unavailable */ }
+        }
+        try {
+            const res = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+            if (!res.ok) { applySidebar(false, false); return; }
+            const person = await res.json();
+            const roles = Array.isArray(person.roles) ? person.roles.map(r => r.name) : [];
+            const isMentor = roles.includes('ROLE_MENTOR');
+
+            // ROLE_PENDING alone doesn't mean "pending mentor" -- it's also the landing
+            // role for any ordinary signup whose email isn't the trusted school domain,
+            // so a real check against the mentor ticket is needed rather than trusting
+            // the role name. Only bother asking when it's even plausible (skip for an
+            // already-approved mentor).
+            let isPendingMentor = false;
+            if (!isMentor && roles.includes('ROLE_PENDING')) {
+                try {
+                    const ticketRes = await fetch(`${javaURI}/api/person/mentor/ticket/status`, fetchOptions);
+                    if (ticketRes.ok) {
+                        const status = await ticketRes.json();
+                        isPendingMentor = !!status.pending;
+                    }
+                } catch (e) { /* leave isPendingMentor false */ }
+            }
+            applySidebar(isMentor, isPendingMentor);
+        } catch (err) {
+            console.error('Mentor sidebar role check failed', err);
+            applySidebar(false, false);
+        }
+    })();
 </script>
