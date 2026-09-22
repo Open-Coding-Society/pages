@@ -4,7 +4,7 @@ courses: {'csse': {'week': 5}}
 categories: ['JavaScript', 'Nested-Conditionals']
 lesson_language: JavaScript
 lesson_topic: Nested-Conditionals
-lesson_part: interactive
+lesson_source: CS111
 lesson_type: lesson
 codemirror: True
 microblog: True

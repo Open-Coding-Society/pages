@@ -135,6 +135,7 @@ Check if this is a course lesson and determine which course context to use
 
 <script type="module">
   import { pythonURI, fetchOptions, javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
 
   /**
    * ============================================
@@ -145,6 +146,9 @@ Check if this is a course lesson and determine which course context to use
   const WEEK = '{{ current_week }}';
   const PAGE_TITLE = "{{ page.title }}";
   const CURRENT_LESSON_ID = '{{ page.url }}';
+  const SUBMISSION_TYPE = {{ page.assignment_submission_type | default: "file" | downcase | jsonify }};
+  const CODE_EXTENSIONS = { python: 'py', java: 'java', javascript: 'js', pseudocode: 'txt' };
+  const GITHUB_ISSUE_URL_PATTERN = /^https?:\/\/github\.com\/[^/]+\/[^/#?]+\/issues\/\d+\/?$/i;
   const STORAGE_KEY = `${COURSE}-lesson-completion`;
   const STATUS_AUTO_HIDE_MS = 5000;
   const FILE_SIZE_LIMIT_MB = 10;
@@ -527,10 +531,50 @@ Check if this is a course lesson and determine which course context to use
     return CURRENT_ASSIGNMENT_ID;
   }
 
-  async function submitLinkToBackend(link, description) {
+  async function submitLinkToBackend(link, description, selfAssessment) {
     const assignmentId = await ensureAssignmentId();
     const { uid, personId } = await resolveCurrentUser();
-    const content = { type: 'link', url: link, notes: description };
+    const content = { type: SUBMISSION_TYPE === 'github_issue' ? 'github_issue' : 'link', url: link, notes: description };
+    const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({
+        assignmentId: assignmentId,
+        submitterId: personId,
+        isGroupSubmission: false,
+        content,
+        comment: description,
+        isLate: false,
+        technicalExcellence: selfAssessment.technicalExcellence,
+        communication: selfAssessment.communication,
+        workHabits: selfAssessment.workHabits,
+        aiOrchestration: selfAssessment.aiOrchestration,
+        selfAssessmentReflection: selfAssessment.selfAssessmentReflection
+      })
+    });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e.error || res.statusText);
+    }
+    // Dual-write to EshikaP1's grades system
+    const assignmentLabel = (typeof CURRENT_ASSIGNMENT_NAME === 'string' && CURRENT_ASSIGNMENT_NAME) ? CURRENT_ASSIGNMENT_NAME : String(assignmentId);
+    await fetch(`${javaURI}/api/grades`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: { ...content, selfAssessment }, submittedAt: new Date().toISOString() })
+    }).catch(() => {}); // non-blocking — don't fail submission if grades write fails
+  }
+
+  async function submitCodeToBackend(code, language, description) {
+    const assignmentId = await ensureAssignmentId();
+    // Resolve the user first so we don't burn a Gist creation on a request that will fail anyway.
+    const { uid, personId } = await resolveCurrentUser();
+    const ext = CODE_EXTENSIONS[language] || 'txt';
+    const gistUrl = await exportToGist(
+      { [`submission.${ext}`]: { content: code } },
+      { type: 'submission', description: description || `Code submission (${language})` }
+    );
+    const content = { type: 'code', url: gistUrl, language, notes: description };
     const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
       ...fetchOptions,
       method: 'POST',
@@ -547,16 +591,16 @@ Check if this is a course lesson and determine which course context to use
       const e = await res.json().catch(() => ({}));
       throw new Error(e.error || res.statusText);
     }
-    // Dual-write to EshikaP1's grades system
     const assignmentLabel = (typeof CURRENT_ASSIGNMENT_NAME === 'string' && CURRENT_ASSIGNMENT_NAME) ? CURRENT_ASSIGNMENT_NAME : String(assignmentId);
     await fetch(`${javaURI}/api/grades`, {
       ...fetchOptions,
       method: 'POST',
       body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: content, submittedAt: new Date().toISOString() })
-    }).catch(() => {}); // non-blocking — don't fail submission if grades write fails
+    }).catch(() => {}); // non-blocking
+    return gistUrl;
   }
 
-  async function submitFilesToBackend(files, notes) {
+  async function submitFilesToBackend(files, notes, selfAssessment) {
     const assignmentId = await ensureAssignmentId();
     const { uid, personId } = await resolveCurrentUser();
     const assignmentName = await resolveAssignmentName();
@@ -569,6 +613,11 @@ Check if this is a course lesson and determine which course context to use
       fd.append('username', uid);
       fd.append('file', file);
       if (notes) fd.append('notes', notes);
+      fd.append('technicalExcellence', String(selfAssessment.technicalExcellence));
+      fd.append('communication', String(selfAssessment.communication));
+      fd.append('workHabits', String(selfAssessment.workHabits));
+      fd.append('aiOrchestration', String(selfAssessment.aiOrchestration));
+      fd.append('selfAssessmentReflection', selfAssessment.selfAssessmentReflection);
       const r = await fetch(`${javaURI}/api/assignment-submissions/upload`, {
         method: 'POST',
         mode: fetchOptions.mode,
@@ -585,7 +634,7 @@ Check if this is a course lesson and determine which course context to use
       await fetch(`${javaURI}/api/grades`, {
         ...fetchOptions,
         method: 'POST',
-        body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: content, submittedAt: new Date().toISOString() })
+        body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: { ...content, selfAssessment }, submittedAt: new Date().toISOString() })
       }).catch(() => {}); // non-blocking
     }
   }
@@ -711,6 +760,63 @@ Check if this is a course lesson and determine which course context to use
 
   /**
    * ============================================
+   * SELF-ASSESSMENT: Collect, validate & reset
+   * ============================================
+   */
+  const SELF_ASSESSMENT_RATING_FIELDS = {
+    technicalExcellence: 'Technical Excellence',
+    communication: 'Communication',
+    workHabits: 'Work Habits',
+    aiOrchestration: 'AI Orchestration'
+  };
+
+  function getSelfAssessmentData() {
+    const data = {};
+    for (const field of Object.keys(SELF_ASSESSMENT_RATING_FIELDS)) {
+      const checked = document.querySelector(`input[name="sa-${field}"]:checked`);
+      data[field] = checked ? parseInt(checked.value, 10) : null;
+    }
+    data.selfAssessmentReflection = document.getElementById('self-assessment-reflection')?.value.trim() || '';
+    return data;
+  }
+
+  function validateSelfAssessment(data) {
+    for (const [field, label] of Object.entries(SELF_ASSESSMENT_RATING_FIELDS)) {
+      const value = data[field];
+      if (!Number.isInteger(value) || value < 1 || value > 5) {
+        return `Please rate "${label}" before submitting.`;
+      }
+    }
+    if (!data.selfAssessmentReflection) {
+      return 'Please add a short self-assessment reflection before submitting.';
+    }
+    return null;
+  }
+
+  function resetSelfAssessment() {
+    document.querySelectorAll('#self-assessment input[type="radio"]').forEach(input => {
+      input.checked = false;
+      input.closest('.rating-option')?.classList.remove('selected');
+    });
+    const reflection = document.getElementById('self-assessment-reflection');
+    if (reflection) reflection.value = '';
+  }
+
+  function setupSelfAssessmentRatings() {
+    const container = document.getElementById('self-assessment');
+    if (!container) return;
+    container.addEventListener('change', (e) => {
+      const input = e.target;
+      if (input.tagName !== 'INPUT' || input.type !== 'radio') return;
+      const group = input.closest('.rating-scale');
+      if (!group) return;
+      group.querySelectorAll('.rating-option').forEach(opt => opt.classList.remove('selected'));
+      input.closest('.rating-option')?.classList.add('selected');
+    });
+  }
+
+  /**
+   * ============================================
    * FORM SUBMISSION: Handle submissions
    * ============================================
    */
@@ -722,13 +828,24 @@ Check if this is a course lesson and determine which course context to use
         const link = document.getElementById('submission-link').value.trim();
         const description = document.getElementById('link-description').value.trim();
         const submitBtn = linkForm.querySelector('button[type="submit"]');
+        if (SUBMISSION_TYPE === 'github_issue' && !GITHUB_ISSUE_URL_PATTERN.test(link)) {
+          showStatus('error', 'That is not a valid GitHub issue link (expected github.com/owner/repo/issues/N).');
+          return;
+        }
+        const selfAssessment = getSelfAssessmentData();
+        const selfAssessmentError = validateSelfAssessment(selfAssessment);
+        if (selfAssessmentError) {
+          showStatus('error', selfAssessmentError);
+          return;
+        }
         submitBtn.disabled = true;
         showStatus('loading', 'Submitting...');
         try {
-          await submitLinkToBackend(link, description);
-          saveSubmissionLocally('link', { link, description });
+          await submitLinkToBackend(link, description, selfAssessment);
+          saveSubmissionLocally('link', { link, description, selfAssessment });
           showStatus('success', 'Link submitted successfully!');
           this.reset();
+          resetSelfAssessment();
         } catch (err) {
           showStatus('error', err.message);
         } finally {
@@ -744,6 +861,12 @@ Check if this is a course lesson and determine which course context to use
         const fileInput = document.getElementById('file-input');
         const notes = document.getElementById('file-notes')?.value?.trim() || '';
         const submitBtn = fileForm.querySelector('button[type="submit"]');
+        const selfAssessment = getSelfAssessmentData();
+        const selfAssessmentError = validateSelfAssessment(selfAssessment);
+        if (selfAssessmentError) {
+          showStatus('error', selfAssessmentError);
+          return;
+        }
         submitBtn.disabled = true;
         showStatus('loading', 'Uploading...');
         try {
@@ -752,11 +875,47 @@ Check if this is a course lesson and determine which course context to use
               throw new Error(`${file.name} exceeds ${FILE_SIZE_LIMIT_MB}MB limit.`);
             }
           }
-          await submitFilesToBackend(Array.from(fileInput.files), notes);
-          saveSubmissionLocally('file', { files: Array.from(fileInput.files).map(f => f.name), notes });
+          await submitFilesToBackend(Array.from(fileInput.files), notes, selfAssessment);
+          saveSubmissionLocally('file', { files: Array.from(fileInput.files).map(f => f.name), notes, selfAssessment });
           showStatus('success', `${fileInput.files.length} file(s) submitted successfully!`);
           fileInput.value = '';
           updateFileListDisplay();
+          this.reset();
+          resetSelfAssessment();
+        } catch (err) {
+          showStatus('error', err.message);
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    }
+
+    const codeForm = document.getElementById('code-form');
+    if (codeForm) {
+      codeForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const code = document.getElementById('code-input').value;
+        const language = document.getElementById('code-language').value;
+        const notes = document.getElementById('code-notes')?.value?.trim() || '';
+        const submitBtn = codeForm.querySelector('button[type="submit"]');
+        if (!code.trim()) {
+          showStatus('error', 'Please enter some code before submitting.');
+          return;
+        }
+        submitBtn.disabled = true;
+        showStatus('loading', 'Checking login...');
+        try {
+          await resolveCurrentUser();
+        } catch (err) {
+          showStatus('error', 'Please log in to submit code.');
+          submitBtn.disabled = false;
+          return;
+        }
+        showStatus('loading', 'Creating Gist and submitting...');
+        try {
+          await submitCodeToBackend(code, language, notes);
+          saveSubmissionLocally('code', { language, notes });
+          showStatus('success', 'Code submitted successfully!');
           this.reset();
         } catch (err) {
           showStatus('error', err.message);
@@ -786,12 +945,15 @@ Check if this is a course lesson and determine which course context to use
         ...fetchOptions,
         method: 'POST',
         headers: {
+          ...fetchOptions.headers,
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: new URLSearchParams({
           name: PAGE_TITLE || {{ page.title | jsonify }},
-          contentUrl: CURRENT_LESSON_ID,
-          description: {{ page.description | default: "" | jsonify }}
+          contentUrl: CURRENT_LESSON_ID.replace(/^\/+|\/+$/g, ''),
+          description: {{ page.description | default: "" | jsonify }},
+          assignmentType: {{ page.assignment_submission_type | default: "File" | jsonify }},
+          pageContent: {{ page.content | strip_html | normalize_whitespace | truncate: 8000 | jsonify }}
         })
       });
       
@@ -811,8 +973,8 @@ Check if this is a course lesson and determine which course context to use
         } else {
           console.log('Assignment resolved with ID:', result.id);
         }
-      } else if (createRes.status === 403) {
-        console.warn('Not authenticated - assignment creation skipped. Please log in to enable assignments.');
+      } else if (createRes.status === 401 || createRes.status === 403) {
+        console.warn('Assignment creation requires an active Spring login session. Please log in and refresh the page.');
       } else if (createRes.status === 400) {
         const error = await createRes.json();
         console.error('Bad request for auto-create assignment:', error.error);
@@ -845,6 +1007,7 @@ Check if this is a course lesson and determine which course context to use
     
     // Assignment submission
     setupSubmissionForms();
+    setupSelfAssessmentRatings();
     
     // File upload handling
     const fileUploadArea = document.getElementById('file-upload-area');
@@ -1025,6 +1188,95 @@ Check if this is a course lesson and determine which course context to use
 
   .assignment-submission-icon {
     color: #2563eb;
+  }
+
+  /* Self-Assessment */
+  .self-assessment {
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+  }
+
+  .self-assessment-title {
+    color: #333;
+    font-size: 1rem;
+    margin: 0 0 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .self-assessment-hint {
+    color: #666;
+    font-size: 13px;
+    margin: 0 0 16px 0;
+  }
+
+  .rating-group {
+    border: none;
+    padding: 0;
+    margin: 0 0 18px 0;
+  }
+
+  .rating-label {
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 0;
+    margin-bottom: 4px;
+  }
+
+  .rating-question {
+    color: #555;
+    font-size: 13px;
+    margin: 0 0 8px 0;
+  }
+
+  .rating-scale {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .rating-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    background: white;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .rating-option:has(input:checked),
+  .rating-option.selected {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+  }
+
+  .rating-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .rating-scale-hint {
+    color: #999;
+    font-size: 11px;
+    margin-top: 6px;
+  }
+
+  .self-assessment-reflection {
+    margin-bottom: 0;
   }
 
   .submission-options {
@@ -1332,27 +1584,28 @@ Check if this is a course lesson and determine which course context to use
     {% endif %}
 
     {% if page.assignment %}
+    {% assign submission_type = page.assignment_submission_type | default: "file" | downcase %}
     <div class="assignment-submission">
       <h3>
         <i class="fa-solid fa-upload assignment-submission-icon"></i>
         Submit Assignment
       </h3>
 
-      <div class="submission-options">
-        <button class="submission-tab" onclick="switchSubmissionType('link')">
-          <i class="fa-solid fa-link"></i> Link Submission
-        </button>
-        <button class="submission-tab" onclick="switchSubmissionType('file')">
-          <i class="fa-solid fa-file-upload"></i> File Upload
-        </button>
-      </div>
-
-
-      <!-- Link Submission Form -->
-      <form class="submission-form" id="link-form-blog">
+      {% if submission_type == "link" or submission_type == "github_issue" %}
+      {% if submission_type == "github_issue" %}
+        {% assign link_label = "GitHub Issue Link" %}
+        {% assign link_placeholder = "https://github.com/owner/repo/issues/123" %}
+      {% else %}
+        {% assign link_label = "Submission Link" %}
+        {% assign link_placeholder = "https://..." %}
+      {% endif %}
+      <form class="submission-form active" id="link-form-blog">
         <div class="form-group">
-          <label for="submission-link-blog">Submission Link</label>
-          <input type="url" id="submission-link-blog" placeholder="https://..." required>
+          <label for="submission-link-blog">{{ link_label }}</label>
+          <input type="url" id="submission-link-blog" placeholder="{{ link_placeholder }}" required>
+          {% if submission_type == "github_issue" %}
+          <p class="form-hint" style="font-size:0.85rem;color:#9ca3af;margin-top:6px;">Must be a public GitHub issue (github.com/owner/repo/issues/N) — it will be validated and reviewed automatically.</p>
+          {% endif %}
         </div>
         <div class="form-group">
           <label for="link-description-blog">Description</label>
@@ -1363,18 +1616,42 @@ Check if this is a course lesson and determine which course context to use
           Submit Link
         </button>
       </form>
-
-      <!-- File Upload Form -->
-      <form class="submission-form" id="file-form-blog">
+      {% elsif submission_type == "code" %}
+      <form class="submission-form active" id="code-form-blog">
+        <div class="form-group">
+          <label for="code-language-blog">Language</label>
+          <select id="code-language-blog">
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+            <option value="javascript">JavaScript</option>
+            <option value="pseudocode">Text / Pseudocode</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="code-input-blog">Code</label>
+          <textarea id="code-input-blog" class="code-input" placeholder="Paste or type your code here..." rows="12" required></textarea>
+          <p class="form-hint" style="font-size:0.85rem;color:#9ca3af;margin-top:6px;">Your code will be saved as a Gist and reviewed automatically. You must be logged in to submit.</p>
+        </div>
+        <div class="form-group">
+          <label for="code-notes-blog">Notes (Optional)</label>
+          <textarea id="code-notes-blog" placeholder="Add any additional comments..."></textarea>
+        </div>
+        <button type="submit" class="submit-btn" id="code-submit-btn-blog">
+          <i class="fas fa-check"></i>
+          Submit Code
+        </button>
+      </form>
+      {% else %}
+      <form class="submission-form active" id="file-form-blog">
         <div class="form-group">
           <label>Upload Files</label>
           <div class="file-upload-area" id="file-upload-area-blog">
-            <input type="file" id="file-input-blog" multiple style="display: none;">
+            <input type="file" id="file-input-blog" multiple accept=".pdf,.zip,.png,.jpg,.jpeg,.gif,.doc,.docx,.txt,.ipynb" style="display: none;">
             <div class="file-upload-icon">
               <i class="fa-solid fa-cloud-upload-alt"></i>
             </div>
             <div class="file-upload-text">Click to upload or drag and drop</div>
-            <div class="file-upload-hint">PDF, ZIP, images, or documents (Max 10MB per file)</div>
+            <div class="file-upload-hint">PDF, ZIP, images, documents, or Jupyter notebooks (.ipynb) (Max 10MB per file)</div>
           </div>
           <div class="file-list" id="file-list-blog"></div>
         </div>
@@ -1387,6 +1664,7 @@ Check if this is a course lesson and determine which course context to use
           Submit Files
         </button>
       </form>
+      {% endif %}
 
       <div class="submission-status" id="submission-status-blog"></div>
     </div>
@@ -1397,6 +1675,9 @@ Check if this is a course lesson and determine which course context to use
     <script>
       const FRONTMATTER_ASSIGNMENT_ID_BLOG = {{ page.assignment_id | default: 'null' }};
       const FRONTMATTER_ASSIGNMENT_NAME_BLOG = {{ page.assignment_name | default: nil | jsonify }};
+      const SUBMISSION_TYPE_BLOG = {{ page.assignment_submission_type | default: "file" | downcase | jsonify }};
+      const CODE_EXTENSIONS_BLOG = { python: 'py', java: 'java', javascript: 'js', pseudocode: 'txt' };
+      const GITHUB_ISSUE_URL_PATTERN_BLOG = /^https?:\/\/github\.com\/[^/]+\/[^/#?]+\/issues\/\d+\/?$/i;
 
       async function ensureAssignmentIdBlog() {
         if (typeof ensureAssignmentId === 'function') {
@@ -1521,118 +1802,193 @@ Check if this is a course lesson and determine which course context to use
       }
 
       // Link submission — POST to Spring API
-      document.getElementById('link-form-blog').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const link = document.getElementById('submission-link-blog').value.trim();
-        const description = document.getElementById('link-description-blog').value.trim();
-        const btn = this.querySelector('button[type="submit"]');
-        btn.disabled = true;
-        showStatusBlog('loading', 'Submitting...');
-        try {
-          const assignmentId = await ensureAssignmentIdBlog();
-          const { uid, personId } = await resolveCurrentUserBlog();
-          const content = { type: 'link', url: link, notes: description };
-          const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
-            ...fetchOptions,
-            method: 'POST',
-            body: JSON.stringify({
-              assignmentId: assignmentId,
-              submitterId: personId,
-              isGroupSubmission: false,
-              content,
-              comment: description,
-              isLate: false
-            })
-          });
-          if (!res.ok) {
-            const e = await res.json().catch(() => ({}));
-            throw new Error(e.error || res.statusText);
+      const linkFormBlog = document.getElementById('link-form-blog');
+      if (linkFormBlog) {
+        linkFormBlog.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          const link = document.getElementById('submission-link-blog').value.trim();
+          const description = document.getElementById('link-description-blog').value.trim();
+          const btn = this.querySelector('button[type="submit"]');
+          if (SUBMISSION_TYPE_BLOG === 'github_issue' && !GITHUB_ISSUE_URL_PATTERN_BLOG.test(link)) {
+            showStatusBlog('error', 'That is not a valid GitHub issue link (expected github.com/owner/repo/issues/N).');
+            return;
           }
-          // Dual-write to EshikaP1's grades system
-          const assignmentName = currentAssignmentNameBlog();
-          const assignmentLabel = assignmentName ? assignmentName : String(assignmentId);
-          await fetch(`${javaURI}/api/grades`, {
-            ...fetchOptions,
-            method: 'POST',
-            body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: content, submittedAt: new Date().toISOString() })
-          }).catch(() => {});
-          showStatusBlog('success', 'Link submitted successfully!');
-          this.reset();
-        } catch (err) {
-          showStatusBlog('error', err.message);
-        } finally {
-          btn.disabled = false;
-        }
-      });
-
-      // File submission — POST to Spring file upload API
-      document.getElementById('file-form-blog').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        if (selectedFilesBlog.length === 0) {
-          showStatusBlog('error', 'Please select at least one file.');
-          return;
-        }
-        const notes = document.getElementById('file-notes-blog').value.trim();
-        const btn = document.getElementById('file-submit-btn-blog');
-        btn.disabled = true;
-        showStatusBlog('loading', 'Uploading...');
-        try {
-          const assignmentId = await ensureAssignmentIdBlog();
-          const { uid, personId } = await resolveCurrentUserBlog();
-          // Resolve assignment name for the file upload endpoint
-          let assignmentName = null;
-          const preferredName = currentAssignmentNameBlog();
-          if (typeof preferredName === 'string') {
-            const normalized = preferredName.trim().toLowerCase();
-            if (normalized && normalized !== 'null' && normalized !== 'undefined') {
-              assignmentName = preferredName;
-            }
-          }
-          if (!assignmentName) {
-            const nameRes = await fetch(`${javaURI}/api/assignments/${assignmentId}`, { ...fetchOptions });
-            if (!nameRes.ok) throw new Error('Assignment not found on server.');
-            assignmentName = await nameRes.text();
-          }
-          for (const file of selectedFilesBlog) {
-            if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} exceeds 10MB limit.`);
-            const content = { type: 'file', filename: file.name, notes: notes || '' };
-            const fd = new FormData();
-            fd.append('assignmentName', assignmentName);
-            fd.append('assignmentId', String(assignmentId));
-            fd.append('userId', personId);
-            fd.append('username', uid);
-            fd.append('file', file);
-            if (notes) fd.append('notes', notes);
-            const r = await fetch(`${javaURI}/api/assignment-submissions/upload`, {
+          btn.disabled = true;
+          showStatusBlog('loading', 'Submitting...');
+          try {
+            const assignmentId = await ensureAssignmentIdBlog();
+            const { uid, personId } = await resolveCurrentUserBlog();
+            const content = { type: SUBMISSION_TYPE_BLOG === 'github_issue' ? 'github_issue' : 'link', url: link, notes: description };
+            const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
+              ...fetchOptions,
               method: 'POST',
-              mode: fetchOptions.mode,
-              credentials: fetchOptions.credentials,
-              headers: { 'X-Origin': 'client' },
-              body: fd
+              body: JSON.stringify({
+                assignmentId: assignmentId,
+                submitterId: personId,
+                isGroupSubmission: false,
+                content,
+                comment: description,
+                isLate: false
+              })
             });
-            if (!r.ok) {
-              const e = await r.json().catch(() => ({}));
-              throw new Error(`Upload failed for ${file.name}: ` + (e.error || r.statusText));
+            if (!res.ok) {
+              const e = await res.json().catch(() => ({}));
+              throw new Error(e.error || res.statusText);
             }
             // Dual-write to EshikaP1's grades system
-            const assignmentNameForGrades = currentAssignmentNameBlog();
-            const assignmentLabel = assignmentNameForGrades ? assignmentNameForGrades : String(assignmentId);
+            const assignmentName = currentAssignmentNameBlog();
+            const assignmentLabel = assignmentName ? assignmentName : String(assignmentId);
             await fetch(`${javaURI}/api/grades`, {
               ...fetchOptions,
               method: 'POST',
               body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: content, submittedAt: new Date().toISOString() })
             }).catch(() => {});
+            showStatusBlog('success', 'Link submitted successfully!');
+            this.reset();
+          } catch (err) {
+            showStatusBlog('error', err.message);
+          } finally {
+            btn.disabled = false;
           }
-          showStatusBlog('success', `${selectedFilesBlog.length} file(s) submitted successfully!`);
-          selectedFilesBlog = [];
-          updateFileListBlog();
-          this.reset();
-        } catch (err) {
-          showStatusBlog('error', err.message);
-        } finally {
-          btn.disabled = false;
-        }
-      });
+        });
+      }
+
+      // File submission — POST to Spring file upload API
+      const fileFormBlog = document.getElementById('file-form-blog');
+      if (fileFormBlog) {
+        fileFormBlog.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          if (selectedFilesBlog.length === 0) {
+            showStatusBlog('error', 'Please select at least one file.');
+            return;
+          }
+          const notes = document.getElementById('file-notes-blog').value.trim();
+          const btn = document.getElementById('file-submit-btn-blog');
+          btn.disabled = true;
+          showStatusBlog('loading', 'Uploading...');
+          try {
+            const assignmentId = await ensureAssignmentIdBlog();
+            const { uid, personId } = await resolveCurrentUserBlog();
+            // Resolve assignment name for the file upload endpoint
+            let assignmentName = null;
+            const preferredName = currentAssignmentNameBlog();
+            if (typeof preferredName === 'string') {
+              const normalized = preferredName.trim().toLowerCase();
+              if (normalized && normalized !== 'null' && normalized !== 'undefined') {
+                assignmentName = preferredName;
+              }
+            }
+            if (!assignmentName) {
+              const nameRes = await fetch(`${javaURI}/api/assignments/${assignmentId}`, { ...fetchOptions });
+              if (!nameRes.ok) throw new Error('Assignment not found on server.');
+              assignmentName = await nameRes.text();
+            }
+            for (const file of selectedFilesBlog) {
+              if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} exceeds 10MB limit.`);
+              const content = { type: 'file', filename: file.name, notes: notes || '' };
+              const fd = new FormData();
+              fd.append('assignmentName', assignmentName);
+              fd.append('assignmentId', String(assignmentId));
+              fd.append('userId', personId);
+              fd.append('username', uid);
+              fd.append('file', file);
+              if (notes) fd.append('notes', notes);
+              const r = await fetch(`${javaURI}/api/assignment-submissions/upload`, {
+                method: 'POST',
+                mode: fetchOptions.mode,
+                credentials: fetchOptions.credentials,
+                headers: { 'X-Origin': 'client' },
+                body: fd
+              });
+              if (!r.ok) {
+                const e = await r.json().catch(() => ({}));
+                throw new Error(`Upload failed for ${file.name}: ` + (e.error || r.statusText));
+              }
+              // Dual-write to EshikaP1's grades system
+              const assignmentNameForGrades = currentAssignmentNameBlog();
+              const assignmentLabel = assignmentNameForGrades ? assignmentNameForGrades : String(assignmentId);
+              await fetch(`${javaURI}/api/grades`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: content, submittedAt: new Date().toISOString() })
+              }).catch(() => {});
+            }
+            showStatusBlog('success', `${selectedFilesBlog.length} file(s) submitted successfully!`);
+            selectedFilesBlog = [];
+            updateFileListBlog();
+            this.reset();
+          } catch (err) {
+            showStatusBlog('error', err.message);
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      }
+
+      // Code submission — bundled into a Gist, then POST to Spring API
+      const codeFormBlog = document.getElementById('code-form-blog');
+      if (codeFormBlog) {
+        codeFormBlog.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          const code = document.getElementById('code-input-blog').value;
+          const language = document.getElementById('code-language-blog').value;
+          const notes = document.getElementById('code-notes-blog')?.value?.trim() || '';
+          const btn = this.querySelector('button[type="submit"]');
+          if (!code.trim()) {
+            showStatusBlog('error', 'Please enter some code before submitting.');
+            return;
+          }
+          btn.disabled = true;
+          showStatusBlog('loading', 'Checking login...');
+          let uid, personId;
+          try {
+            ({ uid, personId } = await resolveCurrentUserBlog());
+          } catch (err) {
+            showStatusBlog('error', 'Please log in to submit code.');
+            btn.disabled = false;
+            return;
+          }
+          showStatusBlog('loading', 'Creating Gist and submitting...');
+          try {
+            const assignmentId = await ensureAssignmentIdBlog();
+            const ext = CODE_EXTENSIONS_BLOG[language] || 'txt';
+            const gistUrl = await window.exportToGist(
+              { [`submission.${ext}`]: { content: code } },
+              { type: 'submission', description: notes || `Code submission (${language})` }
+            );
+            const content = { type: 'code', url: gistUrl, language, notes };
+            const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
+              ...fetchOptions,
+              method: 'POST',
+              body: JSON.stringify({
+                assignmentId: assignmentId,
+                submitterId: personId,
+                isGroupSubmission: false,
+                content,
+                comment: notes,
+                isLate: false
+              })
+            });
+            if (!res.ok) {
+              const e = await res.json().catch(() => ({}));
+              throw new Error(e.error || res.statusText);
+            }
+            const assignmentName = currentAssignmentNameBlog();
+            const assignmentLabel = assignmentName ? assignmentName : String(assignmentId);
+            await fetch(`${javaURI}/api/grades`, {
+              ...fetchOptions,
+              method: 'POST',
+              body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: content, submittedAt: new Date().toISOString() })
+            }).catch(() => {});
+            showStatusBlog('success', 'Code submitted successfully!');
+            this.reset();
+          } catch (err) {
+            showStatusBlog('error', err.message);
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      }
 
       function showStatusBlog(type, message) {
         const status = document.getElementById('submission-status-blog');
@@ -1664,9 +2020,11 @@ Check if this is a course lesson and determine which course context to use
   <!-- Enhanced Analytics Tracking -->
   <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
     window.pythonURI = pythonURI;
     window.javaURI = javaURI;
     window.fetchOptions = fetchOptions;
+    window.exportToGist = exportToGist;
   </script>
   <script src="{{ site.baseurl }}/assets/js/ocs-analytics-enhanced.js"></script>
   <script src="{{ site.baseurl }}/assets/js/code-runner-analytics.js"></script>

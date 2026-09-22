@@ -1,21 +1,112 @@
+$toggle-transition: 0.2s;
+$toggle-width: 54px;
+$toggle-height: 31px;
+$toggle-thumb-size: 23px;
+$toggle-inset: 4px;
+$toggle-travel: $toggle-width - $toggle-thumb-size - (2 * $toggle-inset);
+
+// Public grammar: label.ocs__toggle > input + track + label text.
+.ocs__toggle {
+    --ocs-toggle-accent: var(--pref-accent-color);
+
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--pref-text-color);
+    cursor: pointer;
+
+    &--green {
+        --ocs-toggle-accent: var(--pref-success-color, var(--pref-accent-color));
+    }
+}
+
+.ocs__toggle-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+
+    &:checked + .ocs__toggle-track {
+        background: var(--ocs-toggle-accent);
+
+        &::before {
+            transform: translateX($toggle-travel);
+        }
+    }
+
+    &:focus-visible + .ocs__toggle-track {
+        outline: 2px solid var(--ocs-toggle-accent);
+        outline-offset: 2px;
+    }
+
+    &:disabled ~ .ocs__toggle-track,
+    &:disabled ~ .ocs__toggle-label {
+        cursor: not-allowed;
+        opacity: 0.55;
+    }
+}
+
+.ocs__toggle-track {
+    position: relative;
+    flex: 0 0 $toggle-width;
+    width: $toggle-width;
+    height: $toggle-height;
+    border-radius: $toggle-height;
+    border: 1px solid var(--ui-border);
+    background: var(--panel-mid);
+    transition: background $toggle-transition ease;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: $toggle-inset;
+        left: $toggle-inset;
+        width: $toggle-thumb-size;
+        height: $toggle-thumb-size;
+        border-radius: 50%;
+        background: var(--pref-text-color);
+        box-shadow: 0 1px 3px color-mix(in srgb, var(--pref-text-color) 25%, transparent);
+        transition: transform $toggle-transition ease;
+    }
+}
+
+.ocs__toggle-label {
+    user-select: none;
+}
+
+// Legacy grammar retained for existing pages. New lessons should use ocs__toggle.
 .switch {
     display: flex;
     align-items: center;
-    gap: 10px; // Adjust the spacing between toggle and text
+    gap: 10px;
 
     .toggle {
         position: relative;
-        display: flex;
-        width: 54px;
-        height: 31px;
-        padding: 2px 2px 2px 6px;
-        justify-content: flex-end;
-        align-items: center;
+        width: $toggle-width;
+        height: $toggle-height;
+    }
 
-        input[type="checkbox"] {
-            opacity: 0;
-            width: 0;
-            height: 0;
+    input[type="checkbox"] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+
+        &:checked + .slider {
+            background: var(--pref-accent-color);
+
+            &.green {
+                background: var(--pref-success-color, var(--pref-accent-color));
+            }
+
+            &::before {
+                transform: translateX($toggle-travel);
+            }
+        }
+
+        &:focus-visible + .slider {
+            outline: 2px solid var(--pref-accent-color);
+            outline-offset: 2px;
         }
     }
 }
@@ -24,21 +115,26 @@
     position: absolute;
     cursor: pointer;
     inset: 0;
-    border-radius: 100px;
+    border-radius: $toggle-height;
+    border: 1px solid var(--ui-border);
+    background: var(--panel-mid);
+    transition: background $toggle-transition ease;
 
-    &:before {
+    &::before {
         content: "";
         position: absolute;
-        width: 27px;
-        height: 27px;
-        left: 4px;
-        bottom: 4px;
+        top: $toggle-inset;
+        left: $toggle-inset;
+        width: $toggle-thumb-size;
+        height: $toggle-thumb-size;
         border-radius: 50%;
+        background: var(--pref-text-color);
+        box-shadow: 0 1px 3px color-mix(in srgb, var(--pref-text-color) 25%, transparent);
+        transition: transform $toggle-transition ease;
     }
 }
 
 .label-text {
-    font-size: 16px;
-    color: #fff; // Adjust the text color as needed
+    color: var(--pref-text-color);
     user-select: none;
 }

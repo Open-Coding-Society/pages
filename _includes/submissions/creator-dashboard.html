@@ -1,0 +1,75 @@
+<section id="tab-content-created-assignments"
+         class="tab-content creator-workspace hidden"
+         aria-labelledby="creator-workspace-title">
+  <header class="creator-workspace__header">
+    <div>
+      <p class="creator-workspace__eyebrow">Assignment ownership</p>
+      <h2 id="creator-workspace-title">Assignments you created</h2>
+      <p>Review assignments you own and the submissions received from enrolled students.</p>
+    </div>
+    <p id="creator-dashboard-summary" class="creator-workspace__summary" aria-live="polite"></p>
+  </header>
+
+  <div id="created-assignments-loading" class="creator-workspace__loading" role="status">
+    <span class="creator-workspace__spinner" aria-hidden="true"></span>
+    <span>Loading assignment activity…</span>
+  </div>
+
+  <div id="created-assignments-error" class="creator-workspace__error" role="alert" hidden></div>
+
+  <div id="created-assignments-content" hidden>
+    <section class="creator-workspace__section" aria-labelledby="creator-assignment-list-title">
+      <div class="creator-workspace__section-heading">
+        <div>
+          <h3 id="creator-assignment-list-title">Owned assignments</h3>
+          <p>Assignment courses come directly from the existing page frontmatter.</p>
+        </div>
+      </div>
+      <div id="created-assignments-container" class="creator-workspace__table-scroll"></div>
+    </section>
+
+    <section class="creator-workspace__section" aria-labelledby="creator-submission-list-title">
+      <div class="creator-workspace__section-heading">
+        <div>
+          <h3 id="creator-submission-list-title">Incoming submissions</h3>
+          <p>Course filtering uses each submitter’s current Spring class membership.</p>
+        </div>
+      </div>
+
+      <form id="creator-submission-filters" class="creator-filters" aria-label="Filter creator submissions">
+        <label class="creator-filter">
+          <span>Student course</span>
+          <select id="creator-filter-course">
+            <option value="">All student courses</option>
+          </select>
+        </label>
+        <label class="creator-filter">
+          <span>Assignment</span>
+          <select id="creator-filter-assignment">
+            <option value="">All assignments</option>
+          </select>
+        </label>
+        <label class="creator-filter creator-filter--search">
+          <span>Student</span>
+          <input id="creator-filter-student" type="search" placeholder="Name or UID" autocomplete="off">
+        </label>
+        <label class="creator-filter">
+          <span>Status</span>
+          <select id="creator-filter-status">
+            <option value="">All statuses</option>
+            <option value="pending">Pending review</option>
+            <option value="late">Late</option>
+            <option value="graded">Graded</option>
+          </select>
+        </label>
+        <button id="creator-clear-filters" class="creator-filters__clear" type="button">Clear filters</button>
+      </form>
+
+      <div class="creator-results-bar">
+        <p id="creator-results-summary" aria-live="polite"></p>
+      </div>
+      <div id="creator-submissions-container" class="creator-workspace__table-scroll"></div>
+      <nav id="creator-pagination" class="creator-pagination" aria-label="Creator submission pages"></nav>
+    </section>
+  </div>
+</section>
