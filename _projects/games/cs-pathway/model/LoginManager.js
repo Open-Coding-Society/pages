@@ -21,6 +21,10 @@ import { pythonURI, javaURI, fetchOptions, baseurl } from '@assets/js/api/config
 
 class LoginManager {
 
+  static isStudentIdUsedAsGithubId(uid) {
+    return /^\d{7}$/.test(String(uid ?? '').trim());
+  }
+
   // ── API Methods ────────────────────────────────────────────────────────────
 
   /**
@@ -73,6 +77,14 @@ class LoginManager {
    * @returns {{ success: boolean, code: number, body: object|null }}
    */
   static async signup({ name, uid, sid, school, email, password }) {
+    if (LoginManager.isStudentIdUsedAsGithubId(uid)) {
+      return {
+        success: false,
+        code: 400,
+        body: { error: 'Enter your GitHub ID, not your 7-digit student ID.' },
+      };
+    }
+
     try {
       const flaskRes = await fetch(`${pythonURI}/api/user`, {
         method: 'POST',

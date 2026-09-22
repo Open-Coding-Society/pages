@@ -38,7 +38,7 @@ show_reading_time: false
             </p>
             <div id="reset-g_id_signin_container" class="support-g-signin-container"></div>
             <div id="reset-oauth-status" class="support-oauth-status"></div>
-            <p id="reset-ticket-row" style="display: none; margin-top: 1rem;">
+            <p id="reset-ticket-row" class="support-ticket-row">
                 <button type="button" class="large secondary submit-button" onclick="requestResetTicket(this)">Request a Ticket Instead</button>
             </p>
         </div>

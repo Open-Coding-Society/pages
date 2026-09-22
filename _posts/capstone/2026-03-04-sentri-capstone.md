@@ -3,6 +3,8 @@ microblog: true
 toc: false
 title: "Sentri: The AI-Driven Recovery Ecosystem"
 permalink: /capstone/sentri/
+images:
+  - /images/capstone/sentri.png
 ---
 
 <div id="sentri-showcase" class="sentri-root">

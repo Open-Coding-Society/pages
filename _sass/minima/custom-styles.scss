@@ -16,14 +16,15 @@
 @import "open-coding/elements/capstone/main";
 @import "open-coding/elements/capstone/checklists";
 @import "open-coding/elements/capstone/status-pills";
-// Mentor capstone actions (Apply/Interested/Skip, mentor picks widget, comments)
-@import "open-coding/elements/capstone/mentor-actions";
 
 // Games directory search + topic filter
 @import "open-coding/elements/games-directory-search";
 
 // Jarvis Camera Setup & Object Detection capstone project styles
 @import "capstone/jarvis";
+
+// Sitewide "signed in as Mentor" badge and mentor sidebar layout push
+@import "mentor";
 
 // RPN Calculator Lesson Interactives
 @import "nighthawk/rpn-interactive";

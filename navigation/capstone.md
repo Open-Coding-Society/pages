@@ -26,6 +26,10 @@ show_reading_time: false
         <option value="2026-2027" selected>2026/2027</option>
         <option value="2025-2026">2025/2026</option>
       </select>
+      <!-- Approved-mentor-only: how many projects they've marked Interested in.
+           Hidden for everyone else; revealed by the mentor script below.
+           margin-left:auto pushes it to the far right of this flex row. -->
+      <span id="mentor-interested-count" class="ocs__btn small alert-green" style="display:none; margin-left:auto; cursor:default;">Interested: 0</span>
     </div>
   </div>
 </div>
@@ -257,8 +261,192 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
-<!-- Mentor Apply/Interested/Skip actions, picks widget, and per-project comments -->
-<script type="module" src="{{ site.baseurl }}/assets/js/mentor-capstone.js"></script>
+<!-- Approved-mentor hover actions (Apply Now / Skip / Interested) on every project
+     card. Everyone else sees the grid exactly as above -- this is additive and only
+     ever runs for a confirmed ROLE_MENTOR account. Reuses the existing .ocs__btn /
+     .ocs__links classes already loaded for the filter bar above, so no new CSS is
+     introduced; card-to-card layout stays in normal document flow (no absolute
+     positioning) so a taller hovered card just grows in place. -->
+<script type="module">
+import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+(async function () {
+  // Wait for the script above (which sets card.dataset.pageUrl for the few
+  // projects in its linkMap) to have run its DOMContentLoaded handler first --
+  // module scripts execute before that event fires, not after.
+  if (document.readyState === 'loading') {
+    await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
+  }
+
+  const counterEl = document.getElementById('mentor-interested-count');
+  const grid = document.getElementById('capstone-grid');
+  if (!grid || !counterEl) return;
+
+  // Only an approved mentor (ROLE_MENTOR) gets the hover actions below --
+  // everyone else (including a pending mentor applicant) sees the plain grid.
+  //
+  // Local-only preview: login.md's "mentor" GitHub ID shortcut sets this flag and
+  // sends you straight here, so the backend role check below is skipped entirely --
+  // lets the mentor UI be previewed without a real, admin-approved Spring account.
+  // Gated to localhost so a stray flag can never grant this on the deployed site.
+  const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  let isMentor = isLocalhost && localStorage.getItem('ocsDevMentorPreview') === 'true';
+  if (!isMentor) {
+    try {
+      const res = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+      if (res.ok) {
+        const person = await res.json();
+        const roles = Array.isArray(person.roles) ? person.roles.map(r => r.name) : [];
+        isMentor = roles.includes('ROLE_MENTOR');
+      }
+    } catch (e) { /* not logged in / offline -- treat as not a mentor */ }
+  }
+  if (!isMentor) return;
+
+  const cards = Array.from(grid.querySelectorAll(':scope > div'));
+
+  // Resolve a card's project URL the same way the links-popup logic above
+  // already does (dataset.pageUrl first, falling back to the card's own link),
+  // normalized to a path so it lines up with the backend's stored URLs.
+  function cardUrl(card) {
+    const raw = card.dataset.pageUrl || card.querySelector('a')?.getAttribute('href') || '';
+    try { return new URL(raw, location.origin).pathname; } catch (e) { return raw; }
+  }
+
+  // Maps each project's URL to its numeric capstone id -- needed for the apply
+  // endpoint. Only projects CapstoneSyncService has synced to the backend show
+  // up here; anything else falls back to the "hasn't synced yet" message below.
+  const idByUrl = {};
+  try {
+    const res = await fetch(`${javaURI}/api/capstones`, fetchOptions);
+    if (res.ok) {
+      const rows = await res.json();
+      if (Array.isArray(rows)) {
+        rows.forEach(row => {
+          try { idByUrl[new URL(row.url, location.origin).pathname] = row.id; }
+          catch (e) { idByUrl[row.url] = row.id; }
+        });
+      }
+    }
+  } catch (e) { console.error('Capstone: could not load project ids', e); }
+
+  // Interested/Skip are tracked per-browser (localStorage) -- there's no backend
+  // endpoint for a mentor's shortlist, only for the apply action itself below.
+  const INTERESTED_KEY = 'ocsMentorInterested';
+  const SKIPPED_KEY = 'ocsMentorSkipped';
+  function readSet(key) {
+    try { return new Set(JSON.parse(localStorage.getItem(key) || '[]')); }
+    catch (e) { return new Set(); }
+  }
+  function writeSet(key, set) {
+    try { localStorage.setItem(key, JSON.stringify([...set])); } catch (e) { /* ignore */ }
+  }
+  const interested = readSet(INTERESTED_KEY);
+  const skipped = readSet(SKIPPED_KEY);
+
+  function updateCounter() {
+    counterEl.textContent = `Interested: ${interested.size}`;
+  }
+
+  cards.forEach(card => {
+    const url = cardUrl(card);
+    // The <div> holding the h3/description/team paragraphs -- the sibling right
+    // after the card's thumbnail link, for every card shape in this grid.
+    const infoWrap = card.querySelector('a')?.nextElementSibling;
+    if (!infoWrap) return;
+
+    const actions = document.createElement('div');
+    actions.style.display = 'none';
+    actions.style.marginTop = '0.75rem';
+
+    const links = document.createElement('div');
+    links.className = 'ocs__links';
+
+    const applyBtn = document.createElement('button');
+    applyBtn.type = 'button';
+    applyBtn.className = 'ocs__btn small accent fill';
+    applyBtn.textContent = 'Apply Now';
+
+    const skipBtn = document.createElement('button');
+    skipBtn.type = 'button';
+    skipBtn.className = 'ocs__btn small alert-red';
+    skipBtn.setAttribute('aria-label', 'Skip this project');
+    skipBtn.textContent = '✕';
+
+    const interestedBtn = document.createElement('button');
+    interestedBtn.type = 'button';
+    interestedBtn.className = 'ocs__btn small alert-green';
+    interestedBtn.setAttribute('aria-label', 'Mark interested');
+    interestedBtn.textContent = '✓';
+
+    if (skipped.has(url)) {
+      card.style.opacity = '0.45';
+      applyBtn.disabled = true;
+      skipBtn.disabled = true;
+      interestedBtn.disabled = true;
+    }
+    if (interested.has(url)) {
+      interestedBtn.disabled = true;
+    }
+
+    applyBtn.addEventListener('click', async () => {
+      const id = idByUrl[url];
+      if (!id) {
+        const original = applyBtn.textContent;
+        applyBtn.textContent = "Hasn't synced yet";
+        setTimeout(() => { applyBtn.textContent = original; }, 2500);
+        return;
+      }
+      applyBtn.disabled = true;
+      applyBtn.textContent = 'Applying…';
+      try {
+        const res = await fetch(`${javaURI}/api/capstones/${id}/apply`, { ...fetchOptions, method: 'POST' });
+        if (res.status === 409) {
+          applyBtn.textContent = 'Already a mentor';
+        } else if (res.ok) {
+          applyBtn.textContent = 'Applied ✓';
+        } else {
+          applyBtn.textContent = 'Try again';
+          applyBtn.disabled = false;
+        }
+      } catch (e) {
+        console.error('Capstone: apply failed', e);
+        applyBtn.textContent = 'Try again';
+        applyBtn.disabled = false;
+      }
+    });
+
+    skipBtn.addEventListener('click', () => {
+      skipped.add(url);
+      writeSet(SKIPPED_KEY, skipped);
+      card.style.opacity = '0.45';
+      applyBtn.disabled = true;
+      skipBtn.disabled = true;
+      interestedBtn.disabled = true;
+    });
+
+    interestedBtn.addEventListener('click', () => {
+      if (interested.has(url)) return;
+      interested.add(url);
+      writeSet(INTERESTED_KEY, interested);
+      interestedBtn.disabled = true;
+      updateCounter();
+    });
+
+    links.appendChild(applyBtn);
+    links.appendChild(skipBtn);
+    links.appendChild(interestedBtn);
+    actions.appendChild(links);
+    infoWrap.appendChild(actions);
+
+    card.addEventListener('mouseenter', () => { actions.style.display = ''; });
+    card.addEventListener('mouseleave', () => { actions.style.display = 'none'; });
+  });
+
+  counterEl.style.display = '';
+  updateCounter();
+})();
+</script>
 
 <div id="capstone-grid" class="ocs__grid ocs__grid--card cols-3">
 

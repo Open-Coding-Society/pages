@@ -33,12 +33,23 @@ show_reading_time: false
     <div class="signup-card">
         <h1 id="signupTitle">Sign Up</h1>
         <hr>
+        <div class="form-group">
+            <label for="signupRole" style="display: block; margin-bottom: 0.25rem;">I am a:</label>
+            <select id="signupRole">
+                <option value="student" selected>Student</option>
+                <option value="mentor">Mentor</option>
+            </select>
+        </div>
         <!-- Google OAuth Section (initially hidden) -->
         <div id="oauth-verification" style="display: none; text-align: center; margin-bottom: 2rem;">
-            <h3 style="color: #6366f1; margin-bottom: 1rem;">🎓 School Email Verification</h3>
-            <p style="margin-bottom: 1.5rem; color: #d1d5db;">
-                Please sign in with your school Google account to verify you're a Poway USD student or teacher.
-                <br><strong>You must use an email ending in @stu.powayusd.com or @powayusd.com</strong>
+            <h3 style="color: #6366f1; margin-bottom: 1rem;">Google Account Verification</h3>
+            <p id="oauth-copy-student" style="margin-bottom: 1.5rem; color: #d1d5db;">
+                Sign in with any Google account. Poway USD student accounts receive immediate access;
+                other accounts will await administrator approval.
+            </p>
+            <p id="oauth-copy-mentor" style="display: none; margin-bottom: 1.5rem; color: #d1d5db;">
+                Optionally verify a business email address for faster admin review, or skip this
+                step and sign up now -- your account will await administrator approval either way.
             </p>
             <div id="g_id_onload"
                  data-client_id="{{ site.google_client_id }}"
@@ -54,6 +65,11 @@ show_reading_time: false
                  data-logo_alignment="left"
                  style="margin-bottom: 1rem;">
             </div>
+            <button type="button" id="skip-mentor-oauth" class="large secondary" onclick="skipMentorOAuth()"
+                    style="display: none; background-color: #6b7280; margin-bottom: 1rem;">
+                Skip — verify later
+            </button>
+            <br>
             <button type="button" class="large secondary" onclick="showSignupForm()" 
                     style="background-color: #6b7280;">
                 ← Back to Form
@@ -66,12 +82,13 @@ show_reading_time: false
                 <input type="text" id="name" placeholder="Name" required>
             </div>
             <div class="form-group">
-                <input type="text" id="signupUid" placeholder="GitHub ID" required>
+                <input type="text" id="signupUid" placeholder="GitHub ID" aria-describedby="github-id-validation-message" required>
+                <div id="github-id-validation-message" class="validation-message error" aria-live="polite"></div>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="signupSidGroup">
                 <input type="text" id="signupSid" placeholder="Student ID" required>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="signupSchoolGroup">
                 <select id="signupSchool" required>
                     <option value="" disabled selected>Select Your High School</option>
                     <option value="Abraxas High School">Abraxas</option>
@@ -94,6 +111,15 @@ show_reading_time: false
                 <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
                 <div id="password-validation-message" class="validation-message"></div>
             </div>
+            <p id="kasmNeededGroup">
+                <label class="switch">
+                    <span class="toggle">
+                        <input type="checkbox" name="kasmNeeded" id="kasmNeeded">
+                        <span class="slider"></span>
+                    </span>
+                    <span class="label-text">Kasm Server Needed</span>
+                </label>
+            </p>
             <p>
                 <button type="submit" class="large primary submit-button">Sign Up</button>
             </p>
@@ -118,7 +144,77 @@ show_reading_time: false
 
     let signupFormData = {};
     let verifiedSchoolEmail = null;
+    let signupIdToken = null;
     let validationTimeout = null;
+
+    const STUDENT_ID_AS_GITHUB_ID_PATTERN = /^\d{7}$/;
+
+    function validateGithubId() {
+        const githubIdField = document.getElementById('signupUid');
+        const messageDiv = document.getElementById('github-id-validation-message');
+
+        // This check only makes sense for students, who might mistakenly type their
+        // 7-digit student ID into what's asking for a GitHub username. Mentors don't
+        // have a student ID to confuse it with, and aren't necessarily asked for a
+        // GitHub account at all (see updateSignupModeUI) -- so skip it for them.
+        const isMentor = document.getElementById('signupRole').value === 'mentor';
+        if (isMentor) {
+            githubIdField.setCustomValidity('');
+            messageDiv.textContent = '';
+            return true;
+        }
+
+        const isStudentId = STUDENT_ID_AS_GITHUB_ID_PATTERN.test(githubIdField.value.trim());
+        const message = isStudentId ? 'Enter your GitHub ID, not your 7-digit student ID.' : '';
+
+        githubIdField.setCustomValidity(message);
+        messageDiv.textContent = message;
+        return !isStudentId;
+    }
+
+    document.getElementById('signupUid').addEventListener('input', validateGithubId);
+
+    // Mentor signup drops the Student ID / school requirement and makes the OAuth step
+    // optional (see skipMentorOAuth) instead of the mandatory school-email verification
+    // students go through. A hidden-but-required field still blocks form submission, so
+    // the required attribute has to come off, not just the visual display.
+    function updateSignupModeUI() {
+        const isMentor = document.getElementById('signupRole').value === 'mentor';
+        const sidGroup = document.getElementById('signupSidGroup');
+        const schoolGroup = document.getElementById('signupSchoolGroup');
+        const sidField = document.getElementById('signupSid');
+        const schoolField = document.getElementById('signupSchool');
+        const emailField = document.getElementById('signupEmail');
+
+        sidGroup.style.display = isMentor ? 'none' : '';
+        schoolGroup.style.display = isMentor ? 'none' : '';
+        sidField.required = !isMentor;
+        schoolField.required = !isMentor;
+        emailField.placeholder = isMentor ? 'Email' : 'Personal (not school) Email';
+
+        // "GitHub ID" is a student-signup concept (matches their GitHub Classroom
+        // handle); a mentor has no reason to have or know one. The field is still
+        // required -- it's their login username either way -- just relabeled, and
+        // re-validated immediately so a leftover "not your student ID" message from
+        // switching modes doesn't linger.
+        const uidField = document.getElementById('signupUid');
+        uidField.placeholder = isMentor ? 'Username' : 'GitHub ID';
+        validateGithubId();
+
+        // Mentors have no use for Kasm servers. Hidden (not required), same as sid/school
+        // above -- the checkbox stays unchecked while hidden, so no extra guard is needed
+        // where its .checked value gets read further down.
+        const kasmGroup = document.getElementById('kasmNeededGroup');
+        const kasmField = document.getElementById('kasmNeeded');
+        kasmGroup.style.display = isMentor ? 'none' : '';
+        if (isMentor) kasmField.checked = false;
+
+        document.getElementById('oauth-copy-student').style.display = isMentor ? 'none' : '';
+        document.getElementById('oauth-copy-mentor').style.display = isMentor ? '' : 'none';
+        document.getElementById('skip-mentor-oauth').style.display = isMentor ? 'inline-block' : 'none';
+    }
+
+    document.getElementById('signupRole').addEventListener('change', updateSignupModeUI);
 
     // Password validation with debouncing (1.5 second delay)
     function validatePasswordsDebounced() {
@@ -173,6 +269,12 @@ show_reading_time: false
     function validateSignupForm() {
         const password = document.getElementById('signupPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (!validateGithubId()) {
+            document.getElementById('signupUid').reportValidity();
+            document.getElementById('signupUid').focus();
+            return false;
+        }
 
         if (password !== confirmPassword) {
             alert('Passwords do not match. Please try again.');
@@ -260,18 +362,20 @@ show_reading_time: false
         }
 
         // Store form data
+        const role = document.getElementById("signupRole").value;
         signupFormData = {
+            role: role,
             name: document.getElementById("name").value,
             uid: document.getElementById("signupUid").value,
-            sid: document.getElementById("signupSid").value,
-            school: document.getElementById("signupSchool").value,
+            sid: role === 'mentor' ? '' : document.getElementById("signupSid").value,
+            school: role === 'mentor' ? '' : document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
-            kasmServerNeeded: false,
-            kasm_server_needed: false,
+            kasm_server_needed: document.getElementById("kasmNeeded").checked,
         };
 
-        // Show OAuth verification
+        // Show OAuth verification (mandatory for students, optional -- via the Skip
+        // button -- for mentors; see updateSignupModeUI)
         showOAuthVerification();
     }
 
@@ -284,6 +388,17 @@ show_reading_time: false
         document.getElementById('oauth-verification').style.display = 'none';
         document.getElementById('signupForm').style.display = 'block';
         clearOAuthStatus();
+    }
+
+    // Mentor-only: skips the optional business-email verification step and signs up
+    // immediately with no idToken. Spring's /api/person/create only accepts a
+    // no-idToken signup when accountType is exactly "mentor" (see signup() below) --
+    // the account lands in ROLE_PENDING either way, this just skips the extra step.
+    window.skipMentorOAuth = function() {
+        signupIdToken = null;
+        document.getElementById('oauth-verification').style.display = 'none';
+        document.getElementById('signupForm').style.display = 'block';
+        signup();
     }
 
     function clearOAuthStatus() {
@@ -299,12 +414,10 @@ show_reading_time: false
         try {
             const userInfo = parseJwt(response.credential);
             const email = userInfo.email;
-            if (!email.endsWith('@stu.powayusd.com') && !email.endsWith('@powayusd.com')) {
-                showOAuthStatus('❌ You must use your school email address ending with @stu.powayusd.com or @powayusd.com', true);
-                return;
-            }
             verifiedSchoolEmail = email;
-            showOAuthStatus(`✅ School email verified: ${email}`);
+            signupIdToken = response.credential;
+            signupFormData.email = email;
+            showOAuthStatus(`✅ Google account selected: ${email}`);
 
             setTimeout(() => {
                 document.getElementById('oauth-verification').style.display = 'none';
@@ -334,6 +447,8 @@ show_reading_time: false
 
     // Initialize password validation when page loads
     window.addEventListener('load', function() {
+        updateSignupModeUI();
+
         const passwordField = document.getElementById('signupPassword');
         const confirmPasswordField = document.getElementById('confirmPassword');
 
@@ -351,8 +466,25 @@ show_reading_time: false
         }
     });
 
+    // Local-only preview: typing "mentor" as the GitHub ID skips both real backends
+    // entirely and drops you straight on /capstone/ flagged as an approved mentor, so
+    // the mentor hover actions (see navigation/capstone.md) can be checked without a
+    // real Spring account working through OAuth signup + admin approval. Gated to
+    // localhost so it can never fire against the deployed site. Remove once the mentor
+    // feature no longer needs this shortcut to preview.
+    function isDevMentorPreview(uid) {
+        const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        return isLocalhost && uid.trim().toLowerCase() === 'mentor';
+    }
+
     // Function to handle both Python and Java login simultaneously
     window.loginBoth = function () {
+        if (isDevMentorPreview(document.getElementById('uid').value)) {
+            localStorage.setItem('ocsDevMentorPreview', 'true');
+            window.location.href = '{{site.baseurl}}/capstone/';
+            return;
+        }
+
         // Wrap both logins in Promises and only redirect after both finish
         let javaPromise = new Promise((resolve) => {
             window.javaLogin(resolve);
@@ -389,6 +521,7 @@ show_reading_time: false
     window.javaLogin = function (done) {
         const loginURL = `${javaURI}/authenticate`;
         const databaseURL = `${javaURI}/api/person/get`;
+        const signupURL = `${javaURI}/api/person/create`;
         const userCredentials = JSON.stringify({
             uid: document.getElementById("uid").value,
             password: document.getElementById("password").value,
@@ -424,9 +557,60 @@ show_reading_time: false
             })
             .catch(error => {
                 console.error("Login failed:", error.message);
-                // Spring login is optional for this dual-backend flow.
-                console.warn("Spring login unavailable; continuing with Flask auth flow.");
-                if (done) done();
+                // If login fails, attempt account creation
+                if (error.message === "Invalid login") {
+                    const signupData = JSON.stringify({
+                        uid: document.getElementById("uid").value,
+                        sid: "0000000",
+                        email: document.getElementById("uid").value + "@gmail.com",
+                        dob: "11-01-2024", // Static date, can be modified
+                        name: document.getElementById("uid").value,
+                        password: document.getElementById("password").value,
+                        kasmServerNeeded: false,
+                    });
+                    const signupOptions = {
+                        ...fetchOptions,
+                        method: "POST",
+                        body: signupData,
+                    };
+                    fetch(signupURL, signupOptions)
+                        .then(signupResponse => {
+                            if (!signupResponse.ok) {
+                                throw new Error("Account creation failed!");
+                            }
+                            return signupResponse.json();
+                        })
+                        .then(signupResult => {
+                            console.log("Account creation successful!", signupResult);
+                            // Retry login after account creation
+                            return fetch(loginURL, loginOptions);
+                        })
+                        .then(newLoginResponse => {
+                            if (!newLoginResponse.ok) {
+                                throw new Error("Login failed after account creation");
+                            }
+                            console.log("Login successful after account creation!");
+                            // Fetch database after successful login
+                            return fetch(databaseURL, fetchOptions);
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`Spring server response: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log("Java database response:", data);
+                            if (done) done();
+                        })
+                        .catch(newLoginError => {
+                            console.error("Error after account creation:", newLoginError.message);
+                            if (done) done();
+                        });
+                } else {
+                    console.log("Logged in!");
+                    if (done) done();
+                }
             });
     };
     // Function to fetch and display Python data
@@ -438,7 +622,7 @@ show_reading_time: false
             window.location.href = '{{site.baseurl}}/profile';
         }, 1000);
     }  
-    window.signup = async function () {
+    window.signup = function () {
         const signupButton = document.querySelector(".signup-card button");
         // Disable the button and change its color
         signupButton.disabled = true;
@@ -449,14 +633,28 @@ show_reading_time: false
         document.getElementById('overallStatus').classList.add('hidden');
 
         const data = signupFormData && Object.keys(signupFormData).length > 0 ? signupFormData : {
+            role: document.getElementById("signupRole").value,
             name: document.getElementById("name").value,
             uid: document.getElementById("signupUid").value,
             sid: document.getElementById("signupSid").value,
             school: document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
-            kasmServerNeeded: false,
-            kasm_server_needed: false,
+            kasm_server_needed: document.getElementById("kasmNeeded").checked,
+        };
+
+        const signupDataJava = {
+            uid: data.uid,
+            sid: data.sid,
+            email: data.email,
+            dob: "11-01-2024",
+            name: data.name,
+            password: data.password,
+            kasmServerNeeded: data.kasm_server_needed,
+            idToken: signupIdToken,
+            // "mentor" opts into Spring's no-idToken mentor signup path; anything else
+            // (including this being absent) keeps the existing mandatory-OAuth behavior.
+            accountType: data.role,
         };
 
         if (verifiedSchoolEmail) {
@@ -466,63 +664,68 @@ show_reading_time: false
         console.log("Sending this data to Flask:", JSON.stringify(data, null, 2));
         console.log("Request URL:", `${pythonURI}/api/user`);
 
-        const flaskRequest = {
-            ...fetchOptions,
+        // Flask Backend Request
+        const flaskPromise = fetch(`${pythonURI}/api/user`, {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify(data)
-        };
-
-        const springRequest = {
-            ...fetchOptions,
-            method: "POST",
-            body: JSON.stringify(data)
-        };
-
-        try {
-            // Flask is the blocking source of truth for auth/signup.
-            const flaskResponse = await fetch(`${pythonURI}/api/user`, flaskRequest);
-            const flaskRaw = await flaskResponse.text();
-
-            let flaskData;
-            try {
-                flaskData = flaskRaw ? JSON.parse(flaskRaw) : {};
-            } catch (_) {
-                flaskData = { message: flaskRaw };
-            }
-
-            if (!flaskResponse.ok || flaskData.success === false) {
-                const flaskMessage = flaskData.message || flaskRaw || `Flask signup failed (${flaskResponse.status})`;
-                throw new Error(flaskMessage);
-            }
-
-            updateBackendStatus('flask', 'success');
-
-            // Spring is best-effort; do not block signup success on this path.
-            fetch(`${javaURI}/api/person/create`, springRequest)
-                .then(async (springResponse) => {
-                    const springRaw = await springResponse.text();
-                    if (springResponse.ok) {
-                        updateBackendStatus('spring', 'success');
-                    } else {
-                        console.warn("Spring signup failed:", springResponse.status, springRaw);
-                        updateBackendStatus('spring', 'error');
-                    }
-                    setTimeout(updateOverallStatus, 500);
-                })
-                .catch((springError) => {
-                    console.warn("Spring signup error:", springError.message);
-                    updateBackendStatus('spring', 'error');
-                    setTimeout(updateOverallStatus, 500);
+        })
+        .then(response => {
+            if (response.ok) {
+                updateBackendStatus('flask', 'success');
+                return response.json();
+            } else {
+                return response.text().then(errorText => {
+                    console.log("Flask error details:", errorText);
+                    throw new Error(`Flask: ${response.status} - ${errorText}`);
                 });
-        } catch (error) {
+            }
+        })
+        .catch(error => {
             console.error("Flask signup error:", error);
             updateBackendStatus('flask', 'error');
+            throw error;
+        });
+
+        // Spring Backend Request
+        const springPromise = fetch(`${javaURI}/api/person/create`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(signupDataJava)
+        })
+        .then(response => {
+            if (response.ok) {
+                updateBackendStatus('spring', 'success');
+                return response.json();
+            } else {
+                throw new Error(`Spring: ${response.status}`);
+            }
+        })
+        .catch(error => {
+            console.error("Spring signup error:", error);
             updateBackendStatus('spring', 'error');
-            setTimeout(updateOverallStatus, 500);
-        } finally {
-            signupButton.disabled = false;
-            signupButton.classList.remove("disabled");
-        }
+            throw error;
+        });
+
+        // Handle both requests
+        Promise.allSettled([flaskPromise, springPromise])
+            .then(results => {
+                const [flaskResult, springResult] = results;
+
+                console.log("Flask result:", flaskResult);
+                console.log("Spring result:", springResult);
+
+                // Update overall status after both complete
+                setTimeout(updateOverallStatus, 500);
+
+                // Re-enable button
+                signupButton.disabled = false;
+                signupButton.classList.remove("disabled");
+            });
     }
     function javaDatabase() {
         const URL = `${javaURI}/api/person/get`;

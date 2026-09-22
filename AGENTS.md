@@ -149,8 +149,8 @@ while preserving all critical instructions. The agent must still communicate wit
 ## 导师（Mentor）功能与 Capstone 页
 
 * **角色来源：** `ROLE_MENTOR` 定义在 Spring 端（外部仓库 `Open-Coding-Society/spring`），不在本仓库；Flask 侧的角色是单一字符串列（无 `ROLE_MENTOR`）。前端一律通过 `GET {javaURI}/api/person/get` 检查 `roles.some(r => r.name === 'ROLE_MENTOR')`（同 `_includes/nav/homejava.html` 的 `getCredentialsJava()` 模式），不要在 Flask 侧另建一套角色判断。
-* **Capstone 卡片无稳定 ID：** `navigation/capstone.md` 里 ~90 张卡片没有统一的 `id` 字段。涉及"按项目持久化数据"的功能（如导师的 Interested/Skip 状态、按项目分组的评论）一律通过标题 slugify 派生 id（见 `assets/js/mentor-capstone.js` 的 `slugify()`），除非未来给卡片手工加上 `data-project-id`。
-* **该 Capstone 页尚无真实后端持久化：** `assets/js/new-capstone.js` 与 `navigation/capstone.md` 内联的"新建/编辑 capstone"仅写入 `sessionStorage`，并非真实后端。新增任何"保存到账号"的功能前，先确认 Spring 端点是否存在；若不存在，参照 `assets/js/mentor-capstone.js` 的模式——本地 `localStorage` 缓存 + 尝试远程同步 + 失败时 `console.error`/`console.warn` 记录上下文（不要静默吞掉），并在 `mentor-capstone-api.md` 这类文档里写清所需的端点契约。
+* **导师的 Apply/Skip/Interested 操作内联在 `navigation/capstone.md` 中：** 每张项目卡片的 hover 操作（受实时 `ROLE_MENTOR` 检查门控）是该文件顶部的一段内联 `<script type="module">`，并非独立的 `assets/js/*.js` 文件。项目身份用其归一化页面 URL（`cardUrl()`）标识，与 `capstone/projects.json`（由 `scripts/sync_capstones.py` 同步到 Spring 后端的机器可读项目列表）匹配，解析出 `POST {javaURI}/api/capstones/{id}/apply` 所需的数字 id。Interested/Skip 没有后端接口——仅通过浏览器 `localStorage`（`ocsMentorInterested` / `ocsMentorSkipped`）记录。
+* **Capstone 页的"新建/编辑 capstone"流程尚无真实后端持久化：** `assets/js/new-capstone.js` 与 `navigation/capstone.md` 内联的"新建/编辑 capstone"仅写入 `sessionStorage`，并非真实后端。新增任何"保存到账号"的功能前，先确认 Spring 端点是否存在；若不存在，参照上面导师操作的模式——本地 `localStorage` 缓存 + 尝试远程同步 + 失败时 `console.error`/`console.warn` 记录上下文（不要静默吞掉），并写清所需的端点契约。
 * **评论/微博客复用：** 需要"按某个实体加评论"的功能，优先复用现有 `assets/js/api/microblog.js`（Flask `/api/microblog`），通过自定义 `topicPath`（如 `capstone:<slug>`）隔离范围，而不是新建评论后端；若要复用完整侧边面板 UI，注意 `_includes/microblog_foundation.html` 被多个页面共享，谨慎直接改动，优先新建轻量组件调用同一套 API。
 
 ## 反模式
