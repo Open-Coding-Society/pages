@@ -15,7 +15,6 @@ permalink: /navigation/py-reference/
 <div class="ocs__container" id="language-reference">
     <div class="ocs__badge">Lessons · Python</div>
     <h1>Python Reference</h1>
-
     <div class="language-reference__toolbar">
         <div class="language-reference__search search" aria-label="Search Python lessons">
             <div class="search-input-wrap">
@@ -30,20 +29,19 @@ permalink: /navigation/py-reference/
             <a class="ocs__btn pill" href="{{ '/navigation/sass/' | relative_url }}">SASS</a>
         </nav>
     </div>
-
-        {% if site.categories.Python %}
-            {% assign lessons = site.categories.Python | where_exp: "lesson", "lesson.hide != true" | sort: "title" %}
-        {% else %}
-            {% assign lessons = "" | split: "" %}
-        {% endif %}
-    <div class="ocs__grid ocs__grid--card cols-3">
+    {% if site.categories.Python %}
+        {% assign lessons = site.categories.Python | where_exp: "lesson", "lesson.hide != true" | sort: "title" %}
+    {% else %}
+        {% assign lessons = "" | split: "" %}
+    {% endif %}
+    <div class="ocs__grid ocs__grid--card cols-2 language-reference__cards">
         {% for lesson in lessons %}
-        <article class="ocs__grid-cell">
-            <span class="ocs__status-pill ocs__status-pill--neutral">{{ lesson.lesson_part | default: "reference" }}</span>
-            <h2>{{ lesson.title }}</h2>
-            {% if lesson.description %}<p>{{ lesson.description }}</p>{% endif %}
-            {% if lesson.lesson_topic %}<p><strong>Topic:</strong> {{ lesson.lesson_topic }}</p>{% endif %}
-            <a class="ocs__btn accent fill" href="{{ lesson.url | relative_url }}">Open lesson</a>
+        <article class="ocs__grid-cell">            
+            <a class="ocs__card" href="{{ lesson.url | relative_url }}">
+                <span class="ocs__status-pill ocs__status-pill--neutral">{{ lesson.lesson_part | default: "reference" }}</span>
+                <h2>{{ lesson.title }}</h2>
+                {% if lesson.description %}<p>{{ lesson.description }}</p>{% endif %}
+            </a>
         </article>
         {% endfor %}
     </div>

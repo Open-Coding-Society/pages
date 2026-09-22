@@ -36,7 +36,7 @@ permalink: /navigation/sass/
     {% else %}
       {% assign lessons = "" | split: "" %}
     {% endif %}
-    <div class="ocs__grid ocs__grid--card cols-3">
+    <div class="ocs__grid ocs__grid--card cols-3 language-reference__cards">
         {% for lesson in lessons %}
         <article class="ocs__grid-cell">
             <span class="ocs__status-pill ocs__status-pill--neutral">{{ lesson.lesson_part | default: "reference" }}</span>

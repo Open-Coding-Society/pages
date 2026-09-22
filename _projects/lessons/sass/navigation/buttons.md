@@ -11,296 +11,178 @@ microblog: true
 permalink: /sass/buttons-grammar
 author: Rashi, Aashni, and Kelervia
 ---
+# 🎓 School Portal UI: SASS Buttons & Grammar
 
-# OCS SASS Buttons & Button Grammar
-
-### The Core Rule
-Buttons must use semantic HTML (`<button>` or `<a>`) paired with **OCS SASS button classes** (`ocs__btn`). Never use custom hardcoded CSS or inline `style=""` attributes to style buttons—let your global SASS variables, mixins, and theme classes handle all colors, hover states, and borders.
+Welcome to the Open Coding Society (OCS) guide on building interactive interface components! In this lesson, we will build an interactive **School Student Portal** button bar. You will learn the core grammar of semantic button design and how to use OCS SASS classes to build clean, responsive user interfaces without writing inline styles or custom CSS.
 
 ---
 
-## 1. SASS Button Grammar Reference
+## 1. Quick Reference Table
 
-Use standard OCS class modifiers to express button roles and visual states cleanly:
+Use this reference table to choose the correct semantic tag and OCS SASS utility class for each button type on your school page:
 
-| SASS Class / Modifier | Visual Role / Purpose | Example Usage |
-| :--- | :--- | :--- |
-| `ocs__btn` | **Base Button Role:** Standard button reset, layout, and font rules | `<button class="ocs__btn">Click</button>` |
-| `ocs__btn fill` | **Filled Solid Variant:** High-emphasis primary action | `<button class="ocs__btn fill">Submit</button>` |
-| `ocs__btn outline` | **Outlined Variant:** Secondary or low-emphasis action | `<button class="ocs__btn outline">Cancel</button>` |
-| `ocs__btn small` | **Size Modifier:** Compact button for tight layouts | `<button class="ocs__btn small">Edit</button>` |
-| `alert-green` | **Status Modifier (Success):** Confirmation or success actions | `<a class="ocs__btn alert-green fill">Save</a>` |
-| `alert-yellow` | **Status Modifier (Warning):** Caution or pending state | `<button class="ocs__btn alert-yellow">Caution</button>` |
-| `alert-red` | **Status Modifier (Danger):** Destructive actions (delete, remove) | `<button class="ocs__btn alert-red fill">Delete</button>` |
-
----
-
-## 2. LxD Cycle Process
-
-* **Empathize:** Many CSP students try to style buttons using custom classes or inline CSS (e.g., `<button style="background: blue; color: white;">Submit</button>`), or they use fake `<div>` buttons. This breaks accessibility, ruins site consistency, and duplicates SASS code that already exists globally.
-* **Define:**
-  * **POV:** CSP students need a clear system for creating interactive buttons using semantic tags and OCS SASS utility classes so their project code remains clean, accessible, and theme-compliant.
-  * **Learning Goal:** Students will learn how SASS variables, mixins, and state modifiers (`&:hover`, `&:active`) power global button design, and how to apply predefined OCS classes without writing custom CSS.
-* **Ideate:**
-  * **HMW Question:** How might we teach students to use semantic button elements and OCS SASS button modifier classes instead of writing custom CSS rules?
-  * **Activity:** Refactoring "fake" or hardcoded inline-styled buttons into clean semantic HTML with OCS SASS button modifiers.
-* **Prototype & Test:** We tested a trial run with our team and revised the practice into a quick **Popcorn Hack** (2-minute class refactor) and one targeted **Homework Refactor**.
+| UI Role | Semantic Tag | OCS SASS Utility Classes | Purpose / Example |
+| :--- | :--- | :--- | :--- |
+| **Primary Action** | `<button>` | `ocs__btn fill` | Main action on a page (e.g., "Submit Assignment") |
+| **Secondary Action** | `<button>` | `ocs__btn outline` | Alternative option (e.g., "Save Draft") |
+| **Page Link** | `<a>` | `ocs__btn outline` | Navigating to another page (e.g., "View Grades ↗") |
+| **Success / Green** | `<button>` / `<a>` | `ocs__btn alert-green fill` | Affirmative or success actions (e.g., "Turn In Homework") |
+| **Caution / Yellow** | `<button>` / `<a>` | `ocs__btn alert-yellow outline` | Pending or warning states (e.g., "Request Extension") |
+| **Danger / Red** | `<button>` / `<a>` | `ocs__btn alert-red fill` | Destructive actions (e.g., "Drop Class") |
+| **Small Variant** | `<button>` / `<a>` | `ocs__btn small` | Compact buttons inside tables or card headers |
 
 ---
 
-## 3. Lesson Plan
+## 2. Tech Talk: The Rules of SASS Button Grammar
 
-### Learning Objective
-By the end of this lesson, you will be able to construct functional, accessible buttons using semantic HTML tags (`<button>`, `<a>`) and OCS SASS button classes (`ocs__btn`, `fill`, `outline`, `small`, `alert-*`) without writing manual CSS styling.
+Building clean interfaces requires following two main rules: **Semantic HTML Tags** and **OCS Utility Classes**.
 
-### Success Criteria
-You can refactor broken, non-semantic, inline-styled button markup into clean, accessible OCS SASS buttons that automatically inherit hover states, active transitions, and theme consistency.
+### Rule 1: Use Semantic Tags (`<button>` vs `<a>`)
+* **`<button>` (In-Page Actions):** Use `<button>` when clicking triggers a JavaScript action, submits form data, opens a modal, or changes page state without loading a new URL.
+* **`<a>` (Navigation Links):** Use `<a>` (with an `href="/..."` attribute) when clicking moves the student to a new page, website, or document.
+* **Never use non-semantic elements:** Tags like `<div>`, `<span>`, or `<p>` carry zero accessibility support and should never be styled into fake buttons.
 
-### Tech Talk (3 minutes)
-Under the hood, our global SASS system compiles reusable button styles using **Variables** (e.g., `$btn-radius`, `$primary-color`) and **Mixins** with state operators (`&:hover`, `&:active`). 
-
-As a frontend developer, your job is not to re-invent the button stylesheet. Your job is to select the right **semantic element** and append the correct **OCS button grammar class**.
-
-* **The Rule:** Use `<button>` for in-page actions (forms, submissions, toggles) and `<a>` for navigational links. Apply `ocs__btn` plus visual modifiers.
-* **✅ Do this:** `<button class="ocs__btn alert-green fill small">Save Changes</button>`
-* **❌ Don't do this:** `<div onclick="save()" style="background: green; padding: 10px;">Save Changes</div>`
+### Rule 2: OCS Utility Classes Over Custom CSS
+* **Base Class:** Every button must start with the base class `ocs__btn`. This applies padding, border-radius, font styling, and smooth hover transitions.
+* **Style Modifiers:** Add `fill` for solid backgrounds or `outline` for bordered buttons.
+* **State Modifiers:** Add `alert-green`, `alert-yellow`, or `alert-red` for contextual colors.
+* **Size Modifiers:** Add `small` for compact layouts.
+* **No Inline Styles:** Attributes like `style="background: blue; ..."` are strictly forbidden. Global SASS stylesheets handle all visual theme variables.
 
 ---
 
-### Code Examples
+## 3. Code Examples & Live Previews
 
-#### A. Basic Buttons (Semantic Tags + Base Role)
+### Example A: Portal Navigation & Primary Submission
+
+Use `<button>` for submitted actions and `<a>` for external or internal navigation links.
+
 ```html
-<!-- Action button for form submissions or Javascript triggers -->
-<button class="ocs__btn">Standard Action</button>
-
-<!-- Navigation link styled as a button -->
-<a href="/capstone/goodbrain/" class="ocs__btn">View Project ↗</a>
-
-
-<!-- markdownlint-disable MD033 MD046 -->
-
-Hi! My name is [Your Full Name]
-
-## Learning Buttons
-
-> SASS Mixins examples and code, explore these topics by clicking standard OCS SASS buttons.
-
-<div class="ocs__links">
-    <a class="ocs__btn" href="{{site.baseurl}}/github/pages/about_sass_buttons/">
-        Buttons Lesson
-    </a>
-    <a class="ocs__btn" href="https://github.com/Open-Coding-Society/pages/blob/main/_sass/open-coding/mixins/_buttons.scss">
-        Button Mixins
-    </a>
-    <a class="ocs__btn" href="https://github.com/Open-Coding-Society/pages/blob/main/_sass/open-coding/mixins/_container.scss">
-        Container Mixins
-    </a>
+%%html
+<!-- UI_RUNNER: SASS Buttons Example A -->
+<div class="flex gap-2">
+  <button class="ocs__btn fill">Submit Homework</button>
+  <a href="/portal/grades" class="ocs__btn outline">View Gradebook ↗</a>
 </div>
+```
 
-## Development Environment
+### Example B: Homework State Indicators
+Combine state modifiers (alert-*) with fill and outline classes to signal status.
 
-> Coding starts with tools, explore these tools clicking SASS buttons with SVG.
 
-<div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn ocs__btn--icon alert-green" href="https://opencodingsociety.com">
-        <span class="ocs__btn-icon" aria-hidden="true">
-            <img src="{{ '/favicon.ico' | relative_url }}" alt="">
-        </span>
-        <span>OCS</span>
-    </a>
-    <a class="ocs__btn ocs__btn--icon alert-yellow" href="https://github.com/Open-Coding-Society/portfolio">
-        <span class="ocs__btn-icon" aria-hidden="true">
-            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-            </svg>
-        </span>
-        <span>GitHub</span>
-    </a>
-    <a class="ocs__btn ocs__btn--icon alert-red" href="https://vscode.dev/">
-        <span class="ocs__btn-icon" aria-hidden="true">
-            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11.34 0L5.66 5.39l-2.4-1.8L1.19 4.82v6.36l2.07 1.23 2.4-1.8L11.34 16 15 14.23V1.77L11.34 0zm.59 11.57l-3.86-3.54 3.86-3.54v7.08z"/>
-            </svg>
-        </span>
-        <span>VSCode.dev</span>
-    </a>
+```html
+%%html
+<!-- UI_RUNNER: SASS Buttons Example B -->
+<div class="flex gap-2">
+  <button class="ocs__btn alert-green fill">Turn In Essay</button>
+  <button class="ocs__btn alert-yellow outline">Extension Requested</button>
+  <button class="ocs__btn alert-red fill">Unenroll Course</button>
 </div>
+```
 
-<br>
+Example C: Student Dashboard Compact Action Bar
+In crowded interfaces like grade tables or student card views, use the small utility modifier.
 
-## Code Runner Lessons
-
-> Foundations in Tech are essential, click my iridescent buttons to see some of my lesson creations.
-
-<div class="ocs__links">
-    <a class="ocs__btn iridescent" href="{{site.baseurl}}/code/javascript">
-        JS Basics
-    </a>
-    <a class="ocs__btn alert-green iridescent" href="{{site.baseurl}}/game/essentials/variables">
-        JS Variables
-    </a>
-    <a class="ocs__btn alert-yellow iridescent" href="{{site.baseurl}}/gamerunner">
-        Gamerunner
-    </a>
-    <a class="ocs__btn alert-red iridescent" href="{{site.baseurl}}/network/stack">
-        Networking
-    </a>
+```html
+%%html
+<!-- UI_RUNNER: SASS Buttons Example C -->
+<div class="flex gap-2 align-center">
+  <button class="ocs__btn alert-green fill small">Approve Pass</button>
+  <button class="ocs__btn alert-yellow outline small">Flag Attendance</button>
+  <a href="/portal/messages" class="ocs__btn alert-red outline small">Contact Parent ↗</a>
 </div>
+```
 
-<br>
+### 4. Hacks & Practice Tasks
+Prepare Your Submission IPYNB
+Complete this quick setup in your local environment:
 
-### Class Progress
+Create a new notebook in your portfolio area: _notebooks/homework.
 
-> Here is my game progress through coding, click multicolor and size buttons to see these in the browser
+Add one markdown cell at the top with the frontmatter below.
 
-<div class="ocs__links">
-    <a href="{{site.baseurl}}/snake" class="ocs__btn pill alert-green fill">
-        Snake
-    </a>
-    <a href="{{site.baseurl}}/gamify/parallax" class="ocs__btn small alert-yellow fill">
-        Fish
-    </a>
-    <a href="{{site.baseurl}}/gamify" class="ocs__btn alert-red fill">
-        Gamify
-    </a>
-    <a href="{{site.baseurl}}/cs-pathway" class="ocs__btn large">
-        CS Pathway
-    </a>
+Add code cells for Popcorn and Homework hacks. Keep the %%html and UI_RUNNER comment intact in each cell.
+
+Execute each cell to verify the rendered output before submitting.
+
+#### Submission Safety Rules (Read First)
+[!IMPORTANT]
+To avoid grading errors, follow these rules exactly:
+
+Submit only your final refactored HTML for each hack.
+
+Do not add custom CSS, inline styles, or extra non-OCS classes.
+
+Keep the %%html cell magic tag and the UI_RUNNER comment line intact in each submission cell.
+
+Use only allowed semantic tags and OCS classes for this lesson: <button>, <a>, ocs__btn, fill, outline, small, alert-green, alert-yellow, alert-red.
+
+Your submission cell must start with this exact header line format:
+
+
+### Popcorn Hack (In-Class)
+Purpose: Practice replacing non-semantic, inline-styled elements with proper semantic <button> tags and OCS SASS utility classes to instantly inherit hover states and theme styling.
+
+[!TIP] 2-Minute Challenge: Look at the bad code below. Refactor the two fake school portal button elements into real <button> tags using OCS SASS button classes (ocs__btn, fill, alert-green, alert-red). Remove all inline style="..." attributes!
+
+```html
+%%html
+<!-- UI_RUNNER: SASS Buttons Popcorn Base --> 
+<div class="flex gap-2">
+  <!-- 1. Refactor to a green success action button -->
+  <div class="fake-btn" style="background: green; color: white;">
+    Save Homework Draft
+  </div>
+
+  <!-- 2. Refactor to a red danger action button -->
+  <span class="fake-btn" style="border: 1px solid red; color: red;">
+    Drop Class Section
+  </span>
 </div>
+```
 
-<br>
+### Homework Hack
 
-### Drag and Drop Buttons
+**Purpose:** Practice refactoring a realistic school portal action bar by converting hardcoded, non-semantic tags into clean, standardized OCS SASS buttons.
 
-> Use `ocs__drag-btn` for draggable choices and `ocs__drop-btn` for their destinations. Drag a part onto a slot, or select both buttons with a mouse or keyboard. The complete class contract is documented in `_sass/open-coding/elements/buttons/button-grammar.md`.
+> **[!IMPORTANT] Submission Safety Rules:**
+> * Keep `%%html` and the `<!-- UI_RUNNER: ... -->` line intact at the top of your notebook cell.
+> * Remove **all** inline `style="..."` attributes and custom non-OCS classes.
+> * Use **only** semantic tags (`<button>`, `<a>`) paired with OCS SASS classes (`ocs__btn`, `fill`, `outline`, `small`, `alert-green`, `alert-yellow`, `alert-red`).
 
-<section class="ocs__dnd" id="dnd-demo">
-    <div class="ocs__dnd-header">
-        <h4 class="ocs__dnd-panel-title">Mini Assembly Bench</h4>
-        <button type="button" class="ocs__dnd-reset" data-dnd-reset>Reset</button>
-    </div>
-    <p class="ocs__dnd-status" role="status" aria-live="polite">Drag a part to its slot.</p>
-    <div class="ocs__dnd-layout">
-        <div class="ocs__dnd-panel">
-            <h4 class="ocs__dnd-panel-title">Parts tray</h4>
-            <button type="button" class="ocs__drag-btn" draggable="true" data-part="CPU" aria-pressed="false">CPU</button>
-            <button type="button" class="ocs__drag-btn" draggable="true" data-part="RAM" aria-pressed="false">RAM</button>
-            <button type="button" class="ocs__drag-btn" draggable="true" data-part="GPU" aria-pressed="false">Graphics card</button>
-        </div>
-        <div class="ocs__dnd-panel">
-            <h4 class="ocs__dnd-panel-title">Connection points</h4>
-            <button type="button" class="ocs__drop-btn" data-slot="CPU" data-label="CPU socket">CPU socket</button>
-            <button type="button" class="ocs__drop-btn" data-slot="RAM" data-label="RAM slots">RAM slots</button>
-            <button type="button" class="ocs__drop-btn" data-slot="GPU" data-label="PCIe slot">PCIe slot</button>
-        </div>
-    </div>
-</section>
+> **Quick Cheat Sheet for Beginners:**
+> 1. **Choose the Tag:** Use `<button>` for in-page actions (Submit, Request Hold, Delete) and `<a>` for navigation links (`href="..."`).
+> 2. **Delete Hand-Coded CSS:** Wipe out all `style="..."` attributes completely.
+> 3. **Apply SASS Grammar Classes:**
+>    * Base class (Required): `ocs__btn`
+>    * Primary action (Blue solid): `fill`
+>    * Small green navigation link: `alert-green outline small`
+>    * Caution/Warning button: `alert-yellow outline`
+>    * Destructive action (Red solid): `alert-red fill small`
 
-<script>
-(function() {
-  const board = document.getElementById('dnd-demo');
-  const status = board.querySelector('.ocs__dnd-status');
-  const parts = Array.from(board.querySelectorAll('.ocs__drag-btn'));
-  const slots = Array.from(board.querySelectorAll('.ocs__drop-btn'));
-  let selected = null;
+**Starter Code to Copy:**
 
-  function select(part) {
-    selected = part;
-    parts.forEach(function(other) {
-      const isSelected = other === part;
-      other.classList.toggle('is-selected', isSelected);
-      other.setAttribute('aria-pressed', String(isSelected));
-    });
-    status.textContent = part.textContent + ' selected. Choose its slot.';
-  }
+```html
+%%html
+<!-- UI_RUNNER: SASS Buttons Homework Base --> 
+<div class="flex gap-2">
+  <!-- 1. Primary Action: Convert to a primary filled SASS button -->
+  <span class="my-custom-btn" style="background: blue; color: white;">
+    Submit Assignment
+  </span>
 
-  function place(part, slot) {
-    if (part === null || part === undefined || part.disabled || slot.disabled) {
-      status.textContent = 'Choose an available part first.';
-      return;
-    }
-    if (part.dataset.part !== slot.dataset.slot) {
-      status.textContent = 'Incorrect. ' + part.textContent + ' does not belong in ' + slot.textContent + '.';
-      return;
-    }
-    part.disabled = true;
-    part.draggable = false;
-    part.classList.remove('is-selected');
-    part.setAttribute('aria-pressed', 'false');
-    slot.disabled = true;
-    slot.classList.add('is-filled');
-    slot.textContent = '✓ ' + part.textContent + ' → ' + slot.dataset.label;
-    selected = null;
-    status.textContent = 'Installed ' + part.textContent + '.';
-  }
+  <!-- 2. Green Navigation: Convert to a small green navigation link -->
+  <div class="fake-link" style="color: green;" onclick="location.href='/portal/schedule'">
+    View Bell Schedule ↗
+  </div>
 
-  parts.forEach(function(part) {
-    part.addEventListener('click', function() { select(part); });
-    part.addEventListener('dragstart', function(event) {
-      select(part);
-      event.dataTransfer.setData('text/plain', part.dataset.part);
-      event.dataTransfer.effectAllowed = 'move';
-    });
-  });
+  <!-- 3. Caution Action: Convert to an outlined yellow warning button -->
+  <span class="warn-pill" style="border: 1px solid orange; color: orange;">
+    Request Extension
+  </span>
 
-  slots.forEach(function(slot) {
-    slot.addEventListener('click', function() { place(selected, slot); });
-    slot.addEventListener('dragover', function(event) {
-      event.preventDefault();
-      event.dataTransfer.dropEffect = 'move';
-      slot.classList.add('is-over');
-    });
-    slot.addEventListener('dragleave', function() { slot.classList.remove('is-over'); });
-    slot.addEventListener('drop', function(event) {
-      event.preventDefault();
-      slot.classList.remove('is-over');
-      const partId = event.dataTransfer.getData('text/plain');
-      const draggedPart = parts.find(function(part) {
-        return part.dataset.part === partId;
-      });
-      place(draggedPart, slot);
-    });
-  });
-
-  board.querySelector('[data-dnd-reset]').addEventListener('click', function() {
-    selected = null;
-    parts.forEach(function(part) {
-      part.disabled = false;
-      part.draggable = true;
-      part.classList.remove('is-selected');
-      part.setAttribute('aria-pressed', 'false');
-    });
-    slots.forEach(function(slot) {
-      slot.disabled = false;
-      slot.textContent = slot.dataset.label;
-      slot.classList.remove('is-filled', 'is-over');
-    });
-    status.textContent = 'Drag a part to its slot.';
-  });
-})();
-</script>
-
-#### Size Classes
-
-> The same classes at three scales. Put `ocs__dnd--small`, `--medium`, or `--large` on the board to resize everything inside it, or the same suffix on a single `ocs__drag-btn` / `ocs__drop-btn`.
-
-<div class="ocs__dnd-layout">
-    <div class="ocs__dnd ocs__dnd--small">
-        <p class="ocs__dnd-progress">ocs__dnd--small</p>
-        <button type="button" class="ocs__drag-btn" draggable="true">CPU</button>
-        <button type="button" class="ocs__drop-btn is-filled" disabled>✓ CPU socket</button>
-    </div>
-    <div class="ocs__dnd ocs__dnd--medium">
-        <p class="ocs__dnd-progress">ocs__dnd--medium</p>
-        <button type="button" class="ocs__drag-btn is-selected" draggable="true">CPU</button>
-        <button type="button" class="ocs__drop-btn is-over">CPU socket</button>
-    </div>
-    <div class="ocs__dnd ocs__dnd--large">
-        <p class="ocs__dnd-progress">ocs__dnd--large</p>
-        <button type="button" class="ocs__drag-btn" draggable="true">CPU</button>
-        <button type="button" class="ocs__drop-btn">CPU socket</button>
-    </div>
+  <!-- 4. Danger Action: Convert to a small red filled danger button -->
+  <p class="red-box" style="background: red; color: white;">
+    Cancel Submission
+  </p>
 </div>
-
-<!-- markdownlint-enable MD033 MD046 -->
