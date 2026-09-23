@@ -1,3 +1,4 @@
+{% assign excluded_ids = include.exclude | default: "" | split: "," %}
 <ul class="flex flex-col py-4 space-y-1">
   {% for section in include.data %}
     {% if section.section and section.section != "" %}
@@ -11,6 +12,7 @@
     {% assign current = page.active_tab | default: "" | strip %}
     {% for item in section.items %}
       {% assign item_id = item.id | strip %}
+      {% unless excluded_ids contains item_id %}
       <li>
         <a id="sidebar-{{ include.prefix }}{{ item_id }}" href="{{ site.baseurl }}{{ item.url }}"
            class="nav-item relative flex flex-row items-center h-11 focus:outline-none pr-6 border-l-4
@@ -28,6 +30,7 @@
           <span class="ml-2 text-sm tracking-wide truncate">{{ item.title }}</span>
         </a>
       </li>
+      {% endunless %}
     {% endfor %}
   {% endfor %}
 </ul>

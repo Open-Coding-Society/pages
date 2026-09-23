@@ -29,7 +29,7 @@
          script below); hidden entirely for everyone else, students included. -->
     <div id="mentor-badge" class="mentor-badge" style="display:none;">
         <span class="mentor-badge__dot"></span>
-        <span id="mentor-badge-text">You're signed in as a <strong>Mentor</strong> &mdash; showing mentor tools instead of student tools</span>
+        <span id="mentor-badge-text">You're signed in as a <strong>Mentor</strong> &mdash; showing your mentor view</span>
     </div>
 
     {% if page.microblog %}
@@ -79,12 +79,13 @@
     // Swap in the reduced mentor sidebar for signed-in ROLE_MENTOR users; everyone
     // else (including logged-out visitors) keeps the normal OCS sidebar untouched.
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { viewFor, roleNames } from '{{site.baseurl}}/assets/js/api/role-view.js';
     (async function () {
         const defaultEl = document.getElementById('sidebar-role-default');
         const mentorEl = document.getElementById('sidebar-role-mentor');
         const badgeEl = document.getElementById('mentor-badge');
         const badgeTextEl = document.getElementById('mentor-badge-text');
-        const MENTOR_TEXT = 'You\'re signed in as a <strong>Mentor</strong> &mdash; showing mentor tools instead of student tools';
+        const MENTOR_TEXT = 'You\'re signed in as a <strong>Mentor</strong> &mdash; showing your mentor view';
         const PENDING_TEXT = 'Your <strong>mentor application</strong> is pending review &mdash; you\'ll see mentor tools once an admin approves it';
         // isMentor drives the sidebar swap; isPending only ever changes which bar
         // (if any) is shown -- a pending applicant still sees the normal student
@@ -109,8 +110,9 @@
             const res = await fetch(`${javaURI}/api/person/get`, fetchOptions);
             if (!res.ok) { applySidebar(false, false); return; }
             const person = await res.json();
-            const roles = Array.isArray(person.roles) ? person.roles.map(r => r.name) : [];
-            const isMentor = roles.includes('ROLE_MENTOR');
+            const roles = roleNames(person);
+            // Mentor view = real ROLE_MENTOR + not having logged in as a Student.
+            const isMentor = viewFor(roles) === 'mentor';
 
             // ROLE_PENDING alone doesn't mean "pending mentor" -- it's also the landing
             // role for any ordinary signup whose email isn't the trusted school domain,
@@ -118,7 +120,7 @@
             // the role name. Only bother asking when it's even plausible (skip for an
             // already-approved mentor).
             let isPendingMentor = false;
-            if (!isMentor && roles.includes('ROLE_PENDING')) {
+            if (!roles.includes('ROLE_MENTOR') && roles.includes('ROLE_PENDING')) {
                 try {
                     const ticketRes = await fetch(`${javaURI}/api/person/mentor/ticket/status`, fetchOptions);
                     if (ticketRes.ok) {

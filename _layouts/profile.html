@@ -123,7 +123,7 @@ active_tab: profile
     </div>
 
 
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <div id="facialRegistrationCard" class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <h2 class="text-xl font-semibold mb-6">Facial Registration</h2>
         <div id="facialRegistrationContainer" class="space-y-4">
             <p class="text-gray-400 text-sm">Register your face to use the Bathroom Pass system. Your data will be
@@ -192,6 +192,7 @@ active_tab: profile
 
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { viewFor, roleNames } from '{{site.baseurl}}/assets/js/api/role-view.js';
 
     /**
      * API Request Chaining Implementation
@@ -241,10 +242,11 @@ active_tab: profile
                 // than just leaving it unchecked. Checked against Spring's roles (not
                 // Flask's /api/id, which only ever carries a single role string), same as
                 // the mentor dashboard's own access check.
-                const roles = Array.isArray(personData.roles) ? personData.roles.map(r => r.name) : [];
-                if (roles.includes('ROLE_MENTOR')) {
-                    const kasmToggle = document.getElementById('kasmToggleContainer');
-                    if (kasmToggle) kasmToggle.remove();
+                // Same rule for the whole mentor view: real ROLE_MENTOR and not logged in
+                // as a Student. Bathroom Pass (facial registration) is student-only too.
+                if (viewFor(roleNames(personData)) === 'mentor') {
+                    document.getElementById('kasmToggleContainer')?.remove();
+                    document.getElementById('facialRegistrationCard')?.remove();
                 }
 
                 if (!currentPersonId || !currentUid) {
@@ -1646,6 +1648,7 @@ active_tab: profile
     function updateRegistrationStatus(isRegistered) {
         const dot = document.getElementById('regStatusDot');
         const text = document.getElementById('regStatusText');
+        if (!dot || !text) return; // card is removed in the mentor view
         if (isRegistered) {
             dot.classList.remove('bg-gray-600');
             dot.classList.add('bg-green-500');
