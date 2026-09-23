@@ -6,7 +6,7 @@ permalink: /student
 ---
 
 <div class="toolkit-buttons">
-  <a href="{{site.baseurl}}/bathroom" class="toolkit-button" data-description="Toolset transforms bathroom passes and restroom management with smart digital passes, real-time occupancy tracking, and seamless feedback options. By enhancing hygiene, accessibility, and comfort, it creates a more efficient and user-friendly bathroom experience.">
+  <a href="{{site.baseurl}}/bathroom" id="bathroomToolkitButton" class="toolkit-button" data-description="Toolset transforms bathroom passes and restroom management with smart digital passes, real-time occupancy tracking, and seamless feedback options. By enhancing hygiene, accessibility, and comfort, it creates a more efficient and user-friendly bathroom experience.">
     <img src="{{site.baseurl}}/images/toolkit-nav-buttons/bathroom.png" alt="Bathroom" />
     <span class="button-name">Bathroom</span>
     <div class="description">
@@ -43,6 +43,16 @@ permalink: /student
     </div>
   </a>
 </div>
+
+<script type="module">
+  import { fetchPerson, roleNames, viewFor } from '{{site.baseurl}}/assets/js/api/role-view.js';
+  // Mentors get every toolkit tool except the bathroom pass.
+  fetchPerson().then(person => {
+    if (person && viewFor(roleNames(person)) === 'mentor') {
+      document.getElementById('bathroomToolkitButton')?.remove();
+    }
+  });
+</script>
 
 <style>
   .toolkit-buttons {

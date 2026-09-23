@@ -7,6 +7,18 @@ show_reading_time: false
 ---
 <br>
 
+<style>
+    .login-role { display: flex; gap: 0.5rem; border: 0; padding: 0; margin: 0 0 1rem; }
+    .login-role__option { flex: 1; cursor: pointer; }
+    .login-role__option input { position: absolute; opacity: 0; pointer-events: none; }
+    .login-role__option span {
+        display: block; text-align: center; padding: 0.6rem 0.5rem; border-radius: 6px;
+        border: 1px solid #4b5563; color: #d1d5db; transition: background 0.15s, border-color 0.15s;
+    }
+    .login-role__option input:checked + span { background: #6366f1; border-color: #6366f1; color: #fff; }
+    .login-role__option input:focus-visible + span { outline: 2px solid #a5b4fc; outline-offset: 2px; }
+</style>
+
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <div class="login-container">
@@ -15,6 +27,16 @@ show_reading_time: false
         <h1 id="pythonTitle">User Login</h1>
         <hr>
         <form id="pythonForm" onsubmit="loginBoth(); return false;">
+            <fieldset class="login-role" aria-label="Log in as">
+                <label class="login-role__option">
+                    <input type="radio" name="loginRole" value="student" checked>
+                    <span>Student</span>
+                </label>
+                <label class="login-role__option">
+                    <input type="radio" name="loginRole" value="mentor">
+                    <span>Mentor</span>
+                </label>
+            </fieldset>
             <div class="form-group">
                 <input type="text" id="uid" placeholder="GitHub ID" required>
             </div>
@@ -115,6 +137,7 @@ show_reading_time: false
 
 <script type="module">
     import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { setChosenRole, fetchPerson, roleNames } from '{{site.baseurl}}/assets/js/api/role-view.js';
 
     let signupFormData = {};
     let verifiedSchoolEmail = null;
@@ -360,8 +383,33 @@ show_reading_time: false
         let pythonPromise = new Promise((resolve) => {
             window.pythonLogin(resolve);
         });
-        Promise.allSettled([javaPromise, pythonPromise]).then(() => {
-            // Only redirect after both have completed (success or fail)
+        Promise.allSettled([javaPromise, pythonPromise]).then(async () => {
+            // Only proceed after both have completed (success or fail)
+            const chosen = document.querySelector('input[name="loginRole"]:checked')?.value || 'student';
+            if (chosen === 'mentor') {
+                const person = await fetchPerson();
+                const roles = roleNames(person);
+                if (!roles.includes('ROLE_MENTOR')) {
+                    // Signed in, but not as a mentor: keep them in the student view and say why.
+                    setChosenRole('student');
+                    document.querySelector('input[name="loginRole"][value="student"]').checked = true;
+                    const messageEl = document.getElementById('message');
+                    let pending = false;
+                    if (person && roles.includes('ROLE_PENDING')) {
+                        try {
+                            const ticketRes = await fetch(`${javaURI}/api/person/mentor/ticket/status`, fetchOptions);
+                            pending = ticketRes.ok && !!(await ticketRes.json()).pending;
+                        } catch (e) { /* treat as not pending */ }
+                    }
+                    messageEl.textContent = !person
+                        ? 'Could not verify mentor access. Try again, or log in as a Student.'
+                        : pending
+                            ? 'Your mentor application is still pending review. Log in as a Student for now.'
+                            : 'This account is not an approved mentor. Log in as a Student instead.';
+                    return;
+                }
+            }
+            setChosenRole(chosen);
             window.location.href = '{{site.baseurl}}/profile';
         });
     };
@@ -432,11 +480,9 @@ show_reading_time: false
     // Function to fetch and display Python data
     function pythonDatabase() {
         // Skip the /api/id fetch due to CORS restrictions with credentials mode.
-        // The user is already authenticated (token in cookie), so just redirect to profile.
-        console.log("Authentication successful, redirecting to profile...");
-        setTimeout(() => {
-            window.location.href = '{{site.baseurl}}/profile';
-        }, 1000);
+        // The user is already authenticated (token in cookie); loginBoth() decides
+        // where to send them once the Student/Mentor choice has been checked.
+        console.log("Authentication successful.");
     }  
     window.signup = async function () {
         const signupButton = document.querySelector(".signup-card button");

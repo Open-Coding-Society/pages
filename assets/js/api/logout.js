@@ -1,7 +1,10 @@
 import { pythonURI, javaURI, fetchOptions } from './config.js';
+import { clearChosenRole } from './role-view.js';
 
 // logout from both java and python backends
 export async function handleLogout() {
+    clearChosenRole();
+
     // import config dynamically since we can't use import in non-module script
 
     // logout from python backend
