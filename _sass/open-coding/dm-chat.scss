@@ -1,0 +1,118 @@
+// Direct Messages widget (_includes/dm_chat.html).
+// The shared chat header/messages/form look comes from .announcement-chat
+// in _sass/projects/courses/main.scss -- this file only adds the
+// conversation-list sidebar and "new chat" picker that announcement chat
+// doesn't need.
+
+@import "mixins/variables";
+
+.dm-chat {
+  .dm-layout {
+    display: flex;
+    gap: 0;
+    min-height: 22em;
+
+    @media (max-width: $breakpoint-mobile) {
+      flex-direction: column;
+    }
+  }
+
+  .dm-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    padding: $spacing-sm;
+    border-right: 1px solid $bg-3;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xxs;
+
+    @media (max-width: $breakpoint-mobile) {
+      width: auto;
+      border-right: none;
+      border-bottom: 1px solid $bg-3;
+    }
+  }
+
+  .dm-thread {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dm-conversation-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+  }
+
+  .dm-conversation {
+    padding: $spacing-xxs;
+    border-radius: $radius-xs;
+    color: $text-muted;
+    font-size: $text-sm;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover { background: rgba($text, 0.05); }
+
+    &.is-active {
+      background: rgba($accent, 0.12);
+      color: $text;
+    }
+  }
+
+  .dm-empty {
+    padding: $spacing-xxs;
+    color: $text-muted;
+    font-size: $text-sm;
+  }
+
+  .dm-picker {
+    border: 1px solid $bg-3;
+    border-radius: $radius-sm;
+    padding: $spacing-xxs;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xxs;
+
+    &.hidden { display: none; }
+  }
+
+  .dm-picker-results {
+    max-height: 10em;
+    overflow-y: auto;
+  }
+
+  .dm-picker-result {
+    padding: $spacing-xxxs $spacing-xxs;
+    border-radius: $radius-xxs;
+    font-size: $text-sm;
+    cursor: pointer;
+
+    &:hover { background: rgba($text, 0.05); }
+
+    &.is-selected {
+      background: rgba($accent, 0.15);
+      color: $accent;
+    }
+  }
+
+  .dm-picker-selected {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xxxs;
+  }
+
+  .dm-picker-chip {
+    padding: 2px $spacing-xxs;
+    border-radius: 999px;
+    background: rgba($accent, 0.15);
+    color: $accent;
+    font-size: $text-xs;
+    cursor: pointer;
+  }
+}

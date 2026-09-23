@@ -1,0 +1,528 @@
+<!-- Direct Messages: 1:1 and small-group private chat. -->
+<!-- Backend: Open-Coding-Society/spring's new /api/dm REST endpoints (list -->
+<!-- conversations, get-or-create, message history) plus the existing -->
+<!-- STOMP/SockJS broker at /ws-chat for live delivery on /topic/dm/{id}. -->
+<!-- Sending goes over REST (so the server can trust the JWT-authenticated -->
+<!-- sender); only receiving uses the STOMP subscription. -->
+<!-- -->
+<!-- Reuses the .announcement-chat SCSS (header/messages/form styling) by -->
+<!-- carrying that class alongside .dm-chat, which only adds the sidebar/ -->
+<!-- picker layout that announcement chat doesn't need. -->
+
+<section id="dmChat" class="announcement-chat dm-chat" aria-labelledby="dmChatTitle">
+  <div class="chat-header">
+    <div class="chat-heading">
+      <span class="chat-badge" aria-hidden="true"><i class="fas fa-comments"></i></span>
+      <div class="chat-heading-text">
+        <h2 class="chat-title" id="dmChatTitle">Direct Messages</h2>
+        <p class="chat-subtitle">Private chats with other students and teachers.</p>
+      </div>
+    </div>
+    <span class="chat-status-pill" id="dmStatusPill">
+      <span class="chat-status-dot" aria-hidden="true"></span>
+      <span class="chat-status" id="dmStatus">loading…</span>
+    </span>
+  </div>
+
+  <div class="dm-layout">
+    <div class="dm-sidebar">
+      <button class="ocs__btn pill accent" id="dmNewChatBtn" type="button">+ New chat</button>
+
+      <div class="dm-picker hidden" id="dmPicker">
+        <input type="text" class="search-input input-block form-control" id="dmPickerSearch"
+               placeholder="Search by name or uid…" autocomplete="off">
+        <div class="dm-picker-results" id="dmPickerResults"></div>
+        <div class="dm-picker-selected" id="dmPickerSelected"></div>
+        <button class="ocs__btn pill" id="dmPickerStart" type="button" disabled>Start chat</button>
+      </div>
+
+      <ul class="dm-conversation-list" id="dmConversationList">
+        <li class="dm-empty" id="dmConversationsEmpty">No conversations yet.</li>
+      </ul>
+    </div>
+
+    <div class="dm-thread">
+      <p class="chat-preview-note" id="dmSignedOutNote" hidden>
+        <i class="fas fa-lock" aria-hidden="true"></i> Sign in to send and receive direct messages.
+      </p>
+      <div class="chat-messages" id="dmMessages" role="log" aria-live="polite">
+        <div class="chat-empty" id="dmMessagesEmpty">
+          <i class="fas fa-comments" aria-hidden="true"></i>
+          <p class="chat-empty-title">Select a conversation</p>
+          <span class="chat-empty-hint">Or start a new chat from the sidebar.</span>
+        </div>
+      </div>
+      <form class="chat-form" id="dmForm" autocomplete="off">
+        <button class="chat-send" id="dmSend" type="submit" disabled>
+          <i class="fas fa-paper-plane" aria-hidden="true"></i><span>Send</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script type="module">
+  import { javaURI, javaWebSocketURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+  import { createRichComposer, renderRichMessage } from '{{site.baseurl}}/assets/js/chat/rich-text.js';
+
+  const SOCKJS_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js';
+  const STOMP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js';
+
+  function loadScriptOnce(src) {
+    window.__ocsChatScripts = window.__ocsChatScripts || {};
+    if (!window.__ocsChatScripts[src]) {
+      window.__ocsChatScripts[src] = new Promise((resolve, reject) => {
+        const el = document.createElement('script');
+        el.src = src;
+        el.onload = resolve;
+        el.onerror = () => reject(new Error(`failed to load ${src}`));
+        document.head.appendChild(el);
+      });
+    }
+    return window.__ocsChatScripts[src];
+  }
+
+  async function loadChatLibraries() {
+    await loadScriptOnce(SOCKJS_SRC);
+    await loadScriptOnce(STOMP_SRC);
+  }
+
+  const state = {
+    currentUserUid: null,
+    currentUserDisplayName: 'You',
+    conversations: [],
+    activeConversationId: null,
+    stompClient: null,
+    subscription: null,
+    connected: false,
+    pickerSelected: new Map(), // id -> { id, uid, name }
+    seenMessageIds: new Set(), // reset whenever the active conversation changes
+    lastDayKey: null,
+    lastSender: null,
+    lastTime: 0,
+  };
+
+  const statusEl = document.getElementById('dmStatus');
+  const statusPillEl = document.getElementById('dmStatusPill');
+  const signedOutNoteEl = document.getElementById('dmSignedOutNote');
+  const messagesEl = document.getElementById('dmMessages');
+  const sendBtn = document.getElementById('dmSend');
+  const formEl = document.getElementById('dmForm');
+  const newChatBtn = document.getElementById('dmNewChatBtn');
+  const pickerEl = document.getElementById('dmPicker');
+  const pickerSearchEl = document.getElementById('dmPickerSearch');
+  const pickerResultsEl = document.getElementById('dmPickerResults');
+  const pickerSelectedEl = document.getElementById('dmPickerSelected');
+  const pickerStartBtn = document.getElementById('dmPickerStart');
+  const conversationListEl = document.getElementById('dmConversationList');
+
+  const composer = createRichComposer({
+    placeholder: 'Type a message…',
+    maxLength: 2000,
+    onSubmit: submitMessage,
+  });
+  formEl.classList.add('chat-form--rich');
+  formEl.insertBefore(composer.element, sendBtn);
+
+  function setStatus(text, tone) {
+    statusEl.textContent = text;
+    statusPillEl.classList.remove('is-live', 'is-preview', 'is-error');
+    if (tone) statusPillEl.classList.add(tone);
+  }
+
+  function setComposerEnabled(enabled) {
+    composer.setEnabled(enabled);
+    sendBtn.disabled = !enabled || !state.activeConversationId;
+  }
+
+  function submitMessage() {
+    if (composer.isEmpty() || composer.isOverLimit()) return;
+    sendMessage(composer.getHTML()).then((ok) => { if (ok) composer.clear(); });
+  }
+
+  /* ── Day/sender-grouped message rendering (same idiom as announcement_chat.html) ── */
+
+  function parseDate(isoString) {
+    if (!isoString) return null;
+    const date = new Date(isoString);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+
+  function dayKey(date) { return String(startOfDay(date)); }
+
+  function dayLabel(date) {
+    const diff = Math.round((startOfDay(new Date()) - startOfDay(date)) / 86400000);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    return date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  }
+
+  function formatTime(date) {
+    return date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function initialsFor(name) {
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    if (parts.length === 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  function tintFor(name) {
+    const text = String(name || '');
+    let hash = 0;
+    for (let i = 0; i < text.length; i += 1) hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
+    return `tint-${(hash % 5) + 1}`;
+  }
+
+  function clearMessagesEmpty() {
+    const empty = document.getElementById('dmMessagesEmpty');
+    if (empty) empty.remove();
+  }
+
+  function resetMessageGrouping() {
+    state.lastDayKey = null;
+    state.lastSender = null;
+    state.lastTime = 0;
+  }
+
+  function appendMessage({ senderUid, senderName, body, sentAt }) {
+    clearMessagesEmpty();
+
+    const isSelf = senderUid === state.currentUserUid;
+    const who = isSelf ? 'You' : (senderName || senderUid || 'Unknown');
+    const when = parseDate(sentAt);
+
+    const wasAtBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 40;
+
+    let continued;
+    if (when) {
+      const key = dayKey(when);
+      if (key !== state.lastDayKey) {
+        const separator = document.createElement('div');
+        separator.className = 'chat-day';
+        separator.setAttribute('role', 'separator');
+        separator.textContent = dayLabel(when);
+        messagesEl.appendChild(separator);
+        state.lastDayKey = key;
+        state.lastSender = null;
+      }
+      continued = who === state.lastSender && (when.getTime() - state.lastTime) < 5 * 60 * 1000;
+      state.lastTime = when.getTime();
+    } else {
+      continued = who === state.lastSender;
+    }
+
+    const row = document.createElement('div');
+    row.className = ['chat-msg', isSelf ? 'is-self' : '', continued ? 'is-continued' : '']
+      .filter(Boolean).join(' ');
+
+    const avatar = document.createElement('span');
+    avatar.className = ['chat-avatar', isSelf ? '' : tintFor(who)].filter(Boolean).join(' ');
+    avatar.textContent = initialsFor(isSelf ? (state.currentUserDisplayName || 'You') : who);
+    avatar.setAttribute('aria-hidden', 'true');
+
+    const main = document.createElement('div');
+    main.className = 'chat-msg-main';
+
+    const meta = document.createElement('div');
+    meta.className = 'chat-msg-meta';
+    const senderEl = document.createElement('span');
+    senderEl.className = 'chat-msg-sender';
+    senderEl.textContent = who;
+    meta.appendChild(senderEl);
+    if (when) {
+      const timeEl = document.createElement('span');
+      timeEl.className = 'chat-msg-time';
+      timeEl.textContent = formatTime(when);
+      meta.appendChild(timeEl);
+    }
+
+    const bodyEl = document.createElement('span');
+    bodyEl.className = 'chat-msg-body';
+    renderRichMessage(bodyEl, body);
+
+    main.append(meta, bodyEl);
+    row.append(avatar, main);
+    messagesEl.appendChild(row);
+
+    state.lastSender = who;
+    if (wasAtBottom) messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  /* ── Current user ─────────────────────────────────────────────────── */
+
+  async function resolveCurrentUser() {
+    try {
+      const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
+      if (!res.ok) return false;
+      const user = await res.json();
+      const name = user?.name || user?.uid || user?.github;
+      if (!name || !user?.uid) return false;
+      state.currentUserUid = user.uid;
+      state.currentUserDisplayName = name;
+      return true;
+    } catch (err) {
+      console.warn('DM chat: user lookup failed', err);
+      return false;
+    }
+  }
+
+  /* ── Conversation list ────────────────────────────────────────────── */
+
+  function conversationLabel(conversation) {
+    const names = (conversation.participants || []).map((p) => p.name || p.uid);
+    return names.length ? names.join(', ') : 'Conversation';
+  }
+
+  function renderConversationList() {
+    conversationListEl.innerHTML = '';
+    if (!state.conversations.length) {
+      const empty = document.createElement('li');
+      empty.className = 'dm-empty';
+      empty.textContent = 'No conversations yet.';
+      conversationListEl.appendChild(empty);
+      return;
+    }
+
+    state.conversations.forEach((conversation) => {
+      const item = document.createElement('li');
+      item.className = ['dm-conversation', conversation.id === state.activeConversationId ? 'is-active' : '']
+        .filter(Boolean).join(' ');
+      item.textContent = conversationLabel(conversation);
+      item.addEventListener('click', () => selectConversation(conversation.id));
+      conversationListEl.appendChild(item);
+    });
+  }
+
+  async function loadConversations() {
+    try {
+      const res = await fetch(`${javaURI}/api/dm/conversations`, fetchOptions);
+      if (!res.ok) { console.warn('DM chat: conversations HTTP', res.status); return; }
+      state.conversations = await res.json();
+      renderConversationList();
+    } catch (err) {
+      console.warn('DM chat: conversations load failed', err);
+    }
+  }
+
+  async function selectConversation(id) {
+    if (state.activeConversationId === id) return;
+    state.activeConversationId = id;
+    state.seenMessageIds.clear();
+    resetMessageGrouping();
+    renderConversationList();
+
+    messagesEl.innerHTML = '';
+    setComposerEnabled(Boolean(state.currentUserUid));
+
+    await loadMessages(id);
+    await subscribeToConversation(id);
+  }
+
+  async function loadMessages(id) {
+    try {
+      const res = await fetch(`${javaURI}/api/dm/conversations/${id}/messages`, fetchOptions);
+      if (!res.ok) { console.warn('DM chat: messages HTTP', res.status); return; }
+      const messages = await res.json();
+      (messages || []).forEach((msg) => {
+        if (state.seenMessageIds.has(msg.id)) return;
+        state.seenMessageIds.add(msg.id);
+        appendMessage(msg);
+      });
+    } catch (err) {
+      console.warn('DM chat: messages load failed', err);
+    }
+  }
+
+  /* ── New-chat picker ──────────────────────────────────────────────── */
+
+  function renderPickerSelected() {
+    pickerSelectedEl.innerHTML = '';
+    state.pickerSelected.forEach((person) => {
+      const chip = document.createElement('span');
+      chip.className = 'dm-picker-chip';
+      chip.textContent = person.name || person.uid;
+      chip.title = 'Click to remove';
+      chip.addEventListener('click', () => {
+        state.pickerSelected.delete(person.id);
+        renderPickerSelected();
+      });
+      pickerSelectedEl.appendChild(chip);
+    });
+    pickerStartBtn.disabled = state.pickerSelected.size === 0;
+  }
+
+  function renderPickerResults(results) {
+    pickerResultsEl.innerHTML = '';
+    (results || []).forEach((person) => {
+      if (person.uid === state.currentUserUid) return;
+      const row = document.createElement('div');
+      row.className = 'dm-picker-result';
+      row.textContent = `${person.name} (@${person.uid})`;
+      if (state.pickerSelected.has(person.id)) row.classList.add('is-selected');
+      row.addEventListener('click', () => {
+        if (state.pickerSelected.has(person.id)) {
+          state.pickerSelected.delete(person.id);
+        } else {
+          state.pickerSelected.set(person.id, person);
+        }
+        renderPickerResults(results);
+        renderPickerSelected();
+      });
+      pickerResultsEl.appendChild(row);
+    });
+  }
+
+  let pickerSearchTimer = null;
+  pickerSearchEl.addEventListener('input', () => {
+    clearTimeout(pickerSearchTimer);
+    const query = pickerSearchEl.value.trim();
+    if (!query) { pickerResultsEl.innerHTML = ''; return; }
+    pickerSearchTimer = setTimeout(async () => {
+      try {
+        const res = await fetch(`${javaURI}/api/people/search?query=${encodeURIComponent(query)}`, fetchOptions);
+        if (!res.ok) return;
+        renderPickerResults(await res.json());
+      } catch (err) {
+        console.warn('DM chat: people search failed', err);
+      }
+    }, 250);
+  });
+
+  newChatBtn.addEventListener('click', () => {
+    pickerEl.classList.toggle('hidden');
+  });
+
+  pickerStartBtn.addEventListener('click', async () => {
+    const otherPersonIds = Array.from(state.pickerSelected.keys());
+    if (!otherPersonIds.length) return;
+    try {
+      const res = await fetch(`${javaURI}/api/dm/conversations`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ otherPersonIds }),
+      });
+      if (!res.ok) { console.warn('DM chat: start conversation HTTP', res.status); return; }
+      const conversation = await res.json();
+      state.pickerSelected.clear();
+      renderPickerSelected();
+      pickerSearchEl.value = '';
+      pickerResultsEl.innerHTML = '';
+      pickerEl.classList.add('hidden');
+      await loadConversations();
+      await selectConversation(conversation.id);
+    } catch (err) {
+      console.warn('DM chat: start conversation failed', err);
+    }
+  });
+
+  /* ── Realtime: connect once, subscribe per active conversation ──────── */
+
+  function buildChatSocketEndpoint() {
+    const uri = new URL(javaWebSocketURI);
+    return `${uri.protocol}//${uri.host}/ws-chat`;
+  }
+
+  function handleIncoming(event) {
+    if (!event || event.conversationId !== state.activeConversationId) return;
+    if (state.seenMessageIds.has(event.id)) return;
+    state.seenMessageIds.add(event.id);
+    appendMessage(event);
+  }
+
+  function connectSocket() {
+    return new Promise((resolve) => {
+      if (state.connected) return resolve(true);
+      if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') return resolve(false);
+
+      const socket = new SockJS(buildChatSocketEndpoint());
+      const client = Stomp.over(socket);
+      client.debug = null;
+      state.stompClient = client;
+
+      client.connect({}, () => {
+        state.connected = true;
+        resolve(true);
+      }, (err) => {
+        console.warn('DM chat: connection failed', err);
+        state.connected = false;
+        resolve(false);
+      });
+
+      socket.onclose = () => {
+        if (!state.connected) return;
+        state.connected = false;
+        setStatus('disconnected', 'is-error');
+      };
+    });
+  }
+
+  async function subscribeToConversation(id) {
+    if (state.subscription) { state.subscription.unsubscribe(); state.subscription = null; }
+    if (!state.connected || !state.stompClient) return;
+    state.subscription = state.stompClient.subscribe(`/topic/dm/${id}`, (frame) => {
+      try { handleIncoming(JSON.parse(frame.body)); }
+      catch (err) { console.warn('DM chat: bad frame', err); }
+    });
+  }
+
+  async function sendMessage(text) {
+    if (!state.activeConversationId) return false;
+    try {
+      const res = await fetch(`${javaURI}/api/dm/conversations/${state.activeConversationId}/messages`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ body: text }),
+      });
+      if (!res.ok) { console.warn('DM chat: send HTTP', res.status); return false; }
+      // The server broadcasts the new message on /topic/dm/{id}; our own
+      // subscription (below) is what actually appends it, same as
+      // announcement_chat.html -- this avoids rendering it twice.
+      return true;
+    } catch (err) {
+      console.error('DM chat: send failed', err);
+      return false;
+    }
+  }
+
+  /* ── Init ─────────────────────────────────────────────────────────── */
+
+  async function init() {
+    setStatus('loading…');
+
+    const signedIn = await resolveCurrentUser();
+    if (!signedIn) {
+      setStatus('signed out');
+      signedOutNoteEl.hidden = false;
+      newChatBtn.disabled = true;
+      setComposerEnabled(false);
+      return;
+    }
+
+    await loadConversations();
+
+    try { await loadChatLibraries(); }
+    catch (err) { console.warn('DM chat: library load failed', err); }
+
+    const connected = await connectSocket();
+    setStatus(connected ? 'connected' : 'offline', connected ? 'is-live' : 'is-error');
+    if (state.activeConversationId) await subscribeToConversation(state.activeConversationId);
+  }
+
+  formEl.addEventListener('submit', (e) => {
+    e.preventDefault();
+    submitMessage();
+  });
+
+  window.addEventListener('beforeunload', () => {
+    try {
+      if (state.subscription) state.subscription.unsubscribe();
+      if (state.stompClient && state.connected) state.stompClient.disconnect();
+    } catch (_) { /* ignore */ }
+  });
+
+  init();
+</script>
