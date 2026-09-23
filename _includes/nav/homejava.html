@@ -5,15 +5,11 @@
         <td id="profileLink"></td>
         <td id="studentToolkitLink"></td>
         <td id="teacherToolkitLink"></td>
-        <td id="mentorLink"></td>
         <td id="signupLink"></td>
         <td id="loginLink"></td>
         <td id="logoutLink"></td>
     </tr>
 </table>
-<p id="pendingApprovalMessage" role="status" style="display: none; text-align: center;">
-    Your account is awaiting administrator approval. Toolkit access will be available after approval.
-</p>
 
 <script type="module">
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
@@ -28,20 +24,8 @@
                 const profileLink = document.getElementById('profileLink');
                 const studentToolkitLink = document.getElementById('studentToolkitLink');
                 const teacherToolkitLink = document.getElementById('teacherToolkitLink');
-                const mentorLink = document.getElementById('mentorLink');
-                const pendingApprovalMessage = document.getElementById('pendingApprovalMessage');
 
-                if (data?.pendingApproval) {
-                    signupLink.style.display = 'none';
-                    loginLink.style.display = 'none';
-                    calendarLink.style.display = 'none';
-                    profileLink.style.display = 'none';
-                    studentToolkitLink.style.display = 'none';
-                    teacherToolkitLink.style.display = 'none';
-                    mentorLink.style.display = 'none';
-                    logoutLink.innerHTML = `<a href="{{site.baseurl}}/logoutjava">Logout of Toolkit</a>`;
-                    pendingApprovalMessage.style.display = 'block';
-                } else if (data) { // User is authenticated
+                if (data) { // User is authenticated
                     // Hide signup and login links
                     signupLink.style.display = 'none';
                     loginLink.style.display = 'none';
@@ -50,17 +34,11 @@
                     calendarLink.innerHTML = `<a href="{{site.baseurl}}/student/calendar">Calendar</a>`;
                     profileLink.innerHTML = `<a href="{{site.baseurl}}/profile">Profile</a>`;
                     studentToolkitLink.innerHTML = `<a href="{{site.baseurl}}/student">Student Toolkit</a>`;
-                    // Spring is the source of truth for roles: Flask's /api/id returns a
-                    // single role string and cannot express "student who is also a mentor".
-                    const roles = Array.isArray(data.roles) ? data.roles.map(r => r.name) : [];
-
                     // Check for teacher role to display "Teacher Toolkit"
-                    const isTeacher = roles.includes('ROLE_TEACHER');
+                    const isTeacher = data.roles.some(role => role.name === 'ROLE_TEACHER');
                     if (isTeacher) {
                         teacherToolkitLink.innerHTML = `<a href="{{site.baseurl}}/teacher">Teacher Toolkit</a>`;
                     }
-
-                    mentorLink.style.display = 'none';
 
                     // Display logout link
                     logoutLink.innerHTML = `<a href="{{site.baseurl}}/logoutjava">Logout of Toolkit</a>`;
@@ -74,7 +52,6 @@
                     profileLink.style.display = 'none';
                     studentToolkitLink.style.display = 'none';
                     teacherToolkitLink.style.display = 'none';
-                    mentorLink.style.display = 'none';
                     logoutLink.style.display = 'none';
                 }
             })
@@ -87,9 +64,6 @@
         const URL = javaURI + '/api/person/get';
         return fetch(URL, fetchOptions)
             .then(response => {
-                if (response.status === 403) {
-                    return { pendingApproval: true };
-                }
                 if (response.status !== 200) {
                     console.error("HTTP status code: " + response.status);
                     return null;
