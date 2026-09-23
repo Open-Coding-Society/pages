@@ -285,10 +285,10 @@ import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.j
   // Only an approved mentor (ROLE_MENTOR) gets the hover actions below --
   // everyone else (including a pending mentor applicant) sees the plain grid.
   //
-  // Local-only preview: login.md's "mentor" GitHub ID shortcut sets this flag and
-  // sends you straight here, so the backend role check below is skipped entirely --
-  // lets the mentor UI be previewed without a real, admin-approved Spring account.
-  // Gated to localhost so a stray flag can never grant this on the deployed site.
+  // Local-only preview: run `localStorage.setItem('ocsDevMentorPreview', 'true')` in
+  // devtools to skip the backend role check below entirely, previewing the mentor UI
+  // without a real, admin-approved Spring account. Gated to localhost so a stray flag
+  // can never grant this on the deployed site.
   const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   let isMentor = isLocalhost && localStorage.getItem('ocsDevMentorPreview') === 'true';
   if (!isMentor) {
