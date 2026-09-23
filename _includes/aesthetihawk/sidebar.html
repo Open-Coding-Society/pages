@@ -1,10 +1,12 @@
 <!-- Two sidebars are pre-rendered; JS in _layouts/aesthetihawk.html toggles which
-     one is visible based on a live ROLE_MENTOR check, so a mentor only ever sees
-     the reduced mentor menu and everyone else sees the normal OCS sidebar. -->
+     one is visible based on the live ROLE_MENTOR check plus the Student/Mentor choice
+     made at login. The mentor one is the full menu minus Bathroom Pass, plus mentor
+     extras; everyone else sees the normal OCS sidebar. -->
 <div id="sidebar-role-default">
   {% include aesthetihawk/sidebar-list.html data=site.data.aesthetihawk_sidebar %}
 </div>
 <div id="sidebar-role-mentor" style="display:none;">
+  {% include aesthetihawk/sidebar-list.html data=site.data.aesthetihawk_sidebar prefix="mentor-" exclude="bathroom_pass" %}
   {% include aesthetihawk/sidebar-list.html data=site.data.aesthetihawk_sidebar_mentor prefix="mentor-" %}
 </div>
 <script>

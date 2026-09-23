@@ -269,6 +269,7 @@ document.addEventListener('DOMContentLoaded', function(){
      positioning) so a taller hovered card just grows in place. -->
 <script type="module">
 import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
 
 (async function () {
   // Wait for the script above (which sets card.dataset.pageUrl for the few
@@ -297,7 +298,7 @@ import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.j
       if (res.ok) {
         const person = await res.json();
         const roles = Array.isArray(person.roles) ? person.roles.map(r => r.name) : [];
-        isMentor = roles.includes('ROLE_MENTOR');
+        isMentor = viewFor(roles) === 'mentor';
       }
     } catch (e) { /* not logged in / offline -- treat as not a mentor */ }
   }

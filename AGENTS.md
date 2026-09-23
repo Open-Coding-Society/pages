@@ -139,6 +139,21 @@ while preserving all critical instructions. The agent must still communicate wit
 
 * **同步更新文档：** 随着你在迭代中犯错、学习新的系统模式或约束，主动用重要的注意事项更新 `AGENTS.md`，并确保同步更新 `AGENTS_MD_DOCUMENTATION.md`（英文说明版本），以便系统随时间不断改进。
 
+## 群组与实时聊天（Groups & realtime chat）
+
+* **架构：** 群聊客户端使用 SockJS + STOMP.js（CDN 加载），连接 Spring 后端（Pirna-spring）的 `/ws-chat` 端点。发送到 `/app/groups.chat`，订阅 `/topic/group/${groupId}`；事件含 message/joinGroup/typing/heartbeat(25s)/文件图片，用 JSON event-key 集合去重并自动重连。
+* **端点分支：** localhost 直连 `${protocol}//${host}:8589/ws-chat`，生产环境走 `javaURI + '/ws-chat'`（nginx 转发 8589）。注意：`groups.js` 与 `lesson_chat.html` 中 8589 端口是硬编码的（代码注释标记为待迁移到 config.js）；`assets/js/api/config.js` 已导出 `javaWebSocketURI` 但聊天代码尚未使用。
+* **代码重复警告：** 聊天逻辑存在于多处——规范源是 [assets/js/projects/student-management-groups/groups.js](assets/js/projects/student-management-groups/groups.js)（"CHAT FUNCTIONALITY" 段），但 [_includes/group_dashboard.html](_includes/group_dashboard.html) 与 [_includes/lesson_chat.html](_includes/lesson_chat.html) 内嵌了副本；修改后必须手动同步这些 include，否则行为不一致。
+* **课程聊天约定：** lesson 页面通过 frontmatter `chat: true` 启用，共享 backbone 群组 `"lessons"`，以 `[[lesson:<url>]]` 标记按页面隔离。
+
+## 导师（Mentor）功能与 Capstone 页
+
+* **角色来源：** `ROLE_MENTOR` 定义在 Spring 端（外部仓库 `Open-Coding-Society/spring`），不在本仓库；Flask 侧的角色是单一字符串列（无 `ROLE_MENTOR`）。前端一律通过 `GET {javaURI}/api/person/get` 检查 `roles.some(r => r.name === 'ROLE_MENTOR')`（同 `_includes/nav/homejava.html` 的 `getCredentialsJava()` 模式），不要在 Flask 侧另建一套角色判断。
+* **Student/Mentor 视图在登录时选择：** 登录表单的 Student/Mentor 开关把 `ocsLoginRole` 存入 `localStorage`（登出时清除）。判断视图一律用 `assets/js/api/role-view.js` 的 `viewFor(roles)`——导师视图要求真实的 `ROLE_MENTOR` 且所选不是 `student`。导师侧边栏 = 学生侧边栏去掉 `bathroom_pass`（`_includes/aesthetihawk/sidebar-list.html` 的 `exclude` 参数）再加上 `_data/aesthetihawk_sidebar_mentor.yml`；Bathroom Pass 相关 UI（侧边栏、工具包按钮、个人资料的人脸注册）在导师视图中必须保持隐藏。
+* **导师的 Apply/Skip/Interested 操作内联在 `navigation/capstone.md` 中：** 每张项目卡片的 hover 操作（受实时 `ROLE_MENTOR` 检查门控）是该文件顶部的一段内联 `<script type="module">`，并非独立的 `assets/js/*.js` 文件。项目身份用其归一化页面 URL（`cardUrl()`）标识，与 `capstone/projects.json`（由 `scripts/sync_capstones.py` 同步到 Spring 后端的机器可读项目列表）匹配，解析出 `POST {javaURI}/api/capstones/{id}/apply` 所需的数字 id。Interested/Skip 没有后端接口——仅通过浏览器 `localStorage`（`ocsMentorInterested` / `ocsMentorSkipped`）记录。
+* **Capstone 页的"新建/编辑 capstone"流程尚无真实后端持久化：** `assets/js/new-capstone.js` 与 `navigation/capstone.md` 内联的"新建/编辑 capstone"仅写入 `sessionStorage`，并非真实后端。新增任何"保存到账号"的功能前，先确认 Spring 端点是否存在；若不存在，参照上面导师操作的模式——本地 `localStorage` 缓存 + 尝试远程同步 + 失败时 `console.error`/`console.warn` 记录上下文（不要静默吞掉），并写清所需的端点契约。
+* **评论/微博客复用：** 需要"按某个实体加评论"的功能，优先复用现有 `assets/js/api/microblog.js`（Flask `/api/microblog`），通过自定义 `topicPath`（如 `capstone:<slug>`）隔离范围，而不是新建评论后端；若要复用完整侧边面板 UI，注意 `_includes/microblog_foundation.html` 被多个页面共享，谨慎直接改动，优先新建轻量组件调用同一套 API。
+
 ## 反模式
 
 ### 上帝函数
