@@ -1,32 +1,22 @@
 import { javaURI, fetchOptions } from './config.js';
 
-const ROLE_KEY = 'ocsLoginRole';
 const SIDEBAR_KEY = 'ocsMentorSidebar';
 
-export function getChosenRole() {
-    try { return localStorage.getItem(ROLE_KEY); } catch (e) { return null; }
-}
-
-export function setChosenRole(role) {
-    try { localStorage.setItem(ROLE_KEY, role); } catch (e) { /* localStorage unavailable */ }
-}
-
-export function clearChosenRole() {
-    try {
-        localStorage.removeItem(ROLE_KEY);
-        localStorage.removeItem(SIDEBAR_KEY);
-    } catch (e) { /* localStorage unavailable */ }
+// Clears the cached sidebar choice on logout, so a signed-out visitor doesn't
+// briefly flash the previous session's mentor sidebar before the next role
+// check (in _layouts/aesthetihawk.html) resolves.
+export function clearMentorSidebarCache() {
+    try { localStorage.removeItem(SIDEBAR_KEY); } catch (e) { /* localStorage unavailable */ }
 }
 
 export function roleNames(person) {
     return Array.isArray(person?.roles) ? person.roles.map(r => r.name) : [];
 }
 
-// Mentor view requires the real ROLE_MENTOR (Spring is the source of truth) AND the
-// login choice not being "student". A mentor who logged in as a student gets the
-// student view; a session from before the choice existed defaults to the mentor view.
+// The mentor/student view is derived purely from the account's real ROLE_MENTOR
+// status (Spring is the source of truth) -- there is no separate user choice.
 export function viewFor(roles) {
-    return roles.includes('ROLE_MENTOR') && getChosenRole() !== 'student' ? 'mentor' : 'student';
+    return roles.includes('ROLE_MENTOR') ? 'mentor' : 'student';
 }
 
 export async function fetchPerson() {
