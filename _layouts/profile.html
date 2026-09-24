@@ -345,6 +345,11 @@ active_tab: profile
 
     async function loadPersonas() {
         const container = document.getElementById('personaSelectionContainer');
+        // personaCard (and this container with it) is removed entirely in the mentor
+        // view (see the role check below) -- nothing to load or render for a mentor.
+        if (!container) {
+            return;
+        }
 
         try {
             // Fetch all available personas
@@ -408,6 +413,9 @@ active_tab: profile
     }
     function showPersonaSelectionCards(allPersonas, selectedPersonas, forceShowAll = false) {
         const container = document.getElementById('personaSelectionContainer');
+        if (!container) {
+            return;
+        }
 
         console.log('🎨 Rendering selection cards');
         console.log('Total personas:', allPersonas.length);
@@ -527,6 +535,9 @@ active_tab: profile
     }
     function showCompletedPersonas(selectedPersonas, allPersonas) {
         const container = document.getElementById('personaSelectionContainer');
+        if (!container) {
+            return;
+        }
 
         const categoryLabels = {
             'student': 'Student Archetype',
@@ -1343,9 +1354,12 @@ active_tab: profile
         const name = nameInput.value.trim();
         const uid = uidInput.value.trim();
         const email = emailInput.value.trim();
-        const sid = sidInput.value.trim();
+        // sidInput/schoolInput/kasmInput are all removed from the DOM entirely in the
+        // mentor view (see the role check below) -- null-safe like kasmServerNeeded
+        // already was, so saveChanges doesn't throw for a mentor account.
+        const sid = sidInput ? sidInput.value.trim() : undefined;
         const kasmServerNeeded = kasmInput ? kasmInput.checked : undefined;
-        const school = schoolInput.value;
+        const school = schoolInput ? schoolInput.value : undefined;
 
         // get class info
         const classEntries = Array.from(document.querySelectorAll('.class-entry')).map(entry => ({
