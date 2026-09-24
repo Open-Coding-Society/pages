@@ -269,7 +269,7 @@ build-cayman: use-cayman build-current
 build-so-simple: use-so-simple build-current
 build-yat: use-yat build-current
 
-build-current: clean convert split-courses
+build-current: clean build-registered-projects convert split-courses build-registered-docs
 	@bundle install
 	@echo "Generating dynamic SASS imports..."
 	@$(PYTHON) scripts/generate_sass_imports.py 2>&1 || echo "⚠️  SASS import generation failed"
@@ -283,11 +283,11 @@ build: build-current
 # Multi-course file splitting
 split-courses:
 	@echo " ------ Splitting multi-course files... -------"
-	@python3 scripts/split_multi_course_files.py
+	@$(PYTHON) scripts/split_multi_course_files.py
 
 clean-courses:
 	@echo "🧹Cleaning course-specific files..."
-	@python3 scripts/split_multi_course_files.py clean
+	@$(PYTHON) scripts/split_multi_course_files.py clean
 
 # Notebook and DOCX conversion
 convert: $(MARKDOWN_FILES) convert-docx

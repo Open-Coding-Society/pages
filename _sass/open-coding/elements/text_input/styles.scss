@@ -1,9 +1,10 @@
 @import "common.scss";
 @import "../../materials/main.scss";
 
-// for the various styles, like a gradient styled input
+// OCS input grammar.
+// Keep gradientInput as a legacy alias for existing pages.
+input.ocs__input.gradient,
 input.gradientInput {
-    @extend input;
     background-image: $gradient1;
 }
 

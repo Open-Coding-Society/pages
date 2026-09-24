@@ -2,9 +2,9 @@
 microblog: true
 toc: false
 layout: post
-title: RFID Presence, Funding & Budget
-description: Bill of materials, cost estimates, and the funding ask by phase for the RFID + camera-correlated classroom presence project.
-permalink: /capstone/rfid-presence/funding/
+title: Classroom Presence System, Funding & Budget
+description: Bill of materials and cost estimates for the RFID track, current and paused stages.
+permalink: /capstone/presence-system/funding/
 year: "2026-2027"
 rp_active: funding
 ---
@@ -14,55 +14,41 @@ rp_active: funding
 <div class="rfid-presence-header">
   <div class="ocs__badge">Funding &amp; Budget</div>
   <h1 class="rfid-presence-title">Bill of Materials &amp; Funding Ask</h1>
-  <p class="ocs__description">What's already covered, what the next phase needs, and the itemized hardware behind it.</p>
-</div>{% include rfid-presence-nav.html %}
+  <p class="ocs__description">What's already covered, and the itemized hardware behind the RFID track. Later hardware stages are priced for reference but are not an active funding ask; see the <a href="https://github.com/vibha1019/crowpi-attendance/issues/5" target="_blank" rel="noopener">Research Proposal</a> for why that work is paused.</p>
+</div>{% include presence-system-nav.html %}
 <div class="ocs__card">
-  <h3 class="ocs__section-title">Funding Need by Phase</h3>
+  <h3 class="ocs__section-title">Current Funding Status</h3>
   <div class="rfid-presence-table-wrap">
     <table class="ocs__table rfid-presence-table">
       <thead>
         <tr>
-          <th>Phase</th>
+          <th>Stage</th>
           <th>Funding status</th>
           <th>What it needs</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Phase 1, Contact-Tap Prototype</td>
+          <td>Contact-Tap Prototype (current)</td>
           <td>
             <span class="rfid-presence-pill rfid-presence-pill-good">No new funding needed</span>
           </td>
-          <td>Runs on the CrowPi board and demo tags the team already has; see Phase 1 bill of materials below for the tag SKU.</td>
+          <td>Runs on the CrowPi board and demo tags the team already has; see bill of materials below for the tag SKU.</td>
         </tr>
         <tr>
-          <td>Phase 2, Classroom Pilot</td>
+          <td>Later hardware stages</td>
           <td>
-            <span class="rfid-presence-pill rfid-presence-pill-warn">Small ask</span>
+            <span class="rfid-presence-pill rfid-presence-pill-neutral">No active ask, paused</span>
           </td>
-          <td>Adhesive RFID stickers for the full class (20 or more units), applied one per playing card, same MIFARE Classic 1K family as the demo tags. No new reader hardware; see Phase 2 bill of materials below.</td>
-        </tr>
-        <tr>
-          <td>Phase 3, UHF Doorway Transition</td>
-          <td>
-            <span class="rfid-presence-pill rfid-presence-pill-bad">Main ask, see bill of materials below</span>
-          </td>
-          <td>UHF Pi HAT, antenna, cable, and tamper-evident, on-metal, and UHF tags for a single door-table rig.</td>
-        </tr>
-        <tr>
-          <td>Phase 4, Full Room-Scale</td>
-          <td>
-            <span class="rfid-presence-pill rfid-presence-pill-neutral">Future ask, quantities to be determined</span>
-          </td>
-          <td>A second reader and antenna set for the back door, plus higher-gain antennas and enclosures for full-room coverage. Sizing depends on the confirmed classroom's dimensions; see open questions below.</td>
+          <td>Priced below for reference. Not requested until the research cycles show this hardware is worth building.</td>
         </tr>
       </tbody>
     </table>
   </div>
 </div>
 <div class="ocs__card">
-  <h3 class="ocs__section-title">Phase 1 Bill of Materials</h3>
-  <p class="rfid-presence-about">Already covered by hardware the team has on hand. Listed here for reference and as the SKU to re-order from if more demo tags are needed, or to scale up for Phase 2.</p>
+  <h3 class="ocs__section-title">Current Bill of Materials</h3>
+  <p class="rfid-presence-about">Already covered by hardware the team has on hand. Listed here for reference and as the SKU to re-order from if more demo tags are needed.</p>
   <div class="rfid-presence-table-wrap">
     <table class="ocs__table rfid-presence-table">
       <thead>
@@ -79,7 +65,7 @@ rp_active: funding
           <td>MIFARE Classic 1K keychain RFID fob (pack of 10)</td>
           <td>ISO14443A, 13.56MHz, S50 chip, ABS+PC keychain fob, roughly 40&#215;30&#215;3mm</td>
           <td>$7.99 per 10-pack ($0.80/tag)</td>
-          <td>The demo tags currently used with the CrowPi reader in Phase 1. Same MIFARE Classic 1K family Phase 2's real student tags will need, so this is also the reference SKU for scaling that order up.</td>
+          <td>The demo tags currently used with the CrowPi reader. Same MIFARE Classic 1K family the real student tags would need if the classroom pilot resumes, so this is also the reference SKU for scaling that order up.</td>
           <td>
             <a href="https://www.amazon.com/dp/B0F9FC5133" target="_blank" rel="noopener">Amazon</a>
           </td>
@@ -89,8 +75,9 @@ rp_active: funding
   </div>
 </div>
 <div class="ocs__card">
-  <h3 class="ocs__section-title">Phase 2 Bill of Materials</h3>
-  <p class="rfid-presence-about">Adhesive stickers to apply one per playing card, one per student. Same MIFARE Classic 1K chip as the Phase 1 demo tags, so no reader changes are needed.</p>
+  <h3 class="ocs__section-title">Paused Hardware Stages, Priced for Reference</h3>
+  <p class="rfid-presence-about">Not an active funding ask. Priced now so a real number exists if the research cycles show this hardware is worth building; see the <a href="https://github.com/vibha1019/crowpi-attendance/issues/5" target="_blank" rel="noopener">Research Proposal</a> for why it's paused.</p>
+  <h4>Classroom pilot: adhesive tags</h4>
   <div class="rfid-presence-table-wrap">
     <table class="ocs__table rfid-presence-table">
       <thead>
@@ -107,7 +94,7 @@ rp_active: funding
           <td>MIFARE Classic 1K round adhesive NFC/RFID sticker (pack of 40)</td>
           <td>ISO14443A, 13.56MHz, 1K byte memory, 1 inch (25mm) round, self-adhesive</td>
           <td>$7.97 per 40-pack (about $0.20/tag)</td>
-          <td>Same chip family as the Phase 1 keychain tags, so it works with the existing CrowPi reader unchanged. Small enough to apply directly to a playing card face. One 40-pack comfortably covers a 20 to 34 student class with spares for misprints or reissues.</td>
+          <td>Same chip family as the current keychain tags, so it works with the existing CrowPi reader unchanged. Small enough to apply directly to a playing card face. One 40-pack comfortably covers a 20 to 34 student class with spares for misprints or reissues.</td>
           <td>
             <a href="https://www.amazon.com/Adhesive-Stickers-Self-Adhesive-Commercial-Proximity/dp/B0G1M659Q7" target="_blank" rel="noopener">Amazon</a>
           </td>
@@ -115,10 +102,8 @@ rp_active: funding
       </tbody>
     </table>
   </div>
-</div>
-<div class="ocs__card">
-  <h3 class="ocs__section-title">Phase 3 Bill of Materials</h3>
-  <p class="rfid-presence-about">Room and door-table setup are confirmed; hardware itself is not purchased yet. The teacher supplied concrete RF specs for the initial door-table test rig below.</p>
+  <h4 style="margin-top:1.5rem;">UHF doorway transition</h4>
+  <p class="rfid-presence-about">Room and door-table setup are confirmed. The teacher supplied concrete RF specs for the initial door-table test rig below.</p>
   <div class="rfid-presence-table-wrap">
     <table class="ocs__table rfid-presence-table">
       <thead>
@@ -198,23 +183,19 @@ rp_active: funding
     </table>
   </div>
   <div class="ocs__callout">
-  <strong>Rough Phase 3 estimate:</strong> the items with confirmed pricing above total roughly
-  <strong>$30 to $50</strong>(cable, test antenna, and a small batch of tamper and Alien H3 tags). The Pi/HAT kit and on-metal tag pack prices still need to be pulled from their current listings before a full ask total can be finalized.</div>
+  <strong>Rough UHF-stage estimate:</strong> the items with confirmed pricing above total roughly
+  <strong>$30 to $50</strong> (cable, test antenna, and a small batch of tamper and Alien H3 tags), reference pricing only, not a current request. The Pi/HAT kit and on-metal tag pack prices still need to be pulled from their current listings before a full estimate can be finalized, whenever this stage actually resumes.</div>
 </div>
 <div class="ocs__card">
-  <h3 class="ocs__section-title">Open Budget Questions</h3>
+  <h3 class="ocs__section-title">Open Questions, If This Stage Resumes</h3>
   <ul class="ocs__checklist">
     <li class="open">
       <span class="ocs__checklist-box"></span>
-      <span>Sign-off: Phase 3 hardware purchase (HAT, cable, antenna, tags) still needs approval.</span>
+      <span>Room measurements: actual dimensions and door layout of the confirmed classroom would be needed to size a full-room antenna upgrade and produce a real cost estimate.</span>
     </li>
     <li class="open">
       <span class="ocs__checklist-box"></span>
-      <span>Room measurements: actual dimensions and door layout of the confirmed classroom are needed to size the Phase 4 full-room antenna upgrade and produce a real cost estimate for that phase.</span>
-    </li>
-    <li class="open">
-      <span class="ocs__checklist-box"></span>
-      <span>Confirmed Pi/HAT and on-metal-tag pricing: current listing prices need to be pulled to finalize the Phase 3 total.</span>
+      <span>Confirmed Pi/HAT and on-metal-tag pricing: current listing prices would need to be pulled to finalize a real total.</span>
     </li>
   </ul>
 </div>

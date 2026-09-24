@@ -2,31 +2,32 @@
 microblog: true
 toc: false
 layout: post
-title: RFID Presence, Project Summary
-description: A plain-language summary of the RFID + camera-correlated classroom presence project for mentors, covering the problem, the idea, and the design rationale.
-permalink: /capstone/rfid-presence/summary/
+title: Classroom Presence System, Project Summary
+description: A plain-language summary of the classroom presence project for mentors, covering the problem, the idea, and the design rationale.
+permalink: /capstone/presence-system/summary/
 year: "2026-2027"
 rp_active: summary
 ---
 
-{% assign data = site.data.rfid_presence_infograph %}
+{% assign data = site.data.presence_system_infograph %}
 <!-- markdownlint-disable MD033 MD010 MD012 -->
 <div class="rfid-presence-infograph">
   <div class="rfid-presence-header">
     <div class="ocs__badge">Project Summary, For Mentors</div>
     <h1 class="rfid-presence-title">Classroom Presence System</h1>
-    <p class="ocs__description">The idea, why it's designed this way, where it stands today, and how it compares to what already exists. See the <a href="/capstone/rfid-presence/">Overview</a> page for the problem statement and research question.</p>
+    <p class="ocs__description">The idea, why it's designed this way, where it stands today, and how it compares to what already exists. See the <a href="/capstone/presence-system/">Overview</a> page for the problem statement and research question.</p>
   </div>
 
-  {% include rfid-presence-nav.html %}
+  {% include presence-system-nav.html %}
 
   <div class="ocs__card">
     <h3 class="ocs__section-title">The Idea, in One Paragraph</h3>
-    <p class="rfid-presence-question">Mount a tamper-evident RFID tag on each student's own laptop, not a wearable badge, since laptops are far less likely to be left in a locker, and read it at the classroom door. That tells us the <strong>device</strong> is present. Separately, an existing face-scanning camera system (built by a teammate on another OCS project) tells us the <strong>student</strong> is present. Neither signal alone is trustworthy attendance: a laptop can sit in the room while its owner is in the bathroom, and a face can be recognized without the device belonging to that class period. Correlating the two against the bell schedule and per-period roster produces a real presence determination.</p>
+    <p class="rfid-presence-question">The goal is to know each student's actual instructional minutes in the room and who's currently missing, without a teacher taking or visually verifying attendance. Three inputs are being evaluated toward that goal: RFID tap (Vibha), QR scan (Ruta), and face scan (Kush), each tracked separately in the <a href="https://github.com/vibha1019/crowpi-attendance/issues/9" target="_blank" rel="noopener">Presence System Index</a>. The rest of this page zooms into the most-developed pairing so far: RFID tap correlated with an existing face-scanning camera system built by a teammate on another OCS project.</p>
+    <p class="rfid-presence-question">Mount a tamper-evident RFID tag on each student's own laptop, not a wearable badge, since laptops are far less likely to be left in a locker, and read it at the classroom door. That tells us the <strong>device</strong> is present. The camera separately tells us the <strong>student</strong> is present. Neither signal alone is trustworthy attendance: a laptop can sit in the room while its owner is in the bathroom, and a face can be recognized without the device belonging to that class period. Correlating RFID and camera against the bell schedule and per-period roster produces a real presence determination for that pairing.</p>
   </div>
 
   <div class="ocs__card">
-    <h3 class="ocs__section-title">Why It's Designed This Way</h3>
+    <h3 class="ocs__section-title">Why the RFID + Camera Pairing Is Designed This Way</h3>
     <div class="rfid-presence-table-wrap">
       <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Decision</th><th>In plain terms</th></tr></thead>
@@ -40,7 +41,7 @@ rp_active: summary
       </table>
     </div>
     <div class="ocs__callout">
-      The full technical rationale, state model, and data schema are on the <a href="/capstone/rfid-presence/technical/">Technical Detail</a> page.
+      The full technical rationale, state model, and data schema are on the <a href="/capstone/presence-system/technical/">Technical Detail</a> page.
     </div>
   </div>
 
@@ -58,15 +59,15 @@ rp_active: summary
 
   <div class="ocs__card">
     <h3 class="ocs__section-title">Where It Stands Today</h3>
-    <p class="rfid-presence-about">We're in <strong>Phase 1</strong>: a working contact-tap prototype on a CrowPi board, with one scan pad, 10 demo tags, a Flask backend, and a rough dashboard. It proves the core read, log, and display loop end to end. It does not yet include the camera correlation, UHF doorway detection, or tamper-evident tags described above. Those arrive in later phases, moving from proving the concept works to proving it works contactlessly, at classroom scale.</p>
+    <p class="rfid-presence-about">The RFID track has a working contact-tap prototype on a CrowPi board, with one scan pad, a Flask backend integrated into OCS, and a live dashboard, proving the core read, log, and display loop end to end. It does not yet include the camera correlation, UHF doorway detection, or tamper-evident tags described above; that hardware work is intentionally paused until the research cycles show it's worth deepening. QR and camera integration have not started.</p>
     <div class="ocs__callout">
-      The full four-phase roadmap, including what's built versus still needed, is on the <a href="/capstone/rfid-presence/phases/">Phases</a> page.
+      Current status per track is on the <a href="/capstone/presence-system/">Overview</a> page. What the paused later hardware stages would involve is on the <a href="/capstone/presence-system/phases/">Phases</a> page.
     </div>
   </div>
 
   <div class="ocs__card">
     <h3 class="ocs__section-title">Prior Research &amp; Comparable Systems</h3>
-    <p class="rfid-presence-about">A survey of academic work, related patents, commercial products, and regulatory sources reviewed before finalizing this design, covering classroom attendance systems directly and the underlying RF, sensor-fusion, and UX questions the design depends on (on-body tag reliability, antenna diversity, tag co-location interference, clock synchronization, and audible read confirmation). This is a September 2026 research snapshot, not a formal literature review or patent-clearance search; a proper IP-clearance pass should happen before any claim of novelty is made publicly.</p>
+    <p class="rfid-presence-about">This research is specific to the RFID and camera pairing above; QR has a separate, much smaller literature base not yet reviewed here. A survey of academic work, related patents, commercial products, and regulatory sources reviewed before finalizing this design, covering classroom attendance systems directly and the underlying RF, sensor-fusion, and UX questions the design depends on (on-body tag reliability, antenna diversity, tag co-location interference, clock synchronization, and audible read confirmation). This is a September 2026 research snapshot, not a formal literature review or patent-clearance search; a proper IP-clearance pass should happen before any claim of novelty is made publicly.</p>
 
     <h3 class="ocs__section-title" style="margin-top:1.5rem;">Academic literature</h3>
     <div class="rfid-presence-table-wrap">
@@ -196,7 +197,7 @@ rp_active: summary
           </tr>
           <tr>
             <td><a href="https://www.beontag.com/blog/rfid-read-range/" target="_blank" rel="noopener">RFID Read Range: What Really Affects It</a></td>
-            <td>Practical vendor reference on the factors (power, polarization, orientation, material) behind the read-range numbers used in the <a href="/capstone/rfid-presence/funding/">Funding</a> page bill of materials.</td>
+            <td>Practical vendor reference on the factors (power, polarization, orientation, material) behind the read-range numbers used in the <a href="/capstone/presence-system/funding/">Funding</a> page bill of materials.</td>
           </tr>
           <tr>
             <td><a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/mop.27610" target="_blank" rel="noopener">Card-Type Slot Antenna for UHF RFID Tag Close to the Chest of a Human Body</a></td>
@@ -311,14 +312,14 @@ rp_active: summary
       </table>
     </div>
 
-    <h3 class="ocs__section-title" style="margin-top:1.5rem;">How this project differs, in summary</h3>
+    <h3 class="ocs__section-title" style="margin-top:1.5rem;">How the RFID + camera pairing differs, in summary</h3>
     <ul class="ocs__checklist">
       <li class="done"><span class="ocs__checklist-box"></span><span>The tag is mounted on the student's own laptop, not a badge or ID card. It is a device-presence proxy, not a person-presence proxy.</span></li>
       <li class="done"><span class="ocs__checklist-box"></span><span>Tags are tamper-evident, with an explicit issue, active, tampered/lost, and reissued/retired lifecycle.</span></li>
       <li class="done"><span class="ocs__checklist-box"></span><span>Presence is a multi-state model (tardy, stepped out, left early, opted out, tamper) rather than a binary present/absent flag.</span></li>
       <li class="done"><span class="ocs__checklist-box"></span><span>Attendance counts only inside a bell-schedule-bound window, evaluated against per-period expected enrollment.</span></li>
       <li class="done"><span class="ocs__checklist-box"></span><span>The camera signal carries an explicit opt-in governance model, built in from the start rather than added later.</span></li>
-      <li class="done"><span class="ocs__checklist-box"></span><span>The hardware rollout is deliberately phased: contact-tap prototype first, contactless room-scale detection last, rather than building the hardest hardware problem up front.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>The hardware rollout is deliberately phased and currently paused after contact-tap: harder contactless work only resumes once the research cycles show it's worth building, not built up front on assumption.</span></li>
       <li class="done"><span class="ocs__checklist-box"></span><span>The doorway is designed as a multi-antenna, circularly-polarized portal from the start (the same antenna-diversity technique library and retail security gates use) rather than a single reader antenna, because tag orientation at a walk-through point is inherently unpredictable.</span></li>
       <li class="done"><span class="ocs__checklist-box"></span><span>An audible read-confirmation tone at the doorway is being evaluated so a student has positive proof their crossing registered, rather than trusting a silent background scan, a pattern with real precedent in RFID reader hardware and library systems but not common in the classroom-attendance literature surveyed above.</span></li>
     </ul>

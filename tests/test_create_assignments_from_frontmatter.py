@@ -5,10 +5,14 @@ from pathlib import Path
 
 from scripts.create_assignments_from_frontmatter import (
     AssignmentFrontmatterError,
+    RequestPacer,
     canonicalize_content_url,
     create_assignment,
     deduplicate_candidates,
+    deduplicate_candidates_resilient,
     determine_content_url,
+    find_files,
+    post_with_rate_limit_retry,
     read_course_codes,
     read_creator_uids,
     read_frontmatter,
@@ -22,6 +26,79 @@ class RecordingSession:
     def post(self, url, data, timeout):
         self.request = {"url": url, "data": data, "timeout": timeout}
         return object()
+
+
+class RateLimitRetryTests(unittest.TestCase):
+    def test_rate_limited_request_honors_retry_after_then_succeeds(self):
+        class Response:
+            def __init__(self, status_code, retry_after=None):
+                self.status_code = status_code
+                self.headers = {} if retry_after is None else {"Retry-After": retry_after}
+
+        class Session:
+            def __init__(self):
+                self.responses = [Response(429, "2"), Response(200)]
+                self.calls = 0
+
+            def post(self, url, **kwargs):
+                self.calls += 1
+                return self.responses.pop(0)
+
+        session = Session()
+        sleeps = []
+
+        response = post_with_rate_limit_retry(
+            session,
+            "https://spring.example.test/api/assignments/auto-create",
+            sleeper=sleeps.append,
+            data={"name": "Assignment"},
+            timeout=30,
+        )
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, session.calls)
+        self.assertEqual([2], sleeps)
+
+
+class AssignmentSourceDiscoveryTests(unittest.TestCase):
+    def test_generated_registered_project_outputs_are_not_scanned(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            paths = [
+                root / "_projects/lessons/java/notebooks/source.ipynb",
+                root / "_notebooks/projects/java/generated.ipynb",
+                root / "_posts/projects/java/generated.md",
+                root / "_sass/projects/java/generated.ipynb",
+                root / "_notebooks/Foundation/source.ipynb",
+            ]
+            for path in paths:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("{}", encoding="utf-8")
+
+            found = {path.relative_to(root).as_posix() for path in find_files(root)}
+
+        self.assertEqual(
+            {
+                "_projects/lessons/java/notebooks/source.ipynb",
+                "_notebooks/Foundation/source.ipynb",
+            },
+            found,
+        )
+
+
+class RequestPacerTests(unittest.TestCase):
+    def test_requests_are_spaced_below_the_configured_limit(self):
+        sleeps = []
+        pacer = RequestPacer(60, clock=lambda: 10.0, sleeper=sleeps.append)
+
+        pacer.wait()
+        pacer.wait()
+
+        self.assertEqual([1.0], sleeps)
+
+    def test_nonpositive_limit_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "greater than zero"):
+            RequestPacer(0)
 
 
 class AssignmentCreatorFrontmatterTests(unittest.TestCase):
@@ -185,6 +262,43 @@ class AssignmentCreatorFrontmatterTests(unittest.TestCase):
 
         with self.assertRaisesRegex(AssignmentFrontmatterError, "Conflicting assignment metadata"):
             deduplicate_candidates(candidates)
+
+    def test_source_notebook_wins_over_stale_generated_post(self):
+        candidates = [
+            (Path("_posts/generated.md"), "csa/lesson", "Lesson", "A", None, None, None, [], None),
+            (Path("_notebooks/lesson.ipynb"), "csa/lesson", "Lesson", "A", None, None, "link", ["creator"], ["CSA"]),
+        ]
+
+        result = deduplicate_candidates(candidates)
+
+        self.assertEqual(1, len(result))
+        self.assertEqual(Path("_notebooks/lesson.ipynb"), result[0][0])
+        self.assertEqual(["creator"], result[0][7])
+
+    def test_stale_generated_metadata_cannot_erase_source_metadata(self):
+        candidates = [
+            (Path("_notebooks/lesson.ipynb"), "csa/lesson", "Lesson", "A", None, None, "link", ["creator"], ["CSA"]),
+            (Path("_posts/generated.md"), "csa/lesson", "Lesson", "A", None, None, None, [], None),
+        ]
+
+        result = deduplicate_candidates(candidates)
+
+        self.assertEqual(1, len(result))
+        self.assertEqual(Path("_notebooks/lesson.ipynb"), result[0][0])
+        self.assertEqual(("link", ["creator"], ["CSA"]), result[0][6:9])
+
+    def test_one_conflicting_url_does_not_block_unrelated_assignments(self):
+        candidates = [
+            (Path("one.md"), "csa/conflict", "One", "A", None, None, None, [], ["CSA"]),
+            (Path("two.md"), "csa/conflict", "Two", "B", None, None, None, [], ["CSP"]),
+            (Path("valid.md"), "csa/valid", "Valid", "C", None, None, None, ["creator"], ["CSA"]),
+        ]
+
+        resolved, errors = deduplicate_candidates_resilient(candidates)
+
+        self.assertEqual(["csa/valid"], [candidate[1] for candidate in resolved])
+        self.assertEqual(1, len(errors))
+        self.assertIn("csa/conflict", errors[0])
 
 
 class ContentUrlDerivationTests(unittest.TestCase):

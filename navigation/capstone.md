@@ -358,15 +358,15 @@ document.addEventListener('DOMContentLoaded', function(){
    </div>
 
 
-   <!-- RFID + Camera-Correlated Classroom Presence -->
+   <!-- Classroom Presence System (RFID + QR + Camera) -->
    <div class="ocs__grid-cell CSH" data-year="2026-2027">
-     <a href="{% post_url capstone/RFID/2026-09-12-rfid-presence-capstone %}">
-       <div class="ocs__image-frame ocs__image-frame--thumbnail capstone-card-placeholder" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">RFID</div>
+     <a href="{% post_url capstone/Presence/2026-09-12-presence-system-capstone %}">
+       <div class="ocs__image-frame ocs__image-frame--thumbnail capstone-card-placeholder" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">Presence</div>
      </a>
      <div>
-       <h3><a href="{% post_url capstone/RFID/2026-09-12-rfid-presence-capstone %}">RFID + Camera-Correlated Classroom Presence</a></h3>
-       <p>A low-cost Raspberry Pi UHF RFID system that tracks device presence at the doorway and correlates it with an existing face-scanning camera system to determine true student presence, period by period.</p>
-       <p>Team: Ruta Sirdeshmukh, Vibha Mandayam, Kush Shah</p>
+       <h3><a href="{% post_url capstone/Presence/2026-09-12-presence-system-capstone %}">Classroom Presence System</a></h3>
+       <p>A design-based research project asking whether classroom presence can be measured with zero teacher effort. Three low-effort inputs, RFID tap, QR scan, and face scan, are evaluated in parallel against a shared presence engine and the bell schedule to track instructional minutes and show who is missing in real time.</p>
+       <p>Team: Vibha Mandayam (RFID), Ruta Sirdeshmukh (QR), Kush Shah (Camera)</p>
      </div>
    </div>
     <!-- Jarvis Classroom Object Detection -->

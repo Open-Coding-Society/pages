@@ -2,18 +2,18 @@
 microblog: true
 toc: false
 layout: post
-title: RFID Presence, Phase 1, Contact-Tap Prototype
+title: Classroom Presence System, Phase 1, Contact-Tap Prototype
 description: The current working prototype, a contact-tap RFID reader, Flask backend, and dashboard, proving the core read-log-display loop.
-permalink: /capstone/rfid-presence/phases/phase-1/
+permalink: /capstone/presence-system/phases/phase-1/
 year: "2026-2027"
 rp_active: phases
 ---
 
 
-{% assign data = site.data.rfid_presence_infograph %}
+{% assign data = site.data.presence_system_infograph %}
 <!-- markdownlint-disable MD033 MD010 MD012 -->
 <div class="rfid-presence-infograph">
-  <a href="/capstone/rfid-presence/phases/" class="ocs__phase-crumb">&larr; All Phases</a>
+  <a href="/capstone/presence-system/phases/" class="ocs__phase-crumb">&larr; All Phases</a>
 
   <div class="rfid-presence-header">
     <div class="ocs__badge">Phase 1 of 4</div>
@@ -22,7 +22,7 @@ rp_active: phases
     <div class="ocs__status">Current, Working</div>
   </div>
 
-  {% include rfid-presence-nav.html %}
+  {% include presence-system-nav.html %}
 
   <div class="ocs__card">
     <h3 class="ocs__section-title">How It Works Today</h3>
@@ -49,7 +49,7 @@ shows scan events"]</pre>
       <li><strong>Frontend</strong>: rough scan-event dashboard</li>
     </ul>
     <div class="ocs__callout">
-      Contact-based (tap), single reader, no camera correlation yet. This validates the concept, not the target hardware described on the <a href="/capstone/rfid-presence/technical/">Technical Detail</a> page. See <a href="/capstone/rfid-presence/funding/">Funding</a> for the demo tag SKU.
+      Contact-based (tap), single reader, no camera correlation yet. This validates the concept, not the target hardware described on the <a href="/capstone/presence-system/technical/">Technical Detail</a> page. See <a href="/capstone/presence-system/funding/">Funding</a> for the demo tag SKU.
     </div>
   </div>
 
@@ -63,8 +63,8 @@ shows scan events"]</pre>
   </div>
 
   <div class="ocs__pager">
-    <span></span>
-    <a href="/capstone/rfid-presence/phases/phase-2/" class="ocs__pager-link next">Next: Phase 2, Classroom Pilot &rarr;</a>
+    <a href="/capstone/presence-system/phases/" class="ocs__pager-link">&larr; All Phases</a>
+    <a href="https://github.com/vibha1019/crowpi-attendance/issues/5" target="_blank" rel="noopener" class="ocs__pager-link next">Next: Research Proposal &rarr;</a>
   </div>
 
   <div class="ocs__card">

@@ -37,7 +37,7 @@ year: "2026-2027"
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Existing Foundation</strong>
         <p>The previous team's handoff describes Risk Watch, the Helper Bot, a neighborhood map, member accounts, and a browser-based site editor. We will review these inherited features before extending them.</p>
-        <a class="ocs__btn alert-green fill small" href="{% post_url 2026-03-06-powaynec-capstone %}">Previous Team's Handoff</a>
+        <a class="ocs__btn alert-green fill small" href="{{ '/capstone/powaynec/' | relative_url }}">Previous Team's Handoff</a>
     </div>
     <div class="ocs__grid-cell">
         <strong>Community Participation</strong>

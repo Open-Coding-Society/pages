@@ -16,6 +16,7 @@ import json
 import os
 import re
 import sys
+import time
 from collections import OrderedDict
 from pathlib import Path
 from urllib.parse import quote
@@ -29,17 +30,66 @@ FRONTMATTER_RE = re.compile(r"^\ufeff?\s*---\s*\n(.*?)\n---\s*(?:\n|$)", re.S)
 DEFAULT_BASE_URL = os.getenv("BASE_URL", "https://spring.opencodingsociety.com")
 DEFAULT_UID = os.getenv("PAGES_BOT_UID", "pages-bot")
 DEFAULT_PASSWORD = os.getenv("PAGES_BOT_PASSWORD", "")
+DEFAULT_REQUESTS_PER_MINUTE = int(os.getenv("ASSIGNMENT_SYNC_REQUESTS_PER_MINUTE", "80"))
+GENERATED_PROJECT_ROOTS = {
+    ("_notebooks", "projects"),
+    ("_posts", "projects"),
+    ("_sass", "projects"),
+}
 
 
 class AssignmentFrontmatterError(ValueError):
     """Raised when assignment-specific frontmatter cannot be synchronized safely."""
 
 
+class RequestPacer:
+    """Keep repository-wide synchronization below Spring's per-client limit."""
+
+    def __init__(self, requests_per_minute, clock=time.monotonic, sleeper=time.sleep):
+        if requests_per_minute <= 0:
+            raise ValueError("requests_per_minute must be greater than zero")
+        self.interval = 60.0 / requests_per_minute
+        self.clock = clock
+        self.sleeper = sleeper
+        self.next_request_at = None
+
+    def wait(self):
+        now = self.clock()
+        if self.next_request_at is not None and now < self.next_request_at:
+            delay = self.next_request_at - now
+            self.sleeper(delay)
+            now += delay
+        self.next_request_at = now + self.interval
+
+
+def post_with_rate_limit_retry(session, url, *, max_attempts=3, sleeper=time.sleep, **kwargs):
+    """Retry a throttled request when shared infrastructure still returns HTTP 429."""
+    response = None
+    for attempt in range(max_attempts):
+        response = session.post(url, **kwargs)
+        if getattr(response, "status_code", None) != 429 or attempt == max_attempts - 1:
+            return response
+
+        retry_after = response.headers.get("Retry-After") if hasattr(response, "headers") else None
+        try:
+            delay = max(1, int(retry_after)) if retry_after else 60
+        except ValueError:
+            delay = 60
+        print(f"Rate limited by Spring; retrying in {delay} seconds", file=sys.stderr)
+        sleeper(delay)
+    return response
+
+
 def find_files(root: Path):
+    """Yield editable assignment sources, excluding registered-project build outputs."""
     exts = {".md", ".markdown", ".html", ".htm", ".ipynb"}
-    for p in root.rglob("*"):
-        if p.is_file() and p.suffix.lower() in exts:
-            yield p
+    for path in root.rglob("*"):
+        if not path.is_file() or path.suffix.lower() not in exts:
+            continue
+        relative_parts = path.relative_to(root).parts
+        if len(relative_parts) >= 2 and relative_parts[:2] in GENERATED_PROJECT_ROOTS:
+            continue
+        yield path
 
 
 def parse_frontmatter_text(text: str):
@@ -232,21 +282,52 @@ def deduplicate_candidates(candidates):
             continue
 
         existing = unique[content_url]
-        # Generated posts can intentionally shorten display text from their source
-        # notebook. Only ownership and course metadata is resynchronized on existing
-        # assignments, so those are the fields where disagreement must stop the run.
-        if existing[6:9] != candidate[6:9]:
-            raise AssignmentFrontmatterError(
-                "Conflicting assignment metadata for contentUrl "
-                f"'{content_url}' in {existing[0]} and {path}"
+
+        # Conversion may temporarily leave a generated copy without newer optional
+        # synchronization fields. Merge complementary metadata without relying on path
+        # conventions; two different populated values remain a real conflict.
+        merged_sync_metadata = []
+        for existing_value, candidate_value in zip(existing[6:9], candidate[6:9]):
+            existing_is_populated = existing_value is not None and existing_value != []
+            candidate_is_populated = candidate_value is not None and candidate_value != []
+            if existing_is_populated and candidate_is_populated and existing_value != candidate_value:
+                raise AssignmentFrontmatterError(
+                    "Conflicting assignment metadata for contentUrl "
+                    f"'{content_url}' in {existing[0]} and {path}"
+                )
+            merged_sync_metadata.append(
+                existing_value if existing_is_populated else candidate_value
             )
 
-        # The notebook is the editable source; prefer it when its generated post is also
-        # checked in. Its display metadata is authoritative for first-time creation.
-        if path.suffix.lower() == ".ipynb":
-            unique[content_url] = candidate
+        # Prefer the editable notebook's display metadata when a converted copy is also
+        # present, then apply the safely merged synchronization fields to that candidate.
+        preferred = candidate if path.suffix.lower() == ".ipynb" else existing
+        merged = list(preferred)
+        merged[6:9] = merged_sync_metadata
+        unique[content_url] = tuple(merged)
 
     return list(unique.values())
+
+
+def deduplicate_candidates_resilient(candidates):
+    """Resolve each assignment URL independently.
+
+    A malformed duplicate must be reported, but it must not prevent unrelated valid
+    assignments from reaching Spring. The workflow still exits unsuccessfully after the
+    valid assignments are synchronized so maintainers cannot miss the bad metadata.
+    """
+    candidates_by_url = OrderedDict()
+    for candidate in candidates:
+        candidates_by_url.setdefault(candidate[1], []).append(candidate)
+
+    resolved = []
+    errors = []
+    for url_candidates in candidates_by_url.values():
+        try:
+            resolved.extend(deduplicate_candidates(url_candidates))
+        except AssignmentFrontmatterError as error:
+            errors.append(str(error))
+    return resolved, errors
 
 
 def authenticate(session: requests.Session, base_url: str, uid: str, password: str):
@@ -287,7 +368,12 @@ def create_assignment(
         # As with creatorUids, Requests emits one form field per list entry.
         payload["courseCodes"] = course_codes
     # Use form-encoded to match frontend
-    resp = session.post(f"{base_url}/api/assignments/auto-create", data=payload, timeout=30)
+    resp = post_with_rate_limit_retry(
+        session,
+        f"{base_url}/api/assignments/auto-create",
+        data=payload,
+        timeout=30,
+    )
     return resp
 
 
@@ -301,7 +387,12 @@ def create_assignment_full(session: requests.Session, base_url: str, name: str, 
         "dueDate": dueDate,
         "assignmentType": assignmentType,
     }
-    resp = session.post(f"{base_url}/api/assignments/create", data=payload, timeout=30)
+    resp = post_with_rate_limit_retry(
+        session,
+        f"{base_url}/api/assignments/create",
+        data=payload,
+        timeout=30,
+    )
     return resp
 
 
@@ -312,10 +403,19 @@ def main():
     parser.add_argument("--uid", default=DEFAULT_UID)
     parser.add_argument("--password", default=DEFAULT_PASSWORD)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--requests-per-minute",
+        type=int,
+        default=DEFAULT_REQUESTS_PER_MINUTE,
+        help="Maximum synchronization requests per minute (default: 80)",
+    )
     parser.add_argument("--create", action="store_true", help="Use POST /api/assignments/create with full params from frontmatter (requires teacher/admin)")
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
+    if args.requests_per_minute <= 0:
+        print("requests-per-minute must be greater than zero", file=sys.stderr)
+        return 2
     if not root.exists():
         print("Root not found", file=sys.stderr)
         return 2
@@ -328,7 +428,9 @@ def main():
         authenticate(session, args.base_url, args.uid, args.password)
         print("Authenticated OK")
 
+    pacer = RequestPacer(args.requests_per_minute)
     candidates = []
+    errors = []
     for f in find_files(root):
         fm = read_frontmatter(f)
         if not fm:
@@ -348,25 +450,25 @@ def main():
                 creator_uids = read_creator_uids(fm, f)
                 course_codes = read_course_codes(fm, f)
             except AssignmentFrontmatterError as error:
-                print(f"Invalid assignment frontmatter: {error}", file=sys.stderr)
-                return 2
+                errors.append(str(error))
+                continue
             candidates.append(
                 (f, content_url, name, description, points, due_date,
                  assignment_submission_type, creator_uids, course_codes)
             )
 
-    try:
-        candidates = deduplicate_candidates(candidates)
-    except AssignmentFrontmatterError as error:
-        print(f"Invalid assignment frontmatter: {error}", file=sys.stderr)
-        return 2
+    candidates, duplicate_errors = deduplicate_candidates_resilient(candidates)
+    errors.extend(duplicate_errors)
 
     if not candidates:
         print("No pages with assignment: true found.")
-        return 0
+        for error in errors:
+            print(f"Invalid assignment frontmatter: {error}", file=sys.stderr)
+        return 2 if errors else 0
 
     print(f"Found {len(candidates)} pages with assignment: true")
     for path, content_url, name, description, points, due_date, assignment_submission_type, creator_uids, course_codes in candidates:
+        print(f"Processing assignment for path: {path}, contentUrl={content_url}, name={name}")
         creator_summary = ",".join(creator_uids) if creator_uids else "legacy/unassigned"
         course_summary = ",".join(course_codes) if course_codes else "legacy/unassigned"
         print(
@@ -406,14 +508,21 @@ def main():
                 continue
 
             try:
+                pacer.wait()
                 resp = create_assignment_full(session, args.base_url, name, atype, description, points, str(dueDate), assignment_submission_type or "file")
                 print(f"  {resp.status_code} {resp.text[:200]}")
+                if not resp.ok:
+                    errors.append(
+                        f"Spring rejected '{content_url}': {resp.status_code} {resp.text[:200]}"
+                    )
             except Exception as e:
                 print(f"  ERROR: {e}")
+                errors.append(f"Could not synchronize '{content_url}': {e}")
         else:
             if args.dry_run:
                 continue
             try:
+                pacer.wait()
                 resp = create_assignment(
                     session,
                     args.base_url,
@@ -427,10 +536,17 @@ def main():
                     course_codes,
                 )
                 print(f"  {resp.status_code} {resp.text[:200]}")
+                if not resp.ok:
+                    errors.append(
+                        f"Spring rejected '{content_url}': {resp.status_code} {resp.text[:200]}"
+                    )
             except Exception as e:
                 print(f"  ERROR: {e}")
+                errors.append(f"Could not synchronize '{content_url}': {e}")
 
-    return 0
+    for error in errors:
+        print(f"Assignment synchronization error: {error}", file=sys.stderr)
+    return 2 if errors else 0
 
 
 if __name__ == "__main__":

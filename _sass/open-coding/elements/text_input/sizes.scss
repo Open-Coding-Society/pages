@@ -1,34 +1,37 @@
 @import "common.scss";
 
+// OCS input grammar.
+// Legacy selectors are intentionally kept as aliases so existing pages do not break.
+
+input.ocs__input.small,
 input.smallInput {
-    @extend input;
     font-size: 0.8em;
 }
 
+input.ocs__input.medium,
 input.mediumInput {
-    @extend input;
     font-size: 1.1em;
 }
 
+input.ocs__input.large,
 input.largeInput {
-    @extend input;
     font-size: 1.5em;
 }
 
+textarea.ocs__input.small,
 textarea.smallInput {
-    @extend input;
     font-size: 0.8em;
     height: 8em;
 }
 
+textarea.ocs__input.medium,
 textarea.mediumInput {
-    @extend input;
     font-size: 1.1em;
     height: 12em;
 }
 
+textarea.ocs__input.large,
 textarea.largeInput {
-    @extend input;
     font-size: 1.5em;
     height: 24em;
 }

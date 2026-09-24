@@ -23,11 +23,21 @@
     <div class="ocs__grid ocs__grid--card cols-2 language-reference__cards">
         {% for lesson in lessons %}
         {% assign lesson_label = lesson.lesson_source | default: lesson.lesson_part | default: "reference" %}
+        {% comment %}CSA Unit 3 cards use a bottom-pinned "Open lesson" button; all other cards stay full-card links.{% endcomment %}
+        {% if lesson.url contains '/csa/unit_03/' %}
+        <article class="ocs__grid-cell">
+            <span class="ocs__status-pill ocs__status-pill--neutral">{{ lesson_label }}</span>
+            <h2>{{ lesson.title }}</h2>
+            {% if lesson.description %}<p>{{ lesson.description }}</p>{% endif %}
+            <a class="ocs__btn accent fill" href="{{ lesson.url | relative_url }}">Open lesson</a>
+        </article>
+        {% else %}
         <a class="ocs__grid-cell ocs__card" href="{{ lesson.url | relative_url }}">
             <span class="ocs__status-pill ocs__status-pill--neutral">{{ lesson_label }}</span>
             <h2>{{ lesson.title }}</h2>
             {% if lesson.description %}<p>{{ lesson.description }}</p>{% endif %}
         </a>
+        {% endif %}
         {% endfor %}
     </div>
 </div>

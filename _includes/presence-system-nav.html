@@ -1,0 +1,10 @@
+{% include presence-system-common-style.html %}
+
+<nav class="rfid-presence-stage-nav ocs__capstone-nav" aria-label="RFID Presence navigation">
+  <a href="/capstone/presence-system/" class="ocs__btn pill{% if page.rp_active == 'hub' %} accent fill{% endif %}"{% if page.rp_active == 'hub' %} aria-current="page"{% endif %}>Overview</a>
+  <a href="/capstone/presence-system/summary/" class="ocs__btn pill{% if page.rp_active == 'summary' %} accent fill{% endif %}"{% if page.rp_active == 'summary' %} aria-current="page"{% endif %}>Project Summary</a>
+  <a href="/capstone/presence-system/technical/" class="ocs__btn pill{% if page.rp_active == 'technical' %} accent fill{% endif %}"{% if page.rp_active == 'technical' %} aria-current="page"{% endif %}>Technical Detail</a>
+  <a href="/capstone/presence-system/phases/" class="ocs__btn pill{% if page.rp_active == 'phases' %} accent fill{% endif %}"{% if page.rp_active == 'phases' %} aria-current="page"{% endif %}>Phases</a>
+  <a href="/capstone/presence-system/funding/" class="ocs__btn pill{% if page.rp_active == 'funding' %} accent fill{% endif %}"{% if page.rp_active == 'funding' %} aria-current="page"{% endif %}>Funding</a>
+  <a href="/capstone/presence-system/iterations/" class="ocs__btn pill{% if page.rp_active == 'iterations' %} accent fill{% endif %}"{% if page.rp_active == 'iterations' %} aria-current="page"{% endif %}>Iterations</a>
+</nav>

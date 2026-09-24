@@ -2,27 +2,27 @@
 microblog: true
 toc: false
 layout: post
-title: RFID Presence, Technical Detail & Flow
-description: System architecture, the presence-state machine, data model, and attendance-window logic for the RFID + camera-correlated classroom presence project.
-permalink: /capstone/rfid-presence/technical/
+title: Classroom Presence System, Technical Detail & Flow
+description: System architecture, the presence-state machine, data model, and attendance-window logic for the classroom presence project.
+permalink: /capstone/presence-system/technical/
 year: "2026-2027"
 rp_active: technical
 ---
 
-{% assign data = site.data.rfid_presence_infograph %}
+{% assign data = site.data.presence_system_infograph %}
 <!-- markdownlint-disable MD033 MD010 MD012 -->
 <div class="rfid-presence-infograph">
   <div class="rfid-presence-header">
     <div class="ocs__badge">Technical Detail &amp; Flow</div>
     <h1 class="rfid-presence-title">System Architecture &amp; Data Flow</h1>
-    <p class="ocs__description">How the RFID and camera signals get correlated into an attendance record, for readers who want the mechanism and not just the pitch.</p>
+    <p class="ocs__description">How the RFID and camera signals get correlated into an attendance record, the most-developed of the three input tracks, for readers who want the mechanism and not just the pitch. QR follows the same event API once it's generalized.</p>
   </div>
 
-  {% include rfid-presence-nav.html %}
+  {% include presence-system-nav.html %}
 
   <div class="ocs__card">
     <h3 class="ocs__section-title">System Architecture</h3>
-    <p class="rfid-presence-about">Two independent event sources, RFID and camera, feed a correlation engine that is also aware of the bell schedule and per-period enrollment.</p>
+    <p class="rfid-presence-about">For the RFID and camera pairing: two independent event sources feed a correlation engine that is also aware of the bell schedule and per-period enrollment. QR would feed the same engine as a third source once integrated.</p>
     <div class="ocs__diagram">
       <pre class="mermaid">flowchart TD
     BS[Bell Schedule] --> CP[Class / Period]
@@ -64,7 +64,7 @@ Spatial presence, face-scanning system"]
 
   <div class="ocs__card">
     <h3 class="ocs__section-title">Presence State Model</h3>
-    <p class="rfid-presence-about">Two independent signals, device via RFID and student via camera, get correlated into one of these states per student per period.</p>
+    <p class="rfid-presence-about">For the RFID and camera pairing: two independent signals, device via RFID and student via camera, get correlated into one of these states per student per period.</p>
     <div class="ocs__diagram">
       <pre class="mermaid">stateDiagram-v2
     [*] --> ABSENT
@@ -131,22 +131,22 @@ Computer unlinked"]</pre>
   </div>
 
   <div class="ocs__card">
-    <h3 class="ocs__section-title">Current Software Stack (Phase 1)</h3>
+    <h3 class="ocs__section-title">Current Software Stack (RFID Track)</h3>
     <ul class="ocs__entity-list">
       <li><strong>Reader board</strong>: CrowPi, single scan pad, 13.56MHz MIFARE Classic tags. Contact-tap, not the UHF doorway design above.</li>
-      <li><strong>Backend</strong>: Flask dev server. Production deployment and migration off the dev server is a Phase 2 item.</li>
-      <li><strong>Database</strong>: SQLite. Migrating to a production database with a backup strategy is a Phase 2 item.</li>
-      <li><strong>Frontend</strong>: rough dashboard, being replaced with a roster and admin view in Phase 2.</li>
+      <li><strong>Backend</strong>: Flask, integrated into OCS. Real authentication on admin routes and moving off the dev server are still open, tracked in <a href="https://github.com/vibha1019/crowpi-attendance/issues/6" target="_blank" rel="noopener">Issue #6</a>.</li>
+      <li><strong>Database</strong>: OCS's own database via the shared attendance API; the standalone prototype's separate SQLite database is being phased out.</li>
+      <li><strong>Frontend</strong>: a live dashboard, running locally on the team's own network.</li>
     </ul>
     <div class="ocs__callout">
-      The full RFID and camera architecture above is the <strong>target design</strong> the team is building toward. The current running system implements only the leftmost slice of it: RFID read, log, dashboard, with no camera correlation yet. See <a href="/capstone/rfid-presence/phases/">Phases</a> for how the gap closes.
+      The full RFID and camera architecture above is the <strong>target design</strong> for that pairing. The current running system implements only the leftmost slice of it: RFID read, log, dashboard, with no camera correlation yet, and that gap is intentionally not being closed until the research cycles justify it. See <a href="/capstone/presence-system/phases/">Phases</a> for what's paused and why.
     </div>
   </div>
 
   <div class="ocs__card">
     <h3 class="ocs__section-title">Open Technical Questions</h3>
     <ul class="ocs__checklist">
-      <li class="open"><span class="ocs__checklist-box"></span><span>Bag-orientation reliability: a tagged laptop inside a closed backpack has no guaranteed tag-to-reader orientation, and UHF read reliability drops off-axis. Not yet solved. See <a href="/capstone/rfid-presence/summary/">Project Summary</a> for candidate antenna designs that address this directly.</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Bag-orientation reliability: a tagged laptop inside a closed backpack has no guaranteed tag-to-reader orientation, and UHF read reliability drops off-axis. Not yet solved. See <a href="/capstone/presence-system/summary/">Project Summary</a> for candidate antenna designs that address this directly.</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span>Camera system interface: what the face-scanning system exposes (API, event stream, or file) still needs to be defined, including how it reports a student who has opted out.</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span>Tag mounting standard: a single mounting spot on the laptop (for example, the underside near a plastic vent) so tag type (on-metal versus standard) can be standardized across devices.</span></li>
     </ul>
