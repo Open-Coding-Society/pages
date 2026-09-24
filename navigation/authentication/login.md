@@ -170,6 +170,73 @@ show_reading_time: false
     let signupIdToken = null;
     let validationTimeout = null;
 
+    function isMentorMode() {
+        return document.querySelector('input[name="loginRole"]:checked')?.value === 'mentor';
+    }
+
+    // Mentors are not Poway USD students: no school email verification, no student ID or school.
+    function applyRoleMode() {
+        const mentor = isMentorMode();
+        document.getElementById('signupSidGroup').style.display = mentor ? 'none' : '';
+        document.getElementById('signupSchoolGroup').style.display = mentor ? 'none' : '';
+        document.getElementById('signupSid').required = !mentor;
+        document.getElementById('signupSchool').required = !mentor;
+        document.getElementById('signupEmail').placeholder = mentor ? 'Email' : 'Personal (not school) Email';
+        document.getElementById('signupTitle').textContent = mentor ? 'Mentor Sign Up' : 'Sign Up';
+        // Flask stays visible, dimmed for mentors because their accounts are created in Spring only.
+        const flaskEl = document.getElementById('flaskStatus');
+        flaskEl.style.opacity = mentor ? '0.4' : '';
+        flaskEl.title = mentor ? 'Mentor accounts are created in Spring only' : '';
+        if (mentor && document.getElementById('oauth-verification').style.display !== 'none') {
+            window.showSignupForm();
+        }
+    }
+    document.querySelectorAll('input[name="loginRole"]').forEach(r => r.addEventListener('change', applyRoleMode));
+    applyRoleMode();
+
+    // Mentor accounts live in Spring only; the backend puts them in ROLE_PENDING and raises an approval ticket.
+    async function signupMentor() {
+        const signupButton = document.querySelector('#signupForm button[type="submit"]');
+        const overallEl = document.getElementById('overallStatus');
+        signupButton.disabled = true;
+        updateBackendStatus('spring', 'pending');
+        overallEl.classList.add('hidden');
+        overallEl.classList.remove('success', 'partial', 'error');
+
+        let ok = false;
+        let message;
+        try {
+            const response = await fetch(`${javaURI}/api/person/create`, {
+                ...fetchOptions,
+                method: "POST",
+                body: JSON.stringify({
+                    name: signupFormData.name,
+                    uid: signupFormData.uid,
+                    email: signupFormData.email,
+                    password: signupFormData.password,
+                    accountType: "mentor",
+                }),
+            });
+            const raw = await response.text();
+            ok = response.ok;
+            if (!ok) {
+                let detail = raw;
+                try { detail = JSON.parse(raw).error || raw; } catch (_) { /* keep raw text */ }
+                message = `Mentor signup failed: ${detail || response.status}`;
+            }
+        } catch (error) {
+            message = `Mentor signup failed: ${error.message}`;
+        }
+
+        updateBackendStatus('spring', ok ? 'success' : 'error');
+        overallEl.classList.remove('hidden');
+        overallEl.classList.add(ok ? 'success' : 'error');
+        overallEl.textContent = ok
+            ? '🎉 Mentor request submitted! An admin will review it. You can log in as a Student until you are approved.'
+            : `💥 ${message}`;
+        signupButton.disabled = false;
+    }
+
     const STUDENT_ID_AS_GITHUB_ID_PATTERN = /^\d{7}$/;
 
     function validateGithubId() {
@@ -197,10 +264,13 @@ show_reading_time: false
 
     document.getElementById('signupUid').addEventListener('input', validateGithubId);
 
-    // Mentor signup drops the Student ID / school requirement and makes the OAuth step
-    // optional (see skipMentorOAuth) instead of the mandatory school-email verification
-    // students go through. A hidden-but-required field still blocks form submission, so
-    // the required attribute has to come off, not just the visual display.
+    // Mentor signup (via the signup card's own dropdown -- distinct from the login
+    // card's radio toggle above, which short-circuits straight to signupMentor()
+    // instead) drops the Student ID / school requirement and makes the OAuth step
+    // optional (see skipMentorOAuth) rather than the mandatory school-email
+    // verification students go through. A hidden-but-required field still blocks
+    // form submission, so the required attribute has to come off, not just the
+    // visual display.
     function updateSignupModeUI() {
         const isMentor = document.getElementById('signupRole').value === 'mentor';
         const sidGroup = document.getElementById('signupSidGroup');
@@ -384,6 +454,17 @@ show_reading_time: false
             return;
         }
 
+        if (isMentorMode()) {
+            signupFormData = {
+                name: document.getElementById("name").value,
+                uid: document.getElementById("signupUid").value,
+                email: document.getElementById("signupEmail").value,
+                password: document.getElementById("signupPassword").value,
+            };
+            signupMentor();
+            return;
+        }
+
         // Store form data
         const role = document.getElementById("signupRole").value;
         signupFormData = {
@@ -515,7 +596,7 @@ show_reading_time: false
         let pythonPromise = new Promise((resolve) => {
             window.pythonLogin(resolve);
         });
-        Promise.allSettled([javaPromise, pythonPromise]).then(async () => {
+        Promise.allSettled([javaPromise, pythonPromise]).then(async ([javaOutcome]) => {
             // Only proceed after both have completed (success or fail)
             const chosen = document.querySelector('input[name="loginRole"]:checked')?.value || 'student';
             if (chosen === 'mentor') {
@@ -525,19 +606,7 @@ show_reading_time: false
                     // Signed in, but not as a mentor: keep them in the student view and say why.
                     setChosenRole('student');
                     document.querySelector('input[name="loginRole"][value="student"]').checked = true;
-                    const messageEl = document.getElementById('message');
-                    let pending = false;
-                    if (person && roles.includes('ROLE_PENDING')) {
-                        try {
-                            const ticketRes = await fetch(`${javaURI}/api/person/mentor/ticket/status`, fetchOptions);
-                            pending = ticketRes.ok && !!(await ticketRes.json()).pending;
-                        } catch (e) { /* treat as not pending */ }
-                    }
-                    messageEl.textContent = !person
-                        ? 'Could not verify mentor access. Try again, or log in as a Student.'
-                        : pending
-                            ? 'Your mentor application is still pending review. Log in as a Student for now.'
-                            : 'This account is not an approved mentor. Log in as a Student instead.';
+                    document.getElementById('message').textContent = await describeMentorLoginFailure(javaOutcome.value, person, roles);
                     return;
                 }
             }
@@ -545,6 +614,33 @@ show_reading_time: false
             window.location.href = '{{site.baseurl}}/profile';
         });
     };
+
+    // Explains why a Mentor-mode login did not reach the mentor view. Mentor accounts live in
+    // Spring only, so the Spring login result is what tells a bad password from a real
+    // "not verified" account.
+    async function describeMentorLoginFailure(springLogin, person, roles) {
+        if (springLogin?.reason === 'rejected') {
+            return `Spring rejected this GitHub ID or password (${springLogin.status}). Mentor accounts are created with Sign Up in Mentor mode.`;
+        }
+        if (springLogin?.reason === 'unreachable') {
+            return 'Could not reach the Spring server. Make sure it is running, then try again.';
+        }
+        if (!person) {
+            return 'Spring accepted the login but the session was not kept. Open this site at http://localhost:4500 (not 127.0.0.1) and try again.';
+        }
+        let pending = false;
+        if (roles.includes('ROLE_PENDING')) {
+            try {
+                const ticketRes = await fetch(`${javaURI}/api/person/mentor/ticket/status`, fetchOptions);
+                pending = ticketRes.ok && !!(await ticketRes.json()).pending;
+            } catch (e) {
+                console.warn('Could not read mentor ticket status:', e.message);
+            }
+        }
+        return pending
+            ? 'You are not verified as a mentor yet. Your application is pending admin approval. You can log in as a Student in the meantime.'
+            : 'You are not verified as a mentor. This account does not have mentor access. Log in as a Student instead.';
+    }
     // Function to handle Python login
     window.pythonLogin = function (done) {
         const options = {
@@ -554,6 +650,13 @@ show_reading_time: false
                 if (done) done();
             },
             message: "message",
+            // Mentors exist only in Spring, so a Flask 401 must not block their login.
+            onFailure: function() {
+                if (isMentorMode()) {
+                    document.getElementById("message").textContent = "";
+                    if (done) done();
+                }
+            },
             method: "POST",
             cache: "no-cache",
             body: {
@@ -583,7 +686,9 @@ show_reading_time: false
         fetch(loginURL, loginOptions)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Invalid login");
+                    const rejection = new Error("Invalid login");
+                    rejection.outcome = { ok: false, reason: 'rejected', status: response.status };
+                    throw rejection;
                 }
                 return response.text();
             })
@@ -595,70 +700,21 @@ show_reading_time: false
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`Spring server response: ${response.status}`);
+                    const sessionError = new Error(`Spring server response: ${response.status}`);
+                    sessionError.outcome = { ok: false, reason: 'session', status: response.status };
+                    throw sessionError;
                 }
                 return response.json();
             })
             .then(data => {
                 console.log("Java database response:", data);
-                if (done) done();
+                if (done) done({ ok: true });
             })
             .catch(error => {
                 console.error("Login failed:", error.message);
-                // If login fails, attempt account creation
-                if (error.message === "Invalid login") {
-                    const signupData = JSON.stringify({
-                        uid: document.getElementById("uid").value,
-                        sid: "0000000",
-                        email: document.getElementById("uid").value + "@gmail.com",
-                        dob: "11-01-2024", // Static date, can be modified
-                        name: document.getElementById("uid").value,
-                        password: document.getElementById("password").value,
-                        kasmServerNeeded: false,
-                    });
-                    const signupOptions = {
-                        ...fetchOptions,
-                        method: "POST",
-                        body: signupData,
-                    };
-                    fetch(signupURL, signupOptions)
-                        .then(signupResponse => {
-                            if (!signupResponse.ok) {
-                                throw new Error("Account creation failed!");
-                            }
-                            return signupResponse.json();
-                        })
-                        .then(signupResult => {
-                            console.log("Account creation successful!", signupResult);
-                            // Retry login after account creation
-                            return fetch(loginURL, loginOptions);
-                        })
-                        .then(newLoginResponse => {
-                            if (!newLoginResponse.ok) {
-                                throw new Error("Login failed after account creation");
-                            }
-                            console.log("Login successful after account creation!");
-                            // Fetch database after successful login
-                            return fetch(databaseURL, fetchOptions);
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`Spring server response: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log("Java database response:", data);
-                            if (done) done();
-                        })
-                        .catch(newLoginError => {
-                            console.error("Error after account creation:", newLoginError.message);
-                            if (done) done();
-                        });
-                } else {
-                    console.log("Logged in!");
-                    if (done) done();
-                }
+                // Spring login is optional for students; mentor mode reads this outcome to explain the failure.
+                console.warn("Spring login unavailable; continuing with Flask auth flow.");
+                if (done) done(error.outcome || { ok: false, reason: 'unreachable' });
             });
     };
     // Function to fetch and display Python data
@@ -778,7 +834,9 @@ show_reading_time: false
         fetch(URL, fetchOptions)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`Spring server response: ${response.status}`);
+                    const sessionError = new Error(`Spring server response: ${response.status}`);
+                    sessionError.outcome = { ok: false, reason: 'session', status: response.status };
+                    throw sessionError;
                 }
                 return response.json();
             })
