@@ -5,7 +5,7 @@ description: Explore the Open Coding Society button grammar through living examp
 categories: [SASS, Buttons]
 lesson_language: SASS
 lesson_topic: Buttons Grammar
-lesson_part: interactive
+lesson_source: OCS
 lesson_type: lesson
 microblog: true
 permalink: /sass/buttons-grammar

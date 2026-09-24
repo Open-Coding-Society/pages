@@ -5,7 +5,7 @@ title: OCS Semantic HTML & Typography Grammar
 categories: [SASS, Typography]
 lesson_language: SASS
 lesson_topic: Typography
-lesson_part: interactive
+lesson_source: OCS
 lesson_type: lesson
 microblog: true
 permalink: /sass/typography

@@ -71,6 +71,7 @@ permalink: /student/submissions
                                 <th class="py-2 px-4 text-left text-white-100">Submission Content</th>
                                 <th class="py-2 px-4 text-left text-white-100">Grade</th>
                                 <th class="py-2 px-4 text-left text-white-100">Feedback</th>
+                                <th class="py-2 px-4 text-left text-white-100">Self-Assessment</th>
                             </tr>
                         </thead>
                         <tbody id="submissions-tbody" class="divide-y divide-neutral-600">
@@ -342,6 +343,30 @@ permalink: /student/submissions
                 feedbackCell.textContent = submission.feedback || 'No feedback yet';
                 feedbackCell.className = 'py-2 px-4 italic text-white-600';
                 row.appendChild(feedbackCell);
+
+                const selfAssessmentCell = document.createElement('td');
+                selfAssessmentCell.className = 'py-2 px-4 text-white-700 text-sm';
+                const ratingLabels = [
+                    ['Tech', submission.technicalExcellence],
+                    ['Comm', submission.communication],
+                    ['Habits', submission.workHabits],
+                    ['AI', submission.aiOrchestration]
+                ];
+                const hasSelfAssessment = ratingLabels.some(([, v]) => v != null) || submission.selfAssessmentReflection;
+                if (hasSelfAssessment) {
+                    const ratingsLine = document.createElement('div');
+                    ratingsLine.textContent = ratingLabels.map(([label, v]) => `${label} ${v != null ? v : '—'}/5`).join(' · ');
+                    selfAssessmentCell.appendChild(ratingsLine);
+                    if (submission.selfAssessmentReflection) {
+                        const reflectionLine = document.createElement('div');
+                        reflectionLine.className = 'italic text-white-500';
+                        reflectionLine.textContent = `"${submission.selfAssessmentReflection}"`;
+                        selfAssessmentCell.appendChild(reflectionLine);
+                    }
+                } else {
+                    selfAssessmentCell.textContent = 'N/A (pre-dates self-assessment)';
+                }
+                row.appendChild(selfAssessmentCell);
 
                 tableBody.appendChild(row);
             }

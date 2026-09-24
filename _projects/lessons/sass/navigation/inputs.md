@@ -4,7 +4,7 @@ title: SASS Inputs Aesthetihawk
 categories: [SASS, Inputs]
 lesson_language: SASS
 lesson_topic: Inputs
-lesson_part: interactive
+lesson_source: OCS
 lesson_type: lesson
 microblog: true 
 permalink: /sass/inputs/

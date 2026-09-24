@@ -43,6 +43,7 @@ comments: false
           <th class="p-3 text-left font-semibold">Student Name</th>
           <th class="p-3 text-left font-semibold">Submission Content</th>
           <th class="p-3 text-left font-semibold">Comments</th>
+          <th class="p-3 text-left font-semibold">Self-Assessment</th>
           <th class="p-3 text-left font-semibold">Current Grade</th>
           <th class="p-3 text-left font-semibold">Actions</th>
         </tr>
@@ -109,7 +110,7 @@ comments: false
         document.getElementById('assignmentNameHeader').textContent = `Submissions for: ${assignmentName}`;
         const submissionsList = document.getElementById('submissionsList');
         if (submissions.length === 0) {
-          submissionsList.innerHTML = '<tr><td colspan="5" class="p-3">No submissions found</td></tr>';
+          submissionsList.innerHTML = '<tr><td colspan="6" class="p-3">No submissions found</td></tr>';
         } else {
           submissions.forEach(submission => {
             var name = submission.submitter.name;
@@ -118,6 +119,7 @@ comments: false
               <td class="p-3">${name}</td>
               <td class="p-3">${submission.content || 'No content'}</td>
               <td class="p-3">${submission.comment || 'No comments'}</td>
+              <td class="p-3">${formatSelfAssessment(submission)}</td>
               <td class="p-3">${submission.grade || 'Not graded'}</td>
               <td class="p-3">
                 <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" onclick="gradeAssignment(${submission.assignment.id}, ${submission.submitter.id}, ${submission.isGroup})">Grade</button>
@@ -135,6 +137,22 @@ comments: false
       .finally(() => {
         document.getElementById('submissionsSpinner').classList.add('hidden');
       });
+  }
+
+  function formatSelfAssessment(submission) {
+    const ratings = [
+      ['Tech', submission.technicalExcellence],
+      ['Comm', submission.communication],
+      ['Habits', submission.workHabits],
+      ['AI', submission.aiOrchestration]
+    ];
+    const hasAny = ratings.some(([, v]) => v != null) || submission.selfAssessmentReflection;
+    if (!hasAny) return 'N/A (pre-dates self-assessment)';
+    const ratingsLine = ratings.map(([label, v]) => `${label} ${v != null ? v : '—'}/5`).join(' &middot; ');
+    const reflectionLine = submission.selfAssessmentReflection
+      ? `<div class="italic text-gray-400 text-sm mt-1">"${submission.selfAssessmentReflection}"</div>`
+      : '';
+    return `<div>${ratingsLine}</div>${reflectionLine}`;
   }
 
   window.closeSubmissionsModal = function() {

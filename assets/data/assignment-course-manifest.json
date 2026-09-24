@@ -1,0 +1,21 @@
+---
+layout: null
+---
+{%- assign assignment_documents = site.pages | concat: site.posts -%}
+[
+{%- assign first_assignment = true -%}
+{%- for document in assignment_documents -%}
+  {%- if document.assignment and document.courses -%}
+    {%- unless first_assignment -%},{%- endunless -%}
+    {%- assign first_assignment = false -%}
+    {"contentUrl": {{ document.url | jsonify }}, "courseCodes": [
+      {%- assign first_course = true -%}
+      {%- for course in document.courses -%}
+        {%- unless first_course -%},{%- endunless -%}
+        {%- assign first_course = false -%}
+        {{- course[0] | upcase | jsonify -}}
+      {%- endfor -%}
+    ]}
+  {%- endif -%}
+{%- endfor -%}
+]

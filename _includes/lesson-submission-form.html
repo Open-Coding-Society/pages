@@ -1,29 +1,98 @@
 <!-- ASSIGNMENT SUBMISSION FORM -->
 {% comment %}
   Displays when page.assignment is true
-  Includes both link and file submission options
+  Includes link, github_issue, code, and file submission options
 {% endcomment %}
 
+{% assign submission_type = page.assignment_submission_type | default: "file" | downcase %}
 <section class="ocs__card" aria-labelledby="assignment-submission-title">  
   <h2 id="assignment-submission-title" class="ocs__section-title">
     <i class="fas fa-upload assignment-submission-icon" aria-hidden="true"></i>
     Submit Assignment
   </h2>
 
-  <div class="submission-options">
-    <button class="ocs__btn ocs__btn--icon" onclick="switchSubmissionType('link')" type="button">
-      <i class="fas fa-link"></i> Link Submission
-    </button>
-    <button class="ocs__btn ocs__btn--icon" onclick="switchSubmissionType('file')" type="button">
-      <i class="fas fa-file-upload"></i> File Upload
-    </button>
+  {% if submission_type == "link" or submission_type == "github_issue" %}
+  {% if submission_type == "github_issue" %}
+    {% assign link_label = "GitHub Issue Link" %}
+    {% assign link_placeholder = "https://github.com/owner/repo/issues/123" %}
+  {% else %}
+    {% assign link_label = "Submission Link" %}
+    {% assign link_placeholder = "https://..." %}
+  {% endif %}
+  <div>
+  <div class="self-assessment" id="self-assessment">
+    <h4 class="self-assessment-title">
+      <i class="fas fa-clipboard-check"></i>
+      Self-Assessment
+    </h4>
+    <p class="self-assessment-hint">Rate your work on this assignment, then add a short reflection. All 5 fields are required before you can submit.</p>
+
+    <fieldset class="rating-group" data-field="technicalExcellence">
+      <legend class="rating-label">Technical Excellence</legend>
+      <p class="rating-question">Rate the technical quality of your work on this assignment — your use of tools, problem-solving, and technical growth.</p>
+      <div class="rating-scale" role="radiogroup" aria-label="Technical Excellence rating">
+        <label class="rating-option"><input type="radio" name="sa-technicalExcellence" value="1"><span>1</span></label>
+        <label class="rating-option"><input type="radio" name="sa-technicalExcellence" value="2"><span>2</span></label>
+        <label class="rating-option"><input type="radio" name="sa-technicalExcellence" value="3"><span>3</span></label>
+        <label class="rating-option"><input type="radio" name="sa-technicalExcellence" value="4"><span>4</span></label>
+        <label class="rating-option"><input type="radio" name="sa-technicalExcellence" value="5"><span>5</span></label>
+      </div>
+      <div class="rating-scale-hint">1 Explore &middot; 2 Understand &middot; 3 Apply &middot; 4 Analyze/Evaluate &middot; 5 Create/Extend</div>
+    </fieldset>
+
+    <fieldset class="rating-group" data-field="communication">
+      <legend class="rating-label">Communication</legend>
+      <p class="rating-question">Rate how clearly you communicated your work and process — explanations, documentation, and collaboration or help-seeking.</p>
+      <div class="rating-scale" role="radiogroup" aria-label="Communication rating">
+        <label class="rating-option"><input type="radio" name="sa-communication" value="1"><span>1</span></label>
+        <label class="rating-option"><input type="radio" name="sa-communication" value="2"><span>2</span></label>
+        <label class="rating-option"><input type="radio" name="sa-communication" value="3"><span>3</span></label>
+        <label class="rating-option"><input type="radio" name="sa-communication" value="4"><span>4</span></label>
+        <label class="rating-option"><input type="radio" name="sa-communication" value="5"><span>5</span></label>
+      </div>
+      <div class="rating-scale-hint">1 Beginning &middot; 2 Developing &middot; 3 Consistent &middot; 4 Strong &middot; 5 Model</div>
+    </fieldset>
+
+    <fieldset class="rating-group" data-field="workHabits">
+      <legend class="rating-label">Work Habits</legend>
+      <p class="rating-question">Rate your work habits on this assignment — time management, persistence, responsibility, and follow-through.</p>
+      <div class="rating-scale" role="radiogroup" aria-label="Work Habits rating">
+        <label class="rating-option"><input type="radio" name="sa-workHabits" value="1"><span>1</span></label>
+        <label class="rating-option"><input type="radio" name="sa-workHabits" value="2"><span>2</span></label>
+        <label class="rating-option"><input type="radio" name="sa-workHabits" value="3"><span>3</span></label>
+        <label class="rating-option"><input type="radio" name="sa-workHabits" value="4"><span>4</span></label>
+        <label class="rating-option"><input type="radio" name="sa-workHabits" value="5"><span>5</span></label>
+      </div>
+      <div class="rating-scale-hint">1 Beginning &middot; 2 Developing &middot; 3 Consistent &middot; 4 Strong &middot; 5 Model</div>
+    </fieldset>
+
+    <fieldset class="rating-group" data-field="aiOrchestration">
+      <legend class="rating-label">AI Orchestration</legend>
+      <p class="rating-question">Rate how effectively you used AI tools to support your work — prompting, verifying, extending, or accelerating your development process.</p>
+      <div class="rating-scale" role="radiogroup" aria-label="AI Orchestration rating">
+        <label class="rating-option"><input type="radio" name="sa-aiOrchestration" value="1"><span>1</span></label>
+        <label class="rating-option"><input type="radio" name="sa-aiOrchestration" value="2"><span>2</span></label>
+        <label class="rating-option"><input type="radio" name="sa-aiOrchestration" value="3"><span>3</span></label>
+        <label class="rating-option"><input type="radio" name="sa-aiOrchestration" value="4"><span>4</span></label>
+        <label class="rating-option"><input type="radio" name="sa-aiOrchestration" value="5"><span>5</span></label>
+      </div>
+      <div class="rating-scale-hint">1 Explore &middot; 2 Understand &middot; 3 Apply &middot; 4 Analyze/Evaluate &middot; 5 Create/Extend</div>
+    </fieldset>
+
+    <div class="form-group self-assessment-reflection">
+      <label for="self-assessment-reflection">Reflection</label>
+      <textarea id="self-assessment-reflection" placeholder="In a few sentences, describe what you learned, struggled with, or accomplished on this assignment. Include one specific example."></textarea>
+    </div>
   </div>
 
   <!-- Link Submission Form -->
-  <form class="submission-form" id="link-form">
+  <form class="submission-form active" id="link-form">
     <div class="form-group">
-      <label for="submission-link">Submission Link</label>
-      <input type="url" id="submission-link" placeholder="https://..." required>
+      <label for="submission-link">{{ link_label }}</label>
+      <input type="url" id="submission-link" placeholder="{{ link_placeholder }}" required>
+      {% if submission_type == "github_issue" %}
+      <p class="form-hint" style="font-size:0.85rem;color:#9ca3af;margin-top:6px;">Must be a public GitHub issue (github.com/owner/repo/issues/N) — it will be validated and reviewed automatically.</p>
+      {% endif %}
     </div>
     <div class="form-group">
       <label for="link-description">Description</label>
@@ -34,18 +103,43 @@
       Submit Link
     </button>
   </form>
-
-  <!-- File Upload Form -->
-  <form class="submission-form hidden" id="file-form">
+  </div>
+  {% elsif submission_type == "code" %}
+  <form class="submission-form active" id="code-form">
+    <div class="form-group">
+      <label for="code-language">Language</label>
+      <select id="code-language">
+        <option value="python">Python</option>
+        <option value="java">Java</option>
+        <option value="javascript">JavaScript</option>
+        <option value="pseudocode">Text / Pseudocode</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="code-input">Code</label>
+      <textarea id="code-input" class="code-input" placeholder="Paste or type your code here..." rows="12" required></textarea>
+      <p class="form-hint" style="font-size:0.85rem;color:#9ca3af;margin-top:6px;">Your code will be saved as a Gist and reviewed automatically. You must be logged in to submit.</p>
+    </div>
+    <div class="form-group">
+      <label for="code-notes">Notes (Optional)</label>
+      <textarea id="code-notes" placeholder="Add any additional comments..."></textarea>
+    </div>
+    <button type="submit" class="submit-btn" id="code-submit-btn">
+      <i class="fas fa-check"></i>
+      Submit Code
+    </button>
+  </form>
+  {% else %}
+  <form class="submission-form active" id="file-form">
     <div class="form-group">
       <label>Upload Files</label>
       <div class="file-upload-area" id="file-upload-area">
-        <input type="file" id="file-input" multiple style="display: none;">
+        <input type="file" id="file-input" multiple accept=".pdf,.zip,.png,.jpg,.jpeg,.gif,.doc,.docx,.txt,.ipynb" style="display: none;">
         <div class="file-upload-icon">
           <i class="fas fa-cloud-upload-alt"></i>
         </div>
         <div class="file-upload-text">Click to upload or drag and drop</div>
-        <div class="file-upload-hint">PDF, ZIP, images, or documents (Max 10MB per file)</div>
+        <div class="file-upload-hint">PDF, ZIP, images, documents, or Jupyter notebooks (.ipynb) (Max 10MB per file)</div>
       </div>
       <div class="file-list" id="file-list"></div>
     </div>
@@ -58,6 +152,7 @@
       Submit Files
     </button>
   </form>
+  {% endif %}
 
   <div class="submission-status" id="submission-status"></div>
 </div>
