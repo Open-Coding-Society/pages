@@ -66,7 +66,7 @@ active_tab: profile
     </div>
 
     <!-- School Section -->
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <div id="schoolInfoCard" class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <h2 class="text-xl font-semibold mb-6">School Information</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -99,7 +99,7 @@ active_tab: profile
     </div>
 
     <!-- Classes Section -->
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <div id="classesCard" class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Classes</h2>
             <button type="button" id="addClassBtn"
@@ -114,7 +114,7 @@ active_tab: profile
         </div>
     </div>
 
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <div id="personaCard" class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
 
         <div id="personaSelectionContainer">
@@ -242,11 +242,17 @@ active_tab: profile
                 // than just leaving it unchecked. Checked against Spring's roles (not
                 // Flask's /api/id, which only ever carries a single role string), same as
                 // the mentor dashboard's own access check.
-                // Same rule for the whole mentor view: real ROLE_MENTOR and not logged in
-                // as a Student. Bathroom Pass (facial registration) is student-only too.
+                // Same rule for the whole mentor view: real ROLE_MENTOR. Bathroom Pass
+                // (facial registration), school/student-id, classes, and the CS-pathway
+                // persona picker are all student-only concepts a mentor account has no
+                // use for -- mentor signup never even collects sid/school (see
+                // navigation/authentication/login.md's updateSignupModeUI).
                 if (viewFor(roleNames(personData)) === 'mentor') {
                     document.getElementById('kasmToggleContainer')?.remove();
                     document.getElementById('facialRegistrationCard')?.remove();
+                    document.getElementById('schoolInfoCard')?.remove();
+                    document.getElementById('classesCard')?.remove();
+                    document.getElementById('personaCard')?.remove();
                 }
 
                 if (!currentPersonId || !currentUid) {
