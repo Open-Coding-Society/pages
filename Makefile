@@ -380,11 +380,11 @@ watch-rebuild:
 	@LAST_TRIGGER=0; \
 	while true; do \
 		if [ -f /tmp/.jekyll_rebuild_trigger ]; then \
-			TRIGGER_TIME=$$(stat -f %m /tmp/.jekyll_rebuild_trigger 2>/dev/null || stat -c %Y /tmp/.jekyll_rebuild_trigger); \
+			TRIGGER_TIME=$$(stat -c %Y /tmp/.jekyll_rebuild_trigger 2>/dev/null || stat -f %m /tmp/.jekyll_rebuild_trigger); \
 			if [ $$TRIGGER_TIME -gt $$LAST_TRIGGER ]; then \
 				echo "Changes detected, waiting for more changes to settle..."; \
 				sleep 3; \
-				NEW_TRIGGER=$$(stat -f %m /tmp/.jekyll_rebuild_trigger 2>/dev/null || stat -c %Y /tmp/.jekyll_rebuild_trigger); \
+				NEW_TRIGGER=$$(stat -c %Y /tmp/.jekyll_rebuild_trigger 2>/dev/null || stat -f %m /tmp/.jekyll_rebuild_trigger); \
 				if [ $$NEW_TRIGGER -eq $$TRIGGER_TIME ]; then \
 					echo "🔨Rebuilding Jekyll site..."; \
 					START=$$(date +%s); \

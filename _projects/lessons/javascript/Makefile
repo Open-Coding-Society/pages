@@ -21,12 +21,14 @@ index:
 
 notebooks:
 	@mkdir -p "$(DEST_ROOT)"
+	@rm -f "$(DEST_ROOT)"/*.ipynb
 	@for notebook in $(NOTEBOOKS); do \
 		filename=$$(basename "$$notebook"); \
 		cp "$$notebook" "$(DEST_ROOT)/$$filename"; \
 	done
 
 convert: notebooks
+	@rm -f "$(WORKSPACE_ROOT)/_posts/projects/javascript/"*_IPYNB_2_.md
 	@for notebook in $(NOTEBOOKS); do \
 		filename=$$(basename "$$notebook"); \
 		(cd "$(WORKSPACE_ROOT_ABS)" && "$(WORKSPACE_ROOT_ABS)/venv/bin/python3" "$(WORKSPACE_ROOT_ABS)/scripts/convert_notebooks.py" "$(DEST_ROOT_ABS)/$$filename") >/dev/null || exit 1; \
