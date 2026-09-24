@@ -15,6 +15,14 @@ active_tab: dashboard
                         Preferences
                     </a>
                 </li>
+                <!-- Mentor-only: revealed by the Mentor My-Projects Module script below,
+                     once a real ROLE_MENTOR check succeeds. -->
+                <li class="me-2" id="tab-my-projects-li" style="display:none;">
+                    <a href="#" id="tab-my-projects"
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        My Projects
+                    </a>
+                </li>
             </ul>
             <!-- sliding underline indicator -->
             <div id="tab-underline"
@@ -49,6 +57,40 @@ active_tab: dashboard
                     window.adminFetchPeople(), which the DOMContentLoaded handler
                     calls after confirming the user is an admin.
                 -->
+                </div>
+            </div>
+
+            <!-- Mentor "My Projects" tab content (hidden by default; shown alongside its
+                 tab button by the Mentor My-Projects Module script, only for a real,
+                 signed-in ROLE_MENTOR). See that script for the fetch/render logic. -->
+            <div id="tab-content-my-projects" class="tab-content hidden px-6 py-4 text-neutral-200 max-w-5xl mx-auto">
+                <div id="mentor-ticket-pending-banner" class="p-4 mb-6 rounded-lg bg-amber-900/40 border border-amber-700 text-amber-200" style="display:none;">
+                    Your mentor application is still pending admin approval. You'll see your assigned projects here once approved.
+                </div>
+
+                <h2 class="text-xl font-semibold mb-2">My Projects</h2>
+                <p class="text-neutral-400 mb-4">Capstone projects you've been approved to mentor. Apply to more from the <a href="{{ site.baseurl }}/capstone/" class="text-blue-400 hover:underline">Capstone</a> page.</p>
+                <div id="mentor-my-projects-list" class="space-y-3 mb-8">
+                    <p class="text-neutral-400" id="mentor-my-projects-empty">Loading…</p>
+                </div>
+
+                <h2 class="text-xl font-semibold mb-2">My Applications</h2>
+                <p class="text-neutral-400 mb-4">Projects you've applied to mentor, awaiting or resolved by an admin.</p>
+                <div id="mentor-my-applications-list" class="space-y-2">
+                    <p class="text-neutral-400" id="mentor-my-applications-empty">Loading…</p>
+                </div>
+
+                <!-- Populated per-project when "Chat" is expanded on a card above. -->
+                <div id="mentor-chat-panel" class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700" style="display:none;">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-medium" id="mentor-chat-panel-title">Chat</h3>
+                        <button type="button" id="mentor-chat-panel-close" class="text-neutral-400 hover:text-white text-xl leading-none">&times;</button>
+                    </div>
+                    <div id="mentor-chat-messages" class="space-y-2 mb-3 max-h-80 overflow-y-auto"></div>
+                    <form id="mentor-chat-form" class="flex gap-2">
+                        <input type="text" id="mentor-chat-input" placeholder="Message your team…" class="flex-1 bg-neutral-700 text-white rounded px-3 py-2" autocomplete="off" required>
+                        <button type="submit" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold">Send</button>
+                    </form>
                 </div>
             </div>
 
@@ -909,5 +951,218 @@ import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.j
     // The DOMContentLoaded handler in the dashboard init script
     // calls window.adminFetchPeople() after confirming admin role.
     window.adminFetchPeople = fetchPeople;
+})();
+</script>
+
+<!-- ============================================================
+     Mentor My-Projects Module
+     ============================================================
+     Shows an approved mentor (real ROLE_MENTOR, checked against Spring --
+     Flask's role model has no concept of it) the projects they're
+     currently attached to (GET /api/capstones/mine), the applications
+     they've raised and their resolution status (GET
+     /api/capstones/applications/mine), and a per-project chat reusing the
+     same GroupChatMessage shape/store as group chat (GET/POST
+     /api/capstones/{id}/messages -- plain REST, no WebSocket route exists
+     for capstone chat, unlike group chat's STOMP/SockJS setup).
+
+     Tab button + content stay hidden (see the HTML above) until the
+     mentor check below succeeds, mirroring how #admin-only is revealed
+     for admins -- but gating the tab button itself too, since "My
+     Projects" has no meaning for a non-mentor to even see in the tab bar.
+     ============================================================ -->
+<script type="module">
+import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+import { fetchPerson, roleNames } from '{{ site.baseurl }}/assets/js/api/role-view.js';
+
+(function () {
+    let currentPersonName = '';
+    let activeChatCapstoneId = null;
+    let chatPollTimer = null;
+
+    function escapeHtml(value) {
+        const div = document.createElement('div');
+        div.textContent = value == null ? '' : String(value);
+        return div.innerHTML;
+    }
+
+    async function loadMyProjects() {
+        const list = document.getElementById('mentor-my-projects-list');
+        const empty = document.getElementById('mentor-my-projects-empty');
+        try {
+            const res = await fetch(`${javaURI}/api/capstones/mine`, fetchOptions);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const projects = await res.json();
+            if (!Array.isArray(projects) || projects.length === 0) {
+                empty.textContent = "You're not attached to any projects yet.";
+                return;
+            }
+            empty.remove();
+            list.innerHTML = '';
+            projects.forEach((project) => {
+                const card = document.createElement('div');
+                card.className = 'p-4 rounded-lg bg-neutral-800 border border-neutral-700 flex justify-between items-center';
+                card.innerHTML = `
+                    <div>
+                        <a href="${escapeHtml(project.url)}" target="_blank" class="font-medium text-blue-400 hover:underline">${escapeHtml(project.title)}</a>
+                    </div>
+                    <button type="button" class="mentor-chat-open-btn px-3 py-1.5 rounded bg-neutral-700 hover:bg-neutral-600 text-sm" data-id="${project.id}" data-title="${escapeHtml(project.title)}">Chat</button>
+                `;
+                list.appendChild(card);
+            });
+            list.querySelectorAll('.mentor-chat-open-btn').forEach((btn) => {
+                btn.addEventListener('click', () => openChat(btn.getAttribute('data-id'), btn.getAttribute('data-title')));
+            });
+        } catch (e) {
+            console.error('Failed to load my projects', e);
+            empty.textContent = 'Could not load your projects. Try refreshing.';
+        }
+    }
+
+    async function loadMyApplications() {
+        const list = document.getElementById('mentor-my-applications-list');
+        const empty = document.getElementById('mentor-my-applications-empty');
+        try {
+            const res = await fetch(`${javaURI}/api/capstones/applications/mine`, fetchOptions);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const applications = await res.json();
+            if (!Array.isArray(applications) || applications.length === 0) {
+                empty.textContent = "You haven't applied to any projects yet.";
+                return;
+            }
+            empty.remove();
+            list.innerHTML = '';
+            applications.forEach((application) => {
+                let statusLabel = 'Pending review';
+                let statusClass = 'bg-amber-900/40 text-amber-200 border-amber-700';
+                if (application.resolved) {
+                    statusLabel = application.approved ? 'Approved' : 'Denied';
+                    statusClass = application.approved
+                        ? 'bg-green-900/40 text-green-200 border-green-700'
+                        : 'bg-red-900/40 text-red-200 border-red-700';
+                }
+                const row = document.createElement('div');
+                row.className = 'p-3 rounded-lg bg-neutral-800 border border-neutral-700 flex justify-between items-center';
+                row.innerHTML = `
+                    <a href="${escapeHtml(application.capstoneUrl)}" target="_blank" class="text-blue-400 hover:underline">${escapeHtml(application.capstoneTitle)}</a>
+                    <span class="text-xs px-2 py-1 rounded border ${statusClass}">${statusLabel}</span>
+                `;
+                list.appendChild(row);
+            });
+        } catch (e) {
+            console.error('Failed to load my applications', e);
+            empty.textContent = 'Could not load your applications. Try refreshing.';
+        }
+    }
+
+    function renderChatMessages(messages) {
+        const container = document.getElementById('mentor-chat-messages');
+        container.innerHTML = '';
+        if (!messages || messages.length === 0) {
+            container.innerHTML = '<div class="text-center text-neutral-500 text-sm py-4">No messages yet.</div>';
+            return;
+        }
+        messages.forEach((msg) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'text-sm';
+            wrapper.innerHTML = `<span class="font-medium text-neutral-300">${escapeHtml(msg.name)}:</span> <span class="text-neutral-200">${escapeHtml(msg.message)}</span>`;
+            container.appendChild(wrapper);
+        });
+        container.scrollTop = container.scrollHeight;
+    }
+
+    async function fetchChatMessages(capstoneId) {
+        try {
+            const res = await fetch(`${javaURI}/api/capstones/${capstoneId}/messages`, fetchOptions);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            renderChatMessages(await res.json());
+        } catch (e) {
+            console.error('Chat fetch failed', e);
+        }
+    }
+
+    function openChat(capstoneId, title) {
+        activeChatCapstoneId = capstoneId;
+        document.getElementById('mentor-chat-panel-title').textContent = `Chat — ${title}`;
+        document.getElementById('mentor-chat-panel').style.display = 'block';
+        fetchChatMessages(capstoneId);
+        if (chatPollTimer) clearInterval(chatPollTimer);
+        // Plain polling, not a WebSocket subscription -- no /ws-chat route exists
+        // for capstone chat (only for group chat). Good enough for a mentor
+        // actively viewing one project's thread; stopped on close below.
+        chatPollTimer = setInterval(() => fetchChatMessages(activeChatCapstoneId), 5000);
+    }
+
+    function closeChat() {
+        activeChatCapstoneId = null;
+        document.getElementById('mentor-chat-panel').style.display = 'none';
+        if (chatPollTimer) {
+            clearInterval(chatPollTimer);
+            chatPollTimer = null;
+        }
+    }
+
+    document.getElementById('mentor-chat-panel-close').addEventListener('click', closeChat);
+
+    document.getElementById('mentor-chat-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!activeChatCapstoneId) return;
+        const input = document.getElementById('mentor-chat-input');
+        const text = input.value.trim();
+        if (!text) return;
+        input.disabled = true;
+        try {
+            const res = await fetch(`${javaURI}/api/capstones/${activeChatCapstoneId}/messages`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({
+                    name: currentPersonName || 'Mentor',
+                    message: text,
+                    date: new Date().toISOString(),
+                }),
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            input.value = '';
+            await fetchChatMessages(activeChatCapstoneId);
+        } catch (e) {
+            console.error('Failed to send chat message', e);
+            alert('Could not send message. Try again.');
+        } finally {
+            input.disabled = false;
+            input.focus();
+        }
+    });
+
+    async function checkMentorTicketPending() {
+        try {
+            const res = await fetch(`${javaURI}/api/person/mentor/ticket/status`, fetchOptions);
+            if (!res.ok) return;
+            const status = await res.json();
+            document.getElementById('mentor-ticket-pending-banner').style.display = status.pending ? 'block' : 'none';
+        } catch (e) {
+            console.error('Failed to check mentor ticket status', e);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const person = await fetchPerson();
+        if (!person || !roleNames(person).includes('ROLE_MENTOR')) {
+            return;
+        }
+        currentPersonName = person.name || person.uid || 'Mentor';
+        document.getElementById('tab-my-projects-li').style.display = '';
+        loadMyProjects();
+        loadMyApplications();
+        checkMentorTicketPending();
+
+        // Sidebar's "My Applications" link points at /dashboard#my-projects so a
+        // mentor lands directly on this tab instead of the generic Preferences
+        // one. The tab button's own click handler (defined in the tab-switcher
+        // script above) does the actual show/hide -- reuse it via .click()
+        // rather than duplicating that logic here.
+        if (location.hash === '#my-projects') {
+            document.getElementById('tab-my-projects').click();
+        }
+    });
 })();
 </script>
