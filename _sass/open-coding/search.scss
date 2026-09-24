@@ -51,6 +51,22 @@
     }
 }
 
+/* Pins the action button to the card bottom so it sits at the same height
+   regardless of description length. Grid rows already stretch cells to equal height. */
+.language-reference__card--pinned-action {
+    display: flex;
+    flex-direction: column;
+
+    > .ocs__status-pill,
+    > .ocs__btn {
+        align-self: flex-start;
+    }
+
+    > .ocs__btn {
+        margin-top: auto;
+    }
+}
+
 .search-result-preview {
     // the text
 

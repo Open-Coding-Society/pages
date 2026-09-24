@@ -38,6 +38,15 @@ permalink: /navigation/java-reference/
         {% endif %}
     <div class="ocs__grid ocs__grid--card cols-3">
         {% for lesson in lessons %}
+        {% comment %}CSA Unit 3 cards: source label, description, and a bottom-pinned button; other units keep the original card.{% endcomment %}
+        {% if lesson.url contains '/csa/unit_03/' %}
+        <article class="ocs__grid-cell language-reference__card--pinned-action">
+            <span class="ocs__status-pill ocs__status-pill--neutral">{{ lesson.lesson_source | default: lesson.lesson_part | default: "reference" }}</span>
+            <h2>{{ lesson.title }}</h2>
+            {% if lesson.description %}<p>{{ lesson.description }}</p>{% endif %}
+            <a class="ocs__btn accent fill" href="{{ lesson.url | relative_url }}">Open lesson</a>
+        </article>
+        {% else %}
         <article class="ocs__grid-cell">
             <span class="ocs__status-pill ocs__status-pill--neutral">{{ lesson.lesson_part | default: "reference" }}</span>
             <h2>{{ lesson.title }}</h2>
@@ -45,6 +54,7 @@ permalink: /navigation/java-reference/
             {% if lesson.lesson_topic %}<p><strong>Topic:</strong> {{ lesson.lesson_topic }}</p>{% endif %}
             <a class="ocs__btn accent fill" href="{{ lesson.url | relative_url }}">Open lesson</a>
         </article>
+        {% endif %}
         {% endfor %}
     </div>
 </div>
