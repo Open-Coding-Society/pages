@@ -434,6 +434,18 @@ body:has(.lesson-player) {
   margin-bottom: 6px;
 }
 
+/* When the row is tight (an iPad in portrait keeps the 250px sidebar), the
+   crumbs give way so Prev / Next stay side by side instead of stacking.
+   .ocs__links wraps by default, which is what stacked them. */
+.topbar-left {
+  min-width: 0;
+}
+
+.topbar-actions .ocs__links {
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+
 .breadcrumbs {
   display: flex;
   align-items: center;
@@ -444,6 +456,23 @@ body:has(.lesson-player) {
 
 .breadcrumbs .current {
   color: $text;
+}
+
+/* Keep each crumb whole and let the lesson title truncate; it is repeated as
+   the H1 just below. Burndown lives inside .breadcrumbs, so it must not be
+   the thing that gets squeezed. */
+.breadcrumbs span {
+  white-space: nowrap;
+}
+
+.breadcrumbs .current {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.breadcrumbs .ocs__btn {
+  flex-shrink: 0;
 }
 
 .topbar-progress {
@@ -1014,18 +1043,64 @@ body:has(.lesson-player) {
     gap: 8px;
   }
 
+  /* With align-items: flex-start the crumbs sized to their min-content, and
+     the lesson title still counts at full width there, so the row came out
+     396px wide and pushed Burndown off a 375px screen. Holding it to the
+     column's width is what lets the title truncate. */
+  .topbar-left {
+    width: 100%;
+  }
+
   .breadcrumbs {
     font-size: 12px;
   }
 
+
+  /* Reading time, a bullet and "Assignment" fit in one row on any phone.
+     Stacking them left the bullet alone on its own line, so wrap instead. */
   .lesson-meta {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-wrap: wrap;
     gap: 8px;
   }
   
   .lesson-body {
     width: 100%; /* ADD THIS */
+  }
+
+  /* .lesson-player and .lesson-main above already switch the page to normal
+     height, but the shared rule still gave these three overflow-y: auto, so
+     the lesson scrolled in a box inside the page, and their 24px sides
+     stacked to 72px a side. The site wrapper's 18px is the gutter here. */
+  .lesson-content,
+  .lesson-content-inner,
+  .lesson-header {
+    overflow-y: visible;
+    padding: 6px 0;
+  }
+
+  /* minima/lessonbase.scss gives .lesson-content min-width: 300px to stop it
+     collapsing beside the sidebar. There is no sidebar here, and on a 320px
+     phone only 284px is free, so it pushed the lesson text into the gutter.
+     Scoped under .lesson-main because lessonbase compiles after this file. */
+  .lesson-main .lesson-content {
+    min-width: 0;
+  }
+
+  .topbar-lesson {
+    padding: 6px 0;
+  }
+
+  /* modal-overlay already clears the site header with 60px of top padding on
+     phones, so the desktop top: 60px pushed the chat sheet down twice and
+     60px past the bottom of the screen. */
+  .week-chat-modal > .modal-content {
+    top: 0;
+  }
+
+  /* modal-content runs edge to edge on phones; keep the chat card off the
+     screen edges, the way it sits inside a week card on the course page. */
+  .week-chat-modal .week-chat {
+    margin: 44px 12px 0;
   }
 
   .lesson-bottom {

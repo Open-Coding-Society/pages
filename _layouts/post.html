@@ -507,6 +507,17 @@ Check if this is a course lesson and determine which course context to use
     return sprintGroups;
   }
 
+  // The sidebar is hidden on phones, so this menu is how a phone reaches the
+  // week chats. It copies the sidebar's own buttons for each sprint: same
+  // markup, same openWeekChat() call, authored once in lesson-sidebar-nav.html.
+  function weekChatButtons(sprintTitle) {
+    const section = [...document.querySelectorAll('.sprint-section')]
+      .find(s => s.querySelector('.sprint-title').textContent === sprintTitle);
+    const buttons = section ? [...section.querySelectorAll('[onclick^="openWeekChat"]')] : [];
+    if (!buttons.length) return '';
+    return `<div class="ocs__links week-footer">${buttons.map(b => b.outerHTML).join('')}</div>`;
+  }
+
   function renderTimelineModal(sprintGroups) {
     const modalContent = document.getElementById('timeline-modal-content');
     if (!modalContent) return;
@@ -530,6 +541,7 @@ Check if this is a course lesson and determine which course context to use
           </div>
           <div class="modal-lessons" id="modal-${sprintId}">
             ${lessonHTML}
+            ${weekChatButtons(sprintTitle)}
           </div>
         </div>
       `;
@@ -599,7 +611,9 @@ Check if this is a course lesson and determine which course context to use
 
     if (modalContent) {
       modalContent.addEventListener('click', (e) => {
-        if (e.target.closest('.modal-lesson-item')) closeModal();
+        // Also close for a week chat: this menu is z-index 2000 and the chat's
+        // modal-overlay is 1000, so the chat would otherwise open behind it.
+        if (e.target.closest('.modal-lesson-item, [onclick^="openWeekChat"]')) closeModal();
       });
     }
   }

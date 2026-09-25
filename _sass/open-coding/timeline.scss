@@ -491,6 +491,12 @@
       padding: 16px;
     }
 
+    /* .ocs__card gives the week 24px 28px, which nests inside the sprint's
+       16px and left lesson titles about 200px to wrap in on a phone. */
+    .week-card {
+      padding: 10px;
+    }
+
     .sprint-header {
       flex-direction: column;
       align-items: stretch;
@@ -559,8 +565,20 @@
       gap: 8px;
     }
 
+    /* Same 8px as .item-content above; the icon-to-title gap was left at 12. */
+    .item-link {
+      gap: 8px;
+    }
+
     .item-title {
       font-size: 13px;
+    }
+
+    /* select-control's own mobile rule sets 0.85rem, which suits his 150px
+       language pickers but grew this compact chip on phones, past its desktop
+       size, and took the width from the lesson title beside it. */
+    .item-priority-dropdown {
+      font-size: 11px;
     }
 
     .progression-btn {
