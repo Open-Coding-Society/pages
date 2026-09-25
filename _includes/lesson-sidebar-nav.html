@@ -95,15 +95,27 @@
               </button>
 
               <div class="week-body" id="week-{{ week }}-body" style="display: none;">
+              {%- comment -%}
+                Collapsible section, same shape as the week chat in
+                _includes/week_chat.html: a details/summary with a caret that
+                rotates when open.
+              {%- endcomment -%}
               {%- if weekData.goals -%}
-              <div class="week-goals">
-                <span class="ocs__section-title">Learning Goals</span>
-                <div class="ocs__keypoints">
-                  {%- for goal in weekData.goals -%}
-                  <div class="ocs__keypoint"><span class="ocs__check">&rarr;</span>{{ goal }}</div>
-                  {%- endfor -%}
+              <details class="week-goals">
+                <summary class="week-goals-summary">
+                  <span class="week-goals-icon"><i class="fas fa-bullseye"></i></span>
+                  <span class="ocs__section-title">Learning Goals</span>
+                  <span class="ocs__status-pill ocs__status-pill--neutral">{{ weekData.goals.size }}</span>
+                  <span class="week-goals-caret"><i class="fas fa-chevron-down"></i></span>
+                </summary>
+                <div class="week-goals-body">
+                  <div class="ocs__keypoints">
+                    {%- for goal in weekData.goals -%}
+                    <div class="ocs__keypoint"><span class="ocs__check">&rarr;</span>{{ goal }}</div>
+                    {%- endfor -%}
+                  </div>
                 </div>
-              </div>
+              </details>
               {%- endif -%}
 
               {%- assign assignmentCount = 0 -%}

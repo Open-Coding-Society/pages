@@ -251,10 +251,67 @@ body:has(.lesson-player) {
   margin-top: 8px;
 }
 
+/* Learning goals disclosure. Same shape as .week-chat in the courses project:
+   a bordered details, a summary with no marker, and a caret that flips when
+   open. Sized down for the sidebar column. */
 .week-goals {
   margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid $bg-3;
+  border: 1px solid $bg-3;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.week-goals[open] {
+  border-color: rgba($accent, 0.4);
+}
+
+.week-goals-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 0.2s;
+}
+
+.week-goals-summary::-webkit-details-marker {
+  display: none;
+}
+
+.week-goals-summary:hover {
+  background: rgba($text, 0.05);
+}
+
+.week-goals-summary:focus-visible {
+  outline: 2px solid $accent;
+  outline-offset: -2px;
+}
+
+.week-goals-icon {
+  color: $accent;
+  font-size: 11px;
+}
+
+.week-goals-summary .ocs__section-title {
+  margin: 0;
+}
+
+.week-goals-caret {
+  margin-left: auto;
+  color: $text-muted;
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.week-goals[open] .week-goals-caret {
+  transform: rotate(180deg);
+}
+
+.week-goals-body {
+  padding: 8px;
+  border-top: 1px solid $bg-3;
 }
 
 .week-due {
