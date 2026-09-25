@@ -23,7 +23,7 @@
           <h3 data-week-title>Week {{ index }}</h3>
         </div>
         <div class="week-actions">
-          <div class="completion-badge">
+          <div class="completion-badge ocs__status-pill ocs__status-pill--neutral">
             <span class="completion-count">{{ completedItems }}/{{ totalItems }}</span>
             <span class="completion-label">Complete</span>
           </div>
@@ -68,8 +68,9 @@
 
       {% if assignmentCount > 0 %}
       <div class="assignment-due">
-        <i class="fas fa-calendar"></i>
-        <span>{{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due</span>
+        <span class="ocs__status-pill ocs__status-pill--warn">
+          <i class="fas fa-calendar"></i> {{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due
+        </span>
       </div>
       {% endif %}
 

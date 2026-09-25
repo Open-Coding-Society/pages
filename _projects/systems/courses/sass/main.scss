@@ -262,36 +262,9 @@
     margin: 0 0 4px 0;
   }
 
-  .completion-badge {
-    background: transparent;
-    border: 1px solid $bg-3;
-    color: $text-muted;
-    padding: 4px 12px;
-    border-radius: 4px;
-    font-size: 13px;
-  }
+  /* .completion-badge is styled by .ocs__status-pill--neutral (elements/capstone/status-pills). */
 
-  .sprint-btn {
-    background: var(--pref-bg-color);
-    border: 1px solid var(--pref-accent-color);
-    color: var(--pref-accent-color);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: var(--pref-font-size);
-    font-family: var(--pref-font-family);
-    cursor: pointer;
-    transition: all 0.2s;
-    height: 38px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .sprint-btn:hover,
-  .sprint-btn:focus-visible {
-    @include text-button;
-  }
-
+  /* Base look comes from .ocs__btn in the markup; only the icon-only square shape is set here. */
   .sprint-btn.certificate,
   .sprint-btn.help {
     @include icon-button
@@ -392,28 +365,11 @@
 
   // Item-level priority dropdown in main dashboard
   .item-priority-dropdown {
+    @include select-control(42px);
     flex-shrink: 0;
-    padding: 2px 6px;
     font-size: 11px;
     font-weight: 600;
-    border-radius: 4px;
-    border: 1px solid $bg-3;
-    background: $bg-2;
-    color: $text;
-    cursor: pointer;
-    min-width: 42px;
     text-align: center;
-    transition: all 0.2s ease;
-
-    &:hover {
-      border-color: $accent;
-    }
-
-    &:focus {
-      outline: none;
-      border-color: $accent;
-      box-shadow: 0 0 0 2px rgba($accent, 0.2);
-    }
 
     // Priority color coding
     &.priority-p0 {
@@ -490,12 +446,8 @@
     opacity: 1;
   }
 
+  /* Pill itself is .ocs__status-pill--warn; this only spaces it from the card above. */
   .assignment-due {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #f59e0b;
-    font-size: 14px;
     margin-top: 8px;
   }
 
@@ -613,11 +565,6 @@
     .progression-btn {
       padding: 8px 12px;
       font-size: 12px;
-    }
-
-    .completion-badge {
-      font-size: 12px;
-      padding: 3px 8px;
     }
 
     /* Modal responsiveness */
