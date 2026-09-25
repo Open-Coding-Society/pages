@@ -190,6 +190,45 @@ Check if this is a course lesson and determine which course context to use
   };
 
   /**
+   * Week chat modals, built in lesson-sidebar-nav.html and emitted by
+   * lesson-modals.html. Opening one also opens the chat's <details>, whose
+   * toggle event is what week_chat.html waits for before it connects, so a
+   * chat only loads when someone actually opens it.
+   */
+  let weekChatTrigger = null;
+
+  window.openWeekChat = function (chatId, trigger) {
+    const modal = document.getElementById(`week-chat-modal-${chatId}`);
+    if (!modal) return;
+    weekChatTrigger = trigger || null;
+    modal.style.display = 'block';
+    const chat = modal.querySelector('details.week-chat');
+    if (chat && !chat.open) chat.open = true;
+    const close = modal.querySelector('.modal-close');
+    if (close) close.focus();
+  };
+
+  function closeWeekChat(modal) {
+    modal.style.display = 'none';
+    if (weekChatTrigger) weekChatTrigger.focus();
+    weekChatTrigger = null;
+  }
+
+  // The dim backdrop and the close button both close it; Escape does too.
+  document.addEventListener('click', (e) => {
+    const modal = e.target.closest('.week-chat-modal');
+    if (!modal) return;
+    if (e.target === modal || e.target.closest('.modal-close')) closeWeekChat(modal);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.week-chat-modal').forEach((modal) => {
+      if (modal.style.display === 'block') closeWeekChat(modal);
+    });
+  });
+
+  /**
    * ============================================
    * COMPLETION DATA LAYER: LocalStorage operations
    * ============================================

@@ -20,6 +20,7 @@
     - .lesson-item[data-lesson-id]          -> completion tracking
     - .lesson-status-icon                   -> per-lesson complete/incomplete
     - [data-week-count][data-week-total]    -> per-week completion count
+    - #week-chat-modal-{Sprint}-{week}       -> openWeekChat()
 {% endcomment %}
 
 <div class="lesson-sidebar">
@@ -47,6 +48,8 @@
 
   <div class="sprint-nav">
     {%- assign courseData = site.data[current_course] -%}
+    {%- comment -%} Filled per week below, emitted by _includes/lesson-modals.html. {%- endcomment -%}
+    {%- assign lessonWeekChats = "" -%}
 
     {%- comment -%} Filter to this course's single-course posts once, instead of rescanning all site posts per week. {%- endcomment -%}
     {%- assign coursePosts = "" | split: "" -%}
@@ -136,13 +139,36 @@
               </a>
               {%- endfor -%}
 
-              {%- if assignmentCount > 0 -%}
-              <div class="week-due">
+              {%- comment -%}
+                Week chat. The chat is _includes/week_chat.html, the same one the
+                course timeline puts in each week card, and it is passed the course
+                so it joins the same room. The modal is captured here and emitted by
+                lesson-modals.html, because .week-body is display:none while the week
+                is closed and would hide anything inside it.
+              {%- endcomment -%}
+              {%- assign unitKey = sprintKey -%}
+              {%- assign index = week -%}
+              {%- assign chatId = unitKey | append: '-' | append: index -%}
+              <div class="ocs__links week-footer">
+                {%- if assignmentCount > 0 -%}
                 <span class="ocs__status-pill ocs__status-pill--warn">
                   <i class="fas fa-calendar"></i> {{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due
                 </span>
+                {%- endif -%}
+                <button class="ocs__btn ocs__btn--icon small accent" type="button" onclick="openWeekChat('{{ chatId }}', this)" aria-haspopup="dialog">
+                  <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-comments"></i></span>
+                  <span>Week {{ week }} Chat</span>
+                </button>
               </div>
-              {%- endif -%}
+              {%- capture weekChatModal -%}
+              <div class="modal-overlay week-chat-modal" id="week-chat-modal-{{ chatId }}" role="dialog" aria-modal="true" aria-label="Week {{ week }} chat">
+                <div class="modal-content">
+                  <button class="modal-close" type="button" aria-label="Close chat">&times;</button>
+                  {% include week_chat.html course=current_course %}
+                </div>
+              </div>
+              {%- endcapture -%}
+              {%- assign lessonWeekChats = lessonWeekChats | append: weekChatModal -%}
               </div>
             </div>
             {%- endif -%}
