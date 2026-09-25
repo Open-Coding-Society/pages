@@ -1,5 +1,7 @@
 @import "mixins/modals";
 @import "mixins/buttons";
+@import "mixins/variables";
+@import "mixins/grid";
 
 /* ============================= */
 /*       VIDEO DEMO MODAL        */
@@ -280,8 +282,12 @@
     margin-bottom: 16px;
   }
 
-  /* Box, border, radius, padding and hover all come from .ocs__grid-cell
-     inside .ocs__grid--card. */
+  /* .ocs__grid-cell gives the box. grid-card-cell adds the hover lift his
+     .ocs__grid--card cells get (panel-mid, accent border, -2px, shadow);
+     only card-grid's auto-fill columns were the problem, not the cell. */
+  .item-card {
+    @include grid-card-cell;
+  }
 
   .item-content {
     display: flex;
@@ -290,12 +296,16 @@
     width: 100%;
   }
 
+  /* base-button is his shared control behaviour (cursor, transition, hover
+     and focus tones). The toggle stays a bare round icon at rest and picks up
+     the panel-mid highlight on hover, so it reads as something you can press. */
   .completion-toggle {
+    @include base-button;
     background: none;
     border: none;
+    border-radius: 50%;
     padding: 0;
     margin: 0;
-    cursor: pointer;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -321,11 +331,18 @@
   }
 
   .status-icon.completed {
-    color: $accent;
+    color: var(--pref-accent-color);
+  }
+
+  /* base-button's hover is --panel-mid, a 12% black wash that barely reads on
+     a 20px circle over a dark panel. Previewing the accent on the icon is the
+     same signal .status-icon.completed already uses for the "on" state. */
+  .completion-toggle:hover .status-icon {
+    color: var(--pref-accent-color);
   }
 
   .status-icon.incomplete {
-    color: $bg-3;
+    color: var(--text-muted);
   }
 
   .type-icon {
@@ -389,6 +406,15 @@
       background: rgba(156, 163, 175, 0.15);
       border-color: rgba(156, 163, 175, 0.4);
       color: #9ca3af;
+    }
+
+    /* The priority tones above are emitted after select-control's own :hover
+       and match its specificity, so they were winning and the select sat dead
+       under the pointer. Restating the accent border last puts base-button's
+       hover back on top while the priority tint still shows through. */
+    &:hover,
+    &:focus {
+      border-color: var(--pref-accent-color);
     }
   }
 
