@@ -3,7 +3,7 @@ microblog: true
 toc: false
 layout: post
 title: OCS Admin & Security Team
-description: Mentor access and platform security for Open Coding Society — Google OAuth-verified mentor signup, role-based permissions, a verified password reset flow, password complexity enforced in every layer, and Python/Java code execution moved into isolated Docker runner containers.
+description: "The systems that protect Open Coding Society as it scales: identity verification and password enforcement across the frontend and both backends, isolated execution for student code, automated database maintenance, and a role-based mentor system."
 permalink: /capstone/ocs-admin-security/
 ---
 
