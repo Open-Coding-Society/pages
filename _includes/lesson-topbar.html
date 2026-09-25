@@ -15,7 +15,7 @@
         <span>Week {{ current_week }}</span>
         <i class="fas fa-chevron-right"></i>
         <span class="current">{{ page.title }}</span>
-        <button id="topbar-complete-btn" onclick="toggleComplete()" type="button" title="Mark lesson complete">
+        <button id="topbar-complete-btn" class="ocs__btn ocs__btn--icon small accent" onclick="toggleComplete()" type="button" title="Mark lesson complete">
           <i class="fas fa-circle" id="complete-icon-topbar"></i>
           <span id="complete-text-topbar">Burndown</span>
         </button>
@@ -27,10 +27,10 @@
       prevLesson() and nextLesson() are defined in _layouts/post.html.
     {%- endcomment -%}
     <nav class="ocs__links" aria-label="Lesson navigation">
-      <button class="ocs__btn ocs__btn--icon small" onclick="prevLesson()" type="button" title="Previous lesson">
+      <button class="ocs__btn ocs__btn--icon small accent" onclick="prevLesson()" type="button" title="Previous lesson">
         <i class="fas fa-chevron-left"></i> Prev
       </button>
-      <button class="ocs__btn ocs__btn--icon small" onclick="nextLesson()" type="button" title="Next lesson">
+      <button class="ocs__btn ocs__btn--icon small accent" onclick="nextLesson()" type="button" title="Next lesson">
         Next <i class="fas fa-chevron-right"></i>
       </button>
     </nav>

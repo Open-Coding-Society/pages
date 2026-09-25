@@ -99,8 +99,17 @@ body:has(.lesson-player) {
   text-align: left;
 }
 
+/* Hover tints follow the live theme accent. $accent is a static #4CAFEF that
+   is not the same colour as var(--pref-accent-color) and never changes when
+   the reader picks a different accent, so these use the same color-mix idiom
+   his status pills and button utilities use. */
 .sprint-toggle:hover {
-  background: rgba($accent, 0.08);
+  background: color-mix(in srgb, var(--pref-accent-color) 8%, transparent);
+}
+
+.sprint-toggle:focus-visible {
+  outline: 2px solid var(--pref-accent-color);
+  outline-offset: -2px;
 }
 
 .sprint-chevron {
@@ -147,11 +156,16 @@ body:has(.lesson-player) {
 }
 
 .lesson-item:hover {
-  background: rgba($accent, 0.06);
+  background: color-mix(in srgb, var(--pref-accent-color) 6%, transparent);
+}
+
+.lesson-item:focus-visible {
+  outline: 2px solid var(--pref-accent-color);
+  outline-offset: -2px;
 }
 
 .lesson-item.active {
-  background: rgba($accent, 0.1);
+  background: color-mix(in srgb, var(--pref-accent-color) 10%, transparent);
 }
 
 .lesson-item.active .lesson-title {
@@ -216,7 +230,12 @@ body:has(.lesson-player) {
 }
 
 .week-toggle:hover {
-  background: rgba($accent, 0.06);
+  background: color-mix(in srgb, var(--pref-accent-color) 6%, transparent);
+}
+
+.week-toggle:focus-visible {
+  outline: 2px solid var(--pref-accent-color);
+  outline-offset: -2px;
 }
 
 .week-toggle-row {
@@ -263,7 +282,7 @@ body:has(.lesson-player) {
 }
 
 .week-goals[open] {
-  border-color: rgba($accent, 0.4);
+  border-color: var(--pref-accent-color);
 }
 
 .week-goals-summary {
@@ -281,11 +300,11 @@ body:has(.lesson-player) {
 }
 
 .week-goals-summary:hover {
-  background: rgba($text, 0.05);
+  background: color-mix(in srgb, var(--pref-accent-color) 6%, transparent);
 }
 
 .week-goals-summary:focus-visible {
-  outline: 2px solid $accent;
+  outline: 2px solid var(--pref-accent-color);
   outline-offset: -2px;
 }
 
