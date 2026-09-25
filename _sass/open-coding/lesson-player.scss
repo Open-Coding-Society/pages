@@ -344,15 +344,13 @@ body:has(.lesson-player) {
   color: var(--warn, #f59e0b);
 }
 
-/* The OCS chips and goals list are built for full-width pages. Tighten them
-   for the sidebar column, and match the emphasis the course timeline page
-   gives the same block: the "Learning Goals" label recedes and the goals
-   themselves are the bright text, not the other way round. */
+/* The OCS chips and goals list are built for full-width pages, so the only
+   thing overridden here is size and spacing for the 250px column. Colour and
+   weight are left to the components, which is what the course timeline page
+   now uses for the same block, so the two stay in step. */
 .lesson-sidebar .ocs__section-title {
   margin: 0 0 4px;
-  color: $text-muted;
   font-size: 0.65rem;
-  font-weight: 600;
 }
 
 .lesson-sidebar .ocs__keypoints {
@@ -361,7 +359,6 @@ body:has(.lesson-player) {
 
 .lesson-sidebar .ocs__keypoint {
   gap: 6px;
-  color: $text;
   font-size: 0.78rem;
   line-height: 1.45;
 }
