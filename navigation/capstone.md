@@ -912,7 +912,7 @@ document.addEventListener('DOMContentLoaded', function(){
        </a>
        <div>
            <h3><a href="{% post_url capstone/2026-09-03-ocs-admin-security-team %}">OCS Admin & Security Team</a></h3>
-           <p>Opening Open Coding Society to mentors while locking it down: Google OAuth-verified mentor signup, a scoped capstone dashboard with role-based permissions, complex-password enforcement in every layer, and code runners isolated in their own containers to keep malicious code away from sensitive information.</p>
+           <p>The OCS Admin & Security team maintains the systems that keep OCS operational, recoverable, and secure. Administration includes backup and restore, schema upgrades, AWS RDS/S3/EC2 operations, administrative MVC/Thymeleaf tools, user recovery and password services, mentor and parent authorization, and year-to-year system resets and data pruning. Security examines how the OCS application can be compromised, including isolated Code Runner containers, protection against injected or unsafe student code, JWT and cookie security, and security boundaries across the Java/Spring and Python/Flask systems. Together, the work moves students from building application features to maintaining and protecting a production system.</p>
            <p>Team: Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengji L, Jacob C, Arnav P</p>
        </div>
    </div>

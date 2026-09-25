@@ -1,0 +1,739 @@
+// OCS Admin & Security Team capstone page (/capstone/ocs-admin-security/)
+// Scoped under .oas so it can't clash with site styles.
+
+$oas-bg: #0e1218;
+$oas-panel: rgba(255, 255, 255, 0.045);
+$oas-panel-2: rgba(255, 255, 255, 0.08);
+$oas-line: rgba(255, 255, 255, 0.11);
+$oas-ink: #eef2f7;
+$oas-muted: #a6b3c4;
+$oas-dim: #75859a;
+$oas-accent: #5fb8ad;
+$oas-accent-2: #86a5d6;
+$oas-amber: #d6a544;
+$oas-on-accent: #04211f;
+
+$oas-body-font: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+$oas-display-font: 'Bricolage Grotesque', 'Manrope', system-ui, sans-serif;
+
+@mixin oas-tint($color, $fill: 0.1, $border: 0.4) {
+  background: rgba($color, $fill);
+  border-color: rgba($color, $border);
+}
+
+// Only this page hides the default post header.
+body:has(.oas) .post-header {
+  display: none !important;
+}
+
+.oas {
+  font-family: $oas-body-font;
+  color: $oas-ink;
+  line-height: 1.65;
+  background-color: $oas-bg;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
+  padding: 0 0 4rem;
+  overflow-x: clip;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  // The theme gives headings a glow, underline and extra padding; restate ours.
+  h1,
+  h2,
+  h3 {
+    color: $oas-ink;
+    border: 0 !important;
+    padding-bottom: 0 !important;
+    text-shadow: none !important;
+  }
+
+  h1 {
+    display: block;
+    margin: 0.9rem 0 0.6rem;
+    font-family: $oas-display-font;
+    font-weight: 700;
+    font-size: clamp(2.3rem, 5.5vw, 3.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+  }
+
+  h2 {
+    margin: 0 0 0.7rem;
+    font-family: $oas-display-font;
+    font-weight: 700;
+    font-size: 1.75rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    margin: 1.6rem 0 0.4rem;
+    font-size: 1.02rem;
+    font-weight: 700;
+  }
+
+  p {
+    max-width: 66ch;
+    margin: 0 0 1rem;
+    color: $oas-muted;
+  }
+
+  a:focus-visible {
+    outline: 2px solid $oas-accent;
+    outline-offset: 3px;
+  }
+
+  svg text {
+    font-family: inherit;
+  }
+}
+
+// ── Layout ────────────────────────────────────────────────
+.oas-in {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 4vw, 2rem);
+}
+
+// Hidden SVG that only holds shared <defs> such as the arrowhead marker.
+.oas-defs {
+  position: absolute;
+}
+
+// Centered title panel, in the same style as the other capstone pages.
+.oas-hero {
+  margin: 2.5rem 0 0;
+  padding: 3rem 2rem;
+  text-align: center;
+  background: $oas-panel;
+  border: 1px solid $oas-line;
+  border-radius: 10px;
+
+  h1 {
+    margin: 0 0 1rem;
+    font-family: $oas-body-font;
+    font-size: 2.75rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .oas-people,
+  .oas-stack,
+  .oas-links {
+    justify-content: center;
+  }
+}
+
+.oas-logo {
+  display: block;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 1.25rem;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid $oas-line;
+  background: $oas-panel;
+}
+
+.oas .oas-tagline {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: $oas-muted;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.oas-people,
+.oas-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.oas-people li {
+  padding: 0.2rem 0.75rem;
+  background: $oas-panel;
+  border: 1px solid $oas-line;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: $oas-muted;
+}
+
+.oas-stack li {
+  padding: 0.15rem 0.7rem;
+  background: rgba($oas-accent-2, 0.08);
+  border: 1px solid rgba($oas-accent-2, 0.3);
+  border-radius: 6px;
+  font-size: 0.84rem;
+  color: $oas-accent-2;
+  font-weight: 600;
+}
+
+// ── Buttons and links ─────────────────────────────────────
+.oas-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1.4rem 0 0;
+}
+
+.oas-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1.15rem;
+  border: 1px solid $oas-line;
+  background: $oas-panel;
+  border-radius: 6px;
+  color: $oas-ink;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+
+  &:hover {
+    background: $oas-panel-2;
+    border-color: rgba($oas-accent, 0.55);
+  }
+}
+
+.oas-btn-main {
+  background: $oas-accent;
+  border-color: $oas-accent;
+  color: $oas-on-accent;
+
+  &:hover {
+    background: #79c9bf;
+    border-color: #79c9bf;
+  }
+}
+
+// The theme's link rule forces accent-colored text with !important (also on
+// hover), so buttons restate their colors. The main button's dark text on the
+// accent fill would otherwise vanish.
+.oas a.oas-btn {
+  &,
+  &:visited,
+  &:hover {
+    color: $oas-ink !important;
+  }
+}
+
+.oas a.oas-btn-main {
+  &,
+  &:visited,
+  &:hover {
+    color: $oas-on-accent !important;
+  }
+}
+
+.oas-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0 0 2rem;
+}
+
+.oas-link {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  padding: 0.1rem 0.7rem;
+  border: 1px solid $oas-line;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: $oas-accent;
+  text-decoration: none;
+  background: $oas-panel;
+
+  &::after {
+    content: '\2197';
+  }
+
+  &:hover {
+    border-color: rgba($oas-accent, 0.55);
+    background: $oas-panel-2;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .oas-btn,
+  .oas-link {
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+}
+
+// ── Stats and overview ────────────────────────────────────
+.oas-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 2.5rem 0 3.5rem;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 1rem 1.25rem;
+    background: $oas-panel;
+    border: 1px solid $oas-line;
+    border-radius: 8px;
+  }
+
+  strong {
+    display: block;
+    font-family: $oas-display-font;
+    font-size: 2.1rem;
+    line-height: 1.1;
+    color: $oas-accent;
+  }
+
+  span {
+    color: $oas-muted;
+    font-size: 0.92rem;
+  }
+}
+
+.oas-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 2.5rem;
+  align-items: center;
+  margin: 0 0 3.5rem;
+
+  .oas-fig {
+    padding: 1.25rem;
+    background: $oas-panel;
+    border: 1px solid $oas-line;
+    border-radius: 10px;
+  }
+}
+
+.oas-row {
+  padding: 0.95rem 0;
+  border-top: 1px solid $oas-line;
+
+  h3 {
+    margin: 0;
+    color: $oas-accent;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+.oas-fig {
+  margin: 0;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  img {
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  figcaption {
+    margin-top: 0.7rem;
+    font-size: 0.9rem;
+    color: $oas-muted;
+  }
+}
+
+.oas-why {
+  margin: 0 0 2rem;
+}
+
+// ── Pillar cards ──────────────────────────────────────────
+.oas-card {
+  background: $oas-panel;
+  border: 1px solid $oas-line;
+  border-radius: 10px;
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  margin: 0 0 1.5rem;
+  scroll-margin-top: 5rem;
+}
+
+.oas-phead {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin: 0 0 0.5rem;
+
+  h2 {
+    margin: 0;
+  }
+
+  p {
+    margin: 0.1rem 0 0;
+  }
+}
+
+.oas-ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  border: 1px solid;
+  @include oas-tint($oas-accent, 0.12, 0.35);
+  color: $oas-accent;
+}
+
+.oas-ico-b {
+  @include oas-tint($oas-accent-2, 0.12, 0.4);
+  color: $oas-accent-2;
+}
+
+.oas-icon {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.oas-owned {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.9rem 0 0;
+
+  > strong {
+    font-size: 0.88rem;
+    margin-right: 0.25rem;
+  }
+
+  .oas-people {
+    margin: 0;
+  }
+}
+
+.oas-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: start;
+  margin-top: 0.75rem;
+}
+
+.oas-diagrams {
+  display: grid;
+  gap: 1.75rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.oas-flowfig {
+  svg {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  figcaption {
+    text-align: center;
+  }
+}
+
+// ── "What it does" / "What's next" lists ──────────────────
+.oas-sub {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 1.6rem 0 0.35rem;
+  padding: 0.2rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid;
+
+  &::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+  }
+}
+
+.oas-sub-does {
+  color: $oas-accent;
+  @include oas-tint($oas-accent, 0.08);
+
+  &::before {
+    background: $oas-accent;
+  }
+}
+
+.oas-sub-next {
+  color: $oas-amber;
+  @include oas-tint($oas-amber, 0.08);
+
+  &::before {
+    border: 2px solid $oas-amber;
+  }
+}
+
+.oas-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    position: relative;
+    padding: 0.85rem 0 0.85rem 1.5rem;
+    border-bottom: 1px solid $oas-line;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 1.3rem;
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+      background: $oas-accent;
+    }
+  }
+}
+
+.oas-later li::before {
+  background: transparent;
+  border: 2px solid $oas-amber;
+  width: 0.6rem;
+  height: 0.6rem;
+}
+
+.oas-name {
+  display: block;
+  font-weight: 700;
+  color: $oas-ink;
+}
+
+.oas-note {
+  display: block;
+  font-size: 0.93rem;
+  color: $oas-muted;
+}
+
+// ── GitHub project board button ─────────────────────────────────────────
+.oas-bigbtn {
+  margin: 1.5rem 0 0;
+}
+
+.oas-btn-big {
+  justify-content: center;
+  width: 100%;
+  min-height: 60px;
+  font-size: 1.15rem;
+}
+
+// ── Vision and teamwork ───────────────────────────────────
+.oas-vision {
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.oas-big {
+  font-family: $oas-display-font;
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+  line-height: 1.25;
+  letter-spacing: 0;
+  color: $oas-ink;
+  max-width: 34ch;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.oas-goals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 1rem 1.15rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid $oas-line;
+    border-radius: 8px;
+    color: $oas-muted;
+    font-size: 0.95rem;
+
+    &::before {
+      content: '';
+      display: block;
+      width: 1.6rem;
+      height: 3px;
+      border-radius: 1px;
+      background: $oas-accent;
+      margin-bottom: 0.7rem;
+    }
+  }
+}
+
+.oas-how {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+
+  > div {
+    padding: 1rem 1.15rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid $oas-line;
+    border-radius: 8px;
+  }
+
+  h3 {
+    margin: 0 0 0.3rem;
+    color: $oas-accent-2;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.93rem;
+  }
+}
+
+.oas-follow .oas-links {
+  margin-top: 0.5rem;
+}
+
+// ── Diagram (SVG) parts ───────────────────────────────────
+.oas-node {
+  fill: rgba(255, 255, 255, 0.05);
+  stroke: $oas-line;
+  stroke-width: 1.5;
+}
+
+.oas-edge {
+  stroke: $oas-dim;
+  stroke-width: 2;
+  fill: none;
+}
+
+.oas-arrowhead {
+  fill: $oas-dim;
+}
+
+.oas-t {
+  fill: $oas-ink;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.oas-num {
+  fill: rgba($oas-accent, 0.15);
+  stroke: $oas-accent;
+  stroke-width: 1.5;
+}
+
+.oas-nt {
+  fill: $oas-accent;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.oas-blue {
+  .oas-num {
+    fill: rgba($oas-accent-2, 0.15);
+    stroke: $oas-accent-2;
+  }
+
+  .oas-nt {
+    fill: $oas-accent-2;
+  }
+}
+
+.oas-pill {
+  fill: $oas-panel;
+  stroke: $oas-line;
+  stroke-width: 1.5;
+}
+
+.oas-pill-new {
+  fill: rgba($oas-accent-2, 0.14);
+  stroke: $oas-accent-2;
+  stroke-width: 2;
+}
+
+.oas-lay1 {
+  fill: rgba($oas-accent-2, 0.06);
+  stroke: rgba($oas-accent-2, 0.4);
+  stroke-width: 1.5;
+}
+
+.oas-lay2 {
+  fill: rgba($oas-accent, 0.06);
+  stroke: rgba($oas-accent, 0.4);
+  stroke-width: 1.5;
+}
+
+.oas-lay3 {
+  fill: rgba($oas-accent, 0.12);
+  stroke: rgba($oas-accent, 0.55);
+  stroke-width: 1.5;
+}
+
+.oas-core {
+  fill: rgba(255, 255, 255, 0.06);
+  stroke: $oas-line;
+  stroke-width: 1.5;
+}
+
+.oas-lt {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.oas-lt1 {
+  fill: $oas-accent-2;
+}
+
+.oas-lt2,
+.oas-lt3 {
+  fill: $oas-accent;
+}
+
+.oas-ls {
+  fill: $oas-muted;
+  font-size: 13px;
+}
+
+// ── Small screens ─────────────────────────────────────────
+@media (max-width: 860px) {
+  .oas-overview,
+  .oas-split {
+    grid-template-columns: 1fr;
+  }
+
+  .oas-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .oas-hero {
+    padding-top: 3rem;
+  }
+}
