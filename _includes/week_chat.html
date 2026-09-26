@@ -5,11 +5,16 @@
 <!-- as _includes/lesson_chat.html and _includes/announcement_chat.html. The -->
 <!-- group is created automatically on first use if it doesn't exist yet. -->
 <!-- -->
+<!-- Pages without `page.course` (lesson pages only have `courses:`) pass it -->
+<!-- in as an include parameter, course=current_course, so the room is -->
+<!-- "csa-week-2" and not "null-week-2". The course page needs no param. -->
+<!-- -->
 <!-- Signed-out visitors still get the full UI: the chat drops into a local -->
 <!-- "preview" mode backed by localStorage so the feature can be seen and -->
 <!-- exercised on every week card without a login. Preview messages never -->
 <!-- leave the browser and are clearly labelled as such. -->
 {% assign wc_id = unitKey | append: '-' | append: index %}
+{% assign wc_course = include.course | default: page.course %}
 
 <details class="week-chat" data-week-key="{{ wc_id }}">
   <summary class="chat-summary">
@@ -40,7 +45,7 @@
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
   import { createRichComposer, renderRichMessage } from '{{site.baseurl}}/assets/js/chat/rich-text.js';
 
-  const COURSE = {{ page.course | jsonify }};
+  const COURSE = {{ wc_course | jsonify }};
   const WEEK_INDEX = {{ index | jsonify }};
   const WC_ID = {{ wc_id | jsonify }};
   const GROUP_NAME = `${COURSE}-week-${WEEK_INDEX}`;

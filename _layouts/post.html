@@ -94,6 +94,12 @@ Check if this is a course lesson and determine which course context to use
           {% if page.chat %}
           {% include lesson_chat.html %}
           {% endif %}
+
+          <!-- Previous / next lesson, filled in from the sidebar order by fillLessonPager() -->
+          <div class="ocs__pager" id="lesson-pager" hidden>
+            <a href="#" class="ocs__pager-link" id="pager-prev"></a>
+            <a href="#" class="ocs__pager-link next" id="pager-next"></a>
+          </div>
         </div>
 
         {%- if page.comments -%}
@@ -173,6 +179,58 @@ Check if this is a course lesson and determine which course context to use
     chevron.classList.toggle('fa-chevron-right', !isHidden);
     chevron.classList.toggle('fa-chevron-down', isHidden);
   };
+
+  window.toggleWeek = function (weekId) {
+    const body = document.getElementById(`week-${weekId}-body`);
+    const chevron = document.getElementById(`week-chevron-${weekId}`);
+    const control = document.getElementById(`week-toggle-${weekId}`);
+    if (!body || !chevron) return;
+
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? 'block' : 'none';
+    chevron.classList.toggle('fa-chevron-right', !isHidden);
+    chevron.classList.toggle('fa-chevron-down', isHidden);
+    if (control) control.setAttribute('aria-expanded', isHidden.toString());
+  };
+
+  /**
+   * Week chat modals, built in lesson-sidebar-nav.html and emitted by
+   * lesson-modals.html. Opening one also opens the chat's <details>, whose
+   * toggle event is what week_chat.html waits for before it connects, so a
+   * chat only loads when someone actually opens it.
+   */
+  let weekChatTrigger = null;
+
+  window.openWeekChat = function (chatId, trigger) {
+    const modal = document.getElementById(`week-chat-modal-${chatId}`);
+    if (!modal) return;
+    weekChatTrigger = trigger || null;
+    modal.style.display = 'block';
+    const chat = modal.querySelector('details.week-chat');
+    if (chat && !chat.open) chat.open = true;
+    const close = modal.querySelector('.modal-close');
+    if (close) close.focus();
+  };
+
+  function closeWeekChat(modal) {
+    modal.style.display = 'none';
+    if (weekChatTrigger) weekChatTrigger.focus();
+    weekChatTrigger = null;
+  }
+
+  // The dim backdrop and the close button both close it; Escape does too.
+  document.addEventListener('click', (e) => {
+    const modal = e.target.closest('.week-chat-modal');
+    if (!modal) return;
+    if (e.target === modal || e.target.closest('.modal-close')) closeWeekChat(modal);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.week-chat-modal').forEach((modal) => {
+      if (modal.style.display === 'block') closeWeekChat(modal);
+    });
+  });
 
   /**
    * ============================================
@@ -256,10 +314,26 @@ Check if this is a course lesson and determine which course context to use
     return { total: lessonItems.length, completed };
   }
 
+  function updateWeekCounts(completionData) {
+    document.querySelectorAll('.week-group').forEach(group => {
+      const counter = group.querySelector('[data-week-count]');
+      if (!counter) return;
+
+      const items = group.querySelectorAll('.lesson-item');
+      let completed = 0;
+      items.forEach(item => {
+        if (completionData[item.dataset.lessonId]) completed++;
+      });
+
+      counter.textContent = `${completed}/${items.length}`;
+    });
+  }
+
   function updateProgressBars(completionData) {
     const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
     const stats = updateLessonItems(completionData);
-    
+    updateWeekCounts(completionData);
+
     const sidebarProgress = document.getElementById('sidebar-progress');
     if (sidebarProgress) {
       const sidebarPercent = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
@@ -313,6 +387,44 @@ Check if this is a course lesson and determine which course context to use
 
   /**
    * ============================================
+   * LESSON PAGER: Fill the prev/next links at the
+   * end of the lesson from the sidebar order
+   * ============================================
+   */
+  function fillLessonPager() {
+    const pager = document.getElementById('lesson-pager');
+    if (!pager) return;
+
+    const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
+    const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
+    if (currentIndex === -1) return;
+
+    const prev = lessonItems[currentIndex - 1];
+    const next = lessonItems[currentIndex + 1];
+    const titleOf = item => item.querySelector('.lesson-title').textContent.trim();
+
+    const prevLink = document.getElementById('pager-prev');
+    const nextLink = document.getElementById('pager-next');
+
+    if (prev) {
+      prevLink.href = prev.href;
+      prevLink.innerHTML = `&#8592; ${titleOf(prev)}`;
+    } else {
+      prevLink.replaceWith(document.createElement('span'));
+    }
+
+    if (next) {
+      nextLink.href = next.href;
+      nextLink.innerHTML = `Next: ${titleOf(next)} &rarr;`;
+    } else {
+      nextLink.replaceWith(document.createElement('span'));
+    }
+
+    pager.hidden = false;
+  }
+
+  /**
+   * ============================================
    * INITIALIZATION: Player setup
    * ============================================
    */
@@ -326,11 +438,22 @@ Check if this is a course lesson and determine which course context to use
   function expandCurrentSprint() {
     const activeLesson = document.querySelector('.lesson-item.active');
     if (!activeLesson) return;
-    
+
     const sprintSection = activeLesson.closest('.sprint-section');
     if (sprintSection) {
       const sprintToggle = sprintSection.querySelector('.sprint-toggle');
       if (sprintToggle) sprintToggle.click();
+    }
+  }
+
+  function expandCurrentWeek() {
+    const activeLesson = document.querySelector('.lesson-item.active');
+    if (!activeLesson) return;
+
+    const weekGroup = activeLesson.closest('.week-group');
+    if (weekGroup) {
+      const weekToggle = weekGroup.querySelector('.week-toggle');
+      if (weekToggle) weekToggle.click();
     }
   }
 
@@ -995,7 +1118,9 @@ Check if this is a course lesson and determine which course context to use
     // Lesson player setup
     initLessonPlayer();
     expandCurrentSprint();
+    expandCurrentWeek();
     syncCompletionUI();
+    fillLessonPager();
     setupSyncListeners();
     
     // Mobile enhancements

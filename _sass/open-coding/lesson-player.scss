@@ -1,4 +1,5 @@
 @import "./mixins/buttons";
+@import "./mixins/modals";
 
 /* Apply minimal body styles when lesson player is active */
 body:has(.lesson-player) {
@@ -99,8 +100,17 @@ body:has(.lesson-player) {
   text-align: left;
 }
 
+/* Hover tints follow the live theme accent. $accent is a static #4CAFEF that
+   is not the same colour as var(--pref-accent-color) and never changes when
+   the reader picks a different accent, so these use the same color-mix idiom
+   his status pills and button utilities use. */
 .sprint-toggle:hover {
-  background: rgba($accent, 0.08);
+  background: color-mix(in srgb, var(--pref-accent-color) 8%, transparent);
+}
+
+.sprint-toggle:focus-visible {
+  outline: 2px solid var(--pref-accent-color);
+  outline-offset: -2px;
 }
 
 .sprint-chevron {
@@ -117,6 +127,7 @@ body:has(.lesson-player) {
 .sprint-title {
   color: var(--pref-accent-color);
   font-size: 14px;
+  font-weight: 700;
   margin-bottom: 2px;
 }
 
@@ -126,7 +137,7 @@ body:has(.lesson-player) {
 }
 
 .lesson-list {
-  margin-left: 24px;
+  margin-left: 12px;
   margin-top: 4px;
 }
 
@@ -146,11 +157,16 @@ body:has(.lesson-player) {
 }
 
 .lesson-item:hover {
-  background: rgba($accent, 0.06);
+  background: color-mix(in srgb, var(--pref-accent-color) 6%, transparent);
+}
+
+.lesson-item:focus-visible {
+  outline: 2px solid var(--pref-accent-color);
+  outline-offset: -2px;
 }
 
 .lesson-item.active {
-  background: rgba($accent, 0.1);
+  background: color-mix(in srgb, var(--pref-accent-color) 10%, transparent);
 }
 
 .lesson-item.active .lesson-title {
@@ -179,6 +195,222 @@ body:has(.lesson-player) {
   color: $text-muted;
   font-size: 14px;
   flex: 1;
+  min-width: 0;
+}
+
+/* WEEK GROUPS IN SIDEBAR
+   Same information as the week cards on the course timeline page. The chips,
+   the goals list and its label are OCS components (ocs__status-pill,
+   ocs__keypoints, ocs__section-title); only the grouping and the narrow-column
+   spacing live here, because the sidebar is a fixed 250px column
+   (see _sass/minima/lessonbase.scss). */
+.week-group {
+  padding: 10px 0 10px 10px;
+  border-left: 1px solid $bg-3;
+}
+
+.week-group:last-child {
+  border-left-color: transparent;
+}
+
+/* Week toggle follows .sprint-toggle above: full width, transparent, chevron
+   swapped by toggleWeek() in _layouts/post.html. */
+.week-toggle {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 4px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+.week-toggle:hover {
+  background: color-mix(in srgb, var(--pref-accent-color) 6%, transparent);
+}
+
+.week-toggle:focus-visible {
+  outline: 2px solid var(--pref-accent-color);
+  outline-offset: -2px;
+}
+
+.week-toggle-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.week-chevron {
+  width: 10px;
+  font-size: 10px;
+  color: $text-muted;
+  flex-shrink: 0;
+}
+
+.week-toggle-row .ocs__status-pill--neutral {
+  margin-left: auto;
+}
+
+/* Weeks take the theme's orange so they read as a level below the sprint,
+   which keeps the accent colour. Sprint is bold, week is not. */
+.week-name {
+  display: block;
+  color: var(--orange);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.week-body {
+  margin-top: 8px;
+}
+
+/* Learning goals disclosure. Same shape as .week-chat in the courses project:
+   a bordered details, a summary with no marker, and a caret that flips when
+   open. Sized down for the sidebar column. */
+.week-goals {
+  margin-bottom: 8px;
+  border: 1px solid $bg-3;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.week-goals[open] {
+  border-color: var(--pref-accent-color);
+}
+
+.week-goals-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 0.2s;
+}
+
+.week-goals-summary::-webkit-details-marker {
+  display: none;
+}
+
+.week-goals-summary:hover {
+  background: color-mix(in srgb, var(--pref-accent-color) 6%, transparent);
+}
+
+.week-goals-summary:focus-visible {
+  outline: 2px solid var(--pref-accent-color);
+  outline-offset: -2px;
+}
+
+.week-goals-icon {
+  color: $accent;
+  font-size: 11px;
+}
+
+.week-goals-summary .ocs__section-title {
+  margin: 0;
+}
+
+.week-goals-caret {
+  margin-left: auto;
+  color: $text-muted;
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.week-goals[open] .week-goals-caret {
+  transform: rotate(180deg);
+}
+
+.week-goals-body {
+  padding: 8px;
+  border-top: 1px solid $bg-3;
+}
+
+/* Holds the "assignments due" pill and the week chat button. The row itself
+   is .ocs__links; this only spaces it from the lessons above. */
+.week-footer {
+  margin-top: 6px;
+}
+
+/* WEEK CHAT MODAL
+   The same three mixins his course page uses for #progression-modal and
+   #video-demo. Styled by class instead of id because there is one per week. */
+.week-chat-modal {
+  @include modal-overlay;
+}
+
+.week-chat-modal > .modal-content {
+  @include modal-content;
+  top: 60px;
+}
+
+.week-chat-modal .modal-close {
+  @include modal-close-btn;
+}
+
+/* modal-close-btn sits 28px in from the top corner and is 38px tall, so the
+   chat starts below it instead of running under it. The chat itself is left
+   exactly as the course page draws it. */
+.week-chat-modal .week-chat {
+  margin-top: 44px;
+}
+
+.week-group .lesson-item {
+  gap: 8px;
+  padding: 6px 8px;
+  align-items: flex-start;
+}
+
+.week-group .lesson-title {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.lesson-type-icon {
+  width: 14px;
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.lesson-type-icon.lesson {
+  color: $accent;
+}
+
+.lesson-type-icon.assignment {
+  color: var(--warn, #f59e0b);
+}
+
+/* The OCS chips and goals list are built for full-width pages, so the only
+   thing overridden here is size and spacing for the 250px column. Colour and
+   weight are left to the components, which is what the course timeline page
+   now uses for the same block, so the two stay in step. */
+.lesson-sidebar .ocs__section-title {
+  margin: 0 0 4px;
+  font-size: 0.65rem;
+}
+
+.lesson-sidebar .ocs__keypoints {
+  gap: 2px;
+}
+
+.lesson-sidebar .ocs__keypoint {
+  gap: 6px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.lesson-sidebar .ocs__status-pill {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.45rem;
 }
 
 /* MAIN CONTENT AREA */
@@ -202,6 +434,18 @@ body:has(.lesson-player) {
   margin-bottom: 6px;
 }
 
+/* When the row is tight (an iPad in portrait keeps the 250px sidebar), the
+   crumbs give way so Prev / Next stay side by side instead of stacking.
+   .ocs__links wraps by default, which is what stacked them. */
+.topbar-left {
+  min-width: 0;
+}
+
+.topbar-actions .ocs__links {
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+
 .breadcrumbs {
   display: flex;
   align-items: center;
@@ -212,6 +456,23 @@ body:has(.lesson-player) {
 
 .breadcrumbs .current {
   color: $text;
+}
+
+/* Keep each crumb whole and let the lesson title truncate; it is repeated as
+   the H1 just below. Burndown lives inside .breadcrumbs, so it must not be
+   the thing that gets squeezed. */
+.breadcrumbs span {
+  white-space: nowrap;
+}
+
+.breadcrumbs .current {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.breadcrumbs .ocs__btn {
+  flex-shrink: 0;
 }
 
 .topbar-progress {
@@ -780,6 +1041,14 @@ body:has(.lesson-player) {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+
+  /* With align-items: flex-start the crumbs sized to their min-content, and
+     the lesson title still counts at full width there, so the row came out
+     396px wide and pushed Burndown off a 375px screen. Holding it to the
+     column's width is what lets the title truncate. */
+  .topbar-left {
+    width: 100%;
   }
 
   .breadcrumbs {
