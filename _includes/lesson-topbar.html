@@ -33,6 +33,18 @@
       <button class="ocs__btn ocs__btn--icon small accent" onclick="nextLesson()" type="button" title="Next lesson">
         Next <i class="fas fa-chevron-right"></i>
       </button>
+      {%- comment -%}
+        This lesson's week chat. The sidebar is hidden on phones, so this is how
+        a phone opens it. Icon only, like the course page's calendar and
+        certificate buttons, so it fits beside Prev / Next at every width.
+        currentWeekChatId is set by lesson-sidebar-nav.html, which is included
+        first, and only for a week that has a chat modal.
+      {%- endcomment -%}
+      {%- if currentWeekChatId != blank -%}
+      <button class="ocs__btn ocs__btn--icon small accent" onclick="openWeekChat('{{ currentWeekChatId }}', this)" type="button" aria-haspopup="dialog" aria-label="Week {{ current_week }} chat" title="Week {{ current_week }} chat">
+        <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-comments"></i></span>
+      </button>
+      {%- endif -%}
     </nav>
   </div>
 

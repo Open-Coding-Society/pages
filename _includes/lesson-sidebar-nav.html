@@ -21,6 +21,7 @@
     - .lesson-status-icon                   -> per-lesson complete/incomplete
     - [data-week-count][data-week-total]    -> per-week completion count
     - #week-chat-modal-{Sprint}-{week}       -> openWeekChat()
+    - currentWeekChatId                      -> the top bar's chat button
 {% endcomment %}
 
 <div class="lesson-sidebar">
@@ -50,6 +51,8 @@
     {%- assign courseData = site.data[current_course] -%}
     {%- comment -%} Filled per week below, emitted by _includes/lesson-modals.html. {%- endcomment -%}
     {%- assign lessonWeekChats = "" -%}
+    {%- comment -%} The lesson's own week, for the top bar's chat button. {%- endcomment -%}
+    {%- assign currentWeekChatId = "" -%}
 
     {%- comment -%} Filter to this course's single-course posts once, instead of rescanning all site posts per week. {%- endcomment -%}
     {%- assign coursePosts = "" | split: "" -%}
@@ -149,6 +152,7 @@
               {%- assign unitKey = sprintKey -%}
               {%- assign index = week -%}
               {%- assign chatId = unitKey | append: '-' | append: index -%}
+              {%- if week == current_week -%}{%- assign currentWeekChatId = chatId -%}{%- endif -%}
               <div class="ocs__links week-footer">
                 {%- if assignmentCount > 0 -%}
                 <span class="ocs__status-pill ocs__status-pill--warn">
