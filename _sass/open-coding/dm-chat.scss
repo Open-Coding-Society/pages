@@ -48,14 +48,14 @@
   }
 
   .dm-conversation {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xxs;
     padding: $spacing-xxs;
     border-radius: $radius-xs;
     color: $text-muted;
     font-size: $text-sm;
     cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 
     &:hover { background: rgba($text, 0.05); }
 
@@ -63,6 +63,34 @@
       background: rgba($accent, 0.12);
       color: $text;
     }
+
+    &.has-unread {
+      color: $text;
+      font-weight: 600;
+    }
+  }
+
+  .dm-conversation-name {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dm-conversation-unread {
+    flex-shrink: 0;
+    box-sizing: border-box;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: 9px;
+    background: darken($red, 8%);
+    color: #fff;
+    font-size: $text-xs;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
   }
 
   .dm-empty {

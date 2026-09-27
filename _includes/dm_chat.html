@@ -97,6 +97,7 @@
     connected: false,
     pickerSelected: new Map(), // id -> { id, uid, name }
     seenMessageIds: new Set(), // reset whenever the active conversation changes
+    unseenWhileHidden: false, // a message reached the open conversation while the tab was hidden
     lastDayKey: null,
     lastSender: null,
     lastTime: 0,
@@ -289,13 +290,56 @@
 
     state.conversations.forEach((conversation) => {
       const item = document.createElement('li');
-      item.className = ['dm-conversation', conversation.id === state.activeConversationId ? 'is-active' : '']
-        .filter(Boolean).join(' ');
-      item.textContent = conversationLabel(conversation);
+      const unread = conversation.unreadCount || 0;
+      item.className = [
+        'dm-conversation',
+        conversation.id === state.activeConversationId ? 'is-active' : '',
+        unread > 0 ? 'has-unread' : '',
+      ].filter(Boolean).join(' ');
+
+      const name = document.createElement('span');
+      name.className = 'dm-conversation-name';
+      name.textContent = conversationLabel(conversation);
+      item.appendChild(name);
+
+      if (unread > 0) {
+        const pill = document.createElement('span');
+        pill.className = 'dm-conversation-unread';
+        pill.textContent = unread > 99 ? '99+' : String(unread);
+        pill.setAttribute('aria-label', `${unread} unread`);
+        item.appendChild(pill);
+      }
+
       item.addEventListener('click', () => selectConversation(conversation.id));
       conversationListEl.appendChild(item);
     });
   }
+
+  async function markConversationRead(id) {
+    const conversation = state.conversations.find((c) => c.id === id);
+    if (conversation) conversation.unreadCount = 0;
+    renderConversationList();
+    try {
+      const res = await fetch(`${javaURI}/api/dm/conversations/${id}/read`, { ...fetchOptions, method: 'POST' });
+      if (!res.ok) { console.warn('DM chat: mark read HTTP', res.status); return; }
+      window.dispatchEvent(new Event('dm:refresh-unread')); // navbar bell
+    } catch (err) {
+      console.warn('DM chat: mark read failed', err);
+    }
+  }
+
+  // The navbar bell's periodic summary also keeps these sidebar counts current,
+  // and reveals conversations someone else started since the list was loaded.
+  window.addEventListener('dm:unread', ({ detail }) => {
+    const counts = detail.conversations || {};
+    const known = new Set(state.conversations.map((c) => String(c.id)));
+    if (Object.keys(counts).some((id) => !known.has(id))) {
+      loadConversations();
+      return;
+    }
+    state.conversations.forEach((c) => { c.unreadCount = counts[c.id] || 0; });
+    renderConversationList();
+  });
 
   async function loadConversations() {
     try {
@@ -319,6 +363,7 @@
     setComposerEnabled(Boolean(state.currentUserUid));
 
     await loadMessages(id);
+    markConversationRead(id);
     await subscribeToConversation(id);
   }
 
@@ -431,7 +476,21 @@
     if (state.seenMessageIds.has(event.id)) return;
     state.seenMessageIds.add(event.id);
     appendMessage(event);
+
+    // The server already counts your own messages as read.
+    if (event.senderUid === state.currentUserUid) return;
+    if (document.visibilityState === 'visible') {
+      markConversationRead(event.conversationId);
+    } else {
+      state.unseenWhileHidden = true;
+    }
   }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible' || !state.unseenWhileHidden) return;
+    state.unseenWhileHidden = false;
+    if (state.activeConversationId) markConversationRead(state.activeConversationId);
+  });
 
   function connectSocket() {
     return new Promise((resolve) => {
