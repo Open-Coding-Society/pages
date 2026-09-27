@@ -14,6 +14,11 @@ show_reading_time: false
     <div class="login-card">
         <h1 id="pythonTitle">User Login</h1>
         <hr>
+        <div id="loginPending" class="mentor-pending" role="status" hidden>
+            <h2>Verification Pending</h2>
+            <p>Your mentor account has not been verified yet. Please wait for an administrator to approve your account before accessing the mentor portal.</p>
+            <p>Your account and signup information are saved, so you won't need to register again.</p>
+        </div>
         <form id="pythonForm" onsubmit="loginBoth(); return false;">
             <div class="form-group">
                 <input type="text" id="uid" placeholder="GitHub ID" required>
@@ -39,6 +44,11 @@ show_reading_time: false
                 <option value="student" selected>Student</option>
                 <option value="mentor">Mentor</option>
             </select>
+        </div>
+        <div id="signupMentorPending" class="mentor-pending" role="status" hidden>
+            <h2>Mentor Verification Pending</h2>
+            <p>Your mentor account has been created successfully. An administrator must verify your account before you can access the mentor portal.</p>
+            <p>You will be able to log in normally once your account has been verified.</p>
         </div>
         <!-- Google OAuth Section (initially hidden) -->
         <div id="oauth-verification" style="display: none; text-align: center; margin-bottom: 2rem;">
@@ -78,6 +88,9 @@ show_reading_time: false
         </div>
         <!-- Signup Form -->
         <form id="signupForm" onsubmit="handleSignupSubmit(event);">
+            <p id="mentorSignupNote" class="mentor-signup-note" hidden>
+                You are creating a <strong>mentor account</strong>. Mentor accounts require administrator verification before access to the mentor portal is granted.
+            </p>
             <div class="form-group">
                 <input type="text" id="name" placeholder="Name" required>
             </div>
@@ -102,6 +115,9 @@ show_reading_time: false
             </div>
             <div class="form-group">
                 <input type="email" id="signupEmail" placeholder="Personal (not school) Email" required>
+            </div>
+            <div class="form-group" id="signupBusinessEmailGroup" hidden>
+                <input type="email" id="signupBusinessEmail" placeholder="Business / Work Email">
             </div>
             <div class="form-group">
                 <input type="password" id="signupPassword" placeholder="Password" required>
@@ -141,7 +157,7 @@ show_reading_time: false
 
 <script type="module">
     import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID } from '{{site.baseurl}}/assets/js/api/config.js';
-    import { fetchPerson } from '{{site.baseurl}}/assets/js/api/role-view.js';
+    import { fetchPerson, roleNames } from '{{site.baseurl}}/assets/js/api/role-view.js';
 
     let signupFormData = {};
     let verifiedSchoolEmail = null;
@@ -192,7 +208,12 @@ show_reading_time: false
         schoolGroup.style.display = isMentor ? 'none' : '';
         sidField.required = !isMentor;
         schoolField.required = !isMentor;
-        emailField.placeholder = isMentor ? 'Email' : 'Personal (not school) Email';
+        emailField.placeholder = isMentor ? 'Personal Email' : 'Personal (not school) Email';
+        // Spring requires a business email for mentors (shown to the admin on the mentor ticket).
+        document.getElementById('signupBusinessEmailGroup').hidden = !isMentor;
+        document.getElementById('signupBusinessEmail').required = isMentor;
+        document.getElementById('mentorSignupNote').hidden = !isMentor;
+        document.getElementById('signupMentorPending').hidden = true;
         document.getElementById('signupTitle').textContent = isMentor ? 'Mentor Sign Up' : 'Sign Up';
         // Flask stays visible, dimmed for mentors because their accounts are created in Spring only.
         const flaskEl = document.getElementById('flaskStatus');
@@ -377,6 +398,7 @@ show_reading_time: false
             sid: role === 'mentor' ? '' : document.getElementById("signupSid").value,
             school: role === 'mentor' ? '' : document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
+            businessEmail: role === 'mentor' ? document.getElementById("signupBusinessEmail").value : '',
             password: document.getElementById("signupPassword").value,
             kasm_server_needed: document.getElementById("kasmNeeded").checked,
         };
@@ -499,12 +521,20 @@ show_reading_time: false
         let pythonPromise = new Promise((resolve) => {
             window.pythonLogin(resolve);
         });
+        document.getElementById('loginPending').hidden = true;
         Promise.allSettled([javaPromise, pythonPromise]).then(async ([javaOutcome]) => {
             // Spring is authoritative for both login success and the mentor/student
             // view (see role-view.js) -- no upfront "log in as" choice needed. A
             // Flask-only failure (e.g. no matching row for a Spring-only mentor
             // account) is tolerated separately in pythonLogin's onFailure below.
             const person = await fetchPerson();
+            if (person && roleNames(person).includes('ROLE_PENDING') && await hasPendingMentorTicket()) {
+                // A mentor awaiting approval must not reach the mentor portal.
+                document.getElementById('message').textContent = '';
+                document.getElementById('loginPending').hidden = false;
+                logoutSpring();
+                return;
+            }
             if (person) {
                 window.location.href = '{{site.baseurl}}/profile';
                 return;
@@ -512,6 +542,24 @@ show_reading_time: false
             document.getElementById('message').textContent = await describeLoginFailure(javaOutcome.value);
         });
     };
+
+    // ROLE_PENDING alone can't tell a pending mentor from other unapproved signups,
+    // so ask Spring whether this account has an open mentor application.
+    async function hasPendingMentorTicket() {
+        try {
+            const response = await fetch(`${javaURI}/api/person/mentor/ticket/status`, fetchOptions);
+            return response.ok && !!(await response.json()).pending;
+        } catch (error) {
+            console.warn('Could not read mentor ticket status:', error.message);
+            return false;
+        }
+    }
+
+    // Drops the Spring session so a pending mentor isn't left half signed in.
+    function logoutSpring() {
+        fetch(`${javaURI}/api/logout`, { ...fetchOptions, method: 'POST' })
+            .catch(error => console.warn('Spring logout after pending login failed:', error.message));
+    }
 
     // Explains why login did not reach a live Spring session. Mentor accounts live in
     // Spring only, so the Spring login result is what tells a bad password from a real
@@ -638,6 +686,7 @@ show_reading_time: false
             password: data.password,
             kasmServerNeeded: data.kasm_server_needed,
             idToken: signupIdToken,
+            businessEmail: data.businessEmail,
             // "mentor" opts into Spring's no-idToken mentor signup path; anything else
             // (including this being absent) keeps the existing mandatory-OAuth behavior.
             accountType: data.role,
@@ -707,6 +756,12 @@ show_reading_time: false
 
                 // Update overall status after both complete
                 setTimeout(updateOverallStatus, 500);
+
+                // Mentor accounts live in Spring only; once created they wait on admin approval.
+                if (data.role === 'mentor' && springResult.status === 'fulfilled') {
+                    document.getElementById('signupForm').style.display = 'none';
+                    document.getElementById('signupMentorPending').hidden = false;
+                }
 
                 // Re-enable button
                 signupButton.disabled = false;

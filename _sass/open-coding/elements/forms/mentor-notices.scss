@@ -1,0 +1,33 @@
+// Mentor signup note and "verification pending" notices on /login.
+
+@import "../../materials/main.scss";
+
+$mentor-notice-accent: #6366f1;
+$mentor-notice-pending: #f59e0b;
+
+.mentor-signup-note {
+  margin-bottom: 1.25rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid $mentor-notice-accent;
+  border-radius: 0.5rem;
+  background-color: rgba(99, 102, 241, 0.12);
+  color: #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.mentor-pending {
+  padding: 1.25rem;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: 0.75rem;
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #e5e7eb;
+
+  h2 {
+    margin: 0 0 0.75rem;
+    color: $mentor-notice-pending;
+  }
+
+  p {
+    margin: 0 0 0.5rem;
+  }
+}
