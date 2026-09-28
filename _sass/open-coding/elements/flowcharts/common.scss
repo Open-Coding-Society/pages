@@ -1,69 +1,64 @@
-// Themed Mermaid flowcharts. Add class="mermaid ocs__diagram" to the <pre> and tag nodes
-// with :::start / :::ask / :::good / :::bad / :::info -- no per-diagram classDef needed.
-// Keep 'fontFamily' and 'fontSize' in the diagram's %%{init}%% so Mermaid sizes boxes for the same font.
+// Themed Mermaid flowcharts (distinct from the capstone .ocs__diagram container).
+// Add class="mermaid ocs__flowchart" to the <pre> and tag nodes with :::start / :::ask / :::good / :::bad / :::info -- no per-diagram classDef needed.
+// Font is not set here: Mermaid takes 'fontFamily'/'fontSize' from the diagram's %%{init}%% themeVariables
+// (keep them there so boxes are sized for the same font).
 //
 // Mermaid injects ID-scoped theme CSS into every rendered diagram, so these rules need
 // !important to win (the same reason Mermaid's own classDef output uses it).
 
-$ocs-diagram-font: "JetBrains Mono", monospace;
-$ocs-diagram-text: #f8fafc;
-$ocs-diagram-line: #94a3b8;
-$ocs-diagram-label-bg: #0f172a;
+$ocs-flowchart-text: #f8fafc;
+$ocs-flowchart-line: #94a3b8;
+$ocs-flowchart-label-bg: #0f172a;
 
-// node class: (fill, stroke)
-$ocs-diagram-nodes: (
-  start: (#1e3a8a, #60a5fa),
-  ask: (#78350f, #fbbf24),
-  good: (#14532d, #4ade80),
-  bad: (#7f1d1d, #f87171),
-  info: (#1e293b, #94a3b8)
+// node class: (fill, stroke, text)
+$ocs-flowchart-nodes: (
+  start: (#1e3a8a, #60a5fa, #fff),
+  ask: (#78350f, #fbbf24, #fff),
+  good: (#14532d, #4ade80, #fff),
+  bad: (#7f1d1d, #f87171, #fff),
+  info: (#1e293b, #94a3b8, #f8fafc)
 );
 
-.ocs__diagram {
-  font-family: $ocs-diagram-font;
-  font-size: 14px;
-
-  @each $name, $colors in $ocs-diagram-nodes {
+.ocs__flowchart {
+  @each $name, $colors in $ocs-flowchart-nodes {
     .node.#{$name} {
-      rect,
-      polygon,
-      circle,
-      ellipse,
-      path {
+      // Direct children only, like Mermaid's classDef: the label's own <rect> stays untouched.
+      > rect,
+      > polygon,
+      > circle,
+      > ellipse,
+      > path {
         fill: nth($colors, 1) !important;
         stroke: nth($colors, 2) !important;
         stroke-width: 2px !important;
       }
 
-      .label,
-      .nodeLabel,
       span,
       p {
-        color: #fff !important;
-        fill: #fff !important;
+        color: nth($colors, 3) !important;
       }
     }
   }
 
   .flowchart-link {
-    stroke: $ocs-diagram-line !important;
+    stroke: $ocs-flowchart-line !important;
   }
 
   .marker,
   .arrowMarkerPath {
-    fill: $ocs-diagram-line !important;
-    stroke: $ocs-diagram-line !important;
+    fill: $ocs-flowchart-line !important;
+    stroke: $ocs-flowchart-line !important;
   }
 
   .edgeLabel,
   .edgeLabel p {
-    background-color: $ocs-diagram-label-bg !important;
-    color: $ocs-diagram-text !important;
+    background-color: $ocs-flowchart-label-bg !important;
+    color: $ocs-flowchart-text !important;
   }
 
   .edgeLabel rect,
   .labelBkg {
-    fill: $ocs-diagram-label-bg !important;
-    background-color: $ocs-diagram-label-bg !important;
+    fill: $ocs-flowchart-label-bg !important;
+    background-color: $ocs-flowchart-label-bg !important;
   }
 }
