@@ -435,17 +435,23 @@ function renderWeekGoalPreviews() {
     preview.className = 'week-goals-container';
     
     const label = document.createElement('span');
-    label.className = 'goals-label';
+    label.className = 'goals-label ocs__section-title';
     label.textContent = 'Learning Goals';
     preview.appendChild(label);
     
     const goalsList = document.createElement('div');
     goalsList.className = 'goals-list';
     
+    // ocs__keypoint + ocs__check give the arrow and spacing, so the arrow is
+    // a real element instead of a ::before on .goal-item.
     profile.goals.slice(0, 4).forEach(goal => {
       const item = document.createElement('span');
-      item.className = 'goal-item';
-      item.textContent = goal;
+      item.className = 'goal-item ocs__keypoint';
+      const arrow = document.createElement('span');
+      arrow.className = 'ocs__check';
+      arrow.textContent = '\u2192';
+      item.appendChild(arrow);
+      item.append(goal);
       goalsList.appendChild(item);
     });
     
