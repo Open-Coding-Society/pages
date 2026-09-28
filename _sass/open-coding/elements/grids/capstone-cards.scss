@@ -20,7 +20,11 @@
     flex-direction: column;
   }
 
-  &--skipped {
+  // Dim a skipped card, but not its Unskip button, which must still look clickable.
+  // (Opacity on the card itself would also fade that button, so dim the parts instead.)
+  &--skipped > :not(.capstone-card__body),
+  &--skipped .capstone-card__body > :not(.capstone-mentor-actions),
+  &--skipped .capstone-mentor-actions .ocs__btn:disabled {
     opacity: 0.45;
   }
 }
@@ -73,12 +77,18 @@
   }
 }
 
-.capstone-interested-count {
+.capstone-mentor-counts {
+  display: flex;
+  gap: 0.5rem;
   margin-left: auto;
-  cursor: default;
+
+  .ocs__btn {
+    margin: 0;
+    cursor: default;
+  }
 }
 
-// .ocs__btn sets display, which would override the hidden attribute on the counter.
-.capstone-interested-count[hidden] {
+// display:flex above would otherwise override the hidden attribute.
+.capstone-mentor-counts[hidden] {
   display: none;
 }

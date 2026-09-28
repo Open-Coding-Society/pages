@@ -26,10 +26,13 @@ show_reading_time: false
         <option value="2026-2027" selected>2026/2027</option>
         <option value="2025-2026">2025/2026</option>
       </select>
-      <!-- Approved-mentor-only: how many projects they've marked Interested in.
-           Hidden for everyone else; revealed by the mentor script below.
-           margin-left:auto pushes it to the far right of this flex row. -->
-      <span id="mentor-interested-count" class="ocs__btn small alert-green capstone-interested-count" hidden>Interested: 0</span>
+      <!-- Approved-mentor-only: how many projects they've skipped / marked Interested.
+           Hidden for everyone else; revealed by the mentor script below and pushed to
+           the far right of this flex row (see capstone-cards.scss). -->
+      <span id="mentor-counts" class="capstone-mentor-counts" hidden>
+        <span id="mentor-skipped-count" class="ocs__btn small alert-red">Skipped: 0</span>
+        <span id="mentor-interested-count" class="ocs__btn small alert-green">Interested: 0</span>
+      </span>
     </div>
   </div>
 </div>
@@ -276,9 +279,11 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
     await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
   }
 
-  const counterEl = document.getElementById('mentor-interested-count');
+  const countsEl = document.getElementById('mentor-counts');
+  const interestedCountEl = document.getElementById('mentor-interested-count');
+  const skippedCountEl = document.getElementById('mentor-skipped-count');
   const grid = document.getElementById('capstone-grid');
-  if (!grid || !counterEl) return;
+  if (!grid || !countsEl) return;
 
   // Only an approved mentor (ROLE_MENTOR) gets the hover actions below --
   // everyone else (including a pending mentor applicant) sees the plain grid.
@@ -328,6 +333,44 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
     }
   } catch (e) { console.error('Capstone: could not load project ids', e); }
 
+  // Where this mentor stands on each project. Access to a project (My Projects, its
+  // student group's chat) only comes from admin approval, so the Apply button mirrors
+  // the backend state instead of resetting on every visit.
+  const approvedIds = new Set();
+  const applicationById = {};
+  try {
+    const [mineRes, appsRes] = await Promise.all([
+      fetch(`${javaURI}/api/capstones/mine`, fetchOptions),
+      fetch(`${javaURI}/api/capstones/applications/mine`, fetchOptions),
+    ]);
+    if (mineRes.ok) (await mineRes.json()).forEach(p => approvedIds.add(p.id));
+    // Newest first, so the first application seen per project is the current one.
+    if (appsRes.ok) (await appsRes.json()).forEach(a => { applicationById[a.capstoneId] ??= a; });
+  } catch (e) { console.error('Capstone: could not load application status', e); }
+
+  function applyStateFor(id) {
+    if (approvedIds.has(id)) return 'approved';
+    const application = applicationById[id];
+    if (!application) return 'none';
+    if (!application.resolved) return 'pending';
+    return application.approved ? 'approved' : 'denied';
+  }
+
+  const APPLY_STATES = {
+    none:     { label: 'Apply Now',        variant: 'accent fill',       enabled: true },
+    pending:  { label: 'Pending approval', variant: 'alert-yellow',      enabled: false },
+    approved: { label: 'Approved ✓',       variant: 'alert-green fill',  enabled: false },
+    denied:   { label: 'Not approved',     variant: 'alert-red',         enabled: false },
+  };
+
+  function showApplyState(button, state) {
+    const { label, variant, enabled } = APPLY_STATES[state];
+    button.className = `ocs__btn small ${variant}`;
+    button.textContent = label;
+    button.disabled = !enabled;
+    button.title = state === 'pending' ? 'An admin must approve your application before you get access to this project.' : '';
+  }
+
   // Interested/Skip are tracked per-browser (localStorage) -- there's no backend
   // endpoint for a mentor's shortlist, only for the apply action itself below.
   const INTERESTED_KEY = 'ocsMentorInterested';
@@ -343,7 +386,8 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
   const skipped = readSet(SKIPPED_KEY);
 
   function updateCounter() {
-    counterEl.textContent = `Interested: ${interested.size}`;
+    interestedCountEl.textContent = `Interested: ${interested.size}`;
+    skippedCountEl.textContent = `Skipped: ${skipped.size}`;
   }
 
   cards.forEach(card => {
@@ -358,8 +402,7 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
 
     const applyBtn = document.createElement('button');
     applyBtn.type = 'button';
-    applyBtn.className = 'ocs__btn small accent fill';
-    applyBtn.textContent = 'Apply Now';
+    showApplyState(applyBtn, applyStateFor(idByUrl[url]));
 
     const interestedBtn = document.createElement('button');
     interestedBtn.type = 'button';
@@ -378,12 +421,25 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
       interestedBtn.disabled = true;
     }
 
+    // A skipped card is dimmed with Apply/Interested locked; its Skip button stays
+    // clickable as "Unskip" so the mentor can change their mind.
     function showSkipped() {
       card.classList.add('capstone-card--skipped');
-      skipBtn.textContent = 'Skipped';
+      skipBtn.textContent = 'Unskip';
+      skipBtn.classList.add('fill');
+      skipBtn.setAttribute('aria-pressed', 'true');
       applyBtn.disabled = true;
-      skipBtn.disabled = true;
       interestedBtn.disabled = true;
+    }
+
+    // Restores the card to exactly how it would look had it never been skipped.
+    function showUnskipped() {
+      card.classList.remove('capstone-card--skipped');
+      skipBtn.textContent = 'Skip';
+      skipBtn.classList.remove('fill');
+      skipBtn.setAttribute('aria-pressed', 'false');
+      showApplyState(applyBtn, applyStateFor(idByUrl[url]));
+      interestedBtn.disabled = interested.has(url);
     }
 
     if (interested.has(url)) showInterested();
@@ -402,9 +458,9 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
       try {
         const res = await fetch(`${javaURI}/api/capstones/${id}/apply`, { ...fetchOptions, method: 'POST' });
         if (res.status === 409) {
-          applyBtn.textContent = 'Already a mentor';
+          showApplyState(applyBtn, 'approved');
         } else if (res.ok) {
-          applyBtn.textContent = 'Applied ✓';
+          showApplyState(applyBtn, 'pending');
         } else {
           applyBtn.textContent = 'Try again';
           applyBtn.disabled = false;
@@ -417,9 +473,15 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
     });
 
     skipBtn.addEventListener('click', () => {
-      skipped.add(url);
+      if (skipped.has(url)) {
+        skipped.delete(url);
+        showUnskipped();
+      } else {
+        skipped.add(url);
+        showSkipped();
+      }
       writeSet(SKIPPED_KEY, skipped);
-      showSkipped();
+      updateCounter();
     });
 
     interestedBtn.addEventListener('click', () => {
@@ -437,7 +499,7 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
     infoWrap.classList.add('capstone-card__body');
   });
 
-  counterEl.hidden = false;
+  countsEl.hidden = false;
   updateCounter();
 })();
 </script>

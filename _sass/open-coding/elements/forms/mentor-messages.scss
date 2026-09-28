@@ -1,0 +1,154 @@
+// Dashboard "Messages" tab (mentor <-> admin threads and mentored group chats).
+// Conversation list on the left, chat panel on the right; stacks on narrow screens.
+// Colors come from the OCS theme tokens so it follows the user's preferences.
+
+.mentor-messages {
+  display: grid;
+  grid-template-columns: minmax(13rem, 17rem) 1fr;
+  gap: 1rem;
+  max-width: 64rem;
+  margin: 1.5rem auto 0;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  &__threads,
+  &__panel {
+    border: 1px solid var(--ui-border);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--pref-text-color) 4%, var(--pref-bg-color));
+  }
+
+  &__threads {
+    padding: 1rem;
+  }
+
+  &__heading {
+    margin: 0 0 0.75rem;
+    font-size: 1.05rem;
+  }
+
+  &__thread-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  &__thread {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--pref-text-color);
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--ui-border);
+      background: color-mix(in srgb, var(--pref-text-color) 6%, var(--pref-bg-color));
+    }
+
+    &[aria-current="true"] {
+      border-color: var(--pref-accent-color);
+      background: color-mix(in srgb, var(--pref-accent-color) 14%, var(--pref-bg-color));
+    }
+  }
+
+  &__thread-title {
+    font-weight: 600;
+  }
+
+  &__thread-subtitle,
+  &__hint,
+  &__empty {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  &__panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 26rem;
+  }
+
+  &__panel-header {
+    padding: 1rem 1rem 0.75rem;
+    border-bottom: 1px solid var(--ui-border);
+
+    .mentor-messages__heading {
+      margin-bottom: 0.2rem;
+    }
+  }
+
+  &__log {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-height: 28rem;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+
+  &__bubble {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    max-width: 80%;
+    align-self: flex-start;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--ui-border);
+    border-radius: 12px 12px 12px 4px;
+    background: color-mix(in srgb, var(--pref-text-color) 7%, var(--pref-bg-color));
+
+    &--mine {
+      align-self: flex-end;
+      border-color: color-mix(in srgb, var(--pref-accent-color) 45%, transparent);
+      border-radius: 12px 12px 4px 12px;
+      background: color-mix(in srgb, var(--pref-accent-color) 18%, var(--pref-bg-color));
+    }
+  }
+
+  &__meta {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  &__text {
+    color: var(--pref-text-color);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  &__composer {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem 1rem;
+    border-top: 1px solid var(--ui-border);
+
+    .ocs__btn {
+      margin: 0;
+    }
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    background: var(--pref-bg-color);
+    color: var(--pref-text-color);
+
+    &:focus {
+      outline: 2px solid var(--pref-accent-color);
+      outline-offset: 1px;
+    }
+  }
+}

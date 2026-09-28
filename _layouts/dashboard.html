@@ -23,6 +23,13 @@ active_tab: dashboard
                         My Projects
                     </a>
                 </li>
+                <!-- Mentor/admin-only: revealed by mentorMessages.js after a Spring role check. -->
+                <li class="me-2" id="tab-messages-li" hidden>
+                    <a href="#" id="tab-messages"
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        Messages
+                    </a>
+                </li>
             </ul>
             <!-- sliding underline indicator -->
             <div id="tab-underline"
@@ -95,6 +102,32 @@ active_tab: dashboard
             </div>
 
             <!-- Preferences tab content -->
+            <!-- Messages: mentor <-> admin private threads and mentored group chats
+                 (assets/js/aesthetihawk/dashboard/mentorMessages.js; styles in
+                 _sass/open-coding/elements/forms/mentor-messages.scss). -->
+            <div id="tab-content-messages" class="tab-content hidden">
+                <section class="mentor-messages" aria-label="Messages">
+                    <aside class="mentor-messages__threads">
+                        <h3 class="mentor-messages__heading">Conversations</h3>
+                        <div id="mentorThreadList" class="mentor-messages__thread-list">
+                            <div class="mentor-messages__empty">Loading…</div>
+                        </div>
+                    </aside>
+                    <div class="mentor-messages__panel">
+                        <header class="mentor-messages__panel-header">
+                            <h3 id="mentorThreadTitle" class="mentor-messages__heading">Select a conversation</h3>
+                            <div id="mentorThreadHint" class="mentor-messages__hint">Pick a conversation on the left to start messaging.</div>
+                        </header>
+                        <div id="mentorThreadLog" class="mentor-messages__log" aria-live="polite"></div>
+                        <form id="mentorThreadForm" class="mentor-messages__composer" autocomplete="off">
+                            <input id="mentorThreadInput" class="mentor-messages__input" type="text" maxlength="2000"
+                                placeholder="Write a message…" aria-label="Message" disabled>
+                            <button id="mentorThreadSend" type="submit" class="ocs__btn accent fill" disabled>Send</button>
+                        </form>
+                    </div>
+                </section>
+            </div>
+
             <div id="tab-content-preferences" class="tab-content block px-6 py-4 text-neutral-200 max-w-5xl mx-auto">
                 <h2 class="text-xl font-semibold mb-2">Preferences</h2>
                 <p class="text-neutral-400 mb-6">Customize how the site looks. Changes apply across the site and are saved locally.</p>
@@ -1165,4 +1198,17 @@ import { fetchPerson, roleNames } from '{{ site.baseurl }}/assets/js/api/role-vi
         }
     });
 })();
+</script>
+
+<!-- Messages tab: same SockJS/STOMP client libraries as the weekly/lesson chat. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script type="module">
+import { fetchPerson, roleNames } from '{{ site.baseurl }}/assets/js/api/role-view.js';
+import { initMentorMessages } from '{{ site.baseurl }}/assets/js/aesthetihawk/dashboard/mentorMessages.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const person = await fetchPerson();
+    if (person) initMentorMessages(person, roleNames(person));
+});
 </script>
