@@ -1,0 +1,76 @@
+// /login: Student/Mentor selector and mentor notices. Built on the OCS panel mixin and
+// theme tokens so it follows the user's color preferences; the toggle itself is the
+// standard ocs__btn pill grammar (selected option adds "accent fill"). The hint and the
+// login message are divs because the theme forces a light color on every <p>.
+
+@import "../../mixins/panel";
+
+.login-role {
+  max-width: 440px;
+  margin: 0 auto 2rem;
+  text-align: center;
+
+  &__title {
+    margin: 0 0 0.75rem;
+  }
+
+  &__options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+    padding: 0.35rem;
+    border: 1px solid var(--ui-border);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--pref-text-color) 4%, var(--pref-bg-color));
+
+    .ocs__btn {
+      width: 100%;
+      margin: 0;
+      justify-content: center;
+    }
+  }
+
+  &__hint {
+    margin: 0.75rem 0 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+}
+
+.login-notice {
+  @include info-panel(1rem 1.25rem, 1px, 1.25rem);
+  border-left-width: 4px;
+  font-size: 0.95rem;
+
+  &--pending {
+    border-color: var(--warn);
+    background: var(--warn-bg);
+
+    h3 {
+      color: var(--warn);
+    }
+
+    p + p {
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+.login-card .login-message {
+  margin: 0.75rem 0 0;
+  min-height: 0;
+  text-align: left;
+  font-size: 0.9rem;
+  color: var(--validation-error-color);
+}
+
+// Validation lines also carry .error, which picks up a global `.error { padding: 20px }`;
+// reset it, and let an empty line (e.g. the GitHub ID check) take no space.
+.signup-card .validation-message {
+  padding: 0;
+
+  &:empty {
+    min-height: 0;
+    margin: 0;
+  }
+}
