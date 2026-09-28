@@ -1,9 +1,9 @@
 import { pythonURI, javaURI, fetchOptions } from './config.js';
-import { clearMentorSidebarCache } from './role-view.js';
+import { clearRoleViewCache } from './role-view.js';
 
 // logout from both java and python backends
 export async function handleLogout() {
-    clearMentorSidebarCache();
+    clearRoleViewCache();
 
     // import config dynamically since we can't use import in non-module script
 

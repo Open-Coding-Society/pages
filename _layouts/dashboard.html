@@ -1006,7 +1006,7 @@ import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.j
      ============================================================ -->
 <script type="module">
 import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
-import { fetchPerson, roleNames } from '{{ site.baseurl }}/assets/js/api/role-view.js';
+import { fetchPerson, roleNames, viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
 
 (function () {
     let currentPersonName = '';
@@ -1179,7 +1179,8 @@ import { fetchPerson, roleNames } from '{{ site.baseurl }}/assets/js/api/role-vi
 
     document.addEventListener('DOMContentLoaded', async () => {
         const person = await fetchPerson();
-        if (!person || !roleNames(person).includes('ROLE_MENTOR')) {
+        // Mentor view only: a mentor who switched to the student view sees the student dashboard.
+        if (!person || viewFor(roleNames(person)) !== 'mentor') {
             return;
         }
         currentPersonName = person.name || person.uid || 'Mentor';

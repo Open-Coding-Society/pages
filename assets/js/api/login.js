@@ -1,4 +1,5 @@
 import { baseurl, pythonURI, javaURI, fetchOptions } from './config.js';
+import { roleNames, isMentorAccount, viewFor, switchView } from './role-view.js';
 
 console.log("login.js loaded");
 
@@ -21,11 +22,17 @@ document.addEventListener('DOMContentLoaded', function () {
                                            <hr style="margin: 4px 0;">`
                             : ''
                         }
+                                ${viewSwitchLink(data)}
                                 <a href="${baseurl}/profile">Profile</a>
                                 <a href="${baseurl}/logout">Logout</a>
                             </div>
                         </div>
                     `;
+
+                    loginArea.querySelector('.view-switch')?.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        switchView(roleNames(data));
+                    });
 
                     // Add click event listener for dropdown toggle
                     const dropdownButton = loginArea.querySelector('.dropbtn');
@@ -75,6 +82,15 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 });
+
+// Mentor accounts get a "Switch to student/mentor view" item in the name dropdown, so
+// the switch is reachable on every page (the mentor banner only exists on some layouts).
+function viewSwitchLink(user) {
+    const roles = roleNames(user);
+    if (!isMentorAccount(roles)) return '';
+    const label = viewFor(roles) === 'mentor' ? 'Switch to student view' : 'Switch to mentor view';
+    return `<a href="#" class="view-switch">${label}</a>`;
+}
 
 // Wait for an element to exist in the DOM, retrying up to maxAttempts (delay between attempts)
 function waitForElement(selector, maxAttempts = 20, interval = 100) {

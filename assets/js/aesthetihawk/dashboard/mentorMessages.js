@@ -7,6 +7,7 @@
 //   - "group": the existing group chat students already use (/api/groups/chat/{id}),
 //     live over the same SockJS/STOMP socket as the weekly/lesson chat.
 import { javaURI, fetchOptions } from '../../api/config.js';
+import { viewFor } from '../../api/role-view.js';
 
 const POLL_MS = 5000;
 const CHAT_SOCKET_PORT = 8589; // same hard-coded port as groups.js / lesson_chat.html
@@ -25,7 +26,8 @@ const el = (id) => document.getElementById(id);
 
 export async function initMentorMessages(person, roles) {
     const isAdmin = roles.includes('ROLE_ADMIN');
-    const isMentor = roles.includes('ROLE_MENTOR');
+    // A mentor who switched to the student view gets no mentor threads.
+    const isMentor = viewFor(roles) === 'mentor';
     if (!isAdmin && !isMentor) return;
 
     state.me = person;

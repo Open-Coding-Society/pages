@@ -150,7 +150,7 @@ show_reading_time: false
 
 <script type="module">
     import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID } from '{{site.baseurl}}/assets/js/api/config.js';
-    import { fetchPerson, roleNames } from '{{site.baseurl}}/assets/js/api/role-view.js';
+    import { fetchPerson, roleNames, clearRoleViewCache } from '{{site.baseurl}}/assets/js/api/role-view.js';
 
     let signupFormData = {};
     let verifiedSchoolEmail = null;
@@ -586,6 +586,8 @@ show_reading_time: false
                 return;
             }
             if (person || pythonOutcome.value === true) {
+                // A new session starts in the account's own view (mentor for mentors).
+                clearRoleViewCache();
                 window.location.href = '{{site.baseurl}}/profile';
                 return;
             }

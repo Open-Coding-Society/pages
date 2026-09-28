@@ -32,6 +32,26 @@
     background: var(--success-green);
   }
 
+  // View switch (mentor accounts): an ocs__btn pill sitting at the end of the bar.
+  &__switch {
+    margin: 0 0 0 0.5rem;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  // Mentor account currently viewing the site as a student: same bar, neutral tint.
+  &--student-view {
+    background: color-mix(in srgb, var(--pref-text-color) 6%, transparent);
+    border-bottom-color: var(--ui-border);
+    color: var(--text-muted);
+
+    .mentor-badge__dot {
+      background: var(--text-muted);
+    }
+  }
+
   &--pending {
     background: color-mix(in srgb, var(--warn) 14%, transparent);
     border-bottom-color: color-mix(in srgb, var(--warn) 35%, transparent);
