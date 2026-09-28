@@ -1,5 +1,5 @@
 // import config for api urls and fetch options
-import { pythonURI, fetchOptions } from '../../api/config.js';
+import { pythonURI, javaURI, fetchOptions } from '../../api/config.js';
 
 // fetches all profile data and returns it as an array
 export async function getUserData() {
@@ -13,6 +13,7 @@ export async function getUserData() {
     let kasmServerNeeded = null;
     let pfp = null;
     let school = null;
+    let businessEmail = null;
 
     // get the flask data (READ OPERATION)
     try {
@@ -35,6 +36,28 @@ export async function getUserData() {
         console.error('error fetching data:', error.message);
     }
 
+    // Mentor accounts exist only in Spring, so Flask has no row for them; read the
+    // profile from Spring's session instead.
+    if (!uid) {
+        try {
+            const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+            if (response.ok) {
+                const person = await response.json();
+                name = person.name;
+                uid = person.uid;
+                email = person.email;
+                sid = person.sid;
+                kasmServerNeeded = person.kasmServerNeeded;
+                pfp = person.pfp;
+                businessEmail = person.businessEmail;
+            } else {
+                console.error('error fetching Spring profile:', response.status);
+            }
+        } catch (error) {
+            console.error('error fetching Spring profile:', error.message);
+        }
+    }
+
     // return all data in an array
-    return [name, uid, email, sid, kasmServerNeeded, pfp, school];
+    return [name, uid, email, sid, kasmServerNeeded, pfp, school, businessEmail];
 }

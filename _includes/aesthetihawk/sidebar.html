@@ -21,9 +21,9 @@
       document.getElementById('sidebar-role-mentor').style.display = 'block';
       const badge = document.getElementById('mentor-badge');
       if (badge) {
-        badge.style.display = 'flex';
+        badge.hidden = false;
         document.body.classList.add('mentor-bar-active');
-        document.documentElement.style.setProperty('--mentor-bar-h', badge.offsetHeight + 'px');
+        document.documentElement.style.setProperty('--mentor-bar-bottom', (badge.getBoundingClientRect().bottom + window.scrollY) + 'px');
       }
     }
   } catch (e) { /* localStorage unavailable; default sidebar stays visible */ }

@@ -41,6 +41,15 @@ active_tab: profile
                     value="" onchange="checkForChanges()" autocomplete="off">
             </div>
 
+            <!-- Business Email: mentor-only, read-only (set at mentor signup, shown to the
+                 admin who verified the account); revealed by setUserData.js. -->
+            <div id="businessEmailGroup" hidden>
+                <label for="businessEmailDisplay" class="block text-sm font-medium text-gray-300 mb-1">Business
+                    Email</label>
+                <input type="email" id="businessEmailDisplay" readonly
+                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
             <!-- Kasm Server Toggle: removed outright for mentors (see the role check in the
                  script below) rather than just left unchecked -- mentors have no use for it. -->
             <div class="flex items-center" id="kasmToggleContainer">

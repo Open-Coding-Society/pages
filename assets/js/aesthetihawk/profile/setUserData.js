@@ -5,7 +5,7 @@ import { getUserData } from './getUserData.js';
 export async function setUserData() {
     try {
         // fetch all profile data at once
-        const [name, uid, email, sid, kasm, pfp, school] = await getUserData();
+        const [name, uid, email, sid, kasm, pfp, school, businessEmail] = await getUserData();
 
         // update the name, uid, and email placeholders
         const nameInput = document.getElementById("nameChangeInput");    // full name
@@ -20,7 +20,15 @@ export async function setUserData() {
         nameInput.value = name ? name : "Failed to load name. Are you logged in?";
         uidInput.value = uid ? uid : "Failed to load UID. Are you logged in?";
         emailInput.value = email ? email : "Failed to load email. Are you logged in?";
-        sidInput.value = sid ? sid : "Failed to load SID. Are you logged in?";
+        // Mentors have no student ID, and profile.html may already have removed the field.
+        if (sidInput) sidInput.value = sid ? sid : "Failed to load SID. Are you logged in?";
+
+        // Business email is mentor-only (read-only; it's what the admin verified).
+        const businessEmailGroup = document.getElementById("businessEmailGroup");
+        if (businessEmailGroup && businessEmail) {
+            document.getElementById("businessEmailDisplay").value = businessEmail;
+            businessEmailGroup.hidden = false;
+        }
         // Absent for mentors -- profile.html removes the toggle entirely once it learns
         // the signed-in user's roles, and that removal races this fetch.
         if (kasmCheckbox) kasmCheckbox.checked = kasm;

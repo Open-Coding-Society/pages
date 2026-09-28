@@ -24,10 +24,10 @@
     <!-- navbar -->
     {%- include aesthetihawk/header-shared.html -%}
 
-    <!-- Full-width bar shown right under the header on every aesthetihawk page
-         once a signed-in ROLE_MENTOR user is confirmed (see the role-check
-         script below); hidden entirely for everyone else, students included. -->
-    <div id="mentor-badge" class="mentor-badge" style="display:none;">
+    <!-- Full-width bar in normal flow right under the header on every aesthetihawk
+         page once a signed-in ROLE_MENTOR user is confirmed (see the role-check
+         script below); hidden for everyone else. Styles: status-indicators/mentor-badge.scss -->
+    <div id="mentor-badge" class="mentor-badge" hidden>
         <span class="mentor-badge__dot"></span>
         <span id="mentor-badge-text">You're signed in as a <strong>Mentor</strong> &mdash; showing your mentor view</span>
     </div>
@@ -93,15 +93,14 @@
         function applySidebar(isMentor, isPending) {
             defaultEl.style.display = isMentor ? 'none' : 'block';
             mentorEl.style.display = isMentor ? 'block' : 'none';
-            badgeEl.style.display = (isMentor || isPending) ? 'flex' : 'none';
+            badgeEl.hidden = !(isMentor || isPending);
             badgeEl.classList.toggle('mentor-badge--pending', !isMentor && isPending);
             badgeTextEl.innerHTML = isMentor ? MENTOR_TEXT : PENDING_TEXT;
-            // The bar takes up real height, so push the fixed sidebar and the
-            // main content wrapper down by exactly that much (see the
-            // .mentor-bar-active rules in mentor.scss).
+            // The bar is in page flow, but the sidebar is position:fixed, so move it
+            // down by the bar's height (see status-indicators/mentor-badge.scss).
             document.body.classList.toggle('mentor-bar-active', isMentor || isPending);
             if (isMentor || isPending) {
-                document.documentElement.style.setProperty('--mentor-bar-h', badgeEl.offsetHeight + 'px');
+                document.documentElement.style.setProperty('--mentor-bar-bottom', (badgeEl.getBoundingClientRect().bottom + window.scrollY) + 'px');
             }
             try { localStorage.setItem('ocsMentorSidebar', isMentor ? 'mentor' : 'default'); }
             catch (e) { /* localStorage unavailable */ }
