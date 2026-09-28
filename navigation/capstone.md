@@ -29,7 +29,7 @@ show_reading_time: false
       <!-- Approved-mentor-only: how many projects they've marked Interested in.
            Hidden for everyone else; revealed by the mentor script below.
            margin-left:auto pushes it to the far right of this flex row. -->
-      <span id="mentor-interested-count" class="ocs__btn small alert-green" style="display:none; margin-left:auto; cursor:default;">Interested: 0</span>
+      <span id="mentor-interested-count" class="ocs__btn small alert-green capstone-interested-count" hidden>Interested: 0</span>
     </div>
   </div>
 </div>
@@ -176,11 +176,11 @@ document.addEventListener('DOMContentLoaded', function(){
     applyFilters();
   });
   function closeAllPopups(){
-    document.querySelectorAll('.capstone-popup').forEach(el=>el.classList.add('hidden'));
+    document.querySelectorAll('.capstone-popup').forEach(el=>{ el.hidden = true; });
   }
   function buildPopup(card){
     const popup = card.querySelector('.capstone-popup');
-    const list = popup.querySelector('.capstone-popup-links');
+    const list = popup.querySelector('.capstone-popup__links');
     list.innerHTML = '';
     const pageLink = card.dataset.pageUrl || card.querySelector('a')?.href || '';
     const links = [
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function(){
         anchor.href = link.url;
         anchor.target = '_blank';
         anchor.rel = 'noreferrer noopener';
-        anchor.className = 'block rounded-lg px-3 py-2 text-sm text-slate-900 bg-white/90 hover:bg-white';
+        anchor.className = 'ocs__btn small';
         anchor.textContent = link.label;
         list.appendChild(anchor);
       }
@@ -203,17 +203,17 @@ document.addEventListener('DOMContentLoaded', function(){
   function togglePopup(card){
     const popup = card.querySelector('.capstone-popup');
     if(!popup) return;
-    if(popup.classList.contains('hidden')){
+    if(popup.hidden){
       closeAllPopups();
       buildPopup(card);
-      popup.classList.remove('hidden');
+      popup.hidden = false;
     } else {
-      popup.classList.add('hidden');
+      popup.hidden = true;
     }
   }
 
   cards.forEach(card=>{
-    card.classList.add('ocs__grid-cell', 'relative');
+    card.classList.add('ocs__grid-cell', 'capstone-card');
     card.querySelector('a > img')?.classList.add('ocs__image-frame--thumbnail');
     const titleAnchor = card.querySelector('h3 a');
     if(titleAnchor){
@@ -228,14 +228,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'capstone-links-button absolute top-3 right-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white/90 text-xl text-slate-900 shadow-sm transition hover:bg-white';
+    button.className = 'ocs__btn small pill capstone-links-button';
     button.setAttribute('aria-label', 'Open project links');
-    button.innerHTML = '📁';
+    button.textContent = 'Links';
     const popup = document.createElement('div');
-    popup.className = 'capstone-popup hidden absolute right-3 top-14 z-30 w-64 rounded-2xl border border-white/10 bg-slate-950 p-3 shadow-2xl';
-    popup.style.backdropFilter = 'blur(14px)';
-    popup.style.backgroundColor = 'rgba(15, 23, 42, 0.96)';
-    popup.innerHTML = '<div class="capstone-popup-links space-y-2"></div>';
+    popup.className = 'capstone-popup';
+    popup.hidden = true;
+    popup.innerHTML = '<div class="capstone-popup__links"></div>';
     button.addEventListener('click', event=>{
       event.stopPropagation();
       togglePopup(card);
@@ -261,12 +260,10 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
-<!-- Approved-mentor hover actions (Apply Now / Skip / Interested) on every project
-     card. Everyone else sees the grid exactly as above -- this is additive and only
-     ever runs for a confirmed ROLE_MENTOR account. Reuses the existing .ocs__btn /
-     .ocs__links classes already loaded for the filter bar above, so no new CSS is
-     introduced; card-to-card layout stays in normal document flow (no absolute
-     positioning) so a taller hovered card just grows in place. -->
+<!-- Approved-mentor actions (Apply Now / Interested / Skip) as a footer row on every
+     project card. Everyone else sees the grid exactly as above -- this is additive and
+     only ever runs for a confirmed ROLE_MENTOR account. Buttons are .ocs__btn; placement
+     and card states live in _sass/open-coding/elements/grids/capstone-cards.scss. -->
 <script type="module">
 import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
@@ -357,38 +354,40 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
     if (!infoWrap) return;
 
     const actions = document.createElement('div');
-    actions.style.display = 'none';
-    actions.style.marginTop = '0.75rem';
-
-    const links = document.createElement('div');
-    links.className = 'ocs__links';
+    actions.className = 'capstone-mentor-actions';
 
     const applyBtn = document.createElement('button');
     applyBtn.type = 'button';
     applyBtn.className = 'ocs__btn small accent fill';
     applyBtn.textContent = 'Apply Now';
 
-    const skipBtn = document.createElement('button');
-    skipBtn.type = 'button';
-    skipBtn.className = 'ocs__btn small alert-red';
-    skipBtn.setAttribute('aria-label', 'Skip this project');
-    skipBtn.textContent = '✕';
-
     const interestedBtn = document.createElement('button');
     interestedBtn.type = 'button';
     interestedBtn.className = 'ocs__btn small alert-green';
-    interestedBtn.setAttribute('aria-label', 'Mark interested');
-    interestedBtn.textContent = '✓';
+    interestedBtn.textContent = '☆ Interested';
 
-    if (skipped.has(url)) {
-      card.style.opacity = '0.45';
+    const skipBtn = document.createElement('button');
+    skipBtn.type = 'button';
+    skipBtn.className = 'ocs__btn small alert-red';
+    skipBtn.textContent = 'Skip';
+
+    // A marked project shows a filled "Interested" button that can no longer be clicked.
+    function showInterested() {
+      interestedBtn.textContent = '★ Interested';
+      interestedBtn.classList.add('fill');
+      interestedBtn.disabled = true;
+    }
+
+    function showSkipped() {
+      card.classList.add('capstone-card--skipped');
+      skipBtn.textContent = 'Skipped';
       applyBtn.disabled = true;
       skipBtn.disabled = true;
       interestedBtn.disabled = true;
     }
-    if (interested.has(url)) {
-      interestedBtn.disabled = true;
-    }
+
+    if (interested.has(url)) showInterested();
+    if (skipped.has(url)) showSkipped();
 
     applyBtn.addEventListener('click', async () => {
       const id = idByUrl[url];
@@ -420,31 +419,25 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
     skipBtn.addEventListener('click', () => {
       skipped.add(url);
       writeSet(SKIPPED_KEY, skipped);
-      card.style.opacity = '0.45';
-      applyBtn.disabled = true;
-      skipBtn.disabled = true;
-      interestedBtn.disabled = true;
+      showSkipped();
     });
 
     interestedBtn.addEventListener('click', () => {
       if (interested.has(url)) return;
       interested.add(url);
       writeSet(INTERESTED_KEY, interested);
-      interestedBtn.disabled = true;
+      showInterested();
       updateCounter();
     });
 
-    links.appendChild(applyBtn);
-    links.appendChild(skipBtn);
-    links.appendChild(interestedBtn);
-    actions.appendChild(links);
+    actions.append(applyBtn, interestedBtn, skipBtn);
     infoWrap.appendChild(actions);
-
-    card.addEventListener('mouseenter', () => { actions.style.display = ''; });
-    card.addEventListener('mouseleave', () => { actions.style.display = 'none'; });
+    // Pins the action row to the bottom of the card (see capstone-cards.scss).
+    card.classList.add('capstone-card--mentor');
+    infoWrap.classList.add('capstone-card__body');
   });
 
-  counterEl.style.display = '';
+  counterEl.hidden = false;
   updateCounter();
 })();
 </script>

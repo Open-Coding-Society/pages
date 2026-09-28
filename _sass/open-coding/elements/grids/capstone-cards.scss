@@ -1,0 +1,84 @@
+// /capstone project cards: the per-card "Links" menu (everyone) and the mentor action
+// row (approved ROLE_MENTOR only). Buttons are the ocs__btn grammar; this file only
+// handles placement, the menu panel and card states, using OCS theme tokens.
+
+@import "../../mixins/panel";
+
+.capstone-card {
+  position: relative;
+
+  // Mentor cards: the text block grows to fill the card so the action row sits on the
+  // same baseline at the bottom of every card in a row (grid cells share row height).
+  &--mentor {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &--skipped {
+    opacity: 0.45;
+  }
+}
+
+// Top-right "Links" button; the thumbnail sits top-left so the corner is free.
+.capstone-links-button {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+}
+
+.capstone-popup {
+  @include info-panel(0.75rem, 1px, 0);
+  position: absolute;
+  top: 3.25rem;
+  right: 0.75rem;
+  z-index: 3;
+  width: 14rem;
+  background: var(--pref-bg-color);
+
+  &__links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    .ocs__btn {
+      width: 100%;
+      margin: 0;
+      justify-content: center;
+    }
+  }
+}
+
+// Mentor actions: a footer row under the card text, separated by a hairline.
+.capstone-mentor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--ui-border);
+
+  .ocs__btn {
+    margin: 0;
+  }
+
+  .ocs__btn:disabled {
+    cursor: default;
+  }
+}
+
+.capstone-interested-count {
+  margin-left: auto;
+  cursor: default;
+}
+
+// .ocs__btn sets display, which would override the hidden attribute on the counter.
+.capstone-interested-count[hidden] {
+  display: none;
+}
