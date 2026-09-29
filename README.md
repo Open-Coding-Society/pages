@@ -148,10 +148,17 @@ Run this after cloning and before starting any sprint work:
 
 It auto-detects your repo location, checks required tools (git, ruby, bundler,
 python, pip), validates `_config.yml` and `venv/` setup, and confirms Jekyll can
-run. Each check prints `PASS`, `WARN` (non-blocking, e.g. optional tools like
-Jupyter/Java), or `FAIL` with a remediation hint. Exit code `0` means you're
-ready to go; exit code `1` means something needs fixing before you continue. A
-full report is also written to `verifyTools.md` in the repo root.
+run. Its Markdown report lists each check as `PASS`, `WARN` (non-blocking, e.g.
+optional tools like Jupyter/Java), or `FAIL` with a remediation hint. Exit code
+`0` means there are no failures; exit code `1` means at least one check failed.
+The full report is written to `verifyTools.md` in the repo root.
+
+To print every check and its remediation directly in the terminal without
+creating a Markdown report, run:
+
+```bash
+./scripts/verifyToolsTerminal.sh
+```
 
 ### macOS Terminal Setup Helper (optional)
 
