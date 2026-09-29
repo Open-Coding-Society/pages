@@ -270,6 +270,7 @@ document.addEventListener('DOMContentLoaded', function(){
 <script type="module">
 import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
+import { cardUrl, cardActionRow } from '{{ site.baseurl }}/assets/js/capstone/cardActions.js';
 
 (async function () {
   // Wait for the script above (which sets card.dataset.pageUrl for the few
@@ -307,14 +308,6 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
   if (!isMentor) return;
 
   const cards = Array.from(grid.querySelectorAll(':scope > div'));
-
-  // Resolve a card's project URL the same way the links-popup logic above
-  // already does (dataset.pageUrl first, falling back to the card's own link),
-  // normalized to a path so it lines up with the backend's stored URLs.
-  function cardUrl(card) {
-    const raw = card.dataset.pageUrl || card.querySelector('a')?.getAttribute('href') || '';
-    try { return new URL(raw, location.origin).pathname; } catch (e) { return raw; }
-  }
 
   // Maps each project's URL to its numeric capstone id -- needed for the apply
   // endpoint. Only projects CapstoneSyncService has synced to the backend show
@@ -392,13 +385,8 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
 
   cards.forEach(card => {
     const url = cardUrl(card);
-    // The <div> holding the h3/description/team paragraphs -- the sibling right
-    // after the card's thumbnail link, for every card shape in this grid.
-    const infoWrap = card.querySelector('a')?.nextElementSibling;
-    if (!infoWrap) return;
-
-    const actions = document.createElement('div');
-    actions.className = 'capstone-mentor-actions';
+    const actions = cardActionRow(card);
+    if (!actions) return;
 
     const applyBtn = document.createElement('button');
     applyBtn.type = 'button';
@@ -492,16 +480,28 @@ import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
       updateCounter();
     });
 
-    actions.append(applyBtn, interestedBtn, skipBtn);
-    infoWrap.appendChild(actions);
-    // Pins the action row to the bottom of the card (see capstone-cards.scss).
-    card.classList.add('capstone-card--mentor');
-    infoWrap.classList.add('capstone-card__body');
+    // Mentor buttons lead the row; the Mentors/Chat buttons (cardTools.js) follow.
+    actions.prepend(applyBtn, interestedBtn, skipBtn);
   });
 
   countsEl.hidden = false;
   updateCounter();
 })();
+</script>
+
+<!-- Mentors / Chat buttons on every project card (assets/js/capstone/cardTools.js).
+     Chat reuses the weekly chat's SockJS/STOMP client for live updates. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script type="module">
+import { initCardTools } from '{{ site.baseurl }}/assets/js/capstone/cardTools.js';
+
+// After the first script's DOMContentLoaded handler has set each card's page URL.
+if (document.readyState === 'loading') {
+  await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
+}
+const grid = document.getElementById('capstone-grid');
+if (grid) initCardTools(grid);
 </script>
 
 <div id="capstone-grid" class="ocs__grid ocs__grid--card cols-3">

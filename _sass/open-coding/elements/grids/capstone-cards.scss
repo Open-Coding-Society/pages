@@ -1,15 +1,16 @@
-// /capstone project cards: the per-card "Links" menu (everyone) and the mentor action
-// row (approved ROLE_MENTOR only). Buttons are the ocs__btn grammar; this file only
-// handles placement, the menu panel and card states, using OCS theme tokens.
+// /capstone project cards: the per-card "Links" menu, the action row (mentor Apply /
+// Interested / Skip plus Mentors / Chat), the Mentors popover and the Chat dialog.
+// Buttons are the ocs__btn grammar; this file only handles placement, panels and card
+// states, using OCS theme tokens.
 
 @import "../../mixins/panel";
 
 .capstone-card {
   position: relative;
 
-  // Mentor cards: the text block grows to fill the card so the action row sits on the
-  // same baseline at the bottom of every card in a row (grid cells share row height).
-  &--mentor {
+  // Cards with an action row: the text block grows to fill the card so the row sits on
+  // the same baseline at the bottom of every card in a grid row (cells share row height).
+  &--has-actions {
     display: flex;
     flex-direction: column;
   }
@@ -23,8 +24,8 @@
   // Dim a skipped card, but not its Unskip button, which must still look clickable.
   // (Opacity on the card itself would also fade that button, so dim the parts instead.)
   &--skipped > :not(.capstone-card__body),
-  &--skipped .capstone-card__body > :not(.capstone-mentor-actions),
-  &--skipped .capstone-mentor-actions .ocs__btn:disabled {
+  &--skipped .capstone-card__body > :not(.capstone-card-actions),
+  &--skipped .capstone-card-actions .ocs__btn:disabled {
     opacity: 0.45;
   }
 }
@@ -59,8 +60,10 @@
   }
 }
 
-// Mentor actions: a footer row under the card text, separated by a hairline.
-.capstone-mentor-actions {
+// Action row: a footer under the card text, separated by a hairline. Positioned so
+// the Mentors popover can anchor to it.
+.capstone-card-actions {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -91,4 +94,126 @@
 // display:flex above would otherwise override the hidden attribute.
 .capstone-mentor-counts[hidden] {
   display: none;
+}
+
+// "Mentors (n)" popover: opens above the action row so the card doesn't grow.
+.capstone-mentors-panel {
+  @include info-panel(0.75rem 1rem, 1px, 0);
+  position: absolute;
+  bottom: calc(100% + 0.4rem);
+  left: 0;
+  z-index: 3;
+  min-width: 12rem;
+  background: var(--pref-bg-color);
+
+  &__title {
+    margin-bottom: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+}
+
+// Chat with the project's students: one native <dialog> shared by every card.
+.capstone-chat {
+  width: min(36rem, calc(100vw - 2rem));
+  // The site's global reset zeroes margins, which would pin the dialog top-left.
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  background: var(--pref-bg-color);
+  color: var(--pref-text-color);
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1rem 0.75rem;
+    border-bottom: 1px solid var(--ui-border);
+
+    .ocs__btn {
+      margin: 0;
+    }
+  }
+
+  &__title {
+    margin: 0 0 0.2rem;
+    font-size: 1.05rem;
+  }
+
+  &__hint,
+  &__empty,
+  &__meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  &__log {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    height: 22rem;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+
+  &__bubble {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    max-width: 80%;
+    align-self: flex-start;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--ui-border);
+    border-radius: 12px 12px 12px 4px;
+    background: color-mix(in srgb, var(--pref-text-color) 7%, var(--pref-bg-color));
+
+    &--mine {
+      align-self: flex-end;
+      border-color: color-mix(in srgb, var(--pref-accent-color) 45%, transparent);
+      border-radius: 12px 12px 4px 12px;
+      background: color-mix(in srgb, var(--pref-accent-color) 18%, var(--pref-bg-color));
+    }
+  }
+
+  &__text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  &__composer {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem 1rem;
+    border-top: 1px solid var(--ui-border);
+
+    .ocs__btn {
+      margin: 0;
+    }
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    background: var(--pref-bg-color);
+    color: var(--pref-text-color);
+
+    &:focus {
+      outline: 2px solid var(--pref-accent-color);
+      outline-offset: 1px;
+    }
+  }
 }
