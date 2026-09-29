@@ -19,7 +19,7 @@
     - #sprint-{i}-lessons and #chevron-{i}  -> toggleSprint()
     - .lesson-item[data-lesson-id]          -> completion tracking
     - .lesson-status-icon                   -> per-lesson complete/incomplete
-    - [data-week-count][data-week-total]    -> per-week completion count
+    - [data-week-group] [data-week-count]    -> per-week completion count
     - #week-chat-modal-{Sprint}-{week}       -> openWeekChat()
     - currentWeekChatId                      -> the top bar's chat button
 {% endcomment %}
@@ -90,36 +90,25 @@
 
             {%- if weekPosts.size > 0 -%}
             {%- assign weekData = sprint[week] -%}
-            <div class="week-group">
-              <button class="week-toggle" onclick="toggleWeek('{{ week }}')" type="button" aria-expanded="false" id="week-toggle-{{ week }}">
-                <span class="week-toggle-row">
-                  <i class="fas fa-chevron-right week-chevron" id="week-chevron-{{ week }}"></i>
-                  <span class="ocs__status-pill ocs__status-pill--good">W{{ week }}</span>
-                  <span class="ocs__status-pill ocs__status-pill--neutral" data-week-count data-week-total="{{ weekPosts.size }}">0/{{ weekPosts.size }}</span>
-                </span>
-                <span class="week-name">Week {{ week }}{% if weekData.theme %}: {{ weekData.theme }}{% endif %}</span>
-              </button>
+            {%- comment -%}
+              A week is a <details> element, so the browser opens and closes it
+              and draws its arrow with no CSS or script. The lesson's own week
+              starts open. Everything inside is an OCS component.
+            {%- endcomment -%}
+            <details data-week-group{% if week == current_week %} open{% endif %}>
+              <summary>
+                <span class="ocs__status-pill ocs__status-pill--good">W{{ week }}</span>
+                <span class="ocs__status-pill ocs__status-pill--neutral" data-week-count data-week-total="{{ weekPosts.size }}">0/{{ weekPosts.size }}</span><br>
+                Week {{ week }}{% if weekData.theme %}: {{ weekData.theme }}{% endif %}
+              </summary>
 
-              <div class="week-body" id="week-{{ week }}-body" style="display: none;">
-              {%- comment -%}
-                Collapsible section, same shape as the week chat in
-                _includes/week_chat.html: a details/summary with a caret that
-                rotates when open.
-              {%- endcomment -%}
               {%- if weekData.goals -%}
-              <details class="week-goals">
-                <summary class="week-goals-summary">
-                  <span class="week-goals-icon"><i class="fas fa-bullseye"></i></span>
-                  <span class="ocs__section-title">Learning Goals</span>
-                  <span class="ocs__status-pill ocs__status-pill--neutral">{{ weekData.goals.size }}</span>
-                  <span class="week-goals-caret"><i class="fas fa-chevron-down"></i></span>
-                </summary>
-                <div class="week-goals-body">
-                  <div class="ocs__keypoints">
-                    {%- for goal in weekData.goals -%}
-                    <div class="ocs__keypoint"><span class="ocs__check">&rarr;</span>{{ goal }}</div>
-                    {%- endfor -%}
-                  </div>
+              <details>
+                <summary><span class="ocs__status-pill ocs__status-pill--neutral">{{ weekData.goals.size }}</span> <span class="ocs__section-title">Goals</span></summary>
+                <div class="ocs__keypoints">
+                  {%- for goal in weekData.goals -%}
+                  <div class="ocs__keypoint"><span class="ocs__check">&rarr;</span>{{ goal }}</div>
+                  {%- endfor -%}
                 </div>
               </details>
               {%- endif -%}
@@ -134,9 +123,9 @@
                  data-lesson-id="{{ post.url }}">
                 <i class="fas fa-circle lesson-status-icon incomplete"></i>
                 {%- if post.assignment == true -%}
-                <i class="fas fa-file-alt lesson-type-icon assignment"></i>
+                <i class="fas fa-file-alt" aria-hidden="true"></i>
                 {%- else -%}
-                <i class="fas fa-code lesson-type-icon lesson"></i>
+                <i class="fas fa-code" aria-hidden="true"></i>
                 {%- endif -%}
                 <span class="lesson-title">{{ post.title }}</span>
               </a>
@@ -146,14 +135,13 @@
                 Week chat. The chat is _includes/week_chat.html, the same one the
                 course timeline puts in each week card, and it is passed the course
                 so it joins the same room. The modal is captured here and emitted by
-                lesson-modals.html, because .week-body is display:none while the week
-                is closed and would hide anything inside it.
+                lesson-modals.html, because a closed week hides everything inside it.
               {%- endcomment -%}
               {%- assign unitKey = sprintKey -%}
               {%- assign index = week -%}
               {%- assign chatId = unitKey | append: '-' | append: index -%}
               {%- if week == current_week -%}{%- assign currentWeekChatId = chatId -%}{%- endif -%}
-              <div class="ocs__links week-footer">
+              <div class="ocs__links">
                 {%- if assignmentCount > 0 -%}
                 <span class="ocs__status-pill ocs__status-pill--warn">
                   <i class="fas fa-calendar"></i> {{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due
@@ -173,8 +161,7 @@
               </div>
               {%- endcapture -%}
               {%- assign lessonWeekChats = lessonWeekChats | append: weekChatModal -%}
-              </div>
-            </div>
+            </details>
             {%- endif -%}
 
           {%- endfor -%}
