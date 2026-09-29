@@ -7,7 +7,7 @@
 //     Spring's group-chat ACL enforces the same rule server-side.
 import { javaURI, fetchOptions } from '../api/config.js';
 import { fetchPerson, roleNames, viewFor } from '../api/role-view.js';
-import { cardUrl, cardActionRow } from './cardActions.js';
+import { cardUrl, cardActionGroup } from './cardActions.js';
 import { mountGroupChat } from '../chat/groupChatPanel.js';
 
 
@@ -17,10 +17,11 @@ export async function initCardTools(grid) {
     grid.querySelectorAll(':scope > div').forEach((card) => {
         const project = projectsByUrl[cardUrl(card)];
         if (!project || project.mentorNames.length === 0) return;
-        const row = cardActionRow(card);
-        if (!row) return;
-        row.append(mentorsButton(row, project));
-        if (canChat(project, viewer)) row.append(chatButton(project, viewer));
+        // Project info goes in the right-hand group of the card's action row.
+        const extra = cardActionGroup(card, 'extra');
+        if (!extra) return;
+        extra.append(mentorsButton(extra, project));
+        if (canChat(project, viewer)) extra.append(chatButton(project, viewer));
     });
 }
 
@@ -73,10 +74,7 @@ function canChat(project, viewer) {
 // ---------- Mentors popover ----------
 
 function mentorsButton(row, project) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'ocs__btn small pill';
-    button.textContent = `Mentors (${project.mentorNames.length})`;
+    const button = iconButton('ocs__btn small accent', ICON_PEOPLE, `Mentors (${project.mentorNames.length})`);
     button.setAttribute('aria-expanded', 'false');
 
     const panel = document.createElement('div');
@@ -110,10 +108,7 @@ function mentorsButton(row, project) {
 const chat = { dialog: null, panel: null };
 
 function chatButton(project, viewer) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'ocs__btn small pill accent';
-    button.textContent = '💬 Chat';
+    const button = iconButton('ocs__btn small accent fill', ICON_CHAT, 'Chat');
     button.addEventListener('click', () => openChat(project, viewer));
     return button;
 }
@@ -148,6 +143,21 @@ function openChat(project, viewer) {
         displayName: viewer.person.name,
     });
     dialog.showModal();
+}
+
+// ---------- icon buttons (OCS ocs__btn--icon grammar: icon slot + label) ----------
+
+// 16x16 glyphs from Bootstrap Icons (MIT), filled with the button's text colour.
+const ICON_CHAT = 'M8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6-.097 1.016-.417 2.13-.771 2.966-.079.186.074.394.273.362 2.256-.37 3.597-.938 4.18-1.234A9 9 0 0 0 8 15';
+const ICON_PEOPLE = 'M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5';
+
+function iconButton(className, iconPath, label) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `${className} ocs__btn--icon`;
+    button.innerHTML = `<span class="ocs__btn-icon" aria-hidden="true"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="${iconPath}"/></svg></span>`;
+    button.append(textNode('span', label));
+    return button;
 }
 
 function textNode(tag, text, className) {

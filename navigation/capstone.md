@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'ocs__btn small pill capstone-links-button';
+    button.className = 'ocs__btn small accent capstone-links-button';
     button.setAttribute('aria-label', 'Open project links');
     button.textContent = 'Links';
     const popup = document.createElement('div');
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function(){
 <script type="module">
 import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
-import { cardUrl, cardActionRow } from '{{ site.baseurl }}/assets/js/capstone/cardActions.js';
+import { cardUrl, cardActionGroup } from '{{ site.baseurl }}/assets/js/capstone/cardActions.js';
 
 (async function () {
   // Wait for the script above (which sets card.dataset.pageUrl for the few
@@ -385,7 +385,7 @@ import { cardUrl, cardActionRow } from '{{ site.baseurl }}/assets/js/capstone/ca
 
   cards.forEach(card => {
     const url = cardUrl(card);
-    const actions = cardActionRow(card);
+    const actions = cardActionGroup(card, 'main');
     if (!actions) return;
 
     const applyBtn = document.createElement('button');
@@ -480,8 +480,8 @@ import { cardUrl, cardActionRow } from '{{ site.baseurl }}/assets/js/capstone/ca
       updateCounter();
     });
 
-    // Mentor buttons lead the row; the Mentors/Chat buttons (cardTools.js) follow.
-    actions.prepend(applyBtn, interestedBtn, skipBtn);
+    // The mentor's own actions: the left group of the card's action row.
+    actions.append(applyBtn, interestedBtn, skipBtn);
   });
 
   countsEl.hidden = false;

@@ -60,16 +60,34 @@
   }
 }
 
-// Action row: a footer under the card text, separated by a hairline. Positioned so
-// the Mentors popover can anchor to it.
-.capstone-card-actions {
+// Project info (Mentors / Chat): its own line right under the card text. Anchors the
+// Mentors popover.
+.capstone-card-info {
   position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  margin-top: 0.25rem;
+
+  .ocs__btn {
+    margin: 0;
+  }
+}
+
+// Mentor action row (Apply / Interested / Skip): a footer pinned to the bottom of the
+// card and separated by a hairline, so it lines up across every card in a grid row.
+.capstone-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
   margin-top: auto;
   padding-top: 0.85rem;
   border-top: 1px solid var(--ui-border);
+
+  &:empty {
+    display: none;
+  }
 
   .ocs__btn {
     margin: 0;
@@ -78,6 +96,12 @@
   .ocs__btn:disabled {
     cursor: default;
   }
+}
+
+// Visitors and students have no action row, so the info line takes the bottom spot.
+.capstone-card__body > .capstone-card-info:last-child {
+  margin-top: auto;
+  padding-top: 0.85rem;
 }
 
 .capstone-mentor-counts {
