@@ -27,6 +27,18 @@
       prevLesson() and nextLesson() are defined in _layouts/post.html.
     {%- endcomment -%}
     <nav class="ocs__links" aria-label="Lesson navigation">
+      {%- comment -%}
+        Hides and shows the sidebar. toggleLessonSidebar() is at the bottom of
+        lesson-sidebar-nav.html. The wrapper carries the hidden attribute
+        because .ocs__btn sets its own display, which would override hidden on
+        the button itself; the script shows it on screens wide enough to have
+        a sidebar.
+      {%- endcomment -%}
+      <span id="lesson-sidebar-toggle-wrap" hidden>
+        <button class="ocs__btn ocs__btn--icon small accent" id="lesson-sidebar-toggle" onclick="toggleLessonSidebar()" type="button" aria-controls="lesson-sidebar" aria-expanded="true" aria-label="Hide course navigation" title="Hide course navigation">
+          <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-table-columns"></i></span>
+        </button>
+      </span>
       <button class="ocs__btn ocs__btn--icon small accent" onclick="prevLesson()" type="button" title="Previous lesson">
         <i class="fas fa-chevron-left"></i> Prev
       </button>

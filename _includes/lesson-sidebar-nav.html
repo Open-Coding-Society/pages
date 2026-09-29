@@ -22,9 +22,12 @@
     - [data-week-group] [data-week-count]    -> per-week completion count
     - #week-chat-modal-{Sprint}-{week}       -> openWeekChat()
     - currentWeekChatId                      -> the top bar's chat button
+
+  The script at the bottom of this file hides and shows the sidebar, for the
+  button in _includes/lesson-topbar.html.
 {% endcomment %}
 
-<div class="lesson-sidebar">
+<div class="lesson-sidebar" id="lesson-sidebar">
   <div class="sidebar-header">
     {% if current_course == 'csp' %}
       <h2>Computer Science Principles</h2>
@@ -67,16 +70,30 @@
       {%- assign sprint = courseData[sprintKey] -%}
 
       {%- if sprint -%}
+      {%- comment -%}
+        A shared sprint takes its title and description from _data/cs.yml,
+        the same way _layouts/sprint.html builds the course page. The weeks
+        still come from this course's own data.
+      {%- endcomment -%}
+      {%- assign sprintInfo = sprint -%}
+      {%- if sprint.shared -%}{%- assign sprintInfo = site.data.cs[sprint.shared] -%}{%- endif -%}
       <div class="sprint-section">
         <button class="sprint-toggle" onclick="toggleSprint('{{ i }}')" type="button">
           <i class="fas fa-chevron-right sprint-chevron" id="chevron-{{ i }}"></i>
           <div class="sprint-info">
-            <div class="sprint-title">{{ sprintKey }}: {{ sprint.title }}</div>
+            <div class="sprint-title">{{ sprintKey }}: {{ sprintInfo.title }}</div>
             <div class="sprint-weeks">Weeks {{ sprint.start }}-{{ sprint.end }}</div>
           </div>
         </button>
 
         <div class="lesson-list" id="sprint-{{ i }}-lessons" style="display: none;">
+          {%- if sprintInfo.description -%}
+          {%- comment -%} The sprint's description from the course page, in a <details> so it stays out of the way until asked for. {%- endcomment -%}
+          <details>
+            <summary><span class="ocs__section-title">About</span></summary>
+            <div class="ocs__callout">{{ sprintInfo.description | strip | escape }}</div>
+          </details>
+          {%- endif -%}
           {%- for week in (sprint.start..sprint.end) -%}
 
             {%- comment -%} Collect this week's lessons first, so empty weeks are skipped. {%- endcomment -%}
@@ -171,3 +188,56 @@
     {%- endfor -%}
   </div>
 </div>
+
+<script>
+  /**
+   * Hiding the sidebar, for the button in the top bar. A hidden sidebar has the
+   * hidden attribute, so the lesson takes the full width with no CSS involved.
+   *
+   * The reader's choice is saved and applied here, as soon as the sidebar has
+   * been parsed, so a hidden sidebar never flashes open first. Phones already
+   * hide the sidebar, so the button only shows on wider screens.
+   */
+  (function () {
+    const sidebar = document.getElementById('lesson-sidebar');
+    if (!sidebar) return;
+
+    const STORAGE_KEY = 'ocs-lesson-sidebar-hidden';
+    const wideScreen = window.matchMedia('(min-width: 769px)');
+
+    function readerHidSidebar() {
+      try {
+        return localStorage.getItem(STORAGE_KEY) === 'true';
+      } catch (e) {
+        return false; // storage blocked (private browsing): the sidebar stays open
+      }
+    }
+
+    function show(hide) {
+      sidebar.hidden = hide && wideScreen.matches;
+      const button = document.getElementById('lesson-sidebar-toggle');
+      const wrapper = document.getElementById('lesson-sidebar-toggle-wrap');
+      if (!button || !wrapper) return;
+      const label = sidebar.hidden ? 'Show course navigation' : 'Hide course navigation';
+      wrapper.hidden = !wideScreen.matches;
+      button.setAttribute('aria-expanded', String(!sidebar.hidden));
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    }
+
+    window.toggleLessonSidebar = function () {
+      const hide = !sidebar.hidden;
+      try {
+        localStorage.setItem(STORAGE_KEY, String(hide));
+      } catch (e) {
+        // Same as above: the choice just isn't remembered.
+      }
+      show(hide);
+    };
+
+    show(readerHidSidebar());
+    // The top bar button is parsed after the sidebar, so sync it once it exists.
+    document.addEventListener('DOMContentLoaded', () => show(readerHidSidebar()));
+    wideScreen.addEventListener('change', () => show(readerHidSidebar()));
+  })();
+</script>
