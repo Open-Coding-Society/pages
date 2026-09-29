@@ -8,9 +8,8 @@
 import { javaURI, fetchOptions } from '../api/config.js';
 import { fetchPerson, roleNames, viewFor } from '../api/role-view.js';
 import { cardUrl, cardActionRow } from './cardActions.js';
+import { mountGroupChat } from '../chat/groupChatPanel.js';
 
-const CHAT_SOCKET_PORT = 8589; // same hard-coded port as groups.js / lesson_chat.html
-const SOCKET_TIMEOUT_MS = 8000;
 
 export async function initCardTools(grid) {
     const projectsByUrl = await loadProjects();
@@ -106,8 +105,9 @@ function mentorsButton(row, project) {
 }
 
 // ---------- Chat dialog (one shared <dialog> for the page) ----------
+// Holds the same course-style chat panel as the dashboard Messages tab.
 
-const chat = { dialog: null, stomp: null, subscription: null, seenKeys: new Set(), project: null, viewer: null };
+const chat = { dialog: null, panel: null };
 
 function chatButton(project, viewer) {
     const button = document.createElement('button');
@@ -122,140 +122,32 @@ function chatDialog() {
     if (chat.dialog) return chat.dialog;
     const dialog = document.createElement('dialog');
     dialog.className = 'capstone-chat';
-    dialog.innerHTML = `
-        <header class="capstone-chat__header">
-            <div>
-                <h3 class="capstone-chat__title"></h3>
-                <div class="capstone-chat__hint">Messages go to this project's student group.</div>
-            </div>
-            <button type="button" class="ocs__btn small pill capstone-chat__close" aria-label="Close chat">✕</button>
-        </header>
-        <div class="capstone-chat__log" aria-live="polite"></div>
-        <form class="capstone-chat__composer" autocomplete="off">
-            <input class="capstone-chat__input" type="text" maxlength="2000" placeholder="Write a message…" aria-label="Message">
-            <button type="submit" class="ocs__btn accent fill">Send</button>
-        </form>`;
+    dialog.setAttribute('aria-label', 'Capstone chat');
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'ocs__btn small pill capstone-chat__close';
+    close.setAttribute('aria-label', 'Close chat');
+    close.textContent = '✕';
+    close.addEventListener('click', () => dialog.close());
+    const body = document.createElement('div');
+    body.className = 'capstone-chat__body';
+    dialog.append(close, body);
+    dialog.addEventListener('close', () => { chat.panel?.destroy(); chat.panel = null; });
     document.body.append(dialog);
-    dialog.querySelector('.capstone-chat__close').addEventListener('click', () => dialog.close());
-    dialog.addEventListener('close', disconnect);
-    dialog.querySelector('form').addEventListener('submit', onSend);
     chat.dialog = dialog;
     return dialog;
 }
 
-async function openChat(project, viewer) {
+function openChat(project, viewer) {
     const dialog = chatDialog();
-    disconnect();
-    chat.project = project;
-    chat.viewer = viewer;
-    chat.seenKeys.clear();
-    dialog.querySelector('.capstone-chat__title').textContent = `Chat — ${project.title}`;
-    const log = dialog.querySelector('.capstone-chat__log');
-    log.innerHTML = '';
-    dialog.showModal();
-    await loadHistory(project.groupId);
-    connect(project.groupId);
-    dialog.querySelector('.capstone-chat__input').focus();
-}
-
-async function loadHistory(groupId) {
-    try {
-        const res = await fetch(`${javaURI}/api/groups/chat/${groupId}/messages`, fetchOptions);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        (await res.json()).forEach((msg) => appendMessage({ sender: msg.name, message: msg.message, date: msg.date }));
-    } catch (err) {
-        console.error('Capstone chat: could not load history', err);
-    }
-    const log = chat.dialog.querySelector('.capstone-chat__log');
-    if (!log.children.length) log.append(textNode('p', 'No messages yet — say hello.', 'capstone-chat__empty'));
-}
-
-function socketEndpoint() {
-    const uri = new URL(javaURI);
-    if (uri.hostname === 'localhost' || uri.hostname === '127.0.0.1') {
-        return `${uri.protocol}//${uri.hostname}:${CHAT_SOCKET_PORT}/ws-chat`;
-    }
-    return `${javaURI}/ws-chat`;
-}
-
-// Live updates over the same SockJS/STOMP socket as the weekly chat. If it never
-// connects, sending still works over REST; only live updates are lost.
-function connect(groupId) {
-    if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
-        console.warn('Capstone chat: SockJS/STOMP not loaded; no live updates');
-        return;
-    }
-    const client = Stomp.over(new SockJS(socketEndpoint()));
-    client.debug = null;
-    chat.stomp = client;
-    const giveUp = setTimeout(() => console.warn('Capstone chat: socket timed out; no live updates'), SOCKET_TIMEOUT_MS);
-    client.connect({}, () => {
-        clearTimeout(giveUp);
-        if (chat.stomp !== client) return; // chat closed/switched while connecting
-        chat.subscription = client.subscribe(`/topic/group/${groupId}`, (frame) => {
-            try {
-                const event = JSON.parse(frame.body);
-                if (event.context === 'sendMessageServer') appendMessage(event);
-            } catch (err) {
-                console.warn('Capstone chat: bad frame', err);
-            }
-        });
-    }, (err) => {
-        clearTimeout(giveUp);
-        console.warn('Capstone chat: socket failed; no live updates', err);
+    chat.panel?.destroy();
+    chat.panel = mountGroupChat(dialog.querySelector('.capstone-chat__body'), {
+        groupId: project.groupId,
+        title: project.title,
+        subtitle: "This project's student group — its mentors and admins can read it too.",
+        displayName: viewer.person.name,
     });
-}
-
-function disconnect() {
-    try {
-        if (chat.subscription) chat.subscription.unsubscribe();
-        if (chat.stomp && chat.stomp.connected) chat.stomp.disconnect();
-    } catch (err) {
-        console.warn('Capstone chat: socket close failed', err);
-    }
-    chat.subscription = null;
-    chat.stomp = null;
-}
-
-async function onSend(event) {
-    event.preventDefault();
-    const input = chat.dialog.querySelector('.capstone-chat__input');
-    const text = input.value.trim();
-    if (!text || !chat.project) return;
-    const sender = chat.viewer.person.name;
-    input.disabled = true;
-    try {
-        const res = await fetch(`${javaURI}/api/groups/chat/${chat.project.groupId}/messages`, {
-            ...fetchOptions,
-            method: 'POST',
-            body: JSON.stringify({ name: sender, message: text, date: new Date().toISOString() }),
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        input.value = '';
-        // With a live socket the broadcast echoes it back; otherwise show it now.
-        if (!chat.subscription) appendMessage({ sender, message: text, date: new Date().toISOString() });
-    } catch (err) {
-        console.error('Capstone chat: send failed', err);
-        chat.dialog.querySelector('.capstone-chat__hint').textContent = 'Could not send — please try again.';
-    } finally {
-        input.disabled = false;
-        input.focus();
-    }
-}
-
-function appendMessage({ sender, message, date }) {
-    const key = [sender, date, message].join('|');
-    if (chat.seenKeys.has(key)) return;
-    chat.seenKeys.add(key);
-    const log = chat.dialog.querySelector('.capstone-chat__log');
-    log.querySelector('.capstone-chat__empty')?.remove();
-    const mine = sender === chat.viewer.person.name;
-    const bubble = document.createElement('div');
-    bubble.className = mine ? 'capstone-chat__bubble capstone-chat__bubble--mine' : 'capstone-chat__bubble';
-    const meta = [mine ? 'You' : (sender || 'Unknown'), formatTime(date)].filter(Boolean).join(' · ');
-    bubble.append(textNode('span', meta, 'capstone-chat__meta'), textNode('span', message, 'capstone-chat__text'));
-    log.append(bubble);
-    log.scrollTop = log.scrollHeight;
+    dialog.showModal();
 }
 
 function textNode(tag, text, className) {
@@ -263,10 +155,4 @@ function textNode(tag, text, className) {
     if (className) node.className = className;
     node.textContent = text == null ? '' : String(text);
     return node;
-}
-
-function formatTime(iso) {
-    const date = iso ? new Date(iso) : null;
-    if (!date || Number.isNaN(date.getTime())) return '';
-    return date.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 }

@@ -118,14 +118,18 @@
   }
 }
 
-// Chat with the project's students: one native <dialog> shared by every card.
+// Chat with the project's students: one native <dialog> shared by every card, holding the
+// same course-style panel as the dashboard Messages tab (styled by forms/course-chat.scss).
 .capstone-chat {
-  width: min(36rem, calc(100vw - 2rem));
+  position: relative;
+  width: min(48rem, calc(100vw - 2rem));
   // The site's global reset zeroes margins, which would pin the dialog top-left.
   margin: auto;
   padding: 0;
   border: 1px solid var(--ui-border);
-  border-radius: 12px;
+  border-radius: 14px;
+  overflow: hidden;
+  // Solid, so the cards behind don't show through the chat.
   background: var(--pref-bg-color);
   color: var(--pref-text-color);
 
@@ -133,87 +137,22 @@
     background: rgba(0, 0, 0, 0.55);
   }
 
-  &__header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1rem 1rem 0.75rem;
-    border-bottom: 1px solid var(--ui-border);
-
-    .ocs__btn {
-      margin: 0;
-    }
+  &__close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    z-index: 1;
+    margin: 0;
   }
 
-  &__title {
-    margin: 0 0 0.2rem;
-    font-size: 1.05rem;
-  }
+  &__body .announcement-chat {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
 
-  &__hint,
-  &__empty,
-  &__meta {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-  }
-
-  &__log {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    height: 22rem;
-    padding: 1rem;
-    overflow-y: auto;
-  }
-
-  &__bubble {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    max-width: 80%;
-    align-self: flex-start;
-    padding: 0.55rem 0.8rem;
-    border: 1px solid var(--ui-border);
-    border-radius: 12px 12px 12px 4px;
-    background: color-mix(in srgb, var(--pref-text-color) 7%, var(--pref-bg-color));
-
-    &--mine {
-      align-self: flex-end;
-      border-color: color-mix(in srgb, var(--pref-accent-color) 45%, transparent);
-      border-radius: 12px 12px 4px 12px;
-      background: color-mix(in srgb, var(--pref-accent-color) 18%, var(--pref-bg-color));
-    }
-  }
-
-  &__text {
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
-
-  &__composer {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem 1rem;
-    border-top: 1px solid var(--ui-border);
-
-    .ocs__btn {
-      margin: 0;
-    }
-  }
-
-  &__input {
-    flex: 1;
-    min-width: 0;
-    padding: 0.6rem 0.8rem;
-    border: 1px solid var(--ui-border);
-    border-radius: 8px;
-    background: var(--pref-bg-color);
-    color: var(--pref-text-color);
-
-    &:focus {
-      outline: 2px solid var(--pref-accent-color);
-      outline-offset: 1px;
+    // Leave room on the right of the header for the close button.
+    .chat-header {
+      padding-right: 3.25rem;
     }
   }
 }

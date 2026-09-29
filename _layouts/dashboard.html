@@ -15,6 +15,13 @@ active_tab: dashboard
                         Preferences
                     </a>
                 </li>
+                <!-- Approved mentors only: revealed by mentorCapstoneChat.js. -->
+                <li class="me-2" id="tab-messages-li" hidden>
+                    <a href="#" id="tab-messages"
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        Messages
+                    </a>
+                </li>
             </ul>
             <!-- sliding underline indicator -->
             <div id="tab-underline"
@@ -50,6 +57,17 @@ active_tab: dashboard
                     calls after confirming the user is an admin.
                 -->
                 </div>
+            </div>
+
+            <!-- Messages: chat with the student group of each capstone the mentor is approved for
+                 (assets/js/aesthetihawk/dashboard/mentorCapstoneChat.js). -->
+            <div id="tab-content-messages" class="tab-content hidden">
+                <section class="mentor-chat" aria-labelledby="mentorChatHeading">
+                    <h2 id="mentorChatHeading" class="mentor-chat__heading">Messages</h2>
+                    <div class="mentor-chat__intro">Chat with the student groups of the capstone projects you've been approved to mentor.</div>
+                    <div id="mentorChatProjects" class="ocs__links mentor-chat__projects" role="group" aria-label="Your capstone projects"></div>
+                    <div id="mentorChatPanel"></div>
+                </section>
             </div>
 
             <!-- Preferences tab content -->
@@ -910,4 +928,9 @@ import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.j
     // calls window.adminFetchPeople() after confirming admin role.
     window.adminFetchPeople = fetchPeople;
 })();
+</script>
+
+<script type="module">
+import { initMentorCapstoneChat } from '{{ site.baseurl }}/assets/js/aesthetihawk/dashboard/mentorCapstoneChat.js';
+initMentorCapstoneChat();
 </script>

@@ -490,9 +490,7 @@ import { cardUrl, cardActionRow } from '{{ site.baseurl }}/assets/js/capstone/ca
 </script>
 
 <!-- Mentors / Chat buttons on every project card (assets/js/capstone/cardTools.js).
-     Chat reuses the weekly chat's SockJS/STOMP client for live updates. -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+     The chat panel loads the weekly chat's SockJS/STOMP client itself when opened. -->
 <script type="module">
 import { initCardTools } from '{{ site.baseurl }}/assets/js/capstone/cardTools.js';
 
