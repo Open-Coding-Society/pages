@@ -7,8 +7,6 @@ search_exclude: true
 
 {% include nav/homejava.html %}
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
 <style>
   .login-container {
       display: flex;
@@ -36,7 +34,7 @@ search_exclude: true
 <div id="login-container">
   <div class="signup-card">
     <h1 id="signupTitle">Sign Up</h1>
-    <form id="signupForm" onsubmit="beginGoogleSignup(); return false;">
+    <form id="signupForm" onsubmit="signup(); return false;">
       <p>
         <label>
           Name:
@@ -46,8 +44,7 @@ search_exclude: true
       <p>
         <label>
           Github Id:
-          <input type="text" name="signupUid" id="signupUid" aria-describedby="githubIdMessage" required>
-          <span id="githubIdMessage" aria-live="polite"></span>
+          <input type="text" name="signupUid" id="signupUid" required>
         </label>
       </p>
       <p>
@@ -58,14 +55,14 @@ search_exclude: true
       </p>
       <p>
         <label>
-          Password:
-          <input type="password" name="signupPassword" id="signupPassword" required>
+          Email:
+          <input type="email" name="email" id="email" required>
         </label>
       </p>
       <p>
         <label>
-          <input type="checkbox" name="kasmNeeded" id="kasmNeeded">
-          Kasm Server Needed
+          Password:
+          <input type="password" name="signupPassword" id="signupPassword" required>
         </label>
       </p>
       <p>
@@ -73,136 +70,78 @@ search_exclude: true
       </p>
       <p id="signupMessage" style="color: green;"></p>
     </form>
-    <div id="oauthVerification" style="display: none; text-align: center;">
-      <h2>Google Account Verification</h2>
-      <p>Sign in with any Google account. Poway USD student accounts receive immediate access; other accounts will await administrator approval.</p>
-      <div id="g_id_onload"
-           data-client_id="65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com"
-           data-callback="handleStandaloneGoogleSignIn"
-           data-auto_prompt="false"></div>
-      <div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_blue"></div>
-      <button type="button" class="medium" onclick="showStandaloneSignupForm()">Back to form</button>
-    </div>
   </div>
 </div>
 
 <script type="module">
-  import { javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
-  import { pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
-
-  const studentIdAsGithubIdPattern = /^\d{7}$/;
-  const githubIdInput = document.getElementById('signupUid');
-  const githubIdMessage = document.getElementById('githubIdMessage');
-
-  function validateGithubId() {
-    const isStudentId = studentIdAsGithubIdPattern.test(githubIdInput.value.trim());
-    const message = isStudentId ? 'Enter your GitHub ID, not your 7-digit student ID.' : '';
-    githubIdInput.setCustomValidity(message);
-    githubIdMessage.innerText = message;
-    return !isStudentId;
-  }
-
-  githubIdInput.addEventListener('input', validateGithubId);
-
-  let signupIdToken = null;
-  let verifiedGoogleEmail = null;
-
-  window.beginGoogleSignup = function() {
-    if (!validateGithubId()) {
-      githubIdInput.reportValidity();
-      githubIdInput.focus();
-      return;
-    }
-    if (!document.getElementById('signupForm').checkValidity()) {
-      document.getElementById('signupForm').reportValidity();
-      return;
-    }
-    document.getElementById('signupForm').style.display = 'none';
-    document.getElementById('oauthVerification').style.display = 'block';
-  };
-
-  window.showStandaloneSignupForm = function() {
-    document.getElementById('oauthVerification').style.display = 'none';
-    document.getElementById('signupForm').style.display = 'block';
-  };
-
-  window.handleStandaloneGoogleSignIn = function(response) {
-    const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-    signupIdToken = response.credential;
-    verifiedGoogleEmail = payload.email;
-    document.getElementById('signupMessage').innerText = `Google account selected: ${verifiedGoogleEmail}`;
-    window.signup();
-  };
+  import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
   // Sign up function to handle form submission
-  window.signup = function() {
-    const signupOptionsJava = {
-      URL: `${javaURI}/api/person/create`,
-      method: "POST",
-      cache: "no-cache",
-      headers: new Headers({
-        "Content-Type": "application/json"
-      }),
-      body: JSON.stringify({
-        uid: document.getElementById("signupUid").value,
-        sid: document.getElementById("sid").value,
-        email: verifiedGoogleEmail,
-        dob: "11-01-2024",  // Static date for now, you can modify this
-        name: document.getElementById("name").value,
-        password: document.getElementById("signupPassword").value,
-        kasmServerNeeded: document.getElementById("kasmNeeded").checked,
-        idToken: signupIdToken,
-      })
+  window.signup = async function() {
+    const signupMessage = document.getElementById("signupMessage");
+    const signupData = {
+      uid: document.getElementById("signupUid").value,
+      sid: document.getElementById("sid").value,
+      email: document.getElementById("email").value,
+      name: document.getElementById("name").value,
+      password: document.getElementById("signupPassword").value,
+      kasmServerNeeded: false,
+      // Keep snake_case alias so Flask handlers expecting either key still work.
+      kasm_server_needed: false,
     };
 
-    const signupOptionsPython = {
-      URL: `${pythonURI}/api/user`,
+    const springURL = `${javaURI}/api/person/create`;
+    const flaskURL = `${pythonURI}/api/user`;
+
+    // Use shared defaults from config.js so credentials/CORS behavior is consistent site-wide.
+    const springRequest = {
+      ...fetchOptions,
       method: "POST",
-      cache: "no-cache",
-      headers: new Headers({
-        "Content-Type": "application/json"
-      }),
-      body: JSON.stringify({
-        uid: document.getElementById("signupUid").value,
-        sid: document.getElementById("sid").value,
-        email: verifiedGoogleEmail,
-        dob: "11-01-2024",  // Static date for now, you can modify this
-        name: document.getElementById("name").value,
-        password: document.getElementById("signupPassword").value,
-        kasmServerNeeded: document.getElementById("kasmNeeded").checked,
-      })
+      body: JSON.stringify(signupData),
     };
 
-    // Debugging: Check if the request is set up correctly
-    console.log('Sending request:', signupOptionsJava, signupOptionsPython);
+    const flaskRequest = {
+      ...fetchOptions,
+      method: "POST",
+      body: JSON.stringify(signupData),
+    };
 
-    // Send the request to the server
-    fetch(signupOptionsJava.URL, signupOptionsJava)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          document.getElementById("signupMessage").innerText = "Sign up successful!";
-        } else {
-          document.getElementById("signupMessage").innerText = "Sign up failed: " + data.message;
-        }
-      })
-      .catch(error => {
-        document.getElementById("signupMessage").innerText = "Error: " + error.message;
-        console.error('Error during signup:', error);
-      });
+    console.log("Sending signup requests:", { springURL, flaskURL, springRequest, flaskRequest });
 
-    fetch(signupOptionsPython.URL, signupOptionsPython)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          document.getElementById("signupMessage").innerText = "Sign up successful!";
-        } else {
-          document.getElementById("signupMessage").innerText = "Sign up failed: " + data.message;
-        }
-      })
-      .catch(error => {
-        document.getElementById("signupMessage").innerText = "Error: " + error.message;
-        console.error('Error during signup:', error);
-      });
+    signupMessage.innerText = "Signing up...";
+
+    try {
+      // Flask signup is primary because login/auth reads from Flask user records.
+      const flaskResponse = await fetch(flaskURL, flaskRequest);
+      const flaskRaw = await flaskResponse.text();
+      let flaskData;
+      try {
+        flaskData = flaskRaw ? JSON.parse(flaskRaw) : {};
+      } catch (_) {
+        flaskData = { message: flaskRaw };
+      }
+
+      if (!flaskResponse.ok || flaskData.success === false) {
+        const flaskMessage = flaskData.message || flaskRaw || `Flask signup failed (${flaskResponse.status})`;
+        throw new Error(flaskMessage);
+      }
+
+      signupMessage.innerText = "Sign up successful!";
+
+      // Spring write is best-effort so API/MVC path issues do not block signup.
+      fetch(springURL, springRequest)
+        .then(async (springResponse) => {
+          const springRaw = await springResponse.text();
+          if (!springResponse.ok) {
+            console.warn("Spring signup failed:", springResponse.status, springRaw);
+          }
+        })
+        .catch((springError) => {
+          console.warn("Spring signup error:", springError.message);
+        });
+    } catch (error) {
+      signupMessage.innerText = "Sign up failed: " + error.message;
+      console.error("Error during signup:", error);
+    }
   };
 </script>

@@ -2,6 +2,7 @@
 # All data sourced directly from _data/*_infograph.yml files.
 # Projects without a real tech array are omitted (no tooltip > wrong tooltip).
 
+
 "Assignment Resources Platform":
   - "Spring Boot 3.5 / Java 21"
   - "Jekyll + Static JS"
@@ -98,6 +99,12 @@
   - "Spring Boot"
   - "REST APIs"
 
+"Friends of the Poway Library 2026–27":
+  - "Jekyll"
+  - "JavaScript"
+  - "Python Flask"
+  - "REST APIs"
+
 "DSA Website Redesign":
   - "WordPress REST API"
   - "React Dashboard UI"
@@ -146,3 +153,35 @@
   - "Gemini AI Grading"
   - "Jekyll / Liquid"
   - "JavaScript (Vanilla)"
+
+"Communication System":
+  - "Spring Boot / Java"
+  - "STOMP over SockJS"
+  - "REST /api/groups & /api/dm"
+  - "JPA + Amazon S3"
+  - "JWT Cookie Auth"
+  - "Jekyll Includes / Vanilla JS"
+  - "localStorage"
+
+"OCS Intelligence LLM":
+  - "LLM"
+  - "FlashAttention"
+  - "vLLM"
+  - "Distributed Inference"
+  - "Observability"
+
+"Communication System":
+  - "Spring Boot / Java"
+  - "STOMP over SockJS"
+  - "REST at /api/groups"
+  - "JWT Cookie Auth"
+  - "JPA + S3 message store"
+  - "Jekyll Includes"
+
+"Poway Veterans Organization 2026–27":
+  - "Jekyll / Liquid"
+  - "JavaScript"
+  - "AI Support Chatbot"
+  - "Machine Learning Eligibility Logic"
+  - "Google AI Search"
+  - "Accessibility / WCAG 2.1 AA"

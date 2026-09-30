@@ -2,7 +2,7 @@
 course:
   code: CSSE
   title: "CSSE - Software Engineering"
-  subtitle: "Games, Foundation"
+  subtitle: "Code, Foundation, Games"
   mission: "Computer Science and Software Engineering 1,2 prepares students for the AP Computer Science pathway. This course focuses on teaching the JavaScript programming language, object-oriented programming, and developing algorithmic thinking skills through game development projects."
   progression_key: 5
   learning_journey:

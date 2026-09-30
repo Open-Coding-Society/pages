@@ -3,7 +3,7 @@ toc: True
 layout: post
 data: tools
 title: VSCode Setup 
-description: A key to learning in this class is understanding how to make a GitHub Pages project.  This guide will setup and run the project.  At the end, you will have a student Website that can be used for blogging classroom learnings and progress.
+description: A key to learning in this class is understanding how to make a GitHub Pages project.  This guide will setup and run the project.  At the end, you will have a portfolio Website that can be used for blogging classroom learnings and progress.
 categories: ['DevOps']
 author: Lily Wu
 permalink: /tools/vscode
@@ -21,26 +21,23 @@ You are using Ubuntu, Kali, MacOS in this step.
 
 ### Clone repository
 
-Use same repo that you modified in vscode.dev.
+Change the commands below to use your own organization name (**not** "opencs" of "jm1021").  This is your personal template repository (**not** "open-coding-society/portfolio.git").
 
-Change the commands below to use your own organization name (**not** "opencs" of "jm1021").  This is your personal template repository (**not** "open-coding-society/student.git").
-
-For example, if your GitHub organization is **jm1021** and your repo is ****student**, use:
+For example, if your GitHub organization is **jm1021** and your repo is ****portfolio**, use:
 
    ```bash
    cd                # move to your home directory
    mkdir -p jm1021   # use your organization name here
    cd jm1021         # use your organization name here
-   git clone https://github.com/jm1021/student.git   # use your organization/repo here
+   git clone https://github.com/jm1021/portfolio.git   # use your organization/repo here
    ```
 
 ### Prepare project prior to opening VS Code
 
    ```bash
-   cd student # Move to your personal project directory
+   cd portfolio # Move to your personal project directory
    ./scripts/venv.sh # Activate the virtual environment (observe the prompt change)
    source venv/bin/activate # Prefix (venv) in path
-   bundle install # Ensure Ruby gems for GitHub Pages is installed in (venv)
    code . # Open the project in VS Code
    ```
 
@@ -910,7 +907,7 @@ The SDLC adds the important steps of Make and Test to the workflow. This ensures
 7. Update GitHub Pages:
 
    * GitHub Pages Action automatically rebuilds your site with the latest changes.
-   * Visit your public website at https://<yourGitHubID>.github.io/student to see the updates.
+   * Visit your public website at https://<yourGitHubID>.github.io/portfolio to see the updates.
 
 ```mermaid
 flowchart TD

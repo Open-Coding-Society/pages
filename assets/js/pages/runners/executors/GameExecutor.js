@@ -2,10 +2,10 @@ export class GameExecutor {
   constructor({
     getCode,
     updateStatus,
-    runBtn,
-    pauseBtn,
-    stopBtn,
-    fullscreenBtn,
+    runButton,
+    pauseButton,
+    stopButton,
+    fullscreenButton,
     levelSelect,
     engineVersionSelect,
     getGameContainer,
@@ -16,10 +16,10 @@ export class GameExecutor {
   } = {}) {
     this.getCode = getCode || (() => '');
     this.updateStatus = updateStatus || (() => {});
-    this.runBtn = runBtn;
-    this.pauseBtn = pauseBtn;
-    this.stopBtn = stopBtn;
-    this.fullscreenBtn = fullscreenBtn;
+    this.runButton = runButton;
+    this.pauseButton = pauseButton;
+    this.stopButton = stopButton;
+    this.fullscreenButton = fullscreenButton;
     this.levelSelect = levelSelect;
     this.engineVersionSelect = engineVersionSelect;
     this.getGameContainer = getGameContainer;
@@ -66,10 +66,10 @@ export class GameExecutor {
     }
 
     this.updateStatus('Stopped');
-    if (this.runBtn) this.runBtn.disabled = false;
-    if (this.pauseBtn) this.pauseBtn.disabled = true;
-    if (this.stopBtn) this.stopBtn.disabled = true;
-    if (this.fullscreenBtn) this.fullscreenBtn.disabled = true;
+    if (this.runButton) this.runButton.disabled = false;
+    if (this.pauseButton) this.pauseButton.disabled = true;
+    if (this.stopButton) this.stopButton.disabled = true;
+    if (this.fullscreenButton) this.fullscreenButton.disabled = true;
     if (this.levelSelect) this.levelSelect.disabled = false;
   }
 
@@ -221,14 +221,14 @@ export class GameExecutor {
       }
 
       this.updateStatus('Loading...');
-      if (this.runBtn) this.runBtn.disabled = true;
-      if (this.pauseBtn) {
-        this.pauseBtn.disabled = false;
-        this.pauseBtn.textContent = '⏸ Pause';
-        this.pauseBtn.title = 'Pause Game';
+      if (this.runButton) this.runButton.disabled = true;
+      if (this.pauseButton) {
+        this.pauseButton.disabled = false;
+        this.pauseButton.textContent = '⏸';
+        this.pauseButton.title = 'Pause Game';
       }
-      if (this.stopBtn) this.stopBtn.disabled = false;
-      if (this.fullscreenBtn) this.fullscreenBtn.disabled = false;
+      if (this.stopButton) this.stopButton.disabled = false;
+      if (this.fullscreenButton) this.fullscreenButton.disabled = false;
       if (this.levelSelect) this.levelSelect.disabled = true;
 
       const gameContainer = this.getGameContainer?.();
@@ -350,10 +350,10 @@ export class GameExecutor {
     } catch (error) {
       this.updateStatus('Error: ' + error.message);
       console.error('Game error:', error);
-      if (this.runBtn) this.runBtn.disabled = false;
-      if (this.pauseBtn) this.pauseBtn.disabled = true;
-      if (this.stopBtn) this.stopBtn.disabled = true;
-      if (this.fullscreenBtn) this.fullscreenBtn.disabled = true;
+      if (this.runButton) this.runButton.disabled = false;
+      if (this.pauseButton) this.pauseButton.disabled = true;
+      if (this.stopButton) this.stopButton.disabled = true;
+      if (this.fullscreenButton) this.fullscreenButton.disabled = true;
       if (this.levelSelect) this.levelSelect.disabled = false;
 
       if (this.gameStateMonitor) {
@@ -432,29 +432,29 @@ export class GameExecutor {
       controlsContainer.style.flexWrap = 'wrap';
 
       // Clone control buttons
-      const clonedRunBtn = this.runBtn ? this.runBtn.cloneNode(true) : null;
-      const clonedPauseBtn = this.pauseBtn ? this.pauseBtn.cloneNode(true) : null;
-      const clonedStopBtn = this.stopBtn ? this.stopBtn.cloneNode(true) : null;
-      const clonedFullscreenBtn = this.fullscreenBtn ? this.fullscreenBtn.cloneNode(true) : null;
+      const clonedRunButton = this.runButton ? this.runButton.cloneNode(true) : null;
+      const clonedPauseButton = this.pauseButton ? this.pauseButton.cloneNode(true) : null;
+      const clonedStopButton = this.stopButton ? this.stopButton.cloneNode(true) : null;
+      const clonedFullscreenButton = this.fullscreenButton ? this.fullscreenButton.cloneNode(true) : null;
       const clonedEngineSelect = this.engineVersionSelect ? this.engineVersionSelect.cloneNode(true) : null;
       const clonedLevelSelect = this.levelSelect ? this.levelSelect.cloneNode(true) : null;
 
       // Add event listeners to cloned buttons to trigger original buttons
-      if (clonedRunBtn) {
-        clonedRunBtn.addEventListener('click', () => this.runBtn?.click());
-        controlsContainer.appendChild(clonedRunBtn);
+      if (clonedRunButton) {
+        clonedRunButton.addEventListener('click', () => this.runButton?.click());
+        controlsContainer.appendChild(clonedRunButton);
       }
-      if (clonedPauseBtn) {
-        clonedPauseBtn.addEventListener('click', () => this.pauseBtn?.click());
-        controlsContainer.appendChild(clonedPauseBtn);
+      if (clonedPauseButton) {
+        clonedPauseButton.addEventListener('click', () => this.pauseButton?.click());
+        controlsContainer.appendChild(clonedPauseButton);
       }
-      if (clonedStopBtn) {
-        clonedStopBtn.addEventListener('click', () => this.stopBtn?.click());
-        controlsContainer.appendChild(clonedStopBtn);
+      if (clonedStopButton) {
+        clonedStopButton.addEventListener('click', () => this.stopButton?.click());
+        controlsContainer.appendChild(clonedStopButton);
       }
-      if (clonedFullscreenBtn) {
-        clonedFullscreenBtn.addEventListener('click', () => this.fullscreenBtn?.click());
-        controlsContainer.appendChild(clonedFullscreenBtn);
+      if (clonedFullscreenButton) {
+        clonedFullscreenButton.addEventListener('click', () => this.fullscreenButton?.click());
+        controlsContainer.appendChild(clonedFullscreenButton);
       }
 
       // Add event listeners to cloned selects to sync with originals
@@ -517,9 +517,9 @@ export class GameExecutor {
       this.configuredCanvasHeight = viewportHeight;
 
       // Update button text
-      if (this.fullscreenBtn) {
-        this.fullscreenBtn.textContent = '⛶ Minimize';
-        this.fullscreenBtn.title = 'Exit Fullscreen';
+      if (this.fullscreenButton) {
+        this.fullscreenButton.textContent = '⛶';
+        this.fullscreenButton.title = 'Exit Fullscreen';
       }
 
       this.isFullscreen = true;
@@ -555,9 +555,9 @@ export class GameExecutor {
       }
 
       // Update button text
-      if (this.fullscreenBtn) {
-        this.fullscreenBtn.textContent = '⛶ Fullscreen';
-        this.fullscreenBtn.title = 'Enter Fullscreen';
+      if (this.fullscreenButton) {
+        this.fullscreenButton.textContent = '⛶';
+        this.fullscreenButton.title = 'Enter Fullscreen';
       }
 
       this.isFullscreen = false;

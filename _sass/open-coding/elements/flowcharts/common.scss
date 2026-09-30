@@ -1,0 +1,64 @@
+// Themed Mermaid flowcharts (distinct from the capstone .ocs__diagram container).
+// Add class="mermaid ocs__flowchart" to the <pre> and tag nodes with :::start / :::ask / :::good / :::bad / :::info -- no per-diagram classDef needed.
+// Font is not set here: Mermaid takes 'fontFamily'/'fontSize' from the diagram's %%{init}%% themeVariables
+// (keep them there so boxes are sized for the same font).
+//
+// Mermaid injects ID-scoped theme CSS into every rendered diagram, so these rules need
+// !important to win (the same reason Mermaid's own classDef output uses it).
+
+$ocs-flowchart-text: #f8fafc;
+$ocs-flowchart-line: #94a3b8;
+$ocs-flowchart-label-bg: #0f172a;
+
+// node class: (fill, stroke, text)
+$ocs-flowchart-nodes: (
+  start: (#1e3a8a, #60a5fa, #fff),
+  ask: (#78350f, #fbbf24, #fff),
+  good: (#14532d, #4ade80, #fff),
+  bad: (#7f1d1d, #f87171, #fff),
+  info: (#1e293b, #94a3b8, #f8fafc)
+);
+
+.ocs__flowchart {
+  @each $name, $colors in $ocs-flowchart-nodes {
+    .node.#{$name} {
+      // Direct children only, like Mermaid's classDef: the label's own <rect> stays untouched.
+      > rect,
+      > polygon,
+      > circle,
+      > ellipse,
+      > path {
+        fill: nth($colors, 1) !important;
+        stroke: nth($colors, 2) !important;
+        stroke-width: 2px !important;
+      }
+
+      span,
+      p {
+        color: nth($colors, 3) !important;
+      }
+    }
+  }
+
+  .flowchart-link {
+    stroke: $ocs-flowchart-line !important;
+  }
+
+  .marker,
+  .arrowMarkerPath {
+    fill: $ocs-flowchart-line !important;
+    stroke: $ocs-flowchart-line !important;
+  }
+
+  .edgeLabel,
+  .edgeLabel p {
+    background-color: $ocs-flowchart-label-bg !important;
+    color: $ocs-flowchart-text !important;
+  }
+
+  .edgeLabel rect,
+  .labelBkg {
+    fill: $ocs-flowchart-label-bg !important;
+    background-color: $ocs-flowchart-label-bg !important;
+  }
+}

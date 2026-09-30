@@ -3,6 +3,9 @@
 @import "sizes.scss";
 
 body {
-    font-family: Verdana, sans-serif !important;
+  font-family: var(
+    --pref-font-family,
+    Verdana,
+    sans-serif
+  );
 }
-

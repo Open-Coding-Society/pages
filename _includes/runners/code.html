@@ -19,10 +19,10 @@
   {% endif %}
 
   {% capture code_runner_top_controls %}
-      <button type="button" class="runBtn" title="Run">▶</button>
-      <button type="button" class="copyBtn" title="Copy Code">⎘</button>
-      <button type="button" class="saveBtn" title="Save Code">💾</button>
-      <button type="button" class="clearStorageBtn" title="Clear Storage">🗑</button>
+      <button type="button" class="ocs__btn utility run" data-hook="run" title="Run" aria-label="Run"></button>
+      <button type="button" class="ocs__btn utility copy" data-hook="copy" title="Copy Code" aria-label="Copy Code"></button>
+      <button type="button" class="ocs__btn utility save" data-hook="save" title="Save Code" aria-label="Save Code"></button>
+      <button type="button" class="ocs__btn utility clear" data-hook="clear" title="Clear Storage" aria-label="Clear Storage"></button>
       <select class="languageSelect">
         <option value="python">Python</option>
         <option value="java">Java</option>
@@ -47,7 +47,7 @@
   <div class="output-container">
     <div class="control-panel">
       <span>Output</span>
-      <button type="button" class="copyOutputBtn" title="Copy Output">⎘</button>
+      <button type="button" class="ocs__btn utility copyOutput" data-hook="copy-output" title="Copy Output" aria-label="Copy Output"></button>
     </div>
     <div class="output-content">Click "Run" in code control panel to see output ...</div>
     <div class="control-panel">
@@ -122,6 +122,7 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   if (!container) return;
   
   const initialLang = "{{ include.language }}";
+  const autostart = "{{ include.autostart | default: 'false' }}" === "true";
   const defaultCode = JSON.parse(container.dataset.defaultCode || "\"\"");
   const editorHeight = "{{ include.height }}";
   const storageKey = container.dataset.storageKey;
@@ -215,7 +216,7 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     }
   });
 
-  codeExecutor.bindCopyOutput(container.querySelector('.copyOutputBtn'));
+  codeExecutor.bindCopyOutput(container.querySelector('[data-hook="copy-output"]'));
 
   // Run button logic
   function runCode() {
@@ -227,9 +228,16 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     return codeExecutor.run();
   }
 
-  runner.bindButton('.runBtn', runCode);
+  runner.bindButton('', runCode, 'run');
 
   // Keyboard shortcut
   runner.bindShortcut(runCode);
+
+  if (autostart) {
+    // Wait one tick so the editor/language mode are fully initialized.
+    setTimeout(() => {
+      runCode();
+    }, 0);
+  }
 })();
 </script>
