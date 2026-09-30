@@ -8,7 +8,7 @@ active_tab: analytics
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css" />
 <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css" />
 <div class="w-full">
-    <div class="space-y-4 sm:space-y-6">
+    <div class="space-y-4 sm:space-y-6"> 
         <div class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700 relative">
             <ul class="flex flex-wrap -mb-px relative" id="tab-bar">
                 <li class="me-2">
@@ -116,6 +116,12 @@ active_tab: analytics
                         <p class="text-xs uppercase text-neutral-500 mb-2">Lines Changed</p>
                         <h3 id="lines-changed" class="text-2xl font-medium">Loading...</h3>
                     </div>
+                </div>
+
+                <!-- Commits Over Time Graph -->
+                <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-xl p-5">
+                    <p class="text-xs uppercase text-neutral-500 mb-4">Commits Over Time</p>
+                    <div id="commits-over-time-chart"></div>
                 </div>
 
                 <!-- Commit Cards Container -->
@@ -575,6 +581,80 @@ score += gists * 0.5
             document.getElementById("commits-count").textContent = commitsCount;
             document.getElementById("issues-count").textContent = issuesArray.length;
             document.getElementById("prs-count").textContent = prsArray.length;
+
+            // Commits over time chart
+            const commitsOverTimeChart = document.getElementById("commits-over-time-chart");
+            if (commitsOverTimeChart) {
+                const commitsByDate = {};
+
+                commitsArray.forEach((commit) => {
+                    if (!commit.date) return;
+                    const date = new Date(commit.date);
+                    if (isNaN(date.getTime())) return;
+
+                    // Group commits by day
+                    const dateKey = date.toISOString().split("T")[0];
+                    commitsByDate[dateKey] = (commitsByDate[dateKey] || 0) + 1;
+                });
+
+                const commitDates = Object.keys(commitsByDate).sort();
+
+                if (commitDates.length > 0) {
+                    const commitChartOptions = {
+                        series: [{
+                            name: "Commits",
+                            data: commitDates.map(date => commitsByDate[date])
+                        }],
+                        chart: {
+                            type: "line",
+                            height: 300,
+                            toolbar: { show: false },
+                            background: "transparent"
+                        },
+                        colors: ["#60a5fa"],
+                        xaxis: {
+                            categories: commitDates.map(date => {
+                                const parsedDate = new Date(`${date}T00:00:00`);
+                                return parsedDate.toLocaleDateString(undefined, {
+                                    month: "short",
+                                    day: "numeric"
+                                });
+                            }),
+                            labels: {
+                                style: { colors: "#9ca3af" },
+                                rotate: -45
+                            }
+                        },
+                        yaxis: {
+                            min: 0,
+                            forceNiceScale: true,
+                            labels: { style: { colors: "#9ca3af" } }
+                        },
+                        stroke: { width: 2, curve: "smooth" },
+                        markers: { size: 4 },
+                        grid: { borderColor: "#374151" },
+                        theme: { mode: "dark" },
+                        tooltip: {
+                            theme: "dark",
+                            y: {
+                                formatter: value => `${value} commit${value === 1 ? "" : "s"}`
+                            }
+                        }
+                    };
+
+                    if (window.commitsOverTimeChart) {
+                        window.commitsOverTimeChart.destroy();
+                    }
+
+                    window.commitsOverTimeChart = new ApexCharts(
+                        commitsOverTimeChart,
+                        commitChartOptions
+                    );
+                    window.commitsOverTimeChart.render();
+                } else {
+                    commitsOverTimeChart.innerHTML = '<p class="text-sm text-neutral-400">No commit history available.</p>';
+                }
+            }
 
             // Clear commit cards container
             const commitCardsContainer = document.getElementById("commitCardsContainer");

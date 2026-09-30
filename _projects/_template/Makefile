@@ -13,6 +13,7 @@ PROJECT_SRC = $(CURDIR)
 PROJECT_NAME = $(notdir $(PROJECT_SRC))
 NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).ipynb
 MARKDOWN_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).md
+NOTEBOOK_SOURCE = notebooks
 # Convention: source files are index.ipynb and index.md in project directory
 
 # Workspace root - auto-detect depth (supports both flat and nested structures)
@@ -23,6 +24,7 @@ ifeq ($(wildcard ../../Makefile),)
 else
     WORKSPACE_ROOT = ../..
 endif
+PYTHON = $(abspath $(WORKSPACE_ROOT))/venv/bin/python3
 
 # Distribution destinations (relative to workspace root, in .gitignore)
 JS_DEST = $(WORKSPACE_ROOT)/assets/js/projects/$(PROJECT_NAME)
@@ -32,13 +34,14 @@ IMAGES_DEST = $(WORKSPACE_ROOT)/images/projects/$(PROJECT_NAME)
 NOTEBOOK_DEST = $(WORKSPACE_ROOT)/_notebooks/projects/$(PROJECT_NAME)
 DOCS_DEST = $(WORKSPACE_ROOT)/_posts/projects/$(PROJECT_NAME)
 INCLUDES_DEST = $(WORKSPACE_ROOT)/_includes/projects/$(PROJECT_NAME)
+NOTEBOOKS = $(wildcard $(NOTEBOOK_SOURCE)/*.ipynb)
 
 ###########################################
 # Build Targets
 ###########################################
 
-# Main build target - depends on index (which depends on assets)
-build: index
+# Main build target - depends on index (which depends on assets) and notebook conversion
+build: index convert
 	@echo "✅ $(PROJECT_NAME) built successfully"
 	@echo "   Source: _projects/$(PROJECT_NAME)/"
 	@echo "   JavaScript: assets/js/projects/$(PROJECT_NAME)/"
@@ -105,6 +108,21 @@ index: assets
 		touch /tmp/.jekyll_rebuild_trigger 2>/dev/null || true; \
 	fi
 
+# Copy and convert every notebook in the optional notebooks directory
+notebooks:
+	@if [ -d "$(NOTEBOOK_SOURCE)" ]; then \
+		mkdir -p $(NOTEBOOK_DEST); \
+		for notebook in $(NOTEBOOKS); do \
+			cp "$$notebook" "$(NOTEBOOK_DEST)/$$(basename "$$notebook")"; \
+		done; \
+	fi
+
+convert: notebooks
+	@for notebook in $(NOTEBOOKS); do \
+		filename=$$(basename "$$notebook"); \
+		cd $(WORKSPACE_ROOT) && $(PYTHON) scripts/convert_notebooks.py "_notebooks/projects/$(PROJECT_NAME)/$$filename" >/dev/null || exit 1; \
+	done
+
 ###########################################
 # Clean Target
 ###########################################
@@ -113,6 +131,10 @@ index: assets
 clean:
 	@echo "🧹 Cleaning $(PROJECT_NAME) distribution..."
 	@rm -f $(WORKSPACE_ROOT)/_posts/projects/$(MARKDOWN_FILENAME)
+	@for notebook in $(NOTEBOOKS); do \
+		filename=$$(basename "$$notebook" .ipynb); \
+		rm -f "$(WORKSPACE_ROOT)/_posts/projects/$(PROJECT_NAME)/$${filename}_IPYNB_2_.md"; \
+	done
 	@rm -rf $(NOTEBOOK_DEST)
 	@rm -rf $(JS_DEST)
 	@rm -rf $(CSS_DEST)
@@ -205,4 +227,4 @@ docs:
 docs-clean:
 	@rm -rf $(DOCS_DEST)
 
-.PHONY: build index assets clean watch docs docs-clean
+.PHONY: build index assets notebooks convert clean watch docs docs-clean

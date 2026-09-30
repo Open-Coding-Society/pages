@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function(){
       frontendUrl: "http://sfifoundation.opencodingsociety.com",
       backendUrl: "https://greppers-be.opencodingsociety.com/"
     },
-    "Communication System": {
+    "OCS Communication Systems": {
       pageUrl: "https://pages.opencodingsociety.com/capstone/communication-system/",
       frontendUrl: "https://github.com/UGRC-CSA/Pages",
       backendUrl: "https://github.com/Open-Coding-Society/spring"
@@ -569,8 +569,8 @@ if (grid) initCardTools(grid);
            <div class="ocs__image-frame ocs__image-frame--thumbnail capstone-card-placeholder" style="background: linear-gradient(135deg, #06b6d4, #0f172a);">SUB</div>
        </a>
        <div>
-           <h3><a href="{% post_url capstone/2026-08-31-submissions-capstone %}">OCS Submissions</a></h3>
-           <p>Umbrella capstone covering three groups' work on the assignment/submission system: assignment creator permissions, submission analytics, and AI grading.</p>
+           <h3><a href="{% post_url capstone/2026-08-31-submissions-capstone %}">OCS Assignments System</a></h3>
+           <p>Students are extending the OCS assignment lifecycle from creation through submission, analytics, and grading. The system supports inserting rubrics directly into assignments, providing immediate AI evaluation, and assigning student-generated lessons for peer review and grading. After initial automated evaluation, live review sessions follow, allowing students and graders to discuss challenges, successes, and the work. A grader assignment view supports this process by giving graders a place to review submissions, record observations, and provide an overall assessment. The work integrates OCS interfaces with the Java/Spring backend, AWS S3, and AWS RDS/SQL, moving assignment data, student activity, scores, and feedback into a shared system rather than separate tools and spreadsheets.</p>
            <p>Groups: Assignment Creator Permissions, Submission Analytics, AI Grading</p>
        </div>
    </div>
@@ -601,15 +601,15 @@ if (grid) initCardTools(grid);
    </div>
 
 
-   <!-- RFID + Camera-Correlated Classroom Presence -->
+   <!-- Classroom Presence System (RFID + QR + Camera) -->
    <div class="ocs__grid-cell CSH" data-year="2026-2027">
-     <a href="{% post_url capstone/RFID/2026-09-12-rfid-presence-capstone %}">
-       <div class="ocs__image-frame ocs__image-frame--thumbnail capstone-card-placeholder" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">RFID</div>
+     <a href="{% post_url capstone/Presence/2026-09-12-presence-system-capstone %}">
+       <div class="ocs__image-frame ocs__image-frame--thumbnail capstone-card-placeholder" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">Presence</div>
      </a>
      <div>
-       <h3><a href="{% post_url capstone/RFID/2026-09-12-rfid-presence-capstone %}">RFID + Camera-Correlated Classroom Presence</a></h3>
-       <p>A low-cost Raspberry Pi UHF RFID system that tracks device presence at the doorway and correlates it with an existing face-scanning camera system to determine true student presence, period by period.</p>
-       <p>Team: Ruta Sirdeshmukh, Vibha Mandayam, Kush Shah</p>
+       <h3><a href="{% post_url capstone/Presence/2026-09-12-presence-system-capstone %}">Classroom Presence System</a></h3>
+       <p>A design-based research project asking whether classroom presence can be measured with zero teacher effort. Three low-effort inputs, RFID tap, QR scan, and face scan, are evaluated in parallel against a shared presence engine and the bell schedule to track instructional minutes and show who is missing in real time.</p>
+       <p>Team: Vibha Mandayam (RFID), Ruta Sirdeshmukh (QR), Kush Shah (Camera)</p>
      </div>
    </div>
     <!-- Jarvis Classroom Object Detection -->
@@ -679,7 +679,7 @@ if (grid) initCardTools(grid);
          <img src="{{ '/images/' | append: site.data.toolchain-trail-capstone.Logo | relative_url }}" alt="{{ site.data.toolchain-trail-capstone.Title }} logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-         <h3><a href="{% post_url capstone/2026-08-28-toolchain-trail %}">Toolchain Trail</a></h3>
+         <h3><a href="{% post_url capstone/2026-08-28-toolchain-trail %}"></a>{{ site.data.toolchain-trail-capstone.Title }}</h3>
          <p>{{ site.data.toolchain-trail-capstone.Overview }}</p>
        </div>
    </div>
@@ -1022,6 +1022,35 @@ if (grid) initCardTools(grid);
             <p>Team: Nitya, Vivian, Virginia</p>
         </div>
     </div>
+    
+    <!-- Doing Exceptional Deeds Website Redesign (CSP, 2026/2027) -->
+  <div class="ocsgrid-cell CSP"
+      data-year="2026-2027"
+      data-page-url="{{ '/capstone/doingexceptionaldeeds/' | relative_url }}">
+
+      <a href="{{ '/capstone/doingexceptionaldeeds/' | relative_url }}">
+          <div class="ocsimage-frame ocs__image-frame--thumbnail capstone-card-placeholder">
+              D.A.D.
+          </div>
+      </a>
+
+      <div>
+          <h3>
+              <a href="{{ '/capstone/doingexceptionaldeeds/' | relative_url }}">
+                  Doing Exceptional Deeds
+              </a>
+          </h3>
+
+          <p>
+              A website redesign focused on simpler navigation, shorter content,
+              student and teacher accounts, teacher profiles, and an easier
+              events and calendar experience.
+          </p>
+
+          <p>Team: Jake, Noah, Ishaan</p>
+      </div>
+    </div>
+
 
    <!-- FOPS (2026-2027) -->
  <div class="ocs__grid-cell CSP" data-year="2026-2027">
@@ -1071,7 +1100,34 @@ if (grid) initCardTools(grid);
            <p>Team: Ruchika Kench, Akshara Shankar, Avantika Chittari</p>
        </div>
    </div>
-   
+
+<!-- Safe Passage Heals V2.0 (CSP, 2026/2027) -->
+<div class="ocs__grid-cell CSP" data-year="2026-2027">
+    <a href="{{ '/capstone/safe-passage-heals-v2/' | relative_url }}">
+        <img src="/images/capstone/sph.png"
+             alt="Safe Passage Heals"
+             class="ocs__image-frame ocs__image-frame--thumbnail" />
+    </a>
+
+    <div>
+        <h3>
+            <a href="{{ '/capstone/safe-passage-heals-v2/' | relative_url }}">
+                Safe Passage Heals - Media Management Tools and Interactive Recovery Simulation V2.0
+            </a>
+        </h3>
+
+        <p>
+            An updated version of the Safe Passage Heals project focused on
+            media management tools and an interactive recovery simulation
+            that builds on the original project.
+        </p>
+
+        <p>
+            Team: Yiming Yin, Noor Saif Bijapur, Luke Sanders
+        </p>
+    </div>
+</div>
+
    <!-- California Center For The Performing Arts Escondido (CSP, 2026/2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
        <a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">
@@ -1107,27 +1163,27 @@ if (grid) initCardTools(grid);
        </div>
    </div>
 
-   <!-- OCS Assignment Tracker (CSA) -->
-  <div class="ocs__grid-cell CSA" data-year="2026-2027">
-       <a href="{% post_url capstone/2026-09-03-chuds-capstone %}">
-           <img src="/images/backendboyzgcpiccc.png" alt="Backend Boyz - OCS Assignment Tracker" class="ocs__image-frame ocs__image-frame--thumbnail" />
+   <!-- Shoreline Project Outreach (CSP, 2026/2027) -->
+   <div class="ocs__grid-cell CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-09-11-shoreline-volunteer-capstone %}">
+           <img src="/images/capstone/shoreline.jpeg" alt="Shoreline Community Services logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url capstone/2026-09-03-chuds-capstone %}">Backend Boyz</a></h3>
-           <p>Developing an easy way for mentors to access Open Coding Society, featuring Google OAuth-verified signup, a scoped capstone project dashboard, real-time team chat, and role-based permissions between students and admins.</p>
-           <p>Team: Backend Boyz (Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengli L, Jacob C, Arnav P)</p>
+           <h3><a href="{% post_url 2026-09-11-shoreline-volunteer-capstone %}">Shoreline Community Services</a></h3>
+           <p>Extending Shoreline Community Services' outreach through smarter volunteer coordination and easier giving, this capstone project bridges technology and grassroots community care in San Diego.</p>
+           <p>Team: Vanshika Keswani, Nitya Kasse, Hsu-Cheng Lin</p>
        </div>
    </div>
 
-   <!-- OCS Security (CSA) -->
+   <!-- OCS Admin & Security Team (CSA) -->
   <div class="ocs__grid-cell CSA" data-year="2026-2027">
-       <a href="{% post_url capstone/2026-09-03-cccs-security %}">
-           <img src="/images/capstone/cccs-security-logo.png" alt="CCCS Security" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       <a href="{% post_url capstone/2026-09-03-ocs-admin-security-team %}">
+           <img src="/images/capstone/cccs-security-logo.png" alt="OCS Admin & Security Team" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url capstone/2026-09-03-cccs-security %}">OCS Security</a></h3>
-           <p>These security fixes ensure that new users must create complex passwords to prevent unauthorized access, and ensure code runners execute in individual containers to prevent malicious RCEs from accessing sensitive information.</p>
-           <p>Team: Lucas Masterson, Jacob Chou, Zhengji Li</p>
+           <h3><a href="{% post_url capstone/2026-09-03-ocs-admin-security-team %}">OCS Admin & Security Team</a></h3>
+           <p>The OCS Admin & Security team maintains the systems that keep OCS operational, recoverable, and secure. Administration includes backup and restore, schema upgrades, AWS RDS/S3/EC2 operations, administrative MVC/Thymeleaf tools, user recovery and password services, mentor and parent authorization, and year-to-year system resets and data pruning. Security examines how the OCS application can be compromised, including isolated Code Runner containers, protection against injected or unsafe student code, JWT and cookie security, and security boundaries across the Java/Spring and Python/Flask systems. Together, the work moves students from building application features to maintaining and protecting a production system.</p>
+           <p>Team: Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengji L, Jacob C, Arnav P</p>
        </div>
    </div>
 
@@ -1143,14 +1199,14 @@ if (grid) initCardTools(grid);
        </div>
    </div>
 
-   <!-- Communication System (CSA) -->
+   <!-- OCS Communication Systems (CSA) -->
   <div class="ocs__grid-cell CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">
-           <img src="/images/csa-chat/announcement-chat.png" alt="Communication System - class announcement chat on the CSA course page" class="ocs__image-frame ocs__image-frame--thumbnail" />
+           <img src="/images/csa-chat/announcement-chat.png" alt="OCS Communication System - class announcement chat on the CSA course page" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">Communication System</a></h3>
-           <p>Moving class discussion out of Slack and onto the course site — class-wide announcements, per-week chat, and a rich-text composer with emoji already ship, with per-assignment threads, 1:1 direct messages, GIFs, Slack-style emoji reactions, and teacher moderation still to build.</p>
+           <h3><a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">OCS Communication Systems</a></h3>
+           <p>Students are extending the OCS communication system with chat, announcements, assignment discussions, direct messaging, calendar integration, and reusable presentation components. The work includes maintaining the real-time WebSocket service and connecting these features to the existing course site, backend APIs, security, and data model. Students will also develop the OCS SASS grammar—a small, purpose-built styling system for consistent, responsive, reusable components across the OCS GitHub Pages ecosystem.</p>
            <p>Team: Akhil, Syown, Leon, Perry, Skandan, Sathwik, Akshajh, Tarun, Samarth</p>
        </div>
    </div>

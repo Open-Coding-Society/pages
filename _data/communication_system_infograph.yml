@@ -1,6 +1,6 @@
-# Communication System Capstone Infographic
-Title: "Communication System"
-Description: "Class discussion is moving out of Slack and into the course site, next to the work it is about. Class-wide announcements, per-week chat, and a rich-text composer with emoji already ship; still to build are a thread on every assignment, 1:1 direct messages, GIFs in the composer, and Slack-style emoji reactions."
+# OCS Communication Systems Capstone Infographic
+Title: "OCS Communication Systems"
+Description: "Students are extending the OCS communication system with chat, announcements, assignment discussions, direct messaging, calendar integration, and reusable presentation components. The work includes maintaining the real-time WebSocket service and connecting these features to the existing course site, backend APIs, security, and data model. Students will also develop the OCS SASS grammar—a small, purpose-built styling system for consistent, responsive, reusable components across the OCS GitHub Pages ecosystem."
 
 Topics:
   - title: "Class Announcements"

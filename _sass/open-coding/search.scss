@@ -51,20 +51,38 @@
     }
 }
 
-/* Pins the action button to the card bottom so it sits at the same height
-   regardless of description length. Grid rows already stretch cells to equal height. */
-.language-reference__card--pinned-action {
+/* Language reference cards support either a full-card link or a trailing
+   action button. Grid rows already stretch cards in a row to equal height. */
+.language-reference__cards .ocs__grid-cell {
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    box-sizing: border-box;
+}
 
-    > .ocs__status-pill,
-    > .ocs__btn {
-        align-self: flex-start;
-    }
+.language-reference__cards > a.ocs__grid-cell {
+    width: 100%;
+    margin: 0;
+    color: var(--pref-text-color);
+    text-decoration: none;
+}
 
-    > .ocs__btn {
-        margin-top: auto;
-    }
+.language-reference__cards > .ocs__grid-cell > h2 {
+    max-width: 100%;
+    margin-inline: 0;
+    font-size: $text-lg;
+    overflow-wrap: anywhere;
+}
+
+/* Both are inline by default; as flex items they would otherwise stretch to
+   the full card width. */
+.language-reference__cards .ocs__grid-cell > .ocs__status-pill,
+.language-reference__cards .ocs__grid-cell > .ocs__btn {
+    align-self: flex-start;
+}
+
+.language-reference__cards .ocs__grid-cell > .ocs__btn {
+    margin-top: auto;
 }
 
 .search-result-preview {

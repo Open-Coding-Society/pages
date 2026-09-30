@@ -120,15 +120,6 @@ show_reading_time: false
                 <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
                 <div id="password-validation-message" class="validation-message"></div>
             </div>
-            <p id="kasmNeededGroup">
-                <label class="switch">
-                    <span class="toggle">
-                        <input type="checkbox" name="kasmNeeded" id="kasmNeeded">
-                        <span class="slider"></span>
-                    </span>
-                    <span class="label-text">Kasm Server Needed</span>
-                </label>
-            </p>
             <p>
                 <button type="submit" class="large primary submit-button">Sign Up</button>
             </p>
@@ -243,14 +234,6 @@ show_reading_time: false
         const uidField = document.getElementById('signupUid');
         uidField.placeholder = isMentor ? 'Username' : 'GitHub ID';
         validateGithubId();
-
-        // Mentors have no use for Kasm servers. Hidden (not required), same as sid/school
-        // above -- the checkbox stays unchecked while hidden, so no extra guard is needed
-        // where its .checked value gets read further down.
-        const kasmGroup = document.getElementById('kasmNeededGroup');
-        const kasmField = document.getElementById('kasmNeeded');
-        kasmGroup.hidden = isMentor;
-        if (isMentor) kasmField.checked = false;
     }
 
     document.querySelectorAll('[data-account-role]').forEach(button => button.addEventListener('click', () => selectAccountRole(button)));
@@ -414,7 +397,8 @@ show_reading_time: false
             school: document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
-            kasm_server_needed: document.getElementById("kasmNeeded").checked,
+            kasmServerNeeded: false,
+            kasm_server_needed: false,
         };
 
         // Students verify with Google before the account is created
@@ -656,7 +640,6 @@ show_reading_time: false
     window.javaLogin = function (done) {
         const loginURL = `${javaURI}/authenticate`;
         const databaseURL = `${javaURI}/api/person/get`;
-        const signupURL = `${javaURI}/api/person/create`;
         const userCredentials = JSON.stringify({
             uid: document.getElementById("uid").value,
             password: document.getElementById("password").value,
@@ -708,7 +691,7 @@ show_reading_time: false
         // where to send them once the Student/Mentor choice has been checked.
         console.log("Authentication successful.");
     }  
-    window.signup = function () {
+    window.signup = async function () {
         const signupButton = document.querySelector(".signup-card button");
         // Disable the button and change its color
         signupButton.disabled = true;
@@ -726,7 +709,8 @@ show_reading_time: false
             school: document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
-            kasm_server_needed: document.getElementById("kasmNeeded").checked,
+            kasmServerNeeded: false,
+            kasm_server_needed: false,
         };
 
         const signupDataJava = {
@@ -750,68 +734,63 @@ show_reading_time: false
         console.log("Sending this data to Flask:", JSON.stringify(data, null, 2));
         console.log("Request URL:", `${pythonURI}/api/user`);
 
-        // Flask Backend Request
-        const flaskPromise = fetch(`${pythonURI}/api/user`, {
+        const flaskRequest = {
+            ...fetchOptions,
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
             body: JSON.stringify(data)
-        })
-        .then(response => {
-            if (response.ok) {
-                updateBackendStatus('flask', 'success');
-                return response.json();
-            } else {
-                return response.text().then(errorText => {
-                    console.log("Flask error details:", errorText);
-                    throw new Error(`Flask: ${response.status} - ${errorText}`);
-                });
+        };
+
+        const springRequest = {
+            ...fetchOptions,
+            method: "POST",
+            body: JSON.stringify(signupDataJava)
+        };
+
+        try {
+            // Flask is the blocking source of truth for auth/signup.
+            const flaskResponse = await fetch(`${pythonURI}/api/user`, flaskRequest);
+            const flaskRaw = await flaskResponse.text();
+
+            let flaskData;
+            try {
+                flaskData = flaskRaw ? JSON.parse(flaskRaw) : {};
+            } catch (_) {
+                flaskData = { message: flaskRaw };
             }
-        })
-        .catch(error => {
+
+            if (!flaskResponse.ok || flaskData.success === false) {
+                const flaskMessage = flaskData.message || flaskRaw || `Flask signup failed (${flaskResponse.status})`;
+                throw new Error(flaskMessage);
+            }
+
+            updateBackendStatus('flask', 'success');
+
+            // Spring is best-effort; do not block signup success on this path.
+            fetch(`${javaURI}/api/person/create`, springRequest)
+                .then(async (springResponse) => {
+                    const springRaw = await springResponse.text();
+                    if (springResponse.ok) {
+                        updateBackendStatus('spring', 'success');
+                    } else {
+                        console.warn("Spring signup failed:", springResponse.status, springRaw);
+                        updateBackendStatus('spring', 'error');
+                    }
+                    setTimeout(updateOverallStatus, 500);
+                })
+                .catch((springError) => {
+                    console.warn("Spring signup error:", springError.message);
+                    updateBackendStatus('spring', 'error');
+                    setTimeout(updateOverallStatus, 500);
+                });
+        } catch (error) {
             console.error("Flask signup error:", error);
             updateBackendStatus('flask', 'error');
-            throw error;
-        });
-
-        // Spring Backend Request
-        const springPromise = fetch(`${javaURI}/api/person/create`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(signupDataJava)
-        })
-        .then(response => {
-            if (response.ok) {
-                updateBackendStatus('spring', 'success');
-                return response.json();
-            } else {
-                throw new Error(`Spring: ${response.status}`);
-            }
-        })
-        .catch(error => {
-            console.error("Spring signup error:", error);
             updateBackendStatus('spring', 'error');
-            throw error;
-        });
-
-        // Handle both requests
-        Promise.allSettled([flaskPromise, springPromise])
-            .then(results => {
-                const [flaskResult, springResult] = results;
-
-                console.log("Flask result:", flaskResult);
-                console.log("Spring result:", springResult);
-
-                // Update overall status after both complete
-                setTimeout(updateOverallStatus, 500);
-
-                // Re-enable button
-                signupButton.disabled = false;
-                signupButton.classList.remove("disabled");
-            });
+            setTimeout(updateOverallStatus, 500);
+        } finally {
+            signupButton.disabled = false;
+            signupButton.classList.remove("disabled");
+        }
     }
     function javaDatabase() {
         const URL = `${javaURI}/api/person/get`;

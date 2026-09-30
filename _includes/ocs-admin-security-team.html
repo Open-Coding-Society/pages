@@ -1,0 +1,157 @@
+{% assign data = site.data["ocs-admin-security-team"] %}
+{% comment %}
+  Capstone page body for /capstone/ocs-admin-security/.
+  Built only from shared ocs__ grammar (_sass/open-coding/elements): no page-specific classes or styles.
+  Each pillar lists what shipped and what's next. To move an item, cut its entry from one list to the other.
+{% endcomment %}
+<div class="ocs__container">
+<div class="ocs__card">
+<div class="ocs__badge">Capstone</div>
+<img class="ocs__image-frame ocs__image-frame--thumbnail" src="{{ data.Logo | prepend: '/images/' | relative_url }}" alt="{{ data.TeamName | escape }} logo">
+<p class="ocs__lead">{{ data.Tagline | escape }}</p>
+<div class="ocs__links">
+<a class="ocs__btn medium alert-green fill" href="https://github.com/CSA-Admin-OCS">Our team on GitHub</a>
+<a class="ocs__btn medium" href="https://github.com/Open-Coding-Society/pages">Frontend repo</a>
+<a class="ocs__btn medium" href="https://github.com/Open-Coding-Society/spring">Spring backend</a>
+<a class="ocs__btn medium" href="https://github.com/Open-Coding-Society/flask">Flask backend</a>
+</div>
+<div class="ocs__stats">
+<div class="ocs__stat"><span class="ocs__stat-value">{{ data.Team | size }}</span><span class="ocs__stat-label">team members</span></div>
+<div class="ocs__stat"><span class="ocs__stat-value">3</span><span class="ocs__stat-label">focus areas</span></div>
+<div class="ocs__stat"><span class="ocs__stat-value">3</span><span class="ocs__stat-label">codebases</span></div>
+</div>
+<div class="ocs__callout"><strong>The idea:</strong> every role gets enough access to do its job, and no more. Every check has to hold even when someone skips the website and calls the API directly.</div>
+<div class="ocs__hub-grid">
+<a class="ocs__hub-card" href="#secure"><span class="ocs__nav-card-kicker">Focus 1</span><span class="ocs__hub-card-title">Secure</span><p>Protect accounts and student code.</p></a>
+<a class="ocs__hub-card" href="#manage"><span class="ocs__nav-card-kicker">Focus 2</span><span class="ocs__hub-card-title">Manage</span><p>Keep data and infrastructure reliable.</p></a>
+<a class="ocs__hub-card" href="#expand"><span class="ocs__nav-card-kicker">Focus 3</span><span class="ocs__hub-card-title">Expand</span><p>Add mentor roles and tools.</p></a>
+<a class="ocs__hub-card" href="#vision"><span class="ocs__nav-card-kicker">Beyond</span><span class="ocs__hub-card-title">Vision and teamwork</span><p>Where we are headed and how we work.</p></a>
+</div>
+</div>
+
+<div class="ocs__card" id="secure">
+<h2 class="ocs__section-title">Secure</h2>
+<p class="ocs__lead">Only verified people get in, and student code never touches the platform.</p>
+<div class="ocs__split">
+<div class="ocs__visual"><div class="ocs__team"><span class="ocs__team-label">Owned by</span><span class="ocs__team-name">Jacob C, Lucas M, Zhengji L</span></div></div>
+<div class="ocs__visual"><div class="ocs__team"><span class="ocs__team-label">Built with</span><span class="ocs__team-name"><span class="ocs__status-pill">Spring Boot</span> <span class="ocs__status-pill">Flask</span> <span class="ocs__status-pill">Docker</span> <span class="ocs__status-pill">JWT</span> <span class="ocs__status-pill">Google OAuth2</span></span></div></div>
+</div>
+<h3 class="ocs__section-title">Shipped <span class="ocs__status-pill ocs__status-pill--good">5</span></h3>
+<div class="ocs__keypoints">
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Password rules everywhere.</strong> Enforced in the frontend, Spring, and Flask, so skipping the website still yields no account.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Signup check.</strong> Blocks signups whose GitHub and student ID don't match.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Verified password reset.</strong> Needs Google and GitHub ID verification, is rate-limited, and signs out old tokens.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Safe password sync.</strong> Plaintext sync to Flask is refused over insecure links.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Isolated Flask runner.</strong> Python runs in its own Docker container, never in the main app.</span></div>
+</div>
+<h3 class="ocs__section-title">Next <span class="ocs__status-pill ocs__status-pill--warn">4</span></h3>
+<ul class="ocs__checklist">
+<li><span class="ocs__checklist-box"></span><span><strong>Isolated Spring runner.</strong> Java gets its own container. The API wiring is in progress.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Runner hardening.</strong> Settings move to <code>.env</code>, plus resource limits, timeouts, non-root execution, and restricted network and filesystem.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Spring access control.</strong> Permissions on every endpoint.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Audit log.</strong> A record of important security events.</span></li>
+</ul>
+<h3 class="ocs__section-title">How submitted code is run</h3>
+<div class="ocs__grid ocs__grid--standard cols-4">
+<div class="ocs__grid-cell"><strong>1</strong><br>Student submits code</div>
+<div class="ocs__grid-cell"><strong>2</strong><br>Spring or Flask receives it</div>
+<div class="ocs__grid-cell"><strong>3</strong><br>Runs in a separate container</div>
+<div class="ocs__grid-cell"><strong>4</strong><br>Only the result comes back</div>
+</div>
+<h3 class="ocs__section-title">How a password reset works</h3>
+<div class="ocs__grid ocs__grid--standard cols-3">
+<div class="ocs__grid-cell"><strong>1</strong><br>Reset requested</div>
+<div class="ocs__grid-cell"><strong>2</strong><br>Google and GitHub ID verified</div>
+<div class="ocs__grid-cell"><strong>3</strong><br>Ticket issued, rate-limited</div>
+<div class="ocs__grid-cell"><strong>4</strong><br>Password changed</div>
+<div class="ocs__grid-cell"><strong>5</strong><br>Active tokens invalidated</div>
+</div>
+<div class="ocs__callout"><div class="ocs__links"><a class="ocs__btn medium alert-green fill" href="https://github.com/orgs/CSA-Admin-OCS/projects/5/views/2">See Secure tasks on our GitHub project board</a></div></div>
+</div>
+
+<div class="ocs__card" id="manage">
+<h2 class="ocs__section-title">Manage</h2>
+<p class="ocs__lead">Keep the platform lean, and make changes to its data safe.</p>
+<div class="ocs__split">
+<div class="ocs__visual"><div class="ocs__team"><span class="ocs__team-label">Owned by</span><span class="ocs__team-name">Rudra J, Dhyan S, Lucas M</span></div></div>
+<div class="ocs__visual"><div class="ocs__team"><span class="ocs__team-label">Built with</span><span class="ocs__team-name"><span class="ocs__status-pill">Spring Boot</span> <span class="ocs__status-pill">Docker</span> <span class="ocs__status-pill">Database migrations</span></span></div></div>
+</div>
+<h3 class="ocs__section-title">Shipped <span class="ocs__status-pill ocs__status-pill--good">1</span></h3>
+<div class="ocs__keypoints">
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Docker cleanup.</strong> Redundant images and containers removed.</span></div>
+</div>
+<h3 class="ocs__section-title">Next <span class="ocs__status-pill ocs__status-pill--warn">3</span></h3>
+<ul class="ocs__checklist">
+<li><span class="ocs__checklist-box"></span><span><strong>Production vs. testing config.</strong> Separate Spring settings, so test settings never reach production.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Spring database migration.</strong> Move the Spring data to the new setup.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Automatic upgrades.</strong> Apply database upgrades without manual steps.</span></li>
+</ul>
+<h3 class="ocs__section-title">How a database change ships</h3>
+<div class="ocs__grid ocs__grid--standard cols-4">
+<div class="ocs__grid-cell"><strong>1</strong><br>Migration is written</div>
+<div class="ocs__grid-cell"><strong>2</strong><br>Migration is reviewed</div>
+<div class="ocs__grid-cell"><strong>3</strong><br>Applied to the database</div>
+<div class="ocs__grid-cell"><strong>4</strong><br>Upgrades run automatically</div>
+</div>
+<div class="ocs__callout"><div class="ocs__links"><a class="ocs__btn medium alert-green fill" href="https://github.com/orgs/CSA-Admin-OCS/projects/7/">See Manage tasks on our GitHub project board</a></div></div>
+</div>
+
+<div class="ocs__card" id="expand">
+<h2 class="ocs__section-title">Expand</h2>
+<p class="ocs__lead">New roles get the right access, and nothing more.</p>
+<div class="ocs__split">
+<div class="ocs__visual"><div class="ocs__team"><span class="ocs__team-label">Owned by</span><span class="ocs__team-name">Harrish A, Arnav P, Darshan S, Shayan B, Rudra J</span></div></div>
+<div class="ocs__visual"><div class="ocs__team"><span class="ocs__team-label">Built with</span><span class="ocs__team-name"><span class="ocs__status-pill">Spring Security</span> <span class="ocs__status-pill">Google OAuth2</span> <span class="ocs__status-pill">JWT</span> <span class="ocs__status-pill">GitHub API</span> <span class="ocs__status-pill">Jekyll</span></span></div></div>
+</div>
+<h3 class="ocs__section-title">Shipped <span class="ocs__status-pill ocs__status-pill--good">3</span></h3>
+<div class="ocs__keypoints">
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Mentor role.</strong> <code>ROLE_MENTOR</code> sits between teacher and admin, and a GitHub student ID is checked before it activates.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Mentor login.</strong> Google sign-in with no separate password. PUSD emails get instant access, and other emails wait for admin review.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Support pages rework.</strong> A dropdown groups the support tabs, with guides for new students.</span></div>
+</div>
+<h3 class="ocs__section-title">Next <span class="ocs__status-pill ocs__status-pill--warn">4</span></h3>
+<ul class="ocs__checklist">
+<li><span class="ocs__checklist-box"></span><span><strong>Mentor dashboard.</strong> Mentors track only their own groups' progress and notes.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Guest role.</strong> Read-only access to public content, with no full account.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Approval tickets.</strong> Admins approve Google sign-ins from non-Poway emails.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>AI review with mentor design.</strong> Mentor-guided review of student work.</span></li>
+</ul>
+<h3 class="ocs__section-title">How a mentor gets access</h3>
+<div class="ocs__grid ocs__grid--standard cols-4">
+<div class="ocs__grid-cell"><strong>1</strong><br>Mentor signs in with Google</div>
+<div class="ocs__grid-cell"><strong>2</strong><br>Other emails: admin review</div>
+<div class="ocs__grid-cell"><strong>3</strong><br>Pending role becomes mentor</div>
+<div class="ocs__grid-cell"><strong>4</strong><br>Mentor opens the dashboard</div>
+</div>
+<div class="ocs__callout"><div class="ocs__links"><a class="ocs__btn medium alert-green fill" href="https://github.com/orgs/CSA-Admin-OCS/projects/6/">See Expand tasks on our GitHub project board</a></div></div>
+</div>
+
+<div class="ocs__card" id="vision">
+<h2 class="ocs__section-title">Our vision</h2>
+<p class="ocs__lead">An OCS anyone can safely join and grow in, with no account, code, or data left exposed.</p>
+<div class="ocs__keypoints">
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span>Every account is verified at every layer.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span>Student code always runs contained.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span>The platform stays easy to maintain.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span>New roles get the right access, and nothing more.</span></div>
+</div>
+<h3 class="ocs__section-title">How we work</h3>
+<div class="ocs__grid ocs__grid--standard cols-2">
+<div class="ocs__grid-cell"><strong>Focused sub-teams</strong><br>Security, admin and database, and mentors. Each owns its area.</div>
+<div class="ocs__grid-cell"><strong>Daily meetings</strong><br>Decide the work and keep the board honest.</div>
+<div class="ocs__grid-cell"><strong>One owner, cap of two</strong><br>Each task has one owner, and the least-loaded member claims first.</div>
+<div class="ocs__grid-cell"><strong>Reviewed and reported</strong><br>Review before done, and a weekly update every Thursday.</div>
+</div>
+</div>
+
+<div class="ocs__card">
+<h2 class="ocs__section-title">Following along</h2>
+<div class="ocs__links">
+<a class="ocs__btn medium alert-green fill" href="https://github.com/CSA-Admin-OCS/pages">Main repo</a>
+<a class="ocs__btn medium" href="https://github.com/orgs/CSA-Admin-OCS/projects/1">Project board</a>
+<a class="ocs__btn medium" href="https://github.com/CSA-Admin-OCS/spring">Spring repo</a>
+<a class="ocs__btn medium" href="https://github.com/CSA-Admin-OCS/flask">Flask repo</a>
+<a class="ocs__btn medium" href="https://github.com/CSA-Admin-OCS/pages/issues/26">Future work (issue #26)</a>
+</div>
+</div>
+</div>

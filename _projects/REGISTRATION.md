@@ -4,7 +4,7 @@
 
 The Makefile uses an **auto-registration system** to discover and include project build rules. This keeps the main Makefile clean and project-agnostic.
 
-The system supports **both flat and nested** project structures for flexibility and organization.
+Projects use a nested category structure such as `_projects/games/<project-name>/` or `_projects/lessons/<project-name>/`.
 
 ## How It Works
 
@@ -14,31 +14,24 @@ A simple text file in the root listing enabled projects:
 
 ```text
 # Project Auto-Registration
-# Supports both flat and nested structures
-
-# Nested projects (organized by category)
+# Projects are organized by category
 games/cs-pathway:dev
 lessons/collision-mechanics
 systems/student-management
-
-# Flat projects (legacy or uncategorized)
-another-project
-third-project
 ```
 
 **Rules:**
 
 - One project per line
-- Project path (flat: `name` or nested: `category/name`)
+- Project path in `category/name` format
 - Lines starting with `#` are comments
 - Blank lines ignored
 - Must have corresponding Makefile at path
 - Optional `:dev` suffix for auto-build in dev mode
 
-**Supported Structures:**
+**Supported Structure:**
 
-- **Flat**: `_projects/<project-name>/Makefile` → registered as `<project-name>`
-- **Nested**: `_projects/<category>/<project-name>/Makefile` → registered as `<category>/<project-name>`
+- `_projects/<category>/<project-name>/Makefile` → registered as `<category>/<project-name>`
 
 ### 2. Auto-Include in Makefile
 
@@ -61,42 +54,47 @@ The Makefile reads `.makeprojects` and includes each project:
 1. Checks if `.makeprojects` exists
 2. Filters out comments (#) and blank lines
 3. Prepends `_projects/` and appends `/Makefile`
-4. Supports both `project` → `_projects/project/Makefile` and `category/project` → `_projects/category/project/Makefile`
+4. Resolves `category/project` to `_projects/category/project/Makefile`
 5. Uses `-include` (silent if file missing)
 
 ### 3. No Project-Specific Targets in Makefile
 
-The main Makefile contains **zero** project-specific code. All project targets come from individual Makefiles.
+The main Makefile contains **zero** named project-specific code. It applies the same build rules to registered projects and shared category includes.
 
 ## Project Structure Requirements
 
-Each project must have a Makefile, regardless of structure:
-
-**Flat Structure:**
-
-```text
-_projects/<project-name>/
-├── README.md                   # Documentation
-├── notebook.src.ipynb          # Source notebook (optional)
-├── js/                         # JavaScript source code
-├── sass/                       # SCSS definitions (must include a main.scss)
-├── levels/                     # Legacy project code
-├── model/                      # Legacy data layer
-├── images/                     # Assets
-└── docs/                       # Project docs
-```
+Registered projects use a nested category and project name. Their Makefile is generated from the shared template when needed.
 
 **Nested Structure:**
 
 ```text
-_projects/games/<project-name>/
-├── README.md                   # Documentation
-├── notebook.src.ipynb          # Source notebook (optional)
-├── js/                         # JavaScript source code
-├── sass/                       # SCSS definitions
-├── images/                     # Assets
-└── docs/                       # Project docs
+_projects/<category>/
+├── _includes/                  # Optional includes shared by the category
+│   └── shared-view.html
+└── <project-name>/
+   ├── index.md                # Optional project index; use this or index.ipynb
+   ├── index.ipynb             # Optional notebook index; never use with index.md
+   ├── notebooks/              # Optional lesson notebooks; copied and converted
+   │   └── lesson.ipynb
+   ├── navigation/             # Optional navigation pages and includes
+   │   ├── page.md
+   │   ├── include.html
+   │   └── page.ipynb
+   ├── js/                     # JavaScript source code
+   ├── sass/                   # SCSS definitions; main.scss is the entry point
+   ├── levels/                 # Optional OCS game engine code
+   ├── model/                  # Optional model code
+   ├── services/               # Optional service code
+   ├── data/                   # Optional project data
+   ├── images/                 # Assets
+   ├── favicon.png             # Optional catalog image
+   ├── docs/                   # Optional project documentation
+   └── Makefile                # Generated from _projects/_template/Makefile
 ```
+
+Files under `notebooks/` are copied to `_notebooks/projects/<project-name>/` and converted into posts under `_posts/projects/<project-name>/`. The `index.md` and `index.ipynb` files represent the project index, so a project may provide at most one of them.
+
+Files under `_projects/<category>/_includes/` are copied to `_includes/projects/<category>/`. Project pages reference them with `{% raw %}{% include projects/<category>/shared-view.html %}{% endraw %}`. The generated `_includes/projects/` tree is ignored by Git and removed by `make clean`; edit only the local source under `_projects/`.
 
 **Recommended Categories:**
 
@@ -108,12 +106,13 @@ _projects/games/<project-name>/
 
 **The build system automatically generates Makefiles** for all registered projects:
 
-- **Single Source of Truth**: Only `_projects/_template/Makefile` is version-controlled
+- **Shared Default**: `_projects/_template/Makefile` defines the standard project behavior
 - **Auto-Copy on Build**: When you run any make target, the template is copied to projects missing a Makefile
 - **Always Up-to-Date**: Template improvements instantly benefit all projects
-- **Clean Repository**: No duplicate build configuration in git
+- **Versioned Overrides**: Intentional tracked Makefiles are preserved by cleanup without path-specific exceptions
 
 **What this means for you:**
+
 1. ✅ Create new projects without copying/editing Makefiles
 2. ✅ Bug fixes in template propagate automatically
 3. ✅ Consistent build behavior across all projects
@@ -121,18 +120,22 @@ _projects/games/<project-name>/
 
 **First-Time Setup:**
 Before building individual projects directly, generate their Makefiles:
+
 ```bash
 make generate-makefiles
 ```
+
 This creates Makefiles for all registered projects listed in `_projects/.makeprojects`.
 
 **Build Workflows:**
+
 - **Coordinated builds** (e.g., `make build-registered-projects`, `make dev`) auto-generate Makefiles as needed
 - **Direct project builds** (e.g., `make -C _projects/systems/calendar build`) require Makefiles to exist first
 - **Incremental builds**: Project pages deploy to `_posts/projects/` which Jekyll watches for automatic incremental rebuilds
 
 **Build Timing & Order:**
 The template Makefile copies assets in a specific order to prevent timing issues:
+
 1. **JavaScript files** → `assets/js/projects/<name>/`
 2. **SASS files** → `_sass/projects/<name>/`
 3. **CSS entry point** → `assets/css/projects/<name>/`
@@ -153,18 +156,22 @@ Projects can seamlessly deploy standard styles and scripts to the global `assets
 The `_projects/_template/Makefile` is the single source that powers all projects. It includes:
 
 **Smart Depth Detection:**
-- Automatically detects if project is flat (`_projects/project/`) or nested (`_projects/games/project/`)
-- Sets `WORKSPACE_ROOT` correctly for both structures
+
+- Resolves the workspace root from `_projects/<category>/<project-name>/`
 
 **Standard Build Targets:**
+
 - `build` - Copy assets and notebooks to distribution directories
 - `assets` - Copy JS, SASS, images to assets directories
+- `notebooks` - Copy `notebooks/*.ipynb` into `_notebooks/projects/<project-name>/`
+- `convert` - Convert copied notebooks into Jekyll posts
 - `clean` - Remove distributed files (preserves source)
 - `watch` - Auto-rebuild on file changes (for dev mode)
 - `docs` - Copy documentation to _posts
 - `docs-clean` - Remove documentation posts
 
 **Watch System (Timestamp-Based, No External Dependencies):**
+
 - Uses POSIX `find -newer` with timestamp markers
 - No fswatch or inotify required
 - Individual markers per project: `/tmp/.project_<name>_marker`
@@ -173,31 +180,17 @@ The `_projects/_template/Makefile` is the single source that powers all projects
 - Filters out Makefile changes to avoid regeneration loops
 
 **Auto-Detection Features:**
+
 - Detects project name from directory
-- Handles both flat and nested directory structures
+- Handles nested category/project directories
 - Silently skips missing source directories (js/, sass/, images/)
 
 ### Creating a New Project
 
 Creating a new project is simple - **no Makefile needed!**
 
-**For a flat project:**
-```bash
-# 1. Create project directory
-mkdir -p _projects/my-new-game
-
-# 2. Add your source files
-mkdir -p _projects/my-new-game/js
-echo 'console.log("Hello");' > _projects/my-new-game/js/game.js
-
-# 3. Register in .makeprojects
-echo "my-new-game" >> _projects/.makeprojects
-
-# 4. Build it (Makefile auto-generated!)
-make -C _projects/my-new-game build
-```
-
 **For a nested project:**
+
 ```bash
 # 1. Create in category subdirectory
 mkdir -p _projects/games/my-new-game
@@ -209,7 +202,10 @@ echo 'console.log("Hello");' > _projects/games/my-new-game/js/game.js
 # 3. Register with category path
 echo "games/my-new-game" >> _projects/.makeprojects
 
-# 4. Build it (Makefile auto-generated!)
+# 4. Generate its Makefile from the shared template
+make generate-makefiles
+
+# 5. Build it
 make -C _projects/games/my-new-game build
 ```
 

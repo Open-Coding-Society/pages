@@ -216,20 +216,29 @@ def find_and_split_multi_course_files():
         print("\n✅ No multi-course files found to split")
 
 def clean_split_files():
-    """Remove all generated course-specific and content files."""
+    """Remove all generated course-specific and content files.
+
+    Only _posts is cleaned here. The _notebooks/**/*_{csp,csa,csse,csh}.ipynb
+    variants are left in place: the Makefile's NOTEBOOK_FILES/MARKDOWN_FILES
+    are computed once at parse time (before `clean` runs), so if `clean-courses`
+    deleted them mid-build, `convert` would still expect to produce posts from
+    them and fail with "No rule to make target". Regeneration is idempotent
+    (find_and_split_multi_course_files skips files that already exist), so
+    leaving them behind is safe.
+    """
     directories = []
-    for dir_name in ['_posts', '_notebooks']:
+    for dir_name in ['_posts']:
         dir_path = Path(dir_name)
         if dir_path.exists():
             directories.append(dir_path)
-    
+
     removed_files = []
-    
+
     # Find and remove course-specific files and content files
     for directory in directories:
         for file_pattern in ['*.md', '*.ipynb']:
             for file_path in directory.rglob(file_pattern):
-                if (re.search(r'_(csp|csa|csse|csh)\.(md|ipynb)$', str(file_path)) or 
+                if (re.search(r'_(csp|csa|csse|csh)\.(md|ipynb)$', str(file_path)) or
                     re.search(r'_content\.md$', str(file_path))):
                     file_path.unlink()
                     removed_files.append(str(file_path))

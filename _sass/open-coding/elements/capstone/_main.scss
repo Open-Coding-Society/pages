@@ -264,30 +264,31 @@
 
 .ocs__nav-card {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.35rem 0.75rem;
-  min-height: 3rem;
-  padding: 0.65rem 0.85rem;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.35rem;
+  padding: $spacing-md;
   border: 1px solid var(--ui-border);
-  border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--pref-text-color) 4%, var(--panel));
-  color: var(--text-muted);
-  font-size: 0.88rem;
-  line-height: 1.3;
+  border-radius: $radius-md;
+  background: var(--panel);
+  color: var(--pref-text-color);
   text-decoration: none;
   transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .ocs__nav-card:visited {
-  color: var(--text-muted);
+  color: var(--pref-text-color);
 }
 
 .ocs__nav-card:hover,
 .ocs__nav-card.is-active {
   border-color: var(--pref-accent-color);
   background: color-mix(in srgb, var(--pref-accent-color) 10%, var(--panel));
-  color: var(--pref-text-color);
+}
+
+.ocs__nav-card:hover {
+  transform: translateY(-1px);
 }
 
 .ocs__nav-card:hover {
@@ -295,21 +296,28 @@
 }
 
 .ocs__nav-card-kicker {
-  color: var(--text-muted);
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
+html.user-theme-active .ocs__nav-card-kicker {
+   color: var(--text-muted) !important;
+}
+
+
 .ocs__nav-card-title {
   flex: 1 1 auto;
   min-width: 0;
   margin: 0;
-  color: var(--pref-text-color);
   font-size: 0.92rem;
   font-weight: 700;
   line-height: 1.25;
+}
+
+html.user-theme-active .ocs__nav-card-title {
+  color: var(--pref-accent-color) !important;
 }
 
 .ocs__nav-card .ocs__status {
@@ -330,6 +338,7 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
 
 @import "ocs-intelligence";
 

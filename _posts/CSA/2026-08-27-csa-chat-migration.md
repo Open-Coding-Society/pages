@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Communication System Features
+title: CCS Communication Systems Features
 description: >
   Class discussion is moving out of Slack and into the course site. Announcements
   and week chats already ship; next up is a thread on every assignment and 1:1

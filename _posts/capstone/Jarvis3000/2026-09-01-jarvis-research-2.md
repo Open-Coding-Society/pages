@@ -3,7 +3,7 @@ microblog: true
 toc: false
 layout: post
 title: Camera Setup & Object Detection — Research 2
-description: SAM 3 instance segmentation, mask generation from YOLO prompts, CPU performance benchmarks, and edge refinement.
+description: SAM 3 instance segmentation, mask generation from object-detection prompts, CPU performance benchmarks, and edge refinement.
 permalink: /capstone/jarvis/research-2/
 year: "2026-2027"
 rp_active: research-2
@@ -22,7 +22,7 @@ rp_active: research-2
   <!-- Header -->
   <div class="jv-header">
     <div class="ocs__badge">Research Area 2 · Object Detection &amp; Instance Segmentation</div>
-    <h1 class="jv-title">Research 2: YOLO Object Detection &amp; SAM 3 Segmentation</h1>
+    <h1 class="jv-title">Research 2: Object Detection &amp; SAM 3 Segmentation</h1>
     <p class="ocs__description">Converting classroom images into structured object detections, then refining each bounding box into a pixel-level segmentation mask for tracking, inventory, and scene comparison.</p>
     <p style="font-size:0.8rem;color:var(--jv-text-muted);margin-top:0.5rem;">Individual research by <strong style="color:var(--jv-text);">Shriya Paladugu</strong></p>
   </div>
@@ -38,7 +38,7 @@ rp_active: research-2
   <!-- Research Question -->
   <h2 class="ocs__section-title">Research Question 2</h2>
   <div class="ocs__card">
-    <p class="jv-question">How accurately and efficiently can a locally executed YOLO and SAM 3 pipeline detect, classify, locate, and segment important classroom objects under changing lighting, viewing angles, distance, and partial occlusion while remaining within the target 10-second processing cycle?</p>
+    <p class="jv-question">How accurately and efficiently can a locally executed object-detection and SAM 3 pipeline detect, classify, locate, and segment important classroom objects under changing lighting, viewing angles, distance, and partial occlusion while remaining within the target 10-second processing cycle?</p>
   </div>
 
   <!-- Role in the Full System -->
@@ -47,13 +47,13 @@ rp_active: research-2
     <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">flowchart TD
     CAP["Camera capture\nTimestamped frame"] --> PRE["OpenCV / FFmpeg\nResize + preprocessing"]
-    PRE --> YOLO["YOLO\nClass + confidence + box"]
-    YOLO --> SAM["SAM 3\nPixel-level mask"]
+    PRE --> DETECT["Object detector\nClass + confidence + box"]
+    DETECT --> SAM["SAM 3\nPixel-level mask"]
     SAM --> OUT["Structured observation\nDetection + mask + timestamp"]
     OUT --> TRACK["Tracking / inventory /\nscene comparison"]</pre>
     </div>
     <div class="ocs__callout">
-      <span><strong style="color:var(--jv-text);">Why both models?</strong> YOLO identifies what an object is and provides its bounding box. SAM 3 uses that box as a prompt to trace the object's more precise pixel boundary. The segmentation mask can then support spatial comparison and object-state tracking.</span>
+      <span><strong style="color:var(--jv-text);">Why both models?</strong> The object detector identifies what an object is and provides its bounding box. SAM 3 uses that box as a prompt to trace the object's more precise pixel boundary. The segmentation mask can then support spatial comparison and object-state tracking.</span>
     </div>
   </div>
 
@@ -93,7 +93,7 @@ rp_active: research-2
   <div class="ocs__card">
     <div class="jv-decision-grid">
       <div class="jv-decision-card">
-        <span class="jv-decision-title">YOLO Object Detection</span>
+        <span class="jv-decision-title">Object Detection</span>
         <p class="jv-decision-why">Recognizes multiple objects in one frame and returns a class label, confidence score, and bounding box for each detection.</p>
       </div>
       <div class="jv-decision-card">
@@ -106,7 +106,7 @@ rp_active: research-2
       </div>
       <div class="jv-decision-card">
         <span class="jv-decision-title">SAM 3 Refinement</span>
-        <p class="jv-decision-why">Uses YOLO boxes as prompts and produces masks that preserve object shape more precisely than rectangles.</p>
+        <p class="jv-decision-why">Uses detector boxes as prompts and produces masks that preserve object shape more precisely than rectangles.</p>
       </div>
       <div class="jv-decision-card">
         <span class="jv-decision-title">Local Processing</span>
@@ -120,10 +120,10 @@ rp_active: research-2
   </div>
 
   <!-- Why Object Detection -->
-  <h2 class="ocs__section-title">Why YOLO Instead of Image Classification?</h2>
+  <h2 class="ocs__section-title">Why Object Detection Instead of Image Classification?</h2>
   <div class="ocs__card">
     <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:0;">
-      A standard image-classification model can predict that a classroom image contains a laptop, but it does not identify every separate laptop or show where each one is located. YOLO performs both classification and localization, allowing the system to detect multiple objects in one frame and return an individual class label, confidence score, and bounding box for each object. This makes YOLO more suitable for classroom inventory, people counting, tracking, and scene comparison.
+      A standard image-classification model can predict that a classroom image contains a laptop, but it does not identify every separate laptop or show where each one is located. An object-detection model performs both classification and localization, allowing the system to detect multiple objects in one frame and return an individual class label, confidence score, and bounding box for each object. This makes object detection more suitable for classroom inventory, people counting, tracking, and scene comparison.
     </p>
   </div>
 
@@ -131,13 +131,13 @@ rp_active: research-2
   <h2 class="ocs__section-title">Acceptance Criteria &amp; Test Cases</h2>
   <div class="ocs__card">
     <ul class="ocs__checklist">
-      <li class="open"><span class="ocs__checklist-box"></span><span>Capture a timestamped classroom frame and return a class label, confidence score, and bounding box for every accepted YOLO detection</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Capture a timestamped classroom frame and return a class label, confidence score, and bounding box for every accepted object detection</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span>Evaluate all six target classes using a separate held-out test set that was not used for training</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span>Reach the project target of at least 80% correct-class detections on the held-out images and also report per-class precision, recall, and mAP50</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span>Compare detection performance under bright light, reduced light, distance, unusual viewing angles, and partial occlusion</span></li>
-      <li class="open"><span class="ocs__checklist-box"></span><span>Pass YOLO bounding boxes to SAM 3 as prompt boxes and generate a binary mask for each selected object</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Pass detector bounding boxes to SAM 3 as prompt boxes and generate a binary mask for each selected object</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span>Measure mask quality using Intersection over Union on a manually labeled validation sample</span></li>
-      <li class="open"><span class="ocs__checklist-box"></span><span>Measure end-to-end YOLO + SAM latency at 720p and 1080p on the actual Linux host</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Measure end-to-end object-detection and SAM latency at 720p and 1080p on the actual Linux host</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span>Complete one capture-and-processing cycle within 10 seconds, or document the optimization needed to reach that target</span></li>
     </ul>
   </div>
@@ -152,8 +152,8 @@ rp_active: research-2
       <table class="ocs__table">
         <thead><tr><th>Resolution</th><th>What Will Be Measured</th><th>Expected Tradeoff</th><th>Status</th></tr></thead>
         <tbody>
-          <tr><td>720p (1280×720)</td><td>YOLO latency, SAM latency, total cycle time, class metrics, mask IoU</td><td>Faster processing but reduced detail for small or distant objects</td><td><span class="ocs__status-pill ocs__status-pill--warn">TO TEST</span></td></tr>
-          <tr><td>1080p (1920×1080)</td><td>YOLO latency, SAM latency, total cycle time, class metrics, mask IoU</td><td>More object detail with increased CPU and memory demand</td><td><span class="ocs__status-pill ocs__status-pill--warn">TO TEST</span></td></tr>
+          <tr><td>720p (1280×720)</td><td>Detector latency, SAM latency, total cycle time, class metrics, mask IoU</td><td>Faster processing but reduced detail for small or distant objects</td><td><span class="ocs__status-pill ocs__status-pill--warn">TO TEST</span></td></tr>
+          <tr><td>1080p (1920×1080)</td><td>Detector latency, SAM latency, total cycle time, class metrics, mask IoU</td><td>More object detail with increased CPU and memory demand</td><td><span class="ocs__status-pill ocs__status-pill--warn">TO TEST</span></td></tr>
           <tr><td>4K (3840×2160)</td><td>Optional comparison if lower resolutions cannot preserve required detail</td><td>Highest input detail but likely to exceed the CPU time budget</td><td><span class="ocs__status-pill ocs__status-pill--neutral">OPTIONAL</span></td></tr>
         </tbody>
       </table>
@@ -164,7 +164,7 @@ rp_active: research-2
   <h2 class="ocs__section-title">Open Questions &amp; Next Steps</h2>
   <div class="ocs__card">
     <ul class="ocs__checklist">
-      <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Baseline Test:</strong> Determine which target classes are already supported reliably by the pretrained YOLO model.</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Baseline Test:</strong> Determine which target classes are already supported reliably by the selected pretrained object-detection model.</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Dataset:</strong> Collect representative classroom images across both camera viewpoints and split them into training, validation, and held-out test sets.</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Fine-Tuning:</strong> Train a custom model only for classes that do not meet the required detection performance.</span></li>
       <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Prompt Refinement:</strong> Test box prompts and optional positive/negative points when adjacent objects cause SAM mask leakage.</span></li>
@@ -176,11 +176,6 @@ rp_active: research-2
   <h2 class="ocs__section-title">Technical Sources</h2>
   <div class="ocs__card">
     <div class="jv-paper-grid">
-      <div class="jv-paper-card">
-        <a class="jv-paper-title" href="https://docs.ultralytics.com/tasks/detect/" target="_blank" rel="noopener">Ultralytics Object Detection Documentation</a>
-        <span class="jv-paper-meta">Ultralytics · Official Documentation</span>
-        <ul class="jv-paper-bullets"><li>Explains object classes, confidence scores, bounding boxes, inference, training, and evaluation.</li><li>Supports the choice of YOLO as the first computer-vision stage.</li></ul>
-      </div>
       <div class="jv-paper-card">
         <a class="jv-paper-title" href="https://www.tensorflow.org/hub/tutorials/object_detection" target="_blank" rel="noopener">TensorFlow Object Detection Tutorial</a>
         <span class="jv-paper-meta">TensorFlow · Official Documentation</span>

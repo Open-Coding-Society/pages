@@ -29,12 +29,12 @@ rp_active: technical
   <!-- Capture and processing loop -->
   <h2 class="ocs__section-title">Capture &amp; Processing Logic</h2>
   <div class="ocs__card">
-    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 0.25rem;">Each capture cycle creates a timestamped observation. Jarvis preserves the original frame, processes it through YOLO and SAM 3, and compares the result with recent observations before changing the room model.</p>
+    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 0.25rem;">Each capture cycle creates a timestamped observation. Jarvis preserves the original frame, processes it through the object detector and SAM 3, and compares the result with recent observations before changing the room model.</p>
     <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">sequenceDiagram
     participant Cam as Classroom Cameras
     participant Cap as FFmpeg Capture
-    participant AI as YOLO + SAM 3
+    participant AI as Object Detection + SAM 3
     participant Track as Tracking Logic
     participant Room as Room Model
 
@@ -55,7 +55,7 @@ rp_active: technical
   <div class="ocs__card">
     <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">flowchart LR
-    A[YOLO detection] --> B["SAM 3 mask
+    A[Object detection] --> B["SAM 3 mask
 and observation record"]
     B --> C{Matches an existing track?}
     C -->|Yes| D[Update object history]
@@ -71,7 +71,7 @@ and observation record"]
     <ul class="ocs__entity-list">
       <li><strong>Cameras</strong> — id, device name, host computer, viewpoint, resolution, status</li>
       <li><strong>Frames</strong> — id, camera, capture timestamp, original-file path, processing status</li>
-      <li><strong>YOLO Classes</strong> — class id, object label, and training-version metadata</li>
+      <li><strong>Object Classes</strong> — class id, object label, and training-version metadata</li>
       <li><strong>Detections</strong> — frame, class, confidence, bounding box, model version</li>
       <li><strong>Segmentation Masks</strong> — detection, mask-file path or encoded mask, SAM 3 model version</li>
       <li><strong>Object Tracks</strong> — persistent object id, current class, state, first seen, last seen</li>
@@ -99,7 +99,7 @@ and observation record"]
         <p class="jv-decision-why">Frequent enough, easy to tune.</p>
       </div>
       <div class="jv-decision-card">
-        <span class="jv-decision-title">YOLO before materials</span>
+        <span class="jv-decision-title">Objects before materials</span>
         <p class="jv-decision-why">Objects first, materials later.</p>
       </div>
       <div class="jv-decision-card">
@@ -209,7 +209,7 @@ occupancy"]</pre>
         <div class="jv-bom-thumb"><img src="/images/capstone/jarvis-bom/linux-computer.png" alt="Linux mini PC"></div>
         <span class="jv-bom-title">Main Linux computer</span>
         <div class="jv-bom-meta"><span class="ocs__status-pill ocs__status-pill--good">CURRENT</span><span class="jv-bom-cost">Owned</span></div>
-        <p class="jv-bom-note">Runs capture + YOLO/SAM 3.</p>
+        <p class="jv-bom-note">Runs capture, object detection, and SAM 3.</p>
       </div>
       <div class="jv-bom-card">
         <div class="jv-bom-thumb"><img src="/images/capstone/jarvis-bom/brio-webcam.png" alt="Second Logitech BRIO webcam"></div>

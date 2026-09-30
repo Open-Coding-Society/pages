@@ -5,10 +5,19 @@ on:
     branches:
       - main
       - master
+  schedule:
+    # Reconcile daily so a temporary Spring outage cannot leave assignments stale.
+    - cron: '17 9 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: assignment-frontmatter-sync
+  cancel-in-progress: false
 
 jobs:
   create-assignments:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout

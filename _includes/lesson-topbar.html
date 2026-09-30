@@ -5,21 +5,49 @@
 {% endcomment %}
 
 <div class="topbar-lesson">
-  <div class="topbar-left">
-    <div class="breadcrumbs">
-      <a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}" title="Back to course">
-        <i class="fas fa-home"></i>
-      </a>
-      <i class="fas fa-chevron-right"></i>
-      <span>Week {{ current_week }}</span>
-      <i class="fas fa-chevron-right"></i>
-      <span class="current">{{ page.title }}</span>
-      <button id="topbar-complete-btn" onclick="toggleComplete()" type="button" title="Mark lesson complete">
-        <i class="fas fa-circle" id="complete-icon-topbar"></i>
-        <span id="complete-text-topbar">Burndown</span>
-      </button>
+  <div class="topbar-actions">
+    <div class="topbar-left">
+      <div class="breadcrumbs">
+        <a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}" title="Back to course">
+          <i class="fas fa-home"></i>
+        </a>
+        <i class="fas fa-chevron-right"></i>
+        <span>Week {{ current_week }}</span>
+        <i class="fas fa-chevron-right"></i>
+        <span class="current">{{ page.title }}</span>
+        <button id="topbar-complete-btn" class="ocs__btn ocs__btn--icon small accent" onclick="toggleComplete()" type="button" title="Mark lesson complete">
+          <i class="fas fa-circle" id="complete-icon-topbar"></i>
+          <span id="complete-text-topbar">Burndown</span>
+        </button>
+      </div>
     </div>
+
+    {%- comment -%}
+      Moves through the lesson order shown in the sidebar.
+      prevLesson() and nextLesson() are defined in _layouts/post.html.
+    {%- endcomment -%}
+    <nav class="ocs__links" aria-label="Lesson navigation">
+      <button class="ocs__btn ocs__btn--icon small accent" onclick="prevLesson()" type="button" title="Previous lesson">
+        <i class="fas fa-chevron-left"></i> Prev
+      </button>
+      <button class="ocs__btn ocs__btn--icon small accent" onclick="nextLesson()" type="button" title="Next lesson">
+        Next <i class="fas fa-chevron-right"></i>
+      </button>
+      {%- comment -%}
+        This lesson's week chat. The sidebar is hidden on phones, so this is how
+        a phone opens it. Icon only, like the course page's calendar and
+        certificate buttons, so it fits beside Prev / Next at every width.
+        currentWeekChatId is set by lesson-sidebar-nav.html, which is included
+        first, and only for a week that has a chat modal.
+      {%- endcomment -%}
+      {%- if currentWeekChatId != blank -%}
+      <button class="ocs__btn ocs__btn--icon small accent" onclick="openWeekChat('{{ currentWeekChatId }}', this)" type="button" aria-haspopup="dialog" aria-label="Week {{ current_week }} chat" title="Week {{ current_week }} chat">
+        <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-comments"></i></span>
+      </button>
+      {%- endif -%}
+    </nav>
   </div>
+
   <div class="topbar-progress">
     <div class="topbar-progress-fill" id="lesson-progress"></div>
   </div>

@@ -4,6 +4,7 @@
 @import "bathroom";
 @import "blogs";
 @import "projects/all";  // Auto-generated project imports
+@import "announcement-calendar";
 @import "chatbot";
 @import "forms/code-runner";
 @import "forms/ui-runner";
@@ -25,6 +26,9 @@
 @import "platformer-game";
 @import "quiz";
 @import "rps_lesson";
+@import "csa-unit2-interactive";
+@import "dm-chat";
+@import "dm-bell";
 @import "search";
 @import "stack-clicker";
 @import "theme/user-preferences";
@@ -37,6 +41,7 @@
 @import "documentation";
 @import "api-documentation";
 @import "migration-runbook";
+@import "submissions";
 @import "open-coding/pixel-submit-widget";
 @import "open-coding/grading_modules";
 

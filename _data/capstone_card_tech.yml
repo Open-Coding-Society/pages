@@ -154,15 +154,6 @@
   - "Jekyll / Liquid"
   - "JavaScript (Vanilla)"
 
-"Communication System":
-  - "Spring Boot / Java"
-  - "STOMP over SockJS"
-  - "REST /api/groups & /api/dm"
-  - "JPA + Amazon S3"
-  - "JWT Cookie Auth"
-  - "Jekyll Includes / Vanilla JS"
-  - "localStorage"
-
 "OCS Intelligence LLM":
   - "LLM"
   - "FlashAttention"
@@ -170,7 +161,7 @@
   - "Distributed Inference"
   - "Observability"
 
-"Communication System":
+"OCS Communication System":
   - "Spring Boot / Java"
   - "STOMP over SockJS"
   - "REST at /api/groups"

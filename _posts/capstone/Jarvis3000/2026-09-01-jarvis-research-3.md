@@ -59,10 +59,10 @@ Calibration + 3D projection"]
 Metric scale, m / ft"]
     SCALE --> CLOUD["Open3D
 Point cloud / room map"]
-    C1 --> YOLO["YOLOv8
+    C1 --> DETECT["Object detector
 Object boxes"]
-    C2 --> YOLO
-    YOLO --> CLOUD</pre>
+    C2 --> DETECT
+    DETECT --> CLOUD</pre>
     </div>
   </div>
 
@@ -99,7 +99,7 @@ Object boxes"]
         <p class="jv-decision-why">Keypoints matched across wide baselines.</p>
       </div>
       <div class="jv-decision-card">
-        <span class="jv-decision-title">YOLOv8</span>
+        <span class="jv-decision-title">Object Detection</span>
         <p class="jv-decision-why">Boxes people/objects before distancing.</p>
       </div>
     </div>

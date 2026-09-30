@@ -1,4 +1,5 @@
 import glob
+import html as html_lib
 from nbconvert import MarkdownExporter
 from nbconvert.utils.exceptions import ConversionException
 import os
@@ -56,6 +57,10 @@ Real pair example (Cookie Clicker):
 
 Runner options:
 - autostart: true|false  Auto-runs the game when the runner initializes. Default: false.
+
+UI-runner specific options:
+- show_code: true|false  Show the HTML/CSS/JS source in a disclosure above the rendered UI.
+- show_source: true|false Alias for show_code.
 
 Game-runner specific options:
 - hide_edit, width, height, editor_height
@@ -417,7 +422,21 @@ class UiRunner:
 
     def rendered_markup_lines(self) -> list[str]:
         """Build the final HTML/script wrapper markup inserted into rendered markdown."""
-        return [
+        lines = []
+
+        if self.options.get('show_code') or self.options.get('show_source'):
+            source = self.html
+            if self.script.strip():
+                source += f'\n<script>\n{self.script}\n</script>'
+            lines.extend([
+                '<details class="ui-runner-source">',
+                '<summary>View example code</summary>',
+                '<pre><code class="language-html">' + html_lib.escape(source.strip()) + '</code></pre>',
+                '</details>',
+                '',
+            ])
+
+        lines.extend([
             '<div class="ui-runner">',
             self.html,
             '<script>',
@@ -427,7 +446,8 @@ class UiRunner:
             '</script>',
             '</div>',
             '',
-        ]
+        ])
+        return lines
 
     @staticmethod
     def collect_cells_and_source_ids(notebook):

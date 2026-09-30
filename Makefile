@@ -29,9 +29,9 @@ KNOWN_TARGETS := \
 	build-minima build-cayman build-yat build-so-simple \
 	convert convert-docx convert-docx-config convert-single convert-registered-notebooks \
 	watch-notebooks watch-projects watch-files bundle-install jekyll-serve \
-	build-registered-projects build-registered-docs build-dev-projects \
+	generate-makefiles build-project-includes build-registered-projects build-registered-docs build-dev-projects \
 	watch-registered-projects clean-registered-projects watch-dev-projects \
-	list-projects split-courses clean-courses use-minima use-cayman use-yat \
+	list-projects split-courses clean-courses clean-generated-makefiles use-minima use-cayman use-yat \
 	use-so-simple use-hydejack watch-rebuild
 
 ###########################################
@@ -210,12 +210,21 @@ generate-makefiles:
 	done
 
 # Build all registered projects (game assets, not docs)
-build-registered-projects:
+build-registered-projects: build-project-includes
 	$(call run_projects,$(ALL_PROJECTS),Building,build)
 	@echo "Generating dynamic SASS imports..."
 	@$(PYTHON) scripts/generate_sass_imports.py
 
-build-dev-projects:
+# Publish includes shared by every project in a category.
+build-project-includes:
+	@for source_dir in _projects/*/_includes; do \
+		[ -d "$$source_dir" ] || continue; \
+		category=$$(basename "$$(dirname "$$source_dir")"); \
+		mkdir -p "_includes/projects/$$category"; \
+		cp -R "$$source_dir"/. "_includes/projects/$$category/"; \
+	done
+
+build-dev-projects: build-project-includes
 	@echo "Active DEV Projects: $(ACTIVE_DEV_PROJECTS)"
 	$(call run_projects,$(ACTIVE_DEV_PROJECTS),Building,build)
 	@echo "Generating dynamic SASS imports..."
@@ -260,7 +269,7 @@ build-cayman: use-cayman build-current
 build-so-simple: use-so-simple build-current
 build-yat: use-yat build-current
 
-build-current: clean convert split-courses
+build-current: clean build-registered-projects convert split-courses build-registered-docs
 	@bundle install
 	@echo "Generating dynamic SASS imports..."
 	@$(PYTHON) scripts/generate_sass_imports.py 2>&1 || echo "⚠️  SASS import generation failed"
@@ -274,11 +283,11 @@ build: build-current
 # Multi-course file splitting
 split-courses:
 	@echo " ------ Splitting multi-course files... -------"
-	@python3 scripts/split_multi_course_files.py
+	@$(PYTHON) scripts/split_multi_course_files.py
 
 clean-courses:
 	@echo "🧹Cleaning course-specific files..."
-	@python3 scripts/split_multi_course_files.py clean
+	@$(PYTHON) scripts/split_multi_course_files.py clean
 
 # Notebook and DOCX conversion
 convert: $(MARKDOWN_FILES) convert-docx
@@ -337,6 +346,7 @@ clean: stop
 	@make clean-courses || true
 	@echo "Cleaning project distributions..."
 	@make clean-registered-projects
+	@rm -rf _includes/projects
 	@echo "Cleaning extracted DOCX images..."
 	@rm -rf images/docx/*.png images/docx/*.jpg images/docx/*.jpeg images/docx/*.gif 2>/dev/null || true
 	@echo "Cleaning DOCX index page..."
@@ -347,8 +357,17 @@ clean: stop
 	done
 	@echo "Removing _site directory..."
 	@rm -rf _site
+	@$(MAKE) clean-generated-makefiles
+
+# Remove generated project Makefiles while preserving any versioned overrides.
+clean-generated-makefiles:
 	@echo "Cleaning auto-generated Makefiles..."
-	@find _projects -name "Makefile" ! -path "*/_template/*" ! -path "_projects/lessons/python/Makefile" ! -path "_projects/lessons/javascript/Makefile" ! -path "_projects/lessons/java/Makefile" -type f -exec rm {} +
+	@find _projects -name "Makefile" ! -path "*/_template/*" -type f -print0 | \
+		while IFS= read -r -d '' makefile; do \
+			if ! git ls-files --error-unmatch "$$makefile" >/dev/null 2>&1; then \
+				rm -f "$$makefile"; \
+			fi; \
+		done
 
 stop:
 	@echo "Stopping server..."
@@ -452,6 +471,11 @@ watch-projects:
 		find _projects -type f -newer /tmp/.project_watch_marker 2>/dev/null | \
 			grep -v "/Makefile$$" | while read file; do \
 			echo "Project file changed: $$file"; \
+			if [[ "$$file" == _projects/*/_includes/* ]]; then \
+				$(MAKE) build-project-includes; \
+				touch /tmp/.jekyll_rebuild_trigger; \
+				continue; \
+			fi; \
 			proj=$$(echo "$$file" | cut -d/ -f2); \
 			if [ -d "_projects/$$proj" ]; then \
 				if [ ! -f "_projects/$$proj/Makefile" ]; then \
@@ -480,13 +504,11 @@ bundle-install:
 	fi
 
 # Start Jekyll server (no auto-watch, we control rebuilds manually)
-# Supports optional _config.local.yml override for local settings (e.g. baseurl,
-# google_client_id -- see scripts/generate_local_config_override.sh and .env.example)
+# Supports optional _config.local.yml override for local settings (e.g. baseurl)
 jekyll-serve: bundle-install
 	@touch /tmp/.notebook_watch_marker
 	@rm -f /tmp/.jekyll_rebuild_trigger
-	@./scripts/generate_local_config_override.sh
-	bundle exec jekyll serve -H $(HOST) -P $(PORT) --no-watch --config _config.yml,_config.local.yml > $(LOG_FILE) 2>&1 &
+	bundle exec jekyll serve -H $(HOST) -P $(PORT) --no-watch > $(LOG_FILE) 2>&1 &
 	@make wait-for-server
 
 # Common server wait logic
@@ -620,7 +642,7 @@ list-projects:
 		fi; \
 	done || echo "  None found"
 
-.PHONY: list-projects build-registered-projects convert-registered-notebooks build-registered-docs watch-registered-projects clean-registered-projects
+.PHONY: generate-makefiles build-project-includes list-projects build-registered-projects convert-registered-notebooks build-registered-docs watch-registered-projects clean-registered-projects clean-generated-makefiles
 
 ###########################################
 # Allow unknown targets (project selectors)

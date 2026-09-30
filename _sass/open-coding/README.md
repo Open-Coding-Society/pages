@@ -112,7 +112,7 @@ Example:
 ```
 
 RFID uses scoped aliases that map back to preferences in
-[`rfid-presence-common-style.html`](../../../_includes/rfid-presence-common-style.html).
+[`presence-system-common-style.html`](../../../_includes/presence-system-common-style.html).
 Jarvis uses the same pattern in [`jarvis.scss`](../capstone/jarvis.scss):
 
 ```scss
