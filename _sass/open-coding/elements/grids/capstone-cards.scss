@@ -30,6 +30,19 @@
   }
 }
 
+// Approved: the mentor is on this project. A green accent marks the card, and the action
+// row is a status line rather than buttons. Chained with .ocs__grid-cell to beat the
+// grid's own border.
+.ocs__grid-cell.capstone-card--approved {
+  border-color: color-mix(in srgb, var(--green) 55%, var(--ui-border));
+  box-shadow: inset 0 3px 0 var(--green);
+  background: color-mix(in srgb, var(--green) 5%, var(--panel));
+
+  .capstone-card-actions {
+    border-top-color: color-mix(in srgb, var(--green) 35%, var(--ui-border));
+  }
+}
+
 // Top-right "Links" button; the thumbnail sits top-left so the corner is free.
 .capstone-links-button {
   position: absolute;
@@ -95,6 +108,16 @@
 
   .ocs__btn:disabled {
     cursor: default;
+  }
+
+  // The disabled "Approved" badge is a status, not a faded-out button.
+  .capstone-card--approved & .ocs__btn:disabled {
+    opacity: 1;
+  }
+
+  &__note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
   }
 }
 

@@ -383,6 +383,27 @@ import { setIconLabel } from '{{ site.baseurl }}/assets/js/capstone/cardIcons.js
     skippedCountEl.textContent = `Skipped: ${skipped.size}`;
   }
 
+  // Interested/Skip are for deciding what to apply to, so they no longer apply once a
+  // project is approved -- drop any old mark so it doesn't dim the card or stay counted.
+  function forgetMarks(url) {
+    const wasInterested = interested.delete(url);
+    const wasSkipped = skipped.delete(url);
+    if (wasInterested) writeSet(INTERESTED_KEY, interested);
+    if (wasSkipped) writeSet(SKIPPED_KEY, skipped);
+  }
+
+  // An approved project is settled, so its action row becomes a status line (the
+  // "Approved" badge plus a note) and the card gets a green accent.
+  function showApprovedCard(card, actions, badge) {
+    card.classList.remove('capstone-card--skipped');
+    card.classList.add('capstone-card--approved');
+    showApplyState(badge, 'approved');
+    const note = document.createElement('span');
+    note.className = 'capstone-card-actions__note';
+    note.textContent = "You're mentoring this project";
+    actions.replaceChildren(badge, note);
+  }
+
   cards.forEach(card => {
     const url = cardUrl(card);
     const actions = cardActionGroup(card, 'main');
@@ -391,6 +412,12 @@ import { setIconLabel } from '{{ site.baseurl }}/assets/js/capstone/cardIcons.js
     const applyBtn = document.createElement('button');
     applyBtn.type = 'button';
     showApplyState(applyBtn, applyStateFor(idByUrl[url]));
+
+    if (applyStateFor(idByUrl[url]) === 'approved') {
+      forgetMarks(url);
+      showApprovedCard(card, actions, applyBtn);
+      return;
+    }
 
     const interestedBtn = document.createElement('button');
     interestedBtn.type = 'button';
@@ -445,7 +472,10 @@ import { setIconLabel } from '{{ site.baseurl }}/assets/js/capstone/cardIcons.js
       try {
         const res = await fetch(`${javaURI}/api/capstones/${id}/apply`, { ...fetchOptions, method: 'POST' });
         if (res.status === 409) {
-          showApplyState(applyBtn, 'approved');
+          // Already approved: same end state as a card that loaded approved.
+          forgetMarks(url);
+          showApprovedCard(card, actions, applyBtn);
+          updateCounter();
         } else if (res.ok) {
           showApplyState(applyBtn, 'pending');
         } else {
