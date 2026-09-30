@@ -198,6 +198,10 @@ Check if this is a course lesson and determine which course context to use
    * lesson-modals.html. Opening one also opens the chat's <details>, whose
    * toggle event is what week_chat.html waits for before it connects, so a
    * chat only loads when someone actually opens it.
+   *
+   * Each modal also starts with the hidden attribute, so it stays hidden even
+   * when the stylesheet is stale or has not loaded yet. Without it, all of them
+   * sit in the lesson's flex row and push the lesson off the screen.
    */
   let weekChatTrigger = null;
 
@@ -205,6 +209,7 @@ Check if this is a course lesson and determine which course context to use
     const modal = document.getElementById(`week-chat-modal-${chatId}`);
     if (!modal) return;
     weekChatTrigger = trigger || null;
+    modal.hidden = false;
     modal.style.display = 'block';
     const chat = modal.querySelector('details.week-chat');
     if (chat && !chat.open) chat.open = true;
@@ -214,6 +219,7 @@ Check if this is a course lesson and determine which course context to use
 
   function closeWeekChat(modal) {
     modal.style.display = 'none';
+    modal.hidden = true;
     if (weekChatTrigger) weekChatTrigger.focus();
     weekChatTrigger = null;
   }

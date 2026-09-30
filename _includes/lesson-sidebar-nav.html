@@ -165,8 +165,8 @@
                 </button>
               </div>
               {%- capture weekChatModal -%}
-              <div class="modal-overlay week-chat-modal" id="week-chat-modal-{{ chatId }}" role="dialog" aria-modal="true" aria-label="Week {{ week }} chat">
-                <div class="modal-content">
+              <div class="modal-overlay week-chat-modal" id="week-chat-modal-{{ chatId }}" role="dialog" aria-modal="true" aria-label="Week {{ week }} chat" hidden>
+                <div class="week-chat-modal-content">
                   <button class="modal-close" type="button" aria-label="Close chat">&times;</button>
                   {% include week_chat.html course=current_course %}
                 </div>

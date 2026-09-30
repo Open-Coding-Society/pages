@@ -347,7 +347,10 @@ body:has(.lesson-player) {
   @include modal-overlay;
 }
 
-.week-chat-modal > .modal-content {
+/* Its own class, not .modal-content: the calendar project styles .modal-content
+   site-wide and makes every button inside it full width, which left the chat's
+   Send button filling the row and its message box 2px wide. */
+.week-chat-modal-content {
   @include modal-content;
   top: 60px;
 }
