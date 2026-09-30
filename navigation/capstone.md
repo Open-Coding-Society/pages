@@ -30,8 +30,8 @@ show_reading_time: false
            Hidden for everyone else; revealed by the mentor script below and pushed to
            the far right of this flex row (see capstone-cards.scss). -->
       <span id="mentor-counts" class="capstone-mentor-counts" hidden>
-        <span id="mentor-skipped-count" class="ocs__btn small alert-red">Skipped: 0</span>
-        <span id="mentor-interested-count" class="ocs__btn small alert-green">Interested: 0</span>
+        <span id="mentor-skipped-count" class="ocs__btn alert-red">Skipped: 0</span>
+        <span id="mentor-interested-count" class="ocs__btn alert-green">Interested: 0</span>
       </span>
     </div>
   </div>
@@ -271,14 +271,14 @@ document.addEventListener('DOMContentLoaded', function(){
 import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
 import { cardUrl, cardActionGroup } from '{{ site.baseurl }}/assets/js/capstone/cardActions.js';
+import { setIconLabel } from '{{ site.baseurl }}/assets/js/capstone/cardIcons.js';
 
 (async function () {
   // Wait for the script above (which sets card.dataset.pageUrl for the few
-  // projects in its linkMap) to have run its DOMContentLoaded handler first --
-  // module scripts execute before that event fires, not after.
-  if (document.readyState === 'loading') {
-    await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
-  }
+  // projects in its linkMap) to have run its DOMContentLoaded handler first.
+  // Module scripts always run before that event (readyState is already
+  // 'interactive' then, so it can't be used to decide), so always wait.
+  await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
 
   const countsEl = document.getElementById('mentor-counts');
   const interestedCountEl = document.getElementById('mentor-interested-count');
@@ -350,16 +350,16 @@ import { cardUrl, cardActionGroup } from '{{ site.baseurl }}/assets/js/capstone/
   }
 
   const APPLY_STATES = {
-    none:     { label: 'Apply Now',        variant: 'accent fill',       enabled: true },
-    pending:  { label: 'Pending approval', variant: 'alert-yellow',      enabled: false },
-    approved: { label: 'Approved ✓',       variant: 'alert-green fill',  enabled: false },
-    denied:   { label: 'Not approved',     variant: 'alert-red',         enabled: false },
+    none:     { label: 'Apply Now',        icon: 'send',    variant: 'accent fill',      enabled: true },
+    pending:  { label: 'Pending approval', icon: 'clock',   variant: 'alert-yellow',     enabled: false },
+    approved: { label: 'Approved',         icon: 'check',   variant: 'alert-green fill', enabled: false },
+    denied:   { label: 'Not approved',     icon: 'xCircle', variant: 'alert-red',        enabled: false },
   };
 
   function showApplyState(button, state) {
-    const { label, variant, enabled } = APPLY_STATES[state];
+    const { label, icon, variant, enabled } = APPLY_STATES[state];
     button.className = `ocs__btn small ${variant}`;
-    button.textContent = label;
+    setIconLabel(button, icon, label);
     button.disabled = !enabled;
     button.title = state === 'pending' ? 'An admin must approve your application before you get access to this project.' : '';
   }
@@ -395,16 +395,16 @@ import { cardUrl, cardActionGroup } from '{{ site.baseurl }}/assets/js/capstone/
     const interestedBtn = document.createElement('button');
     interestedBtn.type = 'button';
     interestedBtn.className = 'ocs__btn small alert-green';
-    interestedBtn.textContent = '☆ Interested';
+    setIconLabel(interestedBtn, 'star', 'Interested');
 
     const skipBtn = document.createElement('button');
     skipBtn.type = 'button';
     skipBtn.className = 'ocs__btn small alert-red';
-    skipBtn.textContent = 'Skip';
+    setIconLabel(skipBtn, 'x', 'Skip');
 
     // A marked project shows a filled "Interested" button that can no longer be clicked.
     function showInterested() {
-      interestedBtn.textContent = '★ Interested';
+      setIconLabel(interestedBtn, 'starFill', 'Interested');
       interestedBtn.classList.add('fill');
       interestedBtn.disabled = true;
     }
@@ -413,7 +413,7 @@ import { cardUrl, cardActionGroup } from '{{ site.baseurl }}/assets/js/capstone/
     // clickable as "Unskip" so the mentor can change their mind.
     function showSkipped() {
       card.classList.add('capstone-card--skipped');
-      skipBtn.textContent = 'Unskip';
+      setIconLabel(skipBtn, 'undo', 'Unskip');
       skipBtn.classList.add('fill');
       skipBtn.setAttribute('aria-pressed', 'true');
       applyBtn.disabled = true;
@@ -423,7 +423,7 @@ import { cardUrl, cardActionGroup } from '{{ site.baseurl }}/assets/js/capstone/
     // Restores the card to exactly how it would look had it never been skipped.
     function showUnskipped() {
       card.classList.remove('capstone-card--skipped');
-      skipBtn.textContent = 'Skip';
+      setIconLabel(skipBtn, 'x', 'Skip');
       skipBtn.classList.remove('fill');
       skipBtn.setAttribute('aria-pressed', 'false');
       showApplyState(applyBtn, applyStateFor(idByUrl[url]));
@@ -436,13 +436,12 @@ import { cardUrl, cardActionGroup } from '{{ site.baseurl }}/assets/js/capstone/
     applyBtn.addEventListener('click', async () => {
       const id = idByUrl[url];
       if (!id) {
-        const original = applyBtn.textContent;
-        applyBtn.textContent = "Hasn't synced yet";
-        setTimeout(() => { applyBtn.textContent = original; }, 2500);
+        setIconLabel(applyBtn, 'clock', "Hasn't synced yet");
+        setTimeout(() => showApplyState(applyBtn, 'none'), 2500);
         return;
       }
       applyBtn.disabled = true;
-      applyBtn.textContent = 'Applying…';
+      setIconLabel(applyBtn, 'send', 'Applying…');
       try {
         const res = await fetch(`${javaURI}/api/capstones/${id}/apply`, { ...fetchOptions, method: 'POST' });
         if (res.status === 409) {
@@ -450,12 +449,12 @@ import { cardUrl, cardActionGroup } from '{{ site.baseurl }}/assets/js/capstone/
         } else if (res.ok) {
           showApplyState(applyBtn, 'pending');
         } else {
-          applyBtn.textContent = 'Try again';
+          setIconLabel(applyBtn, 'send', 'Try again');
           applyBtn.disabled = false;
         }
       } catch (e) {
         console.error('Capstone: apply failed', e);
-        applyBtn.textContent = 'Try again';
+        setIconLabel(applyBtn, 'send', 'Try again');
         applyBtn.disabled = false;
       }
     });
@@ -494,10 +493,9 @@ import { cardUrl, cardActionGroup } from '{{ site.baseurl }}/assets/js/capstone/
 <script type="module">
 import { initCardTools } from '{{ site.baseurl }}/assets/js/capstone/cardTools.js';
 
-// After the first script's DOMContentLoaded handler has set each card's page URL.
-if (document.readyState === 'loading') {
-  await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
-}
+// After the first script's DOMContentLoaded handler has built the Links buttons and set
+// each card's page URL. Module scripts always run before that event, so always wait.
+await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
 const grid = document.getElementById('capstone-grid');
 if (grid) initCardTools(grid);
 </script>
