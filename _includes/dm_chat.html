@@ -257,7 +257,7 @@
 
   async function resolveCurrentUser() {
     try {
-      const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
+      const res = await fetch(`${javaURI}/api/person/get`, fetchOptions);
       if (!res.ok) return false;
       const user = await res.json();
       const name = user?.name || user?.uid || user?.github;
