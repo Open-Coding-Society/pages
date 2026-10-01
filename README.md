@@ -157,7 +157,7 @@ To print every check and its remediation directly in the terminal without
 creating a Markdown report, run:
 
 ```bash
-./scripts/verifyToolsTerminal.sh
+bash /scripts/verifyToolsTerminal.sh
 ```
 
 ### macOS Terminal Setup Helper (optional)
