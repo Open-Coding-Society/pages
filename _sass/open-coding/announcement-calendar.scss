@@ -1,0 +1,481 @@
+// Announcement ↔ Calendar demo (_includes/announcement_calendar_demo.html).
+// The chat itself reuses the .announcement-chat styles from the courses
+// project; this file only adds the calendar pieces on top, with the same
+// tokens ($bg-3 borders, $accent highlights, $text-muted secondary text).
+// Nothing is color-coded: priority and class periods are shown as words.
+
+@mixin announcement-pill-button {
+  padding: 5px 10px;
+  border: 1px solid $bg-3;
+  border-radius: 999px;
+  background: transparent;
+  color: $text-muted;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+
+  &:hover:not(:disabled) { border-color: $accent; color: $text; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+.announcement-calendar {
+  margin: 20px 0 28px;
+  color: $text;
+  font-family: var(--pref-font-family);
+
+  /* ── toolbar: version tabs, role + data-source toggles ─────────── */
+  // Two rows: version tabs, then the demo toggles.
+  .announcement-calendar-toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .announcement-calendar-versions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    button {
+      @include announcement-pill-button;
+      font-size: 13px;
+      b { color: $accent; margin-right: 4px; }
+      &[aria-selected="true"] { background: rgba($accent, 0.15); border-color: $accent; color: $text; }
+    }
+  }
+
+  .announcement-calendar-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .announcement-calendar-segment {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid $bg-3;
+    border-radius: 999px;
+    overflow: hidden;
+
+    button {
+      padding: 4px 10px;
+      border: 0;
+      background: transparent;
+      color: $text-muted;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      &[aria-checked="true"] { background: $accent; color: #0b1320; font-weight: 600; }
+      &:disabled { opacity: 0.45; cursor: not-allowed; }
+    }
+  }
+
+  .announcement-calendar-segment-label {
+    padding: 0 4px 0 10px;
+    color: $text-muted;
+    font-size: 11px;
+  }
+
+  .announcement-calendar-reset { @include announcement-pill-button; }
+
+  .announcement-calendar-summary {
+    margin: 0 0 12px;
+    color: $text-muted;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .announcement-calendar-tools {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    &:empty { display: none; }
+  }
+
+  /* ── flash the announcement a Week view chip jumps to ────────── */
+  .chat-msg.is-flash { animation: announcement-calendar-flash 1.6s ease-out; }
+
+  /* ── event card under an announcement (all versions) ─────────── */
+  .event-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    max-width: 520px;
+  }
+
+  .event-card {
+    display: flex;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid $bg-3;
+    border-left: 4px solid $accent;
+    border-radius: 8px;
+    background: rgba($accent, 0.05);
+
+    // Several events in one announcement: one line each (date, title, tags, actions).
+    &.is-compact {
+      align-items: center;
+      padding: 6px 10px;
+      gap: 10px;
+      .event-card-info { flex: 1; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+      .event-card-actions { margin: 0 0 0 auto; }
+    }
+    &.is-removed {
+      opacity: 0.55;
+      .event-card-title { text-decoration: line-through; }
+      .event-card-status { color: $red; }
+    }
+  }
+
+  .event-card-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .event-card-month,
+  .event-card-weekday {
+    color: $text-muted;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .event-card-day { font-size: 20px; font-weight: 700; }
+  .event-card.is-compact .event-card-day { font-size: 16px; }
+
+  .event-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .event-card-title { font-weight: 600; overflow-wrap: anywhere; }
+
+  .event-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .event-card-chip {
+    padding: 1px 8px;
+    border: 1px solid $bg-3;
+    border-radius: 999px;
+    color: $text-muted;
+    font-size: 11px;
+  }
+
+  .event-card-chip--period {
+    border-color: rgba($text, 0.35);
+    color: $text;
+    font-weight: 600;
+  }
+
+  .event-card-status { color: $green; font-size: 11px; }
+
+  .event-card-description {
+    margin: 0;
+    color: $text-muted;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: pre-line;
+  }
+
+  .event-card.is-compact .event-card-description { flex-basis: 100%; }
+
+  // Period filter: events for other periods stay visible but step back.
+  .event-card.is-other-period { opacity: 0.35; }
+
+  .event-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 2px;
+  }
+
+  .event-card-action {
+    @include announcement-pill-button;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    span { white-space: nowrap; }
+  }
+
+  /* ── V1: attach-event panel ───────────────────────────────────── */
+  .calendar-attach-toggle {
+    @include announcement-pill-button;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    &.is-active { background: rgba($accent, 0.15); border-color: $accent; color: $text; }
+  }
+
+  .calendar-attach-panel,
+  .quick-syntax {
+    margin-top: 8px;
+    padding: 10px 12px;
+    border: 1px dashed rgba($accent, 0.5);
+    border-radius: 8px;
+    background: rgba($accent, 0.04);
+    &[hidden] { display: none; }
+  }
+
+  .calendar-attach-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .calendar-attach-close {
+    border: 0;
+    background: transparent;
+    color: $text-muted;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .calendar-attach-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .calendar-field--full { grid-column: 1 / -1; }
+
+  .calendar-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    color: $text-muted;
+    font-size: 11px;
+
+    input,
+    select {
+      padding: 6px 8px;
+      border: 1px solid $bg-3;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      color: $text;
+      font: inherit;
+      font-size: 13px;
+      color-scheme: dark;
+    }
+  }
+
+  .calendar-quick-dates,
+  .calendar-choice-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .calendar-quick-date { @include announcement-pill-button; font-size: 11px; }
+
+  .calendar-choice-label { min-width: 52px; color: $text-muted; font-size: 11px; }
+  .calendar-choice-hint { color: $text-muted; font-size: 11px; font-style: italic; }
+
+  .calendar-period-option {
+    @include announcement-pill-button;
+    min-width: 32px;
+    &[aria-pressed="true"] { background: rgba($accent, 0.15); border-color: $accent; color: $text; font-weight: 700; }
+  }
+
+  .calendar-priority-option {
+    @include announcement-pill-button;
+    &[aria-checked="true"] { background: rgba($accent, 0.15); border-color: $accent; color: $text; font-weight: 700; }
+  }
+
+  .calendar-attach-hint { margin: 8px 0 0; color: $text-muted; font-size: 12px; }
+
+  .calendar-attach-error,
+  .quick-syntax-error {
+    margin: 6px 0 0;
+    color: $red;
+    font-size: 12px;
+    &[hidden] { display: none; }
+  }
+
+  /* ── V2: quick syntax detection ───────────────────────────────── */
+  .quick-syntax-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .quick-syntax-title { font-size: 13px; font-weight: 600; }
+  .quick-syntax-week { flex: 1; color: $text-muted; font-size: 12px; }
+  .quick-syntax-example { @include announcement-pill-button; font-size: 11px; }
+
+  .quick-syntax-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .quick-syntax-empty { color: $text-muted; font-size: 12px; }
+
+  .quick-syntax-chip {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    padding: 6px 10px;
+    border: 1px solid $accent;
+    border-radius: 8px;
+    background: rgba($accent, 0.1);
+    color: $text;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &[aria-pressed="false"] {
+      opacity: 0.45;
+      border-style: dashed;
+      .quick-syntax-chip-title { text-decoration: line-through; }
+    }
+  }
+
+  .quick-syntax-chip-day { color: $accent; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  .quick-syntax-chip-title { font-size: 13px; font-weight: 600; }
+  .quick-syntax-chip-meta { color: $text-muted; font-size: 11px; }
+
+  .quick-syntax-help {
+    margin-top: 8px;
+    color: $text-muted;
+    font-size: 12px;
+    summary { cursor: pointer; }
+    ul { margin: 6px 0 0; padding-left: 18px; }
+    code, kbd { font-size: 11px; }
+  }
+
+  /* ── Week view (toggle in the chat header, works with V1 and V2) ── */
+  .announcement-calendar-header-actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .week-view-toggle {
+    @include announcement-pill-button;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    &[aria-pressed="true"] { background: rgba($accent, 0.15); border-color: $accent; color: $text; }
+  }
+
+  [data-slot="week-view"][hidden] { display: none; }
+
+  .week-view {
+    margin-bottom: 12px;
+    padding: 8px 10px 10px;
+    border: 1px solid $bg-3;
+    border-radius: 8px;
+  }
+
+  .week-view-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .week-view-heading {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.3;
+  }
+
+  .week-view-range { font-size: 13px; font-weight: 600; }
+  .week-view-note { color: $text-muted; font-size: 11px; }
+
+  .week-view-nav {
+    @include announcement-pill-button;
+    padding: 3px 9px;
+  }
+
+  .week-view-days {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .week-view-day {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 64px;
+    padding: 6px;
+    border: 1px solid $bg-3;
+    border-radius: 6px;
+
+    &.is-today { border-color: $accent; box-shadow: inset 0 0 0 1px $accent; }
+    &.is-closed { background: repeating-linear-gradient(135deg, transparent 0 6px, rgba(255, 255, 255, 0.03) 6px 12px); }
+  }
+
+  .week-view-day-label {
+    color: $text-muted;
+    font-size: 11px;
+    white-space: nowrap;
+    b { color: $text; font-size: 14px; }
+  }
+
+  .week-view-closed { color: $warn; font-size: 10px; }
+  .week-view-more { color: $text-muted; font-size: 10px; }
+
+  .week-view-event {
+    overflow: hidden;
+    padding: 2px 5px;
+    border: 0;
+    border-left: 3px solid $accent;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.05);
+    color: $text;
+    font: inherit;
+    font-size: 11px;
+    text-align: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+
+    &:hover { background: rgba($accent, 0.15); }
+  }
+
+  /* ── phones ───────────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .announcement-calendar-toolbar { flex-direction: column; align-items: stretch; }
+    .calendar-attach-grid { grid-template-columns: 1fr 1fr; }
+    .calendar-field--wide { grid-column: 1 / -1; }
+    .week-view-days { grid-template-columns: repeat(5, minmax(56px, 1fr)); overflow-x: auto; }
+    .week-view-day { min-height: 52px; }
+    .week-view-event { font-size: 10px; }
+    .week-view-toggle span { display: none; }
+  }
+}
+
+@keyframes announcement-calendar-flash {
+  0% { background: rgba($accent, 0.35); }
+  100% { background: transparent; }
+}

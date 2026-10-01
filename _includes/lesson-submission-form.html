@@ -5,21 +5,12 @@
 {% endcomment %}
 
 {% assign submission_type = page.assignment_submission_type | default: "file" | downcase %}
-<section class="ocs__card" aria-labelledby="assignment-submission-title">  
+<section class="ocs__card" aria-labelledby="assignment-submission-title">
   <h2 id="assignment-submission-title" class="ocs__section-title">
     <i class="fas fa-upload assignment-submission-icon" aria-hidden="true"></i>
     Submit Assignment
   </h2>
 
-  {% if submission_type == "link" or submission_type == "github_issue" %}
-  {% if submission_type == "github_issue" %}
-    {% assign link_label = "GitHub Issue Link" %}
-    {% assign link_placeholder = "https://github.com/owner/repo/issues/123" %}
-  {% else %}
-    {% assign link_label = "Submission Link" %}
-    {% assign link_placeholder = "https://..." %}
-  {% endif %}
-  <div>
   <div class="self-assessment" id="self-assessment">
     <h4 class="self-assessment-title">
       <i class="fas fa-clipboard-check"></i>
@@ -85,7 +76,14 @@
     </div>
   </div>
 
-  <!-- Link Submission Form -->
+  {% if submission_type == "link" or submission_type == "github_issue" %}
+  {% if submission_type == "github_issue" %}
+    {% assign link_label = "GitHub Issue Link" %}
+    {% assign link_placeholder = "https://github.com/owner/repo/issues/123" %}
+  {% else %}
+    {% assign link_label = "Submission Link" %}
+    {% assign link_placeholder = "https://..." %}
+  {% endif %}
   <form class="submission-form active" id="link-form">
     <div class="form-group">
       <label for="submission-link">{{ link_label }}</label>
@@ -103,28 +101,17 @@
       Submit Link
     </button>
   </form>
-  </div>
   {% elsif submission_type == "code" %}
   <form class="submission-form active" id="code-form">
     <div class="form-group">
-      <label for="code-language">Language</label>
-      <select id="code-language">
-        <option value="python">Python</option>
-        <option value="java">Java</option>
-        <option value="javascript">JavaScript</option>
-        <option value="pseudocode">Text / Pseudocode</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="code-input">Code</label>
-      <textarea id="code-input" class="code-input" placeholder="Paste or type your code here..." rows="12" required></textarea>
-      <p class="form-hint" style="font-size:0.85rem;color:#9ca3af;margin-top:6px;">Your code will be saved as a Gist and reviewed automatically. You must be logged in to submit.</p>
+      <p class="form-hint">This submits the code from this lesson's code runner(s) below as a Gist for automatic review. Save each runner with its 💾 button before submitting.</p>
+      <ul class="code-runner-summary" id="code-runner-summary"></ul>
     </div>
     <div class="form-group">
       <label for="code-notes">Notes (Optional)</label>
       <textarea id="code-notes" placeholder="Add any additional comments..."></textarea>
     </div>
-    <button type="submit" class="submit-btn" id="code-submit-btn">
+    <button type="submit" class="ocs__btn ocs__btn--icon" id="code-submit-btn">
       <i class="fas fa-check"></i>
       Submit Code
     </button>
@@ -155,4 +142,4 @@
   {% endif %}
 
   <div class="submission-status" id="submission-status"></div>
-</div>
+</section>

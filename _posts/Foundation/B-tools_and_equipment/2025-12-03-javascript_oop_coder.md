@@ -2,7 +2,6 @@
 layout: post
 show_reading_time: false
 tailwind: True
-assignment: true
 title: JavaScript OOP Coder 
 description: >
   A guided sequence of hands-on and learning tasks to help you build foundation in JavaScript and the frameworks that power our course.

@@ -1,5 +1,9 @@
-Title: "OCS Admin & Security Team"
+# Data for the OCS Admin & Security Team capstone page.
+# Read by _includes/ocs-admin-security-team.html. Edit here to change the title, intro, or team.
+Title: "OCS Admin & Security"
 TeamName: "OCS Admin & Security Team"
 Logo: "capstone/cccs-security-logo.png"
-Description: "Opening Open Coding Society to mentors while locking the platform down: Google OAuth-verified mentor signup with a scoped capstone dashboard and role-based permissions, a verified password reset flow, password complexity enforced on the Pages frontend and in both the Spring and Flask backends, and isolated Docker code-runner containers so untrusted Python and Java never execute inside the main application."
+Tagline: "We secure sign-in, manage mentor access, and keep student code isolated on the Open Coding Society platform."
+Description: "The OCS Admin & Security Team builds the systems that protect Open Coding Society as it scales: identity verification and password enforcement across the frontend and both backends, isolated execution for student code, automated database maintenance, and a role-based mentor system. Our goal is a platform that can take on new users, roles, and services without taking on new risk."
 Team: ["Shayan B", "Darshan S", "Rudra J", "Dhyan S", "Harrish A", "Lucas M", "Zhengji L", "Jacob C", "Arnav P"]
+Stack: ["Spring", "Flask", "Jekyll", "Docker"]

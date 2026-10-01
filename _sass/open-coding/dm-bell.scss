@@ -1,0 +1,65 @@
+// Navbar notification bell (_includes/themes/minima/header.html,
+// assets/js/api/dm-notifications.js). It lives in .site-nav next to .trigger,
+// not inside it, so it stays visible while the mobile menu is collapsed.
+
+.site-nav {
+  display: flex;
+  align-items: center;
+}
+
+.dm-bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  margin-left: 12px;
+  border-radius: 50%;
+  line-height: 1;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    background: color-mix(in srgb, currentColor 14%, transparent);
+    text-decoration: none;
+  }
+
+  // Clicks land on the link, not the SVG: ocs-analytics-tracker.js's click handler
+  // calls e.target.className.includes(), which throws for SVG elements.
+  svg {
+    fill: currentColor;
+    pointer-events: none;
+  }
+
+  &[hidden] {
+    display: none;
+  }
+
+  @media screen and (max-width: 600px) {
+    margin-left: 4px;
+  }
+}
+
+.dm-bell-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  box-sizing: border-box;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: darken($red, 8%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  pointer-events: none;
+
+  &[hidden] {
+    display: none;
+  }
+}

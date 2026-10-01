@@ -94,6 +94,12 @@ Check if this is a course lesson and determine which course context to use
           {% if page.chat %}
           {% include lesson_chat.html %}
           {% endif %}
+
+          <!-- Previous / next lesson, filled in from the sidebar order by fillLessonPager() -->
+          <div class="ocs__pager" id="lesson-pager" hidden>
+            <a href="#" class="ocs__pager-link" id="pager-prev"></a>
+            <a href="#" class="ocs__pager-link next" id="pager-next"></a>
+          </div>
         </div>
 
         {%- if page.comments -%}
@@ -136,6 +142,7 @@ Check if this is a course lesson and determine which course context to use
 <script type="module">
   import { pythonURI, fetchOptions, javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
   import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
+  import { listRunners, unsavedRunners, readRunners } from '{{ site.baseurl }}/assets/js/runner-io.js';
 
   /**
    * ============================================
@@ -147,7 +154,6 @@ Check if this is a course lesson and determine which course context to use
   const PAGE_TITLE = "{{ page.title }}";
   const CURRENT_LESSON_ID = '{{ page.url }}';
   const SUBMISSION_TYPE = {{ page.assignment_submission_type | default: "file" | downcase | jsonify }};
-  const CODE_EXTENSIONS = { python: 'py', java: 'java', javascript: 'js', pseudocode: 'txt' };
   const GITHUB_ISSUE_URL_PATTERN = /^https?:\/\/github\.com\/[^/]+\/[^/#?]+\/issues\/\d+\/?$/i;
   const STORAGE_KEY = `${COURSE}-lesson-completion`;
   const STATUS_AUTO_HIDE_MS = 5000;
@@ -173,6 +179,64 @@ Check if this is a course lesson and determine which course context to use
     chevron.classList.toggle('fa-chevron-right', !isHidden);
     chevron.classList.toggle('fa-chevron-down', isHidden);
   };
+
+  window.toggleWeek = function (weekId) {
+    const body = document.getElementById(`week-${weekId}-body`);
+    const chevron = document.getElementById(`week-chevron-${weekId}`);
+    const control = document.getElementById(`week-toggle-${weekId}`);
+    if (!body || !chevron) return;
+
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? 'block' : 'none';
+    chevron.classList.toggle('fa-chevron-right', !isHidden);
+    chevron.classList.toggle('fa-chevron-down', isHidden);
+    if (control) control.setAttribute('aria-expanded', isHidden.toString());
+  };
+
+  /**
+   * Week chat modals, built in lesson-sidebar-nav.html and emitted by
+   * lesson-modals.html. Opening one also opens the chat's <details>, whose
+   * toggle event is what week_chat.html waits for before it connects, so a
+   * chat only loads when someone actually opens it.
+   *
+   * Each modal also starts with the hidden attribute, so it stays hidden even
+   * when the stylesheet is stale or has not loaded yet. Without it, all of them
+   * sit in the lesson's flex row and push the lesson off the screen.
+   */
+  let weekChatTrigger = null;
+
+  window.openWeekChat = function (chatId, trigger) {
+    const modal = document.getElementById(`week-chat-modal-${chatId}`);
+    if (!modal) return;
+    weekChatTrigger = trigger || null;
+    modal.hidden = false;
+    modal.style.display = 'block';
+    const chat = modal.querySelector('details.week-chat');
+    if (chat && !chat.open) chat.open = true;
+    const close = modal.querySelector('.modal-close');
+    if (close) close.focus();
+  };
+
+  function closeWeekChat(modal) {
+    modal.style.display = 'none';
+    modal.hidden = true;
+    if (weekChatTrigger) weekChatTrigger.focus();
+    weekChatTrigger = null;
+  }
+
+  // The dim backdrop and the close button both close it; Escape does too.
+  document.addEventListener('click', (e) => {
+    const modal = e.target.closest('.week-chat-modal');
+    if (!modal) return;
+    if (e.target === modal || e.target.closest('.modal-close')) closeWeekChat(modal);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.week-chat-modal').forEach((modal) => {
+      if (modal.style.display === 'block') closeWeekChat(modal);
+    });
+  });
 
   /**
    * ============================================
@@ -256,10 +320,26 @@ Check if this is a course lesson and determine which course context to use
     return { total: lessonItems.length, completed };
   }
 
+  function updateWeekCounts(completionData) {
+    document.querySelectorAll('.week-group').forEach(group => {
+      const counter = group.querySelector('[data-week-count]');
+      if (!counter) return;
+
+      const items = group.querySelectorAll('.lesson-item');
+      let completed = 0;
+      items.forEach(item => {
+        if (completionData[item.dataset.lessonId]) completed++;
+      });
+
+      counter.textContent = `${completed}/${items.length}`;
+    });
+  }
+
   function updateProgressBars(completionData) {
     const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
     const stats = updateLessonItems(completionData);
-    
+    updateWeekCounts(completionData);
+
     const sidebarProgress = document.getElementById('sidebar-progress');
     if (sidebarProgress) {
       const sidebarPercent = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
@@ -313,6 +393,44 @@ Check if this is a course lesson and determine which course context to use
 
   /**
    * ============================================
+   * LESSON PAGER: Fill the prev/next links at the
+   * end of the lesson from the sidebar order
+   * ============================================
+   */
+  function fillLessonPager() {
+    const pager = document.getElementById('lesson-pager');
+    if (!pager) return;
+
+    const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
+    const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
+    if (currentIndex === -1) return;
+
+    const prev = lessonItems[currentIndex - 1];
+    const next = lessonItems[currentIndex + 1];
+    const titleOf = item => item.querySelector('.lesson-title').textContent.trim();
+
+    const prevLink = document.getElementById('pager-prev');
+    const nextLink = document.getElementById('pager-next');
+
+    if (prev) {
+      prevLink.href = prev.href;
+      prevLink.innerHTML = `&#8592; ${titleOf(prev)}`;
+    } else {
+      prevLink.replaceWith(document.createElement('span'));
+    }
+
+    if (next) {
+      nextLink.href = next.href;
+      nextLink.innerHTML = `Next: ${titleOf(next)} &rarr;`;
+    } else {
+      nextLink.replaceWith(document.createElement('span'));
+    }
+
+    pager.hidden = false;
+  }
+
+  /**
+   * ============================================
    * INITIALIZATION: Player setup
    * ============================================
    */
@@ -326,11 +444,22 @@ Check if this is a course lesson and determine which course context to use
   function expandCurrentSprint() {
     const activeLesson = document.querySelector('.lesson-item.active');
     if (!activeLesson) return;
-    
+
     const sprintSection = activeLesson.closest('.sprint-section');
     if (sprintSection) {
       const sprintToggle = sprintSection.querySelector('.sprint-toggle');
       if (sprintToggle) sprintToggle.click();
+    }
+  }
+
+  function expandCurrentWeek() {
+    const activeLesson = document.querySelector('.lesson-item.active');
+    if (!activeLesson) return;
+
+    const weekGroup = activeLesson.closest('.week-group');
+    if (weekGroup) {
+      const weekToggle = weekGroup.querySelector('.week-toggle');
+      if (weekToggle) weekToggle.click();
     }
   }
 
@@ -565,16 +694,12 @@ Check if this is a course lesson and determine which course context to use
     }).catch(() => {}); // non-blocking — don't fail submission if grades write fails
   }
 
-  async function submitCodeToBackend(code, language, description) {
+  async function submitCodeToBackend(files, description, selfAssessment) {
     const assignmentId = await ensureAssignmentId();
     // Resolve the user first so we don't burn a Gist creation on a request that will fail anyway.
     const { uid, personId } = await resolveCurrentUser();
-    const ext = CODE_EXTENSIONS[language] || 'txt';
-    const gistUrl = await exportToGist(
-      { [`submission.${ext}`]: { content: code } },
-      { type: 'submission', description: description || `Code submission (${language})` }
-    );
-    const content = { type: 'code', url: gistUrl, language, notes: description };
+    const gistUrl = await exportToGist(files, { type: 'submission', description: description || 'Code submission' });
+    const content = { type: 'code', url: gistUrl, notes: description };
     const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
       ...fetchOptions,
       method: 'POST',
@@ -584,7 +709,12 @@ Check if this is a course lesson and determine which course context to use
         isGroupSubmission: false,
         content,
         comment: description,
-        isLate: false
+        isLate: false,
+        technicalExcellence: selfAssessment.technicalExcellence,
+        communication: selfAssessment.communication,
+        workHabits: selfAssessment.workHabits,
+        aiOrchestration: selfAssessment.aiOrchestration,
+        selfAssessmentReflection: selfAssessment.selfAssessmentReflection
       })
     });
     if (!res.ok) {
@@ -595,7 +725,7 @@ Check if this is a course lesson and determine which course context to use
     await fetch(`${javaURI}/api/grades`, {
       ...fetchOptions,
       method: 'POST',
-      body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: content, submittedAt: new Date().toISOString() })
+      body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: { ...content, selfAssessment }, submittedAt: new Date().toISOString() })
     }).catch(() => {}); // non-blocking
     return gistUrl;
   }
@@ -817,6 +947,28 @@ Check if this is a course lesson and determine which course context to use
 
   /**
    * ============================================
+   * CODE SUBMISSION: Show which runners will be sent
+   * ============================================
+   */
+  function renderCodeRunnerSummary() {
+    const list = document.getElementById('code-runner-summary');
+    if (!list) return;
+    const runners = listRunners();
+    if (runners.length === 0) {
+      list.innerHTML = '<li>No code runners found on this page.</li>';
+      return;
+    }
+    const unsaved = new Set(unsavedRunners());
+    list.innerHTML = runners.map((el, i) => {
+      const id = el.dataset.runnerId || `runner_${i + 1}`;
+      return unsaved.has(el)
+        ? `<li>${id} — <span class="code-runner-unsaved">not saved yet</span></li>`
+        : `<li>${id} — <span class="code-runner-saved">saved</span></li>`;
+    }).join('');
+  }
+
+  /**
+   * ============================================
    * FORM SUBMISSION: Handle submissions
    * ============================================
    */
@@ -892,14 +1044,24 @@ Check if this is a course lesson and determine which course context to use
 
     const codeForm = document.getElementById('code-form');
     if (codeForm) {
+      renderCodeRunnerSummary();
       codeForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        const code = document.getElementById('code-input').value;
-        const language = document.getElementById('code-language').value;
         const notes = document.getElementById('code-notes')?.value?.trim() || '';
         const submitBtn = codeForm.querySelector('button[type="submit"]');
-        if (!code.trim()) {
-          showStatus('error', 'Please enter some code before submitting.');
+        if (unsavedRunners().length > 0) {
+          showStatus('error', 'Save your code with the 💾 button in each runner before submitting.');
+          return;
+        }
+        const files = readRunners();
+        if (Object.keys(files).length === 0) {
+          showStatus('error', "No saved code found in this lesson's code runner(s).");
+          return;
+        }
+        const selfAssessment = getSelfAssessmentData();
+        const selfAssessmentError = validateSelfAssessment(selfAssessment);
+        if (selfAssessmentError) {
+          showStatus('error', selfAssessmentError);
           return;
         }
         submitBtn.disabled = true;
@@ -913,10 +1075,11 @@ Check if this is a course lesson and determine which course context to use
         }
         showStatus('loading', 'Creating Gist and submitting...');
         try {
-          await submitCodeToBackend(code, language, notes);
-          saveSubmissionLocally('code', { language, notes });
+          await submitCodeToBackend(files, notes, selfAssessment);
+          saveSubmissionLocally('code', { notes, selfAssessment });
           showStatus('success', 'Code submitted successfully!');
           this.reset();
+          resetSelfAssessment();
         } catch (err) {
           showStatus('error', err.message);
         } finally {
@@ -995,7 +1158,9 @@ Check if this is a course lesson and determine which course context to use
     // Lesson player setup
     initLessonPlayer();
     expandCurrentSprint();
+    expandCurrentWeek();
     syncCompletionUI();
+    fillLessonPager();
     setupSyncListeners();
     
     // Mobile enhancements
@@ -1277,6 +1442,25 @@ Check if this is a course lesson and determine which course context to use
 
   .self-assessment-reflection {
     margin-bottom: 0;
+  }
+
+  .code-runner-summary {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    font-size: 0.9rem;
+  }
+
+  .code-runner-summary li {
+    padding: 4px 0;
+  }
+
+  .code-runner-saved {
+    color: #16a34a;
+  }
+
+  .code-runner-unsaved {
+    color: #dc2626;
   }
 
   .submission-options {
@@ -1619,18 +1803,8 @@ Check if this is a course lesson and determine which course context to use
       {% elsif submission_type == "code" %}
       <form class="submission-form active" id="code-form-blog">
         <div class="form-group">
-          <label for="code-language-blog">Language</label>
-          <select id="code-language-blog">
-            <option value="python">Python</option>
-            <option value="java">Java</option>
-            <option value="javascript">JavaScript</option>
-            <option value="pseudocode">Text / Pseudocode</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="code-input-blog">Code</label>
-          <textarea id="code-input-blog" class="code-input" placeholder="Paste or type your code here..." rows="12" required></textarea>
-          <p class="form-hint" style="font-size:0.85rem;color:#9ca3af;margin-top:6px;">Your code will be saved as a Gist and reviewed automatically. You must be logged in to submit.</p>
+          <p class="form-hint">This submits the code from this lesson's code runner(s) below as a Gist for automatic review. Save each runner with its 💾 button before submitting.</p>
+          <ul class="code-runner-summary" id="code-runner-summary-blog"></ul>
         </div>
         <div class="form-group">
           <label for="code-notes-blog">Notes (Optional)</label>
@@ -1676,8 +1850,24 @@ Check if this is a course lesson and determine which course context to use
       const FRONTMATTER_ASSIGNMENT_ID_BLOG = {{ page.assignment_id | default: 'null' }};
       const FRONTMATTER_ASSIGNMENT_NAME_BLOG = {{ page.assignment_name | default: nil | jsonify }};
       const SUBMISSION_TYPE_BLOG = {{ page.assignment_submission_type | default: "file" | downcase | jsonify }};
-      const CODE_EXTENSIONS_BLOG = { python: 'py', java: 'java', javascript: 'js', pseudocode: 'txt' };
       const GITHUB_ISSUE_URL_PATTERN_BLOG = /^https?:\/\/github\.com\/[^/]+\/[^/#?]+\/issues\/\d+\/?$/i;
+
+      function renderCodeRunnerSummaryBlog() {
+        const list = document.getElementById('code-runner-summary-blog');
+        if (!list) return;
+        const runners = window.listRunners();
+        if (runners.length === 0) {
+          list.innerHTML = '<li>No code runners found on this page.</li>';
+          return;
+        }
+        const unsaved = new Set(window.unsavedRunners());
+        list.innerHTML = runners.map((el, i) => {
+          const id = el.dataset.runnerId || `runner_${i + 1}`;
+          return unsaved.has(el)
+            ? `<li>${id} — <span class="code-runner-unsaved">not saved yet</span></li>`
+            : `<li>${id} — <span class="code-runner-saved">saved</span></li>`;
+        }).join('');
+      }
 
       async function ensureAssignmentIdBlog() {
         if (typeof ensureAssignmentId === 'function') {
@@ -1928,14 +2118,21 @@ Check if this is a course lesson and determine which course context to use
       // Code submission — bundled into a Gist, then POST to Spring API
       const codeFormBlog = document.getElementById('code-form-blog');
       if (codeFormBlog) {
+        // window.listRunners/etc. come from a module script further down the page, which
+        // (like all module scripts) runs deferred - only after DOMContentLoaded is it
+        // guaranteed to have executed, so the summary render waits for that event too.
+        document.addEventListener('DOMContentLoaded', renderCodeRunnerSummaryBlog);
         codeFormBlog.addEventListener('submit', async function (e) {
           e.preventDefault();
-          const code = document.getElementById('code-input-blog').value;
-          const language = document.getElementById('code-language-blog').value;
           const notes = document.getElementById('code-notes-blog')?.value?.trim() || '';
           const btn = this.querySelector('button[type="submit"]');
-          if (!code.trim()) {
-            showStatusBlog('error', 'Please enter some code before submitting.');
+          if (window.unsavedRunners().length > 0) {
+            showStatusBlog('error', 'Save your code with the 💾 button in each runner before submitting.');
+            return;
+          }
+          const files = window.readRunners();
+          if (Object.keys(files).length === 0) {
+            showStatusBlog('error', "No saved code found in this lesson's code runner(s).");
             return;
           }
           btn.disabled = true;
@@ -1951,12 +2148,8 @@ Check if this is a course lesson and determine which course context to use
           showStatusBlog('loading', 'Creating Gist and submitting...');
           try {
             const assignmentId = await ensureAssignmentIdBlog();
-            const ext = CODE_EXTENSIONS_BLOG[language] || 'txt';
-            const gistUrl = await window.exportToGist(
-              { [`submission.${ext}`]: { content: code } },
-              { type: 'submission', description: notes || `Code submission (${language})` }
-            );
-            const content = { type: 'code', url: gistUrl, language, notes };
+            const gistUrl = await window.exportToGist(files, { type: 'submission', description: notes || 'Code submission' });
+            const content = { type: 'code', url: gistUrl, notes };
             const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
               ...fetchOptions,
               method: 'POST',
