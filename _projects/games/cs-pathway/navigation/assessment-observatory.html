@@ -1,0 +1,30 @@
+<div class="assessment-overview">
+  <header>
+    <p class="assessment-overview__eyebrow">The 7 Blueprints · CS Pathway</p>
+    <h1>Assessment Observatory</h1>
+    <p>Make learning progress visible. Turn activity and reflection into a clearer picture of student growth.</p>
+    <p><strong>Section lead:</strong> Meryl</p>
+    <p><a href="{{ '/cs-pathway' | relative_url }}">Explore CS Pathway</a> · <a href="https://github.com/the7blueprints/blueprints_pages">GitHub Repository</a></p>
+  </header>
+
+  <section>
+    <h2>Project Overview</h2>
+    <p>Assessment Observatory brings learning activity, GitHub contributions, and saved self-evaluations into one game world. Students visit three stations to review their progress, compare evidence, and identify their next area of growth.</p>
+    <p>The goal is to support reflection with evidence. Commit counts and time spent provide context; they do not explain the quality of a student's work on their own.</p>
+  </section>
+
+  <section>
+    <h2>Observatory Stations</h2>
+    <div class="assessment-overview__grid">
+      <article><span class="assessment-overview__eyebrow">Blue station</span><h3>AI Skill Advisor</h3><p>Explore performance analytics, compare sprint activity, and access recommendations, chat, and a Wordle mini challenge.</p><details><summary>What this supports</summary><p>Students can notice changes in engagement and use those observations to guide their next sprint.</p></details></article>
+      <article><span class="assessment-overview__eyebrow">Green station</span><h3>GitHub Analytics</h3><p>Review commits, pull requests, issues, and lines of code added or removed.</p><details><summary>What this supports</summary><p>Connect development activity to actual contributions. Review what changed and why, alongside the numbers.</p></details></article>
+      <article><span class="assessment-overview__eyebrow">Amber station</span><h3>Sprint Coach</h3><p>Visualize saved self-evaluation ratings in a skill radar, including strengths and growth areas.</p><details><summary>What this supports</summary><p>Compare self-reflection with project evidence and choose a focused improvement to work on.</p></details></article>
+    </div>
+  </section>
+
+  <section><h2>Student Experience</h2><ol><li>Enter the observatory with your saved CS Pathway identity and theme.</li><li>Move between the three stations and interact with their guides.</li><li>Review your activity and contribution data alongside your self-evaluation.</li><li>Identify a strength and a next step to discuss during sprint reflection.</li></ol></section>
+
+  <section><h2>How the Pieces Connect</h2><p>The game uses the shared CS Pathway profile system. Flask endpoints provide identity and GitHub contribution data; Spring endpoints provide learning analytics and saved self-evaluations. A canvas radar visualizes the self-evaluation ratings.</p><p>Personal results depend on a signed-in account and available backend data. The skill radar requires a saved self-evaluation.</p></section>
+
+  <section><h2>Validation &amp; Next Steps</h2><p>Review the experience with accounts that have complete, missing, and unavailable data. Check that station results match their source records, that error states are understandable, and that students can return from each panel to the game.</p><p>Next, connect this overview with the team's other level pages and use student feedback to improve the clarity of the station explanations.</p></section>
+</div>

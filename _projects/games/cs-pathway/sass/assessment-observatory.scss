@@ -1,0 +1,13 @@
+.assessment-overview {
+  max-width: 1100px;
+  margin: 0 auto;
+  line-height: 1.65;
+  header { text-align: center; padding: 2rem 0; }
+  section { margin: 2rem 0; }
+  &__eyebrow { color: #6fc7b2; font-weight: 600; letter-spacing: .04em; }
+  &__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  article { padding: 1.3rem; border: 1px solid rgba(160, 160, 160, .35); border-radius: 12px; }
+  summary { cursor: pointer; font-weight: 600; }
+  a { text-decoration: underline; }
+  @media (max-width: 760px) { &__grid { grid-template-columns: 1fr; } }
+}
