@@ -6,7 +6,6 @@ description: >
   quick concept tests, and bring your leading concept to your industry
   mentor for the first design review of Sprint 2.
 courses: {'csh': {'week': 5}}
-assignment: true
 type: capstone
 canonical_id: csh-design-concepts
 author: PLTW Capstone

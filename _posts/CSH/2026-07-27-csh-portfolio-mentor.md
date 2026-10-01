@@ -6,7 +6,6 @@ description: >
   finalize the signed mentor agreement, and initialize your engineering
   portfolio.
 courses: {'csh': {'week': 3}}
-assignment: true
 type: capstone
 canonical_id: csh-portfolio-mentor
 author: PLTW Capstone
