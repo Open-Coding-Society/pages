@@ -1,0 +1,126 @@
+<!-- Reusable HTML Runner Component: an editable %%html notebook cell -->
+<!-- code-runner-container lets runner-io.js read it; ui-runner-container styles the rendered output -->
+<div class="code-runner-container ui-runner-container"
+  id="html-runner-{{ include.runner_id }}"
+  data-runner-id="{{ include.runner_id }}"
+  data-default-code="{{ include.code | jsonify | escape }}"
+  data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+  {% include runners/fragments/challenge-box.html title="HTML Runner Challenge" challenge=include.challenge %}
+
+  {% if include.source %}
+  <details>
+    <summary>View IPYNB Source</summary>
+
+<div markdown="1">
+{{ include.source }}
+</div>
+
+  </details>
+  {% endif %}
+
+  {% capture html_runner_top_controls %}
+      <button type="button" class="ocs__btn utility run" data-hook="run" title="Run" aria-label="Run"></button>
+      <button type="button" class="ocs__btn utility copy" data-hook="copy" title="Copy Code" aria-label="Copy Code"></button>
+      <button type="button" class="ocs__btn utility save" data-hook="save" title="Save Code" aria-label="Save Code"></button>
+      <button type="button" class="ocs__btn utility clear" data-hook="clear" title="Clear Storage" aria-label="Clear Storage"></button>
+      <select class="languageSelect" aria-label="Language">
+        <option value="html">HTML</option>
+      </select>
+  {% endcapture %}
+  {% capture html_runner_bottom_controls %}
+    {% include runners/fragments/editor-stats.html %}
+  {% endcapture %}
+  {% include runners/fragments/editor-container.html
+     top_controls=html_runner_top_controls
+     bottom_controls=html_runner_bottom_controls
+  %}
+
+  <div class="output-container">
+    <div class="control-panel">
+      <span>HTML Output</span>
+      <button type="button" class="ocs__btn utility reset" data-hook="reset" title="Clear Output" aria-label="Clear Output"></button>
+    </div>
+    <div class="ui-output" id="html-output-{{ include.runner_id }}"></div>
+  </div>
+</div>
+
+{% unless html_runner_modes_loaded %}
+{% assign html_runner_modes_loaded = true %}
+<!-- CodeMirror HTML highlighting (htmlmixed needs xml and css; javascript loads in head-custom.html) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+{% endunless %}
+
+<script type="module">
+import { BaseRunner, HtmlExecutor } from '{{ site.baseurl }}/assets/js/pages/runners/index.js';
+
+(function() {
+  const container = document.getElementById('html-runner-{{ include.runner_id }}');
+  if (!container) return;
+
+  const defaultCode = JSON.parse(container.dataset.defaultCode || "\"\"");
+  const autostart = "{{ include.autostart | default: 'false' }}" === "true";
+  const editorHeight = "{{ include.height }}";
+  const outputHeight = "{{ include.output_height }}";
+  const storageKey = container.dataset.storageKey;
+  const runner = new BaseRunner(container, { storageKey });
+
+  const editor = runner.initializeEditor({
+    defaultCode,
+    editorHeight,
+    fallbackCode: "<p>Write your HTML here</p>",
+    codeMirrorOptions: {
+      lineNumbers: true,
+      mode: "htmlmixed",
+      theme: "darcula",
+      indentUnit: 2,
+      tabSize: 2,
+      styleSelectedText: true
+    }
+  });
+
+  if (outputHeight) {
+    runner.applyScopedStyle(`#html-output-{{ include.runner_id }} { min-height: ${outputHeight}; max-height: ${outputHeight}; height: ${outputHeight}; }`);
+  }
+
+  const htmlExecutor = new HtmlExecutor({
+    editor,
+    outputElement: container.querySelector('.ui-output'),
+  });
+
+  runner.bindEditorButtons({
+    resetValue: defaultCode || "<p>Write your HTML here</p>",
+    onClear: () => {
+      htmlExecutor.stop();
+    },
+    saveFeedback: '✔',
+    copyFeedback: '✔'
+  });
+
+  // Clear the rendered output
+  container.querySelector('[data-hook="reset"]').onclick = () => {
+    htmlExecutor.stop();
+  };
+
+  // Run button logic
+  function runCode() {
+    return htmlExecutor.run();
+  }
+
+  runner.bindButton('', runCode, 'run');
+
+  // Keyboard shortcut
+  runner.bindShortcut(runCode);
+
+  // Autostart only the starter code. Saved code waits for Run, so a saved
+  // <script> that loops forever (or a <style> that breaks the page) can't lock
+  // the student out on the next page load.
+  if (autostart && editor.getValue() === defaultCode) {
+    // Defer to next tick so output container is present before rendering.
+    setTimeout(() => {
+      runCode();
+    }, 0);
+  }
+})();
+</script>

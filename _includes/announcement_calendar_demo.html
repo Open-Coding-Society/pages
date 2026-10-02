@@ -1,0 +1,100 @@
+<!-- Announcement ↔ Calendar demo: two skeleton versions of creating calendar -->
+<!-- events straight from the class announcements, switchable on one page so a -->
+<!-- teacher can compare them, plus a Week view toggle that works with both. -->
+<!-- Preview mode (default) runs on sample data in localStorage; Live mode uses -->
+<!-- the existing Spring /api/calendar and group chat endpoints on a separate -->
+<!-- "<course>-announcements-demo" group. -->
+<!-- Logic lives in assets/js/chat/calendar/ (entry: demo.js). -->
+<!-- Usage: {% raw %}{% include announcement_calendar_demo.html course="csa" %}{% endraw %} -->
+
+{% assign demo_course = include.course | default: page.course | default: "csa" %}
+<section id="announcementCalendarDemo" class="announcement-calendar" data-course="{{ demo_course }}" data-baseurl="{{ site.baseurl }}">
+  <div class="announcement-calendar-toolbar">
+    <div class="announcement-calendar-versions" role="tablist" aria-label="Demo version">
+      <button type="button" role="tab" data-version="1"><b>V1</b> Add-to-calendar button</button>
+      <button type="button" role="tab" data-version="2"><b>V2</b> Quick syntax</button>
+    </div>
+    <div class="announcement-calendar-controls">
+      <div class="announcement-calendar-segment" role="radiogroup" aria-label="Class">
+        <span class="announcement-calendar-segment-label">Class</span>
+        <button type="button" role="radio" data-course="csa" title="Period 2">CSA</button>
+        <button type="button" role="radio" data-course="csh" title="Period 2">CSH</button>
+        <button type="button" role="radio" data-course="csp" title="Periods 3 &amp; 4">CSP</button>
+        <button type="button" role="radio" data-course="csse" title="Period 1">CSSE</button>
+      </div>
+      <div class="announcement-calendar-segment" role="radiogroup" aria-label="Period" data-period-filter></div>
+      <div class="announcement-calendar-segment" role="radiogroup" aria-label="View as">
+        <span class="announcement-calendar-segment-label">View as</span>
+        <button type="button" role="radio" data-role="teacher">Teacher</button>
+        <button type="button" role="radio" data-role="student">Student</button>
+      </div>
+      <div class="announcement-calendar-segment" role="radiogroup" aria-label="Data source">
+        <button type="button" role="radio" data-mode="preview" title="Sample data in this browser">Preview</button>
+        <button type="button" role="radio" data-mode="live" title="Real backend, needs sign-in">Live</button>
+      </div>
+      <button type="button" class="announcement-calendar-reset" title="Restore the sample week"><i class="fas fa-undo" aria-hidden="true"></i> Reset</button>
+    </div>
+  </div>
+  <p class="announcement-calendar-summary"></p>
+
+  <div class="announcement-chat">
+    <div class="chat-header">
+      <div class="chat-heading">
+        <span class="chat-badge" aria-hidden="true"><i class="fas fa-bullhorn"></i></span>
+        <div class="chat-heading-text">
+          <h2 class="chat-title">{{ demo_course | upcase }} Announcements</h2>
+          <p class="chat-subtitle">Class-wide announcements, now with calendar events attached.</p>
+        </div>
+      </div>
+      <div class="announcement-calendar-header-actions">
+        <button type="button" class="week-view-toggle" aria-pressed="true" aria-label="Week view" title="Show or hide this week's calendar">
+          <i class="fas fa-calendar-week" aria-hidden="true"></i><span>Week view</span>
+        </button>
+        <span class="chat-status-pill">
+          <span class="chat-status-dot" aria-hidden="true"></span>
+          <span class="chat-status">loading…</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="chat-body">
+      <p class="chat-preview-note" hidden><i class="fas fa-flask" aria-hidden="true"></i><span></span></p>
+      <div data-slot="week-view"></div>
+      <div class="chat-messages" role="log" aria-live="polite">
+        <div class="chat-empty">
+          <i class="fas fa-bullhorn" aria-hidden="true"></i>
+          <p class="chat-empty-title">No announcements yet</p>
+          <span class="chat-empty-hint">Class-wide messages will appear here.</span>
+        </div>
+      </div>
+      <form class="chat-form" autocomplete="off">
+        <button class="chat-send" type="submit">
+          <i class="fas fa-paper-plane" aria-hidden="true"></i><span>Send</span>
+        </button>
+      </form>
+      <div class="announcement-calendar-tools" data-slot="composer-tools"></div>
+      <div data-slot="composer-panel"></div>
+    </div>
+  </div>
+</section>
+
+{% assign calendar = site.data.school_calendar %}
+<script id="announcementCalendarSchool" type="application/json">
+{
+  "schoolYear": {{ calendar.school_year | jsonify }},
+  "weeks": {
+    {% for week in calendar.weeks %}
+    "{{ week[0] }}": {
+      "monday": {{ week[1].monday | jsonify }},
+      "friday": {{ week[1].friday | jsonify }},
+      "holidays": {{ week[1].holidays | default: nil | jsonify }},
+      "holidayAdjustment": {{ week[1].holiday_adjustment | default: nil | jsonify }},
+      "skipWeek": {{ week[1].skip_week | default: false | jsonify }},
+      "theme": {{ week[1].theme | default: nil | jsonify }},
+      "notes": {{ week[1].notes | default: nil | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  }
+}
+</script>
+<script type="module" src="{{ site.baseurl }}/assets/js/chat/calendar/demo.js"></script>

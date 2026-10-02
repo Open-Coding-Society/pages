@@ -2,6 +2,8 @@
 @import "root-color-map";
 @import "open-coding/mixins/modals";
 @import "open-coding/mixins/buttons";
+@import "open-coding/mixins/variables";
+@import "open-coding/mixins/grid";
 
 /* ============================= */
 /*       VIDEO DEMO MODAL        */
@@ -124,11 +126,10 @@
     margin-top: 32px;
   }
 
+  /* Panel, radius, padding and spacing come from .ocs__card. A sprint keeps
+     the accent border and its lift so it still reads as the outer container. */
   .sprint-card {
-    border: 1px solid var(--accent);
-    border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 24px;
+    border-color: var(--pref-accent-color);
     box-shadow: 0 20px 50px rgba(0,0,0,0.25);
   }
 
@@ -188,9 +189,8 @@
     display: none;
   }
 
+  /* Panel, radius, padding and spacing come from .ocs__card. */
   .week-card {
-    border-radius: 12px;
-    margin-bottom: 16px;
     transition: all 0.2s;
     overflow: hidden;
   }
@@ -224,15 +224,18 @@
     align-items: center;
   }
 
+  /* No OCS component draws a numbered circle on a rail, so this stays
+     bespoke — but on the theme tokens, not hardcoded SASS colours, so it
+     follows the user's accent like every component does. */
   .week-circle {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    border: 2px solid $bg-3;
+    border: 2px solid var(--ui-border);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $accent;
+    color: var(--pref-accent-color);
     font-weight: 600;
     font-size: 14px;
   }
@@ -240,7 +243,7 @@
   .week-connector {
     width: 1px;
     height: 32px;
-    background: $bg-3;
+    background: var(--ui-border);
     margin-top: 8px;
   }
 
@@ -262,41 +265,18 @@
     margin: 0 0 4px 0;
   }
 
-  .completion-badge {
-    background: transparent;
-    border: 1px solid $bg-3;
-    color: $text-muted;
-    padding: 4px 12px;
-    border-radius: 4px;
-    font-size: 13px;
-  }
+  /* .completion-badge is styled by .ocs__status-pill--neutral (elements/capstone/status-pills). */
 
-  .sprint-btn {
-    background: var(--pref-bg-color);
-    border: 1px solid var(--pref-accent-color);
-    color: var(--pref-accent-color);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: var(--pref-font-size);
-    font-family: var(--pref-font-family);
-    cursor: pointer;
-    transition: all 0.2s;
-    height: 38px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .sprint-btn:hover,
-  .sprint-btn:focus-visible {
-    @include text-button;
-  }
-
+  /* Base look comes from .ocs__btn in the markup; only the icon-only square shape is set here. */
   .sprint-btn.certificate,
   .sprint-btn.help {
     @include icon-button
   }
 
+  /* .ocs__grid is the container; the cells are .ocs__grid-cell. The column
+     rule stays here because .ocs__grid--card uses auto-fill at 200px, which
+     leaves a lone lesson squeezed into a 200px track instead of filling the
+     row. auto-fit at 300px collapses the empty track. */
   .items-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -304,15 +284,11 @@
     margin-bottom: 16px;
   }
 
+  /* .ocs__grid-cell gives the box. grid-card-cell adds the hover lift his
+     .ocs__grid--card cells get (panel-mid, accent border, -2px, shadow);
+     only card-grid's auto-fill columns were the problem, not the cell. */
   .item-card {
-    padding: 12px;
-    border: 1px solid $bg-3;
-    border-radius: 8px;
-    transition: background 0.2s;
-  }
-
-  .item-card:hover {
-    background: rgba($text, 0.05);
+    @include grid-card-cell;
   }
 
   .item-content {
@@ -322,12 +298,16 @@
     width: 100%;
   }
 
+  /* base-button is his shared control behaviour (cursor, transition, hover
+     and focus tones). The toggle stays a bare round icon at rest and picks up
+     the panel-mid highlight on hover, so it reads as something you can press. */
   .completion-toggle {
+    @include base-button;
     background: none;
     border: none;
+    border-radius: 50%;
     padding: 0;
     margin: 0;
-    cursor: pointer;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -353,11 +333,18 @@
   }
 
   .status-icon.completed {
-    color: $accent;
+    color: var(--pref-accent-color);
+  }
+
+  /* base-button's hover is --panel-mid, a 12% black wash that barely reads on
+     a 20px circle over a dark panel. Previewing the accent on the icon is the
+     same signal .status-icon.completed already uses for the "on" state. */
+  .completion-toggle:hover .status-icon {
+    color: var(--pref-accent-color);
   }
 
   .status-icon.incomplete {
-    color: $bg-3;
+    color: var(--text-muted);
   }
 
   .type-icon {
@@ -392,28 +379,11 @@
 
   // Item-level priority dropdown in main dashboard
   .item-priority-dropdown {
+    @include select-control(42px);
     flex-shrink: 0;
-    padding: 2px 6px;
     font-size: 11px;
     font-weight: 600;
-    border-radius: 4px;
-    border: 1px solid $bg-3;
-    background: $bg-2;
-    color: $text;
-    cursor: pointer;
-    min-width: 42px;
     text-align: center;
-    transition: all 0.2s ease;
-
-    &:hover {
-      border-color: $accent;
-    }
-
-    &:focus {
-      outline: none;
-      border-color: $accent;
-      box-shadow: 0 0 0 2px rgba($accent, 0.2);
-    }
 
     // Priority color coding
     &.priority-p0 {
@@ -439,6 +409,15 @@
       border-color: rgba(156, 163, 175, 0.4);
       color: #9ca3af;
     }
+
+    /* The priority tones above are emitted after select-control's own :hover
+       and match its specificity, so they were winning and the select sat dead
+       under the pointer. Restating the accent border last puts base-button's
+       hover back on top while the priority tint still shows through. */
+    &:hover,
+    &:focus {
+      border-color: var(--pref-accent-color);
+    }
   }
 
   .week-goals-container {
@@ -448,13 +427,9 @@
     border-bottom: 1px solid $bg-3;
   }
 
+  /* .goals-label is styled by .ocs__section-title; it only needs to be a
+     block so the goals sit under it rather than beside it. */
   .goals-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: $text-muted;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 8px;
     display: block;
   }
 
@@ -465,23 +440,7 @@
     align-items: flex-start;
   }
 
-  .goal-item {
-    position: relative;
-    padding-left: 16px;
-    font-size: 0.85rem;
-    color: $text;
-    line-height: 1.4;
-  }
-
-  .goal-item::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: $accent;
-    font-weight: bold;
-    opacity: 0.7;
-  }
-
+  /* Arrow, gap and colour come from .ocs__keypoint / .ocs__check. */
   .goal-item:hover {
     color: $text;
   }
@@ -490,12 +449,8 @@
     opacity: 1;
   }
 
+  /* Pill itself is .ocs__status-pill--warn; this only spaces it from the card above. */
   .assignment-due {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #f59e0b;
-    font-size: 14px;
     margin-top: 8px;
   }
 
@@ -536,6 +491,12 @@
 
     .sprint-card {
       padding: 16px;
+    }
+
+    /* .ocs__card gives the week 24px 28px, which nests inside the sprint's
+       16px and left lesson titles about 200px to wrap in on a phone. */
+    .week-card {
+      padding: 10px;
     }
 
     .sprint-header {
@@ -610,14 +571,16 @@
       font-size: 13px;
     }
 
+    /* select-control's own mobile rule sets 0.85rem, which suits his 150px
+       language pickers but grew this compact chip on phones, past its desktop
+       size, and took the width from the lesson title beside it. */
+    .item-priority-dropdown {
+      font-size: 11px;
+    }
+
     .progression-btn {
       padding: 8px 12px;
       font-size: 12px;
-    }
-
-    .completion-badge {
-      font-size: 12px;
-      padding: 3px 8px;
     }
 
     /* Modal responsiveness */

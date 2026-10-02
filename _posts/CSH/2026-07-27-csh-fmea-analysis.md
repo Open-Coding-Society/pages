@@ -6,7 +6,6 @@ description: >
   analyze your own Trimester 1 prototype as the "previous solution attempt"
   being superseded.
 courses: {'csh': {'week': 14}}
-assignment: true
 type: capstone
 canonical_id: csh-fmea-analysis
 author: PLTW Capstone

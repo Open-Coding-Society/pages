@@ -26,10 +26,13 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
 export const GOOGLE_CLIENT_ID = "{{ site.google_client_id }}";
 
 export var javaWebSocketURI;
+// Port 8589 only exists on localhost; in production nginx forwards /ws-chat
+// through javaURI's normal port (443), same as announcement_chat.html and
+// week_chat.html's buildChatSocketEndpoint() already do.
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     javaWebSocketURI = "http://localhost:8589";
 } else {
-    javaWebSocketURI = "https://spring.opencodingsociety.com:8589";
+    javaWebSocketURI = "https://spring.opencodingsociety.com";
 }
 
 export const fetchOptions = {

@@ -857,7 +857,34 @@ document.addEventListener('DOMContentLoaded', function(){
            <p>Team: Ruchika Kench, Akshara Shankar, Avantika Chittari</p>
        </div>
    </div>
-   
+
+<!-- Safe Passage Heals V2.0 (CSP, 2026/2027) -->
+<div class="ocs__grid-cell CSP" data-year="2026-2027">
+    <a href="{{ '/capstone/safe-passage-heals-v2/' | relative_url }}">
+        <img src="/images/capstone/sph.png"
+             alt="Safe Passage Heals"
+             class="ocs__image-frame ocs__image-frame--thumbnail" />
+    </a>
+
+    <div>
+        <h3>
+            <a href="{{ '/capstone/safe-passage-heals-v2/' | relative_url }}">
+                Safe Passage Heals - Media Management Tools and Interactive Recovery Simulation V2.0
+            </a>
+        </h3>
+
+        <p>
+            An updated version of the Safe Passage Heals project focused on
+            media management tools and an interactive recovery simulation
+            that builds on the original project.
+        </p>
+
+        <p>
+            Team: Yiming Yin, Noor Saif Bijapur, Luke Sanders
+        </p>
+    </div>
+</div>
+
    <!-- California Center For The Performing Arts Escondido (CSP, 2026/2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
        <a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">

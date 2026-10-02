@@ -28,7 +28,7 @@ SIDE-BY-SIDE RUNNER LEGEND (Container Panel Composition)
 =============================================================
 
 Supported cell directives for side-by-side layout:
-- CODE_RUNNER (python/javascript/java comment marker)
+- CODE_RUNNER (python/javascript/java comment marker, or an HTML comment in a %%html cell)
 - UI_RUNNER   (HTML comment marker)
 - GAME_RUNNER (javascript comment marker)
 
@@ -48,6 +48,7 @@ Pairing behavior:
 
 Examples:
 - // CODE_RUNNER: Challenge text | panel: demo, slot: left, ratio: 35-65
+- <!-- CODE_RUNNER: Challenge text | autostart: true -->   (first line of the cell is %%html)
 - <!-- UI_RUNNER: Notes | panel: demo, slot: left -->
 - // GAME_RUNNER: Arcade mode | panel: demo, slot: right, layout: row
 
@@ -61,6 +62,11 @@ Runner options:
 UI-runner specific options:
 - show_code: true|false  Show the HTML/CSS/JS source in a disclosure above the rendered UI.
 - show_source: true|false Alias for show_code.
+
+HTML code-runner specific options (%%html cells with a CODE_RUNNER comment):
+- Students edit plain HTML (no JavaScript strings), and Run renders it into the page.
+- height: <css-size>        Editor height. Default: 300px.
+- output_height: <css-size> Rendered output height. Default: the UI runner's 400px minimum.
 
 Game-runner specific options:
 - hide_edit, width, height, editor_height
@@ -80,6 +86,7 @@ CODE_RUNNER_PATTERNS = {
     'javascript': r'^//\s*CODE_RUNNER:\s*(.+)$',
     'python': r'^#\s*CODE_RUNNER:\s*(.+)$',
     'java': r'^//\s*CODE_RUNNER:\s*(.+)$',
+    'html': r'^<!--\s*CODE_RUNNER:\s*(.+)\s*-->$',
 }
 
 # UI_RUNNER pattern for HTML cells
@@ -116,6 +123,10 @@ def detect_cell_language(cell):
     # JavaScript: first line is %%js magic command
     if lines and lines[0].strip().startswith('%%js'):
         return 'javascript'
+
+    # HTML: first line is %%html magic command
+    if lines and lines[0].strip().startswith('%%html'):
+        return 'html'
 
     # Java: last non-whitespace line matches ClassName.main(null);
     # Find last non-empty line
@@ -260,6 +271,12 @@ class CodeRunner:
 
     def liquid_lines(self, code_fence_lines: list[str], code_runner_count: int) -> list[str]:
         """Render Jekyll Liquid captures/includes for embedding the code runner widget."""
+        include = 'runners/code.html'
+        if self.language == 'html':
+            include = 'runners/html.html'
+            # The notebook's kernel language labels every fence; this cell is HTML.
+            code_fence_lines = ['```html', *code_fence_lines[1:]]
+
         lines = [
             '',
             '{% capture challenge' + str(code_runner_count) + ' %}',
@@ -274,7 +291,7 @@ class CodeRunner:
             *code_fence_lines,
             '{% endcapture %}',
             '',
-            '{% include runners/code.html',
+            '{% include ' + include,
             '   runner_id="' + self.runner_id + '"',
             '   language="' + self.language + '"',
             '   challenge=challenge' + str(code_runner_count),
@@ -284,6 +301,11 @@ class CodeRunner:
 
         if self.options.get('autostart') or self.options.get('auto_start'):
             lines.append('   autostart="true"')
+
+        if self.language == 'html':
+            for option in ('height', 'output_height'):
+                if self.options.get(option):
+                    lines.append('   ' + option + '="' + str(self.options[option]) + '"')
 
         lines.extend(['%}', ''])
         return lines
@@ -914,6 +936,10 @@ def process_ui_runner_cells(notebook, permalink):
     processed_cells = []
     
     for cell in notebook.cells:
+        if 'code_runner' in cell.get('metadata', {}):
+            # A %%html cell with a CODE_RUNNER comment is already an editable HTML runner.
+            processed_cells.append(cell)
+            continue
         if cell.cell_type == 'raw' or (cell.cell_type == 'code' and cell.source.strip().startswith('%%html')):
             runner = UiRunner.from_cell(cell, permalink, runner_index)
 
