@@ -1,4 +1,3 @@
-
 class GameLevel3 {
     constructor(gameEnv = {}) {
         this.path = gameEnv.path || "/_projects/games/racing-game";
