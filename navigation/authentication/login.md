@@ -56,10 +56,10 @@ show_reading_time: false
         </div>
         <!-- Google OAuth Section (initially hidden) -->
         <div id="oauth-verification" hidden>
-            <h3>Google Account Verification</h3>
+            <h3>School Email Verification</h3>
             <p id="oauth-copy-student">
-                Sign in with any Google account. Poway USD student accounts receive immediate access;
-                other accounts will await administrator approval.
+                Please sign in with your school Google account to verify you're a Poway USD student or teacher.
+                <br><strong>You must use an email ending in @stu.powayusd.com or @powayusd.com</strong>
             </p>
             <div id="g_id_onload"
                  data-client_id="{{ site.google_client_id }}"
@@ -478,10 +478,16 @@ show_reading_time: false
         try {
             const userInfo = parseJwt(response.credential);
             const email = userInfo.email;
+            // Students need no admin approval: a school email is the only check, and the
+            // account is created as soon as it passes (same as Open-Coding-Society/pages).
+            if (!email.endsWith('@stu.powayusd.com') && !email.endsWith('@powayusd.com')) {
+                showOAuthStatus('❌ You must use your school email address ending with @stu.powayusd.com or @powayusd.com', true);
+                return;
+            }
             verifiedSchoolEmail = email;
+            // Spring verifies this token itself; Flask only gets the form data.
             signupIdToken = response.credential;
-            signupFormData.email = email;
-            showOAuthStatus(`✅ Google account selected: ${email}`);
+            showOAuthStatus(`✅ School email verified: ${email}`);
 
             setTimeout(() => {
                 document.getElementById('oauth-verification').hidden = true;
@@ -618,9 +624,9 @@ show_reading_time: false
                 if (done) done(true);
             },
             message: "message",
-            // Spring is authoritative (see loginBoth above); a Flask-only failure
-            // (no matching row, e.g. for a Spring-only mentor account) must not
-            // block completion or leave a stale error message in place.
+            // Flask decides student logins (see loginBoth above). A Flask failure must
+            // still let the flow finish, because a mentor account exists only in Spring;
+            // loginBoth shows the error if neither backend accepted the login.
             onFailure: function() {
                 document.getElementById("message").textContent = "";
                 if (done) done(false);
