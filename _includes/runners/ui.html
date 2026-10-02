@@ -53,7 +53,6 @@ import { BaseRunner, UiExecutor } from '{{ site.baseurl }}/assets/js/pages/runne
       styleSelectedText: true
     }
   });
-
   if (outputHeight) {
     runner.applyScopedStyle(`#ui-output-{{ include.runner_id }} { min-height: ${outputHeight}; max-height: ${outputHeight}; height: ${outputHeight}; }`);
   }
