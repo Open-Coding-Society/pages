@@ -7,4 +7,5 @@ class GameLevel3 {
             src: `${this.path}/images/spring_track_level_3.jpg`,
             pixels: { height: 360, width: 643 }
         };
-    
+    }
+}
