@@ -62,6 +62,11 @@ document.addEventListener('visibilitychange', () => {
     schedulePolling();
 });
 window.addEventListener('dm:refresh-unread', refresh);
+window.addEventListener('dm:message-edited', () => {
+    // A sender's edit should not leave stale unread metadata around while the
+    // active thread is being updated in-place.
+    refresh();
+});
 
 refresh();
 schedulePolling();

@@ -97,6 +97,9 @@
     connected: false,
     pickerSelected: new Map(), // id -> { id, uid, name }
     seenMessageIds: new Set(), // reset whenever the active conversation changes
+    messageMap: new Map(),
+    editingMessageId: null,
+    editingMessage: null,
     unseenWhileHidden: false, // a message reached the open conversation while the tab was hidden
     lastDayKey: null,
     lastSender: null,
@@ -134,11 +137,58 @@
   function setComposerEnabled(enabled) {
     composer.setEnabled(enabled);
     sendBtn.disabled = !enabled || !state.activeConversationId;
+    const icon = sendBtn.querySelector('i');
+    const label = sendBtn.querySelector('span');
+    if (icon) icon.className = state.editingMessageId ? 'fas fa-save' : 'fas fa-paper-plane';
+    if (label) label.textContent = state.editingMessageId ? 'Save' : 'Send';
+  }
+
+  function resetEditState() {
+    state.editingMessageId = null;
+    state.editingMessage = null;
+    composer.clear();
+    setComposerEnabled(Boolean(state.currentUserUid));
+  }
+
+  function beginEditMessage(message) {
+    if (!message || !message.id || message.senderUid !== state.currentUserUid) return;
+    state.editingMessageId = message.id;
+    state.editingMessage = message;
+    composer.clear();
+    composer.setHTML(message.body || '');
+    setComposerEnabled(Boolean(state.currentUserUid));
+    composer.focus();
   }
 
   function submitMessage() {
     if (composer.isEmpty() || composer.isOverLimit()) return;
+    if (state.editingMessageId) {
+      editMessage(state.editingMessageId, composer.getHTML()).then((ok) => {
+        if (ok) resetEditState();
+      });
+      return;
+    }
     sendMessage(composer.getHTML()).then((ok) => { if (ok) composer.clear(); });
+  }
+
+  function updateMessageBody(messageId, body, sentAt) {
+    const key = String(messageId ?? '');
+    if (!key) return;
+
+    const row = messagesEl.querySelector(`[data-message-id="${CSS.escape(key)}"]`);
+    if (row) {
+      const bodyTarget = row.querySelector('.chat-msg-body');
+      if (bodyTarget) {
+        bodyTarget.innerHTML = '';
+        renderRichMessage(bodyTarget, body || '');
+      }
+    }
+
+    const stored = state.messageMap.get(key);
+    if (stored) {
+      stored.body = body ?? stored.body;
+      if (sentAt) stored.sentAt = sentAt;
+    }
   }
 
   /* ── Day/sender-grouped message rendering (same idiom as announcement_chat.html) ── */
@@ -189,8 +239,11 @@
     state.lastTime = 0;
   }
 
-  function appendMessage({ senderUid, senderName, body, sentAt }) {
+  function appendMessage({ id, senderUid, senderName, body, sentAt }) {
     clearMessagesEmpty();
+
+    const messageId = String(id || `${senderUid}:${sentAt || Math.random()}`);
+    state.messageMap.set(messageId, { id: messageId, senderUid, senderName, body, sentAt });
 
     const isSelf = senderUid === state.currentUserUid;
     const who = isSelf ? 'You' : (senderName || senderUid || 'Unknown');
@@ -219,6 +272,7 @@
     const row = document.createElement('div');
     row.className = ['chat-msg', isSelf ? 'is-self' : '', continued ? 'is-continued' : '']
       .filter(Boolean).join(' ');
+    row.dataset.messageId = messageId;
 
     const avatar = document.createElement('span');
     avatar.className = ['chat-avatar', isSelf ? '' : tintFor(who)].filter(Boolean).join(' ');
@@ -239,6 +293,19 @@
       timeEl.className = 'chat-msg-time';
       timeEl.textContent = formatTime(when);
       meta.appendChild(timeEl);
+    }
+
+    if (isSelf) {
+      const actions = document.createElement('div');
+      actions.className = 'chat-msg-actions';
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'chat-msg-action';
+      editBtn.setAttribute('aria-label', 'Edit message');
+      editBtn.innerHTML = '<i class="fas fa-pen" aria-hidden="true"></i>';
+      editBtn.addEventListener('click', () => beginEditMessage({ ...state.messageMap.get(messageId), id: messageId, senderUid }));
+      actions.appendChild(editBtn);
+      meta.appendChild(actions);
     }
 
     const bodyEl = document.createElement('span');
@@ -372,6 +439,7 @@
       const res = await fetch(`${javaURI}/api/dm/conversations/${id}/messages`, fetchOptions);
       if (!res.ok) { console.warn('DM chat: messages HTTP', res.status); return; }
       const messages = await res.json();
+      state.messageMap.clear();
       (messages || []).forEach((msg) => {
         if (state.seenMessageIds.has(msg.id)) return;
         state.seenMessageIds.add(msg.id);
@@ -381,7 +449,6 @@
       console.warn('DM chat: messages load failed', err);
     }
   }
-
   /* ── New-chat picker ──────────────────────────────────────────────── */
 
   function renderPickerSelected() {
@@ -473,6 +540,11 @@
 
   function handleIncoming(event) {
     if (!event || event.conversationId !== state.activeConversationId) return;
+    const isEditEvent = event.type === 'edited' || event.type === 'message-edited' || event.editType === 'update' || event.editType === 'edited';
+    if (isEditEvent) {
+      updateMessageBody(event.id, event.body || event.messageBody, event.sentAt || event.updatedAt);
+      return;
+    }
     if (state.seenMessageIds.has(event.id)) return;
     state.seenMessageIds.add(event.id);
     appendMessage(event);
@@ -543,6 +615,35 @@
       return true;
     } catch (err) {
       console.error('DM chat: send failed', err);
+      return false;
+    }
+  }
+
+  async function editMessage(messageId, body) {
+    if (!state.activeConversationId || !messageId) return false;
+    try {
+      const res = await fetch(`${javaURI}/api/dm/conversations/${state.activeConversationId}/messages/${messageId}`, {
+        ...fetchOptions,
+        method: 'PATCH',
+        body: JSON.stringify({ body }),
+      });
+      if (!res.ok) { console.warn('DM chat: edit HTTP', res.status); return false; }
+      const updated = await res.json().catch(() => null);
+      const finalBody = (updated && (updated.body || updated.messageBody)) || body;
+      if (updated || finalBody) {
+        updateMessageBody(messageId, finalBody, updated?.sentAt || updated?.updatedAt);
+        window.dispatchEvent(new CustomEvent('dm:message-edited', {
+          detail: {
+            conversationId: state.activeConversationId,
+            id: messageId,
+            body: finalBody,
+            sentAt: updated?.sentAt || updated?.updatedAt,
+          },
+        }));
+      }
+      return true;
+    } catch (err) {
+      console.error('DM chat: edit failed', err);
       return false;
     }
   }
