@@ -1,3 +1,23 @@
+/**
+ * @module asset-catalog
+ * @description
+ * Validates GameBuilder background and sprite manifests and turns their
+ * display names into stable selection keys. Manifest sources are restricted
+ * to safe relative paths and are resolved under the published asset folders.
+ *
+ * @data
+ * Background entries contain `name` and `src`. Sprite entries also contain
+ * positive integer `rows` and `cols`, a positive `scaleFactor`, and a
+ * supported `movementPreset`. The returned catalog has `backgrounds` and
+ * `sprites` Maps; each entry includes its key, display name, published source
+ * path, and (for sprites) animation metadata.
+ *
+ * @usage
+ * Call `createAssetCatalog(backgroundManifest, spriteManifest)` after loading
+ * both manifest arrays. Pass the returned catalog to builder validation and
+ * code generation. Invalid, duplicate, or empty manifests throw a descriptive
+ * `TypeError`.
+ */
 const ASSET_TYPES = {
   backgrounds: { directory: 'bg', needsAnimation: false },
   sprites: { directory: 'sprites', needsAnimation: true }
