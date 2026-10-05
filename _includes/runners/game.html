@@ -5,18 +5,20 @@
   style="{% if include.width %}--gr-panel-width: {{ include.width }};{% endif %}{% if game_canvas_height %}--gr-canvas-height: {{ game_canvas_height }};{% endif %}{% if include.editor_height %}--gr-editor-height: {{ include.editor_height }};{% endif %}"
   {% endif %}>
   {% if include.hide_edit != 'true' %}
+  {% if include.hide_challenge != 'true' %}
   {% include runners/fragments/challenge-box.html challenge=include.challenge %}
+  {% endif %}
 
   {% capture game_runner_top_controls %}
       <button type="button" class="ocs__btn utility run" data-hook="run" title="Start Game" aria-label="Start Game"></button>
       <button type="button" class="ocs__btn utility pause" data-hook="pause" title="Pause Game" aria-label="Pause Game"></button>
       <button type="button" class="ocs__btn utility stop" data-hook="stop" title="Stop Game" aria-label="Stop Game"></button>
       <button type="button" class="ocs__btn utility fullscreen" data-hook="fullscreen" title="Toggle Fullscreen" aria-label="Toggle Fullscreen"></button>
-      <select class="engineVersionSelect" title="Select Game Engine Version">
+      <select class="engineVersionSelect ocs__input" title="Select Game Engine Version">
         <option value="GameEnginev1">Engine v1</option>
         <option value="GameEnginev1.1" selected>Engine v1.1</option>
       </select>
-      <select class="levelSelect" title="Select Level">
+      <select class="levelSelect ocs__input" title="Select Level">
         <option value="">Select Level...</option>
       </select>
   {% endcapture %}
@@ -39,11 +41,11 @@
     <button type="button" class="ocs__btn utility pause" data-hook="pause" title="Pause Game" aria-label="Pause Game"></button>
     <button type="button" class="ocs__btn utility stop" data-hook="stop" title="Stop Game" aria-label="Stop Game"></button>
     <button type="button" class="ocs__btn utility fullscreen" data-hook="fullscreen" title="Toggle Fullscreen" aria-label="Toggle Fullscreen"></button>
-    <select class="engineVersionSelect" title="Select Game Engine Version">
+    <select class="engineVersionSelect ocs__input" title="Select Game Engine Version">
       <option value="GameEnginev1">Engine v1</option>
       <option value="GameEnginev1.1" selected>Engine v1.1</option>
     </select>
-    <select class="levelSelect" title="Select Level">
+    <select class="levelSelect ocs__input" title="Select Level">
       <option value="">Select Level...</option>
     </select>
   </div>
@@ -194,6 +196,24 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
 
   // Keyboard shortcuts (only if editor exists)
   runner.bindShortcut(runGame);
+
+  const runnerId = '{{ include.runner_id }}';
+  const controller = Object.freeze({
+    setCode(code) {
+      if (typeof code !== 'string') {
+        throw new TypeError('Game runner code must be a string');
+      }
+      runner.setValue(code);
+    },
+    getCode: () => runner.getValue(),
+    run: runGame,
+    stop: stopGame
+  });
+  window.OCSGameRunners = window.OCSGameRunners || Object.create(null);
+  window.OCSGameRunners[runnerId] = controller;
+  window.dispatchEvent(new CustomEvent('ocs:game-runner-ready', {
+    detail: { runnerId, controller }
+  }));
 
   if (autostart) {
     // Defer by one tick so DOM/layout/controls are fully attached before boot.

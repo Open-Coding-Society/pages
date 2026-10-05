@@ -1,12 +1,12 @@
 ---
-layout: opencs 
+layout: opencs
 title: GameBuilder
 description: Helping programmers understand how to create a game
-permalink: /gamebuilder
+permalink: /gamebuilder/
 ---
 
-<!-- 
-  All GameBuilder styles are now in _sass/open-coding/game-builder.scss
+<!--
+  Legacy GameBuilder styles remain shared in _sass/open-coding/forms/game-builder.scss
   This uses the standardized three-panel layout system with reusable mixins.
   _sass/open-coding/
   ├── game-builder.scss (reusable!)
@@ -38,6 +38,7 @@ permalink: /gamebuilder
     20% width            80% width (flexible)
 -->
 
+<!-- markdownlint-disable MD033 MD010 MD012 -->
 <!-- Minimal page-specific overrides only -->
 <style>
 /* Remove default page wrapper constraints for full-width layout */
@@ -47,19 +48,22 @@ permalink: /gamebuilder
 }
 </style>
 
-<!-- title banner for the GameBuilder page -->
-<div class="gamebuilder-title">
-  {{page.title}}
-  <a href="{{site.baseurl}}/gamebuilder/doc" target="_blank" rel="noopener noreferrer">📜</a>
-  <a href="{{site.baseurl}}/rpg/game" target="_blank" rel="noopener noreferrer">🕹️</a>
-</div>
+<main class="ocs__gamebuilder-system">
+<header class="ocs__gamebuilder-header">
+  {% include projects/cs-pathway/cs-pathway-menu.html %}
+  <div class="ocs__gamebuilder-header-actions">
+    <a href="{{ '/gamebuilder/v2/' | relative_url }}" aria-label="Open the GameBuilder v2 workbench" title="Open the GameBuilder v2 workbench">Workbench</a>
+    <a href="{{ '/gamebuilder/doc' | relative_url }}" target="_blank" rel="noopener noreferrer" aria-label="GameBuilder documentation" title="GameBuilder documentation">📜</a>
+    <a href="{{ '/rpg/game' | relative_url }}" target="_blank" rel="noopener noreferrer" aria-label="Play the sample RPG" title="Play the sample RPG">🕹️</a>
+  </div>
+</header>
 
 <!-- Ensure GameTemplatesV1 is available as a global by loading templates.js -->
 <script>
     (function(){
         try {
             const s = document.createElement('script');
-            s.src = window.location.origin + './templates.js';
+            s.src = "{{ site.baseurl }}/assets/js/projects/gamebuilder/templates.js";
             s.defer = true;
             document.head.appendChild(s);
         } catch (e) { console.warn('Could not load GameTemplatesV1', e); }
@@ -2798,3 +2802,5 @@ document.querySelector('.game-frame')?.addEventListener('click', () => {
     try { canvas?.focus?.(); } catch (_) {}
 });
 </script>
+</main>
+<!-- markdownlint-enable MD033 MD010 MD012 -->

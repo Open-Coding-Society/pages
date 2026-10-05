@@ -1,0 +1,294 @@
+.ocs__gamebuilder-system {
+  color: var(--pref-text-color);
+  font-family: var(--pref-font-family);
+  margin: 0 auto;
+  padding: 0 1rem 1.5rem;
+}
+
+.ocs__gamebuilder-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.25rem auto 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.ocs__gamebuilder-header .ocs__capstone-nav {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ocs__gamebuilder-header .ocs__links--wide {
+  gap: 0.5rem;
+}
+
+.ocs__gamebuilder-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.ocs__gamebuilder-header-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.5rem;
+  color: var(--pref-text-color);
+  text-decoration: none;
+}
+
+.ocs__gamebuilder-header-actions a:hover,
+.ocs__gamebuilder-header-actions a:focus-visible {
+  border-color: var(--pref-accent-color);
+  color: var(--pref-accent-color);
+}
+
+.ocs__gamebuilder-system .creator-layout {
+  height: clamp(32rem, calc(100dvh - 14rem), 52rem);
+}
+
+.ocs__container.ocs__gamebuilder-workbench {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 1rem;
+}
+
+.page-content:has(.ocs__gamebuilder-workbench) > .wrapper {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+.ocs__gamebuilder-workbench-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ocs__gamebuilder-workbench-header h1 {
+  display: block !important;
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.ocs__gamebuilder-workbench-header .ocs__btn {
+  margin-left: auto;
+}
+
+.ocs__gamebuilder-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.ocs__gamebuilder-panel-header .ocs__section-title {
+  margin: 0;
+}
+
+.ocs__gamebuilder-workspace {
+  display: grid;
+  grid-template-columns: minmax(18rem, 25%) minmax(0, 1fr);
+  align-items: start;
+  gap: 1rem;
+}
+
+.ocs__gamebuilder-workspace.is-builder-collapsed {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ocs__gamebuilder-builder {
+  min-width: 0;
+}
+
+.ocs__gamebuilder-form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.ocs__gamebuilder-form fieldset {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0.75rem 1rem 1rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--pref-text-color) 4%, var(--panel));
+}
+
+.ocs__gamebuilder-form legend {
+  padding: 0 0.4rem;
+  color: var(--pref-accent-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ocs__gamebuilder-form label {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--pref-text-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.ocs__gamebuilder-npc-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.ocs__gamebuilder-add-npc {
+  justify-self: start;
+}
+
+.ocs__gamebuilder-npc-empty {
+  margin: 0;
+  color: var(--pref-text-color);
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.ocs__gamebuilder-npc {
+  min-width: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.5rem;
+  background: var(--panel);
+}
+
+.ocs__gamebuilder-npc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.ocs__gamebuilder-npc-header h3 {
+  margin: 0;
+  color: var(--pref-text-color);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.ocs__gamebuilder-npc-header .ocs__btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.ocs__gamebuilder-npc-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: 0.75rem;
+}
+
+.ocs__gamebuilder-npc-fields label:last-child {
+  grid-column: 1 / -1;
+}
+
+.ocs__gamebuilder-form .ocs__input {
+  width: 100%;
+}
+
+.ocs__gamebuilder-form select.ocs__input {
+  max-width: none;
+}
+
+.ocs__gamebuilder-form-help,
+.ocs__gamebuilder-status {
+  margin: 0;
+  color: var(--pref-muted-text-color, var(--pref-text-color));
+  font-size: 0.9rem;
+}
+
+.ocs__gamebuilder-status[data-state="error"] {
+  color: var(--pref-error-color, var(--pref-text-color));
+}
+
+.ocs__gamebuilder-runner {
+  min-width: 0;
+}
+
+.ocs__gamebuilder-runner > .game-runner-container {
+  width: 100%;
+  max-width: none;
+}
+
+.ocs__gamebuilder-runner .editor-textarea {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-height: 24rem;
+  resize: vertical;
+  padding: 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.5rem;
+  background: var(--pref-bg-color);
+  color: var(--pref-text-color);
+  font-family: var(--pref-monospace-font-family, monospace);
+}
+
+.ocs__gamebuilder-workbench .gameContainer {
+  min-height: 24rem;
+}
+
+@media (max-width: 768px) {
+  .ocs__gamebuilder-system {
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+  }
+
+  .ocs__gamebuilder-header {
+    gap: 0.5rem;
+    padding-right: 0.25rem;
+    padding-left: 0.25rem;
+  }
+
+  .ocs__gamebuilder-header .ocs__links--wide {
+    gap: 0.25rem;
+  }
+
+  .ocs__gamebuilder-header-actions {
+    gap: 0.25rem;
+  }
+
+  .ocs__gamebuilder-header-actions a {
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+  }
+
+  .ocs__gamebuilder-system .creator-layout {
+    height: auto;
+  }
+
+  .ocs__gamebuilder-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ocs__gamebuilder-workbench {
+    padding: 0.5rem;
+  }
+
+  .ocs__gamebuilder-workbench-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .ocs__gamebuilder-panel-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+}
