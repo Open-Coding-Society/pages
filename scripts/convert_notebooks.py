@@ -58,6 +58,11 @@ Real pair example (Cookie Clicker):
 
 Runner options:
 - autostart: true|false  Auto-runs the game when the runner initializes. Default: false.
+- editor_height: <css-size> Editor height (or the UI_RUNNER source disclosure height).
+- output_height: <css-size> Output viewport height for every runner.
+- height: <css-size>        Legacy editor height for CODE/UI/PSEUDOCODE runners;
+                           legacy canvas height for GAME_RUNNER.
+- Explicit editor_height/output_height take precedence over the corresponding legacy height.
 
 UI-runner specific options:
 - show_code: true|false  Show the HTML/CSS/JS source in a disclosure above the rendered UI.
@@ -69,7 +74,9 @@ HTML code-runner specific options (%%html cells with a CODE_RUNNER comment):
 - output_height: <css-size> Rendered output height. Default: the UI runner's 400px minimum.
 
 Game-runner specific options:
-- hide_edit, width, height, editor_height
+- hide_edit, width, editor_height
+- height: <css-size>        Game canvas height. Default: 580px.
+- output_height: <css-size> Game canvas height, overriding legacy height.
 
 Notes on CodeFence and MermaidGraph:
 - Plain markdown code fences and Mermaid markdown are not panel-aware by default.
@@ -302,10 +309,7 @@ class CodeRunner:
         if self.options.get('autostart') or self.options.get('auto_start'):
             lines.append('   autostart="true"')
 
-        if self.language == 'html':
-            for option in ('height', 'output_height'):
-                if self.options.get(option):
-                    lines.append('   ' + option + '="' + str(self.options[option]) + '"')
+        lines.extend(runner_height_options(self.options))
 
         lines.extend(['%}', ''])
         return lines
@@ -450,16 +454,32 @@ class UiRunner:
             source = self.html
             if self.script.strip():
                 source += f'\n<script>\n{self.script}\n</script>'
+            editor_height = self.options.get('editor_height') or self.options.get('height')
+            source_style = (
+                ' style="--runner-editor-height: '
+                + html_lib.escape(str(editor_height), quote=True) + ';"'
+                if editor_height else ''
+            )
             lines.extend([
-                '<details class="ui-runner-source">',
+                '<details class="ui-runner-source'
+                + (' ui-runner-source--sized' if editor_height else '')
+                + '"' + source_style + '>',
                 '<summary>View example code</summary>',
                 '<pre><code class="language-html">' + html_lib.escape(source.strip()) + '</code></pre>',
                 '</details>',
                 '',
             ])
 
+        output_height = self.options.get('output_height')
+        output_style = (
+            ' style="--runner-output-height: '
+            + html_lib.escape(str(output_height), quote=True) + ';"'
+            if output_height else ''
+        )
         lines.extend([
-            '<div class="ui-runner">',
+            '<div class="ui-runner'
+            + (' ui-runner--sized' if output_height else '')
+            + '"' + output_style + '>',
             self.html,
             '<script>',
             '(function() {',
@@ -599,10 +619,7 @@ class GameRunner:
             lines.append('   autostart="true"')
         if self.options.get('width'):
             lines.append(f'   width="{self.options["width"]}"')
-        if self.options.get('height'):
-            lines.append(f'   height="{self.options["height"]}"')
-        if self.options.get('editor_height'):
-            lines.append(f'   editor_height="{self.options["editor_height"]}"')
+        lines.extend(runner_height_options(self.options))
 
         lines.extend(['%}', ''])
         return lines
@@ -734,11 +751,19 @@ class PseudocodeRunner:
             '   code=code' + str(code_runner_count),
         ]
 
-        if self.options.get('height'):
-            lines.append(f'   height="{self.options["height"]}"')
+        lines.extend(runner_height_options(self.options))
 
         lines.extend(['%}', ''])
         return lines
+
+
+def runner_height_options(options: dict[str, Any]) -> list[str]:
+    """Forward explicit and legacy dimensions without changing runner-specific defaults."""
+    return [
+        f'   {option}="{options[option]}"'
+        for option in ('height', 'editor_height', 'output_height')
+        if options.get(option)
+    ]
 
 
 @dataclass

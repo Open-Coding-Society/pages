@@ -134,6 +134,15 @@ class Player extends Character {
         }
     }
 
+    resize() {
+        super.resize();
+        // Preserve STEP_FACTOR's horizontal pace without slowing tall/narrow viewport movement.
+        this.yVelocity = this.xVelocity;
+        if (this.pressedKeys && !this.gravity) {
+            this.updateVelocity();
+        }
+    }
+
     update() {
         super.update();
         if(!this.moved){

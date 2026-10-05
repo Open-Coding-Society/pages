@@ -25,6 +25,7 @@ games/red-riding
 games/spline-barriers
 games/tag-game-multiplayer
 games/voidstriker
+games/racing-game:dev
 
 # Lessons
 lessons/ap-frq-simulator

@@ -9,7 +9,8 @@ Core Goals:
 Usage:
     python3 scripts/sync_assignments.py                          # dry run: review only
     PAGES_BOT_PASSWORD=... python3 scripts/sync_assignments.py   # production
-    python3 scripts/sync_assignments_test.py                     # run the test suite for sync_assignments.py
+    python scripts/sync_assignments_test.py                     # run the test suite for sync_assignments.py
+    python scripts/sync_assignments.py 2>&1 | grep WARNING       # run and filter only warnings
 
 Reading order of this file:
   1. Assignment         one page's assignment data, cleaned and ready to send
@@ -27,8 +28,8 @@ The data, as it moves through the three systems:
   title: SASS Inputs        ==>        content_url="sass/inputs",     # Jekyll page.url
   permalink: /sass/inputs              name="SASS Inputs",
   assignment_submission_type: code     description="",                # default
-  assignment_creator_uids:             points=1.0,                    # default
-    - psai-github                      due_date=None,                 # default
+  assignment_creator_uids:             points=1.0,                    # default; an override when declared
+    - psai-github                      due_date=None,                 # not declared
   ---                                  submission_type="code",
                                        creator_uids=("psai-github",),
                                        course_codes=None,             # not declared
@@ -100,6 +101,13 @@ class Assignment:
 
     # Fields that must agree when the same page appears twice (notebook + converted post).
     SYNC_FIELDS = ("submission_type", "creator_uids", "course_codes")
+    # Attribute -> frontmatter key for the fields the grader cannot work without.
+    # Not included: courses (assignments span courses), points (an override, default 1.0)
+    # and due date (set through the calendar).
+    GRADING_FIELDS = {
+        "creator_uids": "assignment_creator_uids",
+        "submission_type": "assignment_submission_type",
+    }
 
     @classmethod
     def from_frontmatter(cls, root: Path, path: Path, fm: dict):
@@ -133,6 +141,9 @@ class Assignment:
                 )
             merged[field] = mine if mine is not None else theirs
         return replace(preferred, **merged)
+
+    def missing_grading_fields(self) -> list:
+        return [key for attr, key in self.GRADING_FIELDS.items() if getattr(self, attr) is None]
 
     def with_defaults(self) -> "Assignment":
         return replace(
@@ -231,6 +242,11 @@ class AssignmentCatalog:
                 self.add(Assignment.from_frontmatter(root, path, fm))
             except SkipAssignment as reason:
                 self.report.skip(str(reason), path)
+        # Checked after merging, so a field declared in either copy of a page counts.
+        for assignment in self._by_url.values():
+            missing = assignment.missing_grading_fields()
+            if missing:
+                warn(f"Missing grading frontmatter: {', '.join(missing)}; defaults will be used", assignment.path)
         return self
 
     def add(self, assignment: Assignment):
@@ -383,7 +399,7 @@ def main(argv=None):
                 assignment.path,
             )
 
-    print(report.summary(len(catalog)))
+    print(report.summary(len(catalog), dry_run=client is None))
     return report.exit_code
 
 
@@ -391,9 +407,21 @@ def main(argv=None):
 
 # ---- reporting: page problems are annotated but never fail the job; only a failed login does
 
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
+
+def annotate(level, message, path=None):
+    """GitHub annotation syntax in CI; plain text in a local terminal."""
+    if IN_GITHUB_ACTIONS:
+        location = f" file={path}" if path else ""
+        print(f"::{level}{location}::{message}", file=sys.stderr)
+    else:
+        location = f" {path}:" if path else ""
+        print(f"{level.upper()}:{location} {message}", file=sys.stderr)
+
+
 def warn(message, path=None):
-    location = f" file={path}" if path else ""
-    print(f"::warning{location}::{message}", file=sys.stderr)
+    annotate("warning", message, path)
 
 
 class SyncReport:
@@ -409,14 +437,16 @@ class SyncReport:
 
     def fail(self, message, path=None):
         self.failed += 1
-        location = f" file={path}" if path else ""
-        print(f"::error{location}::{message}", file=sys.stderr)
+        annotate("error", message, path)
 
     def fatal(self, message):
         self.fatal_error = message
-        print(f"::error::{message}", file=sys.stderr)
+        annotate("error", message)
 
-    def summary(self, total):
+    def summary(self, total, dry_run=False):
+        if dry_run:
+            return (f"Done (dry run): {total} assignments would be sent, {self.skipped} skipped. "
+                    "Spring's own rejections and failures only appear in a production run.")
         return f"Done: {total} assignments, {self.sent} sent, {self.skipped} skipped, {self.failed} failed."
 
     @property

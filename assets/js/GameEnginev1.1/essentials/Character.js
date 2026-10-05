@@ -3,7 +3,10 @@ import GameObject from './GameObject.js';
 // Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
 const STEP_FACTOR = 100; // 1/nth, or N steps up and across the canvas
-const ANIMATION_RATE = 1; // 1/nth of the frame rate
+const DEFAULT_ANIMATION_FPS = 8;
+const LEGACY_ANIMATION_RATE = 1;
+const LEGACY_REFERENCE_FRAME_RATE = 60; // Converts legacy update-count divisors to sprite FPS
+const MAX_ANIMATION_GAP_MS = 250;
 const INIT_POSITION = { x: 0, y: 0 };
 const PIXELS = {height: 16, width: 16};
 
@@ -31,7 +34,8 @@ const PIXELS = {height: 16, width: 16};
  * @property {number} frameIndex - The current frame index for animation.
  * @property {number} frameCount - The total number of frames for each direction.
  * @property {Object} spriteData - The data for the sprite sheet.
- * @property {number} frameCounter - Counter to control the animation rate.
+ * @property {number} animationFps - Sprite frames per second, independent of render frequency.
+ * @property {number} frameCounter - Draw counter used by sprite effects.
  * @method draw - Draws the object on the canvas.
  * @method update - Updates the object's position and ensures it stays within the canvas boundaries.
  * @method resize - Resizes the object based on the game environment.
@@ -46,6 +50,17 @@ class Character extends GameObject {
     constructor(data = null, gameEnv = null) {
         super(gameEnv);
         this.data = data;
+        this.animationRate = data.ANIMATION_RATE || LEGACY_ANIMATION_RATE;
+        // Explicit FPS wins; only explicitly supplied legacy rates use the 60Hz conversion.
+        this.animationFps = data.ANIMATION_FPS
+            ?? (data.ANIMATION_RATE != null
+                ? LEGACY_REFERENCE_FRAME_RATE / this.animationRate
+                : DEFAULT_ANIMATION_FPS);
+        if (!Number.isFinite(this.animationFps) || this.animationFps <= 0) {
+            throw new RangeError(`Character ${data.id || "default"}: ANIMATION_FPS must be a positive finite number`);
+        }
+        this.lastAnimationTime = null;
+        this.animationElapsed = 0;
         this.state = {
             ...this.state,
             animation: 'idle',
@@ -74,7 +89,6 @@ class Character extends GameObject {
         this.scale = { width: this.gameEnv.innerWidth, height: this.gameEnv.innerHeight };
         this.scaleFactor = data.SCALE_FACTOR || SCALE_FACTOR;
         this.stepFactor = data.STEP_FACTOR || STEP_FACTOR;
-        this.animationRate = data.ANIMATION_RATE || ANIMATION_RATE;
         
         // Handle INIT_POSITION with percentage support (0.0-1.0 decimal)
         const initPos = data.INIT_POSITION || INIT_POSITION;
@@ -187,10 +201,8 @@ class Character extends GameObject {
         this.clearCanvas();
 
         if (this.spriteSheet) {
-            // Draw the sprite sheet frame
-            this.drawSprite();
-            // Update the frame index for animation
             this.updateAnimationFrame();
+            this.drawSprite();
         } else {
             // Draw default red square
             this.drawDefaultSquare();
@@ -249,18 +261,38 @@ class Character extends GameObject {
     }
 
     /**
-     * Updates the frame index for animation at a slower rate.
+     * Advances sprite frames by elapsed time, independently of movement and rendering frequency.
      */
-    updateAnimationFrame() {
+    updateAnimationFrame(now = performance.now()) {
         // Skip advancing animation frames while paused
-        if (this.gameEnv && this.gameEnv.gameControl && this.gameEnv.gameControl.isPaused) return;
+        if (this.gameEnv?.gameControl?.isPaused) {
+            this.resetAnimationClock();
+            return;
+        }
 
         this.frameCounter++;
-        if (this.frameCounter % this.animationRate === 0) {
-            const directionData = this.spriteData[this.direction] || {};
-            const frames = directionData.columns || this.spriteData.orientation.columns || 1;
-            this.frameIndex = (this.frameIndex + 1) % frames;
+        if (this.lastAnimationTime === null) {
+            this.lastAnimationTime = now;
+            return;
         }
+        const elapsed = now - this.lastAnimationTime;
+        this.lastAnimationTime = now;
+        // Do not fast-forward through a suspended tab or long stall.
+        if (elapsed > MAX_ANIMATION_GAP_MS) return;
+
+        this.animationElapsed += elapsed;
+        const frameDuration = 1000 / this.animationFps;
+        const framesToAdvance = Math.floor((this.animationElapsed + 1e-9) / frameDuration);
+        if (framesToAdvance > 0) {
+            this.animationElapsed = Math.max(0, this.animationElapsed - framesToAdvance * frameDuration);
+            const directionData = this.spriteData[this.direction] || {};
+            const frames = directionData.columns || this.spriteData.orientation?.columns || 1;
+            this.frameIndex = (this.frameIndex + framesToAdvance) % frames;
+        }
+    }
+
+    resetAnimationClock() {
+        this.lastAnimationTime = null;
     }
 
     /**

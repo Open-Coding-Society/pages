@@ -36,6 +36,12 @@ export class GameExecutor {
     this.originalGameOutput = null;
   }
 
+  getCanvasHeight() {
+    return this.isFullscreen
+      ? this.configuredCanvasHeight
+      : this.getGameContainer?.()?.clientHeight || this.configuredCanvasHeight;
+  }
+
   stop() {
     if (this._transitionTimer) {
       clearTimeout(this._transitionTimer);
@@ -287,7 +293,9 @@ export class GameExecutor {
         }
 
         const containerWidth = gameContainer?.clientWidth || gameContainer?.parentElement?.clientWidth || 800;
-        const containerHeight = this.configuredCanvasHeight;
+        // Measure after layout: the template's startup measurement may precede stylesheet loading.
+        const containerHeight = this.getCanvasHeight();
+        this.configuredCanvasHeight = containerHeight;
 
         const environment = {
           path,
@@ -372,7 +380,7 @@ export class GameExecutor {
       return;
     }
 
-    const resolvedWidth = gameOutput?.parentElement?.clientWidth || gameOutput?.clientWidth || window.innerWidth;
+    const resolvedWidth = this.getGameContainer?.()?.clientWidth || gameOutput?.clientWidth || gameOutput?.parentElement?.clientWidth || window.innerWidth;
     const resolvedHeight = Math.max(1, viewportHeight);
 
     if (this.gameCore?.environment) {
@@ -406,7 +414,9 @@ export class GameExecutor {
       // Enter fullscreen mode
       this.originalGameOutput = {
         parent: gameOutput.parentElement,
-        height: this.configuredCanvasHeight
+        nextSibling: gameOutput.nextSibling,
+        style: gameOutput.getAttribute('style'),
+        height: this.getGameContainer?.()?.clientHeight || this.configuredCanvasHeight
       };
 
       // Create fullscreen overlay
@@ -540,7 +550,12 @@ export class GameExecutor {
       if (this.fullscreenOverlay) {
         // Move game-output back to original parent
         if (this.originalGameOutput && this.originalGameOutput.parent) {
-          this.originalGameOutput.parent.appendChild(gameOutput);
+          this.originalGameOutput.parent.insertBefore(gameOutput, this.originalGameOutput.nextSibling);
+          if (this.originalGameOutput.style === null) {
+            gameOutput.removeAttribute('style');
+          } else {
+            gameOutput.setAttribute('style', this.originalGameOutput.style);
+          }
         }
 
         // Remove overlay
@@ -550,7 +565,8 @@ export class GameExecutor {
 
       // Restore original height
       if (this.originalGameOutput) {
-        this.configuredCanvasHeight = this.originalGameOutput.height;
+        // Read the restored embedded frame, not the cached fullscreen/startup height.
+        this.configuredCanvasHeight = this.getGameContainer?.()?.clientHeight || this.originalGameOutput.height;
         this.originalGameOutput = null;
       }
 
@@ -569,7 +585,7 @@ export class GameExecutor {
       }
 
       // Restore the active level size without reinitializing the level.
-      this._resizeGameForViewport(gameOutput, this.originalGameOutput?.height || this.configuredCanvasHeight);
+      this._resizeGameForViewport(gameOutput, this.configuredCanvasHeight);
     }
   }
 }

@@ -1,7 +1,8 @@
 <!-- Reusable Game Runner Component -->
+{% assign game_canvas_height = include.output_height | default: include.height %}
 <div class="game-runner-container{% if include.hide_edit == 'true' %} hide-editor{% endif %}" id="game-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}"
-  {% if include.width or include.height or include.editor_height %}
-  style="{% if include.width %}--gr-panel-width: {{ include.width }};{% endif %}{% if include.height %}--gr-canvas-height: {{ include.height }};{% endif %}{% if include.editor_height %}--gr-editor-height: {{ include.editor_height }};{% endif %}"
+  {% if include.width or game_canvas_height or include.editor_height %}
+  style="{% if include.width %}--gr-panel-width: {{ include.width }};{% endif %}{% if game_canvas_height %}--gr-canvas-height: {{ game_canvas_height }};{% endif %}{% if include.editor_height %}--gr-editor-height: {{ include.editor_height }};{% endif %}"
   {% endif %}>
   {% if include.hide_edit != 'true' %}
   {% include runners/fragments/challenge-box.html challenge=include.challenge %}
@@ -75,15 +76,9 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
   const hideEdit = "{{ include.hide_edit | default: 'false' }}" === "true";
   const defaultCode = `{{ include.code }}`.trim();
   const editorHeight = "{{ include.editor_height }}";
-  const canvasHeight = "{{ include.height }}";
   const autostart = "{{ include.autostart | default: 'false' }}" === "true";
   const levelClasses = `{{ include.levels }}`.trim().split(',').map(s => s.trim()).filter(Boolean);
   const storageKey = container.dataset.storageKey;
-
-  function parseCssSizeToPixels(value, fallback) {
-    const parsed = Number.parseFloat(value);
-    return Number.isFinite(parsed) ? parsed : fallback;
-  }
 
   function getLevelOptionLabel(levelClass, index) {
     return levelClass?.displayName
@@ -95,7 +90,8 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
       || `Level ${index + 1}`;
   }
 
-  const configuredCanvasHeight = parseCssSizeToPixels(canvasHeight, 580);
+  // Read the CSS-resolved size so rem/vh/calc values also reach the game engine in pixels.
+  const configuredCanvasHeight = container.querySelector('.gameContainer').clientHeight || 580;
   const runner = new BaseRunner(container, {
     storageKey,
     statusSelector: '.status-text'

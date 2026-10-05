@@ -41,6 +41,13 @@ export class BaseRunner {
     return this.editorManager.setCodeMirrorHeight(height);
   }
 
+  setOutputHeight(selector, height = '') {
+    if (!height) return;
+    return this.applyScopedStyle(
+      `#${this.containerId} ${selector} { min-height: ${height}; max-height: ${height}; height: ${height}; }`
+    );
+  }
+
   getStoredValue(fallback = '') {
     return this.storage.get(fallback);
   }
