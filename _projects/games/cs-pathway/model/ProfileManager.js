@@ -257,6 +257,13 @@ class ProfileManager {
         worldThemeSrc: profile.worldThemeSrc,
         coursePlanMeta: profile.coursePlanMeta || null,
         pathwayCalendarMeta: profile.pathwayCalendarMeta || null,
+        // Toolchain Trail (Level 2) - station progress map, active station, score
+        toolchainMeta: {
+          stations: profile.toolchainStations || {},
+          activeStationId: profile.toolchainActiveStationId || null,
+          score: profile.toolchainScore || 0,
+          completedAt: profile.toolchainTrailCompletedAt || null,
+        },
       },
       identityState: {
         // Identity Forge (includes avatar)
@@ -565,6 +572,34 @@ class ProfileManager {
       return { success: true, code: 200, body: update };
     } catch (error) {
       console.error('ProfileManager: updateThemeProgress failed', error);
+      return { success: false, code: 500, body: { error: error.message } };
+    }
+  }
+
+  /**
+   * Save Toolchain Trail station progress to local storage and the backend.
+   */
+  async saveToolchainProgress(stationsMap = {}, activeStationId = null, score = 0, completedAt = null) {
+    try {
+      const update = {
+        toolchainStations: stationsMap,
+        toolchainActiveStationId: activeStationId,
+        toolchainScore: score,
+        ...(completedAt !== null && { toolchainCompletedAt: completedAt }),
+      };
+
+      LocalProfile.update(update);
+      if (this.isAuthenticated) {
+        const completeProfile = LocalProfile.load();
+        if (completeProfile) {
+          PersistentProfile.update(completeProfile).catch(() => { this.syncFailureCount = (this.syncFailureCount || 0) + 1; });
+        }
+      }
+
+      console.log('ProfileManager: toolchain progress saved', { activeStationId, score });
+      return { success: true, code: 200, body: update };
+    } catch (error) {
+      console.error('ProfileManager: saveToolchainProgress failed', error);
       return { success: false, code: 500, body: { error: error.message } };
     }
   }

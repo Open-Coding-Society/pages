@@ -185,6 +185,14 @@ const LocalProfile = {
             },
             completedAt: null,
           },
+          'toolchain-trail': {
+            progress: {
+              stations: data.toolchainStations || {},
+              activeStationId: data.toolchainActiveStationId || null,
+              score: data.toolchainScore || 0,
+            },
+            completedAt: data.toolchainCompletedAt || null,
+          },
         },
       };
 
@@ -268,6 +276,15 @@ const LocalProfile = {
             },
             completedAt: updates.missionToolingCompleted || existing.game_profile?.['mission-tooling']?.completedAt,
           },
+          'toolchain-trail': {
+            progress: {
+              ...existing.game_profile?.['toolchain-trail']?.progress,
+              ...(updates.toolchainStations !== undefined && { stations: updates.toolchainStations }),
+              ...(updates.toolchainActiveStationId !== undefined && { activeStationId: updates.toolchainActiveStationId }),
+              ...(updates.toolchainScore !== undefined && { score: updates.toolchainScore }),
+            },
+            completedAt: updates.toolchainCompletedAt || existing.game_profile?.['toolchain-trail']?.completedAt,
+          },
         },
       };
 
@@ -332,6 +349,7 @@ const LocalProfile = {
     const identityForge = profile.game_profile?.['identity-forge'] || {};
     const wayfindingWorld = profile.game_profile?.['wayfinding-world'] || {};
     const missionTooling = profile.game_profile?.['mission-tooling'] || {};
+    const toolchainTrail = profile.game_profile?.['toolchain-trail'] || {};
 
     return {
       // Metadata
@@ -365,6 +383,11 @@ const LocalProfile = {
       missionProgressCount: missionTooling.progress?.missionProgressCount || 0,
       missionScore: missionTooling.progress?.missionScore || 0.55,
       missionCompletedStations: missionTooling.progress?.missionCompletedStations || [],
+      // Toolchain Trail (Level 2)
+      toolchainStations: toolchainTrail.progress?.stations || {},
+      toolchainActiveStationId: toolchainTrail.progress?.activeStationId || null,
+      toolchainScore: toolchainTrail.progress?.score || 0,
+      toolchainTrailCompletedAt: toolchainTrail.completedAt || null,
       coursePlanMeta: profile.coursePlanMeta || null,
       pathwayCalendarMeta: profile.pathwayCalendarMeta || null,
     };

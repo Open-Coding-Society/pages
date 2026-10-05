@@ -8,4 +8,5 @@ export { CodeExecutor } from './executors/CodeExecutor.js';
 export { PseudocodeExecutor } from './executors/Pseudosystem_Executors/PseudocodeExecutor.js';
 export { RobotExecutor } from './executors/Pseudosystem_Executors/RobotExecutor.js';
 export { UiExecutor } from './executors/UiExecutor.js';
+export { HtmlExecutor } from './executors/HtmlExecutor.js';
 export { GameExecutor } from './executors/GameExecutor.js';
