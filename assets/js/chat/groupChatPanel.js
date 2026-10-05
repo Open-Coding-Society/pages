@@ -1,8 +1,7 @@
 // A course-style chat panel (same markup/classes as _includes/announcement_chat.html, so it
 // picks up the same look from forms/course-chat.scss) bound to one Spring group by id.
 //
-// Used for a mentor's capstone chat: the dashboard Messages tab and the capstone card's Chat
-// dialog both mount it on the project's linked student group.
+// Used by the capstone card's Chat dialog, mounted on the project's linked student group.
 //
 //   history  GET  /api/groups/chat/{groupId}/messages
 //   live     SockJS/STOMP subscribe /topic/group/{groupId}   (same socket as the weekly chat)
@@ -23,12 +22,29 @@ const FONT_AWESOME_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.
 
 /**
  * Mounts a chat for `groupId` into `container` (its contents are replaced).
+ * `readOnly` shows the conversation without a composer (anyone signed in can read a
+ * capstone's chat, only its team posts); `notice` is shown above the messages.
+ * `signedOut` shows just the notice, since the chat needs a Spring session.
  * Returns { destroy() } to close the live connection when the chat is hidden.
  */
-export function mountGroupChat(container, { groupId, title, subtitle, displayName }) {
+export function mountGroupChat(container, { groupId, title, subtitle, displayName, readOnly = false, signedOut = false, notice = '' }) {
     ensureFontAwesome();
     const ui = buildDom(title, subtitle);
     container.replaceChildren(ui.root);
+    if (notice) {
+        ui.noteText.textContent = notice;
+        ui.note.hidden = false;
+    }
+    if (readOnly || signedOut) {
+        // Removed rather than hidden: the chat styles give the form a display value.
+        ui.form.remove();
+        ui.emptyHint.textContent = signedOut ? '' : 'Nothing has been posted here yet.';
+    }
+    if (signedOut) {
+        ui.status.textContent = 'signed out';
+        ui.emptyTitle.textContent = 'Sign in to read this chat';
+        return { destroy() {} };
+    }
 
     const state = {
         stomp: null,
@@ -162,7 +178,7 @@ export function mountGroupChat(container, { groupId, title, subtitle, displayNam
         if (state.destroyed) return;
         if (live) setStatus('connected', 'is-live');
         else setStatus('not live', 'is-preview');
-        setComposerEnabled(true);
+        if (!readOnly) setComposerEnabled(true);
     })();
 
     return {
@@ -196,6 +212,9 @@ function buildDom(title, subtitle) {
         </span>
       </div>
       <div class="chat-body">
+        <p class="chat-preview-note" hidden>
+          <i class="fas fa-eye" aria-hidden="true"></i><span></span>
+        </p>
         <div class="chat-messages" role="log" aria-live="polite">
           <div class="chat-empty">
             <i class="fas fa-comments" aria-hidden="true"></i>
@@ -215,8 +234,12 @@ function buildDom(title, subtitle) {
         root,
         statusPill: root.querySelector('.chat-status-pill'),
         status: root.querySelector('.chat-status'),
+        note: root.querySelector('.chat-preview-note'),
+        noteText: root.querySelector('.chat-preview-note span'),
         messages: root.querySelector('.chat-messages'),
         get empty() { return root.querySelector('.chat-empty'); },
+        emptyTitle: root.querySelector('.chat-empty-title'),
+        emptyHint: root.querySelector('.chat-empty-hint'),
         form: root.querySelector('.chat-form'),
         sendBtn: root.querySelector('.chat-send'),
     };

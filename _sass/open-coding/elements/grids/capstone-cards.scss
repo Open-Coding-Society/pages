@@ -165,8 +165,8 @@
   }
 }
 
-// Chat with the project's students: one native <dialog> shared by every card, holding the
-// same course-style panel as the dashboard Messages tab (styled by forms/course-chat.scss).
+// Chat with the project's students: one native <dialog> shared by every card, holding a
+// course-style chat panel (styled by forms/course-chat.scss).
 .capstone-chat {
   position: relative;
   width: min(48rem, calc(100vw - 2rem));
@@ -190,6 +190,12 @@
     right: 0.6rem;
     z-index: 1;
     margin: 0;
+  }
+
+  &__error {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--text-muted);
   }
 
   &__body .announcement-chat {
