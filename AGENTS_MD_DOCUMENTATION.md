@@ -69,6 +69,7 @@ Split logic into clear layers:
 * Sources live in [notebook sources](_notebooks/) and [docx sources](_docx/); converted Markdown is written to [generated posts](_posts/) (generated, do not hand-edit).
 * Course-split outputs (`*_csp.md`/`*_csa.md`/`*_csse.md`/`*_content.md`) are generated; never edit them. See [scripts/split_multi_course_files.py](scripts/split_multi_course_files.py).
 * Conversion behavior is defined in [scripts/convert_notebooks.py](scripts/convert_notebooks.py) and [scripts/convert_docx.py](scripts/convert_docx.py).
+* GameBuilder lesson notebooks are authored in [_projects/systems/gamebuilder/notebooks/](_projects/systems/gamebuilder/notebooks/); `_notebooks/projects/gamebuilder/` contains build copies. Project Makefiles are generated from [_projects/_template/Makefile](_projects/_template/Makefile), so persistent build/watch fixes belong in the template. Use a subshell for `cd` inside conversion loops so processing several notebooks does not change the loop's working directory.
 
 ### Project Registry & Styling
 

@@ -27,7 +27,7 @@ class GameLevelStarWars {
         src: sprite_src_snowspeeder,
         SCALE_FACTOR: SNOWSPEEDER_SCALE_FACTOR,
         STEP_FACTOR: 1000,
-        ANIMATION_RATE: 50,
+        ANIMATION_FPS: 8,
         INIT_POSITION: { x: 0, y: 0 }, 
         pixels: {height: 293, width: 358},
         orientation: {rows: 1, columns: 1 },

@@ -184,7 +184,7 @@ class GameLevelCsPath0Forge {
       src: player_src,
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       STEP_FACTOR: 1000,
-      ANIMATION_RATE: 50,
+      ANIMATION_FPS: 8,
       INIT_POSITION: { 
         x: width * 0.18,  
         y: height - (height / PLAYER_SCALE_FACTOR) 

@@ -61,7 +61,7 @@ import { BaseRunner, HtmlExecutor } from '{{ site.baseurl }}/assets/js/pages/run
 
   const defaultCode = JSON.parse(container.dataset.defaultCode || "\"\"");
   const autostart = "{{ include.autostart | default: 'false' }}" === "true";
-  const editorHeight = "{{ include.height }}";
+  const editorHeight = "{{ include.editor_height | default: include.height }}";
   const outputHeight = "{{ include.output_height }}";
   const storageKey = container.dataset.storageKey;
   const runner = new BaseRunner(container, { storageKey });
@@ -80,9 +80,7 @@ import { BaseRunner, HtmlExecutor } from '{{ site.baseurl }}/assets/js/pages/run
     }
   });
 
-  if (outputHeight) {
-    runner.applyScopedStyle(`#html-output-{{ include.runner_id }} { min-height: ${outputHeight}; max-height: ${outputHeight}; height: ${outputHeight}; }`);
-  }
+  runner.setOutputHeight('.ui-output', outputHeight);
 
   const htmlExecutor = new HtmlExecutor({
     editor,

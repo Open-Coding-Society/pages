@@ -71,6 +71,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * 源文件在 [notebook sources](_notebooks/) 与 [docx sources](_docx/)；转换后的 Markdown 输出到 [generated posts](_posts/)（生成物，不要手工改）。
 * 多课程拆分文件（`*_csp.md`/`*_csa.md`/`*_csse.md`/`*_content.md`）为生成物，禁止手改；规则见 [scripts/split_multi_course_files.py](scripts/split_multi_course_files.py)。
 * Notebook/DOCX 转换规则见 [scripts/convert_notebooks.py](scripts/convert_notebooks.py) 与 [scripts/convert_docx.py](scripts/convert_docx.py)。
+* GameBuilder 课程 notebook 的规范源在 [_projects/systems/gamebuilder/notebooks/](_projects/systems/gamebuilder/notebooks/)；`_notebooks/projects/gamebuilder/` 是构建副本。项目 Makefile 由 [_projects/_template/Makefile](_projects/_template/Makefile) 生成，持久的构建/监听修复应改模板；循环中的 `cd` 使用子 shell，避免多个 notebook 转换时改变工作目录。
 
 ### 项目注册与样式
 

@@ -1,13 +1,13 @@
 // text inputs
 input, textarea {
-    color: white;
+    color: var(--pref-text-color);
 
     // border
     border-radius: $border-size;
-    border: 1px solid hsla(240, 6%, 30%, 0.63);
+    border: 1px solid color-mix(in srgb, var(--pref-text-color) 24%, transparent);
 
     // shadow
-    filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 10px 10px color-mix(in srgb, var(--pref-text-color) 12%, transparent));
 
     // spacing
     padding: 15px;
@@ -15,7 +15,7 @@ input, textarea {
     // focus colors
     &:focus {
         outline: none;
-        border-color: rgba(255, 255, 255, 0.3);
+        border-color: var(--pref-accent-color);
     }
 
     // override the default browser autofil settings
@@ -24,10 +24,20 @@ input, textarea {
     &:-webkit-autofill:focus,
     &:-webkit-autofill:active {
         -webkit-background-clip: text;
-        -webkit-text-fill-color: #ffffff;
+        -webkit-text-fill-color: var(--pref-text-color);
         transition: background-color 5000s ease-in-out 0s;
-        box-shadow: inset 0 0 20px 20px #23232329;
+        box-shadow: inset 0 0 20px 20px var(--pref-bg-color);
     }
 
     transition: all 0.3s ease;
+}
+
+select.ocs__input {
+    color: var(--pref-text-color);
+    background-color: var(--pref-bg-color);
+}
+
+select.ocs__input option {
+    color: var(--pref-text-color);
+    background-color: var(--pref-bg-color);
 }
