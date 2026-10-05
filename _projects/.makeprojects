@@ -42,7 +42,7 @@ lessons/java
 systems/ai-ab-engine
 systems/calendar
 systems/courses:dev
-systems/gamebuilder
+systems/gamebuilder:dev
 systems/auto-generator
 systems/auto-generator-ui
 systems/scraper

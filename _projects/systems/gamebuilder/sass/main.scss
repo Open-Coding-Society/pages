@@ -1,3 +1,21 @@
+/// GameBuilder v2 workbench styles
+///
+/// Purpose: Style the runner-backed builder page without changing shared OCS
+/// components or the original GameBuilder v1 page.
+/// Reuse: Use the `.ocs__gamebuilder-*` classes only for this workbench. Prefer
+/// shared OCS controls and preference/theme tokens for common UI.
+/// Usage: Loaded through the registered GameBuilder system build. The page
+/// structure and hooks are defined in `index.md`; styles enhance that semantic
+/// markup and do not replace its behavior.
+/// @group gamebuilder
+
+/// Page shell and navigation
+///
+/// Purpose: Establish the page-level text/theme defaults and compact navigation.
+/// Reuse: Scoped to `.ocs__gamebuilder-system`; the original v1 builder keeps
+/// its own established presentation.
+/// Usage: Applies to the shared navigation include and its trailing page links.
+/// @group gamebuilder-shell
 .ocs__gamebuilder-system {
   color: var(--pref-text-color);
   font-family: var(--pref-font-family);
@@ -54,6 +72,15 @@
   height: clamp(32rem, calc(100dvh - 14rem), 52rem);
 }
 
+/// Full-width workbench frame and panel layout
+///
+/// Purpose: Release the generic OCS container width limit and lay out the
+/// builder beside the existing GAME_RUNNER.
+/// Reuse: The selectors are specific to the v2 page. Keep the generic
+/// `.ocs__container` and runner layout unchanged for other pages.
+/// Usage: `.is-builder-collapsed` is toggled by the workbench's accessible
+/// builder visibility control; the mobile layout is defined below.
+/// @group gamebuilder-workspace
 .ocs__container.ocs__gamebuilder-workbench {
   width: 100%;
   max-width: none;
@@ -111,6 +138,17 @@
   min-width: 0;
 }
 
+/// Semantic builder form and feature groups
+///
+/// Purpose: Arrange fieldsets and labels while retaining native form
+/// semantics and shared OCS input styling.
+/// Reuse: Inputs continue to use `.ocs__input`; only their sizing within this
+/// workbench is specialized here.
+/// Usage: The form uses `fieldset`/`legend` for Environment, Player, and NPC
+/// groups. New controls should follow that structure and use existing OCS
+/// buttons and input classes; the spline barrier group adds point-placement
+/// controls while retaining these form conventions.
+/// @group gamebuilder-form
 .ocs__gamebuilder-form {
   display: grid;
   gap: 0.85rem;
@@ -145,6 +183,15 @@
   line-height: 1.4;
 }
 
+/// Repeatable NPC cards
+///
+/// Purpose: Present a flexible list of independently configured NPC forms,
+/// including the empty-list message and per-card removal action.
+/// Reuse: The card treatment is intentionally scoped to NPCs; use standard
+/// OCS card/button patterns for unrelated workbench content.
+/// Usage: `app.mjs` creates `.ocs__gamebuilder-npc` articles dynamically and
+/// uses the child header/fields classes for their responsive layout.
+/// @group gamebuilder-npcs
 .ocs__gamebuilder-npc-list {
   display: grid;
   gap: 0.75rem;
@@ -199,6 +246,58 @@
   grid-column: 1 / -1;
 }
 
+/// Point-placed spline barrier controls and preview marks
+///
+/// Purpose: Keep point-placement, stack undo, finish, and visibility controls
+/// inside each barrier card, with a point-capture overlay on the preview.
+/// Reuse: These selectors are scoped to GameBuilder; generated barriers use
+/// the shared GameEngine class and do not depend on editor styles.
+/// Usage: `app.mjs` toggles the overlay's `is-active` state while a barrier is
+/// being authored. Visible barriers show all stored points, normalized as the
+/// preview resizes.
+/// @group gamebuilder-barriers
+.ocs__gamebuilder-barrier-list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.ocs__gamebuilder-barrier-empty,
+.ocs__gamebuilder-barrier > p {
+  margin: 0;
+  color: var(--pref-muted-text-color, var(--pref-text-color));
+  font-size: 0.85rem;
+}
+
+.ocs__gamebuilder-barrier {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.65rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.5rem;
+  background: var(--panel);
+}
+
+.ocs__gamebuilder-barrier h3 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.ocs__gamebuilder-barrier-points {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--pref-muted-text-color, var(--pref-text-color));
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.ocs__gamebuilder-barrier-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
 .ocs__gamebuilder-form .ocs__input {
   width: 100%;
 }
@@ -207,6 +306,15 @@
   max-width: none;
 }
 
+/// Form guidance and live status
+///
+/// Purpose: Keep helper text and accessible status messages visually quiet,
+/// while making validation errors distinguishable.
+/// Reuse: Status color uses preference tokens with existing text-color
+/// fallbacks.
+/// Usage: The app updates `data-state="error"` on the live status element when
+/// asset loading, validation, or generation fails.
+/// @group gamebuilder-feedback
 .ocs__gamebuilder-form-help,
 .ocs__gamebuilder-status {
   margin: 0;
@@ -218,6 +326,14 @@
   color: var(--pref-error-color, var(--pref-text-color));
 }
 
+/// GAME_RUNNER integration surface
+///
+/// Purpose: Let the shared runner occupy the available grid width and keep
+/// its source editor and game output usable within the workbench.
+/// Reuse: These rules adjust the existing runner include only when it is
+/// inside `.ocs__gamebuilder-runner`; they do not fork runner behavior.
+/// Usage: The right panel in `index.md` wraps `_includes/runners/game.html`.
+/// @group gamebuilder-runner
 .ocs__gamebuilder-runner {
   min-width: 0;
 }
@@ -241,10 +357,68 @@
   font-family: var(--pref-monospace-font-family, monospace);
 }
 
+/// GAME_RUNNER preview and barrier placement layer
+///
+/// Purpose: Position the point-capture SVG over the runner's actual game
+/// surface without replacing or intercepting normal game input outside edit
+/// mode.
+/// Reuse: The preview remains owned and sized by GAME_RUNNER. Only the v2
+/// builder adds this visual placement overlay.
+/// Usage: `barrier-editor.mjs` sets `is-active` while the user places points;
+/// the SVG uses a normalized viewBox so its marks scale with the preview.
+/// @group gamebuilder-barrier-preview
 .ocs__gamebuilder-workbench .gameContainer {
+  position: relative;
   min-height: 24rem;
 }
 
+.ocs__gamebuilder-barrier-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ocs__gamebuilder-barrier-overlay.is-active {
+  cursor: crosshair;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.ocs__gamebuilder-barrier-line {
+  fill: none;
+  stroke: var(--pref-accent-color);
+  stroke-width: 5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.9;
+  pointer-events: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.ocs__gamebuilder-barrier-line.is-active {
+  stroke-width: 7px;
+}
+
+.ocs__gamebuilder-barrier-point {
+  fill: var(--pref-accent-color);
+  stroke: var(--pref-bg-color);
+  stroke-width: 3px;
+  pointer-events: none;
+  vector-effect: non-scaling-stroke;
+}
+
+/// Narrow-screen layout adjustments
+///
+/// Purpose: Reduce page chrome and stack the builder and runner when the
+/// side-by-side layout no longer has comfortable reading width.
+/// Reuse: Breakpoint overrides remain local to the GameBuilder page.
+/// Usage: Keep new responsive overrides for these workbench sections in this
+/// media query, while preserving the same document order and functionality.
+/// @group gamebuilder-responsive
 @media (max-width: 768px) {
   .ocs__gamebuilder-system {
     padding-right: 0.5rem;

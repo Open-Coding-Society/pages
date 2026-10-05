@@ -1,7 +1,7 @@
-# GameBuilder v2 proposal
+# GameBuilder v2 — implementation status and design
 
-> Design source retained with the GameBuilder system at
-> `_projects/systems/gamebuilder/docs/GameBuilderv2.md`.
+> Design and implementation notes retained with the GameBuilder system.
+> Updated 2026-10-05.
 
 ## Purpose
 
@@ -10,32 +10,86 @@ game on the left and plays/runs it through the existing GAME_RUNNER on the
 right. The builder should produce ordinary GameEngine level code that can be
 inspected, edited, saved, and reused outside the builder.
 
-The current v1 builder remains available at `/gamebuilder/`. The Stage 1 v2
-workbench is available at `/gamebuilder/v2/`, with system source kept under
+The v1 builder remains available at `/gamebuilder/`. The v2 workbench is
+available at `/gamebuilder/v2/`, with system source kept under
 `_projects/systems/gamebuilder/`, following the
 `_projects/systems/calendar/` project pattern.
 
-### Stage 1 implementation boundary
+## Current implementation snapshot
 
-The first workbench increment is intentionally narrow: a versioned builder
-document selects one bundled background and one player sprite, sets the player
-name and normalized position, and generates a single level. Generation targets
-the existing GAME_RUNNER contract; the workbench does not own another canvas,
-game loop, or executor. The builder panel can collapse, and generated code
-replaces runner edits only after an explicit confirmation.
+The current v2 page is a working, runner-backed builder for a game name,
+background, player, zero or more NPCs, and multiple open spline barriers. It
+generates a standard GameEngine level module and sends it to the existing
+GAME_RUNNER editor. GAME_RUNNER remains the only code editor and execution
+surface; GameBuilder does not create a second canvas, game loop, or executor.
+Replacing runner code is explicit and prompts for confirmation when existing
+code differs from the last generated version.
 
-The first increment does not yet include NPCs, barriers, persistence,
-object-literal import, or writing files into the VS Code workspace. Its
-starter manifests/assets live in the registered system package and build to
-`/images/projects/gamebuilder/`.
+The system also owns the lesson notebooks under `notebooks/`. The characters
+lesson at `/game/essentials/characters` connects generated data to object
+literals, constructors, inheritance, spritesheet indexes, and animation. Its
+two editable GAME_RUNNER examples progress from a Player to a Player with two
+NPC instances. The backgrounds and characters lessons use system-owned assets
+published under `/images/projects/gamebuilder/`, rather than another game's
+distribution. GameBuilder is registered for `make dev`; its notebook watcher
+copies and converts source lesson changes for the local preview.
+
+### Current page composition
+
+```text
+GameBuilder v2 page
+├── Shared OCS navigation and page links
+├── Workbench heading with builder collapse/reopen control
+├── Live status message
+└── Responsive workbench
+    ├── Left: Level setup (.ocs__card)
+    │   ├── Generate / Sync Code
+    │   ├── Game name
+    │   ├── Environment fieldset: background selection
+    │   ├── Player fieldset: name, sprite, normalized X/Y position
+    │   ├── NPCs fieldset: Add NPC and repeatable NPC configuration cards
+    │   │   └── Each NPC: name, sprite, normalized X/Y position, greeting
+    │   └── Spline barriers: point placement, coordinate list, undo, edit,
+    │       visibility, finish/cancel, and removal controls
+    └── Right: shared GAME_RUNNER include
+        ├── Existing runner controls and source editor
+        └── Game output/canvas
+```
+
+On wide screens, the builder occupies the left quarter of a full-width
+workspace and the runner uses the remaining width. The builder can collapse
+to give the runner the full workspace. At mobile widths, the panels stack.
+Controls use semantic fieldsets, labels, inputs, selects, and buttons, enhanced
+with GameBuilder-scoped OCS classes and preference-aware theme tokens.
+
+Generated code defines `backgroundData`, `playerData`, and one named
+`npcDataN` or `barrierDataN` object per configured object separately, then
+references those data objects in `this.classes`. Barrier points are stored in
+normalized 0–1 coordinates and rendered/collided by the reusable
+`assets/js/GameEnginev1.1/essentials/SplineBarrier.js` class. The asset
+manifests and focused `.mjs` modules are authored under
+`_projects/systems/gamebuilder/` and distributed by the registered project
+build.
+
+### Still not implemented
+
+Importing object-literal code from GAME_RUNNER back into the builder, builder
+configuration save/load, code/config export controls, and direct writing of
+artifacts into the VS Code workspace remain future work. NPC and spline
+barrier editing/code generation are implemented; these are not pending Stage 2
+items.
 
 ## Current state and reuse opportunities
 
-- The current v1 entry point (`../index.md`) has an Assets/configuration
-  column and a main
-  column that contains its own game preview, barrier-drawing overlay, and code
-  editor. Its inline application code owns the asset controls, builder state,
-  code generation, and execution path.
+- The original v1 builder is retained in
+  [`BuilderWorkbenchV1.md`](./BuilderWorkbenchV1.md) and published at
+  `/gamebuilder/`. It has an Assets/configuration column and a main column with
+  its own game preview, barrier-drawing overlay, and code editor. Its inline
+  application code owns the asset controls, builder state, code generation,
+  and execution path.
+- `../index.md` is the v2 workbench entry point, published at
+  `/gamebuilder/v2/`; it uses the shared GAME_RUNNER rather than the v1
+  execution path.
 - Code generation is already compositional: `gamelevel_code()` builds a
   `GameLevelCustom` class and exports `gameLevelClasses`, while
   `step_generate()` gathers configured background, player, NPC, and wall
@@ -50,12 +104,13 @@ starter manifests/assets live in the registered system package and build to
   The runner keeps code in local storage under its storage key, so code and
   builder configuration need distinct persistence keys and an explicit
   precedence rule.
-- The current OCS `.ocs__container` is a document-width container capped at
-  900px, not a full-width workspace layout. `.ocs__split` is an available
-  responsive two-column primitive, but it is currently defined with
-  capstone-oriented styles. Use OCS container and component conventions, and
-  add a narrowly scoped GameBuilder workspace layout in SCSS instead of
-  stretching unrelated page styles.
+- The generic OCS `.ocs__container` is capped at 900px, so the v2 page
+  overrides its workbench to use the available width and defines its
+  responsive columns in
+  [`sass/main.scss`](../sass/main.scss). That stylesheet documents each visual
+  section alongside its rules with SassDoc-style purpose, reuse, and usage
+  notes; keep implementation-specific styling guidance there rather than
+  duplicating it here.
 - Asset documentation recommends JSON manifests because directory listings may
   not work on GitHub Pages. Background manifests list `name` and `src`;
   spritesheets add `rows` and `cols`. These should be the builder's reliable
@@ -69,7 +124,28 @@ starter manifests/assets live in the registered system package and build to
   Its levels also demonstrate object literals with callbacks and references to
   imports and local variables, which a code importer must handle conservatively.
 
-## Proposed workspace
+## Target product boundaries and future workspace
+
+### Next priority: saved games and the Gamify reference game
+
+The next workspace priority is loading, editing, and saving complete games,
+followed by bringing Gamify and its levels into this registered system.
+See [GameBuilder and Gamify workspace roadmap](./GamifyWorkspaceRoadmap.md)
+for the source findings, proposed ownership, ordered milestones, and
+verification criteria. This is a plan, not an implemented migration.
+
+The first save milestone will use browser-local persistence plus portable
+JSON/source export. Existing Gamify behavior must be retained; unsupported
+objects, callbacks, and custom minigames remain code-owned until panel support
+can preserve them. Multi-module saves must retain actual level sources, not
+just a runner entry module that imports the published originals. Game-in-Game
+and the existing Player gravity flag follow the load/edit/save foundation.
+
+Currently GAME_RUNNER saves/restores editor text, but GameBuilder resets its
+panel configuration on reload. Startup preserves existing runner text; the
+confirmed gap is missing workspace persistence, not an established automatic
+startup overwrite. Save/load must restore matching panel state and exact
+editor text without automatically regenerating over manual edits.
 
 ### Navigation and product boundaries
 
@@ -104,8 +180,8 @@ GameBuilder page
 ```
 
 The left side is the authoring surface: forms, asset selection, object
-properties, and eventually placement tools. The right side is the canonical
-execution surface: use GAME_RUNNER to edit and run the generated level code.
+properties, and point placement. The right side is the canonical execution
+surface: use GAME_RUNNER to edit and run the generated level code.
 Do not maintain a second canvas lifecycle, run loop, or game editor in
 GameBuilder.
 
@@ -128,9 +204,10 @@ does.
 Use semantic OCS classes for the workspace and panels, and existing
 `.ocs__btn` controls, inputs, tables, and callouts where applicable. The
 workspace should use theme variables and existing OCS tokens; avoid hard-coded
-colors and inline styles. A small, purpose-specific SCSS layout is appropriate
-because the current `.ocs__container` is capped at 900px and does not itself
-provide an editor workspace layout.
+colors and inline styles. Keep the scoped workspace styles and section-level
+purpose/reuse/usage documentation in
+[`sass/main.scss`](../sass/main.scss), rather than extending generic OCS layout
+rules for this page.
 
 ## Data flow
 
@@ -146,9 +223,9 @@ Keep three representations distinct:
 The flow is:
 
 ```text
-asset manifests + builder document or imported supported code
+asset manifests + builder document
                 ↓
-     parse/import or generate
+          validate/generate
                 ↓
 GAME_RUNNER BaseRunner.setValue(generated code)
                 ↓
@@ -177,27 +254,50 @@ implementation details, but its contents should cover:
 {
   "schemaVersion": 1,
   "name": "My Game",
-  "environment": {
-    "assetKey": "alien_planet"
-  },
+  "backgroundKey": "alien_planet",
   "player": {
     "name": "Player",
     "spriteKey": "chillguy",
-    "position": { "x": 100, "y": 300 },
-    "movementKeys": {}
+    "position": { "x": 0.5, "y": 0.8 }
   },
-  "objects": [],
-  "barriers": []
+  "npcs": [],
+  "barriers": [
+    {
+      "id": "barrier-1",
+      "name": "Barrier 1",
+      "points": [{ "x": 0.1, "y": 0.3 }, { "x": 0.5, "y": 0.25 }, { "x": 0.9, "y": 0.3 }]
+    }
+  ]
 }
 ```
+
+This is the current v2 document shape. The background is selected by its
+manifest-derived key; player and NPC positions are normalized from 0 to 1.
+Each barrier is an open spline with at least two normalized control points.
+During authoring, click the GAME_RUNNER preview directly to add points.
+There are no coordinate-editing inputs, Add point button, or separate placement
+panel. **Undo point**, **Finish barrier**, and **Cancel** live inside the active
+barrier card. Undo works as a stack: each press removes the most recently added
+point. Finish requires at least two points. **Edit** reopens the same controls
+for a completed barrier; Cancel restores its points from before editing.
+Finish the active barrier before generating code. Each completed barrier can
+be hidden, shown, or removed from its card. Hidden barriers are
+not drawn in the editor or runtime, but remain collision obstacles. Editing a
+hidden barrier temporarily displays its curve and markers without changing its
+saved visibility. Curves are
+smoothed with Catmull–Rom interpolation by the shared GameEngine class.
+Control-point markers are shown while a barrier is being edited, and each card
+lists every point's X/Y coordinates. The runtime renderer uses the OCS accent
+color. During game updates, the runtime class resolves player overlap against
+the spline. Barriers and NPCs resize with the logical canvas dimensions, not
+the browser's incidental display pixels.
 
 Store manifest keys (or another stable asset identifier), not display labels or
 duplicated asset metadata. At generation time, resolve keys through the
 manifest-derived asset catalog and report missing assets as visible validation
-errors. Use one documented coordinate space for positions and barriers; map
-from the builder preview's displayed dimensions to the runner's logical game
-dimensions during generation or runtime, rather than persisting incidental
-screen pixels.
+errors. Player/NPC positions and spline control points use normalized
+coordinates from 0 through 1, mapped against the runner's logical game
+dimensions at runtime rather than persisting incidental screen pixels.
 
 Keep the schema extensible for future object types, but do not build a generic
 plugin system until there is a real second use case. Treat each object as a
@@ -320,34 +420,30 @@ silently lose supported configuration or preserved custom code.
 
 ## System project structure and distribution
 
-Create the v2 source package at `_projects/systems/gamebuilder/`. Use its
-`index.md` as the GameBuilder system entry point/page and keep authored
-implementation files, documentation, and images inside the project so a
-developer can work on the whole system from one VS Code folder:
+The v2 source package lives at `_projects/systems/gamebuilder/`. Its
+`index.md` is the workbench page and authored implementation files,
+documentation, and images stay inside the registered project:
 
 ```text
 _projects/systems/gamebuilder/
 ├── index.md                 # Entry point; mounts the builder and GAME_RUNNER
-├── Makefile                 # Registered project build/watch/clean targets
 ├── js/
-│   ├── app.js               # Page wiring and UI lifecycle
-│   ├── builder-state.js     # Versioned document and validation
-│   ├── asset-catalog.js     # Manifest loading and asset resolution
-│   ├── code-generator.js    # Builder document → GameEngine module
-│   ├── code-importer.js     # Supported AST/code → builder document
-│   └── runner-bridge.js     # Minimal integration with GAME_RUNNER
+│   ├── app.mjs              # Page wiring and UI lifecycle
+│   ├── builder-state.mjs    # Versioned document and validation
+│   ├── asset-catalog.mjs    # Manifest loading and asset resolution
+│   ├── code-generator.mjs   # Builder document → GameEngine module
+│   └── runner-bridge.mjs    # Minimal integration with GAME_RUNNER
 ├── sass/
-│   └── main.scss            # Workspace/panel layout using OCS tokens
-├── images/                  # System-owned UI/art assets, if needed
+│   └── main.scss            # OCS-token styling with SassDoc-style section docs
+├── images/                  # Starter backgrounds and spritesheet manifests
 ├── docs/
-│   ├── ARCHITECTURE.md
-│   └── CODE-IMPORT.md
-└── tests/                   # Focused generator/importer fixtures and tests
+│   └── GameBuilderDocV2.md  # Current status and forward-looking design
+└── tests/
+    └── gamebuilder-contract.test.mjs
 ```
 
-This is a proposed responsibility breakdown, not a requirement to create empty
-modules up front; keep each module focused and only introduce the files needed
-by the implementation. The normal registered-project build should distribute
+The structure above reflects the current implementation; add focused modules
+only as future features require them. The normal registered-project build distributes
 the page to `_posts/projects/`, JavaScript to `assets/js/projects/gamebuilder/`,
 Sass to `_sass/projects/gamebuilder/` (and its CSS entry point), and project
 images to `images/projects/gamebuilder/`. Register the system through the
@@ -384,55 +480,81 @@ Use separate persistence for structured configuration and runner source code.
 - Do not imply that browser-local saves synchronize between devices or users.
   Account/server persistence can be a later, separate decision.
 
-When a builder document is loaded, regenerate its source and offer to apply it
-to the runner editor. If the runner has existing saved/manual code, preserve it
-until the user accepts replacement.
+When a saved workspace is loaded, restore its exact editor source and matching
+panel configuration without regeneration. For a configuration-only import,
+offer generation explicitly. Preserve existing saved/manual code until the
+user accepts replacement.
+
+### Runner save-state notification (required, not yet implemented)
+
+After successfully persisting editor source, the runner should emit a
+page-scoped `ocs:runner-saved` notification with a versioned payload identifying
+the runner, its storage key, the exact saved source, and a save revision.
+GameBuilder should subscribe through its runner bridge and associate that
+snapshot with the active game/module and matching panel configuration. Other
+runner pages keep their current Save Code behavior without a workspace
+subscriber.
+
+This event means **source saved**, not **complete workspace saved**, **code
+valid**, or **safe to regenerate**. GameBuilder must report its own persistence
+success or failure separately. When complete-workspace saving is wired into
+the runner's Save action, use an explicit awaited save hook rather than relying
+on asynchronous event listeners to delay success feedback.
+
+Track saved/dirty source separately from builder/code synchronization: saved
+manual edits may still differ from generated code. A save notification can
+offer later AST-based panel import, but must never automatically parse, execute,
+convert, or overwrite code. Storage failure must produce visible error feedback
+and no saved event. Saved state must also be queryable through the runner
+controller so a late subscriber can initialize correctly.
+
+See the [save-state contract in the workspace roadmap](./GamifyWorkspaceRoadmap.md#runner-save-state-contract)
+for the proposed payload and acceptance criteria.
 
 ## Implementation sequence
 
-### Stage 1 — runner-backed vertical slice
+### Stage 1 — runner-backed vertical slice (implemented)
 
-1. Define the initial versioned builder data shape for background, player,
-   NPCs, and barriers based on the v1 controls and generated object definitions.
-2. Create `_projects/systems/gamebuilder/` as a registered system package with
-   `index.md` entry point, project Makefile, JS/Sass/docs, and an `images/`
-   directory; keep the existing v1 page operational during this work.
-3. Extract asset manifest loading and code generation from the inline v1
-   application into focused system modules.
-4. Add the OCS-styled two-panel workspace, accessible collapse/reopen behavior,
-   and mount one GAME_RUNNER include on the right with a unique runner ID.
-5. Add the minimal runner-ready integration hook and prove the basic lifecycle:
-   generate code → update runner editor → run → stop → generate/run again.
-6. Verify registered build/watch distribution, generated exports, engine
-   imports, asset paths, responsive/collapsed layout, editor persistence key,
-   and preservation of manual code edits.
+- Registered the GameBuilder system package while keeping the v1 page available.
+- Added focused `.mjs` modules for state/validation, asset catalogs, code
+  generation, and the runner-ready bridge.
+- Built the OCS-styled responsive two-panel workbench, semantic Environment,
+  Player, and NPC controls, and accessible builder collapse/reopen behavior.
+- Integrated the existing GAME_RUNNER and added explicit generate/sync behavior
+  with confirmation before replacing differing runner code.
+- Added generation of zero or more separately defined `Npc` data objects and
+  contract tests for generated source and validation.
+- Built and distributed the registered project assets. The lifecycle has been
+  exercised through generation and runner-editor synchronization; running the
+  game remains available through the runner's own Run control.
 
 ### Stage 2 — complete builder behaviors
 
-1. Port the asset, player, NPC, and wall/barrier controls incrementally into
-   structured state and validate each section before code generation.
-2. Make the runner the only game preview and execution path; remove v1-only
-   game execution and duplicate editor behavior from the v2 page.
-3. Add AST-based import for the supported object-literal subset, with a
-   non-destructive preview and a canonical simple-game fixture.
-4. Add JSON save/load, migration/error feedback, and separate code/config
-   exports.
-5. Add regression coverage for manifest resolution, generation from
+1. Spline barrier controls and validation are implemented. Next add complete
+   workspace save/load, retaining panel state and exact runner source together,
+   with migration/error feedback and portable JSON/source exports.
+2. Add multi-level, multi-module loading and source editing before relocating
+   Gamify; run saved module edits rather than unchanged published imports.
+3. Move Gamify into the registered system with explicit metadata and
+   make-generated catalogs, preserving existing behavior and URLs. Then add
+   bounded AST-based panel import with a non-destructive preview.
+4. Add regression coverage for manifest resolution, generation from
    representative configurations, missing assets, schema validation, code
    import/round-trip preservation, and the runner integration hook.
 
 ### Stage 3 — advanced authoring
 
-1. Improve object placement and editing against the runner's documented
-   logical coordinate space.
-2. Add richer typed objects and per-spritesheet animation/direction settings.
+1. Add richer asset metadata and per-object animation/direction overrides,
+   followed by Game-in-Game authoring using the existing nested-game lifecycle.
+2. Expose existing Player gravity without confusing it with custom platformer
+   physics; expand typed objects and placement as compatibility requires.
 3. Consider server/account persistence only after the desired ownership,
    sharing, and collaboration behavior is specified.
 
 ## Decisions to confirm before implementation
 
-1. **Draft persistence:** should the first version save configuration only as
-   downloaded/uploaded JSON, or also keep a browser-local draft?
+1. **Draft persistence (confirmed):** browser-local complete-game saves plus
+   portable JSON/source exports are the first milestone.
 2. **Editor visibility:** should the GAME_RUNNER editor always be shown, or
    should Builder/Code modes be used to show the editor only when requested?
 3. **Runner layout:** should the runner editor and game output remain stacked
@@ -441,9 +563,8 @@ until the user accepts replacement.
 4. **Import scope:** which object-literal patterns in the simple game should
    be panel-editable in the first importer? The proposal recommends a safe
    static-literal subset with unsupported code preserved.
-5. **Local artifact workflow:** are download/upload and VS Code-managed source
-   files sufficient initially, or is a secured local workspace bridge a
-   required feature?
+5. **Local artifact workflow (confirmed):** download/upload and VS Code-managed
+   source files are sufficient initially; direct workspace writes are deferred.
 6. **Migration scope:** should v2 initially support the current background,
    player, NPC, and barriers feature set, or may some v1 controls be deferred?
 
