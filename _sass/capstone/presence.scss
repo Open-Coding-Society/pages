@@ -1,0 +1,142 @@
+// Classroom Presence System capstone pages (/capstone/presence-system/*)
+// Scoped aliases map back to the user's preference colors, same pattern as jarvis.scss.
+
+.rfid-presence-infograph {
+  --rp-bg: var(--pref-bg-color);
+  --rp-card-border: var(--ui-border);
+  --rp-text: var(--pref-text-color);
+  --rp-text-muted: var(--text-muted);
+  --rp-accent: var(--pref-accent-color);
+  --rp-accent-soft: color-mix(in srgb, var(--pref-accent-color) 15%, transparent);
+  --rp-surface: color-mix(in srgb, var(--rp-text) 6%, var(--rp-bg));
+  --rp-surface-strong: color-mix(in srgb, var(--rp-text) 12%, var(--rp-bg));
+  --rp-border-strong: color-mix(in srgb, var(--rp-text) 18%, transparent);
+  --rp-success: var(--rp-accent);
+  --rp-warning: var(--rp-accent);
+
+  .rfid-presence-question {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .rfid-presence-table-wrap {
+    overflow-x: auto;
+    margin-top: 1rem;
+  }
+
+  .rfid-presence-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+
+    th,
+    td {
+      text-align: left;
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--rp-card-border);
+      vertical-align: top;
+    }
+
+    th {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--rp-text-muted);
+    }
+
+    td {
+      color: var(--rp-text-muted);
+      line-height: 1.5;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    a {
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+    }
+  }
+
+  .rfid-presence-pill {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-radius: 999px;
+    border: 1px solid var(--rp-border-strong);
+    background: var(--rp-surface-strong);
+    color: var(--rp-text);
+  }
+
+  .rfid-presence-pill-good,
+  .rfid-presence-pill-warn,
+  .rfid-presence-pill-bad {
+    border-color: var(--rp-accent);
+    background: var(--rp-accent-soft);
+    color: var(--rp-accent);
+  }
+
+  .rfid-presence-pill-neutral {
+    border-color: var(--rp-border-strong);
+    background: var(--rp-surface);
+    color: var(--rp-text-muted);
+  }
+
+  .rfid-presence-stage-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rp-card-border);
+
+    > a {
+      flex: 1 1 auto;
+      text-align: center;
+      white-space: nowrap;
+    }
+  }
+
+  // Live dashboard (/capstone/presence-system/dashboard/)
+  .pd-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .pd-stat {
+    border: 1px solid var(--rp-card-border);
+    background: var(--rp-surface);
+    border-radius: 10px;
+    padding: 0.75rem;
+    text-align: center;
+  }
+
+  .pd-stat-count {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--rp-text);
+  }
+
+  .pd-stat-label {
+    font-size: 0.85rem;
+    color: var(--rp-text-muted);
+  }
+
+  .pd-updated {
+    font-size: 0.8rem;
+    color: var(--rp-text-muted);
+    margin-top: 0.5rem;
+  }
+
+  .rfid-presence-table td.pd-name { color: var(--rp-text); }
+}
