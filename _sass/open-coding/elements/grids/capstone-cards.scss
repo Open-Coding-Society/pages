@@ -73,18 +73,27 @@
   }
 }
 
-// Project info (Mentors / Chat): its own line right under the card text. Anchors the
-// Mentors popover.
+// Project info (Chat / Mentors / Message Mentor): one line pinned to the bottom of the
+// card, so Chat sits in the same spot on every card whatever the text length. Chat comes
+// first and the row wraps upwards, so extra buttons never push it off that spot.
+// Anchors the Mentors popover.
 .capstone-card-info {
   position: relative;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap-reverse;
   gap: 0.5rem;
-  margin-top: 0.25rem;
+  margin-top: auto;
+  padding-top: 0.85rem;
 
   .ocs__btn {
     margin: 0;
   }
+}
+
+// In the mentor view the action row follows the info line instead of taking the bottom
+// spot by itself.
+.capstone-card-info + .capstone-card-actions {
+  margin-top: 0.75rem;
 }
 
 // Mentor action row (Apply / Interested / Skip): a footer pinned to the bottom of the
@@ -121,12 +130,6 @@
   }
 }
 
-// Visitors and students have no action row, so the info line takes the bottom spot.
-.capstone-card__body > .capstone-card-info:last-child {
-  margin-top: auto;
-  padding-top: 0.85rem;
-}
-
 .capstone-mentor-counts {
   display: flex;
   gap: 0.5rem;
@@ -135,6 +138,15 @@
   .ocs__btn {
     margin: 0;
     cursor: default;
+  }
+
+  // The counters are read-only badges; Reset is the one real button in the group.
+  button.ocs__btn:enabled {
+    cursor: pointer;
+  }
+
+  button.ocs__btn:disabled {
+    opacity: 0.5;
   }
 }
 

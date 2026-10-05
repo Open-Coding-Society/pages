@@ -31,8 +31,9 @@ export async function initCardTools(grid) {
         // Project info goes on its own line under the card text.
         const extra = cardActionGroup(card, 'extra');
         if (!extra) return;
-        if (project.mentorNames.length > 0) extra.append(mentorsButton(extra, project));
+        // Chat first, so it is in the same place on every card.
         extra.append(chatButton(project, viewer));
+        if (project.mentorNames.length > 0) extra.append(mentorsButton(extra, project));
         if (canSelfJoin(project, viewer)) extra.append(joinChatButton(extra, project, viewer));
     });
 }

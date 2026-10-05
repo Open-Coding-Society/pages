@@ -32,6 +32,7 @@ show_reading_time: false
       <span id="mentor-counts" class="capstone-mentor-counts" hidden>
         <span id="mentor-skipped-count" class="ocs__btn alert-red">Skipped: 0</span>
         <span id="mentor-interested-count" class="ocs__btn alert-green">Interested: 0</span>
+        <button id="mentor-reset-marks" type="button" class="ocs__btn" title="Clear every Skipped and Interested mark">Reset</button>
       </span>
     </div>
   </div>
@@ -378,10 +379,27 @@ import { setIconLabel } from '{{ site.baseurl }}/assets/js/capstone/cardIcons.js
   const interested = readSet(INTERESTED_KEY);
   const skipped = readSet(SKIPPED_KEY);
 
+  const resetBtn = document.getElementById('mentor-reset-marks');
+  setIconLabel(resetBtn, 'undo', 'Reset');
+  // One per card that can carry a mark: puts the card back to its unmarked look.
+  const cardResetters = [];
+
   function updateCounter() {
     interestedCountEl.textContent = `Interested: ${interested.size}`;
     skippedCountEl.textContent = `Skipped: ${skipped.size}`;
+    resetBtn.disabled = interested.size === 0 && skipped.size === 0;
   }
+
+  // Clears every Interested/Skipped mark (both counters back to 0). Applications are
+  // on the backend and are not touched.
+  resetBtn.addEventListener('click', () => {
+    interested.clear();
+    skipped.clear();
+    writeSet(INTERESTED_KEY, interested);
+    writeSet(SKIPPED_KEY, skipped);
+    cardResetters.forEach(reset => reset());
+    updateCounter();
+  });
 
   // Interested/Skip are for deciding what to apply to, so they no longer apply once a
   // project is approved -- drop any old mark so it doesn't dim the card or stay counted.
@@ -457,8 +475,15 @@ import { setIconLabel } from '{{ site.baseurl }}/assets/js/capstone/cardIcons.js
       interestedBtn.disabled = interested.has(url);
     }
 
+    function showNotInterested() {
+      setIconLabel(interestedBtn, 'star', 'Interested');
+      interestedBtn.classList.remove('fill');
+    }
+
     if (interested.has(url)) showInterested();
     if (skipped.has(url)) showSkipped();
+    // Runs after the sets are cleared, so showUnskipped re-enables Interested too.
+    cardResetters.push(() => { showNotInterested(); showUnskipped(); });
 
     applyBtn.addEventListener('click', async () => {
       const id = idByUrl[url];
@@ -478,7 +503,21 @@ import { setIconLabel } from '{{ site.baseurl }}/assets/js/capstone/cardIcons.js
           updateCounter();
         } else if (res.ok) {
           showApplyState(applyBtn, 'pending');
+        } else if (res.status === 401 || res.status === 403) {
+          // Not signed in to Spring as an approved mentor (e.g. the localhost mentor
+          // preview, an expired session, or a student/admin account): the application
+          // was not sent, so say so instead of inviting a retry that can't work.
+          console.warn(`Capstone: apply refused (HTTP ${res.status}) -- not signed in as an approved mentor`);
+          applyBtn.className = 'ocs__btn small alert-yellow';
+          setIconLabel(applyBtn, 'xCircle', 'Log in as a mentor to apply');
+          applyBtn.title = 'Your application was not sent. Log in with an approved mentor account, then apply again.';
+          applyBtn.disabled = false;
+          applyBtn.addEventListener('click', (event) => {
+            event.stopImmediatePropagation();
+            location.href = '{{ site.baseurl }}/login';
+          }, { capture: true, once: true });
         } else {
+          console.error(`Capstone: apply failed (HTTP ${res.status})`);
           setIconLabel(applyBtn, 'send', 'Try again');
           applyBtn.disabled = false;
         }
