@@ -1,0 +1,428 @@
+// ===========================
+// SRFSC (Scripps Ranch Fire Safe Council) dashboard styles
+// ===========================
+// Imported globally through _sass/projects/_all.scss, so every rule is scoped
+// under .srfsc-app and every variable is prefixed to avoid collisions.
+// Palette comes from the ideation page flowchart (/capstone/srfsc/).
+
+$srfsc-forest-deep: #173b2f;
+$srfsc-forest: #2f6d4c;
+$srfsc-ember: #d8572a;
+$srfsc-slate: #49615b;
+$srfsc-amber: #f0b342;
+$srfsc-red: #c0392b;
+$srfsc-bg: #0f1a16;
+$srfsc-card: #15241e;
+$srfsc-border: #27403a;
+$srfsc-text: #eef3ef;
+$srfsc-muted: #a9bab3;
+$srfsc-radius: 14px;
+
+// Fire-weather levels map to colors; used by the weather card and its border.
+$srfsc-weather-levels: (
+  "Normal": lighten($srfsc-forest, 25%),
+  "Elevated": $srfsc-amber,
+  "High": $srfsc-ember,
+  "Extreme": $srfsc-red,
+  "Unknown": lighten($srfsc-slate, 25%),
+);
+
+@mixin srfsc-card {
+  background: $srfsc-card;
+  border: 1px solid $srfsc-border;
+  border-radius: $srfsc-radius;
+}
+
+.srfsc-app {
+  max-width: 1200px;
+  margin: 0 auto 3rem;
+  color: $srfsc-text;
+  line-height: 1.5;
+
+  h2, h3, h4 { color: $srfsc-text; margin: 0 0 0.4rem; }
+
+  // The post layout underlines h2/h3 (.post-content h2); class selectors outrank it, panels already frame titles
+  .srfsc-hero__title,
+  .srfsc-panel__title { border-bottom: none; padding-bottom: 0; }
+  a { color: $srfsc-amber; }
+  [hidden] { display: none !important; }
+
+  // ── Hero: urgency + mission + actions, beside live fire weather ──
+  .srfsc-hero {
+    @include srfsc-card;
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+    gap: 1.5rem;
+    padding: 2rem;
+    background:
+      radial-gradient(circle at 10% 0%, rgba($srfsc-ember, 0.28), transparent 50%),
+      linear-gradient(150deg, $srfsc-forest-deep 0%, $srfsc-bg 80%);
+
+    @media (max-width: 820px) { grid-template-columns: 1fr; padding: 1.25rem; }
+  }
+
+  .srfsc-hero__eyebrow {
+    color: $srfsc-amber;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 0.5rem;
+  }
+  .srfsc-hero__title { font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.2; }
+  .srfsc-hero__lead { color: $srfsc-muted; max-width: 62ch; }
+
+  .srfsc-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.2rem;
+  }
+
+  // ── Fire weather card ──
+  .srfsc-weather {
+    border-radius: $srfsc-radius;
+    padding: 1.2rem;
+    background: rgba($srfsc-bg, 0.7);
+    border: 2px solid $srfsc-slate;
+
+    @each $level, $tone in $srfsc-weather-levels {
+      &[data-level="#{$level}"] {
+        border-color: $tone;
+        .srfsc-weather__level { color: $tone; }
+      }
+    }
+  }
+  .srfsc-weather__label { margin: 0; color: $srfsc-muted; font-size: 0.85rem; }
+  .srfsc-weather__level { margin: 0.1rem 0 0.6rem; font-size: 1.8rem; font-weight: 800; }
+  .srfsc-weather__readings {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin: 0 0 0.6rem;
+    dt { color: $srfsc-muted; font-size: 0.75rem; }
+    dd { margin: 0; font-weight: 700; white-space: nowrap; }
+  }
+  .srfsc-weather__message { margin: 0 0 0.5rem; font-size: 0.9rem; }
+  .srfsc-weather__alerts { list-style: none; padding: 0; margin: 0 0 0.5rem; }
+  .srfsc-weather__alert {
+    display: inline-block;
+    margin: 0 0.3rem 0.3rem 0;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: rgba($srfsc-red, 0.25);
+    font-size: 0.8rem;
+  }
+  .srfsc-weather__source { margin: 0; color: $srfsc-muted; font-size: 0.72rem; }
+
+  // ── KPI tiles ──
+  .srfsc-kpis {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+
+    @media (max-width: 960px) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    @media (max-width: 520px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  .srfsc-kpi {
+    @include srfsc-card;
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+  .srfsc-kpi__value { font-size: 1.6rem; font-weight: 800; color: $srfsc-amber; }
+  .srfsc-kpi__label { color: $srfsc-muted; font-size: 0.8rem; }
+  .srfsc-kpi--live {
+    border-color: rgba($srfsc-forest, 0.8);
+    .srfsc-kpi__value { color: lighten($srfsc-forest, 25%); }
+  }
+
+  // ── Dashboard grid ──
+  .srfsc-dashboard {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+    gap: 1rem;
+    align-items: start;
+
+    // Single column: flatten both columns so actions sit right after events, not below the checklist
+    @media (max-width: 900px) {
+      display: flex;
+      flex-direction: column;
+      .srfsc-dashboard__main, .srfsc-dashboard__side { display: contents; }
+      .srfsc-panel { order: 5; }
+      #updates { order: 1; }
+      #take-action { order: 2; }
+      #community { order: 3; }
+      #programs { order: 4; }
+    }
+  }
+  .srfsc-dashboard__main,
+  .srfsc-dashboard__side {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .srfsc-panel {
+    @include srfsc-card;
+    padding: 1.25rem;
+    scroll-margin-top: 80px;
+  }
+  .srfsc-panel__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+  }
+  .srfsc-panel__title { font-size: 1.15rem; margin: 0; }
+  .srfsc-panel__meta { color: $srfsc-muted; font-size: 0.8rem; }
+  .srfsc-empty { color: $srfsc-muted; font-style: italic; margin: 0; }
+
+  // ── Events ──
+  .srfsc-events { display: flex; flex-direction: column; gap: 0.75rem; }
+  .srfsc-event {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 1rem;
+    padding: 0.9rem;
+    border-radius: 10px;
+    background: rgba($srfsc-bg, 0.6);
+    border-left: 4px solid $srfsc-ember;
+    scroll-margin-top: 80px;
+
+    &:target { outline: 2px solid $srfsc-amber; }
+  }
+  .srfsc-event__date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: $srfsc-forest-deep;
+    padding: 0.4rem 0;
+    line-height: 1.1;
+  }
+  .srfsc-event__month { color: $srfsc-amber; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; }
+  .srfsc-event__day { font-size: 1.5rem; font-weight: 800; }
+  .srfsc-event__weekday { color: $srfsc-muted; font-size: 0.7rem; }
+  .srfsc-event__type {
+    display: inline-block;
+    padding: 0.05rem 0.55rem;
+    border-radius: 999px;
+    background: rgba($srfsc-forest, 0.35);
+    font-size: 0.75rem;
+  }
+  .srfsc-event__title { margin: 0.3rem 0 0.1rem; font-size: 1rem; }
+  .srfsc-event__location { color: $srfsc-muted; margin: 0; font-size: 0.85rem; }
+  .srfsc-event__desc { margin: 0.35rem 0 0; font-size: 0.9rem; }
+  .srfsc-event__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+  }
+  .srfsc-event__rsvps { color: lighten($srfsc-forest, 25%); font-size: 0.85rem; font-weight: 600; }
+
+  .srfsc-rsvp {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+
+    .srfsc-form__status { grid-column: 1 / -1; }
+    @media (max-width: 560px) { grid-template-columns: 1fr; }
+  }
+
+  // ── Programs ──
+  .srfsc-programs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+  }
+  .srfsc-program {
+    padding: 1rem;
+    border-radius: 10px;
+    background: rgba($srfsc-bg, 0.6);
+    border-top: 4px solid $srfsc-forest;
+    display: flex;
+    flex-direction: column;
+
+    h4 { font-size: 1rem; }
+    p { color: $srfsc-muted; margin: 0 0 0.6rem; font-size: 0.9rem; flex: 1; }
+  }
+  .srfsc-program__link { font-weight: 600; text-decoration: none; }
+
+  // ── Checklist ──
+  .srfsc-meter { margin-bottom: 0.8rem; }
+  .srfsc-meter__track { height: 12px; border-radius: 999px; background: $srfsc-border; overflow: hidden; }
+  .srfsc-meter__fill {
+    height: 100%;
+    width: 0;
+    background: $srfsc-ember;
+    transition: width 0.3s ease, background 0.3s ease;
+
+    &[data-level="medium"] { background: $srfsc-amber; }
+    &[data-level="high"] { background: $srfsc-forest; }
+  }
+  .srfsc-meter__label { margin: 0.35rem 0 0; color: $srfsc-muted; font-size: 0.9rem; }
+
+  .srfsc-checklist {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+  }
+  .srfsc-zone {
+    margin: 0;
+    padding: 0.8rem 1rem;
+    border: 1px solid $srfsc-border;
+    border-radius: 10px;
+  }
+  .srfsc-zone__title { color: $srfsc-amber; font-weight: 700; font-size: 0.9rem; padding: 0 0.3rem; }
+  .srfsc-zone__item {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    margin: 0.45rem 0;
+    font-size: 0.88rem;
+    cursor: pointer;
+    input { margin-top: 0.25rem; accent-color: $srfsc-forest; }
+  }
+
+  // ── Take action tabs + forms ──
+  .srfsc-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.25rem;
+    padding: 0.25rem;
+    margin-bottom: 0.9rem;
+    border-radius: 999px;
+    background: $srfsc-bg;
+  }
+  .srfsc-tabs__tab {
+    padding: 0.45rem 0.5rem;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: $srfsc-muted;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+
+    &[aria-selected="true"] { background: $srfsc-forest; color: #fff; }
+  }
+
+  .srfsc-form { display: flex; flex-direction: column; gap: 0.6rem; }
+  .srfsc-field,
+  .srfsc-rsvp {
+    font-size: 0.85rem;
+    color: $srfsc-muted;
+
+    input, select, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.5rem 0.65rem;
+      border: 1px solid $srfsc-border;
+      border-radius: 8px;
+      background: $srfsc-bg;
+      color: $srfsc-text;
+      font: inherit;
+
+      &:focus { outline: 2px solid $srfsc-amber; outline-offset: 1px; }
+    }
+  }
+  .srfsc-field { display: flex; flex-direction: column; gap: 0.25rem; }
+
+  .srfsc-form__status {
+    min-height: 1.1em;
+    margin: 0;
+    font-size: 0.85rem;
+    &--pending { color: $srfsc-muted; }
+    &--success { color: lighten($srfsc-forest, 25%); }
+    &--error { color: lighten($srfsc-ember, 12%); }
+  }
+  .srfsc-form__note { color: $srfsc-muted; font-size: 0.8rem; margin: 0; }
+  .srfsc-donate {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    align-items: flex-start;
+    p { margin: 0; }
+  }
+
+  // ── Community feed ──
+  .srfsc-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
+  .srfsc-chips__chip {
+    padding: 0.2rem 0.75rem;
+    border: 1px solid $srfsc-border;
+    border-radius: 999px;
+    background: transparent;
+    color: $srfsc-muted;
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &[aria-pressed="true"] { border-color: $srfsc-amber; color: $srfsc-amber; }
+  }
+  .srfsc-feed { display: flex; flex-direction: column; gap: 0.7rem; }
+  .srfsc-feed__item { padding-bottom: 0.7rem; border-bottom: 1px solid $srfsc-border; &:last-child { border-bottom: none; } }
+  .srfsc-feed__tag {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: $srfsc-amber;
+    &--impact-story { color: lighten($srfsc-forest, 25%); }
+    &--partner { color: lighten($srfsc-slate, 30%); }
+  }
+  .srfsc-feed__title { font-size: 0.95rem; margin: 0.15rem 0; }
+  .srfsc-feed__body { color: $srfsc-muted; font-size: 0.88rem; margin: 0; }
+
+  .srfsc-partners {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    li {
+      padding: 0.35rem 0.8rem;
+      border-radius: 8px;
+      background: $srfsc-forest-deep;
+      font-size: 0.85rem;
+    }
+  }
+  .srfsc-contact p { margin: 0 0 0.5rem; font-size: 0.9rem; }
+
+  // ── Admin ──
+  .srfsc-admin { margin-top: 1rem; border-style: dashed; }
+  .srfsc-admin__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+    gap: 1.5rem;
+    .srfsc-form + .srfsc-form { margin-top: 1.2rem; }
+    @media (max-width: 900px) { grid-template-columns: 1fr; }
+  }
+  .srfsc-admin__row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 2fr auto;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid $srfsc-border;
+    font-size: 0.88rem;
+    @media (max-width: 700px) { grid-template-columns: 1fr; }
+  }
+  .srfsc-admin__muted { color: $srfsc-muted; }
+  .srfsc-admin__status {
+    background: $srfsc-bg;
+    color: $srfsc-text;
+    border: 1px solid $srfsc-border;
+    border-radius: 6px;
+    padding: 0.3rem;
+  }
+
+  .srfsc-footnote { margin-top: 1.5rem; color: $srfsc-muted; font-size: 0.8rem; text-align: center; }
+}

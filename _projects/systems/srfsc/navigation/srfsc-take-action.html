@@ -1,0 +1,50 @@
+<!-- Volunteer, report, and donate share one panel (ideation: Shared Visibility, single clear path) -->
+<section class="srfsc-panel srfsc-take-action" id="take-action">
+  <header class="srfsc-panel__header"><h3 class="srfsc-panel__title">Take action</h3></header>
+  <div class="srfsc-tabs" role="tablist" aria-label="Ways to help">
+    <button type="button" class="srfsc-tabs__tab" role="tab" data-tab="volunteer" aria-selected="true">Volunteer</button>
+    <button type="button" class="srfsc-tabs__tab" role="tab" data-tab="report" aria-selected="false">Report</button>
+    <button type="button" class="srfsc-tabs__tab" role="tab" data-tab="donate" aria-selected="false">Donate</button>
+  </div>
+
+  <form class="srfsc-form" id="srfsc-volunteer-form" data-tab-panel="volunteer" novalidate>
+    <label class="srfsc-field">Name<input name="name" required maxlength="128" autocomplete="name"></label>
+    <label class="srfsc-field">Email<input name="email" type="email" required autocomplete="email"></label>
+    <label class="srfsc-field">Phone (optional)<input name="phone" type="tel" maxlength="32" autocomplete="tel"></label>
+    <label class="srfsc-field">I'd like to help with
+      <select name="interest" required>
+        <option>Clearing Day</option>
+        <option>Block Meeting Host</option>
+        <option>Board Leadership</option>
+        <option>Events &amp; Outreach</option>
+      </select>
+    </label>
+    <label class="srfsc-field">Street (optional)<input name="street" maxlength="255" autocomplete="address-line1"></label>
+    <label class="srfsc-field">Anything else? (optional)<textarea name="message" rows="2" maxlength="2000"></textarea></label>
+    <button class="ocs__btn alert-green fill" type="submit">Sign me up</button>
+    <p class="srfsc-form__status" aria-live="polite"></p>
+  </form>
+
+  <form class="srfsc-form" id="srfsc-report-form" data-tab-panel="report" hidden novalidate>
+    <label class="srfsc-field">Hazard type
+      <select name="hazard_type" required>
+        <option>Dead Vegetation</option>
+        <option>Hazard Tree</option>
+        <option>Blocked Firebreak</option>
+        <option>Other</option>
+      </select>
+    </label>
+    <label class="srfsc-field">Location<input name="location" required maxlength="255" placeholder="e.g. canyon behind Aviary Dr"></label>
+    <label class="srfsc-field">What did you see?<textarea name="description" rows="3" required maxlength="2000"></textarea></label>
+    <label class="srfsc-field">Your email (optional, for follow-up)<input name="reporter_email" type="email" autocomplete="email"></label>
+    <button class="ocs__btn alert-red fill" type="submit">Send report</button>
+    <p class="srfsc-form__status" aria-live="polite"></p>
+    <p class="srfsc-form__note">Active fire or emergency? Call 911.</p>
+  </form>
+
+  <div class="srfsc-donate" data-tab-panel="donate" hidden>
+    <p>SRFSC is an all-volunteer 501(c)(3). Every dollar goes to clearing work, hazard tree removal, and education.</p>
+    <a class="ocs__btn alert-green fill" href="https://venmo.com/srfsc" target="_blank" rel="noopener noreferrer">Venmo @srfsc</a>
+    <p class="srfsc-form__note">Or mail a check to 9903 Businesspark Ave #102, San Diego, CA 92131.</p>
+  </div>
+</section>

@@ -80,6 +80,9 @@ year: "2026-2027"
     <a class="ocs__btn alert-red fill small" href="https://www.srfsc.org/" target="_blank" rel="noopener noreferrer">
         Visit the original page
     </a>
+    <a class="ocs__btn alert-green fill small" href="{{ site.baseurl }}/capstone/srfsc/app/">
+        Try the interactive redesign
+    </a>
 </div>
 
 > A stronger homepage should feel calm, urgent, and clear at the same time: the message is important, the next step is obvious, and the local community feels included.
