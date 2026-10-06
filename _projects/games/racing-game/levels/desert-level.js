@@ -1,13 +1,13 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 
-class GameLevelWinter {
+class GameLevelDesert {
   constructor(gameEnv) {
     const path = gameEnv.path;
     const background_data = {
-      name: "Winter Course",
-      greeting: "Welcome to the Winter Level!",
-      src: "/images/projects/racing-game/Winter_Track.png",
+      name: "Desert Course",
+      greeting: "Welcome to the Desert Level!",
+      src: "/images/projects/racing-game/Autumn_Track.jpeg",
       pixels: { height: 360, width: 643 }
     };
     const player_data = {
@@ -36,4 +36,4 @@ class GameLevelWinter {
   }
 }
 
-export default GameLevelWinter;
+export default GameLevelDesert;
