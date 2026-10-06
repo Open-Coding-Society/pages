@@ -1,6 +1,5 @@
 ---
 layout: post
-courses: {'csp': {'week': 8}}
 title: Planning Workspaces and APIs (Flocker) 
 description: A project will have frontend and backend, port assignments, and require testing.  This shows some progress that you will need to get to Full Stack.
 permalink: /flask--api
