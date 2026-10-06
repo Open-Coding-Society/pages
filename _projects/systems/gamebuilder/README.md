@@ -9,6 +9,14 @@ original `/gamebuilder/` page. Other documentation is published from `docs/`.
 
 - `index.md` is the runner-backed v2 workbench entry point.
 - `docs/BuilderWorkbenchV1.md` retains the original v1 builder page.
+- `navigation/gamebuilder-docs.md` publishes the blog catalog at
+  `/gamebuilder/docs/`, linked by the CS Pathway gaming menu. It uses the shared
+  `blogs` layout with `post_filter: game_docs` to list only posts whose front
+  matter contains the boolean `game_docs: true`. Add that flag to the first
+  front-matter cell of a lesson notebook (or a documentation Markdown source)
+  to include it. Hidden posts remain excluded; sticky rank and newest-first
+  ordering follow the existing blog conventions. The catalog is itself hidden
+  from blog listings and does not carry the `game_docs` flag.
 - `notebooks/` owns the variables homework, backgrounds lesson, and characters
   lesson. The characters lesson teaches Player and NPC data, instantiation,
   inheritance, and animation through two editable GAME_RUNNER examples.
@@ -43,14 +51,74 @@ original `/gamebuilder/` page. Other documentation is published from `docs/`.
 Edit these sources under `_projects/systems/gamebuilder/`. The page, JavaScript,
 Sass, and images copied into the site directories are generated output.
 
+## Protecting workspace work
+
+The v2 workspace now keeps an automatic browser-local recovery draft of the
+panel settings and exact editor code, including unfinished barrier edits and
+blank form fields. Reload restores that draft without generating over manual
+code. A 200 ms debounce limits writes; page-hide/navigation also flush pending
+changes. Browser crashes before a pending write can still lose the latest edit.
+
+- The runner's existing **Save** icon saves the workspace on this page and
+  keeps one explicit return point, separate from the recovery draft.
+  Other runner pages retain their normal source-only save behavior.
+- **Load Saved Workspace** is a folder icon in the same runner toolbar and
+  returns to that save after replacement confirmation.
+- **Export Workspace JSON / Import Workspace JSON** transfer the complete
+  single-level workspace. Import validates shape/version and confirms replacement.
+- **Export Code** downloads the exact current JavaScript independently.
+- **Clear** retains the runner's construction-default reset: on this page it
+  clears the code after confirmation, without resetting the builder panels or
+  deleting the explicit workspace save.
+
+All file actions live in the runner's existing editor toolbar as labeled icon
+buttons; there is no separate workspace button strip. Fresh startup leaves
+runner code empty until **Push →** is clicked. Restored drafts or saved runner
+code are preserved. Panel controls are outlined icons:
+
+- **Clear Builder** resets the panels to starter settings after confirmation,
+  keeping runner code and the saved workspace.
+- **Pull ←** reads supported settings from the current runner JavaScript after
+  confirmation, leaving that source untouched. The first importer supports one
+  GameBuilder-style level, catalog assets, a Player, NPCs and spline barriers.
+  It parses syntax with Acorn; it never executes code to inspect it. Player/NPC
+  names are reconstructed from their generated IDs, not original capitalization.
+- **Push →** validates panels and generates runner code. Modules with custom
+  behavior, methods, imports or engine settings the panels cannot preserve
+  remain code-owned: Push is blocked. Export the source before explicitly
+  clearing the runner if you intend to replace it. Saving does not implicitly Pull.
+
+Routine operation messages appear briefly near the controls, without occupying
+layout space. Errors remain visible. Automatic draft writes are deliberately
+quiet rather than showing a message on every keystroke.
+
+Saves are local to this browser, origin, and page path: they are not account
+backups, runtime progress saves, multiple named projects, or multi-module game
+packages yet. Export JSON regularly, particularly before clearing browser data
+or changing devices. Missing assets are preserved as unavailable selections;
+choose replacements before generation. Invalid files do not replace open work.
+Storage failures and cross-tab conflicts stop recovery writes, show an error,
+and retain the last valid stored draft. Export open work before resolving them.
+
+`js/workspace-store.mjs` owns versioned validation and storage.
+`js/workspace-persistence.mjs` owns controls and recovery wiring. The shared
+runner controller emits `ocs:runner-saved` after a successful source write,
+exposes its saved snapshot, and awaits GameBuilder's workspace-save hook before
+the Save button shows success.
+
 ## Build and development
 
 Run the focused checks first when changing GameBuilder logic:
 
 ```sh
-node --test _projects/systems/gamebuilder/tests/gamebuilder-contract.test.mjs
-node --test _projects/systems/gamebuilder/tests/lesson-contract.test.mjs
+node --test _projects/systems/gamebuilder/tests/*.test.mjs
 for file in _projects/systems/gamebuilder/js/*.mjs; do node --check "$file"; done
+```
+
+For the shared blog catalog's filtering and card behavior, run:
+
+```sh
+bundle exec ruby scripts/test_blog_catalog.rb
 ```
 
 Build only this system's page, JavaScript, Sass, and images with:
@@ -67,6 +135,12 @@ one-time, full Jekyll build without starting the server, use:
 ```sh
 make build-current
 ```
+
+The project Makefile is generated from the shared registration template, with
+no GameBuilder-specific build override or npm installation. Pull uses the
+checked-in shared [Acorn browser module](../../../assets/js/vendor/acorn.mjs)
+at runtime; see its [vendor documentation](../../../assets/js/vendor/README.md)
+for version, license and maintenance. The parser is not generated during make.
 
 `build-current` performs the full ordered site build: clean, registered project
 builds (including dynamic Sass import generation), conversions, course
