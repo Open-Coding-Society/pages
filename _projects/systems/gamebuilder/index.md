@@ -65,7 +65,14 @@ permalink: /gamebuilder/v2/
           <p class="ocs__gamebuilder-npc-empty" data-role="npc-empty">No NPCs added yet.</p>
           <div class="ocs__gamebuilder-npc-list" data-role="npc-list"></div>
         </fieldset>
-        <p class="ocs__gamebuilder-form-help">Positions are proportions of the runner canvas. Movement uses WASD.</p>
+        <fieldset class="ocs__gamebuilder-barriers" data-role="barriers-fieldset">
+          <legend>Spline barriers</legend>
+          <p class="ocs__gamebuilder-form-help">Click the preview to add points. Undo removes the last point; finish the barrier from its card.</p>
+          <button class="ocs__btn" type="button" data-action="add-barrier">Add spline barrier</button>
+          <p class="ocs__gamebuilder-barrier-empty" data-role="barrier-empty">No barriers added yet.</p>
+          <div class="ocs__gamebuilder-barrier-list" data-role="barrier-list"></div>
+        </fieldset>
+        <p class="ocs__gamebuilder-form-help">Player and NPC positions use proportions of the runner canvas. Movement uses WASD.</p>
       </form>
     </section>
 

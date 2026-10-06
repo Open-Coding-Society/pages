@@ -120,7 +120,7 @@ notebooks:
 convert: notebooks
 	@for notebook in $(NOTEBOOKS); do \
 		filename=$$(basename "$$notebook"); \
-		cd $(WORKSPACE_ROOT) && $(PYTHON) scripts/convert_notebooks.py "_notebooks/projects/$(PROJECT_NAME)/$$filename" >/dev/null || exit 1; \
+		(cd $(WORKSPACE_ROOT) && $(PYTHON) scripts/convert_notebooks.py "_notebooks/projects/$(PROJECT_NAME)/$$filename" >/dev/null) || exit 1; \
 	done
 
 ###########################################
@@ -162,6 +162,18 @@ watch:
 			cp $(PROJECT_SRC)/index.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
 			cd $(WORKSPACE_ROOT) && make convert-single NOTEBOOK_FILE="$(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME)" 2>&1; \
 			changed=1; \
+		fi; \
+		if [ -d "$(PROJECT_SRC)/$(NOTEBOOK_SOURCE)" ]; then \
+			for notebook in $(PROJECT_SRC)/$(NOTEBOOK_SOURCE)/*.ipynb; do \
+				[ -f "$$notebook" ] || continue; \
+				if [ "$$notebook" -nt /tmp/.project_$(PROJECT_NAME)_marker ]; then \
+					echo "  🔄 Lesson notebook changed - copying and converting..."; \
+					$(MAKE) convert || exit 1; \
+					touch /tmp/.jekyll_rebuild_trigger; \
+					changed=1; \
+					break; \
+				fi; \
+			done; \
 		fi; \
 		if [ -d "$(PROJECT_SRC)/js" ]; then \
 			for file in $$(find $(PROJECT_SRC)/js -type f -newer /tmp/.project_$(PROJECT_NAME)_marker 2>/dev/null); do \
