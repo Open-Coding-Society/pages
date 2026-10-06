@@ -516,6 +516,12 @@ import { setIconLabel } from '{{ site.baseurl }}/assets/js/capstone/cardIcons.js
             event.stopImmediatePropagation();
             location.href = '{{ site.baseurl }}/login';
           }, { capture: true, once: true });
+        } else if (res.status === 429) {
+          // Spring's rate limiter (per IP, per minute): nothing is wrong with the
+          // application, it just has to be sent again shortly.
+          console.warn('Capstone: apply rate-limited (HTTP 429)');
+          setIconLabel(applyBtn, 'clock', 'Busy, try again in a minute');
+          applyBtn.disabled = false;
         } else {
           console.error(`Capstone: apply failed (HTTP ${res.status})`);
           setIconLabel(applyBtn, 'send', 'Try again');
