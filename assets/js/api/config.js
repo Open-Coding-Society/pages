@@ -66,6 +66,7 @@ export function login(options) {
             const errorMsg = 'Login error: ' + response.status;
             console.log(errorMsg);
             document.getElementById(options.message).textContent = errorMsg;
+            if (options.onFailure) options.onFailure();
             return response;  // Exit early if response is not OK
         }
         // Success: Proceed with callback
@@ -75,5 +76,6 @@ export function login(options) {
         // Handle network errors
         console.log('Possible CORS or Service Down error: ' + error);
         document.getElementById(options.message).textContent = 'Possible CORS or service down error: ' + error;
+        if (options.onFailure) options.onFailure();
     });
 }
