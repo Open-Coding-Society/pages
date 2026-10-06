@@ -16,6 +16,8 @@ concurrency:
 
 jobs:
   create-assignments:
+    # Writes to production Spring with the pages bot account; forks have no bot secrets and must not sync.
+    if: github.repository == 'Open-Coding-Society/pages'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
