@@ -1,0 +1,12 @@
+services:
+  srfsc:
+    build: .
+    ports:
+      - "8599:8599"
+    environment:
+      # Required for the admin page; set it in a local .env file, never commit it.
+      SRFSC_ADMIN_KEY: ${SRFSC_ADMIN_KEY}
+      SRFSC_ALLOWED_ORIGINS: ${SRFSC_ALLOWED_ORIGINS:-}
+    volumes:
+      - ./instance:/app/instance
+    restart: unless-stopped

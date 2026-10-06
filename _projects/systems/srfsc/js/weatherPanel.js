@@ -1,8 +1,9 @@
 // ============================================
 // weatherPanel.js
-// RESPONSIBILITY: Render the live fire-weather card from /api/srfsc/conditions.
+// RESPONSIBILITY: Render the live fire-weather card (backend /conditions, else NWS directly).
 // ============================================
 import { fetchConditions } from './srfscApi.js';
+import { fetchNwsConditions } from './nwsClient.js';
 import { createElement } from './srfscDom.js';
 
 const formatReading = (value, unit) => (value === null || value === undefined ? '–' : `${value}${unit}`);
@@ -28,10 +29,21 @@ function renderConditions(conditions) {
   }
 }
 
+// Prefer the backend's cached reading; fall back to NWS directly so the risk tile works without it.
 export async function loadWeatherPanel() {
   try {
     renderConditions(await fetchConditions());
-  } catch (error) {
-    renderConditions({ level: 'Unknown', message: error.message, alerts: [] });
+    return;
+  } catch (backendError) {
+    console.info('SRFSC conditions: backend unavailable, reading NWS directly.', backendError.message);
+  }
+  try {
+    renderConditions(await fetchNwsConditions());
+  } catch (nwsError) {
+    renderConditions({
+      level: 'Unknown',
+      message: 'Live weather is unavailable. Check CAL FIRE and SDFR for current conditions.',
+      alerts: [],
+    });
   }
 }

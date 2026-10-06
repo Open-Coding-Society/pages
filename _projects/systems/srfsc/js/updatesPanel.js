@@ -4,6 +4,7 @@
 // ============================================
 import { fetchUpdates } from './srfscApi.js';
 import { createElement } from './srfscDom.js';
+import { FALLBACK_UPDATES } from './srfscFallback.js';
 
 let allUpdates = [];
 let activeCategory = 'All';
@@ -43,10 +44,14 @@ function bindFilterChips() {
 export async function loadUpdatesPanel() {
   try {
     allUpdates = await fetchUpdates(20);
-    renderFeed();
   } catch (error) {
-    document.getElementById('srfsc-updates').replaceChildren(createElement('p', 'srfsc-empty', error.message));
+    if (!error.offline) {
+      document.getElementById('srfsc-updates').replaceChildren(createElement('p', 'srfsc-empty', error.message));
+      return;
+    }
+    allUpdates = [...FALLBACK_UPDATES];
   }
+  renderFeed();
 }
 
 export function initUpdatesPanel() {

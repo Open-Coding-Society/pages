@@ -1,0 +1,17 @@
+<!-- SRFSC site navigation. Pass active="home|events|involved|report|prepare|community|about" to highlight a link. -->
+{%- assign srfsc_root = site.baseurl | append: "/capstone/srfsc/app/" -%}
+<nav class="srfsc-nav" aria-label="Scripps Ranch Fire Safe Council">
+  <a class="srfsc-nav__brand" href="{{ srfsc_root }}">
+    <span class="srfsc-nav__mark" aria-hidden="true">▲</span> SRFSC
+  </a>
+  <ul class="srfsc-nav__links">
+    <li><a href="{{ srfsc_root }}" {% if include.active == "home" %}aria-current="page"{% endif %}>Dashboard</a></li>
+    <li><a href="{{ srfsc_root }}events/" {% if include.active == "events" %}aria-current="page"{% endif %}>Events</a></li>
+    <li><a href="{{ srfsc_root }}get-involved/" {% if include.active == "involved" %}aria-current="page"{% endif %}>Get Involved</a></li>
+    <li><a href="{{ srfsc_root }}report/" {% if include.active == "report" %}aria-current="page"{% endif %}>Report a Hazard</a></li>
+    <li><a href="{{ srfsc_root }}prepare/" {% if include.active == "prepare" %}aria-current="page"{% endif %}>Prepare</a></li>
+    <li><a href="{{ srfsc_root }}community/" {% if include.active == "community" %}aria-current="page"{% endif %}>Community</a></li>
+    <li><a href="{{ srfsc_root }}about/" {% if include.active == "about" %}aria-current="page"{% endif %}>About</a></li>
+  </ul>
+  <a class="ocs__btn alert-green fill small srfsc-nav__cta" href="{{ srfsc_root }}get-involved/#donate">Donate</a>
+</nav>

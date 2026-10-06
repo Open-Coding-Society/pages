@@ -4,6 +4,7 @@
 // ============================================
 import { fetchUpcomingEvents, rsvpToEvent } from './srfscApi.js';
 import { bindForm, createElement } from './srfscDom.js';
+import { OFFLINE_EVENTS_MESSAGE } from './srfscFallback.js';
 
 const rsvpLabel = (count) => (count === 1 ? '1 neighbor going' : `${count} neighbors going`);
 
@@ -84,7 +85,11 @@ export async function loadEventsPanel(onRsvp) {
       return;
     }
     container.replaceChildren(...events.map((event) => buildEventCard(event, onRsvp)));
+    // Hub links target #srfsc-event-<id>; cards render after load, so scroll to the target by hand.
+    if (location.hash.startsWith('#srfsc-event-')) {
+      document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: 'center' });
+    }
   } catch (error) {
-    container.replaceChildren(createElement('p', 'srfsc-empty', error.message));
+    container.replaceChildren(createElement('p', 'srfsc-empty', error.offline ? OFFLINE_EVENTS_MESSAGE : error.message));
   }
 }

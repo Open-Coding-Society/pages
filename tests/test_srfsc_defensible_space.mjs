@@ -28,3 +28,24 @@ test("halfway through the checklist is rated medium", () => {
 test("checklist item ids are unique so checkbox state cannot collide", () => {
   assert.equal(new Set(allItemIds).size, allItemIds.length);
 });
+
+const { rateFireWeather } = await import("../_projects/systems/srfsc/js/fireWeather.js");
+
+// Mirrors SrfscConditionsTest in the Flask repo so the browser fallback and backend agree.
+test("red flag alerts are extreme regardless of weather", () => {
+  assert.equal(rateFireWeather(80, 0, ["Red Flag Warning"]).level, "Extreme");
+});
+
+test("dry and windy is high; dry or breezy is elevated", () => {
+  assert.equal(rateFireWeather(10, 30, []).level, "High");
+  assert.equal(rateFireWeather(24, 5, []).level, "Elevated");
+  assert.equal(rateFireWeather(60, 18, []).level, "Elevated");
+});
+
+test("calm humid weather is normal even with non-fire alerts", () => {
+  assert.equal(rateFireWeather(60, 5, ["Extreme Heat Warning"]).level, "Normal");
+});
+
+test("missing readings are unknown", () => {
+  assert.equal(rateFireWeather(null, null, []).level, "Unknown");
+});

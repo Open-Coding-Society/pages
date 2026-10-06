@@ -1,0 +1,66 @@
+// Forms (volunteer, report, RSVP) and the admin tools.
+.srfsc-form { display: flex; flex-direction: column; gap: 0.6rem; }
+.srfsc-field,
+.srfsc-rsvp {
+  font-size: 0.85rem;
+  color: $srfsc-muted;
+
+  input, select, textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid $srfsc-border;
+    border-radius: 8px;
+    background: rgba($srfsc-bg, 0.9);
+    color: $srfsc-text;
+    font: inherit;
+    &:focus { outline: 2px solid $srfsc-amber; outline-offset: 1px; }
+  }
+}
+.srfsc-field { display: flex; flex-direction: column; gap: 0.25rem; }
+.srfsc-rsvp {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  .srfsc-form__status { grid-column: 1 / -1; }
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
+}
+.srfsc-form__status {
+  min-height: 1.1em;
+  margin: 0;
+  font-size: 0.85rem;
+  &--pending { color: $srfsc-muted; }
+  &--success { color: lighten($srfsc-forest, 25%); }
+  &--error { color: lighten($srfsc-ember, 12%); }
+}
+
+.srfsc-admin-gate { display: flex; flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+.srfsc-admin { border-style: dashed; }
+.srfsc-admin__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 1.5rem;
+  h2 { font-size: 1.05rem; margin-top: 0.8rem; }
+  .srfsc-form + .srfsc-form { margin-top: 1.2rem; }
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+.srfsc-admin__row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 2fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid $srfsc-border;
+  font-size: 0.88rem;
+  @media (max-width: 700px) { grid-template-columns: 1fr; }
+}
+.srfsc-admin__muted { color: $srfsc-muted; }
+.srfsc-admin__status {
+  background: $srfsc-bg;
+  color: $srfsc-text;
+  border: 1px solid $srfsc-border;
+  border-radius: 6px;
+  padding: 0.3rem;
+}
+.srfsc-admin-key { width: min(100%, 360px); }

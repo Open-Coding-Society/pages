@@ -1,0 +1,70 @@
+// Shared building blocks used on every SRFSC page (nested inside .srfsc-app by main.scss).
+h1, h2, h3, h4 { color: $srfsc-text; margin: 0 0 0.4rem; }
+// Another project's CSS ships a global `h1 { display: none }` and a green glow; undo both in the app.
+h1 { display: block; text-shadow: none; font-size: 1.6rem; }
+a { color: $srfsc-amber; }
+[hidden] { display: none !important; }
+
+.srfsc-panel {
+  @include srfsc-card;
+  padding: 1.25rem;
+  scroll-margin-top: 90px;
+}
+.srfsc-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+.srfsc-panel__title { font-size: 1.2rem; margin: 0 0 0.6rem; }
+.srfsc-panel__header .srfsc-panel__title { margin: 0; }
+.srfsc-panel__subtitle { font-size: 1rem; margin: 1.1rem 0 0.4rem; color: $srfsc-amber; }
+.srfsc-panel__meta { color: $srfsc-muted; font-size: 0.8rem; }
+.srfsc-panel__more { font-size: 0.85rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.srfsc-panel__note { color: $srfsc-muted; font-size: 0.85rem; margin: 0.8rem 0 0; }
+.srfsc-empty { color: $srfsc-muted; font-style: italic; margin: 0; list-style: none; }
+
+.srfsc-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+  align-items: start;
+
+  &--wide-left { grid-template-columns: minmax(0, 1.7fr) minmax(260px, 1fr); }
+  @media (max-width: 900px) { &, &--wide-left { grid-template-columns: 1fr; } }
+}
+
+// KPI tiles
+.srfsc-kpis {
+  display: grid;
+  // auto-fit so the row still fills when live tiles hide (backend offline)
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+.srfsc-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+.srfsc-kpi {
+  @include srfsc-card;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+.srfsc-kpi__value { font-size: 1.6rem; font-weight: 800; color: $srfsc-amber; }
+.srfsc-kpi__label { color: $srfsc-muted; font-size: 0.8rem; }
+.srfsc-kpi--live {
+  border-color: rgba($srfsc-forest, 0.9);
+  .srfsc-kpi__value { color: lighten($srfsc-forest, 25%); }
+}
+
+.srfsc-bullets {
+  margin: 0;
+  padding-left: 1.1rem;
+  li { margin: 0.35rem 0; font-size: 0.92rem; }
+}

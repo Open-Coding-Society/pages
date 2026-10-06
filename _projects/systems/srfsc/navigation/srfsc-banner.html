@@ -1,0 +1,12 @@
+<!--
+  Photo banner for SRFSC sub-pages.
+  Params: photo (home|events|involved|report|prepare|community|about), eyebrow, title, lead.
+  `photo` picks a .srfsc-banner--<photo> modifier; the image itself lives in SCSS so pages stay free of inline styles.
+-->
+<header class="srfsc-banner srfsc-banner--{{ include.photo }}">
+  <div class="srfsc-banner__content">
+    {% if include.eyebrow %}<p class="srfsc-banner__eyebrow">{{ include.eyebrow }}</p>{% endif %}
+    <h1 class="srfsc-banner__title">{{ include.title }}</h1>
+    {% if include.lead %}<p class="srfsc-banner__lead">{{ include.lead }}</p>{% endif %}
+  </div>
+</header>

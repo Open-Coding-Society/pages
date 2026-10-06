@@ -1,0 +1,120 @@
+// Dashboard hub: hero with live fire weather, hub cards, and preview lists.
+.srfsc-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  gap: 1.5rem;
+  padding: 2.5rem 2rem;
+  border-radius: $srfsc-radius;
+  border: 1px solid rgba($srfsc-ember, 0.45);
+  @include srfsc-photo-overlay("home", 0.55);
+
+  @media (max-width: 820px) { grid-template-columns: 1fr; padding: 1.25rem; }
+}
+.srfsc-hero__eyebrow {
+  color: $srfsc-amber;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 0.5rem;
+}
+.srfsc-hero__title {
+  font-size: clamp(1.4rem, 3.2vw, 2.2rem);
+  line-height: 1.2;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
+}
+.srfsc-hero__lead { color: $srfsc-text; max-width: 60ch; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8); }
+.srfsc-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.2rem; }
+
+.srfsc-weather {
+  border-radius: $srfsc-radius;
+  padding: 1.2rem;
+  background: rgba($srfsc-bg, 0.82);
+  border: 2px solid $srfsc-slate;
+  backdrop-filter: blur(4px);
+  align-self: start;
+
+  @each $level, $tone in $srfsc-weather-levels {
+    &[data-level="#{$level}"] {
+      border-color: $tone;
+      .srfsc-weather__level { color: $tone; }
+    }
+  }
+}
+.srfsc-weather__label { margin: 0; color: $srfsc-muted; font-size: 0.85rem; }
+.srfsc-weather__level { margin: 0.1rem 0 0.6rem; font-size: 1.8rem; font-weight: 800; }
+.srfsc-weather__readings {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+  dt { color: $srfsc-muted; font-size: 0.75rem; }
+  dd { margin: 0; font-weight: 700; white-space: nowrap; }
+}
+.srfsc-weather__message { margin: 0 0 0.5rem; font-size: 0.9rem; }
+.srfsc-weather__alerts { list-style: none; padding: 0; margin: 0 0 0.5rem; }
+.srfsc-weather__alert {
+  display: inline-block;
+  margin: 0 0.3rem 0.3rem 0;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: rgba($srfsc-red, 0.35);
+  font-size: 0.8rem;
+}
+.srfsc-weather__source { margin: 0; color: $srfsc-muted; font-size: 0.72rem; }
+
+// Hub cards: one per page, photo background with live status line
+.srfsc-hub {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+
+  @media (max-width: 960px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
+}
+.srfsc-hub__card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  min-height: 210px;
+  padding: 1.2rem;
+  border-radius: $srfsc-radius;
+  border: 1px solid $srfsc-border;
+  color: $srfsc-text;
+  text-decoration: none;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+
+  @each $name, $file in $srfsc-photos {
+    &--#{$name} { @include srfsc-photo-overlay($name, 0.6); }
+  }
+  &:hover, &:focus-visible { transform: translateY(-3px); border-color: $srfsc-amber; }
+}
+.srfsc-hub__title { font-size: 1.25rem; font-weight: 800; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8); }
+.srfsc-hub__text { font-size: 0.9rem; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9); }
+.srfsc-hub__status {
+  align-self: flex-start;
+  margin-top: 0.3rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  background: rgba($srfsc-bg, 0.85);
+  color: $srfsc-amber;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+// Compact preview lists ("Coming up", "Latest")
+.srfsc-mini-list { list-style: none; margin: 0; padding: 0; }
+.srfsc-mini-list__item { border-bottom: 1px solid $srfsc-border; &:last-child { border-bottom: none; } }
+.srfsc-mini-list__link {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 0.15rem 0.75rem;
+  padding: 0.6rem 0;
+  color: $srfsc-text;
+  text-decoration: none;
+  &:hover .srfsc-mini-list__title { color: $srfsc-amber; }
+}
+.srfsc-mini-list__date { grid-row: span 2; color: $srfsc-amber; font-size: 0.8rem; font-weight: 700; }
+.srfsc-mini-list__title { font-weight: 600; }
+.srfsc-mini-list__meta { color: $srfsc-muted; font-size: 0.8rem; }

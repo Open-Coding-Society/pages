@@ -1,0 +1,52 @@
+// SRFSC design tokens. Palette comes from the ideation page flowchart (/capstone/srfsc/).
+$srfsc-forest-deep: #173b2f;
+$srfsc-forest: #2f6d4c;
+$srfsc-ember: #d8572a;
+$srfsc-slate: #49615b;
+$srfsc-amber: #f0b342;
+$srfsc-red: #c0392b;
+$srfsc-bg: #0f1a16;
+$srfsc-card: rgba(18, 31, 26, 0.88);
+$srfsc-border: rgba(120, 160, 140, 0.25);
+$srfsc-text: #eef3ef;
+$srfsc-muted: #b7c6bf;
+$srfsc-radius: 14px;
+
+// Photos live in images/projects/srfsc/ (copied by the project Makefile). Paths are relative to the
+// compiled /assets/css/style.css, so they keep working under any site baseurl.
+$srfsc-photo-root: "../../images/projects/srfsc/";
+$srfsc-photos: (
+  "home": "home-cedar-fire-flames.jpg",
+  "events": "events-firewise-outreach.jpg",
+  "involved": "involved-hand-crew.jpg",
+  "report": "report-fuel-crew.jpg",
+  "prepare": "prepare-fuel-treatments.jpg",
+  "community": "community-safety-briefing.jpg",
+  "about": "about-cedar-fire-i15.jpg",
+);
+
+$srfsc-weather-levels: (
+  "Normal": lighten($srfsc-forest, 25%),
+  "Elevated": $srfsc-amber,
+  "High": $srfsc-ember,
+  "Extreme": $srfsc-red,
+  "Unknown": lighten($srfsc-slate, 25%),
+);
+
+@function srfsc-photo($name) {
+  @return url("#{$srfsc-photo-root}#{map-get($srfsc-photos, $name)}");
+}
+
+@mixin srfsc-card {
+  background: $srfsc-card;
+  border: 1px solid $srfsc-border;
+  border-radius: $srfsc-radius;
+  backdrop-filter: blur(6px);
+}
+
+// Dark gradient over a photo so white text stays readable on any image.
+@mixin srfsc-photo-overlay($name, $strength: 0.55) {
+  background:
+    linear-gradient(180deg, rgba($srfsc-bg, $strength - 0.2) 0%, rgba($srfsc-bg, $strength + 0.3) 100%),
+    srfsc-photo($name) center / cover no-repeat;
+}

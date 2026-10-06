@@ -1,0 +1,93 @@
+// Navigation, photo banners, and footer shared by every SRFSC page.
+.srfsc-nav {
+  @include srfsc-card;
+  position: sticky;
+  top: 0.5rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  margin: 1rem 0;
+  background: rgba($srfsc-bg, 0.92);
+
+  @media (max-width: 860px) { flex-wrap: wrap; position: static; }
+}
+.srfsc-nav__brand {
+  color: $srfsc-text;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.srfsc-nav__mark { color: $srfsc-ember; }
+.srfsc-nav__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+
+  a {
+    display: block;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    color: $srfsc-muted;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover { color: $srfsc-text; background: rgba($srfsc-forest, 0.35); }
+    &[aria-current="page"] { color: #fff; background: $srfsc-forest; }
+  }
+}
+
+// Sub-page photo banner; the photo comes from the modifier class.
+.srfsc-banner {
+  border-radius: $srfsc-radius;
+  min-height: 260px;
+  display: flex;
+  align-items: flex-end;
+  padding: 2rem;
+  margin-bottom: 1rem;
+  border: 1px solid $srfsc-border;
+
+  @each $name, $file in $srfsc-photos {
+    &--#{$name} { @include srfsc-photo-overlay($name, 0.5); }
+  }
+  @media (max-width: 600px) { padding: 1.25rem; min-height: 200px; }
+}
+.srfsc-banner__content { max-width: 62ch; }
+.srfsc-banner__eyebrow {
+  margin: 0 0 0.4rem;
+  color: $srfsc-amber;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.srfsc-banner__title { font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.15; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6); }
+.srfsc-banner__lead { margin: 0.4rem 0 0; color: $srfsc-text; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7); }
+
+.srfsc-footer {
+  @include srfsc-card;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.25rem;
+  margin-top: 2rem;
+  font-size: 0.88rem;
+  color: $srfsc-muted;
+
+  p { margin: 0.25rem 0; }
+  strong { color: $srfsc-text; }
+  @media (max-width: 700px) { grid-template-columns: 1fr; }
+}
+.srfsc-footer__emergency { color: lighten($srfsc-ember, 12%); font-weight: 600; }
+.srfsc-footer__credits {
+  grid-column: 1 / -1;
+  border-top: 1px solid $srfsc-border;
+  padding-top: 0.8rem;
+  font-size: 0.78rem;
+}

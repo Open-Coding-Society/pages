@@ -1,17 +1,12 @@
 // ============================================
 // kpiPanel.js
-// RESPONSIBILITY: Fill [data-live-stat] tiles and the "Join the next event" call to action from /stats.
+// RESPONSIBILITY: Fill every [data-live-stat] element on the page from /api/srfsc/stats.
+// When the backend is unavailable, live-only tiles are hidden and [data-offline-text] elements
+// show their fallback wording instead of empty dashes.
 // ============================================
 import { fetchStats } from './srfscApi.js';
-import { formatDate } from './srfscDom.js';
 
-function renderNextEventCta(nextEvent) {
-  const cta = document.getElementById('srfsc-next-event-cta');
-  if (!cta || !nextEvent) return;
-  cta.textContent = `Join ${nextEvent.title} · ${formatDate(nextEvent.event_date)}`;
-  cta.href = `#srfsc-event-${nextEvent.id}`;
-}
-
+/** @returns {Promise<object|null>} the stats payload, or null when the backend is unreachable */
 export async function loadKpiPanel() {
   try {
     const stats = await fetchStats();
@@ -20,9 +15,14 @@ export async function loadKpiPanel() {
       if (value === undefined) return;
       element.textContent = element.dataset.liveStat === 'upcoming_events' ? `${value} scheduled` : value;
     });
-    renderNextEventCta(stats.next_event);
+    return stats;
   } catch (error) {
-    // Live counts are a bonus; the static impact numbers still render without the backend.
+    // Live counts are a bonus; static impact numbers still render without the backend.
     console.warn('SRFSC stats unavailable:', error.message);
+    document.querySelectorAll('.srfsc-kpi--live').forEach((tile) => { tile.hidden = true; });
+    document.querySelectorAll('[data-offline-text]').forEach((element) => {
+      element.textContent = element.dataset.offlineText;
+    });
+    return null;
   }
 }

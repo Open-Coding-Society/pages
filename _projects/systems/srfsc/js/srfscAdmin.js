@@ -4,7 +4,7 @@
 // Stays hidden unless the backend confirms the viewer is an Admin.
 // ============================================
 import {
-  fetchVolunteers, fetchHazardReports, updateReportStatus, createUpdate, createEvent,
+  fetchVolunteers, fetchHazardReports, updateReportStatus, createUpdate, createEvent, getAdminKey, setAdminKey,
 } from './srfscApi.js';
 import { bindForm, createElement } from './srfscDom.js';
 
@@ -70,35 +70,56 @@ function renderReports(container, reports) {
   });
 }
 
-function bindPublishingForms({ onUpdatePublished, onEventCreated }) {
+function bindPublishingForms() {
   bindForm(document.getElementById('srfsc-admin-update-form'), {
     submitFn: createUpdate,
-    successMessage: (update) => `Published "${update.title}".`,
-    onSuccess: onUpdatePublished,
+    successMessage: (update) => `Published "${update.title}". It now shows on the Community page.`,
   });
   bindForm(document.getElementById('srfsc-admin-event-form'), {
     submitFn: createEvent,
-    successMessage: (event) => `Added "${event.title}".`,
-    onSuccess: onEventCreated,
+    successMessage: (event) => `Added "${event.title}". It now shows on the Events page.`,
   });
 }
 
-/**
- * Reveal the admin panel only if the admin-only endpoints answer.
- * @param {{ onUpdatePublished: () => void, onEventCreated: () => void }} callbacks refresh public panels
- */
-export async function initSrfscAdmin(callbacks) {
-  const panel = document.getElementById('srfsc-admin');
+let formsBound = false;
+
+/** Reveal the admin tools only if the admin-only endpoints answer; otherwise explain why in the gate. */
+async function unlockAdmin() {
+  const gateMessage = document.getElementById('srfsc-admin-gate-message');
   try {
     const [volunteers, reports] = await Promise.all([fetchVolunteers(), fetchHazardReports()]);
     renderVolunteers(document.getElementById('srfsc-admin-volunteers'), volunteers);
     renderReports(document.getElementById('srfsc-admin-reports'), reports);
-    bindPublishingForms(callbacks);
-    panel.hidden = false;
+    if (!formsBound) { bindPublishingForms(); formsBound = true; }
+    document.getElementById('srfsc-admin-gate').hidden = true;
+    document.getElementById('srfsc-admin').hidden = false;
   } catch (error) {
-    // 401/403 is the normal case for public visitors; anything else is worth surfacing.
-    if (error.status !== 401 && error.status !== 403) {
-      console.warn('SRFSC admin panel unavailable:', error.message);
+    if (error.offline) {
+      gateMessage.textContent = 'Admin tools need the SRFSC backend, which is not available on this server yet.';
+    } else if (error.status === 401 || error.status === 403) {
+      gateMessage.textContent = getAdminKey()
+        ? `That key didn't work: ${error.message}`
+        : 'This page is for council admins. Enter the council admin key to manage reports, volunteers, events, and updates.';
+      setAdminKey('');
+    } else {
+      gateMessage.textContent = error.message;
     }
   }
+}
+
+export function initSrfscAdmin() {
+  document.getElementById('srfsc-admin-key-form').addEventListener('submit', (submitEvent) => {
+    submitEvent.preventDefault();
+    const input = submitEvent.target.elements.admin_key;
+    setAdminKey(input.value.trim());
+    input.value = '';
+    unlockAdmin();
+  });
+  document.getElementById('srfsc-admin-forget').addEventListener('click', () => {
+    setAdminKey('');
+    document.getElementById('srfsc-admin').hidden = true;
+    document.getElementById('srfsc-admin-gate').hidden = false;
+    document.getElementById('srfsc-admin-gate-message').textContent = 'Key cleared from this browser tab.';
+  });
+  return unlockAdmin();
 }
