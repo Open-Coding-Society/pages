@@ -8,11 +8,15 @@
 <!-- Signed-out visitors still get the full UI: the chat drops into a local -->
 <!-- "preview" mode backed by localStorage, matching _includes/week_chat.html, -->
 <!-- so the feature is visible and testable without a login. -->
+<!-- -->
+<!-- Calendar: a strip of this school week sits above the messages, teachers -->
+<!-- add events with the /event slash command, and announcements that carry -->
+<!-- events show event cards. See assets/js/chat/calendar/calendar-announcements.js. -->
 
 <section id="announcementChat" class="announcement-chat" data-course="{{ page.course }}" aria-labelledby="announcementChatTitle">
   <div class="chat-header">
     <div class="chat-heading">
-      <span class="chat-badge" aria-hidden="true"><i class="fas fa-bullhorn"></i></span>
+      <a class="chat-badge" href="{{ '/student/calendar' | relative_url }}" aria-label="Open OCS calendar" title="Open OCS calendar"><i class="fas fa-calendar" aria-hidden="true"></i></a>
       <div class="chat-heading-text">
         <h2 class="chat-title" id="announcementChatTitle">{{ page.course | upcase }} Announcements</h2>
         <p class="chat-subtitle">Class-wide chat for this course — announcements, questions, anything that isn't week-specific.</p>
@@ -28,6 +32,7 @@
     <p class="chat-preview-note" id="announcementChatNote" hidden>
       <i class="fas fa-flask" aria-hidden="true"></i><span id="announcementChatNoteText"></span>
     </p>
+    <div class="announcement-chat-calendar" data-hook="calendar"></div>
     <div class="chat-messages" id="announcementChatMessages" role="log" aria-live="polite">
       <div class="chat-empty" id="announcementChatEmpty">
         <i class="fas fa-bullhorn" aria-hidden="true"></i>
@@ -35,6 +40,7 @@
         <span class="chat-empty-hint">Class-wide messages will appear here.</span>
       </div>
     </div>
+    <div class="announcement-chat-command" data-hook="command"></div>
     <form class="chat-form" id="announcementChatForm" autocomplete="off">
       <button class="chat-send" id="announcementChatSend" type="submit" disabled>
         <i class="fas fa-paper-plane" aria-hidden="true"></i><span>Send</span>
@@ -43,9 +49,30 @@
   </div>
 </section>
 
+{% assign announcement_school_calendar = site.data.school_calendar %}
+<script id="announcementChatSchoolCalendar" type="application/json">
+{
+  "schoolYear": {{ announcement_school_calendar.school_year | jsonify }},
+  "weeks": {
+    {% for week in announcement_school_calendar.weeks %}
+    "{{ week[0] }}": {
+      "monday": {{ week[1].monday | jsonify }},
+      "friday": {{ week[1].friday | jsonify }},
+      "holidays": {{ week[1].holidays | default: nil | jsonify }},
+      "holidayAdjustment": {{ week[1].holiday_adjustment | default: nil | jsonify }},
+      "skipWeek": {{ week[1].skip_week | default: false | jsonify }},
+      "theme": {{ week[1].theme | default: nil | jsonify }},
+      "notes": {{ week[1].notes | default: nil | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  }
+}
+</script>
+
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
   import { createRichComposer, renderRichMessage } from '{{site.baseurl}}/assets/js/chat/rich-text.js';
+  import { attachAnnouncementCalendar } from '{{site.baseurl}}/assets/js/chat/calendar/calendar-announcements.js';
 
   const COURSE = {{ page.course | jsonify }};
   const GROUP_NAME = `${COURSE}-announcements`;
@@ -116,6 +143,18 @@
   formEl.classList.add('chat-form--rich');
   formEl.insertBefore(composer.element, sendBtn);
 
+  const calendar = attachAnnouncementCalendar({
+    root: document.getElementById('announcementChat'),
+    messagesEl,
+    composer,
+    course: COURSE,
+    schoolCalendar: JSON.parse(document.getElementById('announcementChatSchoolCalendar').textContent),
+    calendarUrl: '{{site.baseurl}}/student/calendar',
+    javaURI,
+    fetchOptions,
+    onSubmit: submitMessage,
+  });
+
   function setStatus(text, tone) {
     statusEl.textContent = text;
     statusPillEl.classList.remove('is-live', 'is-preview', 'is-error');
@@ -132,9 +171,21 @@
     sendBtn.disabled = !enabled;
   }
 
-  function submitMessage() {
-    if (composer.isEmpty() || composer.isOverLimit()) return;
-    if (sendMessage(composer.getHTML())) composer.clear();
+  // An open /event command is sent even with an empty message: the calendar
+  // module creates the event first and hands back the text + event marker.
+  let submitting = false;
+  async function submitMessage() {
+    if (submitting || composer.isOverLimit()) return;
+    submitting = true;
+    try {
+      const html = await calendar.prepareMessage(composer.isEmpty() ? '' : composer.getHTML());
+      if (html !== null && sendMessage(html)) {
+        composer.clear();
+        calendar.reset();
+      }
+    } finally {
+      submitting = false;
+    }
   }
 
   function parseDate(isoString) {
@@ -237,9 +288,11 @@
 
     const body = document.createElement('span');
     body.className = 'chat-msg-body';
-    renderRichMessage(body, message);
+    const { html, events } = calendar.splitMessage(message);
+    renderRichMessage(body, html);
 
     main.append(meta, body);
+    calendar.attachEvents(row, main, events);
     row.append(avatar, main);
     messagesEl.appendChild(row);
 
@@ -289,6 +342,7 @@
 
   function enterPreviewMode(reason) {
     state.mode = 'preview';
+    calendar.start('preview');
     state.currentUserDisplayName = 'You';
     setStatus('preview', 'is-preview');
     showNote(`${reason} This is a local preview — messages stay in this browser and are not sent to the class.`);
@@ -471,6 +525,7 @@
       return;
     }
 
+    await calendar.start('live');
     await loadHistory();
 
     try { await loadChatLibraries(); }

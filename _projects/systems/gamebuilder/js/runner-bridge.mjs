@@ -11,8 +11,9 @@
  *
  * @usage
  * Await `waitForGameRunner(runnerId)` before invoking the returned controller.
- * The GameBuilder page uses this to obtain `setCode`, `getCode`, `run`, and
- * `stop`. If the requested runner does not become ready before the timeout,
+ * The GameBuilder page uses this to obtain code/change, save/snapshot,
+ * engine-selection, run, and stop operations. `setSaveHandler` installs the
+ * awaited workspace persistence hook. If readiness exceeds the timeout,
  * the promise rejects with an error.
  */
 export function waitForGameRunner(runnerId, timeoutMs = 10000) {

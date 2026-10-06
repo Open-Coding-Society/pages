@@ -52,6 +52,7 @@ while preserving all critical instructions. The agent must still communicate wit
 ### 生态系统与工具默认设置
 
 * **优先使用 SASS：** 使用 SASS (`.scss`) 进行样式设计，而不是标准 CSS 或内联样式。
+* **SASS 兼容性：** 当前 Jekyll 使用 Ruby Sass；透明颜色使用 `rgba(0, 0, 0, 0.15)`，不要使用它无法编译的 `rgb(0 0 0 / 15%)` 语法。需通过 Makefile 的 Jekyll 构建验证。
 * **使用 `_projects`：** 利用 `_projects/` 目录中的模块化项目自动注册系统来创建新项目。
 * **系统扩展：** 在现有系统内工作并在需要时进行扩展，而不是创建全新的并行架构。
 * **日历页面约定：** `navigation/calendar.md` 里的布局和弹层样式要放到 SCSS 中，用语义化 class 代替 utility 风格的内联类。
@@ -65,6 +66,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * 以 [Makefile](Makefile) 为唯一指令来源；常用目标 `make`/`make serve-current`、`make dev`、`make stop`、`make convert`、`make convert-single`（细节见 [README.md](README.md)）。
 * 顺序很关键：stop → build projects → convert notebooks/docx → split courses → jekyll serve（以 [Makefile](Makefile) 为准）。
 * 项目构建后必须运行 [SASS 导入生成器](scripts/generate_sass_imports.py)，以创建 `_sass/projects/_all.scss`；`build-registered-projects` 负责此依赖，避免 Jekyll 的 `projects/all` 导入失败。
+* 项目 Makefile 使用模板生成；不要为共享浏览器库添加本地 npm 清单、`.gitignore` 或 Makefile 覆盖。共享运行时库放在 `assets/js/vendor/`，保留许可证和版本说明；常规构建无需 npm 安装。
 
 ### 源文件与生成文件
 

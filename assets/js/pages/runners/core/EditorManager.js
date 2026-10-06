@@ -32,6 +32,13 @@ export class EditorManager {
     const textarea = this.container.querySelector('.editor-textarea');
     if (!textarea || typeof CodeMirror === 'undefined') {
       console.warn(`Runner ${this.containerId}: CodeMirror editor unavailable`);
+      if (textarea) {
+        textarea.value = initialCode || fallbackCode || '';
+        if (trackChanges && typeof this.onChange === 'function') {
+          textarea.addEventListener('input', () => this.onChange(textarea.value));
+          this.onChange(textarea.value);
+        }
+      }
       return null;
     }
 

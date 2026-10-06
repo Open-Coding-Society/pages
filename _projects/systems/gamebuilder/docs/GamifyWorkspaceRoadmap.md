@@ -1,8 +1,8 @@
 # GameBuilder and Gamify workspace roadmap
 
 > Discovery and proposed implementation sequence, 2026-10-05.
-> No game files have been moved and none of the features below are implemented
-> by this document.
+> No game files have been moved. P1's single-level save/load/recovery slice is
+> implemented; the remaining migration milestones are still proposals.
 
 ## Goal and confirmed scope
 
@@ -36,7 +36,9 @@ The key comes from the page permalink and runner ID in
 
 [`app.mjs`](../js/app.mjs) independently creates a default builder document on
 every load. It preserves existing runner code at initialization and asks
-before replacing differing code through Generate / Sync Code.
+before replacing differing code through Push. The initial AST-based Pull reads
+one supported GameBuilder-style level without executing or changing source;
+custom behavior remains code-owned and blocks destructive Push.
 
 Therefore the current source does **not** establish an unconditional startup
 overwrite bug. It does establish a mismatch: saved code returns, but the
@@ -204,6 +206,12 @@ would lose behavior. Do not promise arbitrary JavaScript round trips.
 
 ### P1. Complete save/load for the current builder
 
+**Current status:** the single-level slice is implemented: automatic draft
+recovery, a separate explicit save/load return point, JSON import/export, exact
+source export, and awaited runner Save integration. Unfinished edits are kept.
+Named Save As libraries and multi-module packages remain future work. See the
+[workspace usage guide](../README.md#protecting-workspace-work).
+
 - Add a focused workspace document/store module under `js/`; keep DOM wiring
   in `app.mjs` and validation separate.
 - Add New, Open, Save, Save As, and JSON/source export controls using existing
@@ -365,7 +373,7 @@ the feature milestone with explicit behavior checks.
 
 ## First implementation slice
 
-Implement **P1 only** first: save/reopen the current builder game, including
-manual source edits, without moving Gamify yet. Then add **P2** so moving
+The first **P1** slice now saves/reopens the current builder game, including
+manual source edits, without moving Gamify. Next expand to **P2** so moving
 Gamify produces genuinely editable saved games rather than a catalog of
 imports into read-only published modules.
