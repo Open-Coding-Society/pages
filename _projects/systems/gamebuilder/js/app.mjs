@@ -17,13 +17,18 @@
  * GAME_RUNNER include. The page root must expose `data-gamebuilder-workbench`;
  * its descendants provide the `data-role` and `data-action` hooks queried
  * below. Generate / Sync Code validates the current form and sends generated
- * source through the runner controller's `setCode` method.
+ * source through the runner controller's `setCode` method. Persistence captures
+ * both form and exact source; restoring a workspace never regenerates code.
  */
 import { createAssetCatalog } from './asset-catalog.mjs';
 import { createBarrierPlacementEditor } from './barrier-editor.mjs';
 import { createDefaultBuilderState, createNpcState } from './builder-state.mjs';
 import { generateLevelCode } from './code-generator.mjs?v=2';
 import { waitForGameRunner } from './runner-bridge.mjs';
+import { createWorkspacePersistence } from './workspace-persistence.mjs';
+import { createActionFeedback } from './action-feedback.mjs';
+import { importLevelCode } from './code-importer.mjs';
+import { styleRunnerIcons } from './runner-icons.mjs';
 
 const root = document.querySelector('[data-gamebuilder-workbench]');
 if (!root) {
@@ -42,10 +47,7 @@ const barrierList = form.querySelector('[data-role="barrier-list"]');
 const barrierEmptyMessage = form.querySelector('[data-role="barrier-empty"]');
 const addBarrierButton = form.querySelector('[data-action="add-barrier"]');
 
-function setStatus(message, state = 'info') {
-  status.textContent = message;
-  status.dataset.state = state;
-}
+const setStatus = createActionFeedback(status);
 
 function siteUrl(path) {
   return `${root.dataset.baseUrl || ''}${path}`;
@@ -73,8 +75,18 @@ function populateSelect(select, entries) {
   }
 }
 
+function selectAsset(select, key) {
+  if (![...select.options].some((option) => option.value === key)) {
+    const missing = document.createElement('option');
+    missing.value = key;
+    missing.textContent = `Unavailable asset: ${key}`;
+    select.append(missing);
+  }
+  select.value = key;
+}
+
 function readForm(state) {
-  const numberValue = (input) => input.value === '' ? Number.NaN : Number(input.value);
+  const numberValue = (input) => input.value === '' ? '' : Number(input.value);
   return {
     ...state,
     name: form.elements.namedItem('game-name').value,
@@ -103,9 +115,9 @@ function readForm(state) {
 
 function fillForm(state) {
   form.elements.namedItem('game-name').value = state.name;
-  form.elements.namedItem('background').value = state.backgroundKey;
+  selectAsset(form.elements.namedItem('background'), state.backgroundKey);
   form.elements.namedItem('player-name').value = state.player.name;
-  form.elements.namedItem('player-sprite').value = state.player.spriteKey;
+  selectAsset(form.elements.namedItem('player-sprite'), state.player.spriteKey);
   form.elements.namedItem('player-x').value = String(state.player.position.x);
   form.elements.namedItem('player-y').value = String(state.player.position.y);
 }
@@ -124,7 +136,7 @@ function createNpcField(labelText, fieldName, type, value, entries = null) {
 
   if (type === 'select') {
     populateSelect(control, entries);
-    control.value = value;
+    selectAsset(control, value);
     control.required = true;
   } else if (type === 'textarea') {
     control.rows = 2;
@@ -274,6 +286,7 @@ try {
     waitForGameRunner('gamebuilder-v2')
   ]);
   const catalog = createAssetCatalog(backgroundManifest, spriteManifest);
+  styleRunnerIcons(root);
   populateSelect(form.elements.namedItem('background'), catalog.backgrounds);
   populateSelect(form.elements.namedItem('player-sprite'), catalog.sprites);
 
@@ -287,6 +300,7 @@ try {
   let activeBarrierId = null;
   let barrierEditSnapshot = null;
   let lastGeneratedCode = '';
+  let persistence = null;
   const barrierEditor = createBarrierPlacementEditor(
     root.querySelector('.ocs__gamebuilder-runner .gameContainer'),
     (barrierId, point) => {
@@ -296,6 +310,7 @@ try {
       }
       barrier.points.push(point);
       updateBarrierEditor();
+      persistence?.changed();
       setStatus(`${barrier.name}: point ${barrier.points.length} added.`);
     }
   );
@@ -320,12 +335,84 @@ try {
     setStatus(`Editing ${barrier.name}. Click the preview to add points.`);
   }
 
+  function captureWorkspace() {
+    return {
+      schemaVersion: 1,
+      kind: 'ocs-gamebuilder-workspace',
+      builderState: readForm(state),
+      editorCode: runner.getCode(),
+      lastGeneratedCode,
+      engineVersion: runner.getEngineVersion(),
+      collapsed: builderPanel.hidden,
+      editing: { activeBarrierId, barrierEditSnapshot, nextNpcIndex, nextBarrierIndex }
+    };
+  }
+
+  function restoreWorkspace(document) {
+    runner.stop();
+    state = structuredClone(document.builderState);
+    ({ activeBarrierId, barrierEditSnapshot, nextNpcIndex, nextBarrierIndex } = structuredClone(document.editing));
+    lastGeneratedCode = document.lastGeneratedCode;
+    fillForm(state);
+    renderNpcs(state.npcs, catalog.sprites);
+    updateBarrierEditor();
+    builderPanel.hidden = document.collapsed;
+    workspace.classList.toggle('is-builder-collapsed', document.collapsed);
+    collapseButton.setAttribute('aria-expanded', String(!document.collapsed));
+    collapseButton.textContent = document.collapsed ? 'Show builder' : 'Hide builder';
+    runner.setEngineVersion(document.engineVersion);
+    runner.setCode(document.editorCode);
+    const missing = [state.backgroundKey, state.player.spriteKey, ...state.npcs.map((npc) => npc.spriteKey)]
+      .filter((key, index) => !(index === 0 ? catalog.backgrounds : catalog.sprites).has(key));
+    setStatus(missing.length ? `Workspace restored with unavailable assets: ${missing.join(', ')}. Choose replacements before generating.`
+      : 'Workspace restored without regenerating code.', missing.length ? 'error' : 'info');
+  }
+
+  persistence = createWorkspacePersistence({
+    root, runner, capture: captureWorkspace, restore: restoreWorkspace
+  });
+  collapseButton.addEventListener('click', persistence.changed);
+
+  function replacePanel(nextState) {
+    state = nextState;
+    activeBarrierId = null;
+    barrierEditSnapshot = null;
+    nextNpcIndex = 0;
+    nextBarrierIndex = 0;
+    fillForm(state);
+    renderNpcs(state.npcs, catalog.sprites);
+    updateBarrierEditor();
+    persistence.changed();
+  }
+
+  root.querySelector('[data-action="clear-builder"]').addEventListener('click', () => {
+    if (!window.confirm('Reset builder panels to starter settings? Runner code and the saved workspace are kept.')) return;
+    replacePanel(createDefaultBuilderState(firstBackground, defaultSprite));
+    setStatus('Builder cleared. Runner code is unchanged.');
+  });
+
+  root.querySelector('[data-action="pull"]').addEventListener('click', () => {
+    try {
+      const source = runner.getCode();
+      const result = importLevelCode(source, catalog);
+      if (!window.confirm(`Replace panel settings from the current code?${result.canRegenerate ? '' : ' Custom code is preserved; Push will be blocked to avoid losing it.'}`)) return;
+      replacePanel(result.state);
+      lastGeneratedCode = generateLevelCode(result.state, catalog).code;
+      setStatus(result.canRegenerate ? 'Settings pulled from code. Runner source is unchanged.'
+        : 'Supported settings pulled. Custom code is preserved; edit it in the runner, not with Push.');
+    } catch (error) {
+      console.error('GameBuilder code pull failed:', error);
+      setStatus(`${error.message}. Panels and source are unchanged.`, 'error');
+    }
+  });
+
   form.addEventListener('click', (event) => {
     const button = event.target.closest('[data-action]');
     if (!button) return;
 
     if (button.dataset.action === 'add-npc') {
       state = readForm(state);
+      while (state.npcs.some((npc) => npc.id === `npc-${nextNpcIndex + 1}`)) nextNpcIndex++;
       const npc = createNpcState(nextNpcIndex++, defaultSprite);
       state.npcs.push(npc);
       renderNpcs(state.npcs, catalog.sprites);
@@ -341,6 +428,7 @@ try {
     } else if (button.dataset.action === 'add-barrier') {
       if (activeBarrierId) return;
       state = readForm(state);
+      while (state.barriers.some((barrier) => barrier.id === `barrier-${nextBarrierIndex + 1}`)) nextBarrierIndex++;
       const index = nextBarrierIndex++;
       const barrier = {
         id: `barrier-${index + 1}`,
@@ -407,6 +495,7 @@ try {
       addBarrierButton.focus();
       setStatus('Barrier editing canceled.');
     }
+    persistence.changed();
   });
 
   form.addEventListener('input', () => {
@@ -416,11 +505,11 @@ try {
       title.textContent = card.querySelector('[data-npc-field="name"]').value.trim() || `NPC ${[...npcList.children].indexOf(card) + 1}`;
       card.querySelector('[data-action="remove-npc"]').setAttribute('aria-label', `Remove ${title.textContent}`);
     }
-    setStatus('Builder settings changed. Generate code to sync them to GAME_RUNNER.');
+    persistence.changed();
   });
   form.addEventListener('change', () => {
     state = readForm(state);
-    setStatus('Builder settings changed. Generate code to sync them to GAME_RUNNER.');
+    persistence.changed();
   });
 
   generateButton.addEventListener('click', () => {
@@ -436,19 +525,33 @@ try {
     }
 
     const currentCode = runner.getCode();
+    if (currentCode.trim()) {
+      try {
+        if (!importLevelCode(currentCode, catalog).canRegenerate) {
+          setStatus('Push blocked: current source contains code the panels cannot preserve. Export it first; Clear the runner only when you intend to replace it.', 'error');
+          return;
+        }
+      } catch (error) {
+        setStatus(`Push blocked: ${error.message}. Export the code before explicitly clearing it.`, 'error');
+        return;
+      }
+    }
     if (currentCode.trim() && currentCode !== lastGeneratedCode) {
       const confirmed = window.confirm('Replace the code currently in GAME_RUNNER with generated code?');
       if (!confirmed) return;
     }
     runner.setCode(result.code);
     lastGeneratedCode = result.code;
+    persistence.changed();
     setStatus('Generated code is synced to GAME_RUNNER. Use its Run button to play.');
   });
 
-  if (runner.getCode().trim()) {
-    setStatus('Existing GAME_RUNNER code was preserved. Choose Generate / Sync Code when ready to replace it.');
-  } else {
-    generateButton.click();
+  if (!persistence.recovered) {
+    if (runner.getCode().trim()) {
+      setStatus('Existing runner code was preserved. Pull settings from it, or export it before replacing it.');
+    } else {
+      setStatus('Configure the builder, then choose Push to send it to GAME_RUNNER.');
+    }
   }
 } catch (error) {
   console.error('GameBuilder workbench initialization failed:', error);

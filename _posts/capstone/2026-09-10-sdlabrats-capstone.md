@@ -18,6 +18,12 @@ permalink: /capstone/sdlabrats/
     <a class="ocs__btn" href="https://www.sdlabrats.org/courses-workshops/">
         Their Programs
     </a>
+    <a class="ocs__btn" href="https://github.com/pkdev0101/sdlabrats_frontend">
+        Frontend Repo
+    </a>
+    <a class="ocs__btn" href="https://github.com/pkdev0101/sdlabrats_backend">
+        Backend
+    </a>
 </div>
 
 ---
