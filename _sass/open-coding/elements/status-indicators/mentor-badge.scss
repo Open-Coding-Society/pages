@@ -1,0 +1,76 @@
+// Sitewide "signed in as a Mentor" bar (see _layouts/aesthetihawk.html). It sits in
+// normal page flow right under the header, so it stays at the top of the page and
+// never floats over content. The ROLE_PENDING variant is the same bar tinted amber.
+
+.mentor-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: color-mix(in srgb, var(--pref-accent-color) 14%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--pref-accent-color) 30%, transparent);
+  color: var(--pref-accent-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+
+  // display:flex above would otherwise override the hidden attribute.
+  &[hidden] {
+    display: none;
+  }
+
+  strong {
+    color: var(--pref-text-color);
+  }
+
+  &__dot {
+    flex-shrink: 0;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--success-green);
+  }
+
+  // View switch (mentor accounts): an ocs__btn pill sitting at the end of the bar.
+  &__switch {
+    margin: 0 0 0 0.5rem;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  // Mentor account currently viewing the site as a student: same bar, neutral tint.
+  &--student-view {
+    background: color-mix(in srgb, var(--pref-text-color) 6%, transparent);
+    border-bottom-color: var(--ui-border);
+    color: var(--text-muted);
+
+    .mentor-badge__dot {
+      background: var(--text-muted);
+    }
+  }
+
+  &--pending {
+    background: color-mix(in srgb, var(--warn) 14%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--warn) 35%, transparent);
+    color: var(--warn);
+
+    .mentor-badge__dot {
+      background: var(--warn);
+    }
+  }
+
+  @media (max-width: 640px) {
+    font-size: 0.78rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+// The lesson sidebar is position:fixed just under the header, so it would cover the
+// bar at the top of the page; start it at the bar's bottom edge instead
+// (--mentor-bar-bottom, measured by the layout script when the bar is shown).
+body.mentor-bar-active .lesson-sidebar {
+  top: var(--mentor-bar-bottom);
+}

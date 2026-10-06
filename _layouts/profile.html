@@ -41,8 +41,18 @@ active_tab: profile
                     value="" onchange="checkForChanges()" autocomplete="off">
             </div>
 
-            <!-- Kasm Server Toggle -->
-            <div class="flex items-center">
+            <!-- Business Email: mentor-only, read-only (set at mentor signup, shown to the
+                 admin who verified the account); revealed by setUserData.js. -->
+            <div id="businessEmailGroup" hidden>
+                <label for="businessEmailDisplay" class="block text-sm font-medium text-gray-300 mb-1">Business
+                    Email</label>
+                <input type="email" id="businessEmailDisplay" readonly
+                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- Kasm Server Toggle: removed outright for mentors (see the role check in the
+                 script below) rather than just left unchecked -- mentors have no use for it. -->
+            <div class="flex items-center" id="kasmToggleContainer">
                 <label for="kasmChangeInput" class="flex items-center cursor-pointer">
                     <div class="relative">
                         <input type="checkbox" id="kasmChangeInput" class="sr-only" onchange="checkForChanges()">
@@ -65,7 +75,7 @@ active_tab: profile
     </div>
 
     <!-- School Section -->
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <div id="schoolInfoCard" class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <h2 class="text-xl font-semibold mb-6">School Information</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -98,7 +108,7 @@ active_tab: profile
     </div>
 
     <!-- Classes Section -->
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <div id="classesCard" class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Classes</h2>
             <button type="button" id="addClassBtn"
@@ -113,7 +123,7 @@ active_tab: profile
         </div>
     </div>
 
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <div id="personaCard" class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
 
         <div id="personaSelectionContainer">
@@ -122,7 +132,7 @@ active_tab: profile
     </div>
 
 
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <div id="facialRegistrationCard" class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <h2 class="text-xl font-semibold mb-6">Facial Registration</h2>
         <div id="facialRegistrationContainer" class="space-y-4">
             <p class="text-gray-400 text-sm">Register your face to use the Bathroom Pass system. Your data will be
@@ -191,6 +201,7 @@ active_tab: profile
 
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { viewFor, roleNames } from '{{site.baseurl}}/assets/js/api/role-view.js';
 
     /**
      * API Request Chaining Implementation
@@ -235,6 +246,23 @@ active_tab: profile
                 // Cache user identity for reuse in join/leave operations
                 currentPersonId = personData.id;
                 currentUid = personData.uid;
+
+                // Mentors have no use for Kasm servers -- drop the toggle entirely rather
+                // than just leaving it unchecked. Checked against Spring's roles (not
+                // Flask's /api/id, which only ever carries a single role string), same as
+                // the mentor dashboard's own access check.
+                // Same rule for the whole mentor view: real ROLE_MENTOR. Bathroom Pass
+                // (facial registration), school/student-id, classes, and the CS-pathway
+                // persona picker are all student-only concepts a mentor account has no
+                // use for -- mentor signup never even collects sid/school (see
+                // navigation/authentication/login.md's updateSignupModeUI).
+                if (viewFor(roleNames(personData)) === 'mentor') {
+                    document.getElementById('kasmToggleContainer')?.remove();
+                    document.getElementById('facialRegistrationCard')?.remove();
+                    document.getElementById('schoolInfoCard')?.remove();
+                    document.getElementById('classesCard')?.remove();
+                    document.getElementById('personaCard')?.remove();
+                }
 
                 if (!currentPersonId || !currentUid) {
                     return null;
@@ -326,6 +354,11 @@ active_tab: profile
 
     async function loadPersonas() {
         const container = document.getElementById('personaSelectionContainer');
+        // personaCard (and this container with it) is removed entirely in the mentor
+        // view (see the role check below) -- nothing to load or render for a mentor.
+        if (!container) {
+            return;
+        }
 
         try {
             // Fetch all available personas
@@ -389,6 +422,9 @@ active_tab: profile
     }
     function showPersonaSelectionCards(allPersonas, selectedPersonas, forceShowAll = false) {
         const container = document.getElementById('personaSelectionContainer');
+        if (!container) {
+            return;
+        }
 
         console.log('🎨 Rendering selection cards');
         console.log('Total personas:', allPersonas.length);
@@ -508,6 +544,9 @@ active_tab: profile
     }
     function showCompletedPersonas(selectedPersonas, allPersonas) {
         const container = document.getElementById('personaSelectionContainer');
+        if (!container) {
+            return;
+        }
 
         const categoryLabels = {
             'student': 'Student Archetype',
@@ -1042,19 +1081,22 @@ active_tab: profile
             console.error('addClassBtn not found!'); // ADD THIS
         }
 
-        // Set up toggle switch
+        // Set up toggle switch -- absent for mentors, see the role check that removes
+        // #kasmToggleContainer earlier in the page.
         const toggle = document.querySelector('#kasmChangeInput');
         const toggleDot = document.querySelector('.dot');
 
-        toggle.addEventListener('change', function () {
-            if (this.checked) {
-                toggleDot.classList.add('translate-x-3');
-                toggle.classList.add('bg-blue-600');
-            } else {
-                toggleDot.classList.remove('translate-x-3');
-                toggle.classList.remove('bg-blue-600');
-            }
-        });
+        if (toggle) {
+            toggle.addEventListener('change', function () {
+                if (this.checked) {
+                    toggleDot.classList.add('translate-x-3');
+                    toggle.classList.add('bg-blue-600');
+                } else {
+                    toggleDot.classList.remove('translate-x-3');
+                    toggle.classList.remove('bg-blue-600');
+                }
+            });
+        }
     });
 
     // Save original form values
@@ -1356,9 +1398,12 @@ active_tab: profile
         const name = nameInput.value.trim();
         const uid = uidInput.value.trim();
         const email = emailInput.value.trim();
-        const sid = sidInput.value.trim();
+        // sidInput/schoolInput/kasmInput are all removed from the DOM entirely in the
+        // mentor view (see the role check below) -- null-safe like kasmServerNeeded
+        // already was, so saveChanges doesn't throw for a mentor account.
+        const sid = sidInput ? sidInput.value.trim() : undefined;
         const kasmServerNeeded = kasmInput ? kasmInput.checked : undefined;
-        const school = schoolInput.value;
+        const school = schoolInput ? schoolInput.value : undefined;
 
         // get class info
         const classEntries = Array.from(document.querySelectorAll('.class-entry')).map(entry => ({
@@ -1632,6 +1677,7 @@ active_tab: profile
     function updateRegistrationStatus(isRegistered) {
         const dot = document.getElementById('regStatusDot');
         const text = document.getElementById('regStatusText');
+        if (!dot || !text) return; // card is removed in the mentor view
         if (isRegistered) {
             dot.classList.remove('bg-gray-600');
             dot.classList.add('bg-green-500');

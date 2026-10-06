@@ -1,4 +1,5 @@
-import { baseurl, pythonURI, fetchOptions } from './config.js';
+import { baseurl, pythonURI, javaURI, fetchOptions } from './config.js';
+import { roleNames, isMentorAccount, viewFor, switchView } from './role-view.js';
 
 console.log("login.js loaded");
 
@@ -21,12 +22,18 @@ document.addEventListener('DOMContentLoaded', function () {
                                            <hr style="margin: 4px 0;">`
                             : ''
                         }
+                                ${viewSwitchLink(data)}
                                 <a href="${baseurl}/profile">Profile</a>
                                 <a href="${baseurl}/dm">DMs</a>
                                 <a href="${baseurl}/logout">Logout</a>
                             </div>
                         </div>
                     `;
+
+                    loginArea.querySelector('.view-switch')?.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        switchView(roleNames(data));
+                    });
 
                     // Add click event listener for dropdown toggle
                     const dropdownButton = loginArea.querySelector('.dropbtn');
@@ -49,9 +56,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
-                    // Update navigation AFTER dropdown is set up
+                    // Update navigation AFTER dropdown is set up. Course links come from
+                    // Flask, so a Spring-only account (mentor) keeps the Blogs link.
                     waitForElement('.trigger', 20, 100).then(() => {
-                        updateNavigation(true); // User is logged in
+                        updateNavigation(data.source !== 'spring');
                     });
                 } else {
                     // User is not authenticated, then "Login" link is shown
@@ -76,6 +84,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// Mentor accounts get a "Switch to student/mentor view" item in the name dropdown, so
+// the switch is reachable on every page (the mentor banner only exists on some layouts).
+function viewSwitchLink(user) {
+    const roles = roleNames(user);
+    if (!isMentorAccount(roles)) return '';
+    const label = viewFor(roles) === 'mentor' ? 'Switch to student view' : 'Switch to mentor view';
+    return `<a href="#" class="view-switch">${label}</a>`;
+}
+
 // Wait for an element to exist in the DOM, retrying up to maxAttempts (delay between attempts)
 function waitForElement(selector, maxAttempts = 20, interval = 100) {
     return new Promise((resolve, reject) => {
@@ -94,7 +111,27 @@ function waitForElement(selector, maxAttempts = 20, interval = 100) {
     });
 }
 
-function getCredentials(baseurl) {
+// Flask holds student accounts; mentor accounts exist only in Spring, so fall back to
+// Spring's session before treating the visitor as logged out.
+async function getCredentials(baseurl) {
+    const flaskUser = await getFlaskCredentials();
+    if (flaskUser) return flaskUser;
+    return getSpringCredentials();
+}
+
+async function getSpringCredentials() {
+    try {
+        const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+        if (!response.ok) return null;
+        const person = await response.json();
+        return { ...person, source: 'spring' };
+    } catch (err) {
+        console.warn("Spring session check failed:", err.message);
+        return null;
+    }
+}
+
+function getFlaskCredentials() {
     const URL = pythonURI + '/api/id';
     return fetch(URL, fetchOptions)
         .then(response => {
