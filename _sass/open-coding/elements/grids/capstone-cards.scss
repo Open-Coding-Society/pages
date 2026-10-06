@@ -5,6 +5,76 @@
 
 @import "../../mixins/panel";
 
+// One button format for the whole page: the OCS `small` pill (toolbar, cards, floating
+// actions, chat dialog). The alert tones default to a 2px border; a single 1px weight
+// keeps accent and alert buttons the same size when they sit side by side.
+.capstone-toolbar,
+.capstone-card,
+.capstone-page-actions,
+.capstone-chat {
+  .ocs__btn.small {
+    margin: 0;
+    border-width: 1px;
+    // Same weight as the icon buttons (ocs__btn--icon), so plain-label filters match.
+    font-weight: 700;
+    white-space: nowrap;
+  }
+}
+
+// Filter row above the grid.
+.capstone-toolbar {
+  margin-bottom: 0.9rem;
+
+  .ocs__links {
+    align-items: center;
+  }
+}
+
+// The year picker sits in the pill row, so it takes the small pill's height and shape
+// (the element selector outranks the form's generic .nc-select sizing).
+select.capstone-year-select {
+  width: auto;
+  max-width: 14rem;
+  height: 28px;
+  padding: 0 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 40px;
+  background: color-mix(in srgb, var(--pref-text-color) 6%, var(--pref-bg-color));
+  color: var(--pref-text-color);
+  font-size: 15px;
+  line-height: 20px;
+
+  &:focus-visible {
+    border-color: var(--pref-accent-color);
+  }
+}
+
+.capstone-search-status {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+}
+
+// Floating Edit / New actions, stacked in the bottom-right corner.
+.capstone-page-actions {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+
+  .ocs__btn {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  }
+
+  // Solid backing so the outline button stays readable over the cards it floats above.
+  .ocs__btn:not(.fill) {
+    background: var(--pref-bg-color);
+  }
+}
+
 .capstone-card {
   position: relative;
 
@@ -132,6 +202,7 @@
 
 .capstone-mentor-counts {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin-left: auto;
 
@@ -217,7 +288,7 @@
 
     // Leave room on the right of the header for the close button.
     .chat-header {
-      padding-right: 3.25rem;
+      padding-right: 6.5rem;
     }
   }
 }

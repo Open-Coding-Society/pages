@@ -23,6 +23,9 @@ export async function initCardTools(grid) {
     // The Links menu button is created by the page's non-module script; give it the same
     // icon + label format as the other card buttons.
     grid.querySelectorAll('.capstone-links-button').forEach((button) => setIconLabel(button, 'link', 'Links'));
+    // Same for the page's floating Edit / New buttons.
+    setPageActionIcon('editCapstoneFab', 'pencil', 'Edit');
+    setPageActionIcon('ncFab', 'plus', 'New');
     const projectsByUrl = await loadProjects();
     const viewer = await loadViewer();
     grid.querySelectorAll(':scope > div').forEach((card) => {
@@ -36,6 +39,11 @@ export async function initCardTools(grid) {
         if (project.mentorNames.length > 0) extra.append(mentorsButton(extra, project));
         if (canSelfJoin(project, viewer)) extra.append(joinChatButton(extra, project, viewer));
     });
+}
+
+function setPageActionIcon(id, icon, label) {
+    const button = document.getElementById(id);
+    if (button) setIconLabel(button, icon, label);
 }
 
 // ---------- data ----------
@@ -189,11 +197,8 @@ function chatDialog() {
     const dialog = document.createElement('dialog');
     dialog.className = 'capstone-chat';
     dialog.setAttribute('aria-label', 'Capstone chat');
-    const close = document.createElement('button');
-    close.type = 'button';
-    close.className = 'ocs__btn small pill capstone-chat__close';
+    const close = iconButton('ocs__btn small accent capstone-chat__close', 'x', 'Close');
     close.setAttribute('aria-label', 'Close chat');
-    close.textContent = '✕';
     close.addEventListener('click', () => dialog.close());
     const body = document.createElement('div');
     body.className = 'capstone-chat__body';

@@ -10,19 +10,21 @@ show_reading_time: false
 <!-- markdownlint-disable MD033 MD046 -->
 <link rel="stylesheet" href="/assets/css/new-capstone.css">
 
-<div class="capstone-action-buttons">
-  <button id="editCapstoneFab" class="new-capstone-fab" title="Edit capstone" aria-label="Edit capstone" style="bottom: 100px;">✎</button>
-  <button id="ncFab" class="new-capstone-fab" title="Create new capstone" aria-label="Create new capstone">+</button>
+<!-- Floating page actions: icons and labels are set by cardTools.js; placement is in
+     capstone-cards.scss. -->
+<div class="capstone-page-actions">
+  <button id="editCapstoneFab" type="button" class="ocs__btn small accent" title="Edit capstone">Edit</button>
+  <button id="ncFab" type="button" class="ocs__btn small accent fill" title="Create new capstone">New</button>
 </div>
 
-<div class="ocs__grid" style="margin-bottom: 0.9rem;">
+<div class="ocs__grid capstone-toolbar">
   <div class="ocs__grid-cell">
-    <div class="ocs__links ocs__links--wide">
-      <button id="show-all" type="button" class="ocs__btn capstone-filter-btn alert-green fill" aria-pressed="true">All</button>
-      <button id="show-csh" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSH</button>
-      <button id="show-csa" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSA</button>
-      <button id="show-csp" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSP</button>
-      <select id="year-select" class="nc-select" aria-label="Filter projects by school year" style="max-width: 14rem;">
+    <div class="ocs__links">
+      <button id="show-all" type="button" class="ocs__btn small accent fill" aria-pressed="true">All</button>
+      <button id="show-csh" type="button" class="ocs__btn small accent" aria-pressed="false">CSH</button>
+      <button id="show-csa" type="button" class="ocs__btn small accent" aria-pressed="false">CSA</button>
+      <button id="show-csp" type="button" class="ocs__btn small accent" aria-pressed="false">CSP</button>
+      <select id="year-select" class="nc-select capstone-year-select" aria-label="Filter projects by school year">
         <option value="2026-2027" selected>2026/2027</option>
         <option value="2025-2026">2025/2026</option>
       </select>
@@ -30,9 +32,9 @@ show_reading_time: false
            Hidden for everyone else; revealed by the mentor script below and pushed to
            the far right of this flex row (see capstone-cards.scss). -->
       <span id="mentor-counts" class="capstone-mentor-counts" hidden>
-        <span id="mentor-skipped-count" class="ocs__btn alert-red">Skipped: 0</span>
-        <span id="mentor-interested-count" class="ocs__btn alert-green">Interested: 0</span>
-        <button id="mentor-reset-marks" type="button" class="ocs__btn" title="Clear every Skipped and Interested mark">Reset</button>
+        <span id="mentor-skipped-count" class="ocs__btn small alert-red">Skipped: 0</span>
+        <span id="mentor-interested-count" class="ocs__btn small alert-green">Interested: 0</span>
+        <button id="mentor-reset-marks" type="button" class="ocs__btn small accent" title="Clear every Skipped and Interested mark">Reset</button>
       </span>
     </div>
   </div>
@@ -41,7 +43,7 @@ show_reading_time: false
 <div class="ocs__grid">
   <div class="ocs__grid-cell">
     <input id="project-search" type="search" placeholder="Search projects, descriptions, or team members" class="nc-input" />
-    <p id="search-status" class="text-xs text-gray-500" style="margin: 0.25rem 0 0;">Showing all projects.</p>
+    <p id="search-status" class="capstone-search-status">Showing all projects.</p>
   </div>
 </div>
 
@@ -161,7 +163,6 @@ document.addEventListener('DOMContentLoaded', function(){
     Object.entries(typeButtons).forEach(([type, button])=>{
       if(!button) return;
       const active = type === currentType;
-      button.classList.toggle('alert-green', active);
       button.classList.toggle('fill', active);
       button.setAttribute('aria-pressed', String(active));
     });
@@ -385,8 +386,8 @@ import { setIconLabel } from '{{ site.baseurl }}/assets/js/capstone/cardIcons.js
   const cardResetters = [];
 
   function updateCounter() {
-    interestedCountEl.textContent = `Interested: ${interested.size}`;
-    skippedCountEl.textContent = `Skipped: ${skipped.size}`;
+    setIconLabel(interestedCountEl, 'star', `Interested: ${interested.size}`);
+    setIconLabel(skippedCountEl, 'x', `Skipped: ${skipped.size}`);
     resetBtn.disabled = interested.size === 0 && skipped.size === 0;
   }
 
