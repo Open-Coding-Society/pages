@@ -635,6 +635,95 @@ body:has(.lesson-player) {
   color: $accent;
 }
 
+/* Self-Assessment */
+.self-assessment {
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: $bg-1;
+  border: 1px solid $bg-3;
+  border-radius: 8px;
+}
+
+.self-assessment-title {
+  color: $text;
+  font-size: 1rem;
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.self-assessment-hint {
+  color: $text-muted;
+  font-size: 13px;
+  margin: 0 0 16px 0;
+}
+
+.rating-group {
+  border: none;
+  padding: 0;
+  margin: 0 0 18px 0;
+}
+
+.rating-label {
+  color: $text;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0;
+  margin-bottom: 4px;
+}
+
+.rating-question {
+  color: $text-muted;
+  font-size: 13px;
+  margin: 0 0 8px 0;
+}
+
+.rating-scale {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rating-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid $bg-3;
+  border-radius: 6px;
+  background: $bg-0;
+  color: $text;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rating-option:has(input:checked),
+.rating-option.selected {
+  background: $accent;
+  color: $bg-0;
+  border-color: $accent;
+}
+
+.rating-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.rating-scale-hint {
+  color: $text-muted;
+  font-size: 11px;
+  margin-top: 6px;
+}
+
+.self-assessment-reflection {
+  margin-bottom: 0;
+}
+
 .submission-options {
   display: flex;
   gap: 12px;
@@ -813,6 +902,32 @@ body:has(.lesson-player) {
   display: block;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid #ef4444;
+  color: #ef4444;
+}
+
+.submission-status.loading {
+  display: block;
+  background: color-mix(in srgb, var(--pref-accent-color) 10%, transparent);
+  border: 1px solid var(--pref-accent-color);
+  color: $text;
+}
+
+.code-runner-summary {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.code-runner-summary li {
+  padding: 4px 0;
+}
+
+.code-runner-saved {
+  color: var(--pref-success-color, #22c55e);
+}
+
+.code-runner-unsaved {
   color: #ef4444;
 }
 

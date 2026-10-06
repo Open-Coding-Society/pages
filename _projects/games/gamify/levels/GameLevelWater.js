@@ -34,7 +34,7 @@ class GameLevelWater {
         src: sprite_src_octopus,
         SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
         STEP_FACTOR: 1000,
-        ANIMATION_RATE: 50,
+        ANIMATION_FPS: 8,
         GRAVITY: true,
         INIT_POSITION: { x: 0, y: height - (height/OCTOPUS_SCALE_FACTOR) }, 
         pixels: {height: 250, width: 167},

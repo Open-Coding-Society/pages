@@ -1846,7 +1846,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
       src:            path + '/images/projects/cs-pathway/player/minimalist.png',
       SCALE_FACTOR:   SCALE,
       STEP_FACTOR:    1000,
-      ANIMATION_RATE: 50,
+      ANIMATION_FPS:  8,
       INIT_POSITION:  { x: width * 0.48, y: height * 0.55 },
       pixels:         { height: 1024, width: 1024 },
       orientation:    { rows: 2, columns: 2 },
