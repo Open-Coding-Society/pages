@@ -10,7 +10,8 @@ show_reading_time: false
 <!-- markdownlint-disable MD033 MD046 -->
 <link rel="stylesheet" href="/assets/css/new-capstone.css">
 
-<!-- Floating page actions; placement is in capstone-cards.scss. -->
+<!-- Floating page actions: icons and labels are set by cardTools.js; placement is in
+     capstone-cards.scss. -->
 <div class="capstone-page-actions">
   <button id="editCapstoneFab" type="button" class="ocs__btn small accent" title="Edit capstone">Edit</button>
   <button id="ncFab" type="button" class="ocs__btn small accent fill" title="Create new capstone">New</button>
@@ -561,6 +562,18 @@ import { setIconLabel } from '{{ site.baseurl }}/assets/js/capstone/cardIcons.js
   countsEl.hidden = false;
   updateCounter();
 })();
+</script>
+
+<!-- Mentors / Chat buttons on every project card (assets/js/capstone/cardTools.js).
+     The chat panel loads the weekly chat's SockJS/STOMP client itself when opened. -->
+<script type="module">
+import { initCardTools } from '{{ site.baseurl }}/assets/js/capstone/cardTools.js';
+
+// After the first script's DOMContentLoaded handler has built the Links buttons and set
+// each card's page URL. Module scripts always run before that event, so always wait.
+await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
+const grid = document.getElementById('capstone-grid');
+if (grid) initCardTools(grid);
 </script>
 
 <div id="capstone-grid" class="ocs__grid ocs__grid--card cols-3">

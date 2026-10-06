@@ -225,3 +225,70 @@ select.capstone-year-select {
 .capstone-mentor-counts[hidden] {
   display: none;
 }
+
+// "Mentors (n)" popover: opens above the action row so the card doesn't grow.
+.capstone-mentors-panel {
+  @include info-panel(0.75rem 1rem, 1px, 0);
+  position: absolute;
+  bottom: calc(100% + 0.4rem);
+  left: 0;
+  z-index: 3;
+  min-width: 12rem;
+  background: var(--pref-bg-color);
+
+  &__title {
+    margin-bottom: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+}
+
+// Chat with the project's students: one native <dialog> shared by every card, holding a
+// course-style chat panel (styled by forms/course-chat.scss).
+.capstone-chat {
+  position: relative;
+  width: min(48rem, calc(100vw - 2rem));
+  // The site's global reset zeroes margins, which would pin the dialog top-left.
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  overflow: hidden;
+  // Solid, so the cards behind don't show through the chat.
+  background: var(--pref-bg-color);
+  color: var(--pref-text-color);
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  &__close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    z-index: 1;
+    margin: 0;
+  }
+
+  &__error {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  &__body .announcement-chat {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+
+    // Leave room on the right of the header for the close button.
+    .chat-header {
+      padding-right: 6.5rem;
+    }
+  }
+}
