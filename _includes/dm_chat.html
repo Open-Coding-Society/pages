@@ -15,7 +15,7 @@
       <span class="chat-badge" aria-hidden="true"><i class="fas fa-comments"></i></span>
       <div class="chat-heading-text">
         <h2 class="chat-title" id="dmChatTitle">Direct Messages</h2>
-        <p class="chat-subtitle">Private chats with other students and teachers.</p>
+        <p class="chat-subtitle">Private chats with students, teachers and mentors.</p>
       </div>
     </div>
     <span class="chat-status-pill" id="dmStatusPill">
@@ -321,25 +321,35 @@
     renderConversationList();
     try {
       const res = await fetch(`${javaURI}/api/dm/conversations/${id}/read`, { ...fetchOptions, method: 'POST' });
-      if (!res.ok) { console.warn('DM chat: mark read HTTP', res.status); return; }
-      window.dispatchEvent(new Event('dm:refresh-unread')); // navbar bell
+      if (!res.ok) { console.warn('DM chat: mark read HTTP', res.status); }
     } catch (err) {
       console.warn('DM chat: mark read failed', err);
     }
   }
 
-  // The navbar bell's periodic summary also keeps these sidebar counts current,
-  // and reveals conversations someone else started since the list was loaded.
-  window.addEventListener('dm:unread', ({ detail }) => {
-    const counts = detail.conversations || {};
-    const known = new Set(state.conversations.map((c) => String(c.id)));
-    if (Object.keys(counts).some((id) => !known.has(id))) {
-      loadConversations();
-      return;
+  // Live updates only cover the open conversation, so poll the unread summary to keep
+  // the sidebar counts current and reveal conversations someone else started since
+  // the list was loaded.
+  const UNREAD_POLL_MS = 30000;
+
+  async function refreshUnreadCounts() {
+    try {
+      const res = await fetch(`${javaURI}/api/dm/unread`, fetchOptions);
+      if (!res.ok) { console.warn('DM chat: unread HTTP', res.status); return; }
+      const counts = (await res.json()).conversations || {};
+      const known = new Set(state.conversations.map((c) => String(c.id)));
+      if (Object.keys(counts).some((id) => !known.has(id))) {
+        await loadConversations();
+        return;
+      }
+      state.conversations.forEach((c) => {
+        c.unreadCount = c.id === state.activeConversationId ? 0 : (counts[c.id] || 0);
+      });
+      renderConversationList();
+    } catch (err) {
+      console.warn('DM chat: unread refresh failed', err);
     }
-    state.conversations.forEach((c) => { c.unreadCount = counts[c.id] || 0; });
-    renderConversationList();
-  });
+  }
 
   async function loadConversations() {
     try {
@@ -562,6 +572,7 @@
     }
 
     await loadConversations();
+    setInterval(refreshUnreadCounts, UNREAD_POLL_MS);
 
     try { await loadChatLibraries(); }
     catch (err) { console.warn('DM chat: library load failed', err); }
