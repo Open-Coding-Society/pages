@@ -10,22 +10,31 @@ show_reading_time: false
 <!-- markdownlint-disable MD033 MD046 -->
 <link rel="stylesheet" href="/assets/css/new-capstone.css">
 
-<div class="capstone-action-buttons">
-  <button id="editCapstoneFab" class="new-capstone-fab" title="Edit capstone" aria-label="Edit capstone" style="bottom: 100px;">✎</button>
-  <button id="ncFab" class="new-capstone-fab" title="Create new capstone" aria-label="Create new capstone">+</button>
+<!-- Floating page actions; placement is in capstone-cards.scss. -->
+<div class="capstone-page-actions">
+  <button id="editCapstoneFab" type="button" class="ocs__btn small accent" title="Edit capstone">Edit</button>
+  <button id="ncFab" type="button" class="ocs__btn small accent fill" title="Create new capstone">New</button>
 </div>
 
-<div class="ocs__grid" style="margin-bottom: 0.9rem;">
+<div class="ocs__grid capstone-toolbar">
   <div class="ocs__grid-cell">
-    <div class="ocs__links ocs__links--wide">
-      <button id="show-all" type="button" class="ocs__btn capstone-filter-btn alert-green fill" aria-pressed="true">All</button>
-      <button id="show-csh" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSH</button>
-      <button id="show-csa" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSA</button>
-      <button id="show-csp" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSP</button>
-      <select id="year-select" class="nc-select" aria-label="Filter projects by school year" style="max-width: 14rem;">
+    <div class="ocs__links">
+      <button id="show-all" type="button" class="ocs__btn small accent fill" aria-pressed="true">All</button>
+      <button id="show-csh" type="button" class="ocs__btn small accent" aria-pressed="false">CSH</button>
+      <button id="show-csa" type="button" class="ocs__btn small accent" aria-pressed="false">CSA</button>
+      <button id="show-csp" type="button" class="ocs__btn small accent" aria-pressed="false">CSP</button>
+      <select id="year-select" class="nc-select capstone-year-select" aria-label="Filter projects by school year">
         <option value="2026-2027" selected>2026/2027</option>
         <option value="2025-2026">2025/2026</option>
       </select>
+      <!-- Approved-mentor-only: how many projects they've skipped / marked Interested.
+           Hidden for everyone else; revealed by the mentor script below and pushed to
+           the far right of this flex row (see capstone-cards.scss). -->
+      <span id="mentor-counts" class="capstone-mentor-counts" hidden>
+        <span id="mentor-skipped-count" class="ocs__btn small alert-red">Skipped: 0</span>
+        <span id="mentor-interested-count" class="ocs__btn small alert-green">Interested: 0</span>
+        <button id="mentor-reset-marks" type="button" class="ocs__btn small accent" title="Clear every Skipped and Interested mark">Reset</button>
+      </span>
     </div>
   </div>
 </div>
@@ -33,7 +42,7 @@ show_reading_time: false
 <div class="ocs__grid">
   <div class="ocs__grid-cell">
     <input id="project-search" type="search" placeholder="Search projects, descriptions, or team members" class="nc-input" />
-    <p id="search-status" class="text-xs text-gray-500" style="margin: 0.25rem 0 0;">Showing all projects.</p>
+    <p id="search-status" class="capstone-search-status">Showing all projects.</p>
   </div>
 </div>
 
@@ -153,7 +162,6 @@ document.addEventListener('DOMContentLoaded', function(){
     Object.entries(typeButtons).forEach(([type, button])=>{
       if(!button) return;
       const active = type === currentType;
-      button.classList.toggle('alert-green', active);
       button.classList.toggle('fill', active);
       button.setAttribute('aria-pressed', String(active));
     });
@@ -172,11 +180,11 @@ document.addEventListener('DOMContentLoaded', function(){
     applyFilters();
   });
   function closeAllPopups(){
-    document.querySelectorAll('.capstone-popup').forEach(el=>el.classList.add('hidden'));
+    document.querySelectorAll('.capstone-popup').forEach(el=>{ el.hidden = true; });
   }
   function buildPopup(card){
     const popup = card.querySelector('.capstone-popup');
-    const list = popup.querySelector('.capstone-popup-links');
+    const list = popup.querySelector('.capstone-popup__links');
     list.innerHTML = '';
     const pageLink = card.dataset.pageUrl || card.querySelector('a')?.href || '';
     const links = [
@@ -190,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function(){
         anchor.href = link.url;
         anchor.target = '_blank';
         anchor.rel = 'noreferrer noopener';
-        anchor.className = 'block rounded-lg px-3 py-2 text-sm text-slate-900 bg-white/90 hover:bg-white';
+        anchor.className = 'ocs__btn small';
         anchor.textContent = link.label;
         list.appendChild(anchor);
       }
@@ -199,17 +207,17 @@ document.addEventListener('DOMContentLoaded', function(){
   function togglePopup(card){
     const popup = card.querySelector('.capstone-popup');
     if(!popup) return;
-    if(popup.classList.contains('hidden')){
+    if(popup.hidden){
       closeAllPopups();
       buildPopup(card);
-      popup.classList.remove('hidden');
+      popup.hidden = false;
     } else {
-      popup.classList.add('hidden');
+      popup.hidden = true;
     }
   }
 
   cards.forEach(card=>{
-    card.classList.add('ocs__grid-cell', 'relative');
+    card.classList.add('ocs__grid-cell', 'capstone-card');
     card.querySelector('a > img')?.classList.add('ocs__image-frame--thumbnail');
     const titleAnchor = card.querySelector('h3 a');
     if(titleAnchor){
@@ -224,14 +232,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'capstone-links-button absolute top-3 right-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white/90 text-xl text-slate-900 shadow-sm transition hover:bg-white';
+    button.className = 'ocs__btn small accent capstone-links-button';
     button.setAttribute('aria-label', 'Open project links');
-    button.innerHTML = '📁';
+    button.textContent = 'Links';
     const popup = document.createElement('div');
-    popup.className = 'capstone-popup hidden absolute right-3 top-14 z-30 w-64 rounded-2xl border border-white/10 bg-slate-950 p-3 shadow-2xl';
-    popup.style.backdropFilter = 'blur(14px)';
-    popup.style.backgroundColor = 'rgba(15, 23, 42, 0.96)';
-    popup.innerHTML = '<div class="capstone-popup-links space-y-2"></div>';
+    popup.className = 'capstone-popup';
+    popup.hidden = true;
+    popup.innerHTML = '<div class="capstone-popup__links"></div>';
     button.addEventListener('click', event=>{
       event.stopPropagation();
       togglePopup(card);
@@ -255,6 +262,305 @@ document.addEventListener('DOMContentLoaded', function(){
   updateTypeButtons();
   applyFilters();
 });
+</script>
+
+<!-- Approved-mentor actions (Apply Now / Interested / Skip) as a footer row on every
+     project card. Everyone else sees the grid exactly as above -- this is additive and
+     only ever runs for a confirmed ROLE_MENTOR account. Buttons are .ocs__btn; placement
+     and card states live in _sass/open-coding/elements/grids/capstone-cards.scss. -->
+<script type="module">
+import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+import { viewFor } from '{{ site.baseurl }}/assets/js/api/role-view.js';
+import { cardUrl, cardActionGroup } from '{{ site.baseurl }}/assets/js/capstone/cardActions.js';
+import { setIconLabel } from '{{ site.baseurl }}/assets/js/capstone/cardIcons.js';
+
+(async function () {
+  // Wait for the script above (which sets card.dataset.pageUrl for the few
+  // projects in its linkMap) to have run its DOMContentLoaded handler first.
+  // Module scripts always run before that event (readyState is already
+  // 'interactive' then, so it can't be used to decide), so always wait.
+  await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
+
+  const countsEl = document.getElementById('mentor-counts');
+  const interestedCountEl = document.getElementById('mentor-interested-count');
+  const skippedCountEl = document.getElementById('mentor-skipped-count');
+  const grid = document.getElementById('capstone-grid');
+  if (!grid || !countsEl) return;
+
+  // Only an approved mentor (ROLE_MENTOR) gets the hover actions below --
+  // everyone else (including a pending mentor applicant) sees the plain grid.
+  //
+  // Local-only preview: login.md's "mentor" GitHub ID shortcut sets this flag and
+  // sends you straight here, so the backend role check below is skipped entirely --
+  // lets the mentor UI be previewed without a real, admin-approved Spring account.
+  // Gated to localhost so a stray flag can never grant this on the deployed site.
+  const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  let isMentor = isLocalhost && localStorage.getItem('ocsDevMentorPreview') === 'true';
+  if (!isMentor) {
+    try {
+      const res = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+      if (res.ok) {
+        const person = await res.json();
+        const roles = Array.isArray(person.roles) ? person.roles.map(r => r.name) : [];
+        isMentor = viewFor(roles) === 'mentor';
+      }
+    } catch (e) { /* not logged in / offline -- treat as not a mentor */ }
+  }
+  if (!isMentor) return;
+
+  const cards = Array.from(grid.querySelectorAll(':scope > div'));
+
+  // Maps each project's URL to its numeric capstone id -- needed for the apply
+  // endpoint. Only projects CapstoneSyncService has synced to the backend show
+  // up here; anything else falls back to the "hasn't synced yet" message below.
+  const idByUrl = {};
+  try {
+    const res = await fetch(`${javaURI}/api/capstones`, fetchOptions);
+    if (res.ok) {
+      const rows = await res.json();
+      if (Array.isArray(rows)) {
+        rows.forEach(row => {
+          try { idByUrl[new URL(row.url, location.origin).pathname] = row.id; }
+          catch (e) { idByUrl[row.url] = row.id; }
+        });
+      }
+    }
+  } catch (e) { console.error('Capstone: could not load project ids', e); }
+
+  // Where this mentor stands on each project. Access to a project (My Projects, its
+  // student group's chat) only comes from admin approval, so the Apply button mirrors
+  // the backend state instead of resetting on every visit.
+  const approvedIds = new Set();
+  const applicationById = {};
+  try {
+    const [mineRes, appsRes] = await Promise.all([
+      fetch(`${javaURI}/api/capstones/mine`, fetchOptions),
+      fetch(`${javaURI}/api/capstones/applications/mine`, fetchOptions),
+    ]);
+    if (mineRes.ok) (await mineRes.json()).forEach(p => approvedIds.add(p.id));
+    // Newest first, so the first application seen per project is the current one.
+    if (appsRes.ok) (await appsRes.json()).forEach(a => { applicationById[a.capstoneId] ??= a; });
+  } catch (e) { console.error('Capstone: could not load application status', e); }
+
+  function applyStateFor(id) {
+    if (approvedIds.has(id)) return 'approved';
+    const application = applicationById[id];
+    if (!application) return 'none';
+    if (!application.resolved) return 'pending';
+    return application.approved ? 'approved' : 'denied';
+  }
+
+  const APPLY_STATES = {
+    none:     { label: 'Apply Now',        icon: 'send',    variant: 'accent fill',      enabled: true },
+    pending:  { label: 'Pending approval', icon: 'clock',   variant: 'alert-yellow',     enabled: false },
+    approved: { label: 'Approved',         icon: 'check',   variant: 'alert-green fill', enabled: false },
+    denied:   { label: 'Not approved',     icon: 'xCircle', variant: 'alert-red',        enabled: false },
+  };
+
+  function showApplyState(button, state) {
+    const { label, icon, variant, enabled } = APPLY_STATES[state];
+    button.className = `ocs__btn small ${variant}`;
+    setIconLabel(button, icon, label);
+    button.disabled = !enabled;
+    button.title = state === 'pending' ? 'An admin must approve your application before you get access to this project.' : '';
+  }
+
+  // Interested/Skip are tracked per-browser (localStorage) -- there's no backend
+  // endpoint for a mentor's shortlist, only for the apply action itself below.
+  const INTERESTED_KEY = 'ocsMentorInterested';
+  const SKIPPED_KEY = 'ocsMentorSkipped';
+  function readSet(key) {
+    try { return new Set(JSON.parse(localStorage.getItem(key) || '[]')); }
+    catch (e) { return new Set(); }
+  }
+  function writeSet(key, set) {
+    try { localStorage.setItem(key, JSON.stringify([...set])); } catch (e) { /* ignore */ }
+  }
+  const interested = readSet(INTERESTED_KEY);
+  const skipped = readSet(SKIPPED_KEY);
+
+  const resetBtn = document.getElementById('mentor-reset-marks');
+  setIconLabel(resetBtn, 'undo', 'Reset');
+  // One per card that can carry a mark: puts the card back to its unmarked look.
+  const cardResetters = [];
+
+  function updateCounter() {
+    setIconLabel(interestedCountEl, 'star', `Interested: ${interested.size}`);
+    setIconLabel(skippedCountEl, 'x', `Skipped: ${skipped.size}`);
+    resetBtn.disabled = interested.size === 0 && skipped.size === 0;
+  }
+
+  // Clears every Interested/Skipped mark (both counters back to 0). Applications are
+  // on the backend and are not touched.
+  resetBtn.addEventListener('click', () => {
+    interested.clear();
+    skipped.clear();
+    writeSet(INTERESTED_KEY, interested);
+    writeSet(SKIPPED_KEY, skipped);
+    cardResetters.forEach(reset => reset());
+    updateCounter();
+  });
+
+  // Interested/Skip are for deciding what to apply to, so they no longer apply once a
+  // project is approved -- drop any old mark so it doesn't dim the card or stay counted.
+  function forgetMarks(url) {
+    const wasInterested = interested.delete(url);
+    const wasSkipped = skipped.delete(url);
+    if (wasInterested) writeSet(INTERESTED_KEY, interested);
+    if (wasSkipped) writeSet(SKIPPED_KEY, skipped);
+  }
+
+  // An approved project is settled, so its action row becomes a status line (the
+  // "Approved" badge plus a note) and the card gets a green accent.
+  function showApprovedCard(card, actions, badge) {
+    card.classList.remove('capstone-card--skipped');
+    card.classList.add('capstone-card--approved');
+    showApplyState(badge, 'approved');
+    const note = document.createElement('span');
+    note.className = 'capstone-card-actions__note';
+    note.textContent = "You're mentoring this project";
+    actions.replaceChildren(badge, note);
+  }
+
+  cards.forEach(card => {
+    const url = cardUrl(card);
+    const actions = cardActionGroup(card, 'main');
+    if (!actions) return;
+
+    const applyBtn = document.createElement('button');
+    applyBtn.type = 'button';
+    showApplyState(applyBtn, applyStateFor(idByUrl[url]));
+
+    if (applyStateFor(idByUrl[url]) === 'approved') {
+      forgetMarks(url);
+      showApprovedCard(card, actions, applyBtn);
+      return;
+    }
+
+    const interestedBtn = document.createElement('button');
+    interestedBtn.type = 'button';
+    interestedBtn.className = 'ocs__btn small alert-green';
+    setIconLabel(interestedBtn, 'star', 'Interested');
+
+    const skipBtn = document.createElement('button');
+    skipBtn.type = 'button';
+    skipBtn.className = 'ocs__btn small alert-red';
+    setIconLabel(skipBtn, 'x', 'Skip');
+
+    // A marked project shows a filled "Interested" button that can no longer be clicked.
+    function showInterested() {
+      setIconLabel(interestedBtn, 'starFill', 'Interested');
+      interestedBtn.classList.add('fill');
+      interestedBtn.disabled = true;
+    }
+
+    // A skipped card is dimmed with Apply/Interested locked; its Skip button stays
+    // clickable as "Unskip" so the mentor can change their mind.
+    function showSkipped() {
+      card.classList.add('capstone-card--skipped');
+      setIconLabel(skipBtn, 'undo', 'Unskip');
+      skipBtn.classList.add('fill');
+      skipBtn.setAttribute('aria-pressed', 'true');
+      applyBtn.disabled = true;
+      interestedBtn.disabled = true;
+    }
+
+    // Restores the card to exactly how it would look had it never been skipped.
+    function showUnskipped() {
+      card.classList.remove('capstone-card--skipped');
+      setIconLabel(skipBtn, 'x', 'Skip');
+      skipBtn.classList.remove('fill');
+      skipBtn.setAttribute('aria-pressed', 'false');
+      showApplyState(applyBtn, applyStateFor(idByUrl[url]));
+      interestedBtn.disabled = interested.has(url);
+    }
+
+    function showNotInterested() {
+      setIconLabel(interestedBtn, 'star', 'Interested');
+      interestedBtn.classList.remove('fill');
+    }
+
+    if (interested.has(url)) showInterested();
+    if (skipped.has(url)) showSkipped();
+    // Runs after the sets are cleared, so showUnskipped re-enables Interested too.
+    cardResetters.push(() => { showNotInterested(); showUnskipped(); });
+
+    applyBtn.addEventListener('click', async () => {
+      const id = idByUrl[url];
+      if (!id) {
+        setIconLabel(applyBtn, 'clock', "Hasn't synced yet");
+        setTimeout(() => showApplyState(applyBtn, 'none'), 2500);
+        return;
+      }
+      applyBtn.disabled = true;
+      setIconLabel(applyBtn, 'send', 'Applying…');
+      try {
+        const res = await fetch(`${javaURI}/api/capstones/${id}/apply`, { ...fetchOptions, method: 'POST' });
+        if (res.status === 409) {
+          // Already approved: same end state as a card that loaded approved.
+          forgetMarks(url);
+          showApprovedCard(card, actions, applyBtn);
+          updateCounter();
+        } else if (res.ok) {
+          showApplyState(applyBtn, 'pending');
+        } else if (res.status === 401 || res.status === 403) {
+          // Not signed in to Spring as an approved mentor (e.g. the localhost mentor
+          // preview, an expired session, or a student/admin account): the application
+          // was not sent, so say so instead of inviting a retry that can't work.
+          console.warn(`Capstone: apply refused (HTTP ${res.status}) -- not signed in as an approved mentor`);
+          applyBtn.className = 'ocs__btn small alert-yellow';
+          setIconLabel(applyBtn, 'xCircle', 'Log in as a mentor to apply');
+          applyBtn.title = 'Your application was not sent. Log in with an approved mentor account, then apply again.';
+          applyBtn.disabled = false;
+          applyBtn.addEventListener('click', (event) => {
+            event.stopImmediatePropagation();
+            location.href = '{{ site.baseurl }}/login';
+          }, { capture: true, once: true });
+        } else if (res.status === 429) {
+          // Spring's rate limiter (per IP, per minute): nothing is wrong with the
+          // application, it just has to be sent again shortly.
+          console.warn('Capstone: apply rate-limited (HTTP 429)');
+          setIconLabel(applyBtn, 'clock', 'Busy, try again in a minute');
+          applyBtn.disabled = false;
+        } else {
+          console.error(`Capstone: apply failed (HTTP ${res.status})`);
+          setIconLabel(applyBtn, 'send', 'Try again');
+          applyBtn.disabled = false;
+        }
+      } catch (e) {
+        console.error('Capstone: apply failed', e);
+        setIconLabel(applyBtn, 'send', 'Try again');
+        applyBtn.disabled = false;
+      }
+    });
+
+    skipBtn.addEventListener('click', () => {
+      if (skipped.has(url)) {
+        skipped.delete(url);
+        showUnskipped();
+      } else {
+        skipped.add(url);
+        showSkipped();
+      }
+      writeSet(SKIPPED_KEY, skipped);
+      updateCounter();
+    });
+
+    interestedBtn.addEventListener('click', () => {
+      if (interested.has(url)) return;
+      interested.add(url);
+      writeSet(INTERESTED_KEY, interested);
+      showInterested();
+      updateCounter();
+    });
+
+    // The mentor's own actions: the left group of the card's action row.
+    actions.append(applyBtn, interestedBtn, skipBtn);
+  });
+
+  countsEl.hidden = false;
+  updateCounter();
+})();
 </script>
 
 <div id="capstone-grid" class="ocs__grid ocs__grid--card cols-3">

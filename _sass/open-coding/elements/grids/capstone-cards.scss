@@ -1,0 +1,227 @@
+// /capstone project cards: the per-card "Links" menu, the action row (mentor Apply /
+// Interested / Skip plus Mentors / Chat), the Mentors popover and the Chat dialog.
+// Buttons are the ocs__btn grammar; this file only handles placement, panels and card
+// states, using OCS theme tokens.
+
+@import "../../mixins/panel";
+
+// One button format for the whole page: the OCS `small` pill (toolbar, cards, floating
+// actions, chat dialog). The alert tones default to a 2px border; a single 1px weight
+// keeps accent and alert buttons the same size when they sit side by side.
+.capstone-toolbar,
+.capstone-card,
+.capstone-page-actions,
+.capstone-chat {
+  .ocs__btn.small {
+    margin: 0;
+    border-width: 1px;
+    // Same weight as the icon buttons (ocs__btn--icon), so plain-label filters match.
+    font-weight: 700;
+    white-space: nowrap;
+  }
+}
+
+// Filter row above the grid.
+.capstone-toolbar {
+  margin-bottom: 0.9rem;
+
+  .ocs__links {
+    align-items: center;
+  }
+}
+
+// The year picker sits in the pill row, so it takes the small pill's height and shape
+// (the element selector outranks the form's generic .nc-select sizing).
+select.capstone-year-select {
+  width: auto;
+  max-width: 14rem;
+  height: 28px;
+  padding: 0 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 40px;
+  background: color-mix(in srgb, var(--pref-text-color) 6%, var(--pref-bg-color));
+  color: var(--pref-text-color);
+  font-size: 15px;
+  line-height: 20px;
+
+  &:focus-visible {
+    border-color: var(--pref-accent-color);
+  }
+}
+
+.capstone-search-status {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+}
+
+// Floating Edit / New actions, stacked in the bottom-right corner.
+.capstone-page-actions {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+
+  .ocs__btn {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  }
+
+  // Solid backing so the outline button stays readable over the cards it floats above.
+  .ocs__btn:not(.fill) {
+    background: var(--pref-bg-color);
+  }
+}
+
+.capstone-card {
+  position: relative;
+
+  // Cards with an action row: the text block grows to fill the card so the row sits on
+  // the same baseline at the bottom of every card in a grid row (cells share row height).
+  &--has-actions {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  // Dim a skipped card, but not its Unskip button, which must still look clickable.
+  // (Opacity on the card itself would also fade that button, so dim the parts instead.)
+  &--skipped > :not(.capstone-card__body),
+  &--skipped .capstone-card__body > :not(.capstone-card-actions),
+  &--skipped .capstone-card-actions .ocs__btn:disabled {
+    opacity: 0.45;
+  }
+}
+
+// Approved: the mentor is on this project. A green accent marks the card, and the action
+// row is a status line rather than buttons. Chained with .ocs__grid-cell to beat the
+// grid's own border.
+.ocs__grid-cell.capstone-card--approved {
+  border-color: color-mix(in srgb, var(--green) 55%, var(--ui-border));
+  box-shadow: inset 0 3px 0 var(--green);
+  background: color-mix(in srgb, var(--green) 5%, var(--panel));
+
+  .capstone-card-actions {
+    border-top-color: color-mix(in srgb, var(--green) 35%, var(--ui-border));
+  }
+}
+
+// Top-right "Links" button; the thumbnail sits top-left so the corner is free.
+.capstone-links-button {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+}
+
+.capstone-popup {
+  @include info-panel(0.75rem, 1px, 0);
+  position: absolute;
+  top: 3.25rem;
+  right: 0.75rem;
+  z-index: 3;
+  width: 14rem;
+  background: var(--pref-bg-color);
+
+  &__links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    .ocs__btn {
+      width: 100%;
+      margin: 0;
+      justify-content: center;
+    }
+  }
+}
+
+// Project info (Chat / Mentors / Message Mentor): one line pinned to the bottom of the
+// card, so Chat sits in the same spot on every card whatever the text length. Chat comes
+// first and the row wraps upwards, so extra buttons never push it off that spot.
+// Anchors the Mentors popover.
+.capstone-card-info {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap-reverse;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.85rem;
+
+  .ocs__btn {
+    margin: 0;
+  }
+}
+
+// In the mentor view the action row follows the info line instead of taking the bottom
+// spot by itself.
+.capstone-card-info + .capstone-card-actions {
+  margin-top: 0.75rem;
+}
+
+// Mentor action row (Apply / Interested / Skip): a footer pinned to the bottom of the
+// card and separated by a hairline, so it lines up across every card in a grid row.
+.capstone-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--ui-border);
+
+  &:empty {
+    display: none;
+  }
+
+  .ocs__btn {
+    margin: 0;
+  }
+
+  .ocs__btn:disabled {
+    cursor: default;
+  }
+
+  // The disabled "Approved" badge is a status, not a faded-out button.
+  .capstone-card--approved & .ocs__btn:disabled {
+    opacity: 1;
+  }
+
+  &__note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+}
+
+.capstone-mentor-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-left: auto;
+
+  .ocs__btn {
+    margin: 0;
+    cursor: default;
+  }
+
+  // The counters are read-only badges; Reset is the one real button in the group.
+  button.ocs__btn:enabled {
+    cursor: pointer;
+  }
+
+  button.ocs__btn:disabled {
+    opacity: 0.5;
+  }
+}
+
+// display:flex above would otherwise override the hidden attribute.
+.capstone-mentor-counts[hidden] {
+  display: none;
+}

@@ -1,0 +1,28 @@
+---
+layout: null
+permalink: /capstone/projects.json
+sitemap: false
+---
+{%- comment -%}
+Machine-readable list of capstone projects, generated from the capstone posts
+themselves so it cannot drift from what /capstone/ shows.
+
+A project is a post whose url is under /capstone/ but is not the index itself.
+Consumed by the Spring backend (scripts/sync_capstones.py) to keep its
+capstone_project rows in step, and by /mentor to render a mentor's assigned
+projects. The slug is the identity everything else keys off.
+{%- endcomment -%}
+{%- assign projects = site.posts | where_exp: "p", "p.url contains '/capstone/'" -%}
+[
+{%- assign first = true -%}
+{%- for p in projects -%}
+  {%- if p.url != '/capstone/' and p.type != 'documentation' -%}
+    {%- assign slug = p.url | remove_first: '/capstone/' | remove: '/' -%}
+    {%- if slug != '' -%}
+      {%- if first == false -%},{%- endif -%}
+      {%- assign first = false -%}
+  {"slug": {{ slug | jsonify }}, "title": {{ p.title | default: slug | jsonify }}, "url": {{ p.url | jsonify }}, "description": {{ p.description | default: "" | strip | jsonify }}}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor %}
+]
