@@ -42,8 +42,8 @@ class GameLevelAutumn {
 
 
     this.classes = [
-      { class: GameEnvBackground, data: backgroundData },
-      { class: Player, data: playerData },
+      { class: GameEnvBackground, data: background_data },
+      { class: Player, data: player_data },
       { class: SplineBarrier, data: barrierData1 },
       { class: SplineBarrier, data: barrierData2 }
     ];

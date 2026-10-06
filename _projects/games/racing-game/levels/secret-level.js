@@ -7,7 +7,7 @@ class GameLevelSecret {
     const background_data = {
       name: "Secret Course",
       greeting: "You have found the secret level.",
-      src: "/images/projects/racing-game/Secret_Track.jpeg",
+      src: "/images/projects/racing-game/Secret_Track.png",
       pixels: { height: 360, width: 643 }
     };
     const player_data = {
