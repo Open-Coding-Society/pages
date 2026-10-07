@@ -53,10 +53,12 @@
         </div>
       </div>
       <form class="chat-form" id="dmForm" autocomplete="off">
+        <button class="chat-send dm-cancel-edit" id="dmCancelEdit" type="button" hidden>Cancel</button>
         <button class="chat-send" id="dmSend" type="submit" disabled>
           <i class="fas fa-paper-plane" aria-hidden="true"></i><span>Send</span>
         </button>
       </form>
+      <p class="dm-form-status" id="dmFormStatus" role="alert" hidden></p>
     </div>
   </div>
 </section>
@@ -97,6 +99,10 @@
     connected: false,
     pickerSelected: new Map(), // id -> { id, uid, name }
     seenMessageIds: new Set(), // reset whenever the active conversation changes
+    messageMap: new Map(),
+    editingMessageId: null,
+    editingMessage: null,
+    editInProgress: false,
     unseenWhileHidden: false, // a message reached the open conversation while the tab was hidden
     lastDayKey: null,
     lastSender: null,
@@ -108,6 +114,8 @@
   const signedOutNoteEl = document.getElementById('dmSignedOutNote');
   const messagesEl = document.getElementById('dmMessages');
   const sendBtn = document.getElementById('dmSend');
+  const cancelEditBtn = document.getElementById('dmCancelEdit');
+  const formStatusEl = document.getElementById('dmFormStatus');
   const formEl = document.getElementById('dmForm');
   const newChatBtn = document.getElementById('dmNewChatBtn');
   const pickerEl = document.getElementById('dmPicker');
@@ -132,14 +140,87 @@
   }
 
   function setComposerEnabled(enabled) {
-    composer.setEnabled(enabled);
-    sendBtn.disabled = !enabled || !state.activeConversationId;
+    composer.setEnabled(enabled && !state.editInProgress);
+    sendBtn.disabled = !enabled || !state.activeConversationId || state.editInProgress;
+    cancelEditBtn.hidden = !state.editingMessageId;
+    cancelEditBtn.disabled = state.editInProgress;
+    const icon = sendBtn.querySelector('i');
+    const label = sendBtn.querySelector('span');
+    if (icon) icon.className = state.editingMessageId ? 'fas fa-save' : 'fas fa-paper-plane';
+    if (label) label.textContent = state.editingMessageId ? 'Save' : 'Send';
+  }
+
+  function showFormMessage(message) {
+    formStatusEl.textContent = message;
+    formStatusEl.hidden = !message;
+  }
+
+  function resetEditState() {
+    state.editingMessageId = null;
+    state.editingMessage = null;
+    state.editInProgress = false;
+    composer.clear();
+    showFormMessage('');
+    setComposerEnabled(Boolean(state.currentUserUid));
+  }
+
+  function beginEditMessage(message) {
+    if (state.editInProgress || !message || !message.id || message.senderUid !== state.currentUserUid) return;
+    state.editingMessageId = message.id;
+    state.editingMessage = message;
+    composer.clear();
+    composer.setHTML(message.body || '');
+    showFormMessage('');
+    setComposerEnabled(Boolean(state.currentUserUid));
+    composer.focus();
   }
 
   function submitMessage() {
+    if (state.editInProgress) return;
     if (composer.isEmpty() || composer.isOverLimit()) return;
+    if (state.editingMessageId) {
+      state.editInProgress = true;
+      showFormMessage('');
+      setComposerEnabled(Boolean(state.currentUserUid));
+      editMessage(state.editingMessageId, composer.getHTML()).then((ok) => {
+        if (ok) resetEditState();
+        else {
+          state.editInProgress = false;
+          setComposerEnabled(Boolean(state.currentUserUid));
+          showFormMessage('Could not save the edited message. Please try again.');
+        }
+      });
+      return;
+    }
     sendMessage(composer.getHTML()).then((ok) => { if (ok) composer.clear(); });
   }
+
+  function updateMessageBody(messageId, body) {
+    const key = String(messageId ?? '');
+    if (!key) return;
+
+    const row = messagesEl.querySelector(`[data-message-id="${CSS.escape(key)}"]`);
+    if (row) {
+      const bodyTarget = row.querySelector('.chat-msg-body');
+      if (bodyTarget) {
+        bodyTarget.innerHTML = '';
+        renderRichMessage(bodyTarget, body || '');
+      }
+    }
+
+    const stored = state.messageMap.get(key);
+    if (stored) {
+      stored.body = body ?? stored.body;
+    }
+  }
+
+  composer.element.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && state.editingMessageId && !state.editInProgress) {
+      event.preventDefault();
+      resetEditState();
+    }
+  });
+  cancelEditBtn.addEventListener('click', resetEditState);
 
   /* ── Day/sender-grouped message rendering (same idiom as announcement_chat.html) ── */
 
@@ -189,8 +270,11 @@
     state.lastTime = 0;
   }
 
-  function appendMessage({ senderUid, senderName, body, sentAt }) {
+  function appendMessage({ id, senderUid, senderName, body, sentAt }) {
     clearMessagesEmpty();
+
+    const messageId = String(id || `${senderUid}:${sentAt || Math.random()}`);
+    state.messageMap.set(messageId, { id: messageId, senderUid, senderName, body, sentAt });
 
     const isSelf = senderUid === state.currentUserUid;
     const who = isSelf ? 'You' : (senderName || senderUid || 'Unknown');
@@ -219,6 +303,7 @@
     const row = document.createElement('div');
     row.className = ['chat-msg', isSelf ? 'is-self' : '', continued ? 'is-continued' : '']
       .filter(Boolean).join(' ');
+    row.dataset.messageId = messageId;
 
     const avatar = document.createElement('span');
     avatar.className = ['chat-avatar', isSelf ? '' : tintFor(who)].filter(Boolean).join(' ');
@@ -241,11 +326,25 @@
       meta.appendChild(timeEl);
     }
 
+    let actions;
+    if (isSelf) {
+      actions = document.createElement('div');
+      actions.className = 'chat-msg-actions';
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'chat-msg-action';
+      editBtn.setAttribute('aria-label', 'Edit message');
+      editBtn.innerHTML = '<i class="fas fa-pen" aria-hidden="true"></i>';
+      editBtn.addEventListener('click', () => beginEditMessage({ ...state.messageMap.get(messageId), id: messageId, senderUid }));
+      actions.appendChild(editBtn);
+    }
+
     const bodyEl = document.createElement('span');
     bodyEl.className = 'chat-msg-body';
     renderRichMessage(bodyEl, body);
 
     main.append(meta, bodyEl);
+    if (isSelf) main.appendChild(actions);
     row.append(avatar, main);
     messagesEl.appendChild(row);
 
@@ -354,6 +453,11 @@
 
   async function selectConversation(id) {
     if (state.activeConversationId === id) return;
+    if (state.editInProgress) {
+      showFormMessage('Wait for the current edit to finish before changing conversations.');
+      return;
+    }
+    resetEditState();
     state.activeConversationId = id;
     state.seenMessageIds.clear();
     resetMessageGrouping();
@@ -372,6 +476,7 @@
       const res = await fetch(`${javaURI}/api/dm/conversations/${id}/messages`, fetchOptions);
       if (!res.ok) { console.warn('DM chat: messages HTTP', res.status); return; }
       const messages = await res.json();
+      state.messageMap.clear();
       (messages || []).forEach((msg) => {
         if (state.seenMessageIds.has(msg.id)) return;
         state.seenMessageIds.add(msg.id);
@@ -381,7 +486,6 @@
       console.warn('DM chat: messages load failed', err);
     }
   }
-
   /* ── New-chat picker ──────────────────────────────────────────────── */
 
   function renderPickerSelected() {
@@ -473,6 +577,17 @@
 
   function handleIncoming(event) {
     if (!event || event.conversationId !== state.activeConversationId) return;
+    const messageId = String(event.id ?? '');
+    const body = event.body ?? event.messageBody;
+    const isEditEvent = event.type === 'edited'
+      || event.type === 'message-edited'
+      || event.editType === 'update'
+      || event.editType === 'edited'
+      || (state.messageMap.has(messageId) && body !== undefined);
+    if (isEditEvent) {
+      if (body !== undefined) updateMessageBody(messageId, body);
+      return;
+    }
     if (state.seenMessageIds.has(event.id)) return;
     state.seenMessageIds.add(event.id);
     appendMessage(event);
@@ -543,6 +658,25 @@
       return true;
     } catch (err) {
       console.error('DM chat: send failed', err);
+      return false;
+    }
+  }
+
+  async function editMessage(messageId, body) {
+    if (!state.activeConversationId || !messageId) return false;
+    try {
+      const res = await fetch(`${javaURI}/api/dm/conversations/${state.activeConversationId}/messages/${messageId}`, {
+        ...fetchOptions,
+        method: 'PATCH',
+        body: JSON.stringify({ body }),
+      });
+      if (!res.ok) { console.warn('DM chat: edit HTTP', res.status); return false; }
+      const updated = await res.json().catch(() => null);
+      const finalBody = (updated && (updated.body || updated.messageBody)) || body;
+      updateMessageBody(messageId, finalBody);
+      return true;
+    } catch (err) {
+      console.error('DM chat: edit failed', err);
       return false;
     }
   }

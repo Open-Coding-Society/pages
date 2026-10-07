@@ -14,6 +14,7 @@ let pollTimer = null;
 let stopped = false;
 
 function render(summary) {
+    if (!bell || !badge) return;
     const count = summary.count || 0;
     badge.textContent = count > 99 ? '99+' : String(count);
     badge.hidden = count === 0;
@@ -31,7 +32,7 @@ function render(summary) {
 }
 
 async function refresh() {
-    if (stopped) return;
+    if (stopped || !bell || !badge) return;
     const seq = ++requestSeq;
     try {
         const res = await fetch(`${javaURI}/api/dm/unread`, fetchOptions);
@@ -54,7 +55,8 @@ async function refresh() {
 
 function schedulePolling() {
     clearInterval(pollTimer);
-    pollTimer = !stopped && document.visibilityState === 'visible' ? setInterval(refresh, POLL_MS) : null;
+    pollTimer = !stopped && bell && badge && document.visibilityState === 'visible'
+        ? setInterval(refresh, POLL_MS) : null;
 }
 
 document.addEventListener('visibilitychange', () => {
