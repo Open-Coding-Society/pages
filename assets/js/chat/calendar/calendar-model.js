@@ -361,6 +361,60 @@ export function parseQuickSyntax(text, options = {}) {
   return { weekStart: week.monday, weekSource: week.source, entries, syntaxLines };
 }
 
+/* ── Slash commands ──────────────────────────────────────────────────── */
+
+// Slack/Discord-style commands for the announcement composer. One command per
+// event type, named after the type's first quick-syntax tag, so /event, /plan,
+// /due, /check-in and /graded all open the same fill-in slots with the type preset.
+export const SLASH_COMMANDS = EVENT_TYPES.map((type) => ({
+  name: type.tags[0],
+  type: type.value,
+  hint: `Add ${type.value === 'event' ? 'an event' : `a ${type.label.toLowerCase()} item`} to the class calendar`,
+}));
+
+// "/du" → commands starting with "du"; null when the text isn't a slash command
+// in progress (no leading "/", or a space already typed after the name).
+export function matchSlashCommands(text) {
+  const match = String(text || '').match(/^\/([\w-]*)$/);
+  if (!match) return null;
+  const typed = match[1].toLowerCase();
+  return SLASH_COMMANDS.filter((command) => command.name.startsWith(typed));
+}
+
+// "/due Unit 3 FRQ" → { command, rest: 'Unit 3 FRQ' } so text typed after the
+// command name pre-fills the title slot.
+export function parseSlashInput(text) {
+  const match = String(text || '').match(/^\/([\w-]+)\s*(.*)$/s);
+  const command = match && SLASH_COMMANDS.find((c) => c.name === match[1].toLowerCase());
+  return command ? { command, rest: match[2].trim() } : null;
+}
+
+const WEEKDAY_WORDS = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
+
+// The "When" slot: today, tomorrow, fri / friday (next one, today counts),
+// next fri (the following week), 10/9, 10/9/27 or 2026-10-09. → ISO date or null.
+export function parseDateWord(text, { schoolYear = '', today = todayIso() } = {}) {
+  const word = String(text || '').trim().toLowerCase();
+  if (!word) return null;
+  if (word === 'today') return today;
+  if (word === 'tomorrow' || word === 'tmrw') return addDays(today, 1);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(word)) return word;
+  const monthDay = word.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/);
+  if (monthDay) {
+    const [, month, day, year] = monthDay;
+    if (Number(month) < 1 || Number(month) > 12 || Number(day) < 1 || Number(day) > 31) return null;
+    return isoFromMonthDay(month, day, year, { schoolYear, today });
+  }
+  const weekday = word.match(/^(next\s+)?([a-z]{3})[a-z]*$/);
+  if (weekday && weekday[2] in WEEKDAY_WORDS) {
+    const target = WEEKDAY_WORDS[weekday[2]];
+    const current = fromIsoDate(today).getDay();
+    const ahead = (target - current + 7) % 7;
+    return weekday[1] ? addDays(mondayOf(addDays(today, 7)), (target + 6) % 7) : addDays(today, ahead);
+  }
+  return null;
+}
+
 /* ── Event markers ───────────────────────────────────────────────────── */
 
 // Links a chat message to the calendar events it created.

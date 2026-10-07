@@ -7,6 +7,9 @@ layout: opencs
 
 <!-- Get all posts -->
 {% assign rawposts = site.posts %}
+{% if page.post_filter %}
+  {% assign rawposts = rawposts | where_exp: "post", "post[page.post_filter] == true" %}
+{% endif %}
 
 <!-- Hide posts if front matter flag hide:true -->
 {% assign posts = '' | split:'' %}
@@ -40,12 +43,15 @@ layout: opencs
     {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
     {% assign seen_ids = "" | split: "" %}
     {%- for post in posts -%}
-      {% unless seen_ids contains post.canonical_id or post.title contains "_content" %}
+      {% assign post_id = post.canonical_id | default: post.id %}
+      {% unless seen_ids contains post_id or post.title contains "_content" %}
         <li>
           {%- include post_list_image_card.html -%}
         </li>
-        {% assign seen_ids = seen_ids | push: post.canonical_id %}
+        {% assign seen_ids = seen_ids | push: post_id %}
       {% endunless %}
     {%- endfor -%}
   </ul>
-    {%- endif -%}
+{%- elsif page.post_filter -%}
+  <p>No documentation is available yet.</p>
+{%- endif -%}

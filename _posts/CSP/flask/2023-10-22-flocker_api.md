@@ -1,20 +1,19 @@
 ---
 layout: post
-courses: {'csp': {'week': 11}}
 title: Planning Workspaces and APIs (Flocker) 
 description: A project will have frontend and backend, port assignments, and require testing.  This shows some progress that you will need to get to Full Stack.
-permalink: /flask-flocker-api
+permalink: /flask--api
 toc: True
 ---
 
-## Clone flocker_frontend `https://github.com/open-coding-society/flocker_frontend.git`
+## Clone flocker_frontend `https://github.com/open-coding-society/portfolio.git`
 
 To set up the workspace for your frontend project, follow these steps:
 
 1. **Setup Virtual Environment**:
    - Create a virtual environment to manage your project's dependencies:
      ```bash
-     python -m venv venv
+     ./scripts/venv.sh
      ```
 
 2. **Activate Virtual Environment**:
@@ -42,11 +41,11 @@ To set up the workspace for your frontend project, follow these steps:
      ```
 
 6. **Access the Web Server**:
-   - Click the loopback address (e.g., `http://127.0.0.1:4887`) displayed in the terminal to load the web server in your browser.
+   - Click the loopback address (e.g., `http://127.0.0.1:4500`) displayed in the terminal to load the web server in your browser.
 
-## Clone Backend flocker_backend `https://github.com/open-coding-society/flocker_backend.git`
+## Clone Backend flocker_backend `https://github.com/open-coding-society/flask.git`
 
-1. **Ensure .env Setup**:
+1. **Ensure .env Setup, see README.md`**:
    - Create a `.env` file in the root directory of your project with the following content:
      ```plaintext
      ADMIN_USER='toby'
@@ -77,10 +76,17 @@ To set up the workspace for your frontend project, follow these steps:
 5. **Initialize the Database**:
    - Run the database initialization script to set up the database:
      ```bash
-     scripts/db_init.py
+     ./scripts/db_init.py
      ```
 
-## Stop Python processes
+6. 5. **Run Python Command**:
+   - Run the backend project:
+     ```bash
+     python main.py
+     ```
+
+
+## Stop Python processes (see README.md)
 
 If you have problems with port-in-use errors in VSCode, you can stop Python processes
 
@@ -129,11 +135,11 @@ If you have problems with port-in-use errors in VSCode, you can stop Python proc
 
 1. **GitHub Pages (Frontend)**:
    - **Design, Layout**: The frontend is hosted on GitHub Pages, where the design and layout are defined.
-   - **User Presentation, Style**: This layer is responsible for presenting the user interface and applying styles.
+   - **User Presentation, Style**: This layer is responsible for presenting the user interface and applying styles. Use semantic HTML and ocs__* SASS.
 
 2. **JavaScript (Logic/Events)**:
    - **JS Functionality, Interactivity**: JavaScript adds functionality and interactivity to the frontend.
-   - **Sends API Request**: When a user interacts with the frontend, JavaScript sends an API request to the backend.
+   - **Sends API Request**: When a user interacts with the frontend, JavaScript sends an API request to the backend.  Use standrds conventions by importing Python URI and fetch options.
 
 3. **Python / Flask (Backend)**:
    - **Python Server-Side API Processing**: The Flask backend processes the API requests sent from the frontend.
@@ -195,7 +201,7 @@ Postman is a powerful tool for testing APIs. It allows developers to send HTTP r
 - **Demonstration**: Follow the steps to create, send, and inspect requests using Postman.
 
 
-### Flocker Authenticate through Postman
+### Authenticate through Postman
 
 Here’s how you can use Postman to authenticate users:
 
@@ -207,11 +213,11 @@ To authenticate different users, you need to send the appropriate JSON payload i
 Here are examples for different users:
 Payload in Body-Raw-JSON 
     Toby: `{"uid": "toby", "password": "123Toby!"}`
-    Hop: `http://127.0.0.1:8887/api/authenticate`
-    Niko: `{"uid": "niko", "password": "123niko"}`
+    Hop:  `{"uid": "hop", "password": "123Hoby!"}`
+    Niko: `{"uid": "niko", "password": "123Niko!"}`
 
 
-### Flocker GET requests through Postman
+### GET requests through Postman
 
 Testing your APIs using Postman will save time!  It will help you determine if backend is working prior to defining frontend.  This enables you to split the work between people or debug backend prior to completing frontend work.
 
@@ -231,13 +237,13 @@ Endpoint: `http://127.0.0.1:8887/api/group`
 
 
 
-## Running Deployed Frontend / Backend `https://open-coding-society.github.io/flocker_frontend/`
+## Running Deployed Frontend / Backend `https://open-coding-society.github.io/portfolio/`
 
 The frontend is deployed using GitHub Pages, and the backend is deployed using AWS. Pull requests to your integration leads will enable your project to be updated. Teams will fork both repositories and will make pull requests to update their work.
 
 Some samples of frontend to backend interactions already exist in the project.
 
-### Signup and Login `https://open-coding-society.github.io/flocker_frontend/login`
+### Signup and Login `https://open-coding-society.github.io/login`
 
 Add your own account and credentials using the signup and login features.
 
@@ -250,25 +256,23 @@ There are three test users in the system:
 
 ### Login and Signup
 
-After logging in, you will see the username at the top of the page `https://open-coding-society.github.io/flocker_frontend/profile`. Hover over the name for other options such as `Post` and `History`. These options help you add and review post history by the user.
+After logging in, you will see the username at the top of the page `https://open-coding-society.github.io/profile`. Hover over the name for other options such as `Post` and `History`. These options help you add and review post history by the user.
 
 ### Using the Code from Website Frontend
 
 1. **Access the Frontend**:
-   - Navigate to the deployed frontend at `https://open-coding-society.github.io/flocker_frontend/`.
+   - Navigate to the deployed frontend at `https://open-coding-society.github.io/portfolio`.
 
 2. **Signup and Login**:
    - Use the signup feature to create a new account or login with existing credentials.
    - Test users (`toby`, `hop`, `niko`) can be used for testing purposes.
 
 3. **Navigate to Profile**:
-   - After logging in, go to the profile page at `https://open-coding-society.github.io/flocker_frontend/profile`.
+   - After logging in, go to the profile page at `https://open-coding-society.github.io/profile`.
    - Your username will be displayed at the top of the page.
 
 4. **Explore Options**:
-   - Hover over your username to see additional options such as `Post` and `History`.
-   - Use the `Post` option to add new posts.
-   - Use the `History` option to review your post history.
+   - Loout over your username to see additional options such as `Profile` and `History`.
 
 5. **Integration with Backend**:
    - The frontend interacts with the backend deployed on AWS to handle user authentication, post creation, and history retrieval.

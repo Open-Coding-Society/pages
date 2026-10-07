@@ -26,6 +26,9 @@
       <button type="button" class="ocs__btn utility copy" data-hook="copy" title="Copy Code" aria-label="Copy Code"></button>
       <button type="button" class="ocs__btn utility save" data-hook="save" title="Save Code" aria-label="Save Code"></button>
       <button type="button" class="ocs__btn utility clear" data-hook="clear" title="Clear Storage" aria-label="Clear Storage"></button>
+      {% if include.workspace_controls %}
+      {% include runners/fragments/workspace-actions.html %}
+      {% endif %}
   {% endcapture %}
   {% capture game_runner_bottom_controls %}
     {% include runners/fragments/editor-stats.html extra_controls=game_runner_bottom_actions %}
@@ -34,6 +37,10 @@
      top_controls=game_runner_top_controls
      bottom_controls=game_runner_bottom_controls
   %}
+  {% if include.workspace_controls %}
+  <input type="file" accept=".json,application/json" data-role="workspace-file" aria-label="Import workspace file" hidden>
+  <p class="ocs__gamebuilder-status ocs__gamebuilder-action-feedback ocs__gamebuilder-save-status" data-role="save-status" role="status" aria-live="polite"></p>
+  {% endif %}
   {% else %}
   <!-- Compact controls for hide_edit mode -->
   <div class="compact-controls">
