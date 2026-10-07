@@ -26,6 +26,9 @@ import { createDefaultBuilderState, createNpcState } from './builder-state.mjs';
 import { generateLevelCode } from './code-generator.mjs?v=2';
 import { waitForGameRunner } from './runner-bridge.mjs';
 import { createWorkspacePersistence } from './workspace-persistence.mjs';
+import { createActionFeedback } from './action-feedback.mjs';
+import { importLevelCode } from './code-importer.mjs';
+import { styleRunnerIcons } from './runner-icons.mjs';
 
 const root = document.querySelector('[data-gamebuilder-workbench]');
 if (!root) {
@@ -44,10 +47,7 @@ const barrierList = form.querySelector('[data-role="barrier-list"]');
 const barrierEmptyMessage = form.querySelector('[data-role="barrier-empty"]');
 const addBarrierButton = form.querySelector('[data-action="add-barrier"]');
 
-function setStatus(message, state = 'info') {
-  status.textContent = message;
-  status.dataset.state = state;
-}
+const setStatus = createActionFeedback(status);
 
 function siteUrl(path) {
   return `${root.dataset.baseUrl || ''}${path}`;
@@ -286,6 +286,7 @@ try {
     waitForGameRunner('gamebuilder-v2')
   ]);
   const catalog = createAssetCatalog(backgroundManifest, spriteManifest);
+  styleRunnerIcons(root);
   populateSelect(form.elements.namedItem('background'), catalog.backgrounds);
   populateSelect(form.elements.namedItem('player-sprite'), catalog.sprites);
 
@@ -368,15 +369,42 @@ try {
   }
 
   persistence = createWorkspacePersistence({
-    root, runner, capture: captureWorkspace, restore: restoreWorkspace,
-    createNew: () => ({
-      schemaVersion: 1, kind: 'ocs-gamebuilder-workspace',
-      builderState: createDefaultBuilderState(firstBackground, defaultSprite),
-      editorCode: '', lastGeneratedCode: '', engineVersion: 'GameEnginev1.1', collapsed: false,
-      editing: { activeBarrierId: null, barrierEditSnapshot: null, nextNpcIndex: 0, nextBarrierIndex: 0 }
-    })
+    root, runner, capture: captureWorkspace, restore: restoreWorkspace
   });
   collapseButton.addEventListener('click', persistence.changed);
+
+  function replacePanel(nextState) {
+    state = nextState;
+    activeBarrierId = null;
+    barrierEditSnapshot = null;
+    nextNpcIndex = 0;
+    nextBarrierIndex = 0;
+    fillForm(state);
+    renderNpcs(state.npcs, catalog.sprites);
+    updateBarrierEditor();
+    persistence.changed();
+  }
+
+  root.querySelector('[data-action="clear-builder"]').addEventListener('click', () => {
+    if (!window.confirm('Reset builder panels to starter settings? Runner code and the saved workspace are kept.')) return;
+    replacePanel(createDefaultBuilderState(firstBackground, defaultSprite));
+    setStatus('Builder cleared. Runner code is unchanged.');
+  });
+
+  root.querySelector('[data-action="pull"]').addEventListener('click', () => {
+    try {
+      const source = runner.getCode();
+      const result = importLevelCode(source, catalog);
+      if (!window.confirm(`Replace panel settings from the current code?${result.canRegenerate ? '' : ' Custom code is preserved; Push will be blocked to avoid losing it.'}`)) return;
+      replacePanel(result.state);
+      lastGeneratedCode = generateLevelCode(result.state, catalog).code;
+      setStatus(result.canRegenerate ? 'Settings pulled from code. Runner source is unchanged.'
+        : 'Supported settings pulled. Custom code is preserved; edit it in the runner, not with Push.');
+    } catch (error) {
+      console.error('GameBuilder code pull failed:', error);
+      setStatus(`${error.message}. Panels and source are unchanged.`, 'error');
+    }
+  });
 
   form.addEventListener('click', (event) => {
     const button = event.target.closest('[data-action]');
@@ -477,12 +505,10 @@ try {
       title.textContent = card.querySelector('[data-npc-field="name"]').value.trim() || `NPC ${[...npcList.children].indexOf(card) + 1}`;
       card.querySelector('[data-action="remove-npc"]').setAttribute('aria-label', `Remove ${title.textContent}`);
     }
-    setStatus('Builder settings changed. Generate code to sync them to GAME_RUNNER.');
     persistence.changed();
   });
   form.addEventListener('change', () => {
     state = readForm(state);
-    setStatus('Builder settings changed. Generate code to sync them to GAME_RUNNER.');
     persistence.changed();
   });
 
@@ -499,6 +525,17 @@ try {
     }
 
     const currentCode = runner.getCode();
+    if (currentCode.trim()) {
+      try {
+        if (!importLevelCode(currentCode, catalog).canRegenerate) {
+          setStatus('Push blocked: current source contains code the panels cannot preserve. Export it first; Clear the runner only when you intend to replace it.', 'error');
+          return;
+        }
+      } catch (error) {
+        setStatus(`Push blocked: ${error.message}. Export the code before explicitly clearing it.`, 'error');
+        return;
+      }
+    }
     if (currentCode.trim() && currentCode !== lastGeneratedCode) {
       const confirmed = window.confirm('Replace the code currently in GAME_RUNNER with generated code?');
       if (!confirmed) return;
@@ -511,9 +548,9 @@ try {
 
   if (!persistence.recovered) {
     if (runner.getCode().trim()) {
-      setStatus('Existing GAME_RUNNER code was preserved. Choose Generate / Sync Code when ready to replace it.');
+      setStatus('Existing runner code was preserved. Pull settings from it, or export it before replacing it.');
     } else {
-      generateButton.click();
+      setStatus('Configure the builder, then choose Push to send it to GAME_RUNNER.');
     }
   }
 } catch (error) {

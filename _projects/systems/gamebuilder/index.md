@@ -9,10 +9,6 @@ permalink: /gamebuilder/v2/
 <div class="ocs__gamebuilder-system ocs__container ocs__gamebuilder-workbench" data-gamebuilder-workbench data-base-url="{{ site.baseurl }}">
   <header class="ocs__gamebuilder-header">
     {% include projects/cs-pathway/cs-pathway-menu.html %}
-    <div class="ocs__gamebuilder-header-actions">
-      <a href="{{ '/gamebuilder/' | relative_url }}" aria-label="Open the original GameBuilder" title="Open the original GameBuilder">GameBuilder v1</a>
-      <a href="{{ '/gamebuilder/doc' | relative_url }}" target="_blank" rel="noopener noreferrer" aria-label="GameBuilder asset documentation" title="GameBuilder asset documentation">Asset docs</a>
-    </div>
   </header>
 
   <header class="ocs__gamebuilder-workbench-header">
@@ -20,24 +16,22 @@ permalink: /gamebuilder/v2/
     <button class="ocs__btn" type="button" data-action="toggle-builder" aria-expanded="true" aria-controls="gamebuilder-builder-panel">Hide builder</button>
   </header>
 
-  <section class="ocs__gamebuilder-save-controls" aria-label="Workspace files">
-    <button class="ocs__btn primary" type="button" data-workspace-action="save">Save Workspace</button>
-    <button class="ocs__btn" type="button" data-workspace-action="load">Load Saved Workspace</button>
-    <button class="ocs__btn" type="button" data-workspace-action="export">Export Workspace JSON</button>
-    <button class="ocs__btn" type="button" data-workspace-action="import">Import Workspace JSON</button>
-    <button class="ocs__btn" type="button" data-workspace-action="export-code">Export Code</button>
-    <button class="ocs__btn" type="button" data-workspace-action="new">New Workspace</button>
-    <input type="file" accept=".json,application/json" data-role="workspace-file" aria-label="Import workspace file" hidden>
-    <p class="ocs__gamebuilder-status" data-role="save-status" role="status" aria-live="polite">Workspace recovery is starting...</p>
-  </section>
-
-  <p class="ocs__gamebuilder-status" data-role="status" data-state="info" role="status" aria-live="polite">Loading starter assets and GAME_RUNNER…</p>
-
   <div class="ocs__gamebuilder-workspace" data-role="workspace">
     <section class="ocs__card ocs__gamebuilder-builder" id="gamebuilder-builder-panel" data-role="builder-panel" aria-labelledby="gamebuilder-builder-title">
       <header class="ocs__gamebuilder-panel-header">
         <h2 class="ocs__section-title" id="gamebuilder-builder-title">Level setup</h2>
-        <button class="ocs__btn primary" type="button" data-action="generate">Generate / Sync Code</button>
+        <div class="ocs__gamebuilder-panel-actions" role="group" aria-label="Builder actions">
+          <button class="ocs__btn utility ocs__btn--icon" type="button" data-action="clear-builder" title="Clear panel to starter settings (keep runner code)" aria-label="Clear Builder">
+            <span class="ocs__btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 6V3h12v3h4v2H2V6h4zm2 0h8V5H8v1zM5 10h14l-1 12H6L5 10zm4 2v8h2v-8H9zm4 0v8h2v-8h-2z"/></svg></span>
+          </button>
+          <button class="ocs__btn utility ocs__btn--icon" type="button" data-action="pull" title="Pull supported settings from runner code" aria-label="Pull Code into Builder">
+            <span class="ocs__btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m10 4-8 8 8 8 1.4-1.4L5.8 13H22v-2H5.8l5.6-5.6L10 4z"/></svg></span>
+          </button>
+          <button class="ocs__btn utility ocs__btn--icon" type="button" data-action="generate" title="Push generated code to runner" aria-label="Push Builder to Code">
+            <span class="ocs__btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m14 4 8 8-8 8-1.4-1.4 5.6-5.6H2v-2h16.2l-5.6-5.6L14 4z"/></svg></span>
+          </button>
+          <p class="ocs__gamebuilder-status ocs__gamebuilder-action-feedback" data-role="status" role="status" aria-live="polite"></p>
+        </div>
       </header>
       <form class="ocs__gamebuilder-form" data-role="builder-form">
         <label>
@@ -88,7 +82,7 @@ permalink: /gamebuilder/v2/
     </section>
 
     <section class="ocs__gamebuilder-runner" aria-label="Game code and preview">
-      {% include runners/game.html runner_id="gamebuilder-v2" editor_height="24rem" output_height="28rem" hide_challenge="true" code="" %}
+      {% include runners/game.html runner_id="gamebuilder-v2" editor_height="24rem" output_height="28rem" hide_challenge="true" workspace_controls=true code="" %}
     </section>
   </div>
 </div>

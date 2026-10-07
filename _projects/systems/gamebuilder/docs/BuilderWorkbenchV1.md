@@ -2,7 +2,7 @@
 layout: opencs
 title: GameBuilder
 description: Helping programmers understand how to create a game
-permalink: /gamebuilder/
+permalink: /gamebuilder/v1/
 ---
 
 <!--

@@ -7,6 +7,7 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { createDefaultBuilderState, createNpcState } from '../js/builder-state.mjs';
 import { createWorkspaceStore, parseWorkspace, serializeWorkspace } from '../js/workspace-store.mjs';
 import { createGameRunnerController } from '../../../../assets/js/pages/runners/core/GameRunnerController.js';
@@ -239,4 +240,38 @@ test('ordinary runner Save retains its storage behavior without a workspace hand
   await click();
   assert.equal(saved, true);
   assert.equal(flashed, true);
+});
+
+test('workspace actions extend the runner toolbar without duplicate save or startup generation', () => {
+  const page = readFileSync(new URL('../index.md', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('../js/app.mjs', import.meta.url), 'utf8');
+  const actions = readFileSync(new URL('../../../../_includes/runners/fragments/workspace-actions.html', import.meta.url), 'utf8');
+  const runner = readFileSync(new URL('../../../../_includes/runners/game.html', import.meta.url), 'utf8');
+  assert.match(page, /workspace_controls=true/);
+  assert.doesNotMatch(page, /data-workspace-action|ocs__gamebuilder-save-controls/);
+  assert.doesNotMatch(app, /generateButton\.click\(\)/);
+  assert.match(runner, /include\.workspace_controls/);
+  assert.doesNotMatch(actions, /data-workspace-action="(?:save|new)"/);
+  for (const action of ['load', 'export', 'import', 'export-code']) {
+    assert.match(actions, new RegExp(`data-workspace-action="${action}"`));
+  }
+  assert.equal((actions.match(/aria-label=/g) || []).length, 4);
+  assert.equal((actions.match(/ocs__btn utility ocs__btn--icon/g) || []).length, 4);
+});
+
+test('Clear restores runner construction defaults without changing workspace panels', () => {
+  let click;
+  const button = { addEventListener: (_, listener) => { click = listener; } };
+  const operations = [];
+  const runner = {
+    getHookElement: (hook) => hook === 'clear' ? button : null,
+    clearStorage: () => operations.push('clear-source-storage'),
+    setValue: (value) => operations.push(value),
+    flashButton: () => {}
+  };
+  BaseRunner.prototype.bindEditorButtons.call(runner, {
+    resetValue: '', canClear: () => true, onClear: () => operations.push('stop')
+  });
+  click();
+  assert.deepEqual(operations, ['clear-source-storage', '', 'stop']);
 });

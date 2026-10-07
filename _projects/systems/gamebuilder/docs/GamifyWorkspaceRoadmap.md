@@ -36,7 +36,9 @@ The key comes from the page permalink and runner ID in
 
 [`app.mjs`](../js/app.mjs) independently creates a default builder document on
 every load. It preserves existing runner code at initialization and asks
-before replacing differing code through Generate / Sync Code.
+before replacing differing code through Push. The initial AST-based Pull reads
+one supported GameBuilder-style level without executing or changing source;
+custom behavior remains code-owned and blocks destructive Push.
 
 Therefore the current source does **not** establish an unconditional startup
 overwrite bug. It does establish a mismatch: saved code returns, but the
