@@ -1,0 +1,59 @@
+{% comment %}
+  Calendar smart card: the class calendar as an ocs__ card that can go on any page.
+
+  {% raw %}{% include ocs_calendar_card.html course="csa" %}{% endraw %}
+
+  Options (all optional):
+    course   csa | csp | csse | csh, or "all"   default: the page's course, else all
+    period   one class period, e.g. "3"         default: every period
+    size     small | medium | large             default: medium (ocs__ size grammar)
+    title    card heading                       default: "CSA calendar" / "Class calendar"
+    sample   true shows example events          for prototypes; nothing is saved
+
+  The card loads itself (assets/js/chat/calendar/calendar-card.js) and is styled
+  by _sass/open-coding/elements/calendar/_main.scss.
+{% endcomment %}
+{% assign ocs_cal_course = include.course | default: page.course | default: "all" %}
+{% comment %} include.size alone would return the number of options passed, so check for the key. {% endcomment %}
+{% assign ocs_cal_size = "medium" %}
+{% if include contains "size" %}{% assign ocs_cal_size = include.size %}{% endif %}
+{% if ocs_cal_course == "all" %}
+  {% assign ocs_cal_default_title = "Class calendar" %}
+{% else %}
+  {% assign ocs_cal_default_title = ocs_cal_course | upcase | append: " calendar" %}
+{% endif %}
+{% assign ocs_cal_title = include.title | default: ocs_cal_default_title %}
+<section class="ocs__card ocs__calendar {{ ocs_cal_size }}" data-ocs-calendar data-course="{{ ocs_cal_course }}" data-period="{{ include.period }}" data-sample="{{ include.sample | default: false }}" data-calendar-url="{{ site.baseurl }}/student/calendar" aria-label="{{ ocs_cal_title }}">
+  <header class="ocs__calendar-card-header">
+    <span class="ocs__calendar-kicker"><i class="fas fa-calendar-alt" aria-hidden="true"></i> {{ ocs_cal_title }}{% if include.period %} · Period {{ include.period }}{% endif %}</span>
+    <a class="ocs__btn small pill" href="{{ site.baseurl }}/student/calendar">Open calendar</a>
+  </header>
+  <p class="ocs__calendar-status" role="status" hidden></p>
+  <div class="ocs__calendar-mount"></div>
+  <div class="ocs__calendar-detail" hidden></div>
+  <noscript><p class="ocs__calendar-status">Turn on JavaScript to see the class calendar.</p></noscript>
+</section>
+
+{% unless ocs_calendar_card_assets %}
+{% assign ocs_calendar_card_assets = true %}
+{% assign ocs_cal_school = site.data.school_calendar %}
+<script id="ocsSchoolCalendarData" type="application/json">
+{
+  "schoolYear": {{ ocs_cal_school.school_year | jsonify }},
+  "weeks": {
+    {% for week in ocs_cal_school.weeks %}
+    "{{ week[0] }}": {
+      "monday": {{ week[1].monday | jsonify }},
+      "friday": {{ week[1].friday | jsonify }},
+      "holidays": {{ week[1].holidays | default: nil | jsonify }},
+      "holidayAdjustment": {{ week[1].holiday_adjustment | default: nil | jsonify }},
+      "skipWeek": {{ week[1].skip_week | default: false | jsonify }},
+      "theme": {{ week[1].theme | default: nil | jsonify }},
+      "notes": {{ week[1].notes | default: nil | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  }
+}
+</script>
+<script type="module" src="{{ site.baseurl }}/assets/js/chat/calendar/calendar-card.js"></script>
+{% endunless %}

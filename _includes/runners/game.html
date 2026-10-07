@@ -5,18 +5,20 @@
   style="{% if include.width %}--gr-panel-width: {{ include.width }};{% endif %}{% if game_canvas_height %}--gr-canvas-height: {{ game_canvas_height }};{% endif %}{% if include.editor_height %}--gr-editor-height: {{ include.editor_height }};{% endif %}"
   {% endif %}>
   {% if include.hide_edit != 'true' %}
+  {% if include.hide_challenge != 'true' %}
   {% include runners/fragments/challenge-box.html challenge=include.challenge %}
+  {% endif %}
 
   {% capture game_runner_top_controls %}
       <button type="button" class="ocs__btn utility run" data-hook="run" title="Start Game" aria-label="Start Game"></button>
       <button type="button" class="ocs__btn utility pause" data-hook="pause" title="Pause Game" aria-label="Pause Game"></button>
       <button type="button" class="ocs__btn utility stop" data-hook="stop" title="Stop Game" aria-label="Stop Game"></button>
       <button type="button" class="ocs__btn utility fullscreen" data-hook="fullscreen" title="Toggle Fullscreen" aria-label="Toggle Fullscreen"></button>
-      <select class="engineVersionSelect" title="Select Game Engine Version">
+      <select class="engineVersionSelect ocs__input" title="Select Game Engine Version">
         <option value="GameEnginev1">Engine v1</option>
         <option value="GameEnginev1.1" selected>Engine v1.1</option>
       </select>
-      <select class="levelSelect" title="Select Level">
+      <select class="levelSelect ocs__input" title="Select Level">
         <option value="">Select Level...</option>
       </select>
   {% endcapture %}
@@ -24,6 +26,9 @@
       <button type="button" class="ocs__btn utility copy" data-hook="copy" title="Copy Code" aria-label="Copy Code"></button>
       <button type="button" class="ocs__btn utility save" data-hook="save" title="Save Code" aria-label="Save Code"></button>
       <button type="button" class="ocs__btn utility clear" data-hook="clear" title="Clear Storage" aria-label="Clear Storage"></button>
+      {% if include.workspace_controls %}
+      {% include runners/fragments/workspace-actions.html %}
+      {% endif %}
   {% endcapture %}
   {% capture game_runner_bottom_controls %}
     {% include runners/fragments/editor-stats.html extra_controls=game_runner_bottom_actions %}
@@ -32,6 +37,10 @@
      top_controls=game_runner_top_controls
      bottom_controls=game_runner_bottom_controls
   %}
+  {% if include.workspace_controls %}
+  <input type="file" accept=".json,application/json" data-role="workspace-file" aria-label="Import workspace file" hidden>
+  <p class="ocs__gamebuilder-status ocs__gamebuilder-action-feedback ocs__gamebuilder-save-status" data-role="save-status" role="status" aria-live="polite"></p>
+  {% endif %}
   {% else %}
   <!-- Compact controls for hide_edit mode -->
   <div class="compact-controls">
@@ -39,11 +48,11 @@
     <button type="button" class="ocs__btn utility pause" data-hook="pause" title="Pause Game" aria-label="Pause Game"></button>
     <button type="button" class="ocs__btn utility stop" data-hook="stop" title="Stop Game" aria-label="Stop Game"></button>
     <button type="button" class="ocs__btn utility fullscreen" data-hook="fullscreen" title="Toggle Fullscreen" aria-label="Toggle Fullscreen"></button>
-    <select class="engineVersionSelect" title="Select Game Engine Version">
+    <select class="engineVersionSelect ocs__input" title="Select Game Engine Version">
       <option value="GameEnginev1">Engine v1</option>
       <option value="GameEnginev1.1" selected>Engine v1.1</option>
     </select>
-    <select class="levelSelect" title="Select Level">
+    <select class="levelSelect ocs__input" title="Select Level">
       <option value="">Select Level...</option>
     </select>
   </div>
@@ -68,6 +77,7 @@
 
 <script type="module">
 import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/runners/index.js';
+import { createGameRunnerController } from '{{ site.baseurl }}/assets/js/pages/runners/core/GameRunnerController.js';
 
 (function() {
   const container = document.getElementById('game-runner-{{ include.runner_id }}');
@@ -145,8 +155,16 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
     runner.updateStatus(status);
   }
 
+  const runnerId = '{{ include.runner_id }}';
+  const controller = createGameRunnerController({
+    runner, runnerId, container, engineSelect: engineVersionSelect,
+    run: runGame, stop: stopGame
+  });
+
   runner.bindEditorButtons({
     resetValue: defaultCode || "",
+    saveAction: () => controller.save(),
+    canClear: () => controller.confirmClear(),
     onClear: () => {
       stopGame();
       updateStatus('Reset');
@@ -194,6 +212,12 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
 
   // Keyboard shortcuts (only if editor exists)
   runner.bindShortcut(runGame);
+
+  window.OCSGameRunners = window.OCSGameRunners || Object.create(null);
+  window.OCSGameRunners[runnerId] = controller;
+  window.dispatchEvent(new CustomEvent('ocs:game-runner-ready', {
+    detail: { runnerId, controller }
+  }));
 
   if (autostart) {
     // Defer by one tick so DOM/layout/controls are fully attached before boot.
