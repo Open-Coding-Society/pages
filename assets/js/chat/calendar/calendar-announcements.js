@@ -1,12 +1,12 @@
 // Calendar events in the real class announcements (_includes/announcement_chat.html).
 // The chat keeps owning messages and sending; this module adds:
 //   - the calendar strip, always visible above the messages
-//   - the /event slash command in the composer (teachers only on the live chat)
+//   - the /event slash command in the composer (any signed-in account)
 //   - event cards under announcements that carry [[event:...]] markers
 // Events go through the existing Spring /api/calendar endpoints (calendar-data.js).
 
 import { attachSlashCommand } from './calendar-command.js';
-import { createLiveCalendarStore, createPreviewCalendarStore, fetchLiveIdentity } from './calendar-data.js';
+import { createLiveCalendarStore, createPreviewCalendarStore } from './calendar-data.js';
 import { mountWeekView, renderEventCards, revealAnnouncementForEvent } from './calendar-feed.js';
 import {
   appendEventMarkers, coursePeriods, escapeHtml, extractEventMarkers, formatShortDate, parseSchoolCalendar,
@@ -20,7 +20,6 @@ export function attachAnnouncementCalendar({
   const sourceUrl = `${window.location.origin}${window.location.pathname}`;
   const messageListeners = new Set();
   let store = null;
-  let teacher = false;
   let strip = null;
 
   const slash = attachSlashCommand({
@@ -32,19 +31,15 @@ export function attachAnnouncementCalendar({
   });
 
   // Called by the chat once it knows whether it is live or in local preview.
-  // Live: events hit the real calendar and only teachers get /event.
+  // Live: events hit the real calendar. Every signed-in account can add events
+  // with /event and remove them from the cards (no role check).
   // Preview (signed out / backend down): events stay in this browser, like the messages.
   async function start(mode) {
     strip?.unmount();
-    slash.setEnabled(false);
-    if (mode === 'live') {
-      store = createLiveCalendarStore({ course, javaURI, fetchOptions, sourceUrl });
-      teacher = Boolean((await fetchLiveIdentity({ javaURI, fetchOptions }))?.isTeacher);
-    } else {
-      store = createPreviewCalendarStore({ course, storageKey: `ocs-chat-preview-calendar:${course}` });
-      teacher = true;
-    }
-    slash.setEnabled(teacher);
+    store = mode === 'live'
+      ? createLiveCalendarStore({ course, javaURI, fetchOptions, sourceUrl })
+      : createPreviewCalendarStore({ course, storageKey: `ocs-chat-preview-calendar:${course}` });
+    slash.setEnabled(true);
     strip = mountWeekView({
       slot: root.querySelector('[data-hook="calendar"]'),
       weeks,
@@ -66,7 +61,8 @@ export function attachAnnouncementCalendar({
   function attachEvents(row, main, events) {
     if (!events.length) return;
     row.dataset.eventIds = events.map((e) => e.id).join(' ');
-    main.appendChild(renderEventCards(events, { store: () => store, isTeacher: () => teacher, calendarUrl }));
+    // isTeacher gates the Remove button; every signed-in account gets it.
+    main.appendChild(renderEventCards(events, { store: () => store, isTeacher: () => true, calendarUrl }));
     messageListeners.forEach((listener) => listener({ events }));
   }
 
