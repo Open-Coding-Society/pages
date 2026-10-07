@@ -1,5 +1,6 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Box from '@assets/js/GameEnginev1.1/essentials/Box.js';
 
 class GameLevelAutumn {
   constructor(gameEnv) {
@@ -39,13 +40,21 @@ class GameLevelAutumn {
       coordinateSpace: "normalized",
       splinePoints: [{"x":0.0939,"y":0.9212},{"x":0.1156,"y":0.9314},{"x":0.6908,"y":0.9314},{"x":0.9097,"y":0.9309},{"x":0.9351,"y":0.9156},{"x":0.9477,"y":0.9028},{"x":0.964,"y":0.8671},{"x":0.9758,"y":0.8059},{"x":0.973,"y":0.5452},{"x":0.9631,"y":0.4865},{"x":0.8021,"y":0.1829},{"x":0.7885,"y":0.1599},{"x":0.7686,"y":0.1599},{"x":0.4991,"y":0.1574},{"x":0.4656,"y":0.1676},{"x":0.4439,"y":0.1982},{"x":0.4195,"y":0.2339},{"x":0.3969,"y":0.2824},{"x":0.3327,"y":0.3946},{"x":0.3092,"y":0.3946},{"x":0.263,"y":0.3105},{"x":0.235,"y":0.2875},{"x":0.1789,"y":0.2824},{"x":0.093,"y":0.3054},{"x":0.064,"y":0.3232},{"x":0.0423,"y":0.3793},{"x":0.0342,"y":0.4431},{"x":0.0414,"y":0.813},{"x":0.0505,"y":0.8793},{"x":0.0785,"y":0.9125}]
     };
+    const BoxData = {
+      id: "box-1",
+      src: "/images/projects/racing-game/BoxObstacle.png",
+      coordinateSpace: "normalized",
+      position: { x: 0.5, y: 0.5 },
+      size: { width: 0.1, height: 0.1 }
+    };
 
 
     this.classes = [
       { class: GameEnvBackground, data: background_data },
       { class: Player, data: player_data },
       { class: SplineBarrier, data: barrierData1 },
-      { class: SplineBarrier, data: barrierData2 }
+      { class: SplineBarrier, data: barrierData2 },
+      { class: Box, data: BoxData }
     ];
   }
 }
