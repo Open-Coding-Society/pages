@@ -1,11 +1,13 @@
 // What students and teachers see: the announcement log, the event card under
-// an announcement (ocs__event), and the calendar strip above the feed
-// (ocs__calendar). Used by the real announcement chat and the demo page.
+// an announcement, and the calendar strip above the feed. Used by the real
+// announcement chat and the demo page. The card and the strip are built from
+// existing OCS elements (ocs__card, ocs__callout, ocs__table, ocs__links,
+// ocs__btn, ocs__status-pill) and plain HTML, so they need no CSS of their own.
 
 import { renderRichMessage } from '../rich-text.js';
 import {
   escapeHtml, eventMatchesPeriod, extractEventMarkers, findSchoolWeek, formatPeriods,
-  fromIsoDate, neighborWeek, PRIORITY_LABELS, schoolWeekDays, todayIso, TYPE_LABELS,
+  formatShortDate, fromIsoDate, neighborWeek, PRIORITY_LABELS, schoolWeekDays, todayIso, TYPE_LABELS,
 } from './calendar-model.js';
 
 /* ── Announcement log ────────────────────────────────────────────────── */
@@ -132,24 +134,33 @@ export function createChatFeed({ messagesEl, getSelfName, renderEvents }) {
   };
 }
 
-// Scroll the log to (and flash) the announcement that created a calendar event.
+const HIGHLIGHT_MS = 1600;
+
+// Scroll the log to the announcement that created a calendar event. That
+// event's "View on OCS calendar" button gets the OCS accent fill for a moment
+// and takes focus, so both the eye and the keyboard land on it.
 // Rows carry data-event-ids (see createChatFeed and announcement_chat.html).
 export function revealAnnouncementForEvent(messagesEl, eventId) {
   const row = [...messagesEl.querySelectorAll('[data-event-ids]')]
     .find((el) => el.dataset.eventIds.split(' ').includes(String(eventId)));
   if (!row) return false;
   messagesEl.scrollTop += row.getBoundingClientRect().top - messagesEl.getBoundingClientRect().top - 16;
-  row.classList.remove('is-flash');
-  void row.offsetWidth; // restart the animation
-  row.classList.add('is-flash');
+  const link = row.querySelector(`[data-event-card="${CSS.escape(String(eventId))}"] a.ocs__btn`);
+  if (link) {
+    link.classList.add('accent', 'fill');
+    link.focus({ preventScroll: true });
+    window.setTimeout(() => link.classList.remove('accent', 'fill'), HIGHLIGHT_MS);
+  }
   return true;
 }
 
 /* ── Event card ──────────────────────────────────────────────────────── */
 
-// The card shown under an announcement that created calendar events
-// (ocs__card ocs__event). Everyone can open the event on the OCS calendar;
-// teachers can also take it back off the class calendar.
+// The card shown under an announcement that created calendar events: an
+// ocs__callout, with ocs__keypoints spacing its rows. Everyone can open the
+// event on the OCS calendar; teachers can also take it back off the class
+// calendar. The card sits in a plain [data-event-card] wrapper so the period
+// filter can hide it: ocs__keypoints sets display, which beats `hidden`.
 
 
 function el(tag, className, text) {
@@ -159,19 +170,20 @@ function el(tag, className, text) {
   return node;
 }
 
-function dateBlock(iso) {
-  const date = fromIsoDate(iso);
-  const block = el('div', 'ocs__event-date');
-  block.append(
-    el('span', 'ocs__event-month', date.toLocaleDateString(undefined, { month: 'short' })),
-    el('span', 'ocs__event-day', String(date.getDate())),
-    el('span', 'ocs__event-weekday', date.toLocaleDateString(undefined, { weekday: 'short' })),
-  );
+const statusPill = (tone, text) => el('span', `ocs__status-pill ocs__status-pill--${tone}`, text);
+
+// The teacher's details, one line per line they typed (<br>, not CSS).
+function detailsBlock(text) {
+  const block = el('div');
+  String(text).split('\n').forEach((line, i) => {
+    if (i) block.appendChild(document.createElement('br'));
+    block.appendChild(document.createTextNode(line));
+  });
   return block;
 }
 
 function viewOnCalendarLink(calendarUrl) {
-  const link = el('a', 'ocs__btn small pill');
+  const link = el('a', 'ocs__btn ocs__btn--icon small pill');
   link.href = calendarUrl;
   link.innerHTML = '<i class="fas fa-calendar-alt" aria-hidden="true"></i>';
   link.appendChild(el('span', '', 'View on OCS calendar'));
@@ -197,69 +209,78 @@ function removeButton(event, store, onRemoved, status) {
   return button;
 }
 
-function renderCard(event, { store, isTeacher, calendarUrl }, compact) {
-  const card = el('div', `ocs__card ocs__event${compact ? ' is-compact' : ''}`);
-  card.dataset.periods = (event.periods || []).join(' ');
+function renderCard(event, { store, isTeacher, calendarUrl }) {
+  const wrapper = el('div');
+  wrapper.dataset.eventCard = event.id;
+  wrapper.dataset.periods = (event.periods || []).join(' ');
+  const card = el('div', 'ocs__callout ocs__keypoints');
 
-  const info = el('div', 'ocs__event-body');
-  info.appendChild(el('div', 'ocs__event-title', event.title));
-  const tags = el('div', 'ocs__event-tags');
-  const status = el('span', 'ocs__event-status', 'On class calendar');
+  const date = statusPill('good', formatShortDate(event.date));
+  const title = el('strong', '', event.title);
+  const heading = el('div', 'ocs__links');
+  heading.append(date, title);
+
+  const tags = el('div', 'ocs__links');
+  const status = el('span', '', 'On class calendar');
   tags.append(
-    el('span', 'ocs__status-pill ocs__status-pill--neutral', PRIORITY_LABELS[event.priority] || event.priority),
-    el('span', 'ocs__status-pill ocs__status-pill--neutral', TYPE_LABELS[event.type] || event.type),
+    statusPill('neutral', PRIORITY_LABELS[event.priority] || event.priority),
+    statusPill('neutral', TYPE_LABELS[event.type] || event.type),
   );
   if (event.periods?.length) tags.appendChild(el('span', 'ocs__status-pill', formatPeriods(event.periods)));
   tags.appendChild(status);
-  info.appendChild(tags);
-  if (event.description) info.appendChild(el('p', 'ocs__event-details', event.description));
+  card.append(heading, tags);
+  if (event.description) card.appendChild(detailsBlock(event.description));
 
+  // A removed event stays in the announcement, struck through.
   const markRemoved = () => {
-    card.classList.add('is-removed');
+    date.className = 'ocs__status-pill ocs__status-pill--neutral';
+    title.replaceChildren(el('s', '', event.title));
     status.textContent = 'Removed from calendar';
   };
 
-  const actions = el('div', 'ocs__links ocs__event-actions');
+  const actions = el('div', 'ocs__links');
   actions.appendChild(viewOnCalendarLink(calendarUrl));
   if (isTeacher()) actions.appendChild(removeButton(event, store, markRemoved, status));
-  info.appendChild(actions);
+  card.appendChild(actions);
 
-  card.append(dateBlock(event.date), info);
+  wrapper.appendChild(card);
   if (store()?.status(event.id) === 'removed') markRemoved();
-  return card;
+  return wrapper;
 }
 
 // context: { store: () => calendarStore, isTeacher: () => bool, calendarUrl }
 export function renderEventCards(events, context) {
-  const wrapper = el('div', 'ocs__event-list');
-  const compact = events.length > 1;
+  const list = el('div');
   [...events]
     .sort((a, b) => a.date.localeCompare(b.date))
-    .forEach((event) => wrapper.appendChild(renderCard(event, context, compact)));
-  return wrapper;
+    .forEach((event) => list.appendChild(renderCard(event, context)));
+  return list;
 }
 
-// Dim cards for other class periods when the viewer picks a period ("all" = none dimmed).
+// Hide cards for other class periods when the viewer picks a period ("all" = show every card).
 export function markCardsForPeriod(container, period) {
-  container.querySelectorAll('.ocs__event').forEach((card) => {
+  container.querySelectorAll('[data-event-card]').forEach((card) => {
     const periods = card.dataset.periods ? card.dataset.periods.split(' ') : [];
-    card.classList.toggle('is-other-period', !eventMatchesPeriod({ periods }, period));
+    card.hidden = !eventMatchesPeriod({ periods }, period);
   });
 }
 
 /* ── Calendar strip ──────────────────────────────────────────────────── */
 
-// A compact, read-only look at the current school week (ocs__card
-// ocs__calendar). Used above the announcements and as the calendar smart card
-// (calendar-card.js). Options:
-//   slot / host       append a new card to `slot`, or fill an existing card element `host`
-//   feed              announcements only: revealEvent(id) for clicks, onMessage(listener) to refresh
-//   onSelectEvent     called with (event, item) on click instead of feed.revealEvent
-//   showEmpty         say so when a week has no events
-// Events for other class periods are hidden when getPeriod() returns a period.
+// A compact, read-only look at one school week as an ocs__table. Used above
+// the announcements and inside the calendar card (calendar-card.js). Options:
+//   slot / host     append a new ocs__card to `slot`, or fill an existing element `host`
+//   feed            announcements only: revealEvent(id) for clicks, onMessage(listener) to refresh
+//   onSelectEvent   called with (event, link) on click instead of feed.revealEvent
+//   showEmpty       say so when a week has no events
+// The table has one column per school day. When the strip is narrower than
+// NARROW_WIDTH (a sidebar, a phone) it shows one row per day instead, decided
+// from its own width, so it fits wherever it is placed without any CSS.
+// Events for other class periods are left out when getPeriod() returns a period.
 
 
-const MAX_CHIPS_PER_DAY = 3;
+const MAX_EVENTS_PER_DAY = 3;
+const NARROW_WIDTH = 460;   // px
 
 function weekRangeLabel(week) {
   const format = (iso) => fromIsoDate(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -273,41 +294,86 @@ export function mountWeekView({
   const thisWeek = findSchoolWeek(weeks, today);
   let week = thisWeek;
 
+  // Inside a host (the calendar card) the strip adds no card of its own.
+  // The Today button sits in a plain wrapper: ocs__btn sets display, which
+  // would beat the hidden attribute.
   const root = host || document.createElement('div');
-  if (!host) root.className = 'ocs__card ocs__calendar';
+  if (!host) root.className = 'ocs__card';
   const body = document.createElement('div');
-  body.className = 'ocs__calendar-body';
+  body.className = 'ocs__keypoints';
   body.innerHTML = `
-    <div class="ocs__calendar-header">
+    <div class="ocs__links">
       <button type="button" class="ocs__btn small pill" data-step="-1" aria-label="Previous week"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
-      <div class="ocs__calendar-heading"><span class="ocs__calendar-title"></span><span class="ocs__calendar-note"></span></div>
-      <button type="button" class="ocs__btn small pill" data-today hidden>Today</button>
       <button type="button" class="ocs__btn small pill" data-step="1" aria-label="Next week"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+      <span data-hook="week-today" hidden><button type="button" class="ocs__btn small pill">Today</button></span>
+      <strong data-hook="week-title"></strong>
+      <span class="ocs__text" data-hook="week-note"></span>
     </div>
-    <div class="ocs__calendar-days" role="list"></div>
-    <p class="ocs__calendar-empty" hidden>Nothing on the calendar this week.</p>`;
+    <div class="ocs__table-wrap"><table class="ocs__table"></table></div>
+    <div class="ocs__text" data-hook="week-empty" hidden>Nothing on the calendar this week.</div>`;
   root.appendChild(body);
   if (!host) slot.appendChild(root);
-  const daysEl = body.querySelector('.ocs__calendar-days');
+  const table = body.querySelector('table');
+  let narrow = false;
+  let days = [];
 
-  function eventChip(event) {
-    const chip = document.createElement('button');
-    chip.type = 'button';
-    chip.className = 'ocs__calendar-item';
-    chip.title = [event.title, formatPeriods(event.periods)].filter(Boolean).join(' · ');
-    chip.textContent = event.title;
-    chip.addEventListener('click', () => {
-      if (onSelectEvent) onSelectEvent(event, chip);
-      else if (feed && !feed.revealEvent(event.id)) chip.title = `${event.title}: no announcement for this one`;
+  // A link, not a button, so a long title wraps inside its cell.
+  function eventLink(event) {
+    const link = document.createElement('a');
+    link.href = '#';
+    link.title = [event.title, formatPeriods(event.periods)].filter(Boolean).join(' · ');
+    link.textContent = event.title;
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (onSelectEvent) onSelectEvent(event, link);
+      else if (feed && !feed.revealEvent(event.id)) link.title = `${event.title}: no announcement for this one`;
     });
-    return chip;
+    const line = document.createElement('div');
+    line.appendChild(link);
+    return line;
+  }
+
+  function dayHeading(day, scope) {
+    const heading = document.createElement('th');
+    heading.scope = scope;
+    heading.innerHTML = `${day.label} <b>${fromIsoDate(day.date).getDate()}</b>`;
+    if (day.date === today) {
+      heading.setAttribute('aria-current', 'date');
+      heading.insertAdjacentHTML('beforeend', ' <span class="ocs__status-pill ocs__status-pill--good">Today</span>');
+    }
+    return heading;
+  }
+
+  function dayCell({ dayEvents, closedReason }) {
+    const cell = document.createElement('td');
+    if (closedReason) {
+      cell.insertAdjacentHTML('beforeend', `<span class="ocs__status-pill ocs__status-pill--neutral">${escapeHtml(closedReason)}</span>`);
+    }
+    dayEvents.slice(0, MAX_EVENTS_PER_DAY).forEach((event) => cell.appendChild(eventLink(event)));
+    if (dayEvents.length > MAX_EVENTS_PER_DAY) {
+      cell.insertAdjacentHTML('beforeend', `<div>+${dayEvents.length - MAX_EVENTS_PER_DAY} more</div>`);
+    }
+    return cell;
+  }
+
+  // Wide: a header row of days over one row of events. Narrow: a row per day.
+  function render() {
+    table.replaceChildren();
+    if (narrow) {
+      const rows = table.createTBody();
+      days.forEach((d) => rows.insertRow().append(dayHeading(d.day, 'row'), dayCell(d)));
+    } else {
+      const headings = table.createTHead().insertRow();
+      const cells = table.createTBody().insertRow();
+      days.forEach((d) => { headings.appendChild(dayHeading(d.day, 'col')); cells.appendChild(dayCell(d)); });
+    }
   }
 
   async function refresh() {
     if (!week) return;
-    body.querySelector('.ocs__calendar-title').textContent = weekRangeLabel(week);
-    body.querySelector('.ocs__calendar-note').textContent = [week.theme, week.notes].filter(Boolean).join(' · ');
-    body.querySelector('[data-today]').hidden = week === thisWeek;
+    body.querySelector('[data-hook="week-title"]').textContent = weekRangeLabel(week);
+    body.querySelector('[data-hook="week-note"]').textContent = [week.theme, week.notes].filter(Boolean).join(' · ');
+    body.querySelector('[data-hook="week-today"]').hidden = week === thisWeek;
     const store = getStore();
     const [allEvents, breaks] = await Promise.all([
       store.listRange(week.monday, week.friday),
@@ -315,24 +381,13 @@ export function mountWeekView({
     ]);
     const events = allEvents.filter((event) => eventMatchesPeriod(event, getPeriod()));
     const breakByDate = new Map(breaks.map((b) => [b.date, b.name]));
-
-    daysEl.innerHTML = '';
-    schoolWeekDays(week).forEach((day) => {
-      const closedReason = day.closedReason || breakByDate.get(day.date) || '';
-      const dayEvents = events.filter((e) => e.date === day.date);
-      const cell = document.createElement('div');
-      cell.setAttribute('role', 'listitem');
-      cell.className = ['ocs__calendar-day', day.date === today && 'is-today', (day.closed || closedReason) && 'is-closed']
-        .filter(Boolean).join(' ');
-      cell.innerHTML = `<span class="ocs__calendar-day-label">${day.label} <b>${fromIsoDate(day.date).getDate()}</b></span>`
-        + (closedReason ? `<span class="ocs__calendar-closed">${escapeHtml(closedReason)}</span>` : '');
-      dayEvents.slice(0, MAX_CHIPS_PER_DAY).forEach((event) => cell.appendChild(eventChip(event)));
-      if (dayEvents.length > MAX_CHIPS_PER_DAY) {
-        cell.insertAdjacentHTML('beforeend', `<span class="ocs__calendar-more">+${dayEvents.length - MAX_CHIPS_PER_DAY} more</span>`);
-      }
-      daysEl.appendChild(cell);
-    });
-    body.querySelector('.ocs__calendar-empty').hidden = !showEmpty || events.length > 0;
+    days = schoolWeekDays(week).map((day) => ({
+      day,
+      closedReason: day.closedReason || breakByDate.get(day.date) || '',
+      dayEvents: events.filter((e) => e.date === day.date),
+    }));
+    render();
+    body.querySelector('[data-hook="week-empty"]').hidden = !showEmpty || events.length > 0;
   }
 
   const load = () => refresh().catch((err) => console.error('Calendar: strip load failed', err));
@@ -342,7 +397,15 @@ export function mountWeekView({
       load();
     });
   });
-  body.querySelector('[data-today]').addEventListener('click', () => { week = thisWeek; load(); });
+  body.querySelector('[data-hook="week-today"] button').addEventListener('click', () => { week = thisWeek; load(); });
+
+  // Switch between the wide and narrow table when the strip's own width crosses NARROW_WIDTH.
+  const isNarrow = () => body.clientWidth > 0 && body.clientWidth < NARROW_WIDTH;
+  narrow = isNarrow();
+  const resize = 'ResizeObserver' in window ? new ResizeObserver(() => {
+    if (isNarrow() !== narrow) { narrow = !narrow; render(); }
+  }) : null;
+  resize?.observe(body);
 
   const unsubscribe = getStore().subscribe(load);
   const unlisten = feed ? feed.onMessage(({ events }) => { if (events.length) load(); }) : () => {};
@@ -353,6 +416,7 @@ export function mountWeekView({
     unmount() {
       unsubscribe();
       unlisten();
+      resize?.disconnect();
       if (host) body.remove(); else root.remove();
     },
   };
