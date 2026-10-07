@@ -60,7 +60,7 @@ class GameLevelEmpathyEpic extends GameLevelCsPathIdentity {
       src: player_src,
       SCALE_FACTOR: 5,
       STEP_FACTOR: 1000,
-      ANIMATION_RATE: 50,
+      ANIMATION_FPS: 8,
       INIT_POSITION: { x: width / 2, y: height / 2 },
       pixels: { height: 1024, width: 1024 },
       orientation: { rows: 2, columns: 2 },

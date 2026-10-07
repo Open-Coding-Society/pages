@@ -50,6 +50,7 @@ Split logic into clear layers:
 ### Ecosystem & Tooling Defaults
 
 * **Prioritize SASS:** Use SASS (`.scss`) for styling instead of standard CSS or inline styles.
+* **SASS compatibility:** The current Jekyll build uses Ruby Sass. Use `rgba(0, 0, 0, 0.15)` for transparent colors, not unsupported `rgb(0 0 0 / 15%)` syntax. Validate through the Makefile's Jekyll build.
 * **Use `_projects`:** Leverage the modular project auto-registration system in the `_projects/` directory for new projects.
 * **System Expansion:** Work within the existing systems and expand them if needed, rather than creating completely new parallel architectures.
 * **Calendar pages:** Keep layout and modal styling out of `navigation/calendar.md`; use semantic classes and SCSS instead of utility-heavy inline markup.
@@ -63,12 +64,14 @@ Split logic into clear layers:
 * Treat [Makefile](Makefile) as the single source of truth; common targets are `make`/`make serve-current`, `make dev`, `make stop`, `make convert`, and `make convert-single` (details in [README.md](README.md)).
 * Order matters: stop → build projects → convert notebooks/docx → split courses → jekyll serve (follow [Makefile](Makefile)).
 * Project builds must run the [SASS import generator](scripts/generate_sass_imports.py) to create `_sass/projects/_all.scss`; `build-registered-projects` owns this dependency so Jekyll can resolve `projects/all`.
+* Use template-generated project Makefiles. Do not add local npm manifests, `.gitignore` files or Makefile overrides for shared browser libraries. Keep shared runtime libraries in `assets/js/vendor/` with licenses and version documentation; ordinary builds need no npm installation.
 
 ### Sources vs Generated Files
 
 * Sources live in [notebook sources](_notebooks/) and [docx sources](_docx/); converted Markdown is written to [generated posts](_posts/) (generated, do not hand-edit).
 * Course-split outputs (`*_csp.md`/`*_csa.md`/`*_csse.md`/`*_content.md`) are generated; never edit them. See [scripts/split_multi_course_files.py](scripts/split_multi_course_files.py).
 * Conversion behavior is defined in [scripts/convert_notebooks.py](scripts/convert_notebooks.py) and [scripts/convert_docx.py](scripts/convert_docx.py).
+* GameBuilder lesson notebooks are authored in [_projects/systems/gamebuilder/notebooks/](_projects/systems/gamebuilder/notebooks/); `_notebooks/projects/gamebuilder/` contains build copies. Project Makefiles are generated from [_projects/_template/Makefile](_projects/_template/Makefile), so persistent build/watch fixes belong in the template. Use a subshell for `cd` inside conversion loops so processing several notebooks does not change the loop's working directory.
 
 ### Project Registry & Styling
 

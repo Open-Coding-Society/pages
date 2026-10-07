@@ -540,6 +540,12 @@ class GameControl {
             currentLevelIndex: this.currentLevelIndex,
             canvasCount: document.querySelectorAll('canvas').length
         });
+        // Reset animation clocks on resume so paused time does not cause a sudden frame jump.
+        for (const gameObject of this.currentLevel?.gameEnv?.gameObjects || []) {
+            if (typeof gameObject.resetAnimationClock === 'function') {
+                gameObject.resetAnimationClock();
+            }
+        }
         this.isPaused = false;
         this.addExitKeyListener();
         // Do not restore saved canvas image data here. Resuming should
