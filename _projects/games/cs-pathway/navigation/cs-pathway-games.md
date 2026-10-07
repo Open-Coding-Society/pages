@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: opencs 
 title: CS Pathway Games
 description: Games and interactive projects available through the Open Coding Society CS Pathway.
 permalink: /cs-pathway/games/

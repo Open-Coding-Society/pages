@@ -25,6 +25,7 @@ games/red-riding
 games/spline-barriers
 games/tag-game-multiplayer
 games/voidstriker
+games/racing-game:dev
 
 # Lessons
 lessons/ap-frq-simulator
@@ -41,6 +42,7 @@ lessons/java
 systems/ai-ab-engine
 systems/calendar
 systems/courses:dev
+systems/gamebuilder:dev
 systems/auto-generator
 systems/auto-generator-ui
 systems/scraper

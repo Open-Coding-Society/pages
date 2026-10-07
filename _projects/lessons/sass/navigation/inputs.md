@@ -64,6 +64,8 @@ A simple input looks like this:
 
 ### OCS Input Grammar
 
+`ocs__input` provides a shared, user-preference-aware field appearance: readable theme text, a subtle theme-derived surface and border, consistent spacing, and a visible accent focus ring. Use it instead of repeating utility classes for field color, border, radius, padding, or focus styling. Keep layout choices such as field width with the surrounding form layout.
+
 | Class / Modifier | Purpose | Example |
 | --- | --- | --- |
 | `ocs__input` | Base input role | `<input class="ocs__input">` |

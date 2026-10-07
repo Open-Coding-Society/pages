@@ -28,7 +28,7 @@ SIDE-BY-SIDE RUNNER LEGEND (Container Panel Composition)
 =============================================================
 
 Supported cell directives for side-by-side layout:
-- CODE_RUNNER (python/javascript/java comment marker)
+- CODE_RUNNER (python/javascript/java comment marker, or an HTML comment in a %%html cell)
 - UI_RUNNER   (HTML comment marker)
 - GAME_RUNNER (javascript comment marker)
 
@@ -48,6 +48,7 @@ Pairing behavior:
 
 Examples:
 - // CODE_RUNNER: Challenge text | panel: demo, slot: left, ratio: 35-65
+- <!-- CODE_RUNNER: Challenge text | autostart: true -->   (first line of the cell is %%html)
 - <!-- UI_RUNNER: Notes | panel: demo, slot: left -->
 - // GAME_RUNNER: Arcade mode | panel: demo, slot: right, layout: row
 
@@ -57,13 +58,25 @@ Real pair example (Cookie Clicker):
 
 Runner options:
 - autostart: true|false  Auto-runs the game when the runner initializes. Default: false.
+- editor_height: <css-size> Editor height (or the UI_RUNNER source disclosure height).
+- output_height: <css-size> Output viewport height for every runner.
+- height: <css-size>        Legacy editor height for CODE/UI/PSEUDOCODE runners;
+                           legacy canvas height for GAME_RUNNER.
+- Explicit editor_height/output_height take precedence over the corresponding legacy height.
 
 UI-runner specific options:
 - show_code: true|false  Show the HTML/CSS/JS source in a disclosure above the rendered UI.
 - show_source: true|false Alias for show_code.
 
+HTML code-runner specific options (%%html cells with a CODE_RUNNER comment):
+- Students edit plain HTML (no JavaScript strings), and Run renders it into the page.
+- height: <css-size>        Editor height. Default: 300px.
+- output_height: <css-size> Rendered output height. Default: the UI runner's 400px minimum.
+
 Game-runner specific options:
-- hide_edit, width, height, editor_height
+- hide_edit, width, editor_height
+- height: <css-size>        Game canvas height. Default: 580px.
+- output_height: <css-size> Game canvas height, overriding legacy height.
 
 Notes on CodeFence and MermaidGraph:
 - Plain markdown code fences and Mermaid markdown are not panel-aware by default.
@@ -80,6 +93,7 @@ CODE_RUNNER_PATTERNS = {
     'javascript': r'^//\s*CODE_RUNNER:\s*(.+)$',
     'python': r'^#\s*CODE_RUNNER:\s*(.+)$',
     'java': r'^//\s*CODE_RUNNER:\s*(.+)$',
+    'html': r'^<!--\s*CODE_RUNNER:\s*(.+)\s*-->$',
 }
 
 # UI_RUNNER pattern for HTML cells
@@ -116,6 +130,10 @@ def detect_cell_language(cell):
     # JavaScript: first line is %%js magic command
     if lines and lines[0].strip().startswith('%%js'):
         return 'javascript'
+
+    # HTML: first line is %%html magic command
+    if lines and lines[0].strip().startswith('%%html'):
+        return 'html'
 
     # Java: last non-whitespace line matches ClassName.main(null);
     # Find last non-empty line
@@ -260,6 +278,12 @@ class CodeRunner:
 
     def liquid_lines(self, code_fence_lines: list[str], code_runner_count: int) -> list[str]:
         """Render Jekyll Liquid captures/includes for embedding the code runner widget."""
+        include = 'runners/code.html'
+        if self.language == 'html':
+            include = 'runners/html.html'
+            # The notebook's kernel language labels every fence; this cell is HTML.
+            code_fence_lines = ['```html', *code_fence_lines[1:]]
+
         lines = [
             '',
             '{% capture challenge' + str(code_runner_count) + ' %}',
@@ -274,7 +298,7 @@ class CodeRunner:
             *code_fence_lines,
             '{% endcapture %}',
             '',
-            '{% include runners/code.html',
+            '{% include ' + include,
             '   runner_id="' + self.runner_id + '"',
             '   language="' + self.language + '"',
             '   challenge=challenge' + str(code_runner_count),
@@ -284,6 +308,8 @@ class CodeRunner:
 
         if self.options.get('autostart') or self.options.get('auto_start'):
             lines.append('   autostart="true"')
+
+        lines.extend(runner_height_options(self.options))
 
         lines.extend(['%}', ''])
         return lines
@@ -428,16 +454,32 @@ class UiRunner:
             source = self.html
             if self.script.strip():
                 source += f'\n<script>\n{self.script}\n</script>'
+            editor_height = self.options.get('editor_height') or self.options.get('height')
+            source_style = (
+                ' style="--runner-editor-height: '
+                + html_lib.escape(str(editor_height), quote=True) + ';"'
+                if editor_height else ''
+            )
             lines.extend([
-                '<details class="ui-runner-source">',
+                '<details class="ui-runner-source'
+                + (' ui-runner-source--sized' if editor_height else '')
+                + '"' + source_style + '>',
                 '<summary>View example code</summary>',
                 '<pre><code class="language-html">' + html_lib.escape(source.strip()) + '</code></pre>',
                 '</details>',
                 '',
             ])
 
+        output_height = self.options.get('output_height')
+        output_style = (
+            ' style="--runner-output-height: '
+            + html_lib.escape(str(output_height), quote=True) + ';"'
+            if output_height else ''
+        )
         lines.extend([
-            '<div class="ui-runner">',
+            '<div class="ui-runner'
+            + (' ui-runner--sized' if output_height else '')
+            + '"' + output_style + '>',
             self.html,
             '<script>',
             '(function() {',
@@ -577,10 +619,7 @@ class GameRunner:
             lines.append('   autostart="true"')
         if self.options.get('width'):
             lines.append(f'   width="{self.options["width"]}"')
-        if self.options.get('height'):
-            lines.append(f'   height="{self.options["height"]}"')
-        if self.options.get('editor_height'):
-            lines.append(f'   editor_height="{self.options["editor_height"]}"')
+        lines.extend(runner_height_options(self.options))
 
         lines.extend(['%}', ''])
         return lines
@@ -712,11 +751,19 @@ class PseudocodeRunner:
             '   code=code' + str(code_runner_count),
         ]
 
-        if self.options.get('height'):
-            lines.append(f'   height="{self.options["height"]}"')
+        lines.extend(runner_height_options(self.options))
 
         lines.extend(['%}', ''])
         return lines
+
+
+def runner_height_options(options: dict[str, Any]) -> list[str]:
+    """Forward explicit and legacy dimensions without changing runner-specific defaults."""
+    return [
+        f'   {option}="{options[option]}"'
+        for option in ('height', 'editor_height', 'output_height')
+        if options.get(option)
+    ]
 
 
 @dataclass
@@ -914,6 +961,10 @@ def process_ui_runner_cells(notebook, permalink):
     processed_cells = []
     
     for cell in notebook.cells:
+        if 'code_runner' in cell.get('metadata', {}):
+            # A %%html cell with a CODE_RUNNER comment is already an editable HTML runner.
+            processed_cells.append(cell)
+            continue
         if cell.cell_type == 'raw' or (cell.cell_type == 'code' and cell.source.strip().startswith('%%html')):
             runner = UiRunner.from_cell(cell, permalink, runner_index)
 

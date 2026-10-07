@@ -3,20 +3,25 @@
 Scan the repo for Markdown/HTML/notebook pages with YAML frontmatter containing
 assignment: true and POST to the Spring `auto-create` API for each page.
 
-Usage (CI / local):
-  export BASE_URL=https://spring.opencodingsociety.com
-  export PAGES_BOT_UID=pages-bot
-  export PAGES_BOT_PASSWORD=...
-  python3 scripts/create_assignments_from_frontmatter.py --root .
+Usage:
+  Local review (default; nothing is sent to Spring):
+    python3 scripts/create_assignments_from_frontmatter.py
+
+  Production (CI) - supplying a password enables the live run:
+    export PAGES_BOT_UID=pages-bot
+    export PAGES_BOT_PASSWORD=...
+    python3 scripts/create_assignments_from_frontmatter.py
 
 The script is idempotent: the server will return 200 for existing contentUrl.
 """
 import argparse
 import json
+import math
 import os
 import re
 import sys
 import time
+from datetime import date
 from collections import OrderedDict
 from pathlib import Path
 from urllib.parse import quote
@@ -36,10 +41,72 @@ GENERATED_PROJECT_ROOTS = {
     ("_posts", "projects"),
     ("_sass", "projects"),
 }
+# Fallbacks for missing or invalid frontmatter; the frontend can treat these as "unset".
+DEFAULT_POINTS = 1.0
+DEFAULT_DESCRIPTION = ""
+DEFAULT_DUE_DATE = None
+DEFAULT_SUBMISSION_TYPE = None
+# System test users own assignments whose frontmatter names no creators.
+DEFAULT_CREATOR_UIDS = ("toby", "hop")
+DEFAULT_COURSE_CODES = ()
+# The title falls back to the file stem, since Spring requires a name.
 
 
 class AssignmentFrontmatterError(ValueError):
     """Raised when assignment-specific frontmatter cannot be synchronized safely."""
+
+
+def warn(message, path=None):
+    """Report bad author metadata as a GitHub annotation without failing the job."""
+    location = f" file={path}" if path is not None else ""
+    print(f"::warning{location}::{message}", file=sys.stderr)
+
+
+
+
+def scalar_text(value, field, path, default=None):
+    """Return a stripped string for scalar YAML values, else the default."""
+    if value is None or isinstance(value, bool):
+        return default
+    if isinstance(value, (str, int, float, date)):
+        text = str(value).strip()
+        return text or default
+    warn(f"Ignoring non-scalar {field} {value!r}", path)
+    return default
+
+
+def sanitize_scalar_fields(fm: dict, path: Path):
+    """Coerce free-form fields to safe values; bad or missing ones fall back to defaults."""
+    name = scalar_text(fm.get("title") or fm.get("name"), "title", path, default=path.stem)
+    description = scalar_text(
+        fm.get("description"), "description", path, default=DEFAULT_DESCRIPTION
+    )
+
+    points = DEFAULT_POINTS
+    raw_points = fm.get("points")
+    if raw_points is not None:
+        try:
+            if isinstance(raw_points, bool):
+                raise ValueError
+            points = float(raw_points)
+            if not math.isfinite(points) or points < 0:
+                raise ValueError
+        except (TypeError, ValueError):
+            warn(f"Invalid points {raw_points!r}; using {DEFAULT_POINTS}", path)
+            points = DEFAULT_POINTS
+
+    due_date = scalar_text(
+        fm.get("dueDate") or fm.get("due_date") or fm.get("due"),
+        "dueDate", path, default=DEFAULT_DUE_DATE,
+    )
+
+    submission_type = fm.get("assignment_submission_type")
+    if submission_type is not None and not isinstance(submission_type, str):
+        warn(f"Ignoring non-string assignment_submission_type {submission_type!r}", path)
+        submission_type = None
+    submission_type = (submission_type or "").strip() or DEFAULT_SUBMISSION_TYPE
+
+    return name, description, points, due_date, submission_type
 
 
 class RequestPacer:
@@ -131,7 +198,10 @@ def read_frontmatter(path: Path):
 
         return None
 
-    text = path.read_text(encoding="utf-8")
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return None
     return parse_frontmatter_text(text)
 
 
@@ -402,7 +472,7 @@ def main():
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL)
     parser.add_argument("--uid", default=DEFAULT_UID)
     parser.add_argument("--password", default=DEFAULT_PASSWORD)
-    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--dry-run", action="store_true", help="Force a dry run even when a password is set")
     parser.add_argument(
         "--requests-per-minute",
         type=int,
@@ -421,53 +491,64 @@ def main():
         return 2
 
     session = requests.Session()
-    if not args.dry_run:
-        if not args.password:
-            print("PAGES_BOT_PASSWORD is required (pass --password or set env PAGES_BOT_PASSWORD)", file=sys.stderr)
-            return 2
+    # Credentials opt in to a production run; without them nothing is sent to Spring.
+    dry_run = args.dry_run or not args.password
+    if dry_run:
+        print("DRY RUN: no password provided or --dry-run set; Spring will not be contacted.")
+    else:
         authenticate(session, args.base_url, args.uid, args.password)
-        print("Authenticated OK")
+        print(f"Authenticated OK as {args.uid}; changes will be written to {args.base_url}")
 
     pacer = RequestPacer(args.requests_per_minute)
     candidates = []
+    # Infrastructure failures only; author metadata problems are warnings.
     errors = []
+    skipped = 0
     for f in find_files(root):
         fm = read_frontmatter(f)
-        if not fm:
+        if not isinstance(fm, dict) or fm.get("assignment") is not True:
             continue
-        if fm.get("assignment") is True:
-
-            # Spring defaults new assignments to file; omitting this field must not
-            # overwrite an existing assignment's selected submission type.
-            assignment_submission_type = fm.get("assignment_submission_type") or None
-
+        try:
             content_url = determine_content_url(root, f, fm)
-            name = fm.get("title") or fm.get("name") or f.stem
-            description = fm.get("description") or "auto-created from frontmatter"
-            points = fm.get("points")
-            due_date = fm.get("dueDate") or fm.get("due_date") or fm.get("due")
-            try:
-                creator_uids = read_creator_uids(fm, f)
-                course_codes = read_course_codes(fm, f)
-            except AssignmentFrontmatterError as error:
-                errors.append(str(error))
-                continue
-            candidates.append(
-                (f, content_url, name, description, points, due_date,
-                 assignment_submission_type, creator_uids, course_codes)
+            if not content_url:
+                raise AssignmentFrontmatterError("could not determine contentUrl")
+            name, description, points, due_date, assignment_submission_type = (
+                sanitize_scalar_fields(fm, f)
             )
+        except Exception as error:
+            warn(f"Skipping assignment, bad frontmatter: {error}", f)
+            skipped += 1
+            continue
+        # Invalid lists stay unpopulated here; defaults are applied after dedup so a
+        # generated copy cannot conflict with its source's real creators.
+        try:
+            creator_uids = read_creator_uids(fm, f)
+        except AssignmentFrontmatterError as error:
+            warn(f"{error}; using default creators", f)
+            creator_uids = []
+        try:
+            course_codes = read_course_codes(fm, f)
+        except AssignmentFrontmatterError as error:
+            warn(f"{error}; using default courses", f)
+            course_codes = None
+        candidates.append(
+            (f, content_url, name, description, points, due_date,
+             assignment_submission_type, creator_uids, course_codes)
+        )
 
     candidates, duplicate_errors = deduplicate_candidates_resilient(candidates)
-    errors.extend(duplicate_errors)
+    for error in duplicate_errors:
+        warn(f"Skipping assignment: {error}")
+        skipped += 1
 
     if not candidates:
-        print("No pages with assignment: true found.")
-        for error in errors:
-            print(f"Invalid assignment frontmatter: {error}", file=sys.stderr)
-        return 2 if errors else 0
+        print(f"No valid pages with assignment: true found ({skipped} skipped).")
+        return 0
 
     print(f"Found {len(candidates)} pages with assignment: true")
     for path, content_url, name, description, points, due_date, assignment_submission_type, creator_uids, course_codes in candidates:
+        creator_uids = creator_uids or list(DEFAULT_CREATOR_UIDS)
+        course_codes = course_codes if course_codes is not None else list(DEFAULT_COURSE_CODES)
         print(f"Processing assignment for path: {path}, contentUrl={content_url}, name={name}")
         creator_summary = ",".join(creator_uids) if creator_uids else "legacy/unassigned"
         course_summary = ",".join(course_codes) if course_codes else "legacy/unassigned"
@@ -476,7 +557,7 @@ def main():
             f"assignmentType={assignment_submission_type or 'unchanged/default file'} "
             f"creatorUids={creator_summary} courseCodes={course_summary}"
         )
-        if args.dry_run and not args.create:
+        if dry_run:
             continue
 
         if args.create:
@@ -519,8 +600,6 @@ def main():
                 print(f"  ERROR: {e}")
                 errors.append(f"Could not synchronize '{content_url}': {e}")
         else:
-            if args.dry_run:
-                continue
             try:
                 pacer.wait()
                 resp = create_assignment(
@@ -536,7 +615,11 @@ def main():
                     course_codes,
                 )
                 print(f"  {resp.status_code} {resp.text[:200]}")
-                if not resp.ok:
+                if 400 <= resp.status_code < 500 and resp.status_code not in (401, 403, 429):
+                    # Spring rejected this page's data; other assignments are unaffected.
+                    warn(f"Spring rejected '{content_url}': {resp.status_code} {resp.text[:200]}", path)
+                    skipped += 1
+                elif not resp.ok:
                     errors.append(
                         f"Spring rejected '{content_url}': {resp.status_code} {resp.text[:200]}"
                     )
@@ -544,6 +627,7 @@ def main():
                 print(f"  ERROR: {e}")
                 errors.append(f"Could not synchronize '{content_url}': {e}")
 
+    print(f"Done: {len(candidates)} processed, {skipped} skipped for bad metadata.")
     for error in errors:
         print(f"Assignment synchronization error: {error}", file=sys.stderr)
     return 2 if errors else 0
