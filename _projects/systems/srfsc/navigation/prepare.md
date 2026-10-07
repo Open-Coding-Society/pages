@@ -7,7 +7,84 @@ hide: true
 ---
 
 <!-- markdownlint-disable MD033 -->
-<div class="srfsc-app">
+<style>
+  .srfsc-app.srfsc-prepare {
+    width: min(100%, 1200px);
+    padding-inline: clamp(0.75rem, 2.5vw, 1.25rem);
+    box-sizing: border-box;
+  }
+
+  .srfsc-prepare,
+  .srfsc-prepare * {
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .srfsc-prepare .srfsc-banner__lead,
+  .srfsc-prepare .srfsc-zone-card p,
+  .srfsc-prepare .srfsc-bullets li,
+  .srfsc-prepare .srfsc-panel__note {
+    overflow-wrap: anywhere;
+  }
+
+  .srfsc-prepare .srfsc-panel__header {
+    flex-wrap: wrap;
+  }
+
+  .srfsc-prepare .srfsc-checklist {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  }
+
+  @media (max-width: 720px) {
+    .srfsc-prepare .srfsc-zones {
+      gap: 0.75rem;
+    }
+
+    .srfsc-prepare .srfsc-zone-card,
+    .srfsc-prepare .srfsc-panel {
+      padding: 1rem;
+    }
+
+    .srfsc-prepare .srfsc-zone-card__range {
+      font-size: 1.35rem;
+    }
+
+    .srfsc-prepare .srfsc-zone-card__title,
+    .srfsc-prepare .srfsc-panel__title {
+      font-size: 1rem;
+      line-height: 1.25;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .srfsc-app.srfsc-prepare {
+      padding-inline: 0.5rem;
+    }
+
+    .srfsc-prepare .srfsc-banner {
+      padding: 1rem;
+      min-height: 180px;
+    }
+
+    .srfsc-prepare .srfsc-panel__header {
+      align-items: flex-start;
+    }
+
+    .srfsc-prepare .srfsc-panel__meta {
+      flex-basis: 100%;
+    }
+
+    .srfsc-prepare .srfsc-zone {
+      padding: 0.7rem 0.8rem;
+    }
+
+    .srfsc-prepare .srfsc-zone__item {
+      font-size: 0.84rem;
+    }
+  }
+</style>
+
+<div class="srfsc-app srfsc-prepare">
   {% include projects/srfsc/srfsc-nav.html active="prepare" %}
   {% include projects/srfsc/srfsc-banner.html photo="prepare" eyebrow="Home hardening & education" title="Prepare your home" lead="The Forest Service calls this photo 'fuel treatments at work.' Clearing fuel around homes gives fire less to burn, and defensible space does the same for yours." %}
 
