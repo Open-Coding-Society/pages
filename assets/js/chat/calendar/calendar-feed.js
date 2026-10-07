@@ -250,10 +250,13 @@ export function markCardsForPeriod(container, period) {
 /* ── Calendar strip ──────────────────────────────────────────────────── */
 
 // A compact, read-only look at the current school week (ocs__card
-// ocs__calendar), pinned above the announcements. Clicking an event jumps to
-// the announcement that created it. Events for other class periods are
-// hidden when the viewer picks a period. `feed` needs revealEvent(id) and
-// onMessage(listener).
+// ocs__calendar). Used above the announcements and as the calendar smart card
+// (calendar-card.js). Options:
+//   slot / host       append a new card to `slot`, or fill an existing card element `host`
+//   feed              announcements only: revealEvent(id) for clicks, onMessage(listener) to refresh
+//   onSelectEvent     called with (event, item) on click instead of feed.revealEvent
+//   showEmpty         say so when a week has no events
+// Events for other class periods are hidden when getPeriod() returns a period.
 
 
 const MAX_CHIPS_PER_DAY = 3;
@@ -263,21 +266,29 @@ function weekRangeLabel(week) {
   return `Week ${week.index} · ${format(week.monday)} – ${format(week.friday)}`;
 }
 
-export function mountWeekView({ slot, weeks, getStore, getPeriod, feed }) {
+export function mountWeekView({
+  slot, host, weeks, getStore, getPeriod = () => 'all', feed, onSelectEvent, showEmpty = false,
+}) {
   const today = todayIso();
-  let week = findSchoolWeek(weeks, today);
+  const thisWeek = findSchoolWeek(weeks, today);
+  let week = thisWeek;
 
-  const root = document.createElement('div');
-  root.className = 'ocs__card ocs__calendar';
-  root.innerHTML = `
+  const root = host || document.createElement('div');
+  if (!host) root.className = 'ocs__card ocs__calendar';
+  const body = document.createElement('div');
+  body.className = 'ocs__calendar-body';
+  body.innerHTML = `
     <div class="ocs__calendar-header">
       <button type="button" class="ocs__btn small pill" data-step="-1" aria-label="Previous week"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
       <div class="ocs__calendar-heading"><span class="ocs__calendar-title"></span><span class="ocs__calendar-note"></span></div>
+      <button type="button" class="ocs__btn small pill" data-today hidden>Today</button>
       <button type="button" class="ocs__btn small pill" data-step="1" aria-label="Next week"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
     </div>
-    <div class="ocs__calendar-days" role="list"></div>`;
-  slot.appendChild(root);
-  const daysEl = root.querySelector('.ocs__calendar-days');
+    <div class="ocs__calendar-days" role="list"></div>
+    <p class="ocs__calendar-empty" hidden>Nothing on the calendar this week.</p>`;
+  root.appendChild(body);
+  if (!host) slot.appendChild(root);
+  const daysEl = body.querySelector('.ocs__calendar-days');
 
   function eventChip(event) {
     const chip = document.createElement('button');
@@ -286,15 +297,17 @@ export function mountWeekView({ slot, weeks, getStore, getPeriod, feed }) {
     chip.title = [event.title, formatPeriods(event.periods)].filter(Boolean).join(' · ');
     chip.textContent = event.title;
     chip.addEventListener('click', () => {
-      if (!feed.revealEvent(event.id)) chip.title = `${event.title}: no announcement for this one`;
+      if (onSelectEvent) onSelectEvent(event, chip);
+      else if (feed && !feed.revealEvent(event.id)) chip.title = `${event.title}: no announcement for this one`;
     });
     return chip;
   }
 
   async function refresh() {
     if (!week) return;
-    root.querySelector('.ocs__calendar-title').textContent = weekRangeLabel(week);
-    root.querySelector('.ocs__calendar-note').textContent = [week.theme, week.notes].filter(Boolean).join(' · ');
+    body.querySelector('.ocs__calendar-title').textContent = weekRangeLabel(week);
+    body.querySelector('.ocs__calendar-note').textContent = [week.theme, week.notes].filter(Boolean).join(' · ');
+    body.querySelector('[data-today]').hidden = week === thisWeek;
     const store = getStore();
     const [allEvents, breaks] = await Promise.all([
       store.listRange(week.monday, week.friday),
@@ -319,18 +332,20 @@ export function mountWeekView({ slot, weeks, getStore, getPeriod, feed }) {
       }
       daysEl.appendChild(cell);
     });
+    body.querySelector('.ocs__calendar-empty').hidden = !showEmpty || events.length > 0;
   }
 
-  root.querySelectorAll('[data-step]').forEach((button) => {
+  const load = () => refresh().catch((err) => console.error('Calendar: strip load failed', err));
+  body.querySelectorAll('[data-step]').forEach((button) => {
     button.addEventListener('click', () => {
       week = neighborWeek(weeks, week, Number(button.dataset.step)) || week;
-      refresh();
+      load();
     });
   });
+  body.querySelector('[data-today]').addEventListener('click', () => { week = thisWeek; load(); });
 
-  const load = () => refresh().catch((err) => console.error('Announcement calendar: calendar strip load failed', err));
   const unsubscribe = getStore().subscribe(load);
-  const unlisten = feed.onMessage(({ events }) => { if (events.length) load(); });
+  const unlisten = feed ? feed.onMessage(({ events }) => { if (events.length) load(); }) : () => {};
   load();
 
   return {
@@ -338,7 +353,7 @@ export function mountWeekView({ slot, weeks, getStore, getPeriod, feed }) {
     unmount() {
       unsubscribe();
       unlisten();
-      root.remove();
+      if (host) body.remove(); else root.remove();
     },
   };
 }
