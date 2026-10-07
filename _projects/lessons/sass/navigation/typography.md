@@ -8,7 +8,7 @@ lesson_topic: Typography
 lesson_part: interactive
 lesson_type: lesson
 lesson_source: OCS
-assignment_submission_type: code
+assignment_submission_type: link
 assignment_creator_uids:
   - "tristan-chiu0"
   - "3rii0"
