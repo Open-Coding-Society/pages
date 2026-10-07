@@ -1,5 +1,6 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import TimeLapScreen from './TimeLapScreen.js';
 
 class GameLevelSpring {
   constructor(gameEnv) {
@@ -31,7 +32,8 @@ class GameLevelSpring {
     }
     this.classes = [
         {class: GameEnvBackground, data: background_data},
-        {class: Player, data: player_data}
+        {class: Player, data: player_data},
+        {class: TimeLapScreen, data: { currentLap: 1, totalLaps: 3 }}
     ]
   }
 }
