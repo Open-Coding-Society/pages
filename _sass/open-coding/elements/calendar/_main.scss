@@ -1,8 +1,10 @@
-// Calendar elements (ocs__ grammar), used by the announcement chat and the
-// announcement calendar demo. Colors come from the shared theme variables, so
-// they follow the user's theme like the other ocs__ elements.
+// Calendar elements (ocs__ grammar), used by the announcement chat, the
+// calendar smart card and the announcement calendar demo. Colors come from the
+// shared theme variables, so they follow the user's theme like the other
+// ocs__ elements.
 //
-// - ocs__calendar  the calendar strip: one school week, prev/next, event items
+// - ocs__calendar  the calendar strip: one school week, prev/next, event items;
+//                  as a smart card it adds sizes (small | medium | large)
 // - ocs__event     an event card under an announcement (goes with ocs__card)
 // - ocs__command   the slash-command menu and fill-in slots above a composer
 
@@ -77,6 +79,110 @@
   cursor: pointer;
 
   &:hover { background: color-mix(in srgb, var(--pref-accent-color) 22%, var(--panel)); }
+}
+
+// ocs__btn sets display: inline-flex, which beats the [hidden] attribute.
+.ocs__calendar-header [data-today][hidden] { display: none; }
+
+/* ── ocs__calendar smart card (_includes/ocs_calendar_card.html) ───── */
+
+// Sizes use the ocs__ grammar: `ocs__calendar small | medium | large`.
+// One map entry per size, like the button $sizes map:
+// card padding, day min-height, day padding, date size, item text size, gap
+$ocs-calendar-sizes: (
+  small:  (0.5rem 0.6rem,  2.75rem, 0.25rem, 0.8rem,  0.66rem, 0.3rem),
+  medium: (0.75rem 0.9rem, 3.75rem, 0.35rem, 0.95rem, 0.74rem, 0.45rem),
+  large:  (1rem 1.25rem,   5.5rem,  0.5rem,  1.1rem,  0.82rem, 0.6rem)
+);
+
+// .small / .medium / .large are also the global button sizes
+// (elements/buttons/_utilities.scss). On the card they must not turn it into a
+// short borderless button, so this resets every property button-style sets.
+@mixin ocs-calendar-size($card-padding, $day-height, $day-padding, $date-size, $item-size, $gap) {
+  height: auto;
+  padding: $card-padding;
+  border: 1px solid var(--ui-border);
+  border-radius: 1rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  letter-spacing: normal;
+  cursor: default;
+
+  .ocs__calendar-days { gap: $gap; }
+  .ocs__calendar-day { min-height: $day-height; padding: $day-padding; }
+  .ocs__calendar-day-label b { font-size: $date-size; }
+  .ocs__calendar-item { font-size: $item-size; }
+}
+
+@each $name, $values in $ocs-calendar-sizes {
+  .ocs__card.ocs__calendar.#{$name} { @include ocs-calendar-size($values...); }
+}
+
+.ocs__calendar-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ocs__calendar-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  i { color: var(--pref-accent-color); }
+}
+
+.ocs__calendar-status {
+  margin: 0 0 0.5rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.5rem;
+  background: var(--ui-bg);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  &[hidden] { display: none; }
+}
+
+.ocs__calendar-empty {
+  margin: 0.5rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-align: center;
+  &[hidden] { display: none; }
+}
+
+.ocs__calendar.is-loading .ocs__calendar-mount { opacity: 0.5; }
+
+// The clicked event, shown in the card as an ocs__event card.
+.ocs__calendar-detail {
+  position: relative;
+  margin-top: 0.6rem;
+  &[hidden] { display: none; }
+  .ocs__event-list { max-width: none; margin-top: 0; }
+}
+
+.ocs__calendar-detail-close {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  z-index: 1;
+}
+
+// Narrow card (a sidebar, a phone): days stack into a list. Set by
+// calendar-card.js from the card's own width, not the screen's.
+.ocs__card.ocs__calendar.is-narrow {
+  .ocs__calendar-card-header { flex-wrap: wrap; }
+  .ocs__calendar-days { grid-template-columns: 1fr; overflow-x: visible; }
+  .ocs__calendar-day {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    min-height: 0;
+  }
+  .ocs__calendar-day-label { min-width: 3.25rem; }
+  .ocs__calendar-item { max-width: 100%; }
 }
 
 /* ── ocs__event ────────────────────────────────────────────────────── */
