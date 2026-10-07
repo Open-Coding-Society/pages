@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: SRFSC Council Admin
-description: Admin tools for the Scripps Ranch Fire Safe Council site.
+description: Admin tools for managing updates, events, volunteer signups, and hazard reports for the Scripps Ranch Fire Safe Council.
 permalink: /capstone/srfsc/app/admin/
 hide: true
 search_exclude: true

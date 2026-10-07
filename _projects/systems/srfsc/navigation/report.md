@@ -9,7 +9,7 @@ hide: true
 <!-- markdownlint-disable MD033 -->
 <div class="srfsc-app">
   {% include projects/srfsc/srfsc-nav.html active="report" %}
-  {% include projects/srfsc/srfsc-banner.html photo="report" eyebrow="Fuel reduction" title="Report a fire hazard" lead="Neighbors spot hazards first. Tell us where, and the council will review it and schedule clearing when needed." %}
+  {% include projects/srfsc/srfsc-banner.html photo="report" eyebrow="Fuel reduction" title="Report a fire hazard" lead="Neighbors spot hazards first. Share what you saw and the council will review it and connect the right people to the next step." %}
 
   <p class="srfsc-alert">Active fire or emergency? <strong>Call 911.</strong> This form is for non-emergency hazards only.</p>
 
@@ -36,10 +36,10 @@ hide: true
     <aside class="srfsc-panel">
       <h2 class="srfsc-panel__title">What happens next</h2>
       <ol class="srfsc-steps">
-        <li><strong>New.</strong> Your report reaches the council.</li>
-        <li><strong>Reviewed.</strong> A volunteer checks the location.</li>
+        <li><strong>Received.</strong> Your report reaches the council.</li>
+        <li><strong>Reviewed.</strong> A volunteer checks the location and severity.</li>
         <li><strong>Scheduled.</strong> Clearing is added to a work day or referred to the right agency.</li>
-        <li><strong>Resolved.</strong> The hazard is cleared.</li>
+        <li><strong>Resolved.</strong> The hazard is addressed and the neighborhood is safer.</li>
       </ol>
       <div class="srfsc-kpi-row">
         <div class="srfsc-kpi srfsc-kpi--live"><span class="srfsc-kpi__value" data-live-stat="open_reports">–</span><span class="srfsc-kpi__label">being handled</span></div>

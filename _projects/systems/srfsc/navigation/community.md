@@ -9,7 +9,7 @@ hide: true
 <!-- markdownlint-disable MD033 -->
 <div class="srfsc-app">
   {% include projects/srfsc/srfsc-nav.html active="community" %}
-  {% include projects/srfsc/srfsc-banner.html photo="community" eyebrow="Community trust" title="Community updates" lead="What the council is working on, what volunteers have accomplished, and what our agency partners are saying." %}
+  {% include projects/srfsc/srfsc-banner.html photo="community" eyebrow="Community trust" title="Community updates" lead="Neighbors, volunteers, and local agencies are working together to reduce wildfire risk and keep Scripps Ranch informed and prepared." %}
 
   <div class="srfsc-columns srfsc-columns--wide-left">
     <section class="srfsc-panel">

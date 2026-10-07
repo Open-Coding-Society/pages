@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: Prepare Your Home for Wildfire
-description: Defensible-space zones, home hardening tips, and a readiness check from the Scripps Ranch Fire Safe Council.
+description: Defensible-space guidance, home hardening tips, and a quick wildfire readiness check for Scripps Ranch residents.
 permalink: /capstone/srfsc/app/prepare/
 hide: true
 ---
@@ -9,7 +9,7 @@ hide: true
 <!-- markdownlint-disable MD033 -->
 <div class="srfsc-app ocs__container">
   {% include projects/srfsc/srfsc-nav.html active="prepare" %}
-  {% include projects/srfsc/srfsc-banner.html photo="prepare" eyebrow="Home hardening & education" title="Prepare your home" lead="The Forest Service calls this photo 'fuel treatments at work.' Clearing fuel around homes gives fire less to burn, and defensible space does the same for yours." %}
+  {% include projects/srfsc/srfsc-banner.html photo="prepare" eyebrow="Home hardening & education" title="Prepare your home" lead="Wildfire preparedness starts with the home. Make the first few feet ember-resistant, reduce fuel around the structure, and build a simple plan for leaving early if conditions worsen." %}
 
   <section class="srfsc-zones ocs__grid ocs__grid--card" aria-label="Defensible space zones">
     <article class="srfsc-zone-card srfsc-zone-card--0 ocs__grid-cell">

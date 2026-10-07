@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: SRFSC Events
-description: Upcoming Scripps Ranch Fire Safe Council clearing days, block meetings, and fire safety expos, with one-click RSVP.
+description: Upcoming clearing days, block meetings, and fire safety events in Scripps Ranch, with one-click RSVP.
 permalink: /capstone/srfsc/app/events/
 hide: true
 ---
@@ -9,7 +9,7 @@ hide: true
 <!-- markdownlint-disable MD033 -->
 <div class="srfsc-app">
   {% include projects/srfsc/srfsc-nav.html active="events" %}
-  {% include projects/srfsc/srfsc-banner.html photo="events" eyebrow="Join your neighbors" title="Upcoming events" lead="Clearing days, block meetings, and fire safety expos. Every work party clears fuel that would otherwise carry fire into our canyons." %}
+  {% include projects/srfsc/srfsc-banner.html photo="events" eyebrow="Join your neighbors" title="Upcoming events" lead="Clearing days, block meetings, and fire safety expos. Every event helps reduce fuel, build confidence, and make our neighborhood safer." %}
 
   <div class="srfsc-columns srfsc-columns--wide-left">
     <section class="srfsc-panel">
@@ -24,11 +24,11 @@ hide: true
       <h2 class="srfsc-panel__title">What to expect</h2>
       <dl class="srfsc-facts">
         <dt>Clearing Day</dt>
-        <dd>A monthly work party along canyon edges. Gloves and tools provided. Wear long sleeves and closed-toe shoes.</dd>
+        <dd>A monthly work party along canyon edges. Gloves and tools are provided. Wear long sleeves and closed-toe shoes.</dd>
         <dt>Block Meeting</dt>
-        <dd>A neighbor hosts; the council brings defensible-space and evacuation tips for your street.</dd>
+        <dd>A neighbor hosts the conversation while the council shares defensible-space and evacuation tips for your street.</dd>
         <dt>Fire Safety Expo</dt>
-        <dd>Meet San Diego Fire-Rescue and CAL FIRE, see home-hardening demos, and pick up checklists.</dd>
+        <dd>Meet San Diego Fire-Rescue and CAL FIRE, see home-hardening demos, and pick up practical checklists.</dd>
       </dl>
       <p class="srfsc-panel__note">Can't make it? <a href="{{ site.baseurl }}/capstone/srfsc/app/get-involved/">Sign up to volunteer</a> and we'll reach out about future events.</p>
     </aside>

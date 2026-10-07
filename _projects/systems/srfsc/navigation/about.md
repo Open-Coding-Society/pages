@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: About the Scripps Ranch Fire Safe Council
-description: Why Scripps Ranch neighbors founded the council after the 2003 Cedar Fire, and the programs that protect the neighborhood today.
+description: Why Scripps Ranch neighbors founded the council after the 2003 Cedar Fire, and the programs that help keep the neighborhood safer today.
 permalink: /capstone/srfsc/app/about/
 hide: true
 ---
@@ -9,7 +9,7 @@ hide: true
 <!-- markdownlint-disable MD033 -->
 <div class="srfsc-app">
   {% include projects/srfsc/srfsc-nav.html active="about" %}
-  {% include projects/srfsc/srfsc-banner.html photo="about" eyebrow="October 26, 2003 · Miramar" title="Why we exist" lead="The Cedar Fire jumped Interstate 15 next to Scripps Ranch and destroyed 312 homes in our neighborhood. A year later, neighbors founded the council." %}
+  {% include projects/srfsc/srfsc-banner.html photo="about" eyebrow="Preparedness starts at home" title="Why we exist" lead="The Cedar Fire jumped Interstate 15 next to Scripps Ranch and changed our neighborhood. We formed the council to help neighbors prepare before the next wildfire arrives." %}
 
   <section class="srfsc-timeline" aria-label="SRFSC history">
     <div class="srfsc-timeline__item">
@@ -18,11 +18,11 @@ hide: true
     </div>
     <div class="srfsc-timeline__item">
       <span class="srfsc-timeline__year">2004</span>
-      <p>Residents form the Scripps Ranch Fire Safe Council, an all-volunteer 501(c)(3).</p>
+      <p>Residents form the Scripps Ranch Fire Safe Council, an all-volunteer 501(c)(3) focused on wildfire preparedness.</p>
     </div>
     <div class="srfsc-timeline__item">
       <span class="srfsc-timeline__year">Today</span>
-      <p>650+ residential firebreaks, 340 hazard trees removed, and education for all 12,000 homes.</p>
+      <p>650+ residential firebreaks, 340 hazard trees removed, and education for all 12,000 homes in Scripps Ranch.</p>
     </div>
   </section>
 
@@ -30,22 +30,22 @@ hide: true
     <h2 class="srfsc-panel__title">What we do</h2>
     <div class="srfsc-programs">
       <article class="srfsc-program">
-        <h3>Fuel Reduction &amp; Firebreaks</h3>
-        <p>We clear dead vegetation, remove hazard trees, and keep defensible space along canyon edges.</p>
+        <h3>Fuel reduction &amp; firebreaks</h3>
+        <p>We clear dead vegetation, remove hazard trees, and maintain defensible space along canyon edges.</p>
         <a class="srfsc-program__link" href="{{ site.baseurl }}/capstone/srfsc/app/report/">Report a hazard →</a>
       </article>
       <article class="srfsc-program">
-        <h3>Home Hardening</h3>
+        <h3>Home hardening</h3>
         <p>We share defensible-space checklists and ember-resistant upgrades for every zone around your home.</p>
         <a class="srfsc-program__link" href="{{ site.baseurl }}/capstone/srfsc/app/prepare/">Prepare your home →</a>
       </article>
       <article class="srfsc-program">
-        <h3>Community Education</h3>
-        <p>We run monthly newsletters, block meetings, open houses, and fire safety expos.</p>
+        <h3>Community education</h3>
+        <p>We host block meetings, monthly newsletters, open houses, and neighborhood outreach events.</p>
         <a class="srfsc-program__link" href="{{ site.baseurl }}/capstone/srfsc/app/events/">See events →</a>
       </article>
       <article class="srfsc-program">
-        <h3>Agency Alliances</h3>
+        <h3>Agency partnerships</h3>
         <p>We coordinate with CAL FIRE, San Diego Fire-Rescue, and the California Conservation Corps.</p>
         <a class="srfsc-program__link" href="{{ site.baseurl }}/capstone/srfsc/app/community/">Partner updates →</a>
       </article>

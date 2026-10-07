@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: Scripps Ranch Fire Safe Council
-description: SRFSC community dashboard — live fire weather, impact numbers, and a hub linking to events, volunteering, hazard reports, home preparation, community news, and the council's story.
+description: SRFSC community dashboard — live fire weather, neighborhood impact, and a hub for events, volunteering, hazard reports, home preparation, and community updates.
 permalink: /capstone/srfsc/app/
 author: Krish Kelageri, Jasan Boprai, Shourya Patel
 ---
@@ -16,10 +16,10 @@ author: Krish Kelageri, Jasan Boprai, Shourya Patel
   <section class="srfsc-hero" id="mission">
     <div class="srfsc-hero__message">
       <p class="srfsc-hero__eyebrow">Scripps Ranch · San Diego · All-volunteer since 2004</p>
-      <h1 class="srfsc-hero__title">In 2003 the Cedar Fire destroyed 312 homes here. We work so the next fire meets a prepared neighborhood.</h1>
+      <h1 class="srfsc-hero__title">A prepared neighborhood is the best defense against wildfire.</h1>
       <p class="srfsc-hero__lead">
-        We clear hazardous vegetation, maintain firebreaks along canyon edges, and help all 12,000 Scripps Ranch
-        homes get ready. That gives firefighters a fighting chance and gives you more time to get out safely.
+        We clear hazardous vegetation, maintain firebreaks along canyon edges, and help neighbors prepare before the next fire arrives.
+        That gives residents more time to act, supports first responders, and strengthens the whole community.
       </p>
       <div class="srfsc-actions" id="actions">
         <a class="ocs__btn alert-green fill" href="{{ srfsc_root }}get-involved/">Volunteer</a>
@@ -68,12 +68,12 @@ author: Krish Kelageri, Jasan Boprai, Shourya Patel
     </a>
     <a class="srfsc-hub__card srfsc-hub__card--report" href="{{ srfsc_root }}report/">
       <span class="srfsc-hub__title">Report a Hazard</span>
-      <span class="srfsc-hub__text">Dead brush, a leaning tree, a blocked firebreak? Tell the council where.</span>
+      <span class="srfsc-hub__text">Dead brush, a leaning tree, or a blocked firebreak? Tell the council where.</span>
       <span class="srfsc-hub__status" data-offline-text="Tell us where →"><span data-live-stat="open_reports">–</span> open · <span data-live-stat="resolved_reports">–</span> resolved</span>
     </a>
     <a class="srfsc-hub__card srfsc-hub__card--prepare" href="{{ srfsc_root }}prepare/">
       <span class="srfsc-hub__title">Prepare Your Home</span>
-      <span class="srfsc-hub__text">Defensible-space zones, home hardening, and a 2-minute readiness check.</span>
+      <span class="srfsc-hub__text">Defensible-space zones, home hardening, and a quick readiness check.</span>
       <span class="srfsc-hub__status">Take the readiness check →</span>
     </a>
     <a class="srfsc-hub__card srfsc-hub__card--community" href="{{ srfsc_root }}community/">
@@ -83,7 +83,7 @@ author: Krish Kelageri, Jasan Boprai, Shourya Patel
     </a>
     <a class="srfsc-hub__card srfsc-hub__card--about" href="{{ srfsc_root }}about/">
       <span class="srfsc-hub__title">About SRFSC</span>
-      <span class="srfsc-hub__text">Why neighbors founded the council after the 2003 Cedar Fire, and what we do.</span>
+      <span class="srfsc-hub__text">Learn why neighbors founded the council after the 2003 Cedar Fire.</span>
       <span class="srfsc-hub__status">Our story and programs →</span>
     </a>
   </section>
