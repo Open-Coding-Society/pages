@@ -2,14 +2,21 @@ require "jekyll"
 
 ROOT = File.expand_path("..", __dir__)
 
-class CatalogCardInclude < Liquid::Tag
+# Renders {% include name.html %} from _includes/, as Jekyll does: the layout
+# includes blog-catalog.html, which includes post_list_image_card.html.
+class CatalogInclude < Liquid::Tag
+  def initialize(tag_name, markup, tokens)
+    super
+    @file = markup.strip
+  end
+
   def render(context)
-    Liquid::Template.parse(File.read(File.join(ROOT, "_includes/post_list_image_card.html")))
+    Liquid::Template.parse(File.read(File.join(ROOT, "_includes", @file)))
       .render!(context)
   end
 end
 
-Liquid::Template.register_tag("include", CatalogCardInclude)
+Liquid::Template.register_tag("include", CatalogInclude)
 Liquid::Template.register_filter(Jekyll::Filters)
 
 site = Jekyll::Site.new(Jekyll.configuration(
