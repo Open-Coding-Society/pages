@@ -310,32 +310,21 @@ function attachFilterListeners() {
 
 /**
  * ============================================
- * SPRINT COLLAPSE/EXPAND: Toggle sprint state
+ * SPRINT CARDS: Open the sprint's intro page
  * ============================================
+ * Each sprint card is one big button. Its Open link is the real link, for
+ * the keyboard and for opening in a new tab; a click anywhere else on the
+ * card follows it. Clicks on the card's own buttons, on the calendar
+ * dropdown, or that end a text selection are left alone.
  */
-function toggleSprint(card, control) {
-  const isCollapsed = card.classList.toggle('collapsed');
-  if (control) {
-    control.setAttribute('aria-expanded', (!isCollapsed).toString());
-    control.querySelector('.sprint-toggle-icon').textContent = isCollapsed ? '▸' : '▾';
-  }
-}
-
-function attachSprintToggleListeners() {
+function attachSprintCardLinks() {
   document.querySelectorAll('.sprint-card').forEach(card => {
-    const toggleBtn = card.querySelector('.sprint-toggle-btn');
-    if (toggleBtn) {
-      toggleBtn.querySelector('.sprint-toggle-icon').textContent = '▸';
-      toggleBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleSprint(card, toggleBtn);
-      });
-    }
-    card.querySelector('.sprint-header').addEventListener('click', (e) => {
-      if (!e.target.closest('.sprint-controls')) {
-        toggleSprint(card, toggleBtn);
-      }
+    const link = card.querySelector('[data-sprint-link]');
+    if (!link) return;
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('a, button, input, select, textarea, label, .sprint-date-control')) return;
+      if (window.getSelection().toString()) return;
+      link.click();
     });
   });
 }
@@ -1197,7 +1186,7 @@ document.addEventListener('DOMContentLoaded', () => {
   attachCompletionToggleListeners();
   attachPriorityListeners();
   attachFilterListeners();
-  attachSprintToggleListeners();
+  attachSprintCardLinks();
 
   // Modal wiring
   wireModalCloseButtons();
