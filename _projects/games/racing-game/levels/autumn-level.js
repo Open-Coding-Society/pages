@@ -1,6 +1,7 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
-import Box from '@assets/js/GameEnginev1.1/essentials/Box.js';
+import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
+import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
 
 class GameLevelAutumn {
   constructor(gameEnv) {
@@ -43,9 +44,11 @@ class GameLevelAutumn {
     const BoxData = {
       id: "box-1",
       src: "/images/projects/racing-game/BoxObstacle.png",
-      coordinateSpace: "normalized",
-      position: { x: 0.5, y: 0.5 },
-      size: { width: 0.1, height: 0.1 }
+      SCALE_FACTOR: 18,
+      INIT_POSITION: { x: 0.5, y: 0.5 },
+      orientation: { rows: 1, columns: 1 },
+      down: { row: 0, start: 0, columns: 1 },
+      hitbox: { widthPercentage: 0.5, heightPercentage: 0.5 }
     };
 
 
@@ -54,7 +57,7 @@ class GameLevelAutumn {
       { class: Player, data: player_data },
       { class: SplineBarrier, data: barrierData1 },
       { class: SplineBarrier, data: barrierData2 },
-      { class: Box, data: BoxData }
+      { class: Character, data: BoxData }
     ];
   }
 }
