@@ -111,15 +111,22 @@
             {%- assign weekPosts = weekGroup.items -%}
             {%- assign weekData = sprint[week] -%}
             {%- comment -%}
-              A week is a <details> element, so the browser opens and closes it
-              and draws its arrow with no CSS or script. The lesson's own week
-              starts open. Everything inside is an OCS component.
+              A week is a <details> element, so the browser opens and closes it.
+              Its summary reuses the sprint row's classes, so a week reads like
+              a sprint one level down: chevron, title, then its W and count
+              pills. The week's rows are not indented further, so lesson titles
+              keep the sidebar's full width. The lesson's own week starts open,
+              and the script in _layouts/post.html turns the chevron when a
+              week opens or closes.
             {%- endcomment -%}
             <details data-week-group{% if week == current_week %} open{% endif %}>
-              <summary>
-                <span class="ocs__status-pill ocs__status-pill--good">W{{ week }}</span>
-                <span class="ocs__status-pill ocs__status-pill--neutral" data-week-count data-week-total="{{ weekPosts.size }}">0/{{ weekPosts.size }}</span><br>
-                Week {{ week }}{% if weekData.theme %}: {{ weekData.theme }}{% endif %}
+              <summary class="sprint-toggle">
+                <i class="fas {% if week == current_week %}fa-chevron-down{% else %}fa-chevron-right{% endif %} sprint-chevron" aria-hidden="true"></i>
+                <span class="sprint-info">
+                  <span class="lesson-title"><strong>{% if weekData.theme %}{{ weekData.theme | escape }}{% else %}Week {{ week }}{% endif %}</strong></span><br>
+                  <span class="ocs__status-pill ocs__status-pill--good">W{{ week }}</span>
+                  <span class="ocs__status-pill ocs__status-pill--neutral" data-week-count data-week-total="{{ weekPosts.size }}">0/{{ weekPosts.size }}</span>
+                </span>
               </summary>
 
               {%- comment -%}

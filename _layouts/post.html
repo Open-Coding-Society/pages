@@ -223,6 +223,17 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     chevron.classList.toggle('fa-chevron-down', isHidden);
   };
 
+  // A week is a <details>, so the browser opens and closes it; this only
+  // turns its chevron to match, the way toggleSprint() turns a sprint's.
+  document.querySelectorAll('[data-week-group]').forEach((week) => {
+    week.addEventListener('toggle', () => {
+      const chevron = week.querySelector('summary .sprint-chevron');
+      if (!chevron) return;
+      chevron.classList.toggle('fa-chevron-right', !week.open);
+      chevron.classList.toggle('fa-chevron-down', week.open);
+    });
+  });
+
   /**
    * ============================================
    * COMPLETION DATA LAYER: LocalStorage operations
