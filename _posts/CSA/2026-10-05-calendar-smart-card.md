@@ -39,11 +39,11 @@ The cards below use `sample="true"`, so you can see a full week of events withou
 
 ### In a narrow space
 
-The same card in a two-column layout, the width of a sidebar. On the right is CSP filtered to period 3 (`period="3"`). The period-4-only office hours is hidden there.
+The same card in a two-column layout, the width of a sidebar. On the right is CSP, which meets in periods 3 and 4. The card shows events for both periods. Open an event to see which period it is for: the office hours is only for period 4.
 
 <div class="ocs__split">
 {% include ocs_calendar_card.html course="csa" sample=true %}
-{% include ocs_calendar_card.html course="csp" period="3" sample=true %}
+{% include ocs_calendar_card.html course="csp" sample=true %}
 </div>
 
 ## Options
@@ -51,7 +51,6 @@ The same card in a two-column layout, the width of a sidebar. On the right is CS
 | Option | Values | Default |
 |---|---|---|
 | `course` | `csa`, `csp`, `csse`, `csh`, or `all` | the page's `course`, otherwise `all` |
-| `period` | one class period, for example `3` | every period |
 | `title` | the card heading | "CSA calendar", or "Class calendar" for `all` |
 | `sample` | `true` shows example events | off |
 
