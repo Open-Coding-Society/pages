@@ -2,11 +2,173 @@
   A course's Blogs page: the posts from across the site, the same list as
   /navigation/blogs/, shown beside the sidebar so the course stays one click
   away. The list is built from the posts on each build, so new posts appear
-  on their own. lesson-body gives the title the lessons' heading style.
+  on their own. lesson-body gives the titles the lessons' heading style.
+
+  A post opens right here instead of on its own page: the script below reads
+  the post's page, shows its article in the reader with a button back to the
+  list, and keeps ?post=<address> in the address bar so a reload, a shared
+  link, or the browser's back button all work. The list and the reader are
+  shown and hidden with the hidden attribute on plain divs.
 {%- endcomment %}
-<div class="lesson-body">
-  <h2>{{ page.title | escape }}</h2>
-  <p>Posts from across the site: pinned posts first, then the newest.</p>
+<div data-blog-list>
+  <div class="lesson-body">
+    <h2>{{ page.title | escape }}</h2>
+    <p>Posts from across the site: pinned posts first, then the newest. A post opens right here.</p>
+  </div>
+
+  {% include blog-catalog.html %}
 </div>
 
-{% include blog-catalog.html %}
+<div data-blog-reader hidden>
+  <div class="lesson-body">
+    <p class="ocs__links">
+      <button class="ocs__btn ocs__btn--icon small accent" type="button" data-blog-back>
+        <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-arrow-left"></i></span>
+        <span>Back to blogs</span>
+      </button>
+      <a class="ocs__btn ocs__btn--icon small accent" href="{{ site.baseurl }}/navigation/blogs/" data-blog-full>
+        <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-up-right-from-square"></i></span>
+        <span>Open full page</span>
+      </a>
+    </p>
+    <h2 data-blog-title></h2>
+    <p data-blog-date></p>
+    <div data-blog-note hidden>
+      <div class="ocs__callout">Some parts of this post, like code runners, only work on its full page.</div>
+    </div>
+    <div data-blog-content></div>
+  </div>
+</div>
+
+<script type="module">
+  const list = document.querySelector('[data-blog-list]');
+  const reader = document.querySelector('[data-blog-reader]');
+  const backButton = reader.querySelector('[data-blog-back]');
+  const fullPage = reader.querySelector('[data-blog-full]');
+  const titleEl = reader.querySelector('[data-blog-title]');
+  const dateEl = reader.querySelector('[data-blog-date]');
+  const noteEl = reader.querySelector('[data-blog-note]');
+  const contentEl = reader.querySelector('[data-blog-content]');
+  const scroller = document.querySelector('.lesson-content'); // the lesson player's scrolling pane
+
+  // Where a post's own page keeps its article, from the layouts its posts use.
+  // A post with no layout is a bare fragment, so its whole body is the article.
+  const ARTICLE_SELECTORS = ['.lesson-body', '.post-content', 'article', 'main'];
+  // Parts that cannot run here. Their scripts never run when HTML is inserted,
+  // so the reader drops them and points to the full page instead.
+  const INTERACTIVE = 'script, form, .code-runner-container, #lesson-pager';
+
+  let listScroll = 0;
+  let openedFrom = null;
+  let latestRequest = 0;
+
+  // ?post=/some/post/ with readable slashes; anything not on this site is refused.
+  function addressFor(postPath) {
+    return `?post=${encodeURIComponent(postPath).replace(/%2F/g, '/')}`;
+  }
+
+  function postInAddress() {
+    const post = new URLSearchParams(location.search).get('post');
+    if (!post) return null;
+    const url = new URL(post, location.origin);
+    return url.origin === location.origin ? url.pathname : null;
+  }
+
+  function cardFor(postPath) {
+    return [...list.querySelectorAll('a.post-link')].find((a) => new URL(a.href).pathname === postPath) || null;
+  }
+
+  function showList() {
+    reader.hidden = true;
+    list.hidden = false;
+    contentEl.replaceChildren();
+    if (scroller) scroller.scrollTop = listScroll;
+    if (openedFrom) openedFrom.focus({ preventScroll: true });
+  }
+
+  // The post's article, made safe to show here: links and images point at the
+  // post's own address, and parts that only work on the full page are dropped.
+  function articleFrom(html, postUrl) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const article = ARTICLE_SELECTORS.map((selector) => doc.querySelector(selector)).find(Boolean) || doc.body;
+    article.querySelectorAll('.site-header, .site-footer').forEach((el) => el.remove());
+    const interactive = article.querySelectorAll(INTERACTIVE);
+    interactive.forEach((el) => el.remove());
+    article.querySelectorAll('*').forEach((el) => {
+      for (const attr of [...el.attributes]) {
+        if (attr.name.startsWith('on')) el.removeAttribute(attr.name);
+      }
+      for (const attr of ['src', 'href']) {
+        const value = el.getAttribute(attr);
+        if (!value || value.startsWith('#')) continue;
+        try {
+          el.setAttribute(attr, new URL(value, postUrl).href);
+        } catch {
+          el.removeAttribute(attr); // not a usable address
+        }
+      }
+    });
+    const title = doc.title.replace(/\s*\|[^|]*$/, '').trim();
+    return { article, title, interactive: interactive.length > 0 };
+  }
+
+  async function showPost(postPath) {
+    const request = ++latestRequest;
+    const card = cardFor(postPath);
+    list.hidden = true;
+    reader.hidden = false;
+    fullPage.href = postPath;
+    titleEl.textContent = card ? card.textContent.trim() : '';
+    const date = card && card.closest('li') && card.closest('li').querySelector('.post-meta');
+    dateEl.textContent = date ? date.textContent.trim() : '';
+    noteEl.hidden = true;
+    contentEl.textContent = 'Loading…';
+    if (scroller) scroller.scrollTop = 0;
+    backButton.focus();
+
+    try {
+      const response = await fetch(postPath);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const { article, title, interactive } = articleFrom(await response.text(), new URL(postPath, location.origin));
+      if (request !== latestRequest) return; // a newer post was opened meanwhile
+      if (!titleEl.textContent) titleEl.textContent = title;
+      noteEl.hidden = !interactive;
+      contentEl.replaceChildren(...article.childNodes);
+      if (!contentEl.textContent.trim()) contentEl.textContent = 'This post has nothing to show here. Open its full page instead.';
+    } catch (error) {
+      if (request !== latestRequest) return;
+      console.warn('Blogs reader: could not load', postPath, error);
+      contentEl.textContent = 'This post could not be loaded here. Open its full page instead.';
+    }
+  }
+
+  list.addEventListener('click', (event) => {
+    const link = event.target.closest('a.post-link');
+    // Let new-tab and new-window clicks open the full page as usual.
+    if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    const postPath = new URL(link.href).pathname;
+    openedFrom = link;
+    if (scroller) listScroll = scroller.scrollTop;
+    history.pushState({ post: postPath }, '', addressFor(postPath));
+    showPost(postPath);
+  });
+
+  backButton.addEventListener('click', () => {
+    if (history.state && history.state.post) {
+      history.back(); // popstate shows the list
+    } else {
+      history.replaceState(null, '', location.pathname); // opened from a link: just drop ?post
+      showList();
+    }
+  });
+
+  window.addEventListener('popstate', () => {
+    const postPath = postInAddress();
+    if (postPath) showPost(postPath);
+    else showList();
+  });
+
+  const linkedPost = postInAddress();
+  if (linkedPost) showPost(linkedPost);
+</script>
