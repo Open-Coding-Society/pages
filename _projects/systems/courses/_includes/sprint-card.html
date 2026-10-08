@@ -78,10 +78,30 @@
     </div>
 
     <!-- Full-width sprint info section below buttons -->
+    {%- comment -%}
+      Every card shows the same amount of text, so the cards are the same
+      height: the title fits on one line (40 characters) and the description
+      on two (130). A cut ends on a whole word, or mid-word if there is no
+      space, and adds "…". The full title is the link's tooltip, and both
+      are in full on the sprint's intro page.
+    {%- endcomment -%}
+    {%- assign fullTitle = unitData.title | strip -%}
+    {%- assign cardTitle = fullTitle -%}
+    {%- if cardTitle.size > 40 -%}
+      {%- assign cut = cardTitle | truncate: 41, "" | split: " " | pop | join: " " -%}
+      {%- if cut == "" -%}{%- assign cut = cardTitle | truncate: 39, "" -%}{%- endif -%}
+      {%- assign cardTitle = cut | append: "…" -%}
+    {%- endif -%}
+    {%- assign cardDescription = unitData.description | strip_html | strip -%}
+    {%- if cardDescription.size > 130 -%}
+      {%- assign cut = cardDescription | truncate: 131, "" | split: " " | pop | join: " " -%}
+      {%- if cut == "" -%}{%- assign cut = cardDescription | truncate: 129, "" -%}{%- endif -%}
+      {%- assign cardDescription = cut | append: "…" -%}
+    {%- endif %}
     <div class="sprint-info-full" style="width: 100%;">
-      <h2 class="sprint-title"><a href="{{ site.baseurl }}/{{ page.course }}/sprint-{{ unit }}/" data-sprint-link>{{ unitData.title }}</a></h2>
-      {% if unitData.description %}
-        <p class="sprint-meta">{{ unitData.description }}</p>
+      <h2 class="sprint-title"><a href="{{ site.baseurl }}/{{ page.course }}/sprint-{{ unit }}/" data-sprint-link{% if cardTitle != fullTitle %} title="{{ fullTitle | escape }}"{% endif %}>{{ cardTitle }}</a></h2>
+      {% if cardDescription != "" %}
+        <p class="sprint-meta">{{ cardDescription }}</p>
       {% endif %}
     </div>
 
