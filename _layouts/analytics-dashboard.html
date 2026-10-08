@@ -8,12 +8,13 @@ active_tab: analytics
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css" />
 <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css" />
 <div class="w-full">
-    <div class="space-y-4 sm:space-y-6"> 
+    <div class="space-y-4 sm:space-y-6">
         <div class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700 relative">
             <ul class="flex flex-wrap -mb-px relative" id="tab-bar">
                 <li class="me-2">
                     <a href="#" id="tab-ocs-analytics"
-                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300 active text-blue-500 border-blue-500" aria-current="page">
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300 active text-blue-500 border-blue-500"
+                        aria-current="page">
                         OCS Analytics
                     </a>
                 </li>
@@ -44,7 +45,7 @@ active_tab: analytics
 
         <!-- tab content container -->
         <div id="tab-content-container" class="relative min-h-[400px]">
-            
+
             <!-- OCS Analytics tab content -->
             <div id="tab-content-ocs-analytics" class="tab-content block px-6 py-4 text-neutral-200">
                 <div class="flex items-center justify-center min-h-[400px]">
@@ -58,16 +59,19 @@ active_tab: analytics
             <!-- GitHub Analytics tab content -->
             <div id="tab-content-github" class="tab-content hidden px-6 py-4 text-neutral-200">
                 <!-- Grid -->
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 sm:grid-rows-4 lg:grid-rows-2 gap-4 sm:gap-6 text-neutral-200">
+                <div
+                    class="grid sm:grid-cols-2 lg:grid-cols-4 sm:grid-rows-4 lg:grid-rows-2 gap-4 sm:gap-6 text-neutral-200">
                     <!-- Avatar Card -->
-                    <div class="row-span-2 col-start-1 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700">
+                    <div
+                        class="row-span-2 col-start-1 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700">
                         <div class="p-4 md:p-5 flex justify-center items-center">
                             <img src="" alt="User Avatar" id="avatar" class="w-32 h-32 rounded-xl object-cover" />
                         </div>
                     </div>
 
                     <!-- Profile Info Card -->
-                    <div class="row-span-2 col-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
+                    <div
+                        class="row-span-2 col-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
                         <p class="text-xs uppercase text-neutral-500 mb-2">GitHub Info (Trimester)</p>
                         <h3 id="username" class="text-2xl font-medium mb-2">Loading...</h3>
                         <p id="profile-url" class="text-sm mb-1">Profile URL: Loading...</p>
@@ -79,7 +83,8 @@ active_tab: analytics
                     </div>
 
                     <!-- Commits Card -->
-                    <div class="col-start-3 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
+                    <div
+                        class="col-start-3 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
                         <p class="text-xs uppercase text-neutral-500 mb-2 flex items-center gap-1">
                             Commits
                             <a href="#" class="info-link" id="commits-info" title="Click for details">
@@ -90,7 +95,8 @@ active_tab: analytics
                     </div>
 
                     <!-- Issues Card -->
-                    <div class="col-start-4 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
+                    <div
+                        class="col-start-4 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
                         <p class="text-xs uppercase text-neutral-500 mb-2 flex items-center gap-1">
                             Issues
                             <a href="#" class="info-link" id="issues-info" title="Click for details">
@@ -101,7 +107,8 @@ active_tab: analytics
                     </div>
 
                     <!-- Pull Requests Card -->
-                    <div class="col-start-3 row-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
+                    <div
+                        class="col-start-3 row-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
                         <p class="text-xs uppercase text-neutral-500 mb-2 flex items-center gap-1">
                             Pull Requests
                             <a href="#" class="info-link" id="prs-info" title="Click for details">
@@ -112,7 +119,8 @@ active_tab: analytics
                     </div>
 
                     <!-- Lines Changed Card -->
-                    <div class="col-start-4 row-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
+                    <div
+                        class="col-start-4 row-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
                         <p class="text-xs uppercase text-neutral-500 mb-2">Lines Changed</p>
                         <h3 id="lines-changed" class="text-2xl font-medium">Loading...</h3>
                     </div>
@@ -121,12 +129,33 @@ active_tab: analytics
                 <!-- Commits Over Time Graph -->
                 <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-xl p-5">
                     <p class="text-xs uppercase text-neutral-500 mb-4">Commits Over Time</p>
-                    <div id="commits-over-time-chart"></div>
+
+                    <div class="flex flex-col lg:flex-row gap-6">
+
+                        <!-- Time Period Sidebar -->
+                        <div class="lg:w-52 flex-shrink-0">
+                            <p class="text-xs uppercase text-neutral-500 mb-3">Time Period</p>
+
+                            <div id="commit-period-options"
+                                class="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-1">
+                            </div>
+                        </div>
+
+                        <!-- Chart -->
+                        <div class="flex-1 min-w-0">
+                            <div id="commit-period-label" class="text-sm text-neutral-300 mb-2">
+                                All Time
+                            </div>
+
+                            <div id="commits-over-time-chart"></div>
+                        </div>
+
+                    </div>
                 </div>
 
-                <!-- Commit Cards Container -->
-                <div id="commitCardsContainer" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            </div>
+                    <!-- Commit Cards Container -->
+                    <div id="commitCardsContainer" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div >
 
             <!-- Grade Predictor tab content -->
             <div id="tab-content-grade" class="tab-content hidden px-6 py-4 text-neutral-200">
@@ -359,16 +388,281 @@ score += gists * 0.5
 <!-- FontAwesome for icons -->
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
-<!-- Required plugins -->
-<script src="https://cdn.jsdelivr.net/npm/preline/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lodash/lodash.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/preline/dist/helper-apexcharts.js"></script>
+                <!-- Required plugins -->
+                <script src="https://cdn.jsdelivr.net/npm/preline/dist/index.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/lodash/lodash.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/preline/dist/helper-apexcharts.js"></script>
 
-<!-- Analytics JS -->
-<script type="module">
+                <!-- Analytics JS -->
+                <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
     import { initOCSAnalyticsDashboard } from '{{ site.baseurl }}/assets/js/ocs-analytics-dashboard.js';
+
+    // ===== Commits Over Time: calendar-week sprint periods =====
+    // The weekly calendar announcements define Week 1 as Aug 17–21,
+    // with Sprint 1 beginning that week. Four calendar weeks make a sprint.
+    const CALENDAR_WEEK_START = new Date("2026-08-17T00:00:00");
+    const WEEKS_PER_SPRINT = 4;
+    const DAY_MS = 86400000;
+
+    const localDateKey = (date) =>
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+    const dateFromKey = (key) => {
+        const [year, month, day] = key.split("-").map(Number);
+        return new Date(year, month - 1, day);
+    };
+
+    const formatDate = (date) =>
+        date.toLocaleDateString(undefined, {
+            month: "short",
+            day: "numeric"
+        });
+
+    const addDays = (date, days) => {
+        const result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+    };
+
+    // Build the calendar weeks from the weekly announcement schedule.
+    // Week 1 = Aug 17–21, Week 8 = Oct 5–9.
+    function buildCalendarWeeks() {
+        const weeks = [];
+
+        for (let i = 0; i < 8; i++) {
+            const start = addDays(CALENDAR_WEEK_START, i * 7);
+            const end = addDays(start, 4);
+
+            weeks.push({
+                number: i + 1,
+                start,
+                end
+            });
+        }
+
+        return weeks;
+    }
+
+    function buildSprintPeriods() {
+        const weeks = buildCalendarWeeks();
+        const periods = [];
+
+        for (let i = 0; i < weeks.length; i += WEEKS_PER_SPRINT) {
+            const sprintWeeks = weeks.slice(i, i + WEEKS_PER_SPRINT);
+            if (!sprintWeeks.length) continue;
+
+            periods.push({
+                id: `sprint-${periods.length + 1}`,
+                label: `Sprint ${periods.length + 1}`,
+                start: sprintWeeks[0].start,
+                end: sprintWeeks[sprintWeeks.length - 1].end,
+                weeks: sprintWeeks
+            });
+        }
+
+        return periods;
+    }
+
+    async function renderCommitsOverTimeChart(commitsArray) {
+        const container = document.getElementById("commits-over-time-chart");
+        const optionsEl = document.getElementById("commit-period-options");
+        const labelEl = document.getElementById("commit-period-label");
+
+        if (!container) return;
+
+        // Group commits by local calendar day.
+        // Only days that actually contain commits are added to the graph.
+        const commitsByDay = {};
+
+        commitsArray.forEach((commit) => {
+            if (!commit.date) return;
+
+            const date = new Date(commit.date);
+            if (isNaN(date.getTime())) return;
+
+            const key = localDateKey(date);
+            commitsByDay[key] = (commitsByDay[key] || 0) + 1;
+        });
+
+        const commitDates = Object.keys(commitsByDay)
+            .sort()
+            .map(dateFromKey);
+
+        const sprintPeriods = buildSprintPeriods();
+        const periods = [
+            {
+                id: "all",
+                label: "All Time",
+                start: dateFromKey("2026-08-10"),
+                end: sprintPeriods[sprintPeriods.length - 1].end
+            },
+            ...sprintPeriods
+        ];
+
+        const countCommits = (start, end) => {
+            return commitDates.reduce((total, date) => {
+                return date >= start && date <= end
+                    ? total + (commitsByDay[localDateKey(date)] || 0)
+                    : total;
+            }, 0);
+        };
+
+        function draw(period) {
+            // Always include the first day of the selected period, even if there
+            // were zero commits that day. After that, only show days that
+            // actually contain commits.
+            const periodCommitDates = [
+                period.start,
+                ...commitDates.filter((date) =>
+                    date >= period.start && date <= period.end
+                )
+            ].filter((date, index, dates) =>
+                index === dates.findIndex(d => localDateKey(d) === localDateKey(date))
+            );
+
+            const totalCommits = periodCommitDates.reduce(
+                (total, date) => total + (commitsByDay[localDateKey(date)] || 0),
+                0
+            );
+
+            if (labelEl) {
+                if (period.id === "all") {
+                    labelEl.textContent = `All Time · ${formatDate(period.start)} – ${formatDate(period.end)} · ${totalCommits} commits`;
+                } else {
+                    labelEl.textContent = `${period.label} · ${formatDate(period.start)} – ${formatDate(period.end)} · ${totalCommits} commits`;
+                }
+            }
+
+            if (periodCommitDates.length === 0) {
+                container.innerHTML = '<p class="text-sm text-neutral-400 py-8">No commits during this time period.</p>';
+                if (window.commitsOverTimeChart) {
+                    window.commitsOverTimeChart.destroy();
+                    window.commitsOverTimeChart = null;
+                }
+                return;
+            }
+
+            // Categorical x-axis shows the first day of the period plus only
+            // the days where commits were actually made.
+            const categories = periodCommitDates.map(formatDate);
+            const data = periodCommitDates.map(
+                (date) => commitsByDay[localDateKey(date)] || 0
+            );
+
+            const options = {
+                series: [{
+                    name: "Commits",
+                    data
+                }],
+
+                chart: {
+                    type: "line",
+                    height: 300,
+                    toolbar: { show: false },
+                    background: "transparent"
+                },
+
+                colors: ["#60a5fa"],
+
+                xaxis: {
+                    categories,
+                    labels: {
+                        style: { colors: "#9ca3af" },
+                        rotate: 0,
+                        hideOverlappingLabels: true
+                    }
+                },
+
+                yaxis: {
+                    min: 0,
+                    forceNiceScale: true,
+                    labels: {
+                        style: { colors: "#9ca3af" }
+                    }
+                },
+
+                stroke: {
+                    width: 2,
+                    curve: "smooth"
+                },
+
+                markers: {
+                    size: 4
+                },
+
+                grid: {
+                    borderColor: "#374151"
+                },
+
+                theme: {
+                    mode: "dark"
+                },
+
+                tooltip: {
+                    theme: "dark",
+                    x: {
+                        formatter: (_, { dataPointIndex }) =>
+                            categories[dataPointIndex]
+                    },
+                    y: {
+                        formatter: (value) =>
+                            `${value} commit${value === 1 ? "" : "s"}`
+                    }
+                }
+            };
+
+            if (window.commitsOverTimeChart) {
+                window.commitsOverTimeChart.destroy();
+            }
+
+            window.commitsOverTimeChart = new ApexCharts(container, options);
+            window.commitsOverTimeChart.render();
+        }
+
+        const BTN_BASE =
+            "px-3 py-2 rounded-lg text-sm text-left whitespace-nowrap transition border ";
+        const BTN_ON =
+            BTN_BASE + "border-blue-500 bg-blue-600 text-white";
+        const BTN_OFF =
+            BTN_BASE + "border-neutral-700 bg-neutral-900 text-neutral-300 hover:bg-neutral-700 hover:text-white";
+
+        function select(id) {
+            window.selectedCommitPeriod = id;
+
+            optionsEl?.querySelectorAll("button").forEach((button) => {
+                button.className = button.dataset.period === id
+                    ? BTN_ON
+                    : BTN_OFF;
+            });
+
+            const selectedPeriod =
+                periods.find((period) => period.id === id) || periods[0];
+
+            draw(selectedPeriod);
+        }
+
+        if (optionsEl) {
+            optionsEl.innerHTML = "";
+
+            periods.forEach((period) => {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.dataset.period = period.id;
+                button.className = BTN_OFF;
+                button.textContent = period.label;
+                button.addEventListener("click", () => select(period.id));
+                optionsEl.appendChild(button);
+            });
+        }
+
+        select(
+            periods.some((period) => period.id === window.selectedCommitPeriod)
+                ? window.selectedCommitPeriod
+                : "all"
+        );
+    }
 
     const profileLinksUrl = `${pythonURI}/api/analytics/github/user/profile_links`;
     const userProfileUrl = `${pythonURI}/api/analytics/github/user`;
@@ -582,79 +876,8 @@ score += gists * 0.5
             document.getElementById("issues-count").textContent = issuesArray.length;
             document.getElementById("prs-count").textContent = prsArray.length;
 
-            // Commits over time chart
-            const commitsOverTimeChart = document.getElementById("commits-over-time-chart");
-            if (commitsOverTimeChart) {
-                const commitsByDate = {};
-
-                commitsArray.forEach((commit) => {
-                    if (!commit.date) return;
-                    const date = new Date(commit.date);
-                    if (isNaN(date.getTime())) return;
-
-                    // Group commits by day
-                    const dateKey = date.toISOString().split("T")[0];
-                    commitsByDate[dateKey] = (commitsByDate[dateKey] || 0) + 1;
-                });
-
-                const commitDates = Object.keys(commitsByDate).sort();
-
-                if (commitDates.length > 0) {
-                    const commitChartOptions = {
-                        series: [{
-                            name: "Commits",
-                            data: commitDates.map(date => commitsByDate[date])
-                        }],
-                        chart: {
-                            type: "line",
-                            height: 300,
-                            toolbar: { show: false },
-                            background: "transparent"
-                        },
-                        colors: ["#60a5fa"],
-                        xaxis: {
-                            categories: commitDates.map(date => {
-                                const parsedDate = new Date(`${date}T00:00:00`);
-                                return parsedDate.toLocaleDateString(undefined, {
-                                    month: "short",
-                                    day: "numeric"
-                                });
-                            }),
-                            labels: {
-                                style: { colors: "#9ca3af" },
-                                rotate: -45
-                            }
-                        },
-                        yaxis: {
-                            min: 0,
-                            forceNiceScale: true,
-                            labels: { style: { colors: "#9ca3af" } }
-                        },
-                        stroke: { width: 2, curve: "smooth" },
-                        markers: { size: 4 },
-                        grid: { borderColor: "#374151" },
-                        theme: { mode: "dark" },
-                        tooltip: {
-                            theme: "dark",
-                            y: {
-                                formatter: value => `${value} commit${value === 1 ? "" : "s"}`
-                            }
-                        }
-                    };
-
-                    if (window.commitsOverTimeChart) {
-                        window.commitsOverTimeChart.destroy();
-                    }
-
-                    window.commitsOverTimeChart = new ApexCharts(
-                        commitsOverTimeChart,
-                        commitChartOptions
-                    );
-                    window.commitsOverTimeChart.render();
-                } else {
-                    commitsOverTimeChart.innerHTML = '<p class="text-sm text-neutral-400">No commit history available.</p>';
-                }
-            }
+            // Commits over time chart (sprints computed from calendar breaks)
+            await renderCommitsOverTimeChart(commitsArray);
 
             // Clear commit cards container
             const commitCardsContainer = document.getElementById("commitCardsContainer");
@@ -958,17 +1181,17 @@ score += gists * 0.5
             await window.OCSAnalytics.loadAnalyticsSummary();
         }
     };
-</script>
+                </script>
 
-<style>
-    .info-icon {
-        font-size: 0.875rem;
-        color: #60a5fa;
-        cursor: pointer;
-        transition: color 0.2s;
-    }
-    
-    .info-icon:hover {
-        color: #3b82f6;
-    }
-</style>
+                <style>
+                    .info-icon {
+                        font-size: 0.875rem;
+                        color: #60a5fa;
+                        cursor: pointer;
+                        transition: color 0.2s;
+                    }
+
+                    .info-icon:hover {
+                        color: #3b82f6;
+                    }
+                </style>
