@@ -49,7 +49,7 @@ class GameLevelTutorial {
       { class: Player, data: player_data },
       { class: SplineBarrier, data: barrierData1 },
       { class: SplineBarrier, data: barrierData2 },
-      { class: TimeLapScreen, data: { currentLap: 1, totalLaps: 3 },
+      { class: TimeLapScreen, data: { currentLap: 1, totalLaps: 3 } }
     ];
   }
 }
