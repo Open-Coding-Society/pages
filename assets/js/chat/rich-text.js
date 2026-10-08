@@ -765,6 +765,11 @@ export function createRichComposer(opts = {}) {
       resetTypingFormat();
       handleChange();
     },
+    setHTML(raw) {
+      editor.innerHTML = sanitizeRichText(raw || '');
+      savedRange = null;
+      handleChange();
+    },
     setEnabled(enabled) {
       editor.contentEditable = enabled ? 'true' : 'false';
       editor.classList.toggle('is-disabled', !enabled);

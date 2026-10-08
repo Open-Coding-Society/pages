@@ -72,9 +72,10 @@ export function createLiveCalendarStore({ course, javaURI, fetchOptions, sourceU
     return body;
   }
 
+  // course "all" (the calendar card on a page with no course) keeps every class's events.
   const forThisCourse = (events) => (events || [])
     .map(normalizeBackendEvent)
-    .filter((event) => !event.isBreak && (!event.course || event.course === course));
+    .filter((event) => !event.isBreak && (course === 'all' || !event.course || event.course === course));
 
   return {
     mode: 'live',

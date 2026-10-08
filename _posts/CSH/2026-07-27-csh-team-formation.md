@@ -5,7 +5,6 @@ description: >
   Form your Capstone team, get oriented with the Wayfinding Game and tooling,
   and draft a preliminary abstract for your engineering study.
 courses: {'csh': {'week': 0}}
-assignment: true
 type: capstone
 canonical_id: csh-team-formation
 author: PLTW Capstone

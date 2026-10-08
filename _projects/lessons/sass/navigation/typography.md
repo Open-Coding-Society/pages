@@ -1,19 +1,20 @@
 ---
 layout: post
-assignment: true
-codemirror: true
-title: OCS Semantic HTML & Typography Grammar
+title: Semantic HTML with OCS Typography Grammar
+description: Semantic HTML defines meaning and structure. OCS Typography Grammar expresses the OCS style without hardcoding CSS. 
 categories: [SASS, Typography]
 lesson_language: SASS
 lesson_topic: Typography
 lesson_part: interactive
 lesson_type: lesson
 lesson_source: OCS
-assignment_submission_type: code
+assignment_submission_type: link
 assignment_creator_uids:
   - "tristan-chiu0"
   - "3rii0"
   - "AVG11235"
+assignment: true
+codemirror: true
 microblog: true
 permalink: /sass/typography
 author: Tristan Chiu, Mateo Durand Amador, Barbara Zhao

@@ -6,7 +6,6 @@ description: >
   your Alpha prototype at the Night at the Museum (N@tM) showcase to a
   panel of judges, closing out Trimester 1.
 courses: {'csh': {'week': 12}}
-assignment: true
 type: capstone
 canonical_id: csh-natm-defense
 author: PLTW Capstone

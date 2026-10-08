@@ -29,7 +29,7 @@ class GameLevelOverworld {
       src: sprite_src_player,
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       STEP_FACTOR: 800,
-      ANIMATION_RATE: 50,
+      ANIMATION_FPS: 8,
       INIT_POSITION: { x: 0, y: height - (height / PLAYER_SCALE_FACTOR) - 40 }, 
       pixels: { height: 256, width: 128 },
       orientation: { rows: 8, columns: 4 },

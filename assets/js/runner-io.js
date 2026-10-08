@@ -17,6 +17,7 @@ const EXTENSIONS = {
   python: 'py',
   java: 'java',
   javascript: 'js',
+  html: 'html',
   pseudocode: 'txt',
 };
 

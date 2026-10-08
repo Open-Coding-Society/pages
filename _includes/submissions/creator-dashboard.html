@@ -25,7 +25,7 @@
           <p>Assignment courses come directly from the existing page frontmatter.</p>
         </div>
       </div>
-      <div id="created-assignments-container" class="creator-workspace__table-scroll"></div>
+      <div id="created-assignments-container" class="creator-workspace__table-scroll ocs__table-wrap"></div>
     </section>
 
     <section class="creator-workspace__section" aria-labelledby="creator-submission-list-title">
@@ -39,36 +39,36 @@
       <form id="creator-submission-filters" class="creator-filters" aria-label="Filter creator submissions">
         <label class="creator-filter">
           <span>Student course</span>
-          <select id="creator-filter-course">
+          <select id="creator-filter-course" class="ocs__input">
             <option value="">All student courses</option>
           </select>
         </label>
         <label class="creator-filter">
           <span>Assignment</span>
-          <select id="creator-filter-assignment">
+          <select id="creator-filter-assignment" class="ocs__input">
             <option value="">All assignments</option>
           </select>
         </label>
         <label class="creator-filter creator-filter--search">
           <span>Student</span>
-          <input id="creator-filter-student" type="search" placeholder="Name or UID" autocomplete="off">
+          <input id="creator-filter-student" class="ocs__input" type="search" placeholder="Name or UID" autocomplete="off">
         </label>
         <label class="creator-filter">
           <span>Status</span>
-          <select id="creator-filter-status">
+          <select id="creator-filter-status" class="ocs__input">
             <option value="">All statuses</option>
             <option value="pending">Pending review</option>
             <option value="late">Late</option>
             <option value="graded">Graded</option>
           </select>
         </label>
-        <button id="creator-clear-filters" class="creator-filters__clear" type="button">Clear filters</button>
+        <button id="creator-clear-filters" class="creator-filters__clear ocs__btn medium" type="button">Clear filters</button>
       </form>
 
       <div class="creator-results-bar">
         <p id="creator-results-summary" aria-live="polite"></p>
       </div>
-      <div id="creator-submissions-container" class="creator-workspace__table-scroll"></div>
+      <div id="creator-submissions-container" class="creator-workspace__table-scroll ocs__table-wrap"></div>
       <nav id="creator-pagination" class="creator-pagination" aria-label="Creator submission pages"></nav>
     </section>
   </div>
