@@ -55,7 +55,6 @@ function showDetail(card, event, store, calendarUrl) {
 async function mountCard(card, weeks) {
   card.dataset.mounted = 'true';
   const course = card.dataset.course || 'all';
-  const period = card.dataset.period || 'all';
   const calendarUrl = card.dataset.calendarUrl || '/student/calendar';
   card.setAttribute('aria-busy', 'true');
 
@@ -76,7 +75,6 @@ async function mountCard(card, weeks) {
     host: card.querySelector('[data-hook="mount"]'),
     weeks,
     getStore: () => store,
-    getPeriod: () => period,
     showEmpty: !signedOut,   // signed out, an empty week only means we can't see the events
     onSelectEvent: (event) => showDetail(card, event, store, calendarUrl),
   });
