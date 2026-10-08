@@ -40,6 +40,11 @@
     }
   }
 
+  .chat-msg-body.is-deleted {
+    color: $text-muted;
+    font-style: italic;
+  }
+
   .dm-layout {
     display: flex;
     gap: 0;
