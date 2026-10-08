@@ -15,9 +15,10 @@
 
   The whole card opens the sprint's intro page in the lesson player,
   /<course>/sprint-<n>/, made by _plugins/lesson_player_pages.rb.
-  ocs__hub-card gives the card its lift and tint on hover. The Open link at
-  the bottom is the real link, and courses.js follows it when the card is
-  clicked anywhere else, except on the card's own buttons.
+  ocs__hub-card gives the card its lift and tint on hover. The card is the
+  button, so there is no separate Open button: the sprint's title is the real
+  link, for keyboards and screen readers, and courses.js follows it when the
+  card is clicked anywhere else, except on the card's own buttons.
 {% endcomment %}
 
 <div class="ocs__card ocs__hub-card sprint-card collapsed" data-sprint="{{ unitKey }}" data-course="{{ page.course }}">
@@ -78,17 +79,13 @@
 
     <!-- Full-width sprint info section below buttons -->
     <div class="sprint-info-full" style="width: 100%;">
-      <h2 class="sprint-title">{{ unitData.title }}</h2>
+      <h2 class="sprint-title"><a href="{{ site.baseurl }}/{{ page.course }}/sprint-{{ unit }}/" data-sprint-link>{{ unitData.title }}</a></h2>
       {% if unitData.description %}
         <p class="sprint-meta">{{ unitData.description }}</p>
       {% endif %}
     </div>
 
     <!-- End of Sprint Header-->
-  </div>
-
-  <div class="ocs__capstone-footer">
-    <a class="ocs__btn accent fill" href="{{ site.baseurl }}/{{ page.course }}/sprint-{{ unit }}/" data-sprint-link>Open Sprint {{ unit }} &rarr;</a>
   </div>
 
   {%- comment -%}

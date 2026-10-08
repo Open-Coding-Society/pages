@@ -312,8 +312,8 @@ function attachFilterListeners() {
  * ============================================
  * SPRINT CARDS: Open the sprint's intro page
  * ============================================
- * Each sprint card is one big button. Its Open link is the real link, for
- * the keyboard and for opening in a new tab; a click anywhere else on the
+ * Each sprint card is one big button. The link on its title is the real link,
+ * for the keyboard and for opening in a new tab; a click anywhere else on the
  * card follows it. Clicks on the card's own buttons, on the calendar
  * dropdown, or that end a text selection are left alone.
  */

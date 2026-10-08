@@ -213,7 +213,7 @@ The `courses.js` file (1225 lines) contains all course/sprint functionality extr
 - **Progression Modal** - Open/close, task list, progress updates
 - **Certificate Status Updates** - Update modal with certificate info
 - **Help Video System** - Load and display help videos
-- **Sprint Cards** - A click anywhere on a sprint card follows its Open link
+- **Sprint Cards** - A click anywhere on a sprint card follows the link on its title
 - **Priority System** - Set and display item priorities
 - **Filtering** - Filter by priority
 - **Calendar Integration** - Initialize calendar data
