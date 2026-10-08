@@ -1,5 +1,4 @@
 @import "./mixins/buttons";
-@import "./mixins/modals";
 
 /* Apply minimal body styles when lesson player is active */
 body:has(.lesson-player) {
@@ -196,32 +195,6 @@ body:has(.lesson-player) {
   font-size: 14px;
   flex: 1;
   min-width: 0;
-}
-
-/* WEEK CHAT MODAL
-   The same three mixins his course page uses for #progression-modal and
-   #video-demo. Styled by class instead of id because there is one per week. */
-.week-chat-modal {
-  @include modal-overlay;
-}
-
-/* Its own class, not .modal-content: the calendar project styles .modal-content
-   site-wide and makes every button inside it full width, which left the chat's
-   Send button filling the row and its message box 2px wide. */
-.week-chat-modal-content {
-  @include modal-content;
-  top: 60px;
-}
-
-.week-chat-modal .modal-close {
-  @include modal-close-btn;
-}
-
-/* modal-close-btn sits 28px in from the top corner and is 38px tall, so the
-   chat starts below it instead of running under it. The chat itself is left
-   exactly as the course page draws it. */
-.week-chat-modal .week-chat {
-  margin-top: 44px;
 }
 
 /* MAIN CONTENT AREA */

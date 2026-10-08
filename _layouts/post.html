@@ -10,7 +10,14 @@ Check if this is a course lesson and determine which course context to use
 {% assign current_week = null %}
 
 {% comment %}Since files are now course-specific, get the single course{% endcomment %}
-{% if page.courses.csp %}
+{% if page.player_page %}
+{% comment %}
+A sprint, week, chat, or blogs page made by _plugins/lesson_player_pages.rb.
+Sprint and blogs pages are not part of one week, so their current_week is null.
+{% endcomment %}
+{% assign current_course = page.player_page.course %}
+{% assign current_week = page.player_page.week %}
+{% elsif page.courses.csp %}
 {% assign current_course = 'csp' %}
 {% assign current_week = page.courses.csp.week | plus: 0 %}
 {% elsif page.courses.csa %}
@@ -26,6 +33,8 @@ Check if this is a course lesson and determine which course context to use
 
 {% if current_course != null and current_week != null %}
 {% assign is_course_lesson = true %}
+{% elsif page.player_page %}
+{% assign is_course_lesson = true %}
 {% endif %}
 
 {% if is_course_lesson %}
@@ -35,6 +44,23 @@ Check if this is a course lesson and determine which course context to use
 
 {% assign posts = null | compact %}
 {% assign posts = posts | concat: site.posts | concat: site.pages %}
+
+{%- comment -%}
+  This course's lessons: the posts and pages whose front matter puts them in
+  this course only. Found once here for the sidebar and the player pages.
+{%- endcomment -%}
+{%- assign coursePosts = "" | split: "" -%}
+{%- for post in posts -%}
+  {%- if post.courses[current_course] and post.courses.size == 1 -%}
+    {%- assign coursePosts = coursePosts | push: post -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- comment -%}
+  The same lessons grouped by week, in the same order, so a week's lessons are
+  one lookup (lessonsByWeek | where: "name", week) instead of a scan of every
+  lesson for every week. plus: 0 reads "2" and 2 alike, as the sidebar always has.
+{%- endcomment -%}
+{%- assign lessonsByWeek = coursePosts | group_by_exp: "post", "post.courses[current_course].week | plus: 0" -%}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -52,6 +78,7 @@ Check if this is a course lesson and determine which course context to use
       <div class="lesson-content-inner">
         <div class="lesson-header">
           <h1>{{ page.title | escape }}</h1>
+          {%- unless page.player_page -%}
           <div class="lesson-meta">
             {%- if page.show_reading_time != false -%}
             <span><i class="fa-solid fa-clock"></i> {% include reading_time.html %}</span>
@@ -61,8 +88,18 @@ Check if this is a course lesson and determine which course context to use
             <span><i class="fa-solid fa-file-alt"></i> Assignment</span>
             {% endif %}
           </div>
+          {%- endunless -%}
         </div>
 
+        {% if page.player_page %}
+        {%- comment -%}
+          Not a lesson, so none of the lesson tools or the pager: the body is the
+          page's own include, built only from OCS components.
+        {%- endcomment -%}
+        <div data-player-page="{{ page.player_page.kind }}">
+          {% include player-pages/{{ page.player_page.kind }}.html %}
+        </div>
+        {% else %}
         <div class="lesson-body">
           {%- if page.toc -%}
           {% include toc.html html=content %}
@@ -101,6 +138,7 @@ Check if this is a course lesson and determine which course context to use
             <a href="#" class="ocs__pager-link next" id="pager-next"></a>
           </div>
         </div>
+        {% endif %}
 
         {%- if page.comments -%}
         <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid #2a2a2a;">
@@ -156,6 +194,11 @@ Check if this is a course lesson and determine which course context to use
   const SUBMISSION_TYPE = {{ page.assignment_submission_type | default: "file" | downcase | jsonify }};
   const GITHUB_ISSUE_URL_PATTERN = /^https?:\/\/github\.com\/[^/]+\/[^/#?]+\/issues\/\d+\/?$/i;
   const STORAGE_KEY = `${COURSE}-lesson-completion`;
+  // Sidebar rows. Every row is a step for Prev / Next and the pager, so a new
+  // sprint or week opens on its intro page. Only lessons carry data-lesson-id,
+  // so only they count toward progress.
+  const STEP_ROWS = '.lesson-item';
+  const LESSON_ROWS = '.lesson-item[data-lesson-id]';
   const STATUS_AUTO_HIDE_MS = 5000;
   const FILE_SIZE_LIMIT_MB = 10;
   const FRONTMATTER_ASSIGNMENT_ID = {{ page.assignment_id | default: 'null' }};
@@ -179,51 +222,6 @@ Check if this is a course lesson and determine which course context to use
     chevron.classList.toggle('fa-chevron-right', !isHidden);
     chevron.classList.toggle('fa-chevron-down', isHidden);
   };
-
-  /**
-   * Week chat modals, built in lesson-sidebar-nav.html and emitted by
-   * lesson-modals.html. Opening one also opens the chat's <details>, whose
-   * toggle event is what week_chat.html waits for before it connects, so a
-   * chat only loads when someone actually opens it.
-   *
-   * Each modal also starts with the hidden attribute, so it stays hidden even
-   * when the stylesheet is stale or has not loaded yet. Without it, all of them
-   * sit in the lesson's flex row and push the lesson off the screen.
-   */
-  let weekChatTrigger = null;
-
-  window.openWeekChat = function (chatId, trigger) {
-    const modal = document.getElementById(`week-chat-modal-${chatId}`);
-    if (!modal) return;
-    weekChatTrigger = trigger || null;
-    modal.hidden = false;
-    modal.style.display = 'block';
-    const chat = modal.querySelector('details.week-chat');
-    if (chat && !chat.open) chat.open = true;
-    const close = modal.querySelector('.modal-close');
-    if (close) close.focus();
-  };
-
-  function closeWeekChat(modal) {
-    modal.style.display = 'none';
-    modal.hidden = true;
-    if (weekChatTrigger) weekChatTrigger.focus();
-    weekChatTrigger = null;
-  }
-
-  // The dim backdrop and the close button both close it; Escape does too.
-  document.addEventListener('click', (e) => {
-    const modal = e.target.closest('.week-chat-modal');
-    if (!modal) return;
-    if (e.target === modal || e.target.closest('.modal-close')) closeWeekChat(modal);
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    document.querySelectorAll('.week-chat-modal').forEach((modal) => {
-      if (modal.style.display === 'block') closeWeekChat(modal);
-    });
-  });
 
   /**
    * ============================================
@@ -287,7 +285,7 @@ Check if this is a course lesson and determine which course context to use
 
   function updateLessonItems(completionData) {
     let completed = 0;
-    const lessonItems = document.querySelectorAll('.lesson-item');
+    const lessonItems = document.querySelectorAll(LESSON_ROWS);
     
     lessonItems.forEach(item => {
       const lessonId = item.dataset.lessonId;
@@ -312,7 +310,7 @@ Check if this is a course lesson and determine which course context to use
       const counter = group.querySelector('[data-week-count]');
       if (!counter) return;
 
-      const items = group.querySelectorAll('.lesson-item');
+      const items = group.querySelectorAll(LESSON_ROWS);
       let completed = 0;
       items.forEach(item => {
         if (completionData[item.dataset.lessonId]) completed++;
@@ -323,7 +321,7 @@ Check if this is a course lesson and determine which course context to use
   }
 
   function updateProgressBars(completionData) {
-    const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
+    const lessonItems = Array.from(document.querySelectorAll(LESSON_ROWS));
     const stats = updateLessonItems(completionData);
     updateWeekCounts(completionData);
 
@@ -359,7 +357,7 @@ Check if this is a course lesson and determine which course context to use
    * ============================================
    */
   window.prevLesson = function () {
-    const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
+    const lessonItems = Array.from(document.querySelectorAll(STEP_ROWS));
     const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
     if (currentIndex > 0) {
       window.location.href = lessonItems[currentIndex - 1].href;
@@ -369,7 +367,7 @@ Check if this is a course lesson and determine which course context to use
   };
 
   window.nextLesson = function () {
-    const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
+    const lessonItems = Array.from(document.querySelectorAll(STEP_ROWS));
     const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
     if (currentIndex >= 0 && currentIndex < lessonItems.length - 1) {
       window.location.href = lessonItems[currentIndex + 1].href;
@@ -388,7 +386,7 @@ Check if this is a course lesson and determine which course context to use
     const pager = document.getElementById('lesson-pager');
     if (!pager) return;
 
-    const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
+    const lessonItems = Array.from(document.querySelectorAll(STEP_ROWS));
     const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
     if (currentIndex === -1) return;
 
@@ -429,10 +427,11 @@ Check if this is a course lesson and determine which course context to use
   }
 
   function expandCurrentSprint() {
-    const activeLesson = document.querySelector('.lesson-item.active');
-    if (!activeLesson) return;
+    // This page's row, or on a week's chat page that week's chat link.
+    const current = document.querySelector('.lesson-item.active, #lesson-sidebar [aria-current="page"]');
+    if (!current) return;
 
-    const sprintSection = activeLesson.closest('.sprint-section');
+    const sprintSection = current.closest('.sprint-section');
     if (sprintSection) {
       const sprintToggle = sprintSection.querySelector('.sprint-toggle');
       if (sprintToggle) sprintToggle.click();
@@ -471,7 +470,7 @@ Check if this is a course lesson and determine which course context to use
    */
   function buildTimelineModal() {
     const completionData = getCompletionData();
-    const lessonItems = document.querySelectorAll('.lesson-item');
+    const lessonItems = document.querySelectorAll(LESSON_ROWS);
     const sprintGroups = {};
 
     lessonItems.forEach(item => {

@@ -13,10 +13,12 @@
 <!-- "preview" mode backed by localStorage so the feature can be seen and -->
 <!-- exercised on every week card without a login. Preview messages never -->
 <!-- leave the browser and are clearly labelled as such. -->
+<!-- -->
+<!-- open=true starts the chat open and connected, for a week's chat page. -->
 {% assign wc_id = unitKey | append: '-' | append: index %}
 {% assign wc_course = include.course | default: page.course %}
 
-<details class="week-chat" data-week-key="{{ wc_id }}">
+<details class="week-chat" data-week-key="{{ wc_id }}"{% if include.open %} open{% endif %}>
   <summary class="chat-summary">
     <span class="chat-summary-icon"><i class="fas fa-comments"></i></span>
     <span class="chat-summary-title">Week {{ index }} Chat</span>
@@ -417,6 +419,9 @@
   detailsEl.addEventListener('toggle', () => {
     if (detailsEl.open) initOnce();
   });
+  // A chat page draws the chat already open, and its toggle event may fire
+  // before this module runs, so start here too. initOnce runs only once.
+  if (detailsEl.open) initOnce();
 
   formEl.addEventListener('submit', (e) => {
     e.preventDefault();

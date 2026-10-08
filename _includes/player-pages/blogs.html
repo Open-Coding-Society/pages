@@ -1,0 +1,12 @@
+{%- comment -%}
+  A course's Blogs page: the posts from across the site, the same list as
+  /navigation/blogs/, shown beside the sidebar so the course stays one click
+  away. The list is built from the posts on each build, so new posts appear
+  on their own. lesson-body gives the title the lessons' heading style.
+{%- endcomment %}
+<div class="lesson-body">
+  <h2>{{ page.title | escape }}</h2>
+  <p>Posts from across the site: pinned posts first, then the newest.</p>
+</div>
+
+{% include blog-catalog.html %}
