@@ -1,6 +1,7 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import SplineBarrier from '/assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
+import TimeLapScreen from './TimeLapScreen.js';
 
 
 class GameLevelWinter {
@@ -49,7 +50,8 @@ class GameLevelWinter {
       { class: GameEnvBackground, data: background_data },
       { class: Player, data: player_data },
       { class: SplineBarrier, data: barrierData1 },
-      { class: SplineBarrier, data: barrierData2 }
+      { class: SplineBarrier, data: barrierData2 },
+      { class: TimeLapScreen, data: { currentLap: 1, totalLaps: 3 } }
     ];
   }
 }

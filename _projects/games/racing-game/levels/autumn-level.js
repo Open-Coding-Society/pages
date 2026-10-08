@@ -1,6 +1,8 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Box from '@assets/js/GameEnginev1.1/essentials/Box.js';
+import SplineBarrier from '/assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
+import TimeLapScreen from './TimeLapScreen.js';
 
 class GameLevelAutumn {
   constructor(gameEnv) {
@@ -44,8 +46,14 @@ class GameLevelAutumn {
       id: "box-1",
       src: "/images/projects/racing-game/BoxObstacle.png",
       coordinateSpace: "normalized",
+      SCALE_FACTOR: 10,
+      STEP_FACTOR: 1100,
+      pixels: { height: 1024, width: 1536 },
       position: { x: 0.5, y: 0.5 },
-      size: { width: 0.1, height: 0.1 }
+      orientation: { rows: 4, columns: 4 },
+      up: { row: 3, start: 0, columns: 1 },
+      upRight: { row: 0, start: 2, columns: 1, rotate: Math.PI },
+      right: { row: 1, start: 0, columns: 1 },
     };
 
 
@@ -54,7 +62,8 @@ class GameLevelAutumn {
       { class: Player, data: player_data },
       { class: SplineBarrier, data: barrierData1 },
       { class: SplineBarrier, data: barrierData2 },
-      { class: Box, data: BoxData }
+      { class: Box, data: BoxData },
+      { class: TimeLapScreen, data: { currentLap: 1, totalLaps: 3 } }
     ];
   }
 }
