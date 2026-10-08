@@ -18,6 +18,7 @@ class GameLevelSecret {
         src: "/images/projects/racing-game/Directions_red_car.png",
         SCALE_FACTOR: 10,
         STEP_FACTOR: 1100,
+        INIT_POSITION: { x: 360 / 750, y: 500 / 570},
         pixels: { height: 1024, width: 1536 },
         orientation: { rows: 4, columns: 4 },
         up:        { row: 3, start: 0, columns: 1 },

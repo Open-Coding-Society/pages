@@ -20,6 +20,7 @@ class GameLevelWinter {
         src: "/images/projects/racing-game/Directions_red_car.png",
         SCALE_FACTOR: 10,
         STEP_FACTOR: 1100,
+        INIT_POSITION: {x: 370 / 740, y: 465 / 585},
         pixels: { height: 1024, width: 1536 },
         orientation: { rows: 4, columns: 4 },
         up:        { row: 3, start: 0, columns: 1 },
