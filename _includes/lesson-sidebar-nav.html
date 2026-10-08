@@ -66,12 +66,18 @@
     {%- assign currentWeekUrl = "" -%}
     {%- assign currentWeekChatUrl = "" -%}
 
-    {%- comment -%} Every post on the site, first because it belongs to no sprint. {%- endcomment -%}
+    {%- comment -%}
+      Every post on the site, first because it belongs to no sprint.
+      Here and on the week chat links below, the icon and label sit straight in
+      the button, like the Submit buttons in post.html. The theme presets in
+      user-preferences.js recolor every span, which would turn a span label the
+      theme's text color on top of the current page's filled button.
+    {%- endcomment -%}
     {%- assign blogsUrl = "/" | append: current_course | append: "/blogs/" -%}
     <div class="ocs__links">
       <a class="ocs__btn ocs__btn--icon small accent{% if page.url == blogsUrl %} fill{% endif %}" href="{{ site.baseurl }}{{ blogsUrl }}"{% if page.url == blogsUrl %} aria-current="page"{% endif %}>
-        <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-blog"></i></span>
-        <span>Blogs</span>
+        <i class="fas fa-blog" aria-hidden="true"></i>
+        Blogs
       </a>
     </div>
 
@@ -173,8 +179,8 @@
                 </span>
                 {%- endif -%}
                 <a class="ocs__btn ocs__btn--icon small accent{% if page.url == chatUrl %} fill{% endif %}" href="{{ site.baseurl }}{{ chatUrl }}"{% if page.url == chatUrl %} aria-current="page"{% endif %}>
-                  <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-comments"></i></span>
-                  <span>Week {{ week }} Chat</span>
+                  <i class="fas fa-comments" aria-hidden="true"></i>
+                  Week {{ week }} Chat
                 </a>
               </div>
             </details>

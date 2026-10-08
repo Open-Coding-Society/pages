@@ -45,8 +45,8 @@
     <a class="ocs__btn accent fill" href="{{ site.baseurl }}{{ firstPost.url }}" data-player-start>Start: {{ firstPost.title | escape }} &rarr;</a>
     {%- endif %}
     <a class="ocs__btn ocs__btn--icon accent" href="{{ site.baseurl }}/{{ current_course }}/week-{{ current_week }}/chat/">
-      <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-comments"></i></span>
-      <span>Week {{ current_week }} Chat</span>
+      <i class="fas fa-comments" aria-hidden="true"></i>
+      Week {{ current_week }} Chat
     </a>
   </div>
   {%- if weekPosts.size > 0 %}
