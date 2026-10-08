@@ -1,6 +1,6 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
-import SplineBarrier from '/assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
+import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
 import TimeLapScreen from './TimeLapScreen.js';
 
 class GameLevelSecret {
