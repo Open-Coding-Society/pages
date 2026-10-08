@@ -5,9 +5,12 @@
 
   Options (all optional):
     course   csa | csp | csse | csh, or "all"   default: the page's course, else all
-    period   one class period, e.g. "3"         default: every period
     title    card heading                       default: "CSA calendar" / "Class calendar"
     sample   true shows example events          for prototypes; nothing is saved
+
+  There is no period option. A period typed into a page would be the same for
+  every reader, so the card shows every period its course meets. Events tagged
+  with periods show them on hover and in their details.
 
   The card loads itself (assets/js/chat/calendar/calendar-card.js). It is built
   from existing OCS elements (ocs__card, ocs__links, ocs__btn, ocs__table,
@@ -21,9 +24,9 @@
   {% assign ocs_cal_default_title = ocs_cal_course | upcase | append: " calendar" %}
 {% endif %}
 {% assign ocs_cal_title = include.title | default: ocs_cal_default_title %}
-<section class="ocs__card ocs__keypoints" data-ocs-calendar data-course="{{ ocs_cal_course }}" data-period="{{ include.period }}" data-sample="{{ include.sample | default: false }}" data-calendar-url="{{ site.baseurl }}/student/calendar" aria-label="{{ ocs_cal_title }}">
+<section class="ocs__card ocs__keypoints" data-ocs-calendar data-course="{{ ocs_cal_course }}" data-sample="{{ include.sample | default: false }}" data-calendar-url="{{ site.baseurl }}/student/calendar" aria-label="{{ ocs_cal_title }}">
   <div class="ocs__links">
-    <strong><i class="fas fa-calendar-alt" aria-hidden="true"></i> {{ ocs_cal_title }}{% if include.period %} · Period {{ include.period }}{% endif %}</strong>
+    <strong><i class="fas fa-calendar-alt" aria-hidden="true"></i> {{ ocs_cal_title }}</strong>
     <a class="ocs__btn small pill" href="{{ site.baseurl }}/student/calendar">Open calendar</a>
   </div>
   <div class="ocs__text" data-hook="status" role="status" hidden></div>
