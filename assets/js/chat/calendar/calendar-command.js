@@ -2,7 +2,9 @@
 // Typing "/" opens a menu of commands (/event, /due, ...); picking one turns
 // the area above the composer into fill-in-the-blank slots: title, when,
 // type, priority, periods and details. Enter posts, Esc cancels.
-// Built on the ocs__ element grammar (ocs__command, ocs__btn, ocs__input).
+// Built from existing OCS elements (ocs__callout, ocs__keypoints, ocs__links,
+// ocs__btn, ocs__input, ocs__status-pill) and plain HTML, with no CSS of its
+// own. A highlighted command or a chosen period gets the OCS accent fill.
 
 import {
   CLASS_PERIODS, DEFAULT_PRIORITY, EVENT_TYPES, escapeHtml, formatShortDate, matchSlashCommands,
@@ -10,6 +12,12 @@ import {
 } from './calendar-model.js';
 
 const WHEN_SUGGESTIONS = ['today', 'tomorrow', 'mon', 'tue', 'wed', 'thu', 'fri', 'next mon', 'next fri'];
+
+// On/off for an OCS button: accent fill while it is on.
+function setFilled(button, on) {
+  button.classList.toggle('accent', on);
+  button.classList.toggle('fill', on);
+}
 
 function editorText(composer) {
   return composer.editor.textContent.replace(/​/g, '').trim();
@@ -29,32 +37,41 @@ export function attachSlashCommand({ composer, container, schoolYear, periods = 
     menu = null;
   }
 
+  // A row of command buttons, with the highlighted command's hint under it.
   function renderMenu(commands) {
     closeMenu();
     const el = document.createElement('div');
-    el.className = 'ocs__command-menu';
-    el.setAttribute('role', 'listbox');
-    el.setAttribute('aria-label', 'Slash commands');
+    el.className = 'ocs__callout ocs__keypoints';
+    const list = document.createElement('div');
+    list.className = 'ocs__links';
+    list.setAttribute('role', 'listbox');
+    list.setAttribute('aria-label', 'Slash commands');
     commands.forEach((command, i) => {
       const item = document.createElement('button');
       item.type = 'button';
-      item.className = 'ocs__command-option';
+      item.className = 'ocs__btn small';
       item.setAttribute('role', 'option');
-      item.innerHTML = `<span class="ocs__command-option-name">/${command.name}</span>`
-        + `<span class="ocs__command-option-hint">${escapeHtml(command.hint)}</span>`;
+      item.title = command.hint;
+      item.textContent = `/${command.name}`;
       item.addEventListener('mousedown', (e) => { e.preventDefault(); open(command, ''); });
       item.addEventListener('mouseenter', () => highlight(i));
-      el.appendChild(item);
+      list.appendChild(item);
     });
+    const hint = document.createElement('div');
+    el.append(list, hint);
     container.prepend(el);
-    menu = { el, items: [...el.children], commands, index: 0 };
+    menu = { el, items: [...list.children], commands, hint, index: 0 };
     highlight(0);
   }
 
   function highlight(index) {
     if (!menu) return;
     menu.index = (index + menu.items.length) % menu.items.length;
-    menu.items.forEach((item, i) => item.setAttribute('aria-selected', String(i === menu.index)));
+    menu.items.forEach((item, i) => {
+      item.setAttribute('aria-selected', String(i === menu.index));
+      setFilled(item, i === menu.index);
+    });
+    menu.hint.textContent = menu.commands[menu.index].hint;
   }
 
   function onComposerInput() {
@@ -69,40 +86,43 @@ export function attachSlashCommand({ composer, container, schoolYear, periods = 
     closeMenu();
     reset();
     composer.clear();
+    // Each slot is a <label> (name, line break, field) in an ocs__links row,
+    // which wraps on narrow screens. Field widths come from the size attribute.
     const panel = document.createElement('div');
-    panel.className = 'ocs__command';
+    panel.className = 'ocs__callout ocs__keypoints';
     panel.setAttribute('role', 'group');
     panel.setAttribute('aria-label', `/${command.name}: calendar event`);
     const listId = `ocs-command-when-${Math.random().toString(36).slice(2, 8)}`;
     panel.innerHTML = `
-      <div class="ocs__command-header">
-        <span class="ocs__command-name">/${command.name}</span>
-        <span class="ocs__command-hint">Fill in the blanks. Enter posts it with your message, Esc cancels.</span>
+      <div class="ocs__links">
+        <span class="ocs__status-pill ocs__status-pill--good">/${command.name}</span>
+        <span>Fill in the blanks. Enter posts it with your message, Esc cancels.</span>
         <button type="button" class="ocs__btn small pill" data-hook="cancel" aria-label="Cancel command">&times;</button>
       </div>
-      <div class="ocs__command-slots">
-        <label class="ocs__command-slot ocs__command-slot--wide"><span>title</span>
-          <input class="ocs__input" name="title" maxlength="120" placeholder="e.g. Unit 3 Quiz" value="${escapeHtml(rest)}">
+      <div class="ocs__links">
+        <label>title<br>
+          <input class="ocs__input" name="title" size="28" maxlength="120" placeholder="e.g. Unit 3 Quiz" value="${escapeHtml(rest)}">
         </label>
-        <label class="ocs__command-slot"><span>when</span>
-          <input class="ocs__input" name="when" list="${listId}" placeholder="fri, tomorrow, 10/9">
-          <small class="ocs__command-preview" data-hook="when-preview">pick a day</small>
+        <label>when<br>
+          <input class="ocs__input" name="when" size="12" list="${listId}" placeholder="fri, tomorrow, 10/9">
+          <small data-hook="when-preview">pick a day</small>
           <datalist id="${listId}">${WHEN_SUGGESTIONS.map((w) => `<option value="${w}">`).join('')}</datalist>
         </label>
-        <label class="ocs__command-slot"><span>type</span>
+        <label>type<br>
           <select class="ocs__input" name="type">${EVENT_TYPES.map((t) => `<option value="${t.value}"${t.value === command.type ? ' selected' : ''}>${t.label}</option>`).join('')}</select>
         </label>
-        <label class="ocs__command-slot"><span>priority</span>
+        <label>priority<br>
           <select class="ocs__input" name="priority">${PRIORITIES.map((p) => `<option value="${p.value}"${p.value === DEFAULT_PRIORITY ? ' selected' : ''}>${p.label}</option>`).join('')}</select>
         </label>
-        <div class="ocs__command-slot ocs__command-slot--periods" role="group" aria-label="Class periods"><span>periods</span>
-          <div class="ocs__command-periods">${CLASS_PERIODS.map((p) => `<button type="button" class="ocs__btn small pill" data-period="${p}" aria-pressed="${periods.includes(p)}">${p}</button>`).join('')}</div>
-        </div>
-        <label class="ocs__command-slot ocs__command-slot--full"><span>details</span>
-          <input class="ocs__input" name="details" maxlength="300" placeholder="optional">
-        </label>
       </div>
-      <p class="ocs__command-error" role="alert" hidden></p>`;
+      <div class="ocs__links" role="group" aria-label="Class periods">
+        <span>periods</span>
+        ${CLASS_PERIODS.map((p) => `<button type="button" class="ocs__btn small${periods.includes(p) ? ' accent fill' : ''}" data-period="${p}" aria-pressed="${periods.includes(p)}">${p}</button>`).join('')}
+      </div>
+      <label>details<br>
+        <input class="ocs__input" name="details" size="48" maxlength="300" placeholder="optional">
+      </label>
+      <div role="alert" data-hook="error" hidden></div>`;
     container.appendChild(panel);
     active = { command, panel };
 
@@ -111,10 +131,11 @@ export function attachSlashCommand({ composer, container, schoolYear, periods = 
     when.addEventListener('input', () => {
       const iso = parseDateWord(when.value, { schoolYear });
       preview.textContent = iso ? formatShortDate(iso) : (when.value ? 'try fri, tomorrow or 10/9' : 'pick a day');
-      preview.classList.toggle('is-invalid', Boolean(when.value && !iso));
     });
     panel.querySelectorAll('[data-period]').forEach((button) => button.addEventListener('click', () => {
-      button.setAttribute('aria-pressed', String(button.getAttribute('aria-pressed') !== 'true'));
+      const on = button.getAttribute('aria-pressed') !== 'true';
+      button.setAttribute('aria-pressed', String(on));
+      setFilled(button, on);
     }));
     panel.querySelector('[data-hook="cancel"]').addEventListener('click', () => { reset(); composer.focus(); });
     panel.addEventListener('keydown', (e) => {
@@ -125,9 +146,10 @@ export function attachSlashCommand({ composer, container, schoolYear, periods = 
   }
 
   function showError(text) {
-    const error = active?.panel.querySelector('.ocs__command-error');
+    const error = active?.panel.querySelector('[data-hook="error"]');
     if (!error) return;
-    error.textContent = text;
+    error.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> ';
+    error.appendChild(document.createElement('strong')).textContent = text;
     error.hidden = false;
   }
 
