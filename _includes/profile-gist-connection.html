@@ -1,0 +1,24 @@
+<section class="gist-connection" aria-labelledby="gist-connection-heading">
+  <h2 id="gist-connection-heading">GitHub Gist connection</h2>
+  <p>Create code submissions and exports under your own GitHub account.</p>
+  <p id="gist-connection-state" role="status" aria-live="polite">Checking connection…</p>
+  <form id="gist-connection-form">
+    <label for="gist-connection-token">GitHub personal access token</label>
+    <input class="ocs__input" id="gist-connection-token" type="password" autocomplete="off"
+      spellcheck="false" required maxlength="512" aria-describedby="gist-connection-help">
+    <p id="gist-connection-help">Use a fine-grained token with Gists: write, or a classic token with the gist scope.
+      <a href="https://github.com/settings/tokens" target="_blank" rel="noopener noreferrer">Create a GitHub token</a>.
+      Connecting verifies identity; GitHub checks write permission when you export.</p>
+    <div class="gist-connection-actions">
+      <button class="ocs__btn accent fill" id="gist-connection-save" type="submit" disabled>Save token</button>
+      <button class="ocs__btn" id="gist-connection-disconnect" type="button" hidden disabled>Disconnect</button>
+    </div>
+  </form>
+  <p id="gist-connection-message" role="status" aria-live="polite"></p>
+  <p class="gist-connection-note">Gists are unlisted, but anyone with the link can read them.
+    Disconnect removes the token from OCS; revoke it separately in GitHub settings.</p>
+</section>
+<script type="module">
+  import { initGistConnection } from '{{ site.baseurl }}/assets/js/profile/gist-connection.js';
+  initGistConnection(document.querySelector('.gist-connection'));
+</script>
