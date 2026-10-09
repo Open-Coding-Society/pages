@@ -6,7 +6,7 @@
 
 import { renderRichMessage } from '../rich-text.js';
 import {
-  escapeHtml, eventMatchesPeriod, extractEventMarkers, findSchoolWeek, formatPeriods,
+  eventMatchesPeriod, extractEventMarkers, findSchoolWeek, formatPeriods,
   formatShortDate, fromIsoDate, neighborWeek, PRIORITY_LABELS, schoolWeekDays, todayIso, TYPE_LABELS,
 } from './calendar-model.js';
 
@@ -172,6 +172,19 @@ function el(tag, className, text) {
 
 const statusPill = (tone, text) => el('span', `ocs__status-pill ocs__status-pill--${tone}`, text);
 
+// Event titles are shown as plain text. A title saved from rich text can carry
+// HTML (a pasted <span style="…">…</span>), so only its words are shown. Only a
+// title that looks like markup (a closing tag or an entity) is read as HTML: a
+// typed title such as "ArrayList<Integer> practice" stays exactly as typed.
+const LOOKS_LIKE_MARKUP = /<\/[a-z][\w-]*\s*>|&(#\d+|#x[\da-f]+|[a-z]+\d*);/i;
+function plainTitle(title) {
+  const raw = String(title ?? '');
+  const text = LOOKS_LIKE_MARKUP.test(raw)
+    ? new DOMParser().parseFromString(raw, 'text/html').body.textContent
+    : raw;
+  return text.replace(/\s+/g, ' ').trim();
+}
+
 // The teacher's details, one line per line they typed (<br>, not CSS).
 function detailsBlock(text) {
   const block = el('div');
@@ -197,7 +210,7 @@ function removeButton(event, store, onRemoved, status) {
   button.setAttribute('aria-label', 'Remove from calendar');
   button.innerHTML = '<i class="fas fa-trash-alt" aria-hidden="true"></i>';
   button.addEventListener('click', async () => {
-    if (!window.confirm(`Remove "${event.title}" from the class calendar?`)) return;
+    if (!window.confirm(`Remove "${plainTitle(event.title)}" from the class calendar?`)) return;
     try {
       await store().deleteEvent(event.id);
       onRemoved();
@@ -216,7 +229,7 @@ function renderCard(event, { store, isTeacher, calendarUrl }) {
   const card = el('div', 'ocs__callout ocs__keypoints');
 
   const date = statusPill('good', formatShortDate(event.date));
-  const title = el('strong', '', event.title);
+  const title = el('strong', '', plainTitle(event.title));
   const heading = el('div', 'ocs__links');
   heading.append(date, title);
 
@@ -234,7 +247,7 @@ function renderCard(event, { store, isTeacher, calendarUrl }) {
   // A removed event stays in the announcement, struck through.
   const markRemoved = () => {
     date.className = 'ocs__status-pill ocs__status-pill--neutral';
-    title.replaceChildren(el('s', '', event.title));
+    title.replaceChildren(el('s', '', plainTitle(event.title)));
     status.textContent = 'Removed from calendar';
   };
 
@@ -280,11 +293,48 @@ export function markCardsForPeriod(container, period) {
 
 
 const MAX_EVENTS_PER_DAY = 3;
-const NARROW_WIDTH = 460;   // px
+// Below this strip width a day's column would hold only a few letters of a
+// name, so the strip shows a row per day instead.
+const NARROW_WIDTH = 640;   // px
 
 function weekRangeLabel(week) {
   const format = (iso) => fromIsoDate(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   return `Week ${week.index} · ${format(week.monday)} – ${format(week.friday)}`;
+}
+
+// Fits text into `width` pixels in the element's own font, cutting it with
+// "…" when it is too long. This keeps each event on one line: OCS has no
+// ellipsis class for a pill, and the strip adds no CSS of its own.
+let textRuler = null;
+function fitText(text, element, width) {
+  textRuler = textRuler || document.createElement('canvas').getContext('2d');
+  const style = getComputedStyle(element);
+  textRuler.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+  const fits = (candidate) => textRuler.measureText(candidate).width <= width;
+  if (fits(text)) return text;
+  // Cut by whole characters, so an emoji is never split in half.
+  const chars = Array.from(text);
+  const cutAt = (count) => `${chars.slice(0, count).join('').trimEnd()}…`;
+  let low = 0;
+  let high = chars.length;
+  while (low < high) {
+    const mid = Math.ceil((low + high) / 2);
+    if (fits(cutAt(mid))) low = mid;
+    else high = mid - 1;
+  }
+  return cutAt(low);
+}
+
+// The width a pill's text can use: its cell's content box minus the pill's
+// own padding and border.
+function pillTextRoom(pill) {
+  const cell = getComputedStyle(pill.closest('td'));
+  const own = getComputedStyle(pill);
+  const px = (value) => parseFloat(value) || 0;
+  return pill.closest('td').clientWidth
+    - px(cell.paddingLeft) - px(cell.paddingRight)
+    - px(own.paddingLeft) - px(own.paddingRight)
+    - px(own.borderLeftWidth) - px(own.borderRightWidth);
 }
 
 export function mountWeekView({
@@ -316,57 +366,124 @@ export function mountWeekView({
   const table = body.querySelector('table');
   let narrow = false;
   let days = [];
+  let openDays = new Set();   // days whose "+N more" is open
 
-  // A link, not a button, so a long title wraps inside its cell.
-  function eventLink(event) {
-    const link = document.createElement('a');
-    link.href = '#';
-    link.title = [event.title, formatPeriods(event.periods)].filter(Boolean).join(' · ');
-    link.textContent = event.title;
-    link.addEventListener('click', (e) => {
+  // One pill per event, on one line: the name cut to fit with "…", and the
+  // whole name with its periods in the tooltip. Daily plans are neutral so
+  // what is due, graded, or a check-in stands out in the accent color.
+  function eventPill(event) {
+    const name = plainTitle(event.title);
+    const label = [name, formatPeriods(event.periods)].filter(Boolean).join(' · ');
+    const tone = event.type === 'daily plan' ? 'neutral' : 'good';
+    const pill = el('a', `ocs__status-pill ocs__status-pill--${tone}`);
+    pill.href = '#';
+    pill.dataset.fullText = name;
+    pill.title = label;
+    pill.setAttribute('aria-label', label);
+    pill.addEventListener('click', (e) => {
       e.preventDefault();
-      if (onSelectEvent) onSelectEvent(event, link);
-      else if (feed && !feed.revealEvent(event.id)) link.title = `${event.title}: no announcement for this one`;
+      if (onSelectEvent) onSelectEvent(event, pill);
+      else if (feed && !feed.revealEvent(event.id)) pill.title = `${label}: no announcement for this one`;
     });
-    const line = document.createElement('div');
-    line.appendChild(link);
-    return line;
+    return pill;
   }
 
+  // ocs__keypoints spaces a day's rows, and each ocs__keypoint holds one pill
+  // at the start of the cell.
+  function stackRow(child) {
+    const row = el('div', 'ocs__keypoint');
+    row.appendChild(child);
+    return row;
+  }
+
+  // Today's date sits in an accent pill, the way calendar apps circle it.
+  // A no-break space keeps the weekday and date together in a narrow column.
   function dayHeading(day, scope) {
     const heading = document.createElement('th');
     heading.scope = scope;
-    heading.innerHTML = `${day.label} <b>${fromIsoDate(day.date).getDate()}</b>`;
+    const date = fromIsoDate(day.date).getDate();
+    heading.append(`${day.label}\u00a0`);
     if (day.date === today) {
       heading.setAttribute('aria-current', 'date');
-      heading.insertAdjacentHTML('beforeend', ' <span class="ocs__status-pill ocs__status-pill--good">Today</span>');
+      const pill = statusPill('good', String(date));
+      pill.title = 'Today';
+      heading.appendChild(pill);
+    } else {
+      heading.appendChild(el('b', '', String(date)));
     }
     return heading;
   }
 
-  function dayCell({ dayEvents, closedReason }) {
+  function dayCell({ day, dayEvents, closedReason }) {
     const cell = document.createElement('td');
-    if (closedReason) {
-      cell.insertAdjacentHTML('beforeend', `<span class="ocs__status-pill ocs__status-pill--neutral">${escapeHtml(closedReason)}</span>`);
-    }
-    dayEvents.slice(0, MAX_EVENTS_PER_DAY).forEach((event) => cell.appendChild(eventLink(event)));
+    const stack = el('div', 'ocs__keypoints');
+    if (closedReason) stack.appendChild(stackRow(statusPill('neutral', closedReason)));
+    const open = openDays.has(day.date);
+    (open ? dayEvents : dayEvents.slice(0, MAX_EVENTS_PER_DAY))
+      .forEach((event) => stack.appendChild(stackRow(eventPill(event))));
     if (dayEvents.length > MAX_EVENTS_PER_DAY) {
-      cell.insertAdjacentHTML('beforeend', `<div>+${dayEvents.length - MAX_EVENTS_PER_DAY} more</div>`);
+      const more = el('a', 'ocs__status-pill ocs__status-pill--neutral',
+        open ? 'Show less' : `+${dayEvents.length - MAX_EVENTS_PER_DAY} more`);
+      more.href = '#';
+      more.dataset.dayToggle = day.date;
+      more.setAttribute('aria-expanded', String(open));
+      more.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (open) openDays.delete(day.date);
+        else openDays.add(day.date);
+        render();
+        // render() rebuilds the table, so put focus back on this day's toggle.
+        table.querySelector(`[data-day-toggle="${day.date}"]`)?.focus();
+      });
+      stack.appendChild(stackRow(more));
     }
+    if (stack.children.length) cell.appendChild(stack);
     return cell;
   }
 
-  // Wide: a header row of days over one row of events. Narrow: a row per day.
+  // The column widths and valign="top" are plain HTML table attributes: OCS
+  // has no class for equal columns or top-aligned cells, and the strip adds
+  // no CSS. Wide: a header row of days over one row of pills, each day an
+  // equal share of the width. Narrow: a row per day, the day as narrow as its
+  // label and the pills taking the rest.
+  function columns(widths) {
+    const group = document.createElement('colgroup');
+    widths.forEach(([span, width]) => {
+      const column = document.createElement('col');
+      column.span = span;
+      if (width) column.setAttribute('width', width);
+      group.appendChild(column);
+    });
+    return group;
+  }
+
   function render() {
     table.replaceChildren();
     if (narrow) {
+      table.appendChild(columns([[1, '1%'], [1, '']]));
       const rows = table.createTBody();
-      days.forEach((d) => rows.insertRow().append(dayHeading(d.day, 'row'), dayCell(d)));
+      days.forEach((d) => {
+        const row = rows.insertRow();
+        row.setAttribute('valign', 'top');
+        row.append(dayHeading(d.day, 'row'), dayCell(d));
+      });
     } else {
+      table.appendChild(columns([[days.length || 5, `${100 / (days.length || 5)}%`]]));
       const headings = table.createTHead().insertRow();
       const cells = table.createTBody().insertRow();
+      cells.setAttribute('valign', 'top');
       days.forEach((d) => { headings.appendChild(dayHeading(d.day, 'col')); cells.appendChild(dayCell(d)); });
     }
+    fitPills();
+  }
+
+  // Pills start empty so a long name can't widen its column, then each one
+  // gets as much of its name as fits.
+  function fitPills() {
+    const pills = [...table.querySelectorAll('[data-full-text]')];
+    pills.forEach((pill) => { pill.textContent = ''; });
+    const rooms = pills.map(pillTextRoom);
+    pills.forEach((pill, i) => { pill.textContent = fitText(pill.dataset.fullText, pill, rooms[i]); });
   }
 
   async function refresh() {
@@ -394,18 +511,29 @@ export function mountWeekView({
   body.querySelectorAll('[data-step]').forEach((button) => {
     button.addEventListener('click', () => {
       week = neighborWeek(weeks, week, Number(button.dataset.step)) || week;
+      openDays = new Set();
       load();
     });
   });
-  body.querySelector('[data-hook="week-today"] button').addEventListener('click', () => { week = thisWeek; load(); });
+  body.querySelector('[data-hook="week-today"] button').addEventListener('click', () => {
+    week = thisWeek;
+    openDays = new Set();
+    load();
+  });
 
-  // Switch between the wide and narrow table when the strip's own width crosses NARROW_WIDTH.
+  // Switch between the wide and narrow table when the strip's own width
+  // crosses NARROW_WIDTH, and refit the pills whenever the width changes.
   const isNarrow = () => body.clientWidth > 0 && body.clientWidth < NARROW_WIDTH;
   narrow = isNarrow();
+  let lastWidth = body.clientWidth;
   const resize = 'ResizeObserver' in window ? new ResizeObserver(() => {
-    if (isNarrow() !== narrow) { narrow = !narrow; render(); }
+    if (body.clientWidth === lastWidth) return;
+    lastWidth = body.clientWidth;
+    if (isNarrow() !== narrow) { narrow = !narrow; render(); } else fitPills();
   }) : null;
   resize?.observe(body);
+  // The pills are measured in the page's web font; measure again once it has loaded.
+  document.fonts?.ready.then(fitPills);
 
   const unsubscribe = getStore().subscribe(load);
   const unlisten = feed ? feed.onMessage(({ events }) => { if (events.length) load(); }) : () => {};

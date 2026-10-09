@@ -21,7 +21,7 @@ It sets itself up:
 
 - **Signed in:** it shows your class's events from the OCS calendar, the same ones the announcements create.
 - **Signed out:** it shows the school week, with holidays and days off from the school calendar, and asks you to sign in.
-- **Click an event** to see its details inside the card. **Today** brings you back after you browse to other weeks.
+- **Each event is one pill on one line.** A long name ends in "…": hover for the whole name, or click the event to see its details inside the card. A busy day shows three events and "+N more". **Today** brings you back after you browse to other weeks.
 - **It fits where you put it.** At full width the week shows as five columns. In a sidebar, a two-column layout or on a phone, it shows one row per day.
 - **It's built from existing `ocs__` elements** (`ocs__card`, `ocs__table`, `ocs__links`, `ocs__btn`), so it has no CSS of its own and its colors follow the site theme.
 
