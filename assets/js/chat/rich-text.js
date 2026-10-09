@@ -220,6 +220,11 @@ export function renderRichMessage(container, raw) {
   container.appendChild(sanitizeToFragment(raw));
 }
 
+export function renderDeletedMessage(container) {
+  container.replaceChildren(document.createTextNode('This message was deleted.'));
+  container.classList.add('is-deleted');
+}
+
 /* ------------------------------------------------------------------ *
  * Composer
  * ------------------------------------------------------------------ */

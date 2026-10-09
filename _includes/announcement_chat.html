@@ -42,10 +42,12 @@
     </div>
     <div class="announcement-chat-command" data-hook="command"></div>
     <form class="chat-form" id="announcementChatForm" autocomplete="off">
+      <button class="chat-send dm-cancel-edit" id="announcementChatCancelEdit" type="button" hidden>Cancel</button>
       <button class="chat-send" id="announcementChatSend" type="submit" disabled>
         <i class="fas fa-paper-plane" aria-hidden="true"></i><span>Send</span>
       </button>
     </form>
+    <p class="dm-form-status" id="announcementChatFormStatus" role="alert" hidden></p>
   </div>
 </section>
 
@@ -71,7 +73,7 @@
 
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-  import { createRichComposer, renderRichMessage } from '{{site.baseurl}}/assets/js/chat/rich-text.js';
+  import { createRichComposer, renderDeletedMessage, renderRichMessage } from '{{site.baseurl}}/assets/js/chat/rich-text.js';
   import { attachAnnouncementCalendar } from '{{site.baseurl}}/assets/js/chat/calendar/calendar-announcements.js';
 
   const COURSE = {{ page.course | jsonify }};
@@ -120,7 +122,13 @@
     initialized: false,
     mode: 'live', // 'live' once connected to the backend, 'preview' when local-only
     currentUserDisplayName: 'You',
+    currentUserPfp: null,
     seenKeys: new Set(),
+    messageMap: new Map(),
+    editingMessageId: null,
+    editingMessage: null,
+    editInProgress: false,
+    deletingMessageIds: new Set(),
     // Cursors used to group the log by day and by consecutive sender
     lastDayKey: null,
     lastSender: null,
@@ -133,6 +141,8 @@
   const noteTextEl = document.getElementById('announcementChatNoteText');
   const messagesEl = document.getElementById('announcementChatMessages');
   const sendBtn = document.getElementById('announcementChatSend');
+  const cancelEditBtn = document.getElementById('announcementChatCancelEdit');
+  const formStatusEl = document.getElementById('announcementChatFormStatus');
   const formEl = document.getElementById('announcementChatForm');
 
   const composer = createRichComposer({
@@ -141,7 +151,7 @@
     onSubmit: submitMessage,
   });
   formEl.classList.add('chat-form--rich');
-  formEl.insertBefore(composer.element, sendBtn);
+  formEl.insertBefore(composer.element, cancelEditBtn);
 
   const calendar = attachAnnouncementCalendar({
     root: document.getElementById('announcementChat'),
@@ -167,8 +177,96 @@
   }
 
   function setComposerEnabled(enabled) {
-    composer.setEnabled(enabled);
-    sendBtn.disabled = !enabled;
+    composer.setEnabled(enabled && !state.editInProgress);
+    sendBtn.disabled = !enabled || state.editInProgress;
+    cancelEditBtn.hidden = !state.editingMessageId;
+    cancelEditBtn.disabled = state.editInProgress;
+    const icon = sendBtn.querySelector('i');
+    const label = sendBtn.querySelector('span');
+    if (icon) icon.className = state.editingMessageId ? 'fas fa-save' : 'fas fa-paper-plane';
+    if (label) label.textContent = state.editingMessageId ? 'Save' : 'Send';
+  }
+
+  function showFormMessage(message) {
+    formStatusEl.textContent = message;
+    formStatusEl.hidden = !message;
+  }
+
+  function resetEditState() {
+    state.editingMessageId = null;
+    state.editingMessage = null;
+    state.editInProgress = false;
+    composer.clear();
+    showFormMessage('');
+    setComposerEnabled(true);
+  }
+
+  function beginEditMessage(message) {
+    if (state.editInProgress || !message || !message.id || message.deleted
+      || message.sender !== state.currentUserDisplayName) return;
+    state.editingMessageId = message.id;
+    state.editingMessage = message;
+    composer.clear();
+    composer.setHTML(message.message || '');
+    showFormMessage('');
+    setComposerEnabled(true);
+    composer.focus();
+  }
+
+  composer.element.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && state.editingMessageId && !state.editInProgress) {
+      event.preventDefault();
+      resetEditState();
+    }
+  });
+  cancelEditBtn.addEventListener('click', resetEditState);
+
+  function updateMessageBody(messageId, message) {
+    const key = String(messageId ?? '');
+    if (!key) return;
+    const stored = state.messageMap.get(key);
+    if (stored?.deleted) return;
+
+    const row = messagesEl.querySelector(`[data-message-id="${CSS.escape(key)}"]`);
+    if (row) {
+      const bodyTarget = row.querySelector('.chat-msg-body');
+      if (bodyTarget) {
+        bodyTarget.innerHTML = '';
+        const { html } = calendar.splitMessage(message || '');
+        renderRichMessage(bodyTarget, html);
+      }
+      const meta = row.querySelector('.chat-msg-meta');
+      if (meta && !meta.querySelector('.chat-msg-edited')) {
+        const editedEl = document.createElement('span');
+        editedEl.className = 'chat-msg-edited';
+        editedEl.textContent = '(edited)';
+        meta.appendChild(editedEl);
+      }
+    }
+
+    if (stored) {
+      stored.message = message ?? stored.message;
+      stored.edited = true;
+    }
+  }
+
+  function markMessageDeleted(messageId) {
+    const key = String(messageId ?? '');
+    if (!key) return;
+
+    const stored = state.messageMap.get(key);
+    if (stored) {
+      stored.message = '';
+      stored.deleted = true;
+    }
+    const row = messagesEl.querySelector(`[data-message-id="${CSS.escape(key)}"]`);
+    if (!row) return;
+
+    const bodyTarget = row.querySelector('.chat-msg-body');
+    if (bodyTarget) renderDeletedMessage(bodyTarget);
+    row.classList.add('is-deleted');
+    row.querySelector('.chat-msg-actions')?.remove();
+    if (state.editingMessageId === key && !state.editInProgress) resetEditState();
   }
 
   // An open /event command is sent even with an empty message: the calendar
@@ -176,6 +274,28 @@
   let submitting = false;
   async function submitMessage() {
     if (submitting || composer.isOverLimit()) return;
+    if (state.editInProgress) return;
+
+    if (state.editingMessageId) {
+      if (composer.isEmpty()) return;
+      state.editInProgress = true;
+      showFormMessage('');
+      setComposerEnabled(true);
+      const ok = await editMessage(state.editingMessageId, composer.getHTML());
+      if (ok) {
+        resetEditState();
+      } else if (state.messageMap.get(String(state.editingMessageId))?.deleted) {
+        // The message was deleted while the save was in flight.
+        resetEditState();
+        showFormMessage('That message was deleted, so your edit was not saved.');
+      } else {
+        state.editInProgress = false;
+        setComposerEnabled(true);
+        showFormMessage('Could not save the edited message. Please try again.');
+      }
+      return;
+    }
+
     submitting = true;
     try {
       const html = await calendar.prepareMessage(composer.isEmpty() ? '' : composer.getHTML());
@@ -227,13 +347,51 @@
     return `tint-${(hash % 5) + 1}`;
   }
 
+  // Person.pfp is either a path/URL (seeded accounts, e.g. "/images/toby.png")
+  // or raw base64 image data (uploaded photos) with no "data:" prefix of its own.
+  function pfpSrc(pfp) {
+    if (!pfp) return null;
+    if (/^(https?:)?\/\//.test(pfp) || pfp.startsWith('/') || pfp.startsWith('data:')) return pfp;
+    return `data:image/png;base64,${pfp}`;
+  }
+
+  // Renders a real photo when one is available, falling back to the tinted
+  // initials circle (and back again if the image URL 404s).
+  function buildAvatar(pfp, initials, isSelf, tintClass) {
+    const avatar = document.createElement('span');
+    avatar.className = ['chat-avatar', isSelf ? '' : tintClass].filter(Boolean).join(' ');
+    avatar.setAttribute('aria-hidden', 'true');
+    const src = pfpSrc(pfp);
+    if (src) {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = '';
+      img.loading = 'lazy';
+      img.addEventListener('error', () => { img.remove(); avatar.textContent = initials; }, { once: true });
+      avatar.appendChild(img);
+    } else {
+      avatar.textContent = initials;
+    }
+    return avatar;
+  }
+
   function clearEmpty() {
     const empty = document.getElementById('announcementChatEmpty');
     if (empty) empty.remove();
   }
 
-  function appendMessage({ sender, message, date }) {
+  function appendMessage(entry) {
+    const { id, sender, message, date } = entry;
+    const isDeleted = Boolean(entry.deleted);
     clearEmpty();
+
+    const isEdited = Boolean(entry.edited);
+    const messageId = id != null ? String(id) : null;
+    if (messageId) {
+      state.messageMap.set(messageId, {
+        id: messageId, sender, message: isDeleted ? '' : message, date, deleted: isDeleted, edited: isEdited,
+      });
+    }
 
     const isSelf = sender === state.currentUserDisplayName;
     const who = isSelf ? 'You' : (sender || 'Unknown');
@@ -262,13 +420,16 @@
     }
 
     const row = document.createElement('div');
-    row.className = ['chat-msg', isSelf ? 'is-self' : '', continued ? 'is-continued' : '']
+    row.className = ['chat-msg', isSelf ? 'is-self' : '', continued ? 'is-continued' : '', isDeleted ? 'is-deleted' : '']
       .filter(Boolean).join(' ');
+    if (messageId) row.dataset.messageId = messageId;
 
-    const avatar = document.createElement('span');
-    avatar.className = ['chat-avatar', isSelf ? '' : tintFor(who)].filter(Boolean).join(' ');
-    avatar.textContent = initialsFor(isSelf ? (state.currentUserDisplayName || 'You') : who);
-    avatar.setAttribute('aria-hidden', 'true');
+    const avatar = buildAvatar(
+      isSelf ? state.currentUserPfp : null,
+      initialsFor(isSelf ? (state.currentUserDisplayName || 'You') : who),
+      isSelf,
+      tintFor(who),
+    );
 
     const main = document.createElement('div');
     main.className = 'chat-msg-main';
@@ -285,14 +446,58 @@
       timeEl.textContent = formatTime(when);
       meta.appendChild(timeEl);
     }
+    if (isEdited && !isDeleted) {
+      const editedEl = document.createElement('span');
+      editedEl.className = 'chat-msg-edited';
+      editedEl.textContent = '(edited)';
+      meta.appendChild(editedEl);
+    }
+
+    let actions;
+    if (isSelf && !isDeleted && messageId) {
+      actions = document.createElement('div');
+      actions.className = 'chat-msg-actions';
+
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'chat-msg-action';
+      editBtn.setAttribute('aria-label', 'Edit message');
+      editBtn.title = 'Edit message';
+      editBtn.innerHTML = '<i class="fas fa-pen" aria-hidden="true"></i>';
+      editBtn.addEventListener('click', () => beginEditMessage({ ...state.messageMap.get(messageId), id: messageId, sender }));
+      actions.appendChild(editBtn);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'chat-msg-action';
+      deleteBtn.setAttribute('aria-label', 'Delete message');
+      deleteBtn.title = 'Delete message';
+      deleteBtn.innerHTML = '<i class="fas fa-trash" aria-hidden="true"></i>';
+      deleteBtn.addEventListener('click', () => {
+        if (state.editInProgress) {
+          showFormMessage('Wait for the current edit to finish before deleting a message.');
+          return;
+        }
+        deleteBtn.disabled = true;
+        deleteMessage(messageId).finally(() => { deleteBtn.disabled = false; });
+      });
+      actions.appendChild(deleteBtn);
+    }
 
     const body = document.createElement('span');
     body.className = 'chat-msg-body';
-    const { html, events } = calendar.splitMessage(message);
-    renderRichMessage(body, html);
+    let events = [];
+    if (isDeleted) {
+      renderDeletedMessage(body);
+    } else {
+      const split = calendar.splitMessage(message);
+      renderRichMessage(body, split.html);
+      events = split.events;
+    }
 
     main.append(meta, body);
     calendar.attachEvents(row, main, events);
+    if (actions) main.appendChild(actions);
     row.append(avatar, main);
     messagesEl.appendChild(row);
 
@@ -340,6 +545,18 @@
     }
   }
 
+  function updatePreviewMessage(id, patch) {
+    try {
+      const messages = readPreviewMessages();
+      const idx = messages.findIndex((m) => m.id === id);
+      if (idx === -1) return;
+      messages[idx] = { ...messages[idx], ...patch };
+      window.localStorage.setItem(PREVIEW_KEY, JSON.stringify(messages));
+    } catch (err) {
+      console.warn('Announcement chat: could not update preview message', err);
+    }
+  }
+
   function enterPreviewMode(reason) {
     state.mode = 'preview';
     calendar.start('preview');
@@ -365,10 +582,27 @@
       const name = user?.name || user?.uid || user?.github;
       if (!name) return false;
       state.currentUserDisplayName = name;
+      await fetchCurrentUserPfp();
       return true;
     } catch (err) {
       console.warn('Announcement chat: user lookup failed', err);
       return false;
+    }
+  }
+
+  // Separate from resolveCurrentUser (which goes through Flask): group chat
+  // has no Person record for the sender of someone else's message, only a
+  // plain name string, so a real photo is only ever possible for the reader's
+  // own messages -- fetched here, straight from Spring, since Flask's /api/id
+  // doesn't return one. Best-effort: initials stay the fallback on failure.
+  async function fetchCurrentUserPfp() {
+    try {
+      const res = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+      if (!res.ok) return;
+      const person = await res.json();
+      if (person?.pfp) state.currentUserPfp = person.pfp;
+    } catch (err) {
+      console.warn('Announcement chat: pfp lookup failed', err);
     }
   }
 
@@ -436,7 +670,7 @@
         const key = eventKey({ sender: msg.name, date: msg.date, message: msg.message });
         if (state.seenKeys.has(key)) return;
         state.seenKeys.add(key);
-        appendMessage({ sender: msg.name, message: msg.message, date: msg.date });
+        appendMessage({ id: msg.id, sender: msg.name, message: msg.message, date: msg.date, edited: msg.edited });
       });
     } catch (err) {
       console.warn('Announcement chat: history load failed', err);
@@ -444,11 +678,20 @@
   }
 
   function handleIncoming(event) {
-    if (!event || event.context !== 'sendMessageServer') return;
+    if (!event) return;
+    if (event.context === 'deleteMessageServer') {
+      markMessageDeleted(event.messageId);
+      return;
+    }
+    if (event.context === 'editMessageServer') {
+      updateMessageBody(event.messageId, event.message);
+      return;
+    }
+    if (event.context !== 'sendMessageServer') return;
     const key = eventKey(event);
     if (state.seenKeys.has(key)) return;
     state.seenKeys.add(key);
-    appendMessage({ sender: event.sender, message: event.message, date: event.date });
+    appendMessage({ id: event.messageId, sender: event.sender, message: event.message, date: event.date });
   }
 
   function connect() {
@@ -488,7 +731,7 @@
     const date = new Date().toISOString();
 
     if (state.mode === 'preview') {
-      const entry = { sender: state.currentUserDisplayName || 'You', message: text, date };
+      const entry = { id: crypto.randomUUID(), sender: state.currentUserDisplayName || 'You', message: text, date };
       state.seenKeys.add(eventKey(entry));
       writePreviewMessage(entry);
       appendMessage(entry);
@@ -506,6 +749,67 @@
     };
     try { state.stompClient.send('/app/groups.chat', {}, JSON.stringify(payload)); return true; }
     catch (err) { console.error('Announcement chat: send failed', err); return false; }
+  }
+
+  async function editMessage(messageId, newMessage) {
+    if (!messageId) return false;
+
+    if (state.mode === 'preview') {
+      updateMessageBody(messageId, newMessage);
+      updatePreviewMessage(messageId, { message: newMessage });
+      return true;
+    }
+
+    if (!state.backboneGroupId) return false;
+    try {
+      const res = await fetch(
+        `${javaURI}/api/groups/chat/${state.backboneGroupId}/messages/${encodeURIComponent(messageId)}`,
+        { ...fetchOptions, method: 'PATCH', body: JSON.stringify({ message: newMessage }) },
+      );
+      if (!res.ok) { console.warn('Announcement chat: edit HTTP', res.status); return false; }
+      updateMessageBody(messageId, newMessage);
+      return true;
+    } catch (err) {
+      console.error('Announcement chat: edit failed', err);
+      return false;
+    }
+  }
+
+  async function deleteMessage(messageId) {
+    if (!messageId || state.editInProgress) return false;
+    const key = String(messageId);
+    const message = state.messageMap.get(key);
+    if (!message || message.deleted || message.sender !== state.currentUserDisplayName
+      || state.deletingMessageIds.has(key)) return false;
+
+    if (state.mode === 'preview') {
+      markMessageDeleted(key);
+      updatePreviewMessage(key, { deleted: true, message: '' });
+      return true;
+    }
+
+    if (!state.backboneGroupId) return false;
+    state.deletingMessageIds.add(key);
+    showFormMessage('');
+    try {
+      const res = await fetch(
+        `${javaURI}/api/groups/chat/${state.backboneGroupId}/messages/${encodeURIComponent(key)}`,
+        { ...fetchOptions, method: 'DELETE' },
+      );
+      if (!res.ok) {
+        console.warn('Announcement chat: delete HTTP', res.status);
+        showFormMessage('Could not delete the message. Please try again.');
+        return false;
+      }
+      markMessageDeleted(key);
+      return true;
+    } catch (err) {
+      console.error('Announcement chat: delete failed', err);
+      showFormMessage('Could not delete the message. Please try again.');
+      return false;
+    } finally {
+      state.deletingMessageIds.delete(key);
+    }
   }
 
   async function init() {
