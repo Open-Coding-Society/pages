@@ -3,7 +3,8 @@ import { javaURI, fetchOptions } from './config.js';
 // Navbar notification bell (_includes/themes/minima/header.html). The badge is the
 // number of different people who have sent the signed-in user unread direct messages.
 // Each fresh summary is broadcast as a 'dm:unread' event; dispatch 'dm:refresh-unread'
-// after changing read state so the badge updates right away (dm_chat.html does).
+// after changing read state so the badge updates right away. A successful message
+// deletion also refreshes the summary because the backend may update unread state.
 
 const POLL_MS = 30000;
 const bell = document.getElementById('dmBell');
@@ -38,10 +39,13 @@ async function refresh() {
         const res = await fetch(`${javaURI}/api/dm/unread`, fetchOptions);
         if (seq !== requestSeq) return; // superseded by a newer refresh
         if (!res.ok) {
-            // Signed out (401) or a backend without DMs: hide the bell and stop asking.
-            stopped = true;
-            clearInterval(pollTimer);
-            bell.hidden = true;
+            if (res.status === 401 || res.status === 403 || res.status === 404) {
+                // Signed out or a backend without DMs: hide the bell and stop asking.
+                stopped = true;
+                clearInterval(pollTimer);
+                bell.hidden = true;
+            }
+            // Other errors (e.g. 5xx) are transient: keep the last state and retry next poll.
             return;
         }
         const summary = await res.json();
@@ -64,6 +68,7 @@ document.addEventListener('visibilitychange', () => {
     schedulePolling();
 });
 window.addEventListener('dm:refresh-unread', refresh);
+window.addEventListener('dm:message-deleted', refresh);
 
 refresh();
 schedulePolling();
