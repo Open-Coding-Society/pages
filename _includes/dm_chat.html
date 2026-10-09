@@ -92,6 +92,7 @@
   const state = {
     currentUserUid: null,
     currentUserDisplayName: 'You',
+    currentUserPfp: null,
     conversations: [],
     activeConversationId: null,
     stompClient: null,
@@ -214,10 +215,18 @@
         bodyTarget.innerHTML = '';
         renderRichMessage(bodyTarget, body || '');
       }
+      const meta = row.querySelector('.chat-msg-meta');
+      if (meta && !meta.querySelector('.chat-msg-edited')) {
+        const editedEl = document.createElement('span');
+        editedEl.className = 'chat-msg-edited';
+        editedEl.textContent = '(edited)';
+        meta.appendChild(editedEl);
+      }
     }
 
     if (stored) {
       stored.body = body ?? stored.body;
+      stored.edited = true;
     }
   }
 
@@ -266,6 +275,34 @@
     return `tint-${(hash % 5) + 1}`;
   }
 
+  // Person.pfp is either a path/URL (seeded accounts, e.g. "/images/toby.png")
+  // or raw base64 image data (uploaded photos) with no "data:" prefix of its own.
+  function pfpSrc(pfp) {
+    if (!pfp) return null;
+    if (/^(https?:)?\/\//.test(pfp) || pfp.startsWith('/') || pfp.startsWith('data:')) return pfp;
+    return `data:image/png;base64,${pfp}`;
+  }
+
+  // Renders a real photo when one is available, falling back to the tinted
+  // initials circle (and back again if the image URL 404s).
+  function buildAvatar(pfp, initials, isSelf, tintClass) {
+    const avatar = document.createElement('span');
+    avatar.className = ['chat-avatar', isSelf ? '' : tintClass].filter(Boolean).join(' ');
+    avatar.setAttribute('aria-hidden', 'true');
+    const src = pfpSrc(pfp);
+    if (src) {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = '';
+      img.loading = 'lazy';
+      img.addEventListener('error', () => { img.remove(); avatar.textContent = initials; }, { once: true });
+      avatar.appendChild(img);
+    } else {
+      avatar.textContent = initials;
+    }
+    return avatar;
+  }
+
   function clearMessagesEmpty() {
     const empty = document.getElementById('dmMessagesEmpty');
     if (empty) empty.remove();
@@ -278,13 +315,14 @@
   }
 
   function appendMessage(message) {
-    const { id, senderUid, senderName, body, sentAt } = message;
+    const { id, senderUid, senderName, senderPfp, body, sentAt } = message;
     const isDeleted = Boolean(message.deleted || message.isDeleted || message.deletedAt);
     clearMessagesEmpty();
 
+    const isEdited = Boolean(message.edited);
     const messageId = String(id || `${senderUid}:${sentAt || Math.random()}`);
     state.messageMap.set(messageId, {
-      id: messageId, senderUid, senderName, body: isDeleted ? '' : body, sentAt, deleted: isDeleted,
+      id: messageId, senderUid, senderName, senderPfp, body: isDeleted ? '' : body, sentAt, deleted: isDeleted, edited: isEdited,
     });
 
     const isSelf = senderUid === state.currentUserUid;
@@ -317,10 +355,12 @@
     row.dataset.messageId = messageId;
     if (isDeleted) row.classList.add('is-deleted');
 
-    const avatar = document.createElement('span');
-    avatar.className = ['chat-avatar', isSelf ? '' : tintFor(who)].filter(Boolean).join(' ');
-    avatar.textContent = initialsFor(isSelf ? (state.currentUserDisplayName || 'You') : who);
-    avatar.setAttribute('aria-hidden', 'true');
+    const avatar = buildAvatar(
+      isSelf ? state.currentUserPfp : senderPfp,
+      initialsFor(isSelf ? (state.currentUserDisplayName || 'You') : who),
+      isSelf,
+      tintFor(who),
+    );
 
     const main = document.createElement('div');
     main.className = 'chat-msg-main';
@@ -336,6 +376,12 @@
       timeEl.className = 'chat-msg-time';
       timeEl.textContent = formatTime(when);
       meta.appendChild(timeEl);
+    }
+    if (isEdited && !isDeleted) {
+      const editedEl = document.createElement('span');
+      editedEl.className = 'chat-msg-edited';
+      editedEl.textContent = '(edited)';
+      meta.appendChild(editedEl);
     }
 
     let actions;
@@ -361,7 +407,6 @@
           showFormMessage('Wait for the current edit to finish before deleting a message.');
           return;
         }
-        if (!window.confirm('Delete this message? This cannot be undone.')) return;
         deleteBtn.disabled = true;
         deleteMessage(messageId).finally(() => { deleteBtn.disabled = false; });
       });
@@ -393,6 +438,7 @@
       if (!name || !user?.uid) return false;
       state.currentUserUid = user.uid;
       state.currentUserDisplayName = name;
+      state.currentUserPfp = user.pfp || null;
       return true;
     } catch (err) {
       console.warn('DM chat: user lookup failed', err);
