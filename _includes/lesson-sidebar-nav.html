@@ -4,7 +4,7 @@
   Course data and posts must be available in page context.
 
   Weeks mirror the course timeline page: week badge, theme title, completion
-  count, learning goals, then the lessons for that week.
+  count, then the lessons for that week.
 
   Week themes and goals come from _data/<course>.yml, e.g.
 
@@ -15,16 +15,30 @@
         theme: "Onboarding & Readiness"
         goals: ["Tool Setup", "Scrum Habits"]
 
+  Blogs, each sprint's intro, each week's intro (its learning goals), and each
+  week's chat are pages of their own, made by _plugins/lesson_player_pages.rb.
+  The URLs below must match the ones that plugin gives them:
+    /<course>/blogs/  /<course>/sprint-<n>/  /<course>/week-<w>/  /<course>/week-<w>/chat/
+
+  Expects lessonsByWeek, this course's lessons grouped by week, from
+  _layouts/post.html.
+
   Contracts used by the sidebar script in _layouts/post.html:
     - #sprint-{i}-lessons and #chevron-{i}  -> toggleSprint()
-    - .lesson-item[data-lesson-id]          -> completion tracking
+    - .lesson-item                          -> a step for Prev / Next and the pager
+    - .lesson-item[data-lesson-id]          -> a lesson, for completion tracking
     - .lesson-status-icon                   -> per-lesson complete/incomplete
-    - [data-week-count][data-week-total]    -> per-week completion count
-    - #week-chat-modal-{Sprint}-{week}       -> openWeekChat()
-    - currentWeekChatId                      -> the top bar's chat button
+    - [data-week-group] [data-week-count]    -> per-week completion count
+
+  Sets currentWeekUrl and currentWeekChatUrl when it draws the page's own week,
+  for the top bar's week crumb and chat button. A lesson whose week is in no
+  sprint has neither page, so both stay blank.
+
+  The script at the bottom of this file hides and shows the sidebar, for the
+  button in _includes/lesson-topbar.html.
 {% endcomment %}
 
-<div class="lesson-sidebar">
+<div class="lesson-sidebar" id="lesson-sidebar">
   <div class="sidebar-header">
     {% if current_course == 'csp' %}
       <h2>Computer Science Principles</h2>
@@ -49,80 +63,87 @@
 
   <div class="sprint-nav">
     {%- assign courseData = site.data[current_course] -%}
-    {%- comment -%} Filled per week below, emitted by _includes/lesson-modals.html. {%- endcomment -%}
-    {%- assign lessonWeekChats = "" -%}
-    {%- comment -%} The lesson's own week, for the top bar's chat button. {%- endcomment -%}
-    {%- assign currentWeekChatId = "" -%}
+    {%- assign currentWeekUrl = "" -%}
+    {%- assign currentWeekChatUrl = "" -%}
 
-    {%- comment -%} Filter to this course's single-course posts once, instead of rescanning all site posts per week. {%- endcomment -%}
-    {%- assign coursePosts = "" | split: "" -%}
-    {%- for post in posts -%}
-      {%- if post.courses[current_course] and post.courses.size == 1 -%}
-        {%- assign coursePosts = coursePosts | push: post -%}
-      {%- endif -%}
-    {%- endfor -%}
+    {%- comment -%}
+      Every post on the site, first because it belongs to no sprint.
+      Here and on the week chat links below, the icon and label sit straight in
+      the button, like the Submit buttons in post.html. The theme presets in
+      user-preferences.js recolor every span, which would turn a span label the
+      theme's text color on top of the current page's filled button.
+    {%- endcomment -%}
+    {%- assign blogsUrl = "/" | append: current_course | append: "/blogs/" -%}
+    <div class="ocs__links">
+      <a class="ocs__btn ocs__btn--icon small accent{% if page.url == blogsUrl %} fill{% endif %}" href="{{ site.baseurl }}{{ blogsUrl }}"{% if page.url == blogsUrl %} aria-current="page"{% endif %}>
+        <i class="fas fa-blog" aria-hidden="true"></i>
+        Blogs
+      </a>
+    </div>
 
     {%- for i in (1..9) -%}
       {%- assign sprintKey = "Sprint" | append: i -%}
       {%- assign sprint = courseData[sprintKey] -%}
 
       {%- if sprint -%}
+      {%- comment -%}
+        A shared sprint takes its title and description from _data/cs.yml,
+        the same way _layouts/sprint.html builds the course page. The weeks
+        still come from this course's own data.
+      {%- endcomment -%}
+      {%- assign sprintInfo = sprint -%}
+      {%- if sprint.shared -%}{%- assign sprintInfo = site.data.cs[sprint.shared] -%}{%- endif -%}
       <div class="sprint-section">
         <button class="sprint-toggle" onclick="toggleSprint('{{ i }}')" type="button">
           <i class="fas fa-chevron-right sprint-chevron" id="chevron-{{ i }}"></i>
           <div class="sprint-info">
-            <div class="sprint-title">{{ sprintKey }}: {{ sprint.title }}</div>
+            <div class="sprint-title">{{ sprintKey }}: {{ sprintInfo.title }}</div>
             <div class="sprint-weeks">Weeks {{ sprint.start }}-{{ sprint.end }}</div>
           </div>
         </button>
 
         <div class="lesson-list" id="sprint-{{ i }}-lessons" style="display: none;">
+          {%- comment -%} The sprint's intro page comes first, so Next reaches it before the sprint's first week. {%- endcomment -%}
+          {%- assign sprintUrl = "/" | append: current_course | append: "/sprint-" | append: i | append: "/" -%}
+          <a href="{{ site.baseurl }}{{ sprintUrl }}" class="lesson-item {% if page.url == sprintUrl %}active{% endif %}">
+            <i class="fas fa-flag" aria-hidden="true"></i>
+            <span class="lesson-title">Sprint {{ i }} intro</span>
+          </a>
           {%- for week in (sprint.start..sprint.end) -%}
 
-            {%- comment -%} Collect this week's lessons first, so empty weeks are skipped. {%- endcomment -%}
-            {%- assign weekPosts = "" | split: "" -%}
-            {%- for post in coursePosts -%}
-              {%- assign postWeek = post.courses[current_course].week | plus: 0 -%}
-              {%- if postWeek == week -%}
-                {%- assign weekPosts = weekPosts | push: post -%}
-              {%- endif -%}
-            {%- endfor -%}
-
-            {%- if weekPosts.size > 0 -%}
+            {%- comment -%} This week's lessons, if any; empty weeks are skipped. {%- endcomment -%}
+            {%- assign weekGroup = lessonsByWeek | where: "name", week | first -%}
+            {%- if weekGroup -%}
+            {%- assign weekPosts = weekGroup.items -%}
             {%- assign weekData = sprint[week] -%}
-            <div class="week-group">
-              <button class="week-toggle" onclick="toggleWeek('{{ week }}')" type="button" aria-expanded="false" id="week-toggle-{{ week }}">
-                <span class="week-toggle-row">
-                  <i class="fas fa-chevron-right week-chevron" id="week-chevron-{{ week }}"></i>
+            {%- comment -%}
+              A week is a <details> element, so the browser opens and closes it.
+              Its summary reuses the sprint row's classes, so a week reads like
+              a sprint one level down: chevron, title, then its W and count
+              pills. The week's rows are not indented further, so lesson titles
+              keep the sidebar's full width. The lesson's own week starts open,
+              and the script in _layouts/post.html turns the chevron when a
+              week opens or closes.
+            {%- endcomment -%}
+            <details data-week-group{% if week == current_week %} open{% endif %}>
+              <summary class="sprint-toggle">
+                <i class="fas {% if week == current_week %}fa-chevron-down{% else %}fa-chevron-right{% endif %} sprint-chevron" aria-hidden="true"></i>
+                <span class="sprint-info">
+                  <span class="lesson-title"><strong>{% if weekData.theme %}{{ weekData.theme | escape }}{% else %}Week {{ week }}{% endif %}</strong></span><br>
                   <span class="ocs__status-pill ocs__status-pill--good">W{{ week }}</span>
                   <span class="ocs__status-pill ocs__status-pill--neutral" data-week-count data-week-total="{{ weekPosts.size }}">0/{{ weekPosts.size }}</span>
                 </span>
-                <span class="week-name">Week {{ week }}{% if weekData.theme %}: {{ weekData.theme }}{% endif %}</span>
-              </button>
+              </summary>
 
-              <div class="week-body" id="week-{{ week }}-body" style="display: none;">
               {%- comment -%}
-                Collapsible section, same shape as the week chat in
-                _includes/week_chat.html: a details/summary with a caret that
-                rotates when open.
+                The week's intro page, with its learning goals, comes first, so
+                Next from the last lesson of the week before lands on it.
               {%- endcomment -%}
-              {%- if weekData.goals -%}
-              <details class="week-goals">
-                <summary class="week-goals-summary">
-                  <span class="week-goals-icon"><i class="fas fa-bullseye"></i></span>
-                  <span class="ocs__section-title">Learning Goals</span>
-                  <span class="ocs__status-pill ocs__status-pill--neutral">{{ weekData.goals.size }}</span>
-                  <span class="week-goals-caret"><i class="fas fa-chevron-down"></i></span>
-                </summary>
-                <div class="week-goals-body">
-                  <div class="ocs__keypoints">
-                    {%- for goal in weekData.goals -%}
-                    <div class="ocs__keypoint"><span class="ocs__check">&rarr;</span>{{ goal }}</div>
-                    {%- endfor -%}
-                  </div>
-                </div>
-              </details>
-              {%- endif -%}
+              {%- assign weekUrl = "/" | append: current_course | append: "/week-" | append: week | append: "/" -%}
+              <a href="{{ site.baseurl }}{{ weekUrl }}" class="lesson-item {% if page.url == weekUrl %}active{% endif %}">
+                <i class="fas fa-bullseye" aria-hidden="true"></i>
+                <span class="lesson-title">Week {{ week }} intro</span>
+              </a>
 
               {%- assign assignmentCount = 0 -%}
               {%- for post in weekPosts -%}
@@ -134,47 +155,35 @@
                  data-lesson-id="{{ post.url }}">
                 <i class="fas fa-circle lesson-status-icon incomplete"></i>
                 {%- if post.assignment == true -%}
-                <i class="fas fa-file-alt lesson-type-icon assignment"></i>
+                <i class="fas fa-file-alt" aria-hidden="true"></i>
                 {%- else -%}
-                <i class="fas fa-code lesson-type-icon lesson"></i>
+                <i class="fas fa-code" aria-hidden="true"></i>
                 {%- endif -%}
                 <span class="lesson-title">{{ post.title }}</span>
               </a>
               {%- endfor -%}
 
               {%- comment -%}
-                Week chat. The chat is _includes/week_chat.html, the same one the
-                course timeline puts in each week card, and it is passed the course
-                so it joins the same room. The modal is captured here and emitted by
-                lesson-modals.html, because .week-body is display:none while the week
-                is closed and would hide anything inside it.
+                The week's chat opens as its own page, beside this sidebar.
+                It is a link, not a step, so Prev / Next pass it by.
               {%- endcomment -%}
-              {%- assign unitKey = sprintKey -%}
-              {%- assign index = week -%}
-              {%- assign chatId = unitKey | append: '-' | append: index -%}
-              {%- if week == current_week -%}{%- assign currentWeekChatId = chatId -%}{%- endif -%}
-              <div class="ocs__links week-footer">
+              {%- assign chatUrl = weekUrl | append: "chat/" -%}
+              {%- if week == current_week -%}
+                {%- assign currentWeekUrl = weekUrl -%}
+                {%- assign currentWeekChatUrl = chatUrl -%}
+              {%- endif -%}
+              <div class="ocs__links">
                 {%- if assignmentCount > 0 -%}
                 <span class="ocs__status-pill ocs__status-pill--warn">
                   <i class="fas fa-calendar"></i> {{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due
                 </span>
                 {%- endif -%}
-                <button class="ocs__btn ocs__btn--icon small accent" type="button" onclick="openWeekChat('{{ chatId }}', this)" aria-haspopup="dialog">
-                  <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-comments"></i></span>
-                  <span>Week {{ week }} Chat</span>
-                </button>
+                <a class="ocs__btn ocs__btn--icon small accent{% if page.url == chatUrl %} fill{% endif %}" href="{{ site.baseurl }}{{ chatUrl }}"{% if page.url == chatUrl %} aria-current="page"{% endif %}>
+                  <i class="fas fa-comments" aria-hidden="true"></i>
+                  Week {{ week }} Chat
+                </a>
               </div>
-              {%- capture weekChatModal -%}
-              <div class="modal-overlay week-chat-modal" id="week-chat-modal-{{ chatId }}" role="dialog" aria-modal="true" aria-label="Week {{ week }} chat" hidden>
-                <div class="week-chat-modal-content">
-                  <button class="modal-close" type="button" aria-label="Close chat">&times;</button>
-                  {% include week_chat.html course=current_course %}
-                </div>
-              </div>
-              {%- endcapture -%}
-              {%- assign lessonWeekChats = lessonWeekChats | append: weekChatModal -%}
-              </div>
-            </div>
+            </details>
             {%- endif -%}
 
           {%- endfor -%}
@@ -184,3 +193,56 @@
     {%- endfor -%}
   </div>
 </div>
+
+<script>
+  /**
+   * Hiding the sidebar, for the button in the top bar. A hidden sidebar has the
+   * hidden attribute, so the lesson takes the full width with no CSS involved.
+   *
+   * The reader's choice is saved and applied here, as soon as the sidebar has
+   * been parsed, so a hidden sidebar never flashes open first. Phones already
+   * hide the sidebar, so the button only shows on wider screens.
+   */
+  (function () {
+    const sidebar = document.getElementById('lesson-sidebar');
+    if (!sidebar) return;
+
+    const STORAGE_KEY = 'ocs-lesson-sidebar-hidden';
+    const wideScreen = window.matchMedia('(min-width: 769px)');
+
+    function readerHidSidebar() {
+      try {
+        return localStorage.getItem(STORAGE_KEY) === 'true';
+      } catch (e) {
+        return false; // storage blocked (private browsing): the sidebar stays open
+      }
+    }
+
+    function show(hide) {
+      sidebar.hidden = hide && wideScreen.matches;
+      const button = document.getElementById('lesson-sidebar-toggle');
+      const wrapper = document.getElementById('lesson-sidebar-toggle-wrap');
+      if (!button || !wrapper) return;
+      const label = sidebar.hidden ? 'Show course navigation' : 'Hide course navigation';
+      wrapper.hidden = !wideScreen.matches;
+      button.setAttribute('aria-expanded', String(!sidebar.hidden));
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    }
+
+    window.toggleLessonSidebar = function () {
+      const hide = !sidebar.hidden;
+      try {
+        localStorage.setItem(STORAGE_KEY, String(hide));
+      } catch (e) {
+        // Same as above: the choice just isn't remembered.
+      }
+      show(hide);
+    };
+
+    show(readerHidSidebar());
+    // The top bar button is parsed after the sidebar, so sync it once it exists.
+    document.addEventListener('DOMContentLoaded', () => show(readerHidSidebar()));
+    wideScreen.addEventListener('change', () => show(readerHidSidebar()));
+  })();
+</script>

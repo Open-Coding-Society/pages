@@ -72,6 +72,7 @@ while preserving all critical instructions. The agent must still communicate wit
 
 * 源文件在 [notebook sources](_notebooks/) 与 [docx sources](_docx/)；转换后的 Markdown 输出到 [generated posts](_posts/)（生成物，不要手工改）。
 * 多课程拆分文件（`*_csp.md`/`*_csa.md`/`*_csse.md`/`*_content.md`）为生成物，禁止手改；规则见 [scripts/split_multi_course_files.py](scripts/split_multi_course_files.py)。
+* 课程播放器页面（每门课的 `/<course>/sprint-<n>/`、`/<course>/week-<w>/`、`/<course>/week-<w>/chat/`、`/<course>/blogs/`）没有源文件：由 [_plugins/lesson_player_pages.rb](_plugins/lesson_player_pages.rb) 在构建时根据 `_data/<course>.yml` 生成，周页面和聊天页面只为有 lesson 的周生成。页面内容改 [_includes/player-pages/](_includes/player-pages/)；[_includes/lesson-sidebar-nav.html](_includes/lesson-sidebar-nav.html) 中的链接必须使用相同的 URL。测试：`bundle exec ruby scripts/test_player_pages.rb`。
 * Notebook/DOCX 转换规则见 [scripts/convert_notebooks.py](scripts/convert_notebooks.py) 与 [scripts/convert_docx.py](scripts/convert_docx.py)。
 * GameBuilder 课程 notebook 的规范源在 [_projects/systems/gamebuilder/notebooks/](_projects/systems/gamebuilder/notebooks/)；`_notebooks/projects/gamebuilder/` 是构建副本。项目 Makefile 由 [_projects/_template/Makefile](_projects/_template/Makefile) 生成，持久的构建/监听修复应改模板；循环中的 `cd` 使用子 shell，避免多个 notebook 转换时改变工作目录。
 
@@ -79,6 +80,7 @@ while preserving all critical instructions. The agent must still communicate wit
 
 * 新项目遵循 [_projects/REGISTRATION.md](_projects/REGISTRATION.md) 注册/构建约定；架构示例见 [_projects/ARCHITECTURE.md](_projects/ARCHITECTURE.md)。
 * 样式优先使用 SCSS；主题切换与样式约定见 [README.md](README.md)。
+* 主题预设（[assets/js/user-preferences.js](assets/js/user-preferences.js)）会用 `!important` 把所有 `span`、`div`、`p`、`li` 和标题改成主题文字色。按钮的图标和文字要直接写在 `ocs__btn` 里（像 [_layouts/post.html](_layouts/post.html) 的 Submit 按钮），不要包在 `<span>` 里，否则 `fill` 按钮上的文字会变成主题文字色，可能看不清。
 
 ### 后端边界
 

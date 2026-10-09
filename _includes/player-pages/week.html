@@ -1,0 +1,67 @@
+{%- comment -%}
+  A week's intro page: its learning goals, then its lessons, with a way into
+  the first lesson and the week's chat. Next from the last lesson of the week
+  before lands here. Only OCS components; no CSS of its own.
+
+  Expects from _layouts/post.html: current_course, current_week, lessonsByWeek.
+  The week's goals come from _data/<course>.yml, its lessons from their front matter.
+{%- endcomment -%}
+{%- assign sprintKey = "Sprint" | append: page.player_page.sprint -%}
+{%- assign sprint = site.data[current_course][sprintKey] -%}
+{%- assign sprintInfo = sprint -%}
+{%- if sprint.shared -%}{%- assign sprintInfo = site.data.cs[sprint.shared] -%}{%- endif -%}
+{%- assign weekData = sprint[current_week] -%}
+
+{%- assign weekPosts = "" | split: "" -%}
+{%- assign weekGroup = lessonsByWeek | where: "name", current_week | first -%}
+{%- if weekGroup -%}{%- assign weekPosts = weekGroup.items -%}{%- endif -%}
+
+{%- comment -%}
+  The title opens the page the way a lesson's own title does. lesson-body gives
+  it the lessons' heading style; a bare h2 picks up site-wide h2 rules from
+  other pages' SASS.
+{%- endcomment %}
+<div class="lesson-body">
+  <h2>{{ page.title | escape }}</h2>
+  <p>Week {{ current_week }} of <a href="{{ site.baseurl }}/{{ current_course }}/sprint-{{ page.player_page.sprint }}/">Sprint {{ page.player_page.sprint }}: {{ sprintInfo.title | strip | escape }}</a>.</p>
+</div>
+
+{%- if weekData.goals %}
+<div class="ocs__card">
+  <h2 class="ocs__section-title">Learning goals</h2>
+  <div class="ocs__keypoints">
+    {%- for goal in weekData.goals %}
+    <div class="ocs__keypoint"><span class="ocs__check">&check;</span>{{ goal }}</div>
+    {%- endfor %}
+  </div>
+</div>
+{%- endif %}
+
+<div class="ocs__card">
+  <h2 class="ocs__section-title">This week</h2>
+  <div class="ocs__links">
+    {%- if weekPosts.size > 0 %}
+    {%- assign firstPost = weekPosts | first %}
+    <a class="ocs__btn accent fill" href="{{ site.baseurl }}{{ firstPost.url }}" data-player-start>Start: {{ firstPost.title | escape }} &rarr;</a>
+    {%- endif %}
+    <a class="ocs__btn ocs__btn--icon accent" href="{{ site.baseurl }}/{{ current_course }}/week-{{ current_week }}/chat/">
+      <i class="fas fa-comments" aria-hidden="true"></i>
+      Week {{ current_week }} Chat
+    </a>
+  </div>
+  {%- if weekPosts.size > 0 %}
+  <div class="ocs__nav-grid ocs__nav-grid--in-card">
+    {%- for post in weekPosts %}
+    <a class="ocs__nav-card" href="{{ site.baseurl }}{{ post.url }}">
+      <span class="ocs__nav-card-kicker">{% if post.assignment == true %}Assignment{% else %}Lesson{% endif %}</span>
+      <span class="ocs__nav-card-title">{{ post.title | escape }}</span>
+      {%- if post.description %}
+      <span class="ocs__text">{{ post.description | strip_html | truncate: 140 }}</span>
+      {%- endif %}
+    </a>
+    {%- endfor %}
+  </div>
+  {%- else %}
+  <div class="ocs__text">No lessons have been posted for this week yet.</div>
+  {%- endif %}
+</div>

@@ -1,22 +1,25 @@
 <!-- Week Chat: collapsible WebSocket chat scoped to a single sprint week. -->
 <!-- One group per (course, week), e.g. "csa-week-0", "csa-week-1". -->
-<!-- Include from sprint-week-card.html, which has `index` (week number) and -->
-<!-- `unitKey` (e.g. "Sprint1") in scope. Reuses the same STOMP/SockJS backend -->
-<!-- as _includes/lesson_chat.html and _includes/announcement_chat.html. The -->
-<!-- group is created automatically on first use if it doesn't exist yet. -->
+<!-- Included by _includes/player-pages/chat.html, a week's chat page, which -->
+<!-- sets `index` (week number) and `unitKey` (e.g. "Sprint1"). Reuses the -->
+<!-- same STOMP/SockJS backend as _includes/lesson_chat.html and -->
+<!-- _includes/announcement_chat.html. The group is created automatically on -->
+<!-- first use if it doesn't exist yet. -->
 <!-- -->
 <!-- Pages without `page.course` (lesson pages only have `courses:`) pass it -->
 <!-- in as an include parameter, course=current_course, so the room is -->
-<!-- "csa-week-2" and not "null-week-2". The course page needs no param. -->
+<!-- "csa-week-2" and not "null-week-2". -->
 <!-- -->
 <!-- Signed-out visitors still get the full UI: the chat drops into a local -->
 <!-- "preview" mode backed by localStorage so the feature can be seen and -->
-<!-- exercised on every week card without a login. Preview messages never -->
+<!-- exercised on every chat page without a login. Preview messages never -->
 <!-- leave the browser and are clearly labelled as such. -->
+<!-- -->
+<!-- open=true starts the chat open and connected, for a week's chat page. -->
 {% assign wc_id = unitKey | append: '-' | append: index %}
 {% assign wc_course = include.course | default: page.course %}
 
-<details class="week-chat" data-week-key="{{ wc_id }}">
+<details class="week-chat" data-week-key="{{ wc_id }}"{% if include.open %} open{% endif %}>
   <summary class="chat-summary">
     <span class="chat-summary-icon"><i class="fas fa-comments"></i></span>
     <span class="chat-summary-title">Week {{ index }} Chat</span>
@@ -56,8 +59,7 @@
   const SOCKJS_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js';
   const STOMP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js';
 
-  // Every week card includes this file, so load the chat libraries once per
-  // page and only when someone actually opens a chat.
+  // Load the chat libraries once per page, and only when the chat opens.
   function loadScriptOnce(src) {
     window.__ocsChatScripts = window.__ocsChatScripts || {};
     if (!window.__ocsChatScripts[src]) {
@@ -417,6 +419,9 @@
   detailsEl.addEventListener('toggle', () => {
     if (detailsEl.open) initOnce();
   });
+  // A chat page draws the chat already open, and its toggle event may fire
+  // before this module runs, so start here too. initOnce runs only once.
+  if (detailsEl.open) initOnce();
 
   formEl.addEventListener('submit', (e) => {
     e.preventDefault();

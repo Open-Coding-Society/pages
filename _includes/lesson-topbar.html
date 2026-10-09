@@ -2,6 +2,10 @@
 {% comment %}
   Shows breadcrumbs, current page info, completion toggle, and progress bar
   Expects: current_course, current_week, page, site
+
+  A player page (a sprint or week intro, a week's chat, or Blogs) is not a
+  lesson, so it keeps only the breadcrumbs and the sidebar button: there is
+  nothing to burn down, and its own content says where to go next.
 {% endcomment %}
 
 <div class="topbar-lesson">
@@ -11,14 +15,30 @@
         <a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}" title="Back to course">
           <i class="fas fa-home"></i>
         </a>
+        {%- comment -%}
+          A week intro sits in its sprint. A lesson or chat sits in its week, and
+          the crumb opens the week's intro; currentWeekUrl is set by
+          lesson-sidebar-nav.html, which is included first.
+        {%- endcomment -%}
+        {%- if page.player_page.kind == "week" %}
         <i class="fas fa-chevron-right"></i>
+        <span><a href="{{ site.baseurl }}/{{ current_course }}/sprint-{{ page.player_page.sprint }}/">Sprint {{ page.player_page.sprint }}</a></span>
+        {%- elsif current_week != null %}
+        <i class="fas fa-chevron-right"></i>
+        {%- if currentWeekUrl != blank %}
+        <span><a href="{{ site.baseurl }}{{ currentWeekUrl }}">Week {{ current_week }}</a></span>
+        {%- else %}
         <span>Week {{ current_week }}</span>
+        {%- endif %}
+        {%- endif %}
         <i class="fas fa-chevron-right"></i>
         <span class="current">{{ page.title }}</span>
+        {%- unless page.player_page %}
         <button id="topbar-complete-btn" class="ocs__btn ocs__btn--icon small accent" onclick="toggleComplete()" type="button" title="Mark lesson complete">
           <i class="fas fa-circle" id="complete-icon-topbar"></i>
           <span id="complete-text-topbar">Burndown</span>
         </button>
+        {%- endunless %}
       </div>
     </div>
 
@@ -27,6 +47,19 @@
       prevLesson() and nextLesson() are defined in _layouts/post.html.
     {%- endcomment -%}
     <nav class="ocs__links" aria-label="Lesson navigation">
+      {%- comment -%}
+        Hides and shows the sidebar. toggleLessonSidebar() is at the bottom of
+        lesson-sidebar-nav.html. The wrapper carries the hidden attribute
+        because .ocs__btn sets its own display, which would override hidden on
+        the button itself; the script shows it on screens wide enough to have
+        a sidebar.
+      {%- endcomment -%}
+      <span id="lesson-sidebar-toggle-wrap" hidden>
+        <button class="ocs__btn ocs__btn--icon small accent" id="lesson-sidebar-toggle" onclick="toggleLessonSidebar()" type="button" aria-controls="lesson-sidebar" aria-expanded="true" aria-label="Hide course navigation" title="Hide course navigation">
+          <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-table-columns"></i></span>
+        </button>
+      </span>
+      {%- unless page.player_page %}
       <button class="ocs__btn ocs__btn--icon small accent" onclick="prevLesson()" type="button" title="Previous lesson">
         <i class="fas fa-chevron-left"></i> Prev
       </button>
@@ -34,21 +67,23 @@
         Next <i class="fas fa-chevron-right"></i>
       </button>
       {%- comment -%}
-        This lesson's week chat. The sidebar is hidden on phones, so this is how
-        a phone opens it. Icon only, like the course page's calendar and
-        certificate buttons, so it fits beside Prev / Next at every width.
-        currentWeekChatId is set by lesson-sidebar-nav.html, which is included
-        first, and only for a week that has a chat modal.
+        This lesson's week chat page. The sidebar is hidden on phones, so this
+        is how a phone reaches it. Icon only, like the course page's calendar
+        and certificate buttons, so it fits beside Prev / Next at every width.
+        currentWeekChatUrl is set by lesson-sidebar-nav.html.
       {%- endcomment -%}
-      {%- if currentWeekChatId != blank -%}
-      <button class="ocs__btn ocs__btn--icon small accent" onclick="openWeekChat('{{ currentWeekChatId }}', this)" type="button" aria-haspopup="dialog" aria-label="Week {{ current_week }} chat" title="Week {{ current_week }} chat">
+      {%- if currentWeekChatUrl != blank %}
+      <a class="ocs__btn ocs__btn--icon small accent" href="{{ site.baseurl }}{{ currentWeekChatUrl }}" aria-label="Week {{ current_week }} chat" title="Week {{ current_week }} chat">
         <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-comments"></i></span>
-      </button>
-      {%- endif -%}
+      </a>
+      {%- endif %}
+      {%- endunless %}
     </nav>
   </div>
 
+  {%- unless page.player_page %}
   <div class="topbar-progress">
     <div class="topbar-progress-fill" id="lesson-progress"></div>
   </div>
+  {%- endunless %}
 </div>

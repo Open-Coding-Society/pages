@@ -1,4 +1,4 @@
-<!-- SPRINT CARD - Container for all weeks in a sprint -->
+<!-- SPRINT CARD - One big button that opens the sprint's intro page -->
 {% comment %}
   Expects:
     - unit: unit number (from units loop)
@@ -12,18 +12,23 @@
     - posts: all posts/pages
     - sites: site data
     - shared: shared data
+
+  The whole card opens the sprint's intro page in the lesson player,
+  /<course>/sprint-<n>/, made by _plugins/lesson_player_pages.rb.
+  ocs__hub-card gives the card its lift and tint on hover. The card is the
+  button, so there is no separate Open button: the sprint's title is the real
+  link, for keyboards and screen readers, and courses.js follows it when the
+  card is clicked anywhere else, except on the card's own buttons.
 {% endcomment %}
 
-<div class="ocs__card sprint-card collapsed" data-sprint="{{ unitKey }}" data-course="{{ page.course }}">
+<div class="ocs__card ocs__hub-card sprint-card collapsed" data-sprint="{{ unitKey }}" data-course="{{ page.course }}">
   <div class="sprint-header" style="display: flex; flex-direction: column; gap: 12px;">
     <div class="sprint-controls" style="display: flex; gap: 8px; align-items: center; justify-content: space-between; width: 100%;">
       
-      <!-- Sprint Label and Weeks Toggle on the left -->
+      <!-- Sprint label and its weeks on the left -->
       <div style="display: flex; gap: 8px; align-items: center;">
         <p style="margin: 0;">{{ unitKey }}</p>
-        <button class="sprint-toggle-btn" type="button" aria-expanded="false">
-          <span class="sprint-toggle-icon">▾</span> {{ start }} - {{ end }} Weeks
-        </button>
+        <span class="ocs__status-pill ocs__status-pill--neutral">Weeks {{ start }}&ndash;{{ end }}</span>
       </div>
 
       <!-- Divider between left and right controls -->
@@ -73,17 +78,42 @@
     </div>
 
     <!-- Full-width sprint info section below buttons -->
+    {%- comment -%}
+      Every card shows the same amount of text, so the cards are the same
+      height: the title fits on one line (40 characters) and the description
+      on two (130). A cut ends on a whole word, or mid-word if there is no
+      space, and adds "…". The full title is the link's tooltip, and both
+      are in full on the sprint's intro page.
+    {%- endcomment -%}
+    {%- assign fullTitle = unitData.title | strip -%}
+    {%- assign cardTitle = fullTitle -%}
+    {%- if cardTitle.size > 40 -%}
+      {%- assign cut = cardTitle | truncate: 41, "" | split: " " | pop | join: " " -%}
+      {%- if cut == "" -%}{%- assign cut = cardTitle | truncate: 39, "" -%}{%- endif -%}
+      {%- assign cardTitle = cut | append: "…" -%}
+    {%- endif -%}
+    {%- assign cardDescription = unitData.description | strip_html | strip -%}
+    {%- if cardDescription.size > 130 -%}
+      {%- assign cut = cardDescription | truncate: 131, "" | split: " " | pop | join: " " -%}
+      {%- if cut == "" -%}{%- assign cut = cardDescription | truncate: 129, "" -%}{%- endif -%}
+      {%- assign cardDescription = cut | append: "…" -%}
+    {%- endif %}
     <div class="sprint-info-full" style="width: 100%;">
-      <h2 class="sprint-title">{{ unitData.title }}</h2>
-      {% if unitData.description %}
-        <p class="sprint-meta">{{ unitData.description }}</p>
+      <h2 class="sprint-title"><a href="{{ site.baseurl }}/{{ page.course }}/sprint-{{ unit }}/" data-sprint-link{% if cardTitle != fullTitle %} title="{{ fullTitle | escape }}"{% endif %}>{{ cardTitle }}</a></h2>
+      {% if cardDescription != "" %}
+        <p class="sprint-meta">{{ cardDescription }}</p>
       {% endif %}
     </div>
 
     <!-- End of Sprint Header-->
   </div>
 
-  <!-- Weeks Container -->
+  {%- comment -%}
+    The week cards stay in the page, hidden: nothing opens them any more, but
+    the Progress & Certificates button reads their lessons and checkmarks.
+    The plain hidden wrapper keeps them hidden whatever .sprint-weeks sets.
+  {%- endcomment %}
+  <div hidden>
   <div class="sprint-weeks">
     <div class="sprint-body">
       {% for index in (start..end) %}
@@ -141,5 +171,6 @@
         {% include sprint-week-card.html %}
       {% endfor %}
     </div>
+  </div>
   </div>
 </div>
