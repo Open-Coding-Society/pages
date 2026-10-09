@@ -7,43 +7,10 @@
 @import "mixins/variables";
 
 .dm-chat {
-  .dm-cancel-edit[hidden] { display: none; }
-
-  .dm-cancel-edit { color: $text-muted; }
-
-  .dm-form-status {
-    margin: 6px 0 0;
-    color: $red;
-    font-size: $text-sm;
-  }
-
-  .chat-msg-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 2px;
-  }
-
-  .chat-msg-action {
-    border: 0;
-    border-radius: $radius-xxs;
-    padding: 2px 5px;
-    background: transparent;
-    color: $text-muted;
-    cursor: pointer;
-    font-size: $text-xs;
-
-    &:hover { color: $accent; }
-
-    &:focus-visible {
-      outline: 2px solid $accent;
-      outline-offset: 2px;
-    }
-  }
-
-  .chat-msg-body.is-deleted {
-    color: $text-muted;
-    font-style: italic;
-  }
+  // Message edit/delete actions, the cancel-edit button, and the deleted-message
+  // tombstone style live on the shared .announcement-chat selector in main.scss
+  // (dm_chat.html's <section> carries both classes), since announcement_chat.html
+  // uses the same edit/delete UI.
 
   .dm-layout {
     display: flex;
