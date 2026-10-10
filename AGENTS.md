@@ -76,6 +76,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * Notebook/DOCX 转换规则见 [scripts/convert_notebooks.py](scripts/convert_notebooks.py) 与 [scripts/convert_docx.py](scripts/convert_docx.py)。
 * GameBuilder 课程 notebook 的规范源在 [_projects/systems/gamebuilder/notebooks/](_projects/systems/gamebuilder/notebooks/)；`_notebooks/projects/gamebuilder/` 是构建副本。项目 Makefile 由 [_projects/_template/Makefile](_projects/_template/Makefile) 生成，持久的构建/监听修复应改模板；循环中的 `cd` 使用子 shell，避免多个 notebook 转换时改变工作目录。
 * CSA 内容按 `cs112 → cs113 → csa1 → csa2 → ds2` 优先级归属到 `_projects/lessons/` 的注册项目；`notebooks/` 与 `docs/` 必须平铺，迁移保留 permalink 和 `courses.csa.week`。`articulation` 只表示课程对应，不表示获得学分。草稿用 `lesson_status: draft` 与 `planned_week`，不要设置 `courses`：时间线不会按 `hide` 排除课程。详见 [_projects/REGISTRATION.md](_projects/REGISTRATION.md)。验证：`node --test tests/csa_curriculum.test.mjs`。
+* CSA 13–37 周按 `_data/csa.yml` 编排：所有课程项目和 `lessons/java` 合计每教学周最多三篇主文档；其他例题为无周次参考。总结、AP 复习、展示和期末周用清单链接旧课，不新增作业。预期选课见 `tests/fixtures/csa_week_schedule.json`；缺口用 `lesson_notes` 显示。移除课程或移动源后检查旧构建副本与拆分输出，只清理确认无源的生成文件，防止旧周次重新发布。
 
 ### 项目注册与样式
 

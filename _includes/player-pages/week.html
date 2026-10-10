@@ -34,6 +34,9 @@
     <div class="ocs__keypoint"><span class="ocs__check">&check;</span>{{ goal }}</div>
     {%- endfor %}
   </div>
+  {%- if weekData.lesson_notes %}
+  <p class="ocs__text">{{ weekData.lesson_notes | escape }}</p>
+  {%- endif %}
 </div>
 {%- endif %}
 

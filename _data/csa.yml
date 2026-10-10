@@ -178,6 +178,7 @@ Sprint5:
       - "PBL Observation - Inspect Submitter and the Parameterized AssignmentQueueConverter Contract"
   18:
     theme: "Peer Teaching"
+    lesson_notes: "Ready references cover passing reference values and memory. The copy-constructor and shallow/deep-copy lab remains an unscheduled authoring draft."
     goals:
       - "Trace Reference Values, Aliasing, and Object Lifetime"
       - "Implement Copy Constructors and Compare Shallow versus Deep Copies"
@@ -185,6 +186,7 @@ Sprint5:
       - "PBL Extension - Prototype an Independent Snapshot of AssignmentQueue Lists"
   19:
     theme: "Final Teaching"
+    lesson_notes: "The text-file lesson is ready. Binary files, random-access records, and deliberate recovery tests still need the reliable-file-persistence lab; its draft is not an assignment."
     goals:
       - "Build Text and Binary Import/Export Layers"
       - "Update Fixed-Size Records with Random Access Files"
@@ -211,6 +213,7 @@ Sprint6:
       - "PBL Observation - Compare AssignmentQueue ArrayLists with GenericCollectionController List Responses"
   22:
     theme: "Functional Checkpoint"
+    lesson_notes: "Existing Collectable and Queue examples supply custom linked-node and generic implementation layers. The dedicated LinkedList lab still needs its focused boundary-test exercise before publication."
     goals:
       - "Build LinkedList Nodes and Reference Links from Scratch"
       - "Implement List Insertion and Traversal in Layers"
@@ -245,6 +248,7 @@ Sprint7:
       - "PBL Extension - Model AssignmentQueue Transitions with Student-Built List, Stack, and Queue Layers"
   26:
     theme: "Hashing for Web Data"
+    lesson_notes: "The set reference complements week 14 HashMap use. Custom hash functions, collision resolution, and load-factor experiments remain authoring gaps, not completed implementation lessons."
     goals:
       - "Design Hash Functions and Analyze Collisions"
       - "Build a Hash Table with Chaining and Compare Open Addressing"
@@ -252,6 +256,7 @@ Sprint7:
       - "PBL Extension - Build a Student Hash Index over Train Product or Collection Item IDs"
   27:
     theme: "Tree, Priority, and Network Models"
+    lesson_notes: "The three ready documents cover graph models, Java adjacency, and BFS/DFS. Custom tree/BST and heap/priority-queue labs remain unscheduled drafts."
     goals:
       - "Build Binary Tree and BST Layers; Compare Balanced and Skewed Costs"
       - "Build Binary Heap and Priority Queue Layers; Verify Invariants"
@@ -308,6 +313,7 @@ Sprint9:
   end: 37
   34:
     theme: "Efficient Project Algorithms"
+    lesson_notes: "The existing sorting-analysis exercise supports benchmarking. Dynamic programming and complete quick/heap/shell/radix instruction still need authoring; the drafts are not scheduled. Choose only algorithms already learned until those lessons are ready."
     goals:
       - "Compare Recursive, Memoized, and Tabulated Solutions"
       - "Implement Quicksort and Heapsort; Analyze Their Work"
@@ -315,6 +321,7 @@ Sprint9:
       - "PBL Extension - Benchmark Student Sorts over Calendar Events or Train Products"
   35:
     theme: "Structure and Algorithm Alternatives"
+    lesson_notes: "Graph-search comparisons support performance analysis. Dedicated 2-3-4 tree and skip-list implementation layers still need authoring; advanced completion is differentiated."
     goals:
       - "Compare 2-3-4 Tree Balancing and Skip List Layers"
       - "Benchmark Search and Sort across Input Sizes and Distributions"

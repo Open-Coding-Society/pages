@@ -113,6 +113,21 @@ explicit permalinks, existing course assignments, and lesson bodies when moving
 sources; never move or edit generated notebook posts as authoritative lessons.
 Project publication regenerates those posts from the new notebook sources.
 
+The curated weeks 13-37 follow `_data/csa.yml`, with at most three primary topic
+documents per instructional week across the curriculum and `lessons/java`.
+Unselected examples and FRQs remain accessible references without a CSA week;
+do not refill a week with every alternate example. The expected primary-source
+selection is recorded in `tests/fixtures/csa_week_schedule.json` for regression
+checks; frontmatter remains the publishing source of truth. Java references
+stay in their existing project and do not acquire articulation ownership.
+
+Summative, presentation, AP-review, and finals weeks use one checklist document
+with links to previously introduced work, not newly assigned FRQs. The shared
+`csa-checkpoint.html` reads the existing week goals. Do not enable challenge
+submission on these checkpoints. `lesson_notes` in the course outline identifies
+remaining authoring gaps; a library example is not a completed custom
+implementation lesson. Keep gaps visible rather than scheduling unfinished drafts.
+
 Unfinished notebook skeletons use `lesson_status: draft`, `hide: true`,
 `search_exclude: true`, and `planned_week`, with no `courses` assignment.
 The timeline does not use `hide` to exclude lessons, so omitting `courses` is
