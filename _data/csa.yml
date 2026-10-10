@@ -57,6 +57,18 @@ web_dev_layers: &web_dev_layers |
     |   Store Data   |
     +----------------+
 
+data_structures: &data_structures |
+  Web Project Data
+        |
+        v
+  Lists / Stacks / Queues / Maps
+        |
+        v
+  Trees / Heaps / Graphs
+        |
+        v
+  Implement -> Test -> Analyze -> Integrate
+
 # CSA course meta data
 course:
   code: CSA
@@ -120,86 +132,205 @@ Sprint3:
   start: 9
   end: 12
 Sprint4:
-  title: Integration, Fontend, MVC Layers, and FRQs
-  description: Trimester 2 begins with four weeks of Integration and FRQs.  At the center of work is the College Board FRQs and Frontend/Backend and MVC layers.  Consider a Mini-project that Integrates Trimister 1 work with another team, adds an FRQ, and performs Unit 10 Sorting and Analysis. For each peace, provide JavaScript Visualization; ThymeLeaf administration, Backend Java Sorting, Inheritance, and Polymorphic behavior.  Also, teach the College Board FRQ topic to the class.  Ideas spans at least two teams or eight students.
+  title: Integration, Frontend, MVC Layers, and FRQs
+  description: CSA2 begins with a team mini-project integrating Web interfaces, Java/Spring services, and AP FRQ concepts. Weeks 13-15 introduce three approximately ten-minute topic clusters each; the fourth goal identifies Spring MVC code to observe or extend during PBL, not another lesson. Introduce HashMap, searching, and sorting early. Week 16 compiles competence evidence, evaluates the integrated product, and leads a retrospective without new material.
   start: 13
   end: 16
+  13:
+    theme: "Integration Design"
+    goals:
+      - "Model a Web Feature with UML and Pseudocode"
+      - "Encapsulate State across MVC Layers"
+      - "Define Boundary Test Data and CodeRunner Checks"
+      - "PBL Observation - Trace CalendarEventService from Web Request to Repository"
+  14:
+    theme: "Connected Web Features"
+    goals:
+      - "Apply Inheritance and Runtime Polymorphism"
+      - "Use HashMap for IDs, Lookups, and API Data"
+      - "Compare Arrays, ArrayLists, and Lookup Costs"
+      - "PBL Observation - Inspect Submitter Inheritance and Train Cargo Maps"
+  15:
+    theme: "Search and Sort Integration"
+    goals:
+      - "Implement Linear and Binary Search; Trace Recursive Base Cases"
+      - "Implement Selection, Insertion, and Merge Sort in Project Layers"
+      - "Compare Growth Functions and Big O; Visualize Search and Sort Work"
+      - "PBL Extension - Compare Calendar List Filtering with In-Memory Search and Sort"
+  16:
+    theme: "Summative Mini-Project Review and Retrospective"
+    goals:
+      - "Compile the OOP, Search, and Sort Competence Checklist"
+      - "Evaluate Existing CodeRunner Tests and Integrated Web Results"
+      - "Reflect on Team Integration and Plan the Next Sprint"
+      - "PBL Review - Demonstrate the Completed Calendar or Train Feature; No New Requirements"
 Sprint5:
   title: AP Java FRQ Topics & OCS Platform Enhancement
-  description: In this Sprint, students will master AP CSA Java requirements by teaching a selected topic to their peers and building or improving features on the Open Coding Society (OCS) platform. Required topics include Methods & Control Structures, Arrays, ArrayLists, Classes, 2D Arrays, Searching, and Sorting. Each student will deliver a lesson on their chosen topic, complete coding hacks from other groups' topics, and contribute to OCS features for student tracking and feedback. Teaching and platform work are integrated, with all students demonstrating mastery through both instruction and hands-on development.
+  description: Students teach AP Java concepts while strengthening CS112 foundations through OCS platform features. Weeks 17-19 introduce three short topic clusters each and a fourth Spring MVC observation or extension goal for PBL. Develop file-handling topics as layers of one persistence lab, not separate documents for every API. Week 20 compiles individual CodeRunner evidence and peer-teaching checklists, evaluates the project, and leads a retrospective without new material.
   start: 17
-  end: 20 
+  end: 20
   17:
     theme: "Prep and OCS Requirements"
     goals:
-      - "Pick Teaching Topics"
-      - "Define Lesson, HW Standards"
-      - "Develop OCS Features"
+      - "Design Abstract Classes and Interface Contracts"
+      - "Build Generic Classes and Methods for Project Data"
+      - "Explain Access, Scope, and Static versus Dynamic Binding"
+      - "PBL Observation - Inspect Submitter and the Parameterized AssignmentQueueConverter Contract"
   18:
     theme: "Peer Teaching"
     goals:
-      - "Present 1-Topic (prototype)"
-      - "Grading/Feedback 1-Topic"
-      - "Provide Feedback"
-      - "Revise OCS Features"
+      - "Trace Reference Values, Aliasing, and Object Lifetime"
+      - "Implement Copy Constructors and Compare Shallow versus Deep Copies"
+      - "Explain Reachability, Memory Management, and Garbage Collection"
+      - "PBL Extension - Prototype an Independent Snapshot of AssignmentQueue Lists"
   19:
     theme: "Final Teaching"
     goals:
-      - "Present 4-Topics (final)"
-      - "Assign Student Assessment"
-      - "Capture Preliminary Student Data in OCS"
+      - "Build Text and Binary Import/Export Layers"
+      - "Update Fixed-Size Records with Random Access Files"
+      - "Handle Exceptions and Resources; Test Malformed Data and Recovery"
+      - "PBL Observation and Extension - Compare AssignmentQueue JSON Conversion with a Local File Lab"
   20:
-    theme: "Summative Assessment"
+    theme: "Summative Assessment and Retrospective"
     goals:
-      - "Analyze Student Data"
-      - "Capture Final Student Data in OCS"
-      - "Present to Teacher"
+      - "Compile the OOP, Memory, and Persistence Competence Checklist"
+      - "Evaluate Existing CodeRunner Evidence and Peer-Teaching Results"
+      - "Reflect on Reliability and Identify Next-Sprint Improvements"
+      - "PBL Review - Explain AssignmentQueue Conversion and Completed File-Lab Tests"
 Sprint6:
   title: OCS Enhancement & N@tM Feedback
-  description: In this Sprint, students may choose to continue enhancing the OCS platform or propose and prototype a new project based on their interests and skills. The focus is on creativity, design, and technical growth—whether through OCS development or a new passion project. Students should document their design process, make technical decisions, and present their work for peer and instructor feedback. Consider frontend design, database modeling, API plans, JWT designs, big data solutions, and future usefulness. Weekly live reviews and feedback will support project evolution.
+  description: Students enhance OCS or a passion project through three instructional weeks of collection selection, linked-list implementation, and Web integration. Each has three short topic clusters and a fourth Spring MVC observation or extension goal. Complete individual CodeRunner checks and presentation readiness by week 23. Week 24 is consumed by community presentations, evaluation, and reflection; no new lessons, implementation requirements, or competence exercises are introduced.
   start: 21
   end: 24
   21:
     theme: "Design Checkpoint"
-    goals:  
-      - "Research Technologies"
-      - "Database Models (draw.io)"
-      - "Frontend UI/UX (html/css)"
-      - "API Basics (postman)"
+    goals:
+      - "Select ArrayList, Vector, or LinkedList for a Web Feature"
+      - "Traverse Collections with Iterators"
+      - "Design Web GUI Events and Java API Contracts"
+      - "PBL Observation - Compare AssignmentQueue ArrayLists with GenericCollectionController List Responses"
   22:
     theme: "Functional Checkpoint"
-    goals:  
-      - "Issue Burndown"
-      - "Backend Admin UI"
-      - "Frontend Interactivity"
-      - "API Testing (postman)"
-  23: 
+    goals:
+      - "Build LinkedList Nodes and Reference Links from Scratch"
+      - "Implement List Insertion and Traversal in Layers"
+      - "Test Empty, Singleton, and Multi-Node Lists"
+      - "PBL Extension - Prototype a Linked-Node Review Queue without Replacing the Existing Service"
+  23:
     theme: "Final Prototype Push"
-    goals:    
-      - "Final Features"
-      - "Testing/Debugging"
-      - "Project Presentation"
-      - "N@tM Feedback"
-  24: 
-    theme: "N@tM Retrospective"
-    goals:    
-      - "Peer Review"
-      - "Instructor Feedback"
-      - "Next Steps Planning"
-Sprint7: 
+    goals:
+      - "Apply Recursive Traversal to Project Data"
+      - "Connect Collection Operations to an Interactive Web View"
+      - "Validate User Input and Display Recoverable Errors"
+      - "PBL Extension - Connect the Queue Prototype to a Web Demo and Complete the Readiness Checklist"
+  24:
+    theme: "N@tM Community Presentations and Reflection"
+    goals:
+      - "Present the Completed Web Feature and Existing Competence Evidence"
+      - "Collect Community Feedback and Evaluate Project Design Choices"
+      - "Reflect on Individual and Team Learning; Record Future DS2 Ideas"
+      - "PBL Reflection - Explain the Completed Queue or Collection Feature; No New Work"
+Sprint7:
   title: Data Structures using OCS Project
-  description: A focus on Data Structures that relate to the AP exam. A key requirement is to make your own Algorithmic sorting video. The theme is to produce work that can help you pass the AP Exam and improve your Passion Project. Each student must cover key concepts from the Four AP FRQ types, contain a key Data Structure, and utilize Sorting.
+  description: DS2 extends the OCS or passion project with CS113 structures using CS112 foundations. Weeks 25-27 introduce three short topic clusters each and a fourth Spring MVC extension context. Build on existing examples and develop implementation depth in PBL layers; distinguish using a library from implementing a structure. Shared expectations are conceptual understanding, appropriate collection use, testing, and a working Web contribution. Advanced from-scratch CS113 implementations are differentiated layers, not a requirement that every high-school student completes every structure. Track individual demonstrated competence separately from team completion for articulation review. Week 28 is summative and retrospective, with no new material. Week 29 consolidates existing evidence and prepares the AP review handoff, including the search/sort explanation video; it introduces no new topics or project requirements.
   illustration: *data_structures
   start: 25
   end: 29
+  25:
+    theme: "Project Data Structure Layers"
+    goals:
+      - "Extend LinkedList with Removal, Size, and Iterator Support"
+      - "Build Stack and Queue Operations over Linked Nodes"
+      - "Apply Stack and Queue Layers to an RPN Calculator or Web Workflow"
+      - "PBL Extension - Model AssignmentQueue Transitions with Student-Built List, Stack, and Queue Layers"
+  26:
+    theme: "Hashing for Web Data"
+    goals:
+      - "Design Hash Functions and Analyze Collisions"
+      - "Build a Hash Table with Chaining and Compare Open Addressing"
+      - "Implement Set and Map Behavior; Compare Load Factors and Lookup Costs"
+      - "PBL Extension - Build a Student Hash Index over Train Product or Collection Item IDs"
+  27:
+    theme: "Tree, Priority, and Network Models"
+    goals:
+      - "Build Binary Tree and BST Layers; Compare Balanced and Skewed Costs"
+      - "Build Binary Heap and Priority Queue Layers; Verify Invariants"
+      - "Model Graph Adjacency and Implement BFS and DFS"
+      - "PBL Extension - Prototype Priority Review Scheduling or Graph Search over Group Relationships"
+  28:
+    theme: "Summative Structures Review and Retrospective"
+    goals:
+      - "Compile the List, Hash, Tree, Heap, and Graph Competence Checklist"
+      - "Evaluate Existing Structure Tests, Invariants, and Complexity Claims"
+      - "Reflect on Implementation Layers and Team Design Decisions"
+      - "PBL Review - Demonstrate the Completed Student Structure and Compare It with Spring Collections"
+  29:
+    theme: "Evidence Consolidation and AP Review Handoff"
+    goals:
+      - "Review Existing Search/Sort Videos and CodeRunner Evidence"
+      - "Compile a Personal AP Readiness and Misconception Checklist"
+      - "Reflect on Structure Selection and Carry Forward Post-AP Project Ideas"
+      - "PBL Reflection - Document Existing Queue, Hash Index, or Graph Prototype Results"
 Sprint8:
   title: AP Weeks, Study Sessions
-  description: Students will lead several study sessions (20-minute test, followed by review) the week before the exam. In any break in study, students will transition activities back to their final project.
+  description: "AP weeks are review only: no new topics, assignments, or required project features. Use three approximately ten-minute review topics per week for retrieval practice, tracing, and discussion of previously completed work. Students may use existing CodeRunner submissions, FRQs, and search/sort videos as review evidence. Any available PBL time is for continuing previously assigned work, not introducing new requirements."
   illustration: *frq_types
   start: 30
   end: 33
+  30:
+    theme: "AP Review: Methods and Classes"
+    goals:
+      - "Review Methods and Control Structures"
+      - "Review Class Design, Constructors, and Reference Values"
+      - "Review Existing FRQ Solutions and Boundary Tests"
+  31:
+    theme: "AP Review: Arrays and ArrayLists"
+    goals:
+      - "Review Array and ArrayList Traversals"
+      - "Review Collection Updates and Off-by-One Errors"
+      - "Review Existing Array and ArrayList FRQs"
+  32:
+    theme: "AP Review: Search, Sort, and Recursion"
+    goals:
+      - "Review Linear and Binary Search Traces"
+      - "Review Selection, Insertion, and Merge Sort"
+      - "Review Recursive Base Cases and Algorithm Work Counts"
+  33:
+    theme: "AP Review: 2D Arrays and Readiness"
+    goals:
+      - "Review 2D Array Traversals and Algorithms"
+      - "Review Mixed FRQs and Explain Test Corrections"
+      - "Review Personal Error Patterns and Exam Strategies"
 Sprint9:
   title: OCS Project v2.0 and N@tM
-  description: Wrap up your preferred project and data structures. There will be an opportunity to contribute and be published to the Open Coding Society. If your project is selected, then you will receive a high 'A' on the final project.
+  description: After AP review, weeks 34-35 introduce three short advanced-topic clusters each, with a fourth Spring MVC extension context. Students pursue advanced CS113 implementation layers according to readiness and project needs; completing every advanced algorithm or structure is not a shared high-school requirement. Evaluate each student's demonstrated implementation, testing, and analysis rather than inferring competence from exposure or the team product. Develop implementation and benchmarking depth in PBL layers and finish individual competence evidence before community presentations. Week 36 is consumed by N@tM presentations, evaluation, and reflection with no new lessons or work requirements. Week 37 is finals and assessment only, with no new instruction.
   start: 34
   end: 37
+  34:
+    theme: "Efficient Project Algorithms"
+    goals:
+      - "Compare Recursive, Memoized, and Tabulated Solutions"
+      - "Implement Quicksort and Heapsort; Analyze Their Work"
+      - "Compare Bubble, Shell, and Radix Sort Layers and Input Constraints"
+      - "PBL Extension - Benchmark Student Sorts over Calendar Events or Train Products"
+  35:
+    theme: "Structure and Algorithm Alternatives"
+    goals:
+      - "Compare 2-3-4 Tree Balancing and Skip List Layers"
+      - "Benchmark Search and Sort across Input Sizes and Distributions"
+      - "Verify Structure Invariants and Boundary Conditions with Automated Tests"
+      - "PBL Extension - Complete the Selected Structure Demo and Existing CodeRunner Evidence before N@tM"
+  36:
+    theme: "N@tM Community Presentations and Reflection"
+    goals:
+      - "Present the Completed Web Project and Existing Performance Evidence"
+      - "Evaluate Design Choices using Community Feedback and the Competence Checklist"
+      - "Reflect on Individual Growth and Team Outcomes"
+      - "PBL Reflection - Explain the Demonstrated Spring Feature Extension; No New Work"
+  37:
+    theme: "Finals: Assessment Only"
+    goals:
+      - "Present the Completed Project and Individual Evidence"
+      - "Complete Final Assessment and Reflection"
+      - "Submit the Existing Portfolio; No New Instruction"
+      - "PBL Assessment - Evaluate Only the Previously Completed Project"
