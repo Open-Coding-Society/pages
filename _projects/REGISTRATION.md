@@ -182,6 +182,14 @@ with every alternate example. The expected primary-source
 selection is recorded in `tests/fixtures/csa_week_schedule.json` for regression
 checks; frontmatter remains the publishing source of truth. Java references
 stay in their existing project and do not acquire articulation ownership.
+Map relevant Java library permalinks in each topic's `supporting_lessons` array,
+separate from the owned `lessons` array. The shared outline renderer selects
+these posts by `lesson_language: Java`, labels them as supporting Java references,
+and reads their existing titles and CSA weeks. Unselected Java posts do not enter
+the college reports' awaiting-mapping lists. Keep the Java Reference navigation
+link at `/navigation/java-reference/`. Reassess coverage notes against the actual
+Java lessons before describing recursion, scope, text-file reading, or sorting
+as missing. Validate with `bundle exec ruby scripts/test_java_curriculum_references.rb`.
 
 Summative, presentation, AP-review, and finals weeks use one checklist document
 with links to previously introduced work, not newly assigned FRQs. The shared

@@ -79,6 +79,7 @@ Split logic into clear layers:
 * The CS112/CS113 reports follow MiraCosta's original five sections and Lab Outline through `_data/cs112_topics.json` and `_data/cs113_topics.json`, sharing `curriculum-outline-report.html` and matching stable permalinks rather than filenames or AP categories. Show current titles/weeks, gaps, and PBL extensions; clearly label unfinished drafts. New unmapped lessons remain visible and deleted lessons do not create dead links. CS113 from-scratch layers are differentiated extensions; library use is not implementation mastery. Update mappings and coverage notes with source additions/removals. Validate with `bundle exec ruby scripts/test_cs112_report.rb` and `bundle exec ruby scripts/test_cs113_report.rb`.
 
 ### Project Registry & Styling
+* College report topics may include Java library permalinks in `supporting_lessons`, separate from owned `lessons`. Keep Java source ownership, articulation metadata, and weeks unchanged; label supporting references and link `/navigation/java-reference/` in curriculum navigation. Audit existing Java coverage before declaring gaps. Validate with `bundle exec ruby scripts/test_java_curriculum_references.rb`.
 
 * New projects must follow [_projects/REGISTRATION.md](_projects/REGISTRATION.md); architecture reference in [_projects/ARCHITECTURE.md](_projects/ARCHITECTURE.md).
 * Use SCSS-first styling; theme and styling conventions are in [README.md](README.md).

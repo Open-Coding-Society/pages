@@ -1,5 +1,8 @@
 <li>
   <a href="{{ include.lesson.url | relative_url }}">{{ include.lesson.title | escape }}</a>
+  {% if include.supporting_reference %}
+    &mdash; supporting Java reference
+  {% endif %}
   {% if include.lesson.courses.csa.week != nil %}
     &mdash; CSA week {{ include.lesson.courses.csa.week }}
   {% else %}

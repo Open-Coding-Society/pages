@@ -81,6 +81,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * CS112/CS113 报告按 MiraCosta 原始五节与 Lab Outline 编排，映射在 `_data/cs112_topics.json` 与 `_data/cs113_topics.json`，共用 `curriculum-outline-report.html`；以稳定 permalink 匹配，不按文件名或 AP 分类。显示当前题名/周次、缺口、PBL 延伸；草稿明确未完成。新增未映射课程仍显示，删除课程不生成死链接。CS113 自实现层为差异化延伸，不把库调用当作实现掌握。增删源时同步映射与覆盖说明。验证：`bundle exec ruby scripts/test_cs112_report.rb` 与 `bundle exec ruby scripts/test_cs113_report.rb`。
 
 ### 项目注册与样式
+* 学院报告用 `supporting_lessons` 映射 Java 库 permalink，与归属 `lessons` 分离；保持 Java 源归属、articulation、周次不变，标记辅助参考并在导航加入 `/navigation/java-reference/`。判断缺口先审核现有 Java 内容。验证：`bundle exec ruby scripts/test_java_curriculum_references.rb`。
 
 * 新项目遵循 [_projects/REGISTRATION.md](_projects/REGISTRATION.md) 注册/构建约定；架构示例见 [_projects/ARCHITECTURE.md](_projects/ARCHITECTURE.md)。
 * 样式优先使用 SCSS；主题切换与样式约定见 [README.md](README.md)。

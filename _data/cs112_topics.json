@@ -5,6 +5,7 @@
     "topics": [
       {
         "id": "encapsulation",
+        "supporting_lessons": ["/csa/unit_01/1_12", "/csa/unit_03/3_1", "/csa/unit_03/3_3", "/csa/unit_03/3_4", "/csa/unit_03/3_5", "/csa/unit_03/3_9"],
         "title": "A. Encapsulation, inheritance, and polymorphism",
         "coverage": "Class-writing FRQs support constructors, encapsulation, and methods. Interface, inheritance, and Collectable examples extend this into polymorphic design.",
         "gap": "Strengthen the connection between isolated class exercises and a tested, multi-class Web feature.",
@@ -13,6 +14,7 @@
       },
       {
         "id": "abstract-generics",
+        "supporting_lessons": ["/csa/unit_03/3_1", "/csa/unit_04/4_8"],
         "title": "B. Abstract classes and generics or parameterized types",
         "coverage": "The abstract Fibonacci and Collectable lessons demonstrate abstract parents, interfaces, and typed collections.",
         "gap": "Add a focused student-authored generic class exercise; using ArrayList<T> alone does not demonstrate designing a parameterized type.",
@@ -27,6 +29,7 @@
     "topics": [
       {
         "id": "memory",
+        "supporting_lessons": ["/csa/unit_01/1_13", "/csa/unit_03/3_6"],
         "title": "A. Memory management and garbage collection",
         "coverage": "Stack and heap memory, reference types, and object-copying notes provide the foundation.",
         "gap": "Finish the copying/memory draft with reachability, garbage collection, and object-lifetime checks.",
@@ -35,9 +38,10 @@
       },
       {
         "id": "scope",
+        "supporting_lessons": ["/csa/unit_03/3_6", "/csa/unit_03/3_7", "/csa/unit_03/3_8", "/csa/unit_03/3_9"],
         "title": "B. Visibility, scope, binding, and lifetime",
-        "coverage": "Data types, reference semantics, POJOs, and class-writing practice support field visibility and local-versus-instance state.",
-        "gap": "Make scope, dynamic method binding, and lifetime explicit in a short comparative exercise.",
+        "coverage": "Java Scope and Access explicitly covers visibility, shadowing, private fields, and accessors. Reference passing, class variables, POJOs, and class-writing practice support local-versus-instance state.",
+        "gap": "Extend the existing scope instruction with dynamic method binding and object-lifetime comparisons.",
         "pbl": "Compare request-local variables with entity fields and inspect an overridden method's runtime behavior.",
         "lessons": ["/2025/02/18/java-data_types_IPYNB_2_.html", "/java/spring/pojo/", "/csa/frqs/classes", "/csa/stack_heap/teacher"]
       }
@@ -49,6 +53,7 @@
     "topics": [
       {
         "id": "copy-constructors",
+        "supporting_lessons": ["/csa/unit_03/3_4", "/csa/unit_03/3_6"],
         "title": "A. Copy constructors",
         "coverage": "Reference and memory lessons are prerequisites; a dedicated object-copying skeleton exists.",
         "gap": "The copy-constructor lesson is unfinished. Require shallow/deep-copy tests rather than treating reference assignment as copying.",
@@ -57,9 +62,10 @@
       },
       {
         "id": "text-binary-files",
+        "supporting_lessons": ["/csa/unit_04/4_6"],
         "title": "B. Advanced input/output techniques - 1. Text and binary files",
-        "coverage": "JPA and backend references provide persistence context, but database persistence is not a substitute for file I/O.",
-        "gap": "Finish a text/binary import-export exercise with resource closure and round-trip tests.",
+        "coverage": "Java Using Text Files covers File/Scanner reading, token versus line input, resource closure, and empty-file handling. JPA adds persistence context but is not a substitute for file I/O.",
+        "gap": "Extend the text-reading foundation with text writing, binary import/export, and round-trip tests.",
         "pbl": "Add an export/import layer to a project collection and compare text and binary representations.",
         "lessons": ["/java/spring/jpa/", "/fullstack/java/backend", "/csa/cs112/drafts/reliable-file-io/"]
       },
@@ -73,16 +79,18 @@
       },
       {
         "id": "recursion",
+        "supporting_lessons": ["/csa/unit_04/4_16", "/csa/unit_04/4_17"],
         "title": "C. Recursive methods",
-        "coverage": "The Fibonacci lesson supplies an algorithm-comparison context. Methods/control practice supports the prerequisite method-writing skills.",
-        "gap": "Add explicit base-case, recursive-step, and call-trace checks; ordinary loops and method-writing FRQs alone do not cover recursion.",
+        "coverage": "Java Recursion explicitly covers base cases, progress, call-stack tracing, and recursive methods. Recursive Searching and Sorting extends this to arrays, ArrayLists, and binary search; Fibonacci adds an algorithm-comparison context.",
+        "gap": "Apply the existing recursion checks to a student project and compare recursive and iterative costs; ordinary method-writing FRQs are prerequisites, not recursion evidence.",
         "pbl": "Compare recursive and iterative implementations, then explain the call-stack cost.",
         "lessons": ["/2025/02/20/fibonaccii_abstract_IPYNB_2_.html", "/csa/frqs/methods-and-control-structures", "/csa/frqs/2019/1"]
       },
       {
         "id": "exceptions",
+        "supporting_lessons": ["/csa/unit_04/4_6"],
         "title": "D. Fault-tolerance through exception and error handling",
-        "coverage": "Backend and file-persistence materials provide contexts for invalid input, persistence failures, and recovery.",
+        "coverage": "Java text-file instruction introduces file-opening errors and resource handling. Backend and file-persistence materials provide contexts for invalid input, failures, and recovery.",
         "gap": "Finish a dedicated exercise that tests failure paths, useful error reporting, and safe resource handling.",
         "pbl": "Send invalid input or a malformed import to a project feature and verify the reported error and unchanged valid data.",
         "lessons": ["/fullstack/java/backend", "/csa/cs112/drafts/reliable-file-io/"]
@@ -95,6 +103,7 @@
     "topics": [
       {
         "id": "lists-iterators",
+        "supporting_lessons": ["/csa/unit_04/4_3", "/csa/unit_04/4_4", "/csa/unit_04/4_5", "/csa/unit_04/4_7", "/csa/unit_04/4_8", "/csa/unit_04/4_9", "/csa/unit_04/4_10", "/csa/unit_04/4_11", "/csa/unit_04/4_12", "/csa/unit_04/4_13"],
         "title": "A. ArrayLists, vectors, linked lists, and iterators",
         "coverage": "Collection/list lessons and array-processing FRQs provide traversal, modification, and iteration practice. The 2D example is supporting array practice, not a separate CS112 outline section.",
         "gap": "Finish the from-scratch LinkedList layers and explicitly compare Vector with ArrayList. Library usage is not a custom implementation.",
@@ -103,6 +112,7 @@
       },
       {
         "id": "structure-selection",
+        "supporting_lessons": ["/csa/unit_02/2_12", "/csa/unit_04/4_14", "/csa/unit_04/4_15"],
         "title": "B. Data structure assessment and appropriate selection",
         "coverage": "Collection introductions, summaries, Comparable, and queue references support choosing structures for project needs.",
         "gap": "Require students to justify their selection using actual operations and test data. Deeper sort analysis belongs to the CS113 extension.",

@@ -1,3 +1,5 @@
+<p>Mapped <a href="{{ '/navigation/java-reference/' | relative_url }}">Java Reference</a> lessons supplement this outline. Their original ownership and week assignments are unchanged; inclusion here does not add an assignment or claim articulation credit.</p>
+{% assign java_references = site.posts | where: 'lesson_language', 'Java' %}
 <nav class="ocs__links ocs__links--wide" aria-label="{{ include.course }} outline sections">
   {% for section in include.outline %}
   <a class="ocs__btn pill" href="#{{ page.curriculum_group }}-{{ section.id }}">{{ section.title | escape }}</a>
@@ -8,12 +10,20 @@
 <section aria-labelledby="{{ page.curriculum_group }}-{{ section.id }}">
   <h2 id="{{ page.curriculum_group }}-{{ section.id }}">{{ section.title | escape }}</h2>
   {% for topic in section.topics %}
+  {% assign topic_lessons = lessons %}
+  {% for reference in java_references %}
+    {% if topic.supporting_lessons contains reference.permalink %}
+      {% assign reference_list = java_references | where: 'permalink', reference.permalink %}
+      {% assign topic_lessons = topic_lessons | concat: reference_list %}
+    {% endif %}
+  {% endfor %}
+  {% assign topic_lessons = topic_lessons | uniq | sort: 'title' %}
   <h3 id="{{ page.curriculum_group }}-{{ topic.id }}">{{ topic.title | escape }}</h3>
   <p><strong>Available material:</strong> {{ topic.coverage | escape }}</p>
   <ul>
     {% assign topic_count = 0 %}
-    {% for lesson in lessons %}
-      {% if topic.lessons contains lesson.permalink %}
+    {% for lesson in topic_lessons %}
+      {% if topic.lessons contains lesson.permalink or topic.supporting_lessons contains lesson.permalink %}
         {% capture route_key %}|{{ lesson.permalink }}|{% endcapture %}
         {% assign mapped_routes = mapped_routes | append: route_key %}
         {% if lesson.lesson_status == 'draft' %}
@@ -21,7 +31,11 @@
           <li><a href="{{ lesson.url | relative_url }}">{{ lesson.title | escape }}</a> &mdash; unfinished authoring draft, planned week {{ lesson.planned_week }}</li>
         {% elsif lesson.hide != true %}
           {% assign topic_count = topic_count | plus: 1 %}
-          {% include projects/lessons/csa-curriculum-lesson.html lesson=lesson %}
+          {% assign supporting_reference = false %}
+          {% if topic.supporting_lessons contains lesson.permalink %}
+            {% assign supporting_reference = true %}
+          {% endif %}
+          {% include projects/lessons/csa-curriculum-lesson.html lesson=lesson supporting_reference=supporting_reference %}
         {% endif %}
       {% endif %}
     {% endfor %}

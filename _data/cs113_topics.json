@@ -5,30 +5,34 @@
     "topics": [
       {
         "id": "design-tools",
+        "supporting_lessons": ["/csa/unit_01/1_1", "/csa/unit_03/3_1", "/csa/unit_03/3_2"],
         "title": "A. Computationally efficient coding through algorithms, pseudo-code, UML, and flow diagrams before coding",
-        "coverage": "Calculator enactments, RPN pipeline examples, and sorting simulations make algorithm steps visible before implementation.",
+        "coverage": "Java algorithm, abstraction, and program-design references complement calculator enactments, RPN pipelines, and sorting simulations for planning before implementation.",
         "gap": "Require a student-authored design artifact before coding. An enactment or supplied implementation alone does not demonstrate UML or pseudo-code design.",
         "pbl": "Diagram a feature's data flow and algorithm, then trace one request through the planned steps.",
         "lessons": ["/2025/02/20/rpn_calculator_IPYNB_2_.html", "/csa/rpn-calculator/graph-variant/", "/csa/calculator-enactment", "/2025/03/17/calculatorlesson_IPYNB_2_.html", "/toolkit-sorting-insertion-simulation", "/toolkit-sorting-selection-simulation"]
       },
       {
         "id": "big-o",
+        "supporting_lessons": ["/csa/unit_02/2_12", "/csa/unit_04/4_15"],
         "title": "B. Growth functions and Big O notation",
-        "coverage": "Selection/insertion, merge sort, and sorting homework introduce growth rates and comparison/swap counts.",
+        "coverage": "Selection/insertion, merge sort, and sorting homework introduce growth rates. Java Informal Run-Time Analysis and Sorting Algorithms add statement counts and comparison-count runners; formal Big O is a college extension to those AP foundations.",
         "gap": "Strengthen explanations that connect code operations to a growth function rather than memorizing a Big O label.",
         "pbl": "Count a feature's dominant operations and justify the resulting complexity.",
         "lessons": ["/csa/sorting/common", "/2025/01/06/sort-merge_IPYNB_2_.html", "/sortingTTG/sorting/", "/sortingTTG/sorting/hw/"]
       },
       {
         "id": "growth-comparison",
+        "supporting_lessons": ["/csa/unit_02/2_12", "/csa/unit_04/4_15"],
         "title": "C. Growth function comparison as the number of inputs increases",
-        "coverage": "Search and sorting examples provide algorithms with different growth rates; advanced analysis has an authoring draft.",
+        "coverage": "Search and sorting examples provide different growth rates. Java sorting runners compare operation counts on sorted and reversed inputs; advanced analysis has an authoring draft.",
         "gap": "Add reproducible comparisons across increasing input sizes, with operation counts and controlled data.",
         "pbl": "Compare list scanning and map lookup for a growing project dataset; plot counts alongside timings.",
         "lessons": ["/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/sortingTTG/sorting/hw/", "/csa/cs113/drafts/advanced-sort-analysis/"]
       },
       {
         "id": "time-complexity",
+        "supporting_lessons": ["/csa/unit_02/2_12", "/csa/unit_04/4_14", "/csa/unit_04/4_15", "/csa/unit_04/4_17"],
         "title": "D. Time complexity issues",
         "coverage": "Search, sort, and graph-search materials offer examples for discussing best/worst cases and algorithm trade-offs.",
         "gap": "Separate asymptotic analysis from measured runtime, including setup costs and input-order effects.",
@@ -37,6 +41,7 @@
       },
       {
         "id": "test-preparation",
+        "supporting_lessons": ["/csa/unit_03/3_1", "/csa/unit_04/4_15"],
         "title": "E. Testing - 1. Preparations for testing",
         "coverage": "RPN tracking and calculator examples expose intermediate states. Implementation drafts include evidence checklists to author.",
         "gap": "Add an explicit test plan, expected results, and invariants before students implement advanced layers.",
@@ -45,17 +50,19 @@
       },
       {
         "id": "test-data",
+        "supporting_lessons": ["/csa/unit_04/4_15", "/csa/unit_04/4_17"],
         "title": "E. Testing - 2. Developing appropriate test data",
-        "coverage": "Calculator examples supply expressions; sorting homework supplies a small array for operation tracing.",
+        "coverage": "Calculator examples supply expressions; sorting homework supplies a small array. Java sorting compares input orders, and recursive searching/sorting asks for predicted versus actual results with additional peer-test inputs.",
         "gap": "Expand beyond supplied examples to deterministic sorted, reverse-sorted, duplicate, and malformed inputs with known expected results.",
         "pbl": "Create representative and adversarial datasets for the project's algorithm and explain why each test matters.",
         "lessons": ["/2025/02/20/rpn_calculator_IPYNB_2_.html", "/csa/rpn-lesson/", "/sortingTTG/sorting/hw/", "/csa/cs113/drafts/advanced-sort-analysis/"]
       },
       {
         "id": "boundary-testing",
+        "supporting_lessons": ["/csa/unit_04/4_16", "/csa/unit_04/4_17"],
         "title": "E. Testing - 3. Testing boundary conditions",
-        "coverage": "Hash-table, heap, and tree drafts provide places to author implementation-specific boundary checks.",
-        "gap": "Dedicated boundary-condition instruction remains unfinished. Require empty/singleton structures, missing keys, collisions, and invalid operations.",
+        "coverage": "Java recursion and recursive searching/sorting include base cases, empty and singleton inputs, and missing-target behavior. Hash-table, heap, and tree drafts provide contexts for further boundary checks.",
+        "gap": "Extend the existing array/recursion boundary tests to empty structures, collisions, missing keys, and invalid heap/tree operations.",
         "pbl": "Test an empty queue, a missing map key, and a graph with no path; verify useful failure behavior.",
         "lessons": ["/csa/cs113/drafts/hash-table-layers/", "/csa/cs113/drafts/heap-priority-queue/", "/csa/cs113/drafts/tree-layers/"]
       }
@@ -127,8 +134,9 @@
     "topics": [
       {
         "id": "divide-conquer",
+        "supporting_lessons": ["/csa/unit_04/4_16", "/csa/unit_04/4_17"],
         "title": "A. Divide and conquer technique",
-        "coverage": "Merge sort explicitly divides, recursively sorts, and combines subproblems. Advanced sorting drafts extend the comparison to quicksort.",
+        "coverage": "Java Recursion and Recursive Searching and Sorting cover base cases and shrinking search regions. Merge sort explicitly divides, recursively sorts, and combines subproblems; advanced drafts extend the comparison to quicksort.",
         "gap": "Require base-case reasoning, a recursive call trace, and evidence that merging preserves sorted order.",
         "pbl": "Trace a merge sort on project records and explain the time and temporary-storage costs.",
         "lessons": ["/2025/01/06/sort-merge_IPYNB_2_.html", "/csa/cs113/drafts/advanced-sort-analysis/"]
@@ -149,14 +157,16 @@
     "topics": [
       {
         "id": "elementary-sorts",
+        "supporting_lessons": ["/csa/unit_04/4_15"],
         "title": "A. Selection, insertion, shellsort, and bubble sorts",
-        "coverage": "Selection/insertion instruction and interactive simulations provide early AP-aligned practice. Sorting homework includes bubble sort as a choice.",
+        "coverage": "Selection/insertion instruction and simulations provide early AP-aligned practice. Java Sorting Algorithms adds complete pass traces and comparison-count runners. Sorting homework includes bubble sort as a choice.",
         "gap": "Complete dedicated bubble and Shell sort implementation/analysis layers and compare behavior on different input orders.",
         "pbl": "Visualize sorting a small project dataset and count comparisons and moves.",
         "lessons": ["/csa/sorting/common", "/sortingTTG/sorting/", "/sortingTTG/sorting/hw/", "/toolkit-sorting-insertion-simulation", "/toolkit-sorting-selection-simulation", "/csa/cs113/drafts/advanced-sort-analysis/"]
       },
       {
         "id": "advanced-sorts",
+        "supporting_lessons": ["/csa/unit_04/4_17"],
         "title": "B. Quicksort, merging and mergesort, heapsort, and radix sorts",
         "coverage": "Merge sort is a published lesson; sorting homework names quicksort. The advanced-sort draft plans quicksort, heapsort, and radix layers.",
         "gap": "Finish partitioning, heap reuse, and radix input constraints with correctness and performance comparisons.",
@@ -165,8 +175,9 @@
       },
       {
         "id": "search-performance",
+        "supporting_lessons": ["/csa/unit_04/4_14", "/csa/unit_04/4_17"],
         "title": "C. Performance characteristics of search routines",
-        "coverage": "Linear/binary/hash lookup and graph-search lessons provide different search strategies and analysis contexts.",
+        "coverage": "Java Linear Search Algorithms and Recursive Searching and Sorting add array search and recursive binary-search foundations to the linear/binary/hash and graph-search analysis examples.",
         "gap": "Make preconditions and trade-offs explicit: sorted input for binary search, hash distribution, and graph structure. Verify missing-target behavior.",
         "pbl": "Compare linear, binary, and keyed lookup for a feature, then explain when graph traversal is the right model instead.",
         "lessons": ["/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/graphs/searching", "/heuristics/searches", "/graph", "graphHeuristics"]

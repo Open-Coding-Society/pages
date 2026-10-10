@@ -23,7 +23,25 @@ def curriculum_sources(group)
   end
 end
 
-def render_report(sections, lessons, group = "cs112")
+def java_reference_sources(sections)
+  routes = sections.flat_map { |section| section["topics"].flat_map { |topic| topic.fetch("supporting_lessons", []) } }.uniq
+  references = Dir.glob(File.join(ROOT, "_projects/lessons/java/notebooks/*.ipynb")).filter_map do |filename|
+    cell = JSON.parse(File.read(filename)).fetch("cells").first.fetch("source")
+    text = cell.is_a?(Array) ? cell.join : cell
+    next unless text.lines.any? { |line| routes.any? { |route| line.strip == "permalink: #{route}" } }
+    metadata = text.split(/^---\s*$\n?/, 3)[1]
+    YAML.safe_load(metadata, permitted_classes: [Date, Time], aliases: true)
+  end
+  assert(references.map { |reference| reference["permalink"] }.sort == routes.sort,
+         "Every supporting route must resolve to a Java source")
+  references.each do |reference|
+    assert(reference["lesson_language"] == "Java", "Supporting references retain Java identity")
+    assert(!reference.key?("articulation"), "Supporting references do not acquire articulation metadata")
+  end
+  references
+end
+
+def render_report(sections, lessons, group = "cs112", references = [])
   Dir.mktmpdir("curriculum-report-") do |source|
     includes = File.join(source, "_includes/projects/lessons")
     FileUtils.mkdir_p(includes)
@@ -33,7 +51,7 @@ def render_report(sections, lessons, group = "cs112")
     FileUtils.mkdir_p(File.join(source, "_data"))
     File.write(File.join(source, "_data/#{group}_topics.json"), JSON.generate(sections))
     FileUtils.mkdir_p(File.join(source, "_posts"))
-    lessons.each_with_index do |lesson, index|
+    (lessons + references).each_with_index do |lesson, index|
       File.write(File.join(source, "_posts/2025-01-01-lesson-#{index}.md"),
                  YAML.dump(lesson.merge("layout" => nil)) + "---\n")
     end
