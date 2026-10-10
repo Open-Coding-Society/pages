@@ -74,9 +74,10 @@ course:
   code: CSA
   title: "CSA - Computer Science A"
   subtitle: "Systems, Architecture"
-  mission: "AP Computer Science A (CSA 1, CSA 2, DS 2) is an in-depth course focusing on programming, algorithms, and data structures. Students prepare for AP exam by architecting and building systems, focusing on code quality, becoming an algorithmic problem solver, establishing fluency in JavaScript, Java and OOP."
+  mission: "AP Computer Science A (CSA 1, CSA 2, DS 2) is an in-depth course focusing on programming, algorithms, and data structures. Students enter with prior-year APCSP experience building a project for a community organization or nonprofit. They prepare for the AP exam by architecting and extending the OCS system, focusing on code quality, algorithmic problem solving, and fluency in JavaScript, Java, and OOP. Integrated features become lasting foundations for future students to maintain and extend, building on the work of successive cohorts year after year."
   progression_key: 15
   learning_journey:
+    - "From CSP Community Projects to Sustained OCS Systems"
     - "Java OOP Fundamentals"
     - "Classes and Objects"
     - "Inheritance & Polymorphism"
@@ -122,18 +123,27 @@ Sprint1:
       - "Set Future Knowledge Goals"
 Sprint2:
   title: Java / Spring Full Stack Web Development
-  description: Students will master Frontend to Backend Programming using the Java/Spring Framework. 
+  description: "Students build frontend-to-backend features using Java/Spring, applying the POJO, JPA, and API foundations introduced by week 4 and connecting them to prior APCSP Python experience. Through week 8, students establish integration, testing, review, and collaboration habits that prepare them for sustained capstone teams. The sprint closes with evaluation and reflection on working features and individual contributions."
   illustration: *web_dev_layers
   start: 5
   end: 8
 Sprint3:
-  title: Team Project for N@tM
-  description: In this Sprint, students will continue to become familiar with Java development as they immerse themselves in  Web Development using the Spring Framework. Coding will focus on RESTful APIs, receiving requests, working with data using SQLite, and responding to requests.  Students will pick a Full Stack Web Development project, and work in teams to build it out, including all layers, and how to use ThymeLeaf to create an Admin UI.  The goal is to have the project working and deployed on AWS by the end of this Sprint.
+  title: Sustained Capstone Teams and N@tM
+  description: "Beginning in week 9, students establish or continue an OpenCS capstone that can grow across all three trimesters, rather than a project discarded at the sprint's end. Team portfolios include Gamification/Onboarding, Admin/Security, Communication/Design, and AI/Assignments. Students plan before coding, implement Java/Spring REST and MVC features with persistence and Web interfaces, integrate contributions, and test normal, boundary, and failure cases. Individual review tickets connect design, code, tests, and feedback to each student's role. Before week 13, every team completes two mentor reviews and a community N@tM presentation, focusing on the project, a working demonstration, and discussion of how it is made. This mentor-review and community-presentation cycle continues throughout the year, with feedback informing later iterations. The sprint closes with a working deployed feature, presentation, and reflection; later CSA2 and DS2 iterations deepen the same project's CS112/CS113 concepts. Project participation alone does not establish individual mastery or college credit."
   start: 9
   end: 12
+  12:
+    theme: "System Contributions, Curriculum Connections, and Retrospective"
+    goals:
+      - "Explain How Prior CSP Community or Nonprofit Experience Led to an OCS System Contribution"
+      - "Review Two Mentor Reviews and Community N@tM Feedback with Project, Demo, and How-It-Is-Made Evidence"
+      - "Identify Individual Design, Implementation, Integration, and Testing Evidence"
+      - "Map Demonstrated Skills to CS112 and CS113 Topics without Claiming Uncompleted Layers"
+      - "Document System Foundations, Maintenance Handoff, and Next Iteration Ideas for CSA2"
+      - "Propose One Future Teaching Topic Individually or with Up to Two Teammates and Coordinate Classroom Contributions"
 Sprint4:
   title: Integration, Frontend, MVC Layers, and FRQs
-  description: CSA2 begins with a team mini-project integrating Web interfaces, Java/Spring services, and AP FRQ concepts. Weeks 13-15 introduce three approximately ten-minute topic clusters each; the fourth goal identifies Spring MVC code to observe or extend during PBL, not another lesson. Introduce HashMap, searching, and sorting early. Week 16 compiles competence evidence, evaluates the integrated product, and leads a retrospective without new material.
+  description: "CSA2 builds on trimester-1 lead-in skills and the sustained capstone established in week 9. Every team enters week 13 having completed two mentor reviews and a community N@tM presentation, including project demonstrations and discussions of how the system is made. This review cycle continues throughout the year. Students carry forward Java/Spring models, persistence, APIs, team roles, design plans, and review feedback while extending the project with Web interfaces and AP FRQ concepts. Weeks 13-15 introduce three approximately ten-minute topic clusters each; the fourth goal identifies Spring MVC code to observe or extend during PBL, not another lesson. Introduce HashMap, searching, and sorting early. Individual CodeRunner and project evidence demonstrate competence rather than group participation alone. Week 16 compiles competence evidence, evaluates the integrated product, and leads a retrospective without new material."
   start: 13
   end: 16
   13:

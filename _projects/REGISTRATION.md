@@ -121,6 +121,37 @@ authored Markdown pages belong directly in `docs/`. Include the original year or
 variant in a filename when flattening would create a collision. Historical
 full-stack Markdown exports without notebook originals are retained as references.
 
+CSA week-9 capstone objectives are authored in
+`lessons/csa1/notebooks/2024-10-29-sprint3_plan.ipynb`, retaining
+`/csa/sprint3/objectives`. The historical CSA version used week 8; the restored
+version deliberately uses week 9 and does not replace the separate CSSE source.
+It combines current capstone portfolios with individual design, implementation,
+integration, testing, and reflection evidence across three trimesters.
+Sprint 2-4 titles and descriptions in `_data/csa.yml` explain the progression
+from preparation through week 8 to sustained capstones in week 9 and deeper
+CSA2 integration. Preserve the sprint boundaries and lesson weeks when updating
+this narrative; a capstone continues beyond a sprint's summative review.
+Before week 13, all teams complete two mentor reviews and a community N@tM
+presentation. The project/demo/how-it-is-made review cycle continues throughout
+the year; retain feedback and individual contribution evidence without assuming
+additional review dates or counts.
+Students bring prior-year APCSP community/nonprofit project experience into
+system-level OCS work. Integrated features become maintainable foundations for
+successive cohorts, not disposable sprint projects. Preserve the distinction
+between planned/prototype work and integrated contributions; document contracts,
+integration tests, operation, limitations, and handoff alongside individual evidence.
+Validate with `node --test tests/csa_capstone_objectives.test.mjs`.
+Week 12 uses `lessons/csa1/docs/2026-10-10-week-12-checkpoint.md` and the shared
+checkpoint include to reflect on completed system contributions, two mentor
+reviews, N@tM feedback, individual evidence, and CS112/CS113 connections.
+It introduces no new submissions or implementation requirements; its goals
+come from Sprint 3 week 12 in `_data/csa.yml`.
+The week-12 handoff includes a proposal for one future teaching topic, chosen
+individually or with up to two teammates (three students maximum). Record topic,
+timing, learning needs, classroom/system value, and individual roles in the
+existing review ticket for teacher coordination. Topic selection is planning,
+not a new lesson build or CodeRunner submission during the retrospective.
+
 `lesson_group` identifies ownership for the collection indexes. Existing
 `courses.csa.week` values still drive the shared CSA timeline, regardless of folder.
 CS112/CS113 sources also carry `articulation: {institution: MiraCosta College,
