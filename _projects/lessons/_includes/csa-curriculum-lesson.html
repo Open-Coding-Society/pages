@@ -1,0 +1,11 @@
+<li>
+  <a href="{{ include.lesson.url | relative_url }}">{{ include.lesson.title | escape }}</a>
+  {% if include.lesson.courses.csa.week != nil %}
+    &mdash; CSA week {{ include.lesson.courses.csa.week }}
+  {% else %}
+    &mdash; reference, not currently scheduled
+  {% endif %}
+  {% if include.lesson.lesson_type == 'ap-practice' %}
+    &mdash; supplemental AP + CS112 runner practice
+  {% endif %}
+</li>

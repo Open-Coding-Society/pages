@@ -76,7 +76,8 @@ while preserving all critical instructions. The agent must still communicate wit
 * Notebook/DOCX 转换规则见 [scripts/convert_notebooks.py](scripts/convert_notebooks.py) 与 [scripts/convert_docx.py](scripts/convert_docx.py)。
 * 项目 notebook（包括 GameBuilder）从 `_projects/<category>/<project>/` 直接转换到 `_posts/projects/<project>/`；旧 `_notebooks/projects/` 副本不再参与全局转换或拆分。共享模板每项目一次批量调用（默认最多 4 workers），缓存 `.notebook-conversion-cache/` 按源/转换器内容和输出状态失效；相同 Markdown 不重写。`CONVERT_FLAGS=--force` 强制转换。`make dev` 不再清理和重复转换；改管线后重启 watcher。Makefile 生成器刷新未跟踪模板副本，保留已跟踪覆盖；持久修改改 [_projects/_template/Makefile](_projects/_template/Makefile)。验证：`venv/bin/python -m unittest discover -s tests -p test_convert_notebooks.py`。
 * CSA 内容按 `cs112 → cs113 → csa1 → csa2 → ds2` 优先级归属到 `_projects/lessons/` 的注册项目；`notebooks/` 与 `docs/` 必须平铺，迁移保留 permalink 和 `courses.csa.week`。`articulation` 只表示课程对应，不表示获得学分。草稿用 `lesson_status: draft` 与 `planned_week`，不要设置 `courses`：时间线不会按 `hide` 排除课程。详见 [_projects/REGISTRATION.md](_projects/REGISTRATION.md)。验证：`node --test tests/csa_curriculum.test.mjs`。
-* CSA 13–37 周按 `_data/csa.yml` 编排：所有课程项目和 `lessons/java` 合计每教学周最多三篇主文档；其他例题为无周次参考。总结、AP 复习、展示和期末周用清单链接旧课，不新增作业。预期选课见 `tests/fixtures/csa_week_schedule.json`；缺口用 `lesson_notes` 显示。移除课程或移动源后检查旧构建副本与拆分输出，只清理确认无源的生成文件，防止旧周次重新发布。
+* CSA 13–37 周按 `_data/csa.yml` 编排：每教学周最多三篇主文档；已对应 CS112 的 AP FRQ runner 可作为 `lesson_type: ap-practice` 补充练习超出限额，放在匹配教学周，题名/文件名以主题开头，保留 permalink。补充选课见 `tests/fixtures/csa_frq_practice.json`，主文档见 `tests/fixtures/csa_week_schedule.json`；其他例题为无周次参考。总结、AP 复习、展示和期末周用清单链接旧课，不新增作业。缺口用 `lesson_notes` 显示。移动源后只清理确认无源的生成文件，防止旧标题/周次重新发布。
+* AP FRQ 分类号与历史题号必须分离：`ap_frq_category` 为 1 方法/控制、2 类设计、3 一维数组/ArrayList、4 二维数组；`ap_exam_year`/`ap_exam_question` 保存历史身份。题名如 `FRQ 3 - Array or ArrayList Manipulation - 2017 Exam Q1 - CS112`；按题目实际练习审核分类，不按旧题名或历史序号推断。旧题可能跨技能；9 分说明针对四题制分类，不改历史评分。frontmatter description 用纯文本，不含 Liquid 或 `#`：卡片不会递归渲染变量，转换器未引号输出会截断 YAML 注释。
 
 ### 项目注册与样式
 

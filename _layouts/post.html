@@ -55,6 +55,9 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     {%- assign coursePosts = coursePosts | push: post -%}
   {%- endif -%}
 {%- endfor -%}
+{%- if current_course == 'csa' -%}
+  {%- assign coursePosts = coursePosts | sort: "title" -%}
+{%- endif -%}
 {%- comment -%}
   The same lessons grouped by week, in the same order, so a week's lessons are
   one lookup (lessonsByWeek | where: "name", week) instead of a scan of every

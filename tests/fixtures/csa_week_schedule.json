@@ -1,6 +1,6 @@
 {
-  "13": ["java/notebooks/2025-09-21-3.1.ipynb", "cs112/notebooks/2025-01-10-classes.ipynb", "cs112/notebooks/2025-01-04-methods-and-control-structures.ipynb"],
-  "14": ["cs112/notebooks/2025-01-10-ap_frq_lessons-2022-frq2-classes.ipynb", "cs113/notebooks/2025-01-06-search_linear_binary_hash.ipynb", "java/notebooks/2025-09-21-4.8-arraylist-methods.ipynb"],
+  "13": ["java/notebooks/2025-09-21-3.1.ipynb", "cs112/notebooks/2025-01-10-frq2-class-writing-design-ap-review-cs112.ipynb", "cs112/notebooks/2025-01-04-frq1-methods-control-structures-ap-review-cs112.ipynb"],
+  "14": ["cs112/notebooks/2025-01-10-frq2-class-writing-design-2022-exam-q2-cs112.ipynb", "cs113/notebooks/2025-01-06-search_linear_binary_hash.ipynb", "java/notebooks/2025-09-21-4.8-arraylist-methods.ipynb"],
   "15": ["cs113/notebooks/2025-01-06-sort-selection_insertion.ipynb", "cs113/notebooks/2025-01-06-sort-merge.ipynb", "java/notebooks/2025-09-21-2.12.ipynb"],
   "16": ["csa2/docs/2026-10-10-week-16-checkpoint.md"],
   "17": ["cs112/notebooks/2025-02-20-fibonaccii_abstract.ipynb", "cs112/notebooks/2025-04-10-teamteachCollectable.ipynb", "java/notebooks/2025-09-21-3.8.ipynb"],
@@ -8,7 +8,7 @@
   "19": ["java/notebooks/2025-09-21-4.6-using-text-files.ipynb"],
   "20": ["csa2/docs/2026-10-10-week-20-checkpoint.md"],
   "21": ["cs112/notebooks/2025-04-10-data_structures-collectables-lists.ipynb", "cs112/notebooks/2025-01-07-Thymeleaf.ipynb", "java/notebooks/2025-09-21-4.9-ArrayList_Transversals.ipynb"],
-  "22": ["cs112/notebooks/2025-02-21-java-collections.ipynb", "cs112/notebooks/2025-03-01-comparable.ipynb", "cs112/notebooks/2026-01-10-frq3-arrays.ipynb"],
+  "22": ["cs112/notebooks/2025-02-21-java-collections.ipynb", "cs112/notebooks/2025-03-01-comparable.ipynb", "cs112/notebooks/2026-01-10-frq3-arrays-arraylists-2021-exam-q3-cs112.ipynb"],
   "23": ["java/notebooks/2025-09-21-4.16-recursions.ipynb", "cs112/notebooks/2025-01-28-Jquery.ipynb", "java/notebooks/2025-09-21-4.13-2d-algorithms.ipynb"],
   "24": ["csa2/docs/2026-10-10-week-24-checkpoint.md"],
   "25": ["cs113/notebooks/2025-02-20-rpn_calculator_lesson.ipynb", "cs113/notebooks/2025-04-10-QueueDequeue.ipynb", "cs112/notebooks/2025-04-02-collectibles.ipynb"],

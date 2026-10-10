@@ -132,8 +132,28 @@ Project publication regenerates those posts from the new notebook sources.
 
 The curated weeks 13-37 follow `_data/csa.yml`, with at most three primary topic
 documents per instructional week across the curriculum and `lessons/java`.
-Unselected examples and FRQs remain accessible references without a CSA week;
-do not refill a week with every alternate example. The expected primary-source
+Runner-backed AP FRQs already aligned to CS112 may exceed that limit as
+supplemental practice in the matching instructional week. Tag these with
+`lesson_type: ap-practice`; they are not new primary topics. Use topic-first
+titles such as `FRQ 3 - Array or ArrayList Manipulation - 2017 Exam Q1 - CS112`
+and filenames `<date>-frq3-arrays-arraylists-2017-exam-q1-cs112.ipynb`,
+preserving the permalink. `ap_frq_category` records the four-question AP
+category (1 methods/control, 2 class writing/design, 3 arrays/ArrayLists,
+4 2D arrays); `ap_exam_year` and `ap_exam_question` record historical exam
+identity separately. Audit the exercise, not its old title or question number.
+Use plain-text descriptions, not `{{ page.year }}` or other Liquid expressions
+inside frontmatter: cards do not recursively render metadata, and the notebook
+converter's unquoted output treats `#` as a YAML comment.
+Older exams mixed skills and used different ordering. The leading FRQ number
+is a practice classification, not a claim that the historical question was
+renumbered or had today's scoring format. Overview pages omit exam identity.
+The CS112 index groups by this category metadata and shows their
+weeks and supplemental status. The exact selection is recorded in
+`tests/fixtures/csa_frq_practice.json`. CSA week cards and sidebar lessons share
+title ordering so topic groups also stay together in the lesson player.
+Non-runner examples and other unselected
+FRQs remain accessible references without a CSA week; do not refill a week
+with every alternate example. The expected primary-source
 selection is recorded in `tests/fixtures/csa_week_schedule.json` for regression
 checks; frontmatter remains the publishing source of truth. Java references
 stay in their existing project and do not acquire articulation ownership.
