@@ -94,6 +94,32 @@ _projects/<category>/
 
 Files under `notebooks/` are copied to `_notebooks/projects/<project-name>/` and converted into posts under `_posts/projects/<project-name>/`. The `index.md` and `index.ipynb` files represent the project index, so a project may provide at most one of them.
 
+### CSA Curriculum Source Ownership
+
+CSA sources are registered lesson projects under `lessons/cs112`, `lessons/cs113`,
+`lessons/csa1`, `lessons/csa2`, and `lessons/ds2`, in that ownership priority order.
+Keep one authoritative source even when its topic supports multiple stages.
+Notebook lessons belong directly in `notebooks/` (the template does not recurse);
+authored Markdown pages belong directly in `docs/`. Include the original year or
+variant in a filename when flattening would create a collision. Historical
+full-stack Markdown exports without notebook originals are retained as references.
+
+`lesson_group` identifies ownership for the collection indexes. Existing
+`courses.csa.week` values still drive the shared CSA timeline, regardless of folder.
+CS112/CS113 sources also carry `articulation: {institution: MiraCosta College,
+course: CS112}` (or `CS113`), separate from `courses` and without outcome IDs.
+This records curriculum alignment, not mastery or awarded credit. Preserve
+explicit permalinks, existing course assignments, and lesson bodies when moving
+sources; never move or edit generated notebook posts as authoritative lessons.
+Project publication regenerates those posts from the new notebook sources.
+
+Unfinished notebook skeletons use `lesson_status: draft`, `hide: true`,
+`search_exclude: true`, and `planned_week`, with no `courses` assignment.
+The timeline does not use `hide` to exclude lessons, so omitting `courses` is
+essential until a draft is ready. Finish the exercise and assessment before
+assigning its week and enabling challenge submissions. Advanced CS113 layers
+remain differentiated; the DS2 ML/AI collection is a separate project pathway.
+
 Files under `_projects/<category>/_includes/` are copied to `_includes/projects/<category>/`. Project pages reference them with `{% raw %}{% include projects/<category>/shared-view.html %}{% endraw %}`. The generated `_includes/projects/` tree is ignored by Git and removed by `make clean`; edit only the local source under `_projects/`.
 
 **Recommended Categories:**

@@ -75,6 +75,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * 课程播放器页面（每门课的 `/<course>/sprint-<n>/`、`/<course>/week-<w>/`、`/<course>/week-<w>/chat/`、`/<course>/blogs/`）没有源文件：由 [_plugins/lesson_player_pages.rb](_plugins/lesson_player_pages.rb) 在构建时根据 `_data/<course>.yml` 生成，周页面和聊天页面只为有 lesson 的周生成。页面内容改 [_includes/player-pages/](_includes/player-pages/)；[_includes/lesson-sidebar-nav.html](_includes/lesson-sidebar-nav.html) 中的链接必须使用相同的 URL。测试：`bundle exec ruby scripts/test_player_pages.rb`。
 * Notebook/DOCX 转换规则见 [scripts/convert_notebooks.py](scripts/convert_notebooks.py) 与 [scripts/convert_docx.py](scripts/convert_docx.py)。
 * GameBuilder 课程 notebook 的规范源在 [_projects/systems/gamebuilder/notebooks/](_projects/systems/gamebuilder/notebooks/)；`_notebooks/projects/gamebuilder/` 是构建副本。项目 Makefile 由 [_projects/_template/Makefile](_projects/_template/Makefile) 生成，持久的构建/监听修复应改模板；循环中的 `cd` 使用子 shell，避免多个 notebook 转换时改变工作目录。
+* CSA 内容按 `cs112 → cs113 → csa1 → csa2 → ds2` 优先级归属到 `_projects/lessons/` 的注册项目；`notebooks/` 与 `docs/` 必须平铺，迁移保留 permalink 和 `courses.csa.week`。`articulation` 只表示课程对应，不表示获得学分。草稿用 `lesson_status: draft` 与 `planned_week`，不要设置 `courses`：时间线不会按 `hide` 排除课程。详见 [_projects/REGISTRATION.md](_projects/REGISTRATION.md)。验证：`node --test tests/csa_curriculum.test.mjs`。
 
 ### 项目注册与样式
 

@@ -1,0 +1,41 @@
+<div class="ocs__container">
+  <h1>{{ page.title }}</h1>
+  <p>{{ page.description }}</p>
+  <nav class="ocs__links ocs__links--wide" aria-label="CSA curriculum collections">
+    <a class="ocs__btn pill" href="{{ '/csa/cs112/' | relative_url }}">CS112</a>
+    <a class="ocs__btn pill" href="{{ '/csa/cs113/' | relative_url }}">CS113</a>
+    <a class="ocs__btn pill" href="{{ '/csa/csa1/' | relative_url }}">CSA1</a>
+    <a class="ocs__btn pill" href="{{ '/csa/csa2/' | relative_url }}">CSA2</a>
+    <a class="ocs__btn pill" href="{{ '/csa/ds2/' | relative_url }}">DS2 / ML</a>
+    <a class="ocs__btn pill" href="{{ '/csa/' | relative_url }}">CSA course plan</a>
+  </nav>
+  <p>Source ownership follows CS112, CS113, CSA1, CSA2, then DS2. Week assignments remain in the shared CSA course plan. Articulation metadata identifies a curriculum connection, not earned credit or demonstrated mastery.</p>
+  {% assign lessons = site.posts | where: "lesson_group", page.curriculum_group | sort: "title" %}
+  <h2>Lessons and project references</h2>
+  <ul>
+    {% for lesson in lessons %}
+      {% unless lesson.hide or lesson.lesson_status == 'draft' %}
+      <li>
+        <a href="{{ lesson.url | relative_url }}">{{ lesson.title }}</a>
+        {% if lesson.courses.csa.week != nil %}
+          &mdash; CSA week {{ lesson.courses.csa.week }}
+        {% else %}
+          &mdash; reference, not currently scheduled
+        {% endif %}
+      </li>
+      {% endunless %}
+    {% endfor %}
+  </ul>
+  {% assign drafts = lessons | where: "lesson_status", "draft" %}
+  {% if drafts.size > 0 %}
+  <details>
+    <summary>Authoring drafts &mdash; {{ drafts.size }} unfinished lesson skeletons</summary>
+    <p>These drafts are not assignments and are excluded from the course timeline. Planned weeks are authoring targets only. Complete the instruction, CodeRunner exercise, and assessment checks before adding a CSA week assignment.</p>
+    <ul>
+      {% for lesson in drafts %}
+      <li><a href="{{ lesson.url | relative_url }}">{{ lesson.title }}</a> &mdash; planned week {{ lesson.planned_week }}</li>
+      {% endfor %}
+    </ul>
+  </details>
+  {% endif %}
+</div>
