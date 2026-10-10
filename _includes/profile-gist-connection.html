@@ -1,0 +1,39 @@
+<section class="gist-connection" aria-labelledby="gist-connection-heading">
+  <h2 id="gist-connection-heading">GitHub Gist connection</h2>
+  <p>Create code submissions and exports under your own GitHub account.</p>
+  <p id="gist-connection-state" role="status" aria-live="polite">Checking connection…</p>
+  <details class="gist-connection-instructions">
+    <summary>How to get a GitHub token</summary>
+    <ol>
+      <li>Sign in to the GitHub account you want to own your Gists. You do not need to create a Gist first.</li>
+      <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">New fine-grained personal access token</a>.
+        Give it a name such as <strong>OCS Gist submissions</strong>, choose an expiration, and select your personal account as the resource owner.</li>
+      <li>Keep repository access at <strong>Public repositories</strong>; no additional repository permissions are needed.</li>
+      <li>Under <strong>Permissions</strong>, select <strong>Account</strong> (not Repositories), then <strong>Add permissions → Gists → Read and write</strong>.</li>
+      <li>Click <strong>Generate token</strong>, copy it, paste it into the field below, and click <strong>Save token</strong>.
+        GitHub only shows the token once.</li>
+    </ol>
+    <p>Alternatively, <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">create a classic token</a>
+      with only the <strong>gist</strong> scope selected.</p>
+    <p>Treat your token like a password: never share it or commit it. When it expires, create a new one and use <strong>Replace token</strong> here.</p>
+  </details>
+  <form id="gist-connection-form">
+    <label for="gist-connection-token">GitHub personal access token</label>
+    <input class="ocs__input" id="gist-connection-token" type="password" autocomplete="off"
+      spellcheck="false" required maxlength="512" aria-describedby="gist-connection-help">
+    <p id="gist-connection-help">Use a fine-grained token with Gists: write, or a classic token with the gist scope.
+      <a href="https://github.com/settings/tokens" target="_blank" rel="noopener noreferrer">Create a GitHub token</a>.
+      Connecting verifies identity; GitHub checks write permission when you export.</p>
+    <div class="gist-connection-actions">
+      <button class="ocs__btn accent fill" id="gist-connection-save" type="submit" disabled>Save token</button>
+      <button class="ocs__btn" id="gist-connection-disconnect" type="button" hidden disabled>Disconnect</button>
+    </div>
+  </form>
+  <p id="gist-connection-message" role="status" aria-live="polite"></p>
+  <p class="gist-connection-note">Gists are unlisted, but anyone with the link can read them.
+    Disconnect removes the token from OCS; revoke it separately in GitHub settings.</p>
+</section>
+<script type="module">
+  import { initGistConnection } from '{{ site.baseurl }}/assets/js/profile/gist-connection.js';
+  initGistConnection(document.querySelector('.gist-connection'));
+</script>

@@ -180,6 +180,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
 <script type="module">
   import { pythonURI, fetchOptions, javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
   import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
+  import { appendGistSettingsLink } from '{{ site.baseurl }}/assets/js/gist-connection-errors.js';
   import { listRunners, unsavedRunners, readRunners } from '{{ site.baseurl }}/assets/js/runner-io.js';
 
   /**
@@ -788,14 +789,15 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
    * STATUS MESSAGES: Display feedback
    * ============================================
    */
-  function showStatus(type, message) {
+  function showStatus(type, message, error) {
     const status = document.getElementById('submission-status');
     if (!status) return;
     const icon = type === 'success' ? 'check-circle' : type === 'loading' ? 'spinner fa-spin' : 'exclamation-circle';
     status.className = `submission-status ${type}`;
     status.innerHTML = `<i class="fa-solid fa-${icon}"></i> ${message}`;
+    appendGistSettingsLink(status, error);
     status.style.display = 'block';
-    if (type !== 'loading') {
+    if (type !== 'loading' && !error?.settingsUrl) {
       setTimeout(() => {
         status.style.display = 'none';
       }, STATUS_AUTO_HIDE_MS);
@@ -1067,7 +1069,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
           this.reset();
           resetSelfAssessment();
         } catch (err) {
-          showStatus('error', err.message);
+          showStatus('error', err.message, err);
         } finally {
           submitBtn.disabled = false;
         }
@@ -2065,20 +2067,21 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
             this.reset();
             resetSelfAssessmentBlog();
           } catch (err) {
-            showStatusBlog('error', err.message);
+            showStatusBlog('error', err.message, err);
           } finally {
             btn.disabled = false;
           }
         });
       }
 
-      function showStatusBlog(type, message) {
+      function showStatusBlog(type, message, error) {
         const status = document.getElementById('submission-status-blog');
         const icon = type === 'success' ? 'check-circle' : type === 'loading' ? 'spinner fa-spin' : 'exclamation-circle';
         status.className = `submission-status ${type}`;
         status.innerHTML = `<i class="fa-solid fa-${icon}"></i> ${message}`;
+        window.appendGistSettingsLink(status, error);
         status.style.display = 'block';
-        if (type !== 'loading') {
+        if (type !== 'loading' && !error?.settingsUrl) {
           setTimeout(() => {
             status.style.display = 'none';
           }, 5000);
@@ -2103,10 +2106,12 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
   <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
     import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
+    import { appendGistSettingsLink } from '{{ site.baseurl }}/assets/js/gist-connection-errors.js';
     window.pythonURI = pythonURI;
     window.javaURI = javaURI;
     window.fetchOptions = fetchOptions;
     window.exportToGist = exportToGist;
+    window.appendGistSettingsLink = appendGistSettingsLink;
   </script>
   <script src="{{ site.baseurl }}/assets/js/ocs-analytics-enhanced.js"></script>
   <script src="{{ site.baseurl }}/assets/js/code-runner-analytics.js"></script>

@@ -12,7 +12,8 @@
  *   const url = await exportToGist(files, { type: 'submission' });
  */
 
-import { javaURI } from '/assets/js/api/config.js';
+import { javaURI, baseurl } from '/assets/js/api/config.js';
+import { gistExportError } from './gist-connection-errors.js';
 
 /** Filename of the manifest describing what an envelope contains. */
 export const MANIFEST = 'ocs.json';
@@ -63,12 +64,8 @@ export async function exportToGist(files, opts = {}) {
   });
 
   if (!res.ok) {
-    // 401/403 is by far the most common failure and deserves its own message,
-    // otherwise callers surface the literal word "Forbidden" to a student.
-    if (res.status === 401 || res.status === 403) {
-      throw new Error('Sign in before exporting.');
-    }
-    throw new Error(`Export failed (${res.status})`);
+    const data = await res.json().catch(() => ({}));
+    throw gistExportError(res.status, data, `${baseurl}/profile#gist-connection-heading`);
   }
 
   const { url } = await res.json();
