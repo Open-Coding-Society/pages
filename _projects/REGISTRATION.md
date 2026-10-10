@@ -147,8 +147,23 @@ converter's unquoted output treats `#` as a YAML comment.
 Older exams mixed skills and used different ordering. The leading FRQ number
 is a practice classification, not a claim that the historical question was
 renumbered or had today's scoring format. Overview pages omit exam identity.
-The CS112 index groups by this category metadata and shows their
-weeks and supplemental status. The exact selection is recorded in
+The CS112 report follows MiraCosta's original five-section outline and lab
+outline, using `_data/cs112_topics.json`. Map stable source permalinks, not
+filenames, titles, or AP question numbers; renamed lessons retain their topic
+placement. The report reads current titles, weeks, and supplemental status from
+published lesson metadata. A lesson can support multiple subtopics without
+changing its schedule. FRQs are taught in CSA2 and beyond; CS112 topic placement
+does not move FRQ instruction into CSA1. POJO, JPA, and APIs are introduced in
+CSA1 week 4 as an entry point for students with prior APCSP Python Web/API
+experience. Later CSA2 and DS2 work deepens these CS112-aligned foundations;
+articulation alignment does not impose a minimum teaching week.
+Each subtopic shows available material, strengthening
+needs, and a PBL observation/extension. Draft links are explicitly unfinished,
+and persistence references do not claim file-I/O coverage. Deleted lessons are
+not rendered; new unmapped lessons appear in an awaiting-mapping section.
+Update the mapping and coverage notes when adding or removing sources. Validate
+with `bundle exec ruby scripts/test_cs112_report.rb`.
+The exact supplemental selection is recorded in
 `tests/fixtures/csa_frq_practice.json`. CSA week cards and sidebar lessons share
 title ordering so topic groups also stay together in the lesson player.
 Non-runner examples and other unselected

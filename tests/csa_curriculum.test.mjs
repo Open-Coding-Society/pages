@@ -175,10 +175,7 @@ test("CS112 FRQ categories are distinct from historical exam question numbers", 
         assert.notEqual(scalar(source.frontmatter, "hide"), "true");
     }
     const index = fs.readFileSync(path.join(root, "_projects/lessons/_includes/csa-curriculum.html"), "utf8");
-    assert.match(index, /AP \+ CS112 topic groups/);
-    assert.match(index, /where: 'ap_frq_category', category/);
-    assert.match(index, /Exam Q/);
-    assert.match(index, /9 points/);
+    assert.match(index, /include projects\/lessons\/cs112-report\.html/);
     assert.match(index, /sort: "title"/);
     const player = fs.readFileSync(path.join(root, "_layouts/post.html"), "utf8");
     assert.match(player, /current_course == 'csa'[\s\S]*?coursePosts = coursePosts \| sort: "title"/);

@@ -12,36 +12,13 @@
   <p>Source ownership follows CS112, CS113, CSA1, CSA2, then DS2. Week assignments remain in the shared CSA course plan. Articulation metadata identifies a curriculum connection, not earned credit or demonstrated mastery.</p>
   {% assign lessons = site.posts | where: "lesson_group", page.curriculum_group | sort: "title" %}
   {% if page.curriculum_group == 'cs112' %}
-  <h2>AP + CS112 topic groups</h2>
-  <p>The four AP categories below are worth 9 points each in the four-question format. The leading FRQ number identifies the practice category; <strong>Exam Q</strong> identifies the original question number in that year's exam. Older exams used different ordering and sometimes combined skills, so these numbers need not match. Lesson bodies and historical scoring guides retain their original exam references.</p>
-  <p>The three-primary-document limit remains; runner-backed FRQs appear in matching instructional weeks as supplemental practice, not additional new topics. Class-writing practice is in week 14, inheritance and interfaces in week 17, collections in week 22, and 2D arrays in week 23. Unscheduled examples remain references.</p>
-  {% assign category_topics = 'Methods and Control Structures|Class Writing and Design|Array or ArrayList Manipulation|2D Array Operations' | split: '|' %}
-  {% assign category_descriptions = 'Writing methods, loops, conditional logic, and math/string operations.|Writing an entire class with instance variables, a constructor, and specified methods.|Traversing, modifying, or processing 1D arrays and ArrayLists.|Processing and traversing 2D arrays, often in row-major order.' | split: '|' %}
-  {% for topic in category_topics %}
-    {% assign category = forloop.index %}
-    {% assign category_lessons = lessons | where: 'ap_frq_category', category %}
-    <h3>FRQ {{ category }} &mdash; {{ topic }} &mdash; 9 points</h3>
-    <p>{{ category_descriptions[forloop.index0] }}</p>
-    <ul>
-    {% for lesson in category_lessons %}
-      {% unless lesson.hide or lesson.lesson_status == 'draft' %}
-        {% include projects/lessons/csa-curriculum-lesson.html lesson=lesson %}
-      {% endunless %}
-    {% endfor %}
-    </ul>
-  {% endfor %}
-  {% endif %}
+  {% include projects/lessons/cs112-report.html %}
+  {% else %}
   <h2>Lessons and project references</h2>
   <ul>
     {% for lesson in lessons %}
       {% unless lesson.hide or lesson.lesson_status == 'draft' %}
-      {% if page.curriculum_group != 'cs112' %}
         {% include projects/lessons/csa-curriculum-lesson.html lesson=lesson %}
-      {% else %}
-        {% unless lesson.ap_frq_category %}
-          {% include projects/lessons/csa-curriculum-lesson.html lesson=lesson %}
-        {% endunless %}
-      {% endif %}
       {% endunless %}
     {% endfor %}
   </ul>
@@ -56,5 +33,6 @@
       {% endfor %}
     </ul>
   </details>
+  {% endif %}
   {% endif %}
 </div>

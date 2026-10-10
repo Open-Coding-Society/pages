@@ -1,0 +1,150 @@
+[
+  {
+    "id": "oop",
+    "title": "I. Object-oriented programming (OOP): design and analysis",
+    "topics": [
+      {
+        "id": "encapsulation",
+        "title": "A. Encapsulation, inheritance, and polymorphism",
+        "coverage": "Class-writing FRQs support constructors, encapsulation, and methods. Interface, inheritance, and Collectable examples extend this into polymorphic design.",
+        "gap": "Strengthen the connection between isolated class exercises and a tested, multi-class Web feature.",
+        "pbl": "Observe a Spring entity and controller, then extend the model without exposing internal state.",
+        "lessons": ["/java/spring/pojo/", "/csa/reference/teacher", "/DTMcollectible", "/csa/frqs/classes", "/csa/frqs/2014/1/q2", "/csa/frqs/2015/2", "/csa/frqs/2015/4", "/csa/frqs/2016q1", "/csa/frqs/2017/2", "/csa/frqs/2018/3", "/csa/frqs/2019/2", "/csa/frqs/2021/2", "/csa/frqs/2022/2", "/csa/frqs/2023/2", "/csa/frqs/2024/2", "/csa/frqs/2025/2"]
+      },
+      {
+        "id": "abstract-generics",
+        "title": "B. Abstract classes and generics or parameterized types",
+        "coverage": "The abstract Fibonacci and Collectable lessons demonstrate abstract parents, interfaces, and typed collections.",
+        "gap": "Add a focused student-authored generic class exercise; using ArrayList<T> alone does not demonstrate designing a parameterized type.",
+        "pbl": "Extend a shared Collectable abstraction and explain the type contract used by its collection.",
+        "lessons": ["/2025/02/20/fibonaccii_abstract_IPYNB_2_.html", "/csp/arraylists", "/collectablesToolkit", "/teamTeachCollectables/intro", "/collectablesToolkitIntro"]
+      }
+    ]
+  },
+  {
+    "id": "software-engineering",
+    "title": "II. Software engineering design: techniques and strategies",
+    "topics": [
+      {
+        "id": "memory",
+        "title": "A. Memory management and garbage collection",
+        "coverage": "Stack and heap memory, reference types, and object-copying notes provide the foundation.",
+        "gap": "Finish the copying/memory draft with reachability, garbage collection, and object-lifetime checks.",
+        "pbl": "Trace references held by a controller or collection and explain when an object becomes eligible for garbage collection.",
+        "lessons": ["/csa/stack_heap/teacher", "/csa/reference/teacher", "/csa/cs112/drafts/object-copying-memory/"]
+      },
+      {
+        "id": "scope",
+        "title": "B. Visibility, scope, binding, and lifetime",
+        "coverage": "Data types, reference semantics, POJOs, and class-writing practice support field visibility and local-versus-instance state.",
+        "gap": "Make scope, dynamic method binding, and lifetime explicit in a short comparative exercise.",
+        "pbl": "Compare request-local variables with entity fields and inspect an overridden method's runtime behavior.",
+        "lessons": ["/2025/02/18/java-data_types_IPYNB_2_.html", "/java/spring/pojo/", "/csa/frqs/classes", "/csa/stack_heap/teacher"]
+      }
+    ]
+  },
+  {
+    "id": "language-elements",
+    "title": "III. Advanced language elements",
+    "topics": [
+      {
+        "id": "copy-constructors",
+        "title": "A. Copy constructors",
+        "coverage": "Reference and memory lessons are prerequisites; a dedicated object-copying skeleton exists.",
+        "gap": "The copy-constructor lesson is unfinished. Require shallow/deep-copy tests rather than treating reference assignment as copying.",
+        "pbl": "Create an independent snapshot of project data and verify that editing the original does not change the snapshot.",
+        "lessons": ["/csa/reference/teacher", "/csa/cs112/drafts/object-copying-memory/"]
+      },
+      {
+        "id": "text-binary-files",
+        "title": "B. Advanced input/output techniques - 1. Text and binary files",
+        "coverage": "JPA and backend references provide persistence context, but database persistence is not a substitute for file I/O.",
+        "gap": "Finish a text/binary import-export exercise with resource closure and round-trip tests.",
+        "pbl": "Add an export/import layer to a project collection and compare text and binary representations.",
+        "lessons": ["/java/spring/jpa/", "/fullstack/java/backend", "/csa/cs112/drafts/reliable-file-io/"]
+      },
+      {
+        "id": "random-access-files",
+        "title": "B. Advanced input/output techniques - 2. Random access files",
+        "coverage": "The reliable-file-persistence draft includes fixed-size records and RandomAccessFile offsets.",
+        "gap": "No completed dedicated random-access file lesson is available in this collection.",
+        "pbl": "Update one fixed-size record by its offset without reading or rewriting every record.",
+        "lessons": ["/csa/cs112/drafts/reliable-file-io/"]
+      },
+      {
+        "id": "recursion",
+        "title": "C. Recursive methods",
+        "coverage": "The Fibonacci lesson supplies an algorithm-comparison context. Methods/control practice supports the prerequisite method-writing skills.",
+        "gap": "Add explicit base-case, recursive-step, and call-trace checks; ordinary loops and method-writing FRQs alone do not cover recursion.",
+        "pbl": "Compare recursive and iterative implementations, then explain the call-stack cost.",
+        "lessons": ["/2025/02/20/fibonaccii_abstract_IPYNB_2_.html", "/csa/frqs/methods-and-control-structures", "/csa/frqs/2019/1"]
+      },
+      {
+        "id": "exceptions",
+        "title": "D. Fault-tolerance through exception and error handling",
+        "coverage": "Backend and file-persistence materials provide contexts for invalid input, persistence failures, and recovery.",
+        "gap": "Finish a dedicated exercise that tests failure paths, useful error reporting, and safe resource handling.",
+        "pbl": "Send invalid input or a malformed import to a project feature and verify the reported error and unchanged valid data.",
+        "lessons": ["/fullstack/java/backend", "/csa/cs112/drafts/reliable-file-io/"]
+      }
+    ]
+  },
+  {
+    "id": "data-structures",
+    "title": "IV. Advanced data structures",
+    "topics": [
+      {
+        "id": "lists-iterators",
+        "title": "A. ArrayLists, vectors, linked lists, and iterators",
+        "coverage": "Collection/list lessons and array-processing FRQs provide traversal, modification, and iteration practice. The 2D example is supporting array practice, not a separate CS112 outline section.",
+        "gap": "Finish the from-scratch LinkedList layers and explicitly compare Vector with ArrayList. Library usage is not a custom implementation.",
+        "pbl": "Build a small review queue using student-authored nodes, insertion, and traversal, with empty and singleton tests.",
+        "lessons": ["/teamTeachCollectables/lists", "/collectablesToolkitLists", "/csp/arraylists", "/DTMcollectible", "/csa/frqs/arrays", "/csa/frqs/arraylists", "/csa/frqs/2014/1", "/csa/frqs/2016q2", "/csa/frqs/2017/1", "/csa/frqs/2018/2", "/csa/frqs/2019/3", "/csa/frqs/2021/3", "/csa/frqs/2022/3", "/csa/frqs/2023/3", "/csa/frqs/2024/3", "/csa/frqs/2025/3", "/csa/frqs/2015/1", "/csa/frqs/2019/4", "/csa/frqs/2024/4", "/csa/cs112/drafts/linked-list-layers/"]
+      },
+      {
+        "id": "structure-selection",
+        "title": "B. Data structure assessment and appropriate selection",
+        "coverage": "Collection introductions, summaries, Comparable, and queue references support choosing structures for project needs.",
+        "gap": "Require students to justify their selection using actual operations and test data. Deeper sort analysis belongs to the CS113 extension.",
+        "pbl": "Compare a list and a map for a project's lookup needs, then justify the chosen structure.",
+        "lessons": ["/teamTeachCollectables/intro", "/collectablesToolkitIntro", "/teamTeachCollectables/summary", "/collectablesToolkitConclusion", "/2025/03/01/comparable_IPYNB_2_.html", "/docs/queue"]
+      }
+    ]
+  },
+  {
+    "id": "graphics",
+    "title": "V. Graphics",
+    "topics": [
+      {
+        "id": "gui",
+        "title": "A. Graphical user interface (GUI) design",
+        "coverage": "Fullstack design, frontend UI, Thymeleaf, and concrete viewer/game examples support browser-based GUI design.",
+        "gap": "Strengthen accessibility, validation, and user-flow evaluation in student project evidence.",
+        "pbl": "Evaluate a form or table with a user, then improve its feedback and keyboard interaction.",
+        "lessons": ["/fullstack/java/design", "/java/spring/ui/", "/toolkit/documentation/thymeleaf", "/toolkit/documentation/person", "/toolkit/documentation/cookie", "/csa/announcement-calendar", "/csa/calendar-card"]
+      },
+      {
+        "id": "web",
+        "title": "B. Java applets or Web",
+        "coverage": "Use the Web pathway: Spring-backed pages, frontend/backend integration, JQuery, and generated CRUD tables. Applets are not the teaching target.",
+        "gap": "Require an end-to-end feature with a clear API contract and demonstrated success and error states.",
+        "pbl": "Connect a browser interaction to a Spring endpoint and persist or retrieve project data.",
+        "lessons": ["/fullstack/java/frontend", "/fullstack/java/backend", "/fullstack/java/example", "toolkit/documentation/jquery", "/toolkit/documentation/tables", "/java/spring/ui/", "/csa/chat-migration"]
+      }
+    ]
+  },
+  {
+    "id": "lab",
+    "title": "Lab Outline",
+    "topics": [
+      {
+        "id": "projects",
+        "title": "Individual and group hands-on projects",
+        "coverage": "Projects support, complement, and extend lecture material and theory. Existing feature documentation provides examples to observe and extend, not proof that students have implemented the underlying CS112 concepts.",
+        "gap": "Collect individual competence evidence alongside group project work, followed by summative evaluation and reflection.",
+        "pbl": "Choose a feature, identify its CS112 concepts, implement an extension, demonstrate it, and reflect on test evidence.",
+        "lessons": ["/fullstack/java/intro", "/fullstack/java/design", "/fullstack/java/example", "/docs/assignments", "/docs/calendar", "/docs/casino", "/docs/fortuneFinders", "/docs/groups", "/docs/screenshare", "/docs/stocks", "/docs/stocksGame", "/docs/teamteach", "/docs/queue", "/csa/chat-migration", "/csa/announcement-calendar", "/csa/calendar-card"]
+      }
+    ]
+  }
+]
