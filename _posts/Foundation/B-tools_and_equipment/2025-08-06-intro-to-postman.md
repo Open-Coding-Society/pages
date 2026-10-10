@@ -1,6 +1,6 @@
 ---
 layout: post
-courses: {'csa': {'week': 21}}
+courses: { csp: {week: 9}, csa: {week: 9} }
 toc: true
 title: Postman Guide
 description: Quick Guide to Write & Test APIs with Postman
