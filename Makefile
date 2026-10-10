@@ -2,13 +2,13 @@ HOST ?= localhost
 PORT ?= 4500
 LOG_FILE = /tmp/jekyll$(PORT).log
 PYTHON := venv/bin/python3
+CONVERT_JOBS ?= 4
+CONVERT_FLAGS ?=
 
 SHELL = /bin/bash -c
 .SHELLFLAGS = -e
 
-NOTEBOOK_FILES := $(shell find _notebooks -name '*.ipynb')
 DESTINATION_DIRECTORY = _posts
-MARKDOWN_FILES := $(patsubst _notebooks/%.ipynb,$(DESTINATION_DIRECTORY)/%_IPYNB_2_.md,$(NOTEBOOK_FILES))
 
 ###########################################
 # Project Selection Logic
@@ -68,14 +68,16 @@ ACTIVE_DEV_PROJECTS = $(sort $(DEV_PROJECTS) $(VALID_EXTRA_PROJECTS))
 define run_projects
 	@for proj in $(1); do \
 		if [ -d "_projects/$$proj" ]; then \
-			if [ ! -f "_projects/$$proj/Makefile" ]; then \
+			if [ ! -f "_projects/$$proj/Makefile" ] || \
+				{ ! git ls-files --error-unmatch "_projects/$$proj/Makefile" >/dev/null 2>&1 && \
+				  ! cmp -s _projects/_template/Makefile "_projects/$$proj/Makefile"; }; then \
 				echo "📋 Generating Makefile for $$proj (from template)"; \
 				cp "_projects/_template/Makefile" "_projects/$$proj/Makefile"; \
 			fi; \
 			echo "$(2): $$proj"; \
-			$(MAKE) -C "_projects/$$proj" $(3) 2>/dev/null || echo "  ⚠️  Failed: $$proj"; \
+			$(MAKE) -C "_projects/$$proj" $(3) || exit 1; \
 		else \
-			echo "⚠️  Project directory not found: $$proj"; \
+			echo "Project directory not found: $$proj" >&2; exit 1; \
 		fi; \
 	done
 endef
@@ -198,7 +200,9 @@ generate-makefiles:
 	@echo "Generating Makefiles for registered projects..."
 	@for proj in $(ALL_PROJECTS); do \
 		if [ -d "_projects/$$proj" ]; then \
-			if [ ! -f "_projects/$$proj/Makefile" ]; then \
+			if [ ! -f "_projects/$$proj/Makefile" ] || \
+				{ ! git ls-files --error-unmatch "_projects/$$proj/Makefile" >/dev/null 2>&1 && \
+				  ! cmp -s _projects/_template/Makefile "_projects/$$proj/Makefile"; }; then \
 				echo "📋 Generating Makefile for $$proj"; \
 				cp "_projects/_template/Makefile" "_projects/$$proj/Makefile"; \
 			else \
@@ -230,18 +234,9 @@ build-dev-projects: build-project-includes
 	@echo "Generating dynamic SASS imports..."
 	@$(PYTHON) scripts/generate_sass_imports.py 2>&1 || echo "⚠️  SASS import generation failed"
 
-# Convert notebooks for dev projects only (dev mode initial build)
+# Compatibility target for explicitly converting active projects (build already does this).
 convert-registered-notebooks:
-	@if [ -f _projects/.makeprojects ]; then \
-		for proj in $(ACTIVE_DEV_PROJECTS); do \
-			proj_name=$$(basename $$proj); \
-			if [ -d "_notebooks/projects/$$proj_name" ]; then \
-				find "_notebooks/projects/$$proj_name" -name '*.ipynb' 2>/dev/null | while read notebook; do \
-					make convert-single NOTEBOOK_FILE="$$notebook" 2>&1; \
-				done; \
-			fi; \
-		done; \
-	fi
+	$(call run_projects,$(ACTIVE_DEV_PROJECTS),Converting,convert)
 
 # Build documentation for all registered projects (serve mode only)
 build-registered-docs:
@@ -290,10 +285,12 @@ clean-courses:
 	@$(PYTHON) scripts/split_multi_course_files.py clean
 
 # Notebook and DOCX conversion
-convert: $(MARKDOWN_FILES) convert-docx
-$(DESTINATION_DIRECTORY)/%_IPYNB_2_.md: _notebooks/%.ipynb
+convert: convert-docx
+	@$(PYTHON) scripts/convert_notebooks.py --jobs "$(CONVERT_JOBS)" $(CONVERT_FLAGS)
+
+$(DESTINATION_DIRECTORY)/%_IPYNB_2_.md: _notebooks/%.ipynb scripts/convert_notebooks.py
 	@mkdir -p $(@D)
-	@$(PYTHON) -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"
+	@$(PYTHON) scripts/convert_notebooks.py "$<" --jobs 1 $(CONVERT_FLAGS)
 
 # Single notebook conversion (faster for development)
 convert-single:
@@ -302,7 +299,7 @@ convert-single:
 		exit 1; \
 	fi
 	@echo "Converting: $(NOTEBOOK_FILE)"
-	@$(PYTHON) scripts/convert_notebooks.py "$(NOTEBOOK_FILE)"
+	@$(PYTHON) scripts/convert_notebooks.py "$(NOTEBOOK_FILE)" --jobs 1 $(CONVERT_FLAGS)
 
 # DOCX conversion
 convert-docx:
@@ -429,13 +426,12 @@ watch-rebuild:
 		sleep 1; \
 	done
 
-# Development mode: clean start, no conversion, converts files on save
+# Development mode: incremental project build, then converts files on save.
 # Runs in background - use 'make stop' to stop, 'tail -f /tmp/jekyll4500.log' to view logs
-dev: stop clean
+dev: stop
 	@echo "DEV Projects: $(ACTIVE_DEV_PROJECTS)"
 	@$(MAKE) generate-makefiles
 	@$(MAKE) build-dev-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
-	@$(MAKE) convert-registered-notebooks ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
 	@$(MAKE) jekyll-serve ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
 	@echo "Initializing watch markers..."
 	@touch /tmp/.notebook_watch_marker /tmp/.project_watch_marker
@@ -444,7 +440,6 @@ dev: stop clean
 	@$(MAKE) watch-notebooks ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
 	@$(MAKE) watch-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
 	@$(MAKE) watch-files ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
-	@$(MAKE) watch-dev-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
 	@echo "Dev server running in background on http://localhost:$(PORT)"
 	@echo "  View logs: tail -f $(LOG_FILE)"
 	@echo "  Stop: make stop"
@@ -454,45 +449,57 @@ dev: stop clean
 # Excludes _notebooks/projects/* (handled by project-specific watchers)
 watch-notebooks:
 	@echo "Watching _notebooks for changes..."
-	@while true; do \
+	@SCAN_MARKER=$$(mktemp); trap 'rm -f "$$SCAN_MARKER"' EXIT; \
+	while true; do \
+		touch "$$SCAN_MARKER"; \
 		find _notebooks -name '*.ipynb' -newer /tmp/.notebook_watch_marker -print 2>/dev/null | \
 			grep -v "_notebooks/projects/" | while read notebook; do \
 			echo "Notebook changed: $$notebook"; \
-			make convert-single NOTEBOOK_FILE="$$notebook"; \
+			$(MAKE) convert-single NOTEBOOK_FILE="$$notebook" || exit 1; \
 			touch /tmp/.jekyll_rebuild_trigger; \
 		done; \
-		touch /tmp/.notebook_watch_marker; \
+		touch -r "$$SCAN_MARKER" /tmp/.notebook_watch_marker; \
 		sleep 2; \
 	done
 
 watch-projects:
 	@echo "Watching _projects for changes..."
-	@while true; do \
+	@SCAN_MARKER=$$(mktemp); trap 'rm -f "$$SCAN_MARKER"' EXIT; \
+	while true; do \
+		touch "$$SCAN_MARKER"; \
 		find _projects -type f -newer /tmp/.project_watch_marker 2>/dev/null | \
 			grep -v "/Makefile$$" | while read file; do \
+			case "$$file" in */.ipynb_checkpoints/*) continue ;; esac; \
 			echo "Project file changed: $$file"; \
 			if [[ "$$file" == _projects/*/_includes/* ]]; then \
 				$(MAKE) build-project-includes; \
 				touch /tmp/.jekyll_rebuild_trigger; \
 				continue; \
 			fi; \
-			proj=$$(echo "$$file" | cut -d/ -f2); \
-			if [ -d "_projects/$$proj" ]; then \
-				if [ ! -f "_projects/$$proj/Makefile" ]; then \
-					echo "📋 Generating Makefile for $$proj (from template)"; \
+			proj=$$(echo "$$file" | cut -d/ -f2,3); \
+			if ! grep -v '^\#' $(PROJECT_FILE) | cut -d: -f1 | grep -Fxq "$$proj"; then \
+				proj=$$(echo "$$file" | cut -d/ -f2); \
+			fi; \
+			if grep -v '^\#' $(PROJECT_FILE) | cut -d: -f1 | grep -Fxq "$$proj"; then \
+				if [ ! -f "_projects/$$proj/Makefile" ] || \
+					{ ! git ls-files --error-unmatch "_projects/$$proj/Makefile" >/dev/null 2>&1 && \
+					  ! cmp -s _projects/_template/Makefile "_projects/$$proj/Makefile"; }; then \
 					cp "_projects/_template/Makefile" "_projects/$$proj/Makefile"; \
 				fi; \
-				make -C "_projects/$$proj" build; \
-				proj_name=$$(basename $$proj); \
-				if [ -d "_notebooks/projects/$$proj_name" ]; then \
-					find "_notebooks/projects/$$proj_name" -name '*.ipynb' -newer /tmp/.project_watch_marker 2>/dev/null | while read notebook; do \
-						make convert-single NOTEBOOK_FILE="$$notebook" 2>&1; \
-					done; \
-				fi; \
+				case "$$file" in \
+					*.ipynb) \
+						case "$$(dirname "$$file")" in \
+							"_projects/$$proj"|"_projects/$$proj/notebooks"|"_projects/$$proj/navigation") \
+								$(MAKE) -C "_projects/$$proj" convert-single NOTEBOOK_FILE="$(CURDIR)/$$file" || exit 1 ;; \
+							*) continue ;; \
+						esac ;; \
+					*/docs/*) $(MAKE) -C "_projects/$$proj" docs || exit 1 ;; \
+					*) $(MAKE) -C "_projects/$$proj" build || exit 1 ;; \
+				esac; \
 				touch /tmp/.jekyll_rebuild_trigger; \
 			fi; \
 		done; \
-		touch /tmp/.project_watch_marker; \
+		touch -r "$$SCAN_MARKER" /tmp/.project_watch_marker; \
 		sleep 2; \
 	done
 

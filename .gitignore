@@ -25,6 +25,7 @@ vendor/*
 package-lock.json
 private/
 .jekyll-metadata
+.notebook-conversion-cache/
 ijava/
 ijava-1.3.0.zip
 ijava.zip

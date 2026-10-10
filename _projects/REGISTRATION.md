@@ -74,7 +74,7 @@ _projects/<category>/
 └── <project-name>/
    ├── index.md                # Optional project index; use this or index.ipynb
    ├── index.ipynb             # Optional notebook index; never use with index.md
-   ├── notebooks/              # Optional lesson notebooks; copied and converted
+   ├── notebooks/              # Optional lesson notebooks; converted directly
    │   └── lesson.ipynb
    ├── navigation/             # Optional navigation pages and includes
    │   ├── page.md
@@ -92,7 +92,24 @@ _projects/<category>/
    └── Makefile                # Generated from _projects/_template/Makefile
 ```
 
-Files under `notebooks/` are copied to `_notebooks/projects/<project-name>/` and converted into posts under `_posts/projects/<project-name>/`. The `index.md` and `index.ipynb` files represent the project index, so a project may provide at most one of them.
+Files under `notebooks/` are converted directly into posts under
+`_posts/projects/<project-name>/`; there is no intermediate notebook copy.
+`index.ipynb` retains the dated `<date>-<project-name>_IPYNB_2_.md` output in that
+directory. The `index.md` and `index.ipynb` files represent the project index,
+so a project may provide at most one of them.
+
+One Python invocation handles a project's index, lesson, and navigation
+notebooks, with at most four conversion workers by default. A content-based
+cache in `.notebook-conversion-cache/` skips unchanged sources, invalidates when
+the converter changes or output is missing/modified, and avoids rewriting
+identical Markdown. Set `CONVERT_JOBS=1` for sequential conversion or
+`CONVERT_FLAGS=--force` to bypass the cache. Batch failures stop Make with the
+source filename and error; they do not report success.
+
+Old `_notebooks/projects/` copies are obsolete generated artifacts, not inputs
+to global conversion or notebook splitting. Project multi-course posts are
+still split from `_posts` by `make split-courses`. Do not hand-edit copied
+notebooks, generated posts, or course-split files.
 
 ### CSA Curriculum Source Ownership
 
@@ -148,7 +165,7 @@ Files under `_projects/<category>/_includes/` are copied to `_includes/projects/
 **The build system automatically generates Makefiles** for all registered projects:
 
 - **Shared Default**: `_projects/_template/Makefile` defines the standard project behavior
-- **Auto-Copy on Build**: When you run any make target, the template is copied to projects missing a Makefile
+- **Auto-Copy on Build**: Registered-project builds and `make generate-makefiles` create or refresh untracked generated Makefiles when the template changes
 - **Always Up-to-Date**: Template improvements instantly benefit all projects
 - **Versioned Overrides**: Intentional tracked Makefiles are preserved by cleanup without path-specific exceptions
 
@@ -202,10 +219,11 @@ The `_projects/_template/Makefile` is the single source that powers all projects
 
 **Standard Build Targets:**
 
-- `build` - Copy assets and notebooks to distribution directories
+- `build` - Copy assets and incrementally publish source notebooks
 - `assets` - Copy JS, SASS, images to assets directories
-- `notebooks` - Copy `notebooks/*.ipynb` into `_notebooks/projects/<project-name>/`
-- `convert` - Convert copied notebooks into Jekyll posts
+- `notebooks` - Compatibility alias for `convert`
+- `convert` - Batch-convert changed index, lesson, and navigation notebooks directly into Jekyll posts
+- `convert-single NOTEBOOK_FILE=notebooks/<filename>.ipynb` - Convert only one project source
 - `clean` - Remove distributed files (preserves source)
 - `watch` - Auto-rebuild on file changes (for dev mode)
 - `docs` - Copy documentation to _posts
@@ -217,7 +235,7 @@ The `_projects/_template/Makefile` is the single source that powers all projects
 - No fswatch or inotify required
 - Individual markers per project: `/tmp/.project_<name>_marker`
 - Checks for changes every 2 seconds
-- Automatically rebuilds assets when JS, SASS, images, or notebooks change
+- Converts only the edited notebook; rebuilds assets when JS, SASS, or images change
 - Filters out Makefile changes to avoid regeneration loops
 
 **Auto-Detection Features:**
@@ -268,7 +286,8 @@ the standard project Makefile:
 
 - `.md` files go to `_posts/projects/<project-name>/` with the navigation date prefix.
 - `.html` files go to `_includes/projects/<project-name>/`.
-- `.ipynb` files go to `_notebooks/projects/<project-name>/` with the navigation date prefix.
+- `.ipynb` files convert directly to `_posts/projects/<project-name>/` with the
+  navigation date prefix and `_IPYNB_2_.md` suffix.
 
 ### Game Catalog Images
 
