@@ -1,40 +1,4 @@
-require "jekyll"
-require "json"
-require "tmpdir"
-require "fileutils"
-require "date"
-
-ROOT = File.expand_path("..", __dir__)
-
-def assert(condition, message)
-  abort("FAIL: #{message}") unless condition
-end
-
-def render_report(sections, lessons, group = "cs112")
-  Dir.mktmpdir("cs112-report-") do |source|
-    includes = File.join(source, "_includes/projects/lessons")
-    FileUtils.mkdir_p(includes)
-    %w[csa-curriculum.html csa-curriculum-lesson.html cs112-report.html].each do |name|
-      FileUtils.cp(File.join(ROOT, "_projects/lessons/_includes", name), includes)
-    end
-    FileUtils.mkdir_p(File.join(source, "_data"))
-    File.write(File.join(source, "_data/cs112_topics.json"), JSON.generate(sections))
-    FileUtils.mkdir_p(File.join(source, "_posts"))
-    lessons.each_with_index do |lesson, index|
-      File.write(File.join(source, "_posts/2025-01-01-lesson-#{index}.md"),
-                 YAML.dump(lesson.merge("layout" => nil)) + "---\n")
-    end
-    File.write(File.join(source, "index.html"),
-               YAML.dump("curriculum_group" => group, "title" => "Curriculum report") +
-               "---\n{% include projects/lessons/csa-curriculum.html %}")
-    site = Jekyll::Site.new(Jekyll.configuration(
-      "source" => source, "destination" => File.join(source, "_site"),
-      "config" => [], "plugins" => [], "future" => true, "quiet" => true
-    ))
-    site.process
-    File.read(File.join(source, "_site/index.html"))
-  end
-end
+require_relative "test_support/curriculum_report"
 
 sections = JSON.parse(File.read(File.join(ROOT, "_data/cs112_topics.json")))
 expected_titles = [
@@ -55,17 +19,7 @@ topics.each do |topic|
   assert(topic["lessons"].uniq == topic["lessons"], "No duplicate links within #{topic['id']}")
 end
 
-lessons = Dir.glob(File.join(ROOT, "_projects/lessons/*/{notebooks,docs}/*.{ipynb,md}")).filter_map do |filename|
-  text = File.read(filename)
-  if filename.end_with?(".ipynb")
-    cell = JSON.parse(text).fetch("cells").first.fetch("source")
-    text = cell.is_a?(Array) ? cell.join : cell
-  end
-  metadata = text.split(/^---\s*$\n?/, 3)[1]
-  next unless metadata&.match?(/^lesson_group:\s*["']?cs112["']?\s*$/)
-  assert(metadata, "Missing source frontmatter: #{filename}")
-  YAML.safe_load(metadata, permitted_classes: [Date, Time], aliases: true)
-end
+lessons = curriculum_sources("cs112")
 routes = lessons.map { |lesson| lesson.fetch("permalink") }
 mapped = topics.flat_map { |topic| topic["lessons"] }.uniq
 assert(routes.sort == mapped.sort, "Map every remaining CS112 source, with no deleted-source entries")
@@ -109,11 +63,11 @@ assert(html.include?("Awaiting CS112 topic mapping"), "Unmapped-source notice")
 puts "PASS: renames, deletion, escaping, new sources, hidden references, and unmapped drafts"
 
 html = render_report(sections, [
-  { "title" => "CS113 reference", "permalink" => "/cs113/reference/", "lesson_group" => "cs113" },
-  { "title" => "CS113 draft", "permalink" => "/cs113/draft/", "lesson_group" => "cs113",
+  { "title" => "CSA2 reference", "permalink" => "/csa2/reference/", "lesson_group" => "csa2" },
+  { "title" => "CSA2 draft", "permalink" => "/csa2/draft/", "lesson_group" => "csa2",
     "lesson_status" => "draft", "hide" => true, "planned_week" => 26 }
-], "cs113")
+], "csa2")
 assert(html.include?("Lessons and project references"), "Other collections retain their existing view")
 assert(html.include?("Authoring drafts"), "Other collections retain draft listing")
-assert(!html.include?("CS112 Instruction / Examples"), "Only CS112 uses the college outline report")
+assert(!html.include?("CS112 Instruction / Examples"), "CSA2 retains its collection view")
 puts "PASS: other curriculum collection behavior is unchanged"

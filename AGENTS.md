@@ -78,7 +78,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * CSA 内容按 `cs112 → cs113 → csa1 → csa2 → ds2` 优先级归属到 `_projects/lessons/` 的注册项目；`notebooks/` 与 `docs/` 必须平铺，迁移保留 permalink 和 `courses.csa.week`。`articulation` 只表示课程对应，不表示获得学分。草稿用 `lesson_status: draft` 与 `planned_week`，不要设置 `courses`：时间线不会按 `hide` 排除课程。详见 [_projects/REGISTRATION.md](_projects/REGISTRATION.md)。验证：`node --test tests/csa_curriculum.test.mjs`。
 * CSA 13–37 周按 `_data/csa.yml` 编排：每教学周最多三篇主文档；已对应 CS112 的 AP FRQ runner 可作为 `lesson_type: ap-practice` 补充练习超出限额，放在匹配教学周，题名/文件名以主题开头，保留 permalink。补充选课见 `tests/fixtures/csa_frq_practice.json`，主文档见 `tests/fixtures/csa_week_schedule.json`；其他例题为无周次参考。总结、AP 复习、展示和期末周用清单链接旧课，不新增作业。缺口用 `lesson_notes` 显示。移动源后只清理确认无源的生成文件，防止旧标题/周次重新发布。
 * AP FRQ 分类号与历史题号必须分离：`ap_frq_category` 为 1 方法/控制、2 类设计、3 一维数组/ArrayList、4 二维数组；`ap_exam_year`/`ap_exam_question` 保存历史身份。题名如 `FRQ 3 - Array or ArrayList Manipulation - 2017 Exam Q1 - CS112`；按题目实际练习审核分类，不按旧题名或历史序号推断。旧题可能跨技能；9 分说明针对四题制分类，不改历史评分。frontmatter description 用纯文本，不含 Liquid 或 `#`：卡片不会递归渲染变量，转换器未引号输出会截断 YAML 注释。
-* CS112 报告按 MiraCosta 原始五节与 Lab Outline 编排，映射在 `_data/cs112_topics.json`，以稳定 permalink 匹配，不按文件名或 AP 分类。显示当前题名/周次、缺口、PBL 延伸；草稿明确未完成。新增未映射课程仍显示，删除课程不生成死链接。增删源时同步映射与覆盖说明。验证：`bundle exec ruby scripts/test_cs112_report.rb`。
+* CS112/CS113 报告按 MiraCosta 原始五节与 Lab Outline 编排，映射在 `_data/cs112_topics.json` 与 `_data/cs113_topics.json`，共用 `curriculum-outline-report.html`；以稳定 permalink 匹配，不按文件名或 AP 分类。显示当前题名/周次、缺口、PBL 延伸；草稿明确未完成。新增未映射课程仍显示，删除课程不生成死链接。CS113 自实现层为差异化延伸，不把库调用当作实现掌握。增删源时同步映射与覆盖说明。验证：`bundle exec ruby scripts/test_cs112_report.rb` 与 `bundle exec ruby scripts/test_cs113_report.rb`。
 
 ### 项目注册与样式
 

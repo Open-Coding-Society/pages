@@ -13,6 +13,8 @@
   {% assign lessons = site.posts | where: "lesson_group", page.curriculum_group | sort: "title" %}
   {% if page.curriculum_group == 'cs112' %}
   {% include projects/lessons/cs112-report.html %}
+  {% elsif page.curriculum_group == 'cs113' %}
+  {% include projects/lessons/cs113-report.html %}
   {% else %}
   <h2>Lessons and project references</h2>
   <ul>

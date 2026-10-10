@@ -1,0 +1,55 @@
+<nav class="ocs__links ocs__links--wide" aria-label="{{ include.course }} outline sections">
+  {% for section in include.outline %}
+  <a class="ocs__btn pill" href="#{{ page.curriculum_group }}-{{ section.id }}">{{ section.title | escape }}</a>
+  {% endfor %}
+</nav>
+{% assign mapped_routes = '' %}
+{% for section in include.outline %}
+<section aria-labelledby="{{ page.curriculum_group }}-{{ section.id }}">
+  <h2 id="{{ page.curriculum_group }}-{{ section.id }}">{{ section.title | escape }}</h2>
+  {% for topic in section.topics %}
+  <h3 id="{{ page.curriculum_group }}-{{ topic.id }}">{{ topic.title | escape }}</h3>
+  <p><strong>Available material:</strong> {{ topic.coverage | escape }}</p>
+  <ul>
+    {% assign topic_count = 0 %}
+    {% for lesson in lessons %}
+      {% if topic.lessons contains lesson.permalink %}
+        {% capture route_key %}|{{ lesson.permalink }}|{% endcapture %}
+        {% assign mapped_routes = mapped_routes | append: route_key %}
+        {% if lesson.lesson_status == 'draft' %}
+          {% assign topic_count = topic_count | plus: 1 %}
+          <li><a href="{{ lesson.url | relative_url }}">{{ lesson.title | escape }}</a> &mdash; unfinished authoring draft, planned week {{ lesson.planned_week }}</li>
+        {% elsif lesson.hide != true %}
+          {% assign topic_count = topic_count | plus: 1 %}
+          {% include projects/lessons/csa-curriculum-lesson.html lesson=lesson %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {% if topic_count == 0 %}
+    <li>No published lesson or authoring draft is currently mapped to this topic.</li>
+    {% endif %}
+  </ul>
+  <p><strong>Strengthening / gap:</strong> {{ topic.gap | escape }}</p>
+  <p><strong>PBL observation or extension:</strong> {{ topic.pbl | escape }}</p>
+  {% endfor %}
+</section>
+{% endfor %}
+{% capture unmapped_lessons %}
+  {% for lesson in lessons %}
+    {% capture route_key %}|{{ lesson.permalink }}|{% endcapture %}
+    {% unless mapped_routes contains route_key %}
+      {% unless lesson.hide or lesson.lesson_status == 'draft' %}
+        {% include projects/lessons/csa-curriculum-lesson.html lesson=lesson %}
+      {% endunless %}
+      {% if lesson.lesson_status == 'draft' %}
+      <li><a href="{{ lesson.url | relative_url }}">{{ lesson.title | escape }}</a> &mdash; unfinished authoring draft, planned week {{ lesson.planned_week }}</li>
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+{% endcapture %}
+{% assign unmapped_lessons = unmapped_lessons | strip %}
+{% if unmapped_lessons != '' %}
+<h2>Awaiting {{ include.course }} topic mapping</h2>
+<p>These current sources remain visible until they are placed under an outline topic.</p>
+<ul>{{ unmapped_lessons }}</ul>
+{% endif %}

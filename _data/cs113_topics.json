@@ -1,0 +1,190 @@
+[
+  {
+    "id": "analysis",
+    "title": "I. Object-oriented programming (OOP) design and algorithmic analysis",
+    "topics": [
+      {
+        "id": "design-tools",
+        "title": "A. Computationally efficient coding through algorithms, pseudo-code, UML, and flow diagrams before coding",
+        "coverage": "Calculator enactments, RPN pipeline examples, and sorting simulations make algorithm steps visible before implementation.",
+        "gap": "Require a student-authored design artifact before coding. An enactment or supplied implementation alone does not demonstrate UML or pseudo-code design.",
+        "pbl": "Diagram a feature's data flow and algorithm, then trace one request through the planned steps.",
+        "lessons": ["/2025/02/20/rpn_calculator_IPYNB_2_.html", "/csa/rpn-calculator/graph-variant/", "/csa/calculator-enactment", "/2025/03/17/calculatorlesson_IPYNB_2_.html", "/toolkit-sorting-insertion-simulation", "/toolkit-sorting-selection-simulation"]
+      },
+      {
+        "id": "big-o",
+        "title": "B. Growth functions and Big O notation",
+        "coverage": "Selection/insertion, merge sort, and sorting homework introduce growth rates and comparison/swap counts.",
+        "gap": "Strengthen explanations that connect code operations to a growth function rather than memorizing a Big O label.",
+        "pbl": "Count a feature's dominant operations and justify the resulting complexity.",
+        "lessons": ["/csa/sorting/common", "/2025/01/06/sort-merge_IPYNB_2_.html", "/sortingTTG/sorting/", "/sortingTTG/sorting/hw/"]
+      },
+      {
+        "id": "growth-comparison",
+        "title": "C. Growth function comparison as the number of inputs increases",
+        "coverage": "Search and sorting examples provide algorithms with different growth rates; advanced analysis has an authoring draft.",
+        "gap": "Add reproducible comparisons across increasing input sizes, with operation counts and controlled data.",
+        "pbl": "Compare list scanning and map lookup for a growing project dataset; plot counts alongside timings.",
+        "lessons": ["/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/sortingTTG/sorting/hw/", "/csa/cs113/drafts/advanced-sort-analysis/"]
+      },
+      {
+        "id": "time-complexity",
+        "title": "D. Time complexity issues",
+        "coverage": "Search, sort, and graph-search materials offer examples for discussing best/worst cases and algorithm trade-offs.",
+        "gap": "Separate asymptotic analysis from measured runtime, including setup costs and input-order effects.",
+        "pbl": "Identify a slow lookup or ordering operation and explain whether an algorithm or data-structure change would help.",
+        "lessons": ["/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/csa/sorting/common", "/2025/01/06/sort-merge_IPYNB_2_.html", "/heuristics/searches", "/csa/cs113/drafts/advanced-sort-analysis/"]
+      },
+      {
+        "id": "test-preparation",
+        "title": "E. Testing - 1. Preparations for testing",
+        "coverage": "RPN tracking and calculator examples expose intermediate states. Implementation drafts include evidence checklists to author.",
+        "gap": "Add an explicit test plan, expected results, and invariants before students implement advanced layers.",
+        "pbl": "Define what must remain true after each queue, stack, or heap operation and plan tests before coding.",
+        "lessons": ["/2025/02/20/rpn_calculator-tracking_IPYNB_2_.html", "/csa/rpn-calculator-lesson", "/csa/cs113/drafts/heap-priority-queue/"]
+      },
+      {
+        "id": "test-data",
+        "title": "E. Testing - 2. Developing appropriate test data",
+        "coverage": "Calculator examples supply expressions; sorting homework supplies a small array for operation tracing.",
+        "gap": "Expand beyond supplied examples to deterministic sorted, reverse-sorted, duplicate, and malformed inputs with known expected results.",
+        "pbl": "Create representative and adversarial datasets for the project's algorithm and explain why each test matters.",
+        "lessons": ["/2025/02/20/rpn_calculator_IPYNB_2_.html", "/csa/rpn-lesson/", "/sortingTTG/sorting/hw/", "/csa/cs113/drafts/advanced-sort-analysis/"]
+      },
+      {
+        "id": "boundary-testing",
+        "title": "E. Testing - 3. Testing boundary conditions",
+        "coverage": "Hash-table, heap, and tree drafts provide places to author implementation-specific boundary checks.",
+        "gap": "Dedicated boundary-condition instruction remains unfinished. Require empty/singleton structures, missing keys, collisions, and invalid operations.",
+        "pbl": "Test an empty queue, a missing map key, and a graph with no path; verify useful failure behavior.",
+        "lessons": ["/csa/cs113/drafts/hash-table-layers/", "/csa/cs113/drafts/heap-priority-queue/", "/csa/cs113/drafts/tree-layers/"]
+      }
+    ]
+  },
+  {
+    "id": "collections",
+    "title": "II. Data structures and collections",
+    "topics": [
+      {
+        "id": "stacks-heaps-queues",
+        "title": "A. Stacks, heaps, queues, priority queues, and lists",
+        "coverage": "RPN calculators and queue/deque lessons cover stack and queue behavior and library implementation choices. Heap and priority-queue implementation layers are drafted.",
+        "gap": "Finish student-built heap operations and priority ordering. Using a library PriorityQueue does not demonstrate implementing a heap.",
+        "pbl": "Compare FIFO task handling with priority scheduling and explain the ordering invariant.",
+        "lessons": ["/csa/rpn-calculator-lesson", "/csa/rpn-lesson/", "/csa/rpn-lesson2", "/2025/03/17/calculatorlesson_IPYNB_2_.html", "/collectablesToolkitQueueDequeue", "/teamTeachCollectables/queue-dequeue", "/csa/cs113/drafts/heap-priority-queue/"]
+      },
+      {
+        "id": "linked-lists-trees",
+        "title": "B. Linked lists, trees, binary trees, binary search trees, 2-3-4 trees, and skip lists",
+        "coverage": "Queue/deque references discuss library LinkedList use. The tree implementation skeleton is available for authoring; from-scratch linked-list foundations are mapped in the CS112 report.",
+        "gap": "Finish tree/BST insertion, traversal, and search. Dedicated 2-3-4 tree and skip-list lessons are still needed; graph lessons are not a substitute for tree implementation.",
+        "pbl": "Build a search index for project records and compare a BST with a linked-list scan.",
+        "lessons": ["/teamTeachCollectables/queue-dequeue", "/csa/cs113/drafts/tree-layers/"]
+      },
+      {
+        "id": "collection-implementation",
+        "title": "C. Application and implementation approaches",
+        "coverage": "RPN variants, tracking, and enactments show how stacks and queues participate in a complete expression-processing pipeline.",
+        "gap": "Make the layers explicit: trace the existing example, use a collection API, then implement and test a selected structure from scratch.",
+        "pbl": "Extend the calculator or a project work queue and document where a library structure was used versus implemented.",
+        "lessons": ["/2025/02/20/rpn_calculator_IPYNB_2_.html", "/csa/rpn-calculator/graph-variant/", "/2025/02/20/rpn_calculator-tracking_IPYNB_2_.html", "/csa/rpn-calculator-wayfinding", "/csa/rpn-lesson2", "/csa/rpn-calculator-lesson", "/csa/rpn-lesson/", "/csa/calculator-enactment", "/2025/03/17/calculatorlesson_IPYNB_2_.html"]
+      }
+    ]
+  },
+  {
+    "id": "graphs-hashing",
+    "title": "III. Graphs, hash tables, sets, and maps",
+    "topics": [
+      {
+        "id": "networks",
+        "title": "A. Networks and graphing strategies",
+        "coverage": "Graph introductions, Java representations, BFS/DFS, and heuristic-search examples cover nodes, edges, adjacency structures, and path-finding strategies.",
+        "gap": "Strengthen directed/weighted graph tests and the distinction between exact search and heuristic trade-offs.",
+        "pbl": "Represent dependencies or routes as a graph and compare traversal and path-finding strategies.",
+        "lessons": ["/graphs/intro", "/graphs/java", "/graphs/searching", "/heuristics/intro", "/heuristics/searches", "/graph", "graphHeuristics"]
+      },
+      {
+        "id": "hash-collisions",
+        "title": "B. Hashing functions and resolving collisions",
+        "coverage": "The search/HashMap lesson introduces hashing and lookup costs. A hash-table implementation draft addresses collisions and load factor.",
+        "gap": "Finish a custom table with collision resolution and collision-heavy tests; library HashMap use alone is not implementation evidence.",
+        "pbl": "Build a small keyed lookup table and compare chaining with open addressing under deliberate collisions.",
+        "lessons": ["/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/csa/cs113/drafts/hash-table-layers/"]
+      },
+      {
+        "id": "graph-map-implementation",
+        "title": "C. Implementation strategies",
+        "coverage": "Set lessons provide uniqueness and collection operations; Java graph and search examples support adjacency representations and traversals.",
+        "gap": "Require students to justify representation choices and test equality, duplicate handling, missing keys, and disconnected graphs.",
+        "pbl": "Use a set for deduplication, a map for keyed records, and a graph for relationships; explain each choice.",
+        "lessons": ["/teamTeachCollectables/sets", "/collectablesToolkitSets", "/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/graphs/java", "/graphs/searching", "/csa/cs113/drafts/hash-table-layers/"]
+      }
+    ]
+  },
+  {
+    "id": "recursion",
+    "title": "IV. Recursion",
+    "topics": [
+      {
+        "id": "divide-conquer",
+        "title": "A. Divide and conquer technique",
+        "coverage": "Merge sort explicitly divides, recursively sorts, and combines subproblems. Advanced sorting drafts extend the comparison to quicksort.",
+        "gap": "Require base-case reasoning, a recursive call trace, and evidence that merging preserves sorted order.",
+        "pbl": "Trace a merge sort on project records and explain the time and temporary-storage costs.",
+        "lessons": ["/2025/01/06/sort-merge_IPYNB_2_.html", "/csa/cs113/drafts/advanced-sort-analysis/"]
+      },
+      {
+        "id": "dynamic-programming",
+        "title": "B. Dynamic programming",
+        "coverage": "A differentiated dynamic-programming implementation skeleton exists.",
+        "gap": "No completed dedicated lesson is available. Author overlapping subproblems, memoization, tabulation, and comparisons with the baseline algorithm.",
+        "pbl": "Choose a repeated-computation problem, cache subproblem results, and verify correctness and operation-count improvements.",
+        "lessons": ["/csa/cs113/drafts/dynamic-programming/"]
+      }
+    ]
+  },
+  {
+    "id": "sort-search",
+    "title": "V. Analysis and efficiency of sort and search methods",
+    "topics": [
+      {
+        "id": "elementary-sorts",
+        "title": "A. Selection, insertion, shellsort, and bubble sorts",
+        "coverage": "Selection/insertion instruction and interactive simulations provide early AP-aligned practice. Sorting homework includes bubble sort as a choice.",
+        "gap": "Complete dedicated bubble and Shell sort implementation/analysis layers and compare behavior on different input orders.",
+        "pbl": "Visualize sorting a small project dataset and count comparisons and moves.",
+        "lessons": ["/csa/sorting/common", "/sortingTTG/sorting/", "/sortingTTG/sorting/hw/", "/toolkit-sorting-insertion-simulation", "/toolkit-sorting-selection-simulation", "/csa/cs113/drafts/advanced-sort-analysis/"]
+      },
+      {
+        "id": "advanced-sorts",
+        "title": "B. Quicksort, merging and mergesort, heapsort, and radix sorts",
+        "coverage": "Merge sort is a published lesson; sorting homework names quicksort. The advanced-sort draft plans quicksort, heapsort, and radix layers.",
+        "gap": "Finish partitioning, heap reuse, and radix input constraints with correctness and performance comparisons.",
+        "pbl": "Select an ordering strategy for project records and justify it against the existing merge-sort baseline.",
+        "lessons": ["/2025/01/06/sort-merge_IPYNB_2_.html", "/sortingTTG/sorting/hw/", "/csa/cs113/drafts/advanced-sort-analysis/", "/csa/cs113/drafts/heap-priority-queue/"]
+      },
+      {
+        "id": "search-performance",
+        "title": "C. Performance characteristics of search routines",
+        "coverage": "Linear/binary/hash lookup and graph-search lessons provide different search strategies and analysis contexts.",
+        "gap": "Make preconditions and trade-offs explicit: sorted input for binary search, hash distribution, and graph structure. Verify missing-target behavior.",
+        "pbl": "Compare linear, binary, and keyed lookup for a feature, then explain when graph traversal is the right model instead.",
+        "lessons": ["/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/graphs/searching", "/heuristics/searches", "/graph", "graphHeuristics"]
+      }
+    ]
+  },
+  {
+    "id": "lab",
+    "title": "Lab Outline",
+    "topics": [
+      {
+        "id": "projects",
+        "title": "Individual and group hands-on projects",
+        "coverage": "Calculator enactments, RPN implementations, sorting visualizations, and graph exercises support, complement, and extend the lecture material and theory.",
+        "gap": "Collect individual competence evidence alongside group project work. Advanced from-scratch CS113 layers are differentiated opportunities, not a claim that every student completes them.",
+        "pbl": "Choose a structure or algorithm layer, demonstrate its use or implementation in a project, and reflect on correctness and efficiency evidence.",
+        "lessons": ["/csa/calculator-enactment", "/2025/03/17/calculatorlesson_IPYNB_2_.html", "/csa/rpn-calculator-lesson", "/2025/02/20/rpn_calculator-tracking_IPYNB_2_.html", "/csa/rpn-calculator-wayfinding", "/sortingTTG/sorting/hw/", "/graphs/java", "/graphs/searching"]
+      }
+    ]
+  }
+]
