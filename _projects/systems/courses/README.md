@@ -92,8 +92,11 @@ messages, and signed-out preview behavior; no second chat implementation is used
 
 Course pills live above the sidebar title on landing pages, sprint/week pages,
 and lessons. The breadcrumb home icon returns to the same calendar/announcements
-landing page. A labeled Blogs button in the player top bar opens the course's
-`/<course>/blogs/` page on desktop and mobile. Neither the sidebar nor the mobile
+landing page. An icon-only Blogs button on regular documents and course player
+pages opens the course's `/<course>/blogs/` page on desktop and mobile, with a
+tooltip and accessible label. The top bar omits the extra week-chat shortcut;
+week chat remains available in course navigation and on week introductions.
+Regular documents retain completion and Previous/Next. Neither the sidebar nor the mobile
 drawer duplicates a Home/Blogs button row.
 Sprint 1 remains available at `/<course>/sprint-1/`, rather than
 being the default. Existing lesson completion keys and lesson ordering are

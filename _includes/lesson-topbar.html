@@ -54,8 +54,8 @@
       prevLesson() and nextLesson() are defined in _layouts/post.html.
     {%- endcomment -%}
     <nav class="ocs__links" aria-label="Lesson navigation">
-      <a class="ocs__btn ocs__btn--icon small accent{% if page.player_page.kind == 'blogs' %} fill{% endif %}" href="{{ site.baseurl }}/{{ current_course }}/blogs/"{% if page.player_page.kind == 'blogs' %} aria-current="page"{% endif %} title="Course blogs">
-        <i class="fas fa-blog" aria-hidden="true"></i> Blogs
+      <a class="ocs__btn ocs__btn--icon small accent{% if page.player_page.kind == 'blogs' %} fill{% endif %}" href="{{ site.baseurl }}/{{ current_course }}/blogs/"{% if page.player_page.kind == 'blogs' %} aria-current="page"{% endif %} aria-label="Course blogs" title="Course blogs">
+        <i class="fas fa-blog" aria-hidden="true"></i>
       </a>
       {%- if page.player_page == nil or page.player_page.kind == 'sprint' or page.player_page.kind == 'week' %}
       <button class="ocs__btn ocs__btn--icon small accent" onclick="prevLesson()" type="button" aria-label="Previous lesson" title="Previous lesson">
@@ -65,19 +65,6 @@
         <i class="fas fa-chevron-right" aria-hidden="true"></i>
       </button>
       {%- endif %}
-      {%- unless page.player_page %}
-      {%- comment -%}
-        This lesson's week chat page. The sidebar is hidden on phones, so this
-        is how a phone reaches it. Icon only, like the course page's calendar
-        and certificate buttons, so it fits beside Prev / Next at every width.
-        currentWeekChatUrl is set by lesson-sidebar-nav.html.
-      {%- endcomment -%}
-      {%- if currentWeekChatUrl != blank %}
-      <a class="ocs__btn ocs__btn--icon small accent" href="{{ site.baseurl }}{{ currentWeekChatUrl }}" aria-label="Week {{ current_week }} chat" title="Week {{ current_week }} chat">
-        <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-comments"></i></span>
-      </a>
-      {%- endif %}
-      {%- endunless %}
     </nav>
   </div>
 

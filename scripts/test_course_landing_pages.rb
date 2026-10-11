@@ -109,8 +109,11 @@ Dir.mktmpdir("course-landing-") do |source|
       assert(breadcrumbs.include?('aria-label="Open course navigation"') &&
              !breadcrumbs.include?('fa-times'),
              "#{path} keeps only hamburger open controls beside Home")
-      assert(html.match?(%r{<a class="ocs__btn[^"]*" href="/preview/#{course}/blogs/"[^>]*>\s*<i class="fas fa-blog"[^>]*></i> Blogs\s*</a>}),
-             "#{path} keeps a labeled course Blogs button in the top bar")
+      assert(html.match?(%r{<a class="ocs__btn[^"]*" href="/preview/#{course}/blogs/"[^>]*aria-label="Course blogs"[^>]*>\s*<i class="fas fa-blog" aria-hidden="true"></i>\s*</a>}),
+             "#{path} keeps an icon-only accessible Blogs shortcut")
+      topbar = html.split('class="topbar-lesson"', 2).last.split('class="lesson-content"', 2).first
+      assert(!topbar.include?('fa-comments'),
+             "#{path} omits the extra topbar chat shortcut")
       if path == "#{course}/blogs/index.html"
         assert(html.match?(%r{<a class="ocs__btn[^"]* fill" href="/preview/#{course}/blogs/" aria-current="page"}),
                "#{path} highlights the current Blogs page")
@@ -129,6 +132,8 @@ Dir.mktmpdir("course-landing-") do |source|
              "#{path} highlights the current course even without page.course")
       assert(sidebar.include?("href=\"/preview/#{course}/sprint-1/\""),
              "#{path} keeps the existing sprint route")
+      assert(sidebar.include?("href=\"/preview/#{course}/week-1/chat/\""),
+             "#{path} retains week chat access in course navigation")
       assert(sidebar.include?('data-lesson-id="/' + course + '/example/"'),
              "#{path} preserves lesson completion identity")
       assert(html.include?('course-mobile-nav"'), "#{path} exposes course pills on mobile")
