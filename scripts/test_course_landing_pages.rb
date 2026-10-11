@@ -13,7 +13,10 @@ end
 Dir.mktmpdir("course-landing-") do |source|
   FileUtils.mkdir_p(File.join(source, "_layouts"))
   FileUtils.cp(File.join(ROOT, "_layouts/post.html"), File.join(source, "_layouts"))
-  File.write(File.join(source, "_layouts/opencs.html"), "{{ content }}")
+  File.write(File.join(source, "_layouts/opencs.html"), '{% include themes/minima/header.html %}{{ content }}')
+  FileUtils.mkdir_p(File.join(source, "_includes/themes/minima"))
+  FileUtils.cp(File.join(ROOT, "_includes/themes/minima/header.html"),
+               File.join(source, "_includes/themes/minima/header.html"))
   FileUtils.mkdir_p(File.join(source, "_includes/player-pages"))
   %w[course-nav.html course-title.html lesson-sidebar-nav.html lesson-topbar.html lesson-modals.html announcement_chat.html reading_time.html blog-catalog.html post_list_image_card.html].each do |name|
     FileUtils.cp(File.join(ROOT, "_includes", name), File.join(source, "_includes"))
@@ -55,7 +58,8 @@ Dir.mktmpdir("course-landing-") do |source|
     "layouts_dir" => File.join(source, "_layouts"),
     "includes_dir" => File.join(source, "_includes"),
     "config" => [], "plugins" => [], "baseurl" => "/preview", "quiet" => true,
-    "incremental" => false
+    "incremental" => false, "default_course" => "csse",
+    "minima" => { "nav_pages" => ["navigation/course.md"] }
   ))
   site.process
 
@@ -68,6 +72,10 @@ Dir.mktmpdir("course-landing-") do |source|
            "#{course} retains its course-specific announcements and calendar")
     assert(!home.include?('class="timeline-container"'), "#{course} has no duplicate sprint timeline")
     assert(!home.include?('id="lesson-pager"'), "#{course} home has no lesson pager")
+    assert(home.scan('data-course-entry ').size == 1 &&
+           home.include?('data-default-course="csse" href="/preview/csse/blogs/"'),
+           "#{course} has one direct course entry respecting baseurl")
+    assert(home.include?('rememberCourse(COURSE);'), "#{course} remembers the selected course")
     title = site.pages.find { |p| p.name == "#{course}.md" }.data["title"]
     assert(home.include?("const PAGE_TITLE = #{JSON.generate(title)};"),
            "#{course} safely encodes quoted titles in player JavaScript")

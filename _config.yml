@@ -22,6 +22,7 @@ github_username: open-coding-society
 github_repo: "pages"
 baseurl: ""
 future: true
+default_course: csse
 
 # Single source of truth for the Google OAuth client id -- assets/js/api/config.js's
 # GOOGLE_CLIENT_ID and login.md's #g_id_onload data-client_id both pull from this at
@@ -131,7 +132,6 @@ minima:
     - { platform: x, user_url: "https://x.com/Open_Coding" }
     - { platform: youtube, user_url: "https://www.youtube.com/@OpenCodingSociety" } 
   nav_pages:
-    - navigation/blog.md
-    - navigation/courses.md
+    - navigation/course.md
     - navigation/capstone.md
     - navigation/search.md

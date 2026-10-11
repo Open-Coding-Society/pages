@@ -84,6 +84,15 @@ Exception in `.gitignore`:
 
 ### Course Landing Pages
 
+The top-menu course entry links directly to a course's Blogs player, without
+passing through the global Blogs catalog or course chooser. `_config.yml`
+sets `default_course: csse` for first-time visitors. Course player visits save
+`ocs-selected-course`; returning signed-out visitors use that selection.
+Signed-in users prefer that selection when enrolled, otherwise the first
+enrolled course in CSSE/CSP/CSA/CSH order. The legacy `/navigation/courses/`
+chooser and `/navigation/blogs/` catalog remain available at their own URLs.
+Validate entry selection with `node --test tests/course_entry.test.mjs`.
+
 The authoritative entry pages are `navigation/{csse,csp,csa,csh}.md` in this
 project. Their existing `/navigation/courses/<course>/` routes use `layout: post`
 with `player_page: {course: <course>, kind: home}`. The home body reuses

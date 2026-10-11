@@ -21,6 +21,9 @@
 
                 <div class="trigger">
                     {%- for path in site.minima.nav_pages -%}
+                    {%- if path == 'navigation/course.md' -%}
+                    <a class="page-link" data-course-entry data-default-course="{{ site.default_course | default: 'csse' | escape }}" href="{{ site.baseurl }}/{{ site.default_course | default: 'csse' }}/blogs/">{{ site.default_course | default: 'csse' | upcase | escape }}</a>
+                    {%- else -%}
                     {%- assign my_page = site.pages | where: "path", path | first -%}
                     {%- if my_page.title -%}
                     <a class="page-link" href="{{ my_page.url | relative_url }}">
@@ -30,6 +33,7 @@
                             {{ my_page.title | escape }}
                         {%- endif -%}
                     </a>
+                    {%- endif -%}
                     {%- endif -%}
                     {%- endfor -%}
                     <a id="loginArea" class="page-link" href="{{ site.baseurl }}/login">Login</a>

@@ -186,6 +186,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
   import { appendGistSettingsLink } from '{{ site.baseurl }}/assets/js/gist-connection-errors.js';
   import { listRunners, unsavedRunners, readRunners } from '{{ site.baseurl }}/assets/js/runner-io.js';
   import { createNavigationState } from '{{ site.baseurl }}/assets/js/course-navigation-state.js';
+  import { rememberCourse } from '{{ site.baseurl }}/assets/js/course-entry.js';
 
   /**
    * ============================================
@@ -193,6 +194,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
    * ============================================
    */
   const COURSE = '{{ current_course }}';
+  rememberCourse(COURSE);
   const WEEK = '{{ current_week }}';
   const PAGE_TITLE = {{ page.title | jsonify }};
   const CURRENT_LESSON_ID = '{{ page.url }}';
