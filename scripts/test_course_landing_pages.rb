@@ -18,7 +18,7 @@ Dir.mktmpdir("course-landing-") do |source|
   %w[course-nav.html course-title.html lesson-sidebar-nav.html lesson-topbar.html lesson-modals.html announcement_chat.html reading_time.html blog-catalog.html post_list_image_card.html].each do |name|
     FileUtils.cp(File.join(ROOT, "_includes", name), File.join(source, "_includes"))
   end
-  %w[home.html sprint.html blogs.html].each do |name|
+  %w[home.html sprint.html week.html blogs.html].each do |name|
     FileUtils.cp(File.join(ROOT, "_includes/player-pages", name), File.join(source, "_includes/player-pages"))
   end
   FileUtils.mkdir_p(File.join(source, "_data"))
@@ -43,6 +43,11 @@ Dir.mktmpdir("course-landing-") do |source|
       "layout" => "post", "title" => "Blogs", "course" => course,
       "permalink" => "/#{course}/blogs/",
       "player_page" => { "course" => course, "kind" => "blogs" }
+    ) + "---\n")
+    File.write(File.join(source, "#{course}-week.md"), YAML.dump(
+      "layout" => "post", "title" => "Week 1", "course" => course,
+      "permalink" => "/#{course}/week-1/",
+      "player_page" => { "course" => course, "kind" => "week", "sprint" => 1, "week" => 1 }
     ) + "---\n")
   end
   site = Jekyll::Site.new(Jekyll.configuration(
@@ -70,8 +75,29 @@ Dir.mktmpdir("course-landing-") do |source|
       _, error, status = Open3.capture3("node", "--input-type=module", "--check", stdin_data: script.first)
       assert(status.success?, "#{course} rendered module parses: #{error}")
     end
-    %W[navigation/courses/#{course}/index.html #{course}/sprint-1/index.html #{course}/example/index.html #{course}/blogs/index.html].each do |path|
+    %W[navigation/courses/#{course}/index.html #{course}/sprint-1/index.html #{course}/week-1/index.html #{course}/example/index.html #{course}/blogs/index.html].each do |path|
       html = File.read(File.join(source, "_site", path))
+      completion_button = html[%r{<button id="topbar-complete-btn".*?</button>}m]
+      assert(!completion_button.nil? == (path == "#{course}/example/index.html"),
+             "#{path} keeps reading completion on lessons only")
+      if completion_button
+        assert(completion_button.include?('aria-label="Mark lesson complete"') &&
+               completion_button.include?('aria-pressed="false"') &&
+               completion_button.match?(%r{>\s*<i class="fas fa-circle" id="complete-icon-topbar" aria-hidden="true"></i>\s*</button>}),
+               "#{path} keeps the completion circle icon-only and accessible")
+      end
+      sequence_page = %W[#{course}/sprint-1/index.html #{course}/week-1/index.html #{course}/example/index.html].include?(path)
+      %w[prev next].each do |direction|
+        name = direction == "prev" ? "Previous" : "Next"
+        icon = direction == "prev" ? "left" : "right"
+        arrow = html[%r{<button[^>]*onclick="#{direction}Lesson\(\)"[^>]*>.*?</button>}m]
+        assert(!arrow.nil? == sequence_page, "#{path} shows #{name} only for sequence pages")
+        if arrow
+          assert(arrow.include?("aria-label=\"#{name} lesson\"") &&
+                 arrow.match?(%r{>\s*<i class="fas fa-chevron-#{icon}" aria-hidden="true"></i>\s*</button>}),
+                 "#{path} has an icon-only accessible #{name} arrow")
+        end
+      end
       assert(html.scan('id="floating-menu-btn"').size == 1,
              "#{path} has exactly one mobile navigation button")
       assert(html.match?(%r{<div class="breadcrumbs">\s*<button class="mobile-course-menu"[^>]*aria-controls="timeline-modal"}),

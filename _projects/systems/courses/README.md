@@ -98,6 +98,13 @@ drawer duplicates a Home/Blogs button row.
 Sprint 1 remains available at `/<course>/sprint-1/`, rather than
 being the default. Existing lesson completion keys and lesson ordering are
 unchanged. On mobile, the existing navigation drawer exposes the same menu.
+Icon-only Previous/Next controls appear on lessons and sprint/week introductions
+at every screen width and follow the existing sidebar order. Tooltips and
+accessible labels name each arrow; home, chat, and Blogs are not sequence steps.
+Lessons retain an icon-only reading-completion circle. It becomes a checked
+circle when complete; its tooltip and accessible pressed state follow the saved
+completion value. Clicking again marks the lesson incomplete, using the same
+completion keys and progress counts as before.
 Its hamburger button sits at the upper left of the course top bar, before the
 breadcrumbs, instead of floating over content in the lower right. The desktop
 sidebar's hamburger appears in that same left-hand position only when the panel

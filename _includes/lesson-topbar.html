@@ -4,8 +4,8 @@
   Expects: current_course, current_week, page, site
 
   A player page (a sprint or week intro, a week's chat, or Blogs) is not a
-  lesson, so it keeps only the breadcrumbs, navigation toggle, and Blogs: there is
-  nothing to burn down, and its own content says where to go next.
+  lesson, so there is nothing to burn down. Sprint/week introductions retain
+  the same Previous/Next navigation as lessons.
 {% endcomment %}
 
 <div class="topbar-lesson">
@@ -42,9 +42,8 @@
         <i class="fas fa-chevron-right"></i>
         <span class="current">{{ page.title }}</span>
         {%- unless page.player_page %}
-        <button id="topbar-complete-btn" class="ocs__btn ocs__btn--icon small accent" onclick="toggleComplete()" type="button" title="Mark lesson complete">
-          <i class="fas fa-circle" id="complete-icon-topbar"></i>
-          <span id="complete-text-topbar">Burndown</span>
+        <button id="topbar-complete-btn" class="ocs__btn ocs__btn--icon small accent" onclick="toggleComplete()" type="button" aria-label="Mark lesson complete" aria-pressed="false" title="Mark lesson complete">
+          <i class="fas fa-circle" id="complete-icon-topbar" aria-hidden="true"></i>
         </button>
         {%- endunless %}
       </div>
@@ -58,13 +57,15 @@
       <a class="ocs__btn ocs__btn--icon small accent{% if page.player_page.kind == 'blogs' %} fill{% endif %}" href="{{ site.baseurl }}/{{ current_course }}/blogs/"{% if page.player_page.kind == 'blogs' %} aria-current="page"{% endif %} title="Course blogs">
         <i class="fas fa-blog" aria-hidden="true"></i> Blogs
       </a>
+      {%- if page.player_page == nil or page.player_page.kind == 'sprint' or page.player_page.kind == 'week' %}
+      <button class="ocs__btn ocs__btn--icon small accent" onclick="prevLesson()" type="button" aria-label="Previous lesson" title="Previous lesson">
+        <i class="fas fa-chevron-left" aria-hidden="true"></i>
+      </button>
+      <button class="ocs__btn ocs__btn--icon small accent" onclick="nextLesson()" type="button" aria-label="Next lesson" title="Next lesson">
+        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+      </button>
+      {%- endif %}
       {%- unless page.player_page %}
-      <button class="ocs__btn ocs__btn--icon small accent" onclick="prevLesson()" type="button" title="Previous lesson">
-        <i class="fas fa-chevron-left"></i> Prev
-      </button>
-      <button class="ocs__btn ocs__btn--icon small accent" onclick="nextLesson()" type="button" title="Next lesson">
-        Next <i class="fas fa-chevron-right"></i>
-      </button>
       {%- comment -%}
         This lesson's week chat page. The sidebar is hidden on phones, so this
         is how a phone reaches it. Icon only, like the course page's calendar
