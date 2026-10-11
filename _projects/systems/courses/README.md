@@ -5,7 +5,7 @@ Unified courses and sprint timeline system managing CSP, CSA, CSSE, CSH, and fut
 ## Overview
 
 The courses system provides:
-- **Multiple Course Entry Points**: CSP, CSA, CSSE, CSH course pages with sprint timelines
+- **Unified Course Entry Points**: CSP, CSA, CSSE, CSH open calendar/announcements beside the lesson-player sprint/week navigation
 - **Completion Tracking**: Persistent localStorage tracking for items and priorities
 - **Progress Visualization**: Week and sprint-level progress bars with statistics
 - **Certificate System**: Week-based certificate generation tied to completion
@@ -81,6 +81,25 @@ Exception in `.gitignore`:
 ```
 
 ## Integration Points
+
+### Course Landing Pages
+
+The authoritative entry pages are `navigation/{csse,csp,csa,csh}.md` in this
+project. Their existing `/navigation/courses/<course>/` routes use `layout: post`
+with `player_page: {course: <course>, kind: home}`. The home body reuses
+`_includes/announcement_chat.html`, including its calendar, course-specific
+messages, and signed-out preview behavior; no second chat implementation is used.
+
+Course pills live above the sidebar title on landing pages, sprint/week pages,
+and lessons. The sidebar's Home link returns to the same calendar/announcements
+landing page. Sprint 1 remains available at `/<course>/sprint-1/`, rather than
+being the default. Existing lesson completion keys and lesson ordering are
+unchanged. On mobile, the existing navigation drawer exposes the same menu.
+
+Styles use the OCS components and `_sass/open-coding/lesson-player.scss`.
+Publish entry-page changes with `make -C _projects/systems/courses assets`.
+Validate rendering with `bundle exec ruby scripts/test_course_landing_pages.rb`
+and generated sprint/week routes with `bundle exec ruby scripts/test_player_pages.rb`.
 
 ### Sprint Layout (`_layouts/sprint.html`)
 

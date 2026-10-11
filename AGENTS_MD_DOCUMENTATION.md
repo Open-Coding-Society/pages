@@ -68,6 +68,8 @@ Split logic into clear layers:
 
 ### Sources vs Generated Files
 
+* Course home sources are [_projects/systems/courses/navigation/](_projects/systems/courses/navigation/). Preserve `/navigation/courses/<course>/`; use `layout: post` and `player_page: {course: <course>, kind: home}` to share the sidebar and existing announcement/calendar UI. Course pills must resolve `current_course` on lessons, not only `page.course`. Encode Liquid values in JavaScript with `jsonify`, especially quoted titles. Validate with `bundle exec ruby scripts/test_course_landing_pages.rb` and a mobile navigation check.
+
 * Sources live in [notebook sources](_notebooks/) and [docx sources](_docx/); converted Markdown is written to [generated posts](_posts/) (generated, do not hand-edit).
 * Course-split outputs (`*_csp.md`/`*_csa.md`/`*_csse.md`/`*_content.md`) are generated; never edit them. See [scripts/split_multi_course_files.py](scripts/split_multi_course_files.py).
 * Lesson player pages (each course's `/<course>/sprint-<n>/`, `/<course>/week-<w>/`, `/<course>/week-<w>/chat/`, and `/<course>/blogs/`) have no source files: [_plugins/lesson_player_pages.rb](_plugins/lesson_player_pages.rb) makes them at build time from `_data/<course>.yml`, with week and chat pages only for weeks that have lessons. Edit their bodies in [_includes/player-pages/](_includes/player-pages/); the links in [_includes/lesson-sidebar-nav.html](_includes/lesson-sidebar-nav.html) must use the same URLs. Test: `bundle exec ruby scripts/test_player_pages.rb`.

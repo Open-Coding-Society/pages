@@ -40,6 +40,7 @@
 
 <div class="lesson-sidebar" id="lesson-sidebar">
   <div class="sidebar-header">
+    {% include course-nav.html %}
     {% if current_course == 'csp' %}
       <h2>Computer Science Principles</h2>
     {% elsif current_course == 'csa' %}
@@ -74,7 +75,12 @@
       theme's text color on top of the current page's filled button.
     {%- endcomment -%}
     {%- assign blogsUrl = "/" | append: current_course | append: "/blogs/" -%}
+    {%- assign homeUrl = "/navigation/courses/" | append: current_course | append: "/" -%}
     <div class="ocs__links">
+      <a class="ocs__btn ocs__btn--icon small accent{% if page.player_page.kind == 'home' %} fill{% endif %}" href="{{ site.baseurl }}{{ homeUrl }}" title="Calendar / Announcements"{% if page.player_page.kind == 'home' %} aria-current="page"{% endif %}>
+        <i class="fas fa-calendar" aria-hidden="true"></i>
+        Home
+      </a>
       <a class="ocs__btn ocs__btn--icon small accent{% if page.url == blogsUrl %} fill{% endif %}" href="{{ site.baseurl }}{{ blogsUrl }}"{% if page.url == blogsUrl %} aria-current="page"{% endif %}>
         <i class="fas fa-blog" aria-hidden="true"></i>
         Blogs

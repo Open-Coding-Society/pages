@@ -1,5 +1,8 @@
 ---
-layout: sprint 
+layout: post
+player_page:
+  course: csa
+  kind: home
 show_reading_time: false
 feedback: true
 title: Computer Science "A"
@@ -19,4 +22,3 @@ certificates:
     completed_tasks: 10
     total_tasks: 10
 ---
-

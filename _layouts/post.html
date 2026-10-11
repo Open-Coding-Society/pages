@@ -193,7 +193,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
    */
   const COURSE = '{{ current_course }}';
   const WEEK = '{{ current_week }}';
-  const PAGE_TITLE = "{{ page.title }}";
+  const PAGE_TITLE = {{ page.title | jsonify }};
   const CURRENT_LESSON_ID = '{{ page.url }}';
   const SUBMISSION_TYPE = {{ page.assignment_submission_type | default: "file" | downcase | jsonify }};
   const GITHUB_ISSUE_URL_PATTERN = /^https?:\/\/github\.com\/[^/]+\/[^/#?]+\/issues\/\d+\/?$/i;
@@ -443,7 +443,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
 
   function expandCurrentSprint() {
     // This page's row, or on a week's chat page that week's chat link.
-    const current = document.querySelector('.lesson-item.active, #lesson-sidebar [aria-current="page"]');
+    const current = document.querySelector('.lesson-item.active, #lesson-sidebar .sprint-nav [aria-current="page"]');
     if (!current) return;
 
     const sprintSection = current.closest('.sprint-section');
@@ -485,7 +485,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
    */
   function buildTimelineModal() {
     const completionData = getCompletionData();
-    const lessonItems = document.querySelectorAll(LESSON_ROWS);
+    const lessonItems = document.querySelectorAll('#lesson-sidebar .sprint-section .lesson-item, #lesson-sidebar .sprint-section .ocs__links a');
     const sprintGroups = {};
 
     lessonItems.forEach(item => {
@@ -497,10 +497,11 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
       
       sprintGroups[sprintTitle].push({
         id: item.dataset.lessonId,
-        title: item.querySelector('.lesson-title').textContent,
+        title: (item.querySelector('.lesson-title') || item).textContent.trim(),
         url: item.href,
-        completed: completionData[item.dataset.lessonId] || false,
-        active: item.classList.contains('active')
+        completed: item.dataset.lessonId && completionData[item.dataset.lessonId] || false,
+        active: item.classList.contains('active') || item.getAttribute('aria-current') === 'page',
+        icon: item.dataset.lessonId ? 'fa-solid fa-circle' : (item.querySelector('i')?.className || 'fas fa-book')
       });
     });
 
@@ -515,7 +516,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
       const sprintId = sprintTitle.replace(/\s+/g, '-').toLowerCase();
       const lessonHTML = lessons.map(lesson => `
         <a href="${lesson.url}" class="modal-lesson-item ${lesson.active ? 'active' : ''}">
-          <i class="fa-solid ${lesson.completed ? 'fa-circle-check' : 'fa-circle'} modal-lesson-status ${lesson.completed ? 'completed' : 'incomplete'}"></i>
+          <i class="${lesson.completed ? 'fa-solid fa-circle-check' : lesson.icon} modal-lesson-status ${lesson.completed ? 'completed' : 'incomplete'}"></i>
           <span class="modal-lesson-title">${lesson.title}</span>
         </a>
       `).join('');

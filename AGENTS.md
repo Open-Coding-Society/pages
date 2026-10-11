@@ -70,6 +70,8 @@ while preserving all critical instructions. The agent must still communicate wit
 
 ### 源文件与生成文件
 
+* Course home sources are [_projects/systems/courses/navigation/](_projects/systems/courses/navigation/). Preserve `/navigation/courses/<course>/`; use `layout: post` and `player_page: {course: <course>, kind: home}` to share the sidebar and existing announcement/calendar UI. Course pills must resolve `current_course` on lessons, not only `page.course`. Encode Liquid values in JavaScript with `jsonify`, especially quoted titles. Validate with `bundle exec ruby scripts/test_course_landing_pages.rb` and a mobile navigation check.
+
 * 源文件在 [notebook sources](_notebooks/) 与 [docx sources](_docx/)；转换后的 Markdown 输出到 [generated posts](_posts/)（生成物，不要手工改）。
 * 多课程拆分文件（`*_csp.md`/`*_csa.md`/`*_csse.md`/`*_content.md`）为生成物，禁止手改；规则见 [scripts/split_multi_course_files.py](scripts/split_multi_course_files.py)。
 * 课程播放器页面（每门课的 `/<course>/sprint-<n>/`、`/<course>/week-<w>/`、`/<course>/week-<w>/chat/`、`/<course>/blogs/`）没有源文件：由 [_plugins/lesson_player_pages.rb](_plugins/lesson_player_pages.rb) 在构建时根据 `_data/<course>.yml` 生成，周页面和聊天页面只为有 lesson 的周生成。页面内容改 [_includes/player-pages/](_includes/player-pages/)；[_includes/lesson-sidebar-nav.html](_includes/lesson-sidebar-nav.html) 中的链接必须使用相同的 URL。测试：`bundle exec ruby scripts/test_player_pages.rb`。

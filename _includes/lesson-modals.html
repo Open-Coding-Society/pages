@@ -1,7 +1,7 @@
 <!-- LESSON PLAYER MODALS -->
 
 <!-- Floating hamburger menu (mobile only) -->
-<button class="floating-menu-btn" id="floating-menu-btn" style="display: none;">
+<button class="floating-menu-btn" id="floating-menu-btn" style="display: none;" type="button" aria-label="Open course navigation" aria-controls="timeline-modal">
   <i class="fas fa-bars"></i>
 </button>
 
@@ -15,6 +15,13 @@
     <button class="timeline-close-btn" id="timeline-close-btn" type="button">
       <i class="fas fa-times"></i>
     </button>
+  </div>
+  <div class="course-mobile-nav">
+    {% include course-nav.html %}
+    <nav class="ocs__links" aria-label="Course home">
+      <a class="ocs__btn small accent{% if page.player_page.kind == 'home' %} fill{% endif %}" href="{{ site.baseurl }}/navigation/courses/{{ current_course }}/"{% if page.player_page.kind == 'home' %} aria-current="page"{% endif %}>Calendar / Announcements</a>
+      <a class="ocs__btn small accent{% if page.player_page.kind == 'blogs' %} fill{% endif %}" href="{{ site.baseurl }}/{{ current_course }}/blogs/"{% if page.player_page.kind == 'blogs' %} aria-current="page"{% endif %}>Blogs</a>
+    </nav>
   </div>
   <div class="timeline-modal-content" id="timeline-modal-content">
     <!-- Sprint cards will be populated by JavaScript -->
