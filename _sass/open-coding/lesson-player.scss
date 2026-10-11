@@ -765,17 +765,15 @@ body:has(.lesson-player) {
   gap: 12px;
 }
 
-/* Floating Menu Button (Mobile) */
-.floating-menu-btn {
+/* Course navigation sits before the breadcrumbs on mobile. */
+.mobile-course-menu {
   @include icon-button(20px, 0);
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 56px;
-  height: 56px;
-  background: var(--pref-accent-color); 
-  border-radius: 50%;
-  z-index: 1000;
+  display: none;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  background: var(--pref-accent-color);
+  border-radius: 8px;
 }
 
 /* Timeline Modal - applies to all screen sizes */
@@ -966,7 +964,7 @@ body:has(.lesson-player) {
     min-height: 100vh; /* ADD THIS */
   }
 
-  .floating-menu-btn {
+  .mobile-course-menu {
     display: flex;
   }
 

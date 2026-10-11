@@ -95,6 +95,8 @@ and lessons. The sidebar's Home link returns to the same calendar/announcements
 landing page. Sprint 1 remains available at `/<course>/sprint-1/`, rather than
 being the default. Existing lesson completion keys and lesson ordering are
 unchanged. On mobile, the existing navigation drawer exposes the same menu.
+Its hamburger button sits at the upper left of the course top bar, before the
+breadcrumbs, instead of floating over content in the lower right.
 
 Styles use the OCS components and `_sass/open-coding/lesson-player.scss`.
 Publish entry-page changes with `make -C _projects/systems/courses assets`.

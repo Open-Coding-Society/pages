@@ -67,6 +67,10 @@ Dir.mktmpdir("course-landing-") do |source|
     end
     %W[navigation/courses/#{course}/index.html #{course}/sprint-1/index.html #{course}/example/index.html].each do |path|
       html = File.read(File.join(source, "_site", path))
+      assert(html.scan('id="floating-menu-btn"').size == 1,
+             "#{path} has exactly one mobile navigation button")
+      assert(html.match?(%r{<div class="breadcrumbs">\s*<button class="mobile-course-menu"[^>]*aria-controls="timeline-modal"}),
+             "#{path} places mobile course navigation at the upper left before breadcrumbs")
       sidebar = html.split('id="lesson-sidebar"', 2).last.split('<script>', 2).first
       assert(sidebar.include?('aria-label="Courses"'), "#{path} has course pills in the sidebar")
       assert(sidebar.match?(%r{</a>\s*</nav>\s*<h2>}),
