@@ -4,7 +4,7 @@
   Expects: current_course, current_week, page, site
 
   A player page (a sprint or week intro, a week's chat, or Blogs) is not a
-  lesson, so it keeps only the breadcrumbs and the sidebar button: there is
+  lesson, so it keeps only the breadcrumbs, navigation toggle, and Blogs: there is
   nothing to burn down, and its own content says where to go next.
 {% endcomment %}
 
@@ -12,11 +12,16 @@
   <div class="topbar-actions">
     <div class="topbar-left">
       <div class="breadcrumbs">
-        <button class="mobile-course-menu" id="floating-menu-btn" type="button" aria-label="Open course navigation" aria-controls="timeline-modal">
+        <button class="mobile-course-menu" id="floating-menu-btn" type="button" aria-label="Open course navigation" aria-controls="timeline-modal" aria-expanded="false" title="Open course navigation">
           <i class="fas fa-bars" aria-hidden="true"></i>
         </button>
-        <a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}" title="Back to course">
-          <i class="fas fa-home"></i>
+        <span id="lesson-sidebar-toggle-wrap" hidden>
+          <button class="lesson-course-menu" id="lesson-sidebar-toggle" onclick="toggleLessonSidebar()" type="button" aria-controls="lesson-sidebar" aria-expanded="true" aria-label="Close course navigation" title="Close course navigation">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </span>
+        <a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}/" title="Course home" aria-label="Course home">
+          <i class="fas fa-home" aria-hidden="true"></i>
         </a>
         {%- comment -%}
           A week intro sits in its sprint. A lesson or chat sits in its week, and
@@ -50,18 +55,9 @@
       prevLesson() and nextLesson() are defined in _layouts/post.html.
     {%- endcomment -%}
     <nav class="ocs__links" aria-label="Lesson navigation">
-      {%- comment -%}
-        Hides and shows the sidebar. toggleLessonSidebar() is at the bottom of
-        lesson-sidebar-nav.html. The wrapper carries the hidden attribute
-        because .ocs__btn sets its own display, which would override hidden on
-        the button itself; the script shows it on screens wide enough to have
-        a sidebar.
-      {%- endcomment -%}
-      <span id="lesson-sidebar-toggle-wrap" hidden>
-        <button class="ocs__btn ocs__btn--icon small accent" id="lesson-sidebar-toggle" onclick="toggleLessonSidebar()" type="button" aria-controls="lesson-sidebar" aria-expanded="true" aria-label="Hide course navigation" title="Hide course navigation">
-          <span class="ocs__btn-icon" aria-hidden="true"><i class="fas fa-table-columns"></i></span>
-        </button>
-      </span>
+      <a class="ocs__btn ocs__btn--icon small accent{% if page.player_page.kind == 'blogs' %} fill{% endif %}" href="{{ site.baseurl }}/{{ current_course }}/blogs/"{% if page.player_page.kind == 'blogs' %} aria-current="page"{% endif %} title="Course blogs">
+        <i class="fas fa-blog" aria-hidden="true"></i> Blogs
+      </a>
       {%- unless page.player_page %}
       <button class="ocs__btn ocs__btn--icon small accent" onclick="prevLesson()" type="button" title="Previous lesson">
         <i class="fas fa-chevron-left"></i> Prev

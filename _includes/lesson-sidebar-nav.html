@@ -67,26 +67,6 @@
     {%- assign currentWeekUrl = "" -%}
     {%- assign currentWeekChatUrl = "" -%}
 
-    {%- comment -%}
-      Every post on the site, first because it belongs to no sprint.
-      Here and on the week chat links below, the icon and label sit straight in
-      the button, like the Submit buttons in post.html. The theme presets in
-      user-preferences.js recolor every span, which would turn a span label the
-      theme's text color on top of the current page's filled button.
-    {%- endcomment -%}
-    {%- assign blogsUrl = "/" | append: current_course | append: "/blogs/" -%}
-    {%- assign homeUrl = "/navigation/courses/" | append: current_course | append: "/" -%}
-    <div class="ocs__links">
-      <a class="ocs__btn ocs__btn--icon small accent{% if page.player_page.kind == 'home' %} fill{% endif %}" href="{{ site.baseurl }}{{ homeUrl }}" title="Calendar / Announcements"{% if page.player_page.kind == 'home' %} aria-current="page"{% endif %}>
-        <i class="fas fa-calendar" aria-hidden="true"></i>
-        Home
-      </a>
-      <a class="ocs__btn ocs__btn--icon small accent{% if page.url == blogsUrl %} fill{% endif %}" href="{{ site.baseurl }}{{ blogsUrl }}"{% if page.url == blogsUrl %} aria-current="page"{% endif %}>
-        <i class="fas fa-blog" aria-hidden="true"></i>
-        Blogs
-      </a>
-    </div>
-
     {%- for i in (1..9) -%}
       {%- assign sprintKey = "Sprint" | append: i -%}
       {%- assign sprint = courseData[sprintKey] -%}
@@ -229,11 +209,14 @@
       const button = document.getElementById('lesson-sidebar-toggle');
       const wrapper = document.getElementById('lesson-sidebar-toggle-wrap');
       if (!button || !wrapper) return;
-      const label = sidebar.hidden ? 'Show course navigation' : 'Hide course navigation';
+      const label = sidebar.hidden ? 'Open course navigation' : 'Close course navigation';
       wrapper.hidden = !wideScreen.matches;
       button.setAttribute('aria-expanded', String(!sidebar.hidden));
       button.setAttribute('aria-label', label);
       button.title = label;
+      const icon = button.querySelector('i');
+      icon.classList.toggle('fa-bars', sidebar.hidden);
+      icon.classList.toggle('fa-times', !sidebar.hidden);
     }
 
     window.toggleLessonSidebar = function () {

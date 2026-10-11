@@ -91,12 +91,17 @@ with `player_page: {course: <course>, kind: home}`. The home body reuses
 messages, and signed-out preview behavior; no second chat implementation is used.
 
 Course pills live above the sidebar title on landing pages, sprint/week pages,
-and lessons. The sidebar's Home link returns to the same calendar/announcements
-landing page. Sprint 1 remains available at `/<course>/sprint-1/`, rather than
+and lessons. The breadcrumb home icon returns to the same calendar/announcements
+landing page. A labeled Blogs button in the player top bar opens the course's
+`/<course>/blogs/` page on desktop and mobile. Neither the sidebar nor the mobile
+drawer duplicates a Home/Blogs button row.
+Sprint 1 remains available at `/<course>/sprint-1/`, rather than
 being the default. Existing lesson completion keys and lesson ordering are
 unchanged. On mobile, the existing navigation drawer exposes the same menu.
 Its hamburger button sits at the upper left of the course top bar, before the
-breadcrumbs, instead of floating over content in the lower right.
+breadcrumbs, instead of floating over content in the lower right. The desktop
+sidebar toggle uses that same left-hand position. Both use a hamburger to open
+navigation and an X to close; the mobile drawer's X sits left of its heading.
 
 Styles use the OCS components and `_sass/open-coding/lesson-player.scss`.
 Publish entry-page changes with `make -C _projects/systems/courses assets`.

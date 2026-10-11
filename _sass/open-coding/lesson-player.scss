@@ -765,15 +765,25 @@ body:has(.lesson-player) {
   gap: 12px;
 }
 
-/* Course navigation sits before the breadcrumbs on mobile. */
-.mobile-course-menu {
+/* Open and close controls share a left-hand position and touch target. */
+.mobile-course-menu,
+.lesson-course-menu,
+.timeline-close-btn {
   @include icon-button(20px, 0);
-  display: none;
+  display: flex;
   flex-shrink: 0;
   width: 44px;
   height: 44px;
   background: var(--pref-accent-color);
   border-radius: 8px;
+}
+
+.mobile-course-menu {
+  display: none;
+}
+
+#lesson-sidebar-toggle-wrap {
+  flex-shrink: 0;
 }
 
 /* Timeline Modal - applies to all screen sizes */
@@ -817,7 +827,7 @@ body:has(.lesson-player) {
 .timeline-modal-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
   padding: 20px 24px;
   border-bottom: 1px solid $bg-3;
 }
@@ -826,11 +836,6 @@ body:has(.lesson-player) {
   color: $text;
   margin: 0;
   font-size: 1.5rem;
-}
-
-.timeline-close-btn {
-  @include emphasized-icon-button;
-  font-size: 24px;
 }
 
 .timeline-modal-content {

@@ -582,12 +582,14 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
       timelineModal.classList.add('open');
       overlay.classList.add('open');
       document.body.style.overflow = 'hidden';
+      floatingBtn.setAttribute('aria-expanded', 'true');
     };
 
     const closeModal = () => {
       timelineModal.classList.remove('open');
       overlay.classList.remove('open');
       document.body.style.overflow = '';
+      floatingBtn.setAttribute('aria-expanded', 'false');
     };
 
     if (floatingBtn) floatingBtn.addEventListener('click', openModal);
