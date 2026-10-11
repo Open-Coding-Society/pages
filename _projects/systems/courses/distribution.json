@@ -1,0 +1,27 @@
+{
+  "files": [
+    { "source": "_includes", "destination": "_includes" },
+    { "source": "layouts", "destination": "_layouts" },
+    { "source": "plugins", "destination": "_plugins" },
+    { "source": "data", "destination": "_data" },
+    { "source": "navigation/csa.md", "destination": "_posts/projects/courses/2026-09-12-csa.md" },
+    { "source": "navigation/csp.md", "destination": "_posts/projects/courses/2026-09-12-csp.md" },
+    { "source": "navigation/csse.md", "destination": "_posts/projects/courses/2026-09-12-csse.md" },
+    { "source": "navigation/csh.md", "destination": "_posts/projects/courses/2026-09-12-csh.md" },
+    { "source": "pages/course.md", "destination": "navigation/course.md" },
+    { "source": "pages/blog.md", "destination": "navigation/blog.md" },
+    { "source": "js/player/course-entry.js", "destination": "assets/js/course-entry.js" },
+    { "source": "js/player/course-navigation-state.js", "destination": "assets/js/course-navigation-state.js" },
+    { "source": "js/player/lesson-completion.js", "destination": "assets/js/lesson-completion.js" },
+    { "source": "js/player/lesson-completion-bigsix.js", "destination": "assets/js/lesson-completion-bigsix.js" },
+    { "source": "js/player/lessonbase.js", "destination": "assets/js/lessonbase.js" },
+    { "source": "js/player/lessonbasecapture.js", "destination": "assets/js/lessonbasecapture.js" },
+    { "source": "js/announcement-calendar", "destination": "assets/js/chat/calendar" },
+    { "source": "js/courses.js", "destination": "assets/js/projects/courses/courses.js" },
+    { "source": "sass/main.scss", "destination": "_sass/projects/courses/main.scss" },
+    { "source": "sass/viewing/lesson-player.scss", "destination": "_sass/open-coding/lesson-player.scss" },
+    { "source": "sass/viewing/blogs.scss", "destination": "_sass/open-coding/blogs.scss" },
+    { "source": "sass/viewing/timeline.scss", "destination": "_sass/open-coding/timeline.scss" },
+    { "source": "sass/viewing/announcement-calendar.scss", "destination": "_sass/open-coding/announcement-calendar.scss" }
+  ]
+}

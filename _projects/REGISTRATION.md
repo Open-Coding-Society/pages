@@ -373,6 +373,50 @@ the standard project Makefile:
 - `.ipynb` files convert directly to `_posts/projects/<project-name>/` with the
   navigation date prefix and `_IPYNB_2_.md` suffix.
 
+### System Kits with Shared Runtime Paths
+
+Most projects use the standard `js/`, `sass/`, and `navigation/` destinations.
+A system kit that also owns root Jekyll layouts/includes/plugins/data can add
+an explicit `distribution.json` without a custom project Makefile:
+
+```json
+{
+  "files": [
+    { "source": "_includes", "destination": "_includes" },
+    { "source": "layouts", "destination": "_layouts" },
+    { "source": "plugins", "destination": "_plugins" },
+    { "source": "data", "destination": "_data" },
+    { "source": "js/main.js", "destination": "assets/js/projects/example/main.js" },
+    { "source": "sass/main.scss", "destination": "_sass/projects/example/main.scss" }
+  ]
+}
+```
+
+Paths are relative to the project (source) and workspace (destination).
+Directories expand recursively; file destinations name the output file.
+Allowed destination roots are `_includes`, `_layouts`, `_plugins`, `_data`,
+`_posts`, `navigation`, `assets`, and `_sass`. Traversal, duplicate outputs,
+escaping sources, and symlink destinations are rejected.
+
+For manifest projects, declare all JavaScript and Sass outputs explicitly:
+the generic whole-folder JS/Sass copy is replaced by manifest publication.
+The template still generates the CSS entry and processes navigation/index/
+notebooks normally. Include navigation files in the manifest if their changes
+should be fingerprinted by the manifest watcher.
+
+Publication skips identical content, tracks ownership in the ignored
+`.project-distribution-cache/`, removes obsolete outputs, and rejects conflicting
+claims from another manifest project. Cleanup removes only recorded, unchanged
+outputs and preserves sources. Watchers fingerprint these mappings and fail
+explicitly if publication fails. Add exact generated paths to root `.gitignore`
+and remove their old tracked copies when migrating ownership.
+
+The [courses kit](systems/courses/README.md) is the reference implementation.
+It is registered as `systems/courses:dev`; its manifest preserves established
+runtime paths while its sources and focused tests remain inside the project.
+Validate this support with `bundle exec ruby scripts/test_course_distribution.rb`.
+Restart watchers after changing the shared template.
+
 ### Game Catalog Images
 
 For a game with `game_directory: true`, add a project-root `favicon.png`:

@@ -44,7 +44,7 @@ test("original individual and group evaluation weights are preserved", () => {
 });
 
 test("sprint descriptions connect week-eight preparation to sustained capstones and CSA2", () => {
-    const outline = fs.readFileSync(path.join(root, "_data/csa.yml"), "utf8");
+    const outline = fs.readFileSync(path.join(root, "_projects/systems/courses/data/csa.yml"), "utf8");
     const sprint = number => outline.split(`\nSprint${number}:\n`)[1].split(/\nSprint\d+:\n/)[0];
     assert.match(sprint(2), /Through week 8/);
     assert.match(sprint(2), /evaluation and reflection/);
@@ -82,7 +82,7 @@ test("week twelve reflects on system and curriculum evidence without adding new 
     for (const phrase of ["two mentor reviews", "how it is made", "future cohorts", "individual evidence", "does not require new implementation", "/csa/cs112/", "/csa/cs113/", "/csa/csa2/"]) {
         assert.ok(checkpoint.includes(phrase), phrase);
     }
-    const outline = fs.readFileSync(path.join(root, "_data/csa.yml"), "utf8");
+    const outline = fs.readFileSync(path.join(root, "_projects/systems/courses/data/csa.yml"), "utf8");
     assert.match(outline, /  12:\n    theme: "System Contributions, Curriculum Connections, and Retrospective"/);
     assert.match(checkpoint, /one future learning topic/);
     assert.match(checkpoint, /up to two other teammates/);

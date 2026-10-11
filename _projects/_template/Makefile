@@ -72,21 +72,24 @@ assets:
 	@if [ -d "data" ]; then mkdir -p $(JS_DEST)/data; cp data/*.js $(JS_DEST)/data/ 2>/dev/null || true; fi
 	@
 	@# General JS parsing
-	@if [ -d "js" ]; then mkdir -p $(JS_DEST); cp -r js/* $(JS_DEST)/ 2>/dev/null || true; fi
+	@if [ -d "js" ] && [ ! -f "distribution.json" ]; then mkdir -p $(JS_DEST); cp -r js/* $(JS_DEST)/ 2>/dev/null || true; fi
 	@
 	@# Images
 	@if [ -d "images" ]; then mkdir -p $(IMAGES_DEST); cp -r images/* $(IMAGES_DEST)/ 2>/dev/null || true; fi
 	@if [ -f "favicon.png" ]; then mkdir -p $(IMAGES_DEST); cp favicon.png $(IMAGES_DEST)/favicon.png; fi
 	@
 	@# Native Jekyll SASS processing
-	@if [ -d "sass" ]; then \
+	@if [ -d "sass" ] && [ ! -f "distribution.json" ]; then \
 		mkdir -p $(SASS_DEST); \
 		cp -r sass/* $(SASS_DEST)/ 2>/dev/null || true; \
-		if [ -f "$(SASS_DEST)/main.scss" ]; then \
-			mkdir -p $(CSS_DEST); \
-			echo "---" > $(CSS_DEST)/main.scss; \
-			echo "---" >> $(CSS_DEST)/main.scss; \
-			echo "@import \"projects/$(PROJECT_NAME)/main\";" >> $(CSS_DEST)/main.scss; \
+	fi
+	@if [ -f "distribution.json" ]; then \
+		ruby "$(WORKSPACE_ROOT)/scripts/publish_project.rb" publish "$(PROJECT_SRC)" "$(abspath $(WORKSPACE_ROOT))"; \
+	fi
+	@if [ -f "$(SASS_DEST)/main.scss" ]; then \
+		mkdir -p $(CSS_DEST); \
+		if ! printf '%s\n' '---' '---' '@import "projects/$(PROJECT_NAME)/main";' | cmp -s - "$(CSS_DEST)/main.scss"; then \
+			printf '%s\n' '---' '---' '@import "projects/$(PROJECT_NAME)/main";' > "$(CSS_DEST)/main.scss"; \
 		fi; \
 	fi
 
@@ -125,6 +128,9 @@ convert-single:
 # Clean distributed files (keeps source in _projects/$(PROJECT_NAME))
 clean:
 	@echo "🧹 Cleaning $(PROJECT_NAME) distribution..."
+	@if [ -f "distribution.json" ] || [ -f "$(WORKSPACE_ROOT)/.project-distribution-cache/$(PROJECT_NAME).json" ]; then \
+		ruby "$(WORKSPACE_ROOT)/scripts/publish_project.rb" clean "$(PROJECT_SRC)" "$(abspath $(WORKSPACE_ROOT))"; \
+	fi
 	@rm -f $(WORKSPACE_ROOT)/_posts/projects/$(MARKDOWN_FILENAME)
 	@for notebook in $(NOTEBOOKS); do \
 		filename=$$(basename "$$notebook" .ipynb); \
@@ -150,9 +156,18 @@ watch:
 	@mkdir -p /tmp
 	@touch /tmp/.project_$(PROJECT_NAME)_marker
 	@SCAN_MARKER=$$(mktemp); trap 'rm -f "$$SCAN_MARKER"' EXIT; \
+	MANIFEST_FINGERPRINT=""; \
 	while true; do \
 		touch "$$SCAN_MARKER"; \
 		changed=0; \
+		if [ -f "$(PROJECT_SRC)/distribution.json" ] || [ -n "$$MANIFEST_FINGERPRINT" ]; then \
+			CURRENT_FINGERPRINT=$$(ruby "$(WORKSPACE_ROOT)/scripts/publish_project.rb" fingerprint "$(PROJECT_SRC)" "$(abspath $(WORKSPACE_ROOT))") || exit 1; \
+			if [ "$$CURRENT_FINGERPRINT" != "$$MANIFEST_FINGERPRINT" ]; then \
+				$(MAKE) assets || exit 1; \
+				touch /tmp/.jekyll_rebuild_trigger; \
+				MANIFEST_FINGERPRINT="$$CURRENT_FINGERPRINT"; \
+			fi; \
+		fi; \
 		if [ -f "$(PROJECT_SRC)/index.ipynb" ] && [ "$(PROJECT_SRC)/index.ipynb" -nt /tmp/.project_$(PROJECT_NAME)_marker ]; then \
 			echo "  🔄 Notebook changed - converting source..."; \
 			$(MAKE) convert-single NOTEBOOK_FILE="$(PROJECT_SRC)/index.ipynb" || exit 1; \

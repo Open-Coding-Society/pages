@@ -177,9 +177,9 @@ test("CS112 FRQ categories are distinct from historical exam question numbers", 
     const index = fs.readFileSync(path.join(root, "_projects/lessons/_includes/csa-curriculum.html"), "utf8");
     assert.match(index, /include projects\/lessons\/cs112-report\.html/);
     assert.match(index, /sort: "title"/);
-    const player = fs.readFileSync(path.join(root, "_layouts/post.html"), "utf8");
+    const player = fs.readFileSync(path.join(root, "_projects/systems/courses/layouts/post.html"), "utf8");
     assert.match(player, /current_course == 'csa'[\s\S]*?coursePosts = coursePosts \| sort: "title"/);
-    const week = fs.readFileSync(path.join(root, "_includes/player-pages/week.html"), "utf8");
+    const week = fs.readFileSync(path.join(root, "_projects/systems/courses/_includes/player-pages/week.html"), "utf8");
     assert.match(week, /post.lesson_type == 'ap-practice'.*?Supplemental AP practice/);
 });
 

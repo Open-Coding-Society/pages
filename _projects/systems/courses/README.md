@@ -1,428 +1,152 @@
-# Courses/Sprint System
-
-Unified courses and sprint timeline system managing CSP, CSA, CSSE, CSH, and future CSH courses.
-
-## Overview
-
-The courses system provides:
-- **Unified Course Entry Points**: CSP, CSA, CSSE, CSH open calendar/announcements beside the lesson-player sprint/week navigation
-- **Completion Tracking**: Persistent localStorage tracking for items and priorities
-- **Progress Visualization**: Week and sprint-level progress bars with statistics
-- **Certificate System**: Week-based certificate generation tied to completion
-- **Modals**: Help videos, progression tracking, sprint details
-- **Calendar Integration**: Works with systems/calendar for synchronized events
-
-## Directory Structure
-
-```
-_projects/systems/courses/
-├── Makefile              # Custom build system for multiple pages + assets
-├── README.md            # This file
-├── pages/               # Course entry pages (source)
-│   ├── csp.md          # Computer Science Principles
-│   ├── csa.md          # Computer Science A  
-│   ├── csse.md         # Computer Science & Software Engineering
-│   ├── csh.md         # Computer Science Honors
-├── _includes/           # Sprint layout components (source)
-│   ├── sprint-card.html
-│   ├── sprint-item-card.html
-│   ├── sprint-modals.html
-│   └── sprint-week-card.html
-├── js/                  # JavaScript functionality (source)
-│   └── courses.js      # Main courses system (1225 lines, extracted from sprint.html)
-├── sass/                # Styles (source)
-│   └── main.scss       # Sprint timeline styles (2813 lines, from timeline.scss)
-└── docs/                # Documentation
-    └── (future architecture docs)
-```
-
-## Build System
-
-### Build Targets
-
-```bash
-make -C _projects/systems/courses build    # Build and deploy everything
-make -C _projects/systems/courses pages    # Deploy course pages only
-make -C _projects/systems/courses assets   # Build JS + SASS + CSS
-make -C _projects/systems/courses js       # Copy JavaScript files
-make -C _projects/systems/courses sass     # Copy SASS files
-make -C _projects/systems/courses css      # Create CSS entry file
-make -C _projects/systems/courses clean    # Remove all deployed files
-make -C _projects/systems/courses watch    # Watch for changes and auto-rebuild
-```
-
-### Deployment Locations
-
-- **Course Pages**: `pages/*.md` → `navigation/courses/*.md`
-- **JavaScript**: `js/courses.js` → `assets/js/projects/courses/courses.js`
-- **SASS**: `sass/main.scss` → `_sass/projects/courses/main.scss`
-- **CSS Entry**: → `assets/css/projects/courses/main.scss` (with frontmatter)
-
-The build follows this dependency chain:
-```
-build → pages + assets
-pages → assets (course pages deployed LAST to trigger Jekyll)
-assets → js + sass + css
-css → sass (CSS entry requires SASS to exist)
-```
-
-### Auto-Registration
-
-Registered in `_projects/.makeprojects` as:
-```
-systems/courses
-```
-
-The Makefile is **custom** (not auto-generated from `_template/Makefile`) because this system manages multiple page files rather than a single `index.md`.
-
-Exception in `.gitignore`:
-```
-!_projects/systems/courses/Makefile
-```
-
-## Integration Points
-
-### Course Landing Pages
-
-The top-menu course entry links directly to a course's Blogs player, without
-passing through the global Blogs catalog or course chooser. `_config.yml`
-sets `default_course: csse` for first-time visitors. Course player visits save
-`ocs-selected-course`; returning signed-out visitors use that selection.
-Signed-in users prefer that selection when enrolled, otherwise the first
-enrolled course in CSSE/CSP/CSA/CSH order. The legacy `/navigation/courses/`
-chooser and `/navigation/blogs/` catalog remain available at their own URLs.
-Validate entry selection with `node --test tests/course_entry.test.mjs`.
-
-The authoritative entry pages are `navigation/{csse,csp,csa,csh}.md` in this
-project. Their existing `/navigation/courses/<course>/` routes use `layout: post`
-with `player_page: {course: <course>, kind: home}`. The home body reuses
-`_includes/announcement_chat.html`, including its calendar, course-specific
-messages, and signed-out preview behavior; no second chat implementation is used.
-
-Course pills live above the sidebar title on landing pages, sprint/week pages,
-and lessons. The breadcrumb home icon returns to the same calendar/announcements
-landing page. An icon-only Blogs button on regular documents and course player
-pages opens the course's `/<course>/blogs/` page on desktop and mobile, with a
-tooltip and accessible label. The top bar omits the extra week-chat shortcut;
-week chat remains available in course navigation and on week introductions.
-Regular documents retain completion and Previous/Next. Neither the sidebar nor the mobile
-drawer duplicates a Home/Blogs button row.
-Sprint 1 remains available at `/<course>/sprint-1/`, rather than
-being the default. Existing lesson completion keys and lesson ordering are
-unchanged. On mobile, the existing navigation drawer exposes the same menu.
-Icon-only Previous/Next controls appear on lessons and sprint/week introductions
-at every screen width and follow the existing sidebar order. Tooltips and
-accessible labels name each arrow; home, chat, and Blogs are not sequence steps.
-Lessons retain an icon-only reading-completion circle. It becomes a checked
-circle when complete; its tooltip and accessible pressed state follow the saved
-completion value. Clicking again marks the lesson incomplete, using the same
-completion keys and progress counts as before.
-Its hamburger button sits at the upper left of the course top bar, before the
-breadcrumbs, instead of floating over content in the lower right. The desktop
-sidebar's hamburger appears in that same left-hand position only when the panel
-is closed. Both panels put course buttons across the top with an X at the
-upper right, and the selected course title below. Closing returns focus to the
-hamburger; opening moves focus to the panel's close button.
-
-Navigation remembers expanded sections and scroll position per course, separately
-for desktop and mobile, in `ocs-course-navigation:<course>:<panel>` localStorage
-keys. Opening a page (including Previous/Next and browser history) expands its
-containing sprint/week and reveals its selected row only if it is outside the
-restored viewport. Other expanded sections remain open. Hidden panels retain
-their last scroll position until reopened. Mobile resize handling does not
-rebuild the menu or attach duplicate click listeners.
-The last opened document is also remembered separately from the current page.
-Returning to Blogs (or course home) keeps that page in the main pane while the
-last document is highlighted in navigation with a "Continue reading" tooltip
-and its containing sections expanded. It does not redirect or mark it complete.
-Validate persistence with `node --test tests/course_navigation_state.test.mjs`.
-
-Styles use the OCS components and `_sass/open-coding/lesson-player.scss`.
-Publish entry-page changes with `make -C _projects/systems/courses assets`.
-Validate rendering with `bundle exec ruby scripts/test_course_landing_pages.rb`
-and generated sprint/week routes with `bundle exec ruby scripts/test_player_pages.rb`.
-
-### Sprint Layout (`_layouts/sprint.html`)
-
-The sprint layout loads courses.js:
-```html
-<script src="{{site.baseurl}}/assets/js/projects/courses/courses.js"></script>
-```
-
-Includes for sprint components remain in root `_includes/`:
-```liquid
-{% include sprint-card.html %}
-{% include sprint-item-card.html %}
-{% include sprint-modals.html %}
-{% include sprint-week-card.html %}
-```
-
-### Course Data Files
-
-Course content sourced from YAML data files:
-- `_data/csp.yml` - Computer Science Principles units/sprints
-- `_data/csa.yml` - Computer Science A units/sprints
-- `_data/csse.yml` - CS & Software Engineering units/sprints
-- `_data/cs.yml` - Generic CS content and CWGU data
-
-### SASS Integration
-
-Styles imported via `_sass/open-coding/_main.scss`:
-```scss
-@import 'projects/all';  // Dynamic imports including courses
-```
-
-The `_sass/projects/_all.scss` file is auto-generated by `scripts/generate_sass_imports.py`:
-```scss
-@import "calendar/main";
-@import "courses/main";
-```
-
-## Functionality
-
-### Completion Tracking
-
-- **LocalStorage Keys**: 
-  - `${CURRENT_COURSE}-lesson-completion` - Item completion state
-  - `item_priorities_${window.location.pathname}` - Item priorities
-- **Operations**: Toggle completion, bulk operations via progression modal
-- **Persistence**: Survives page refreshes and navigation
-
-### Progress Bars
-
-- **Week Level**: Tracks completion within each week card
-- **Sprint Level**: Aggregates all weeks in a sprint
-- **Calculation**: Completed items / total items * 100
-
-### Certificate System
-
-- **Availability**: Triggered when ALL items in a week are completed
-- **Profile Building**: Extracts theme, goals, and week metadata
-- **Display**: Shows available certificates in progression modal
-- **Skill Library Override**: Supports custom certificate names via `COURSE_SKILL_LIBRARY`
-
-### Modals
-
-- **Progression Modal**: Shows all tasks across sprint weeks with completion tracking
-- **Help Video Modal**: Displays instructional videos (if configured)
-- **Sprint Cards**: Each sprint is one card; clicking it opens the sprint's intro page in the lesson player (`/<course>/sprint-<n>/`). The week cards stay in the page, hidden, as the data the progression modal reads.
-
-### Filtering
-
-- **Priority Filters**: Filter items by priority level (P0-P3)
-- **Search**: (Future) Search across items
-
-## Configuration
-
-### Current Courses
-
-```javascript
-const COURSE_LABELS = {
-  csp: 'Computer Science Principles',
-  csa: 'Computer Science A',
-  csse: 'Computer Science and Software Engineering',
-  csh: 'Computer Science Honors'
-};
-```
-
-### Adding a New Course
-
-To add Computer Science Honors (CSH):
-
-1. **Create Data File**: `_data/csh.yml` with units/sprints
-2. **Create Course Page**: `_projects/systems/courses/pages/csh.md`:
-   ```yaml
-   ---
-   layout: sprint
-   course: csh
-   title: Computer Science Honors
-   permalink: /courses/csh/
-   ---
-   ```
-3. **Add to COURSE_LABELS**: In `js/courses.js` (TODO: move to config)
-4. **Rebuild**: `make -C _projects/systems/courses build`
-
-### Disabling Courses
-
-For student portfolios where courses should be disabled:
-
-1. **Remove from `.makeprojects`**: Comment out or remove:
-   ```
-   # systems/courses
-   ```
-2. **Clean Deployed Files**: `make -C _projects/systems/courses clean`
-3. **Rebuild Site**: `make build`
-
-The courses system will not be built, and navigation will not include course pages.
-
-## JavaScript Structure
-
-The `courses.js` file (1225 lines) contains all course/sprint functionality extracted from `_layouts/sprint.html`. 
-
-### Major Sections
-
-- **Configuration & Constants** - Course labels, storage keys
-- **Skill Library Initialization** - Loads course skill overrides
-- **Data Persistence** - LocalStorage read/write operations
-- **Completion Tracking** - Toggle completion, update UI
-- **Progress Calculations** - Week and sprint progress bars
-- **Week Utilities** - Extract week numbers, find week cards
-- **Certificate Building** - Extract goals, build certificate profiles
-- **Goal Preview Rendering** - Display learning goals in week cards
-- **Certificate Availability** - Check completion status
-- **Progression Modal** - Open/close, task list, progress updates
-- **Certificate Status Updates** - Update modal with certificate info
-- **Help Video System** - Load and display help videos
-- **Sprint Cards** - A click anywhere on a sprint card follows the link on its title
-- **Priority System** - Set and display item priorities
-- **Filtering** - Filter by priority
-- **Calendar Integration** - Initialize calendar data
-- **Initialization** - DOMContentLoaded setup
-
-### Future Modularization
-
-**TODO**: Break `courses.js` into focused modules:
-```
-js/
-├── courseConfig.js     # Constants, labels, storage keys
-├── dataStore.js        # LocalStorage persistence
-├── completion.js       # Completion tracking logic
-├── progress.js         # Progress bar calculations
-├── certificates.js     # Certificate management
-├── modals.js          # Modal management (progression, help)
-├── filters.js         # Sprint filtering, priority filters
-├── utilities.js       # Week utilities, helpers
-└── courses.js         # Main orchestrator
-```
-
-This follows the calendar system pattern and improves maintainability.
-
-## SASS Structure
-
-The `sass/main.scss` file (2813 lines) contains all sprint timeline styles originally from `_sass/open-coding/timeline.scss`.
-
-### Major Style Sections
-
-- Timeline page container and layout
-- Sprint cards (header, body, footer, actions)
-- Week cards (header, body, footer, goals)
-- Item cards (title, content, completion toggle, priorities)
-- Progress bars (week-level, sprint-level, modal)
-- Modals (progression, help video, sprint details)
-- Certificate display and status
-- Priority badges (P0-P3 colors)
-- Filters and controls
-- Responsive breakpoints
-- Theme integration (light/dark mode)
-
-### Theme Variables Used
-
-```scss
-// Background colors
---pref-bg-color
---panel
---bg-0, --bg-1, --bg-2, --bg-3
-
-// Text colors
---pref-text-color
-
-// Priority colors
---priority-p0, --priority-p1, --priority-p2, --priority-p3
-
-// Interactive elements
---color-theme-color
---link-hover
-```
-
-## Troubleshooting
-
-### Course pages not showing
-
-1. **Check deployment**: Verify files in `navigation/courses/`
-2. **Check build**: Run `make -C _projects/systems/courses build`
-3. **Check registration**: Ensure `systems/courses` in `.makeprojects`
-
-### JavaScript not loading
-
-1. **Check path**: Verify `assets/js/projects/courses/courses.js` exists
-2. **Check sprint.html**: Ensure script src path is correct
-3. **Browser console**: Check for JS errors or 404s
-
-### Styles not applying
-
-1. **Check SASS**: Verify `_sass/projects/courses/main.scss` exists
-2. **Check imports**: Verify `_sass/projects/_all.scss` includes courses
-3. **Regenerate**: Run `python3 scripts/generate_sass_imports.py`
-4. **Jekyll**: Restart Jekyll server
-
-### Completion not persisting
-
-1. **Check localStorage**: Open browser DevTools → Application → LocalStorage
-2. **Check keys**: Look for `${course}-lesson-completion` and `item_priorities_*`
-3. **Clear cache**: Try clearing localStorage and testing again
-
-### Build errors
-
-1. **Check Makefile**: Ensure `_projects/systems/courses/Makefile` exists
-2. **Check paths**: PROJECT_SRC should resolve to courses directory
-3. **Check files**: Ensure source files exist in pages/, js/, sass/
-
-## Development Workflow
-
-### Making Changes
-
-1. **Edit source files** in `_projects/systems/courses/`
-2. **Rebuild**: `make -C _projects/systems/courses build`
-3. **Jekyll triggers**: Automatically rebuilds site when pages deployed
-4. **Test**: Check changes in browser
-
-### Adding New Features
-
-1. **JavaScript**: Edit `js/courses.js` (or create new module)
-2. **Styles**: Edit `sass/main.scss`
-3. **HTML**: Edit sprint includes in `_includes/`
-4. **Build and test**: Rebuild and verify
-
-### Watch Mode
-
-For active development:
-```bash
+# Courses and Document Viewing Kit
+
+This project owns the course entry, Blogs catalog, lesson player, sprint/week
+navigation, reading completion, and course chat/calendar interfaces. Its sources
+live here; the registered project build publishes them to the existing Jekyll
+and browser paths. Do not edit those generated copies.
+
+## Source map
+
+| Source here | Responsibility | Published destination |
+| --- | --- | --- |
+| `navigation/{csse,csp,csa,csh}.md` | Course home entry pages | Dated posts in `_posts/projects/courses/` |
+| `pages/course.md`, `pages/blog.md` | Legacy course chooser and global Blogs catalog | `navigation/course.md`, `navigation/blog.md` |
+| `layouts/post.html` | Course document player and conventional post rendering | `_layouts/post.html` |
+| `layouts/sprint.html`, `layouts/courses.html`, `layouts/blogs.html` | Legacy sprint view and catalog wrappers | `_layouts/` |
+| `layouts/lessonbase*.html`, `layouts/notebook.html` | Legacy study/flashcard/capture viewers and notebook wrapper | `_layouts/` |
+| `_includes/course-*.html` | Course pills and selected course title | `_includes/` |
+| `_includes/lesson-{sidebar-nav,topbar,modals}.html` | Desktop/mobile player controls | `_includes/` |
+| `_includes/player-pages/` | Home, sprint, week, chat, and Blogs page bodies | `_includes/player-pages/` |
+| `_includes/sprint-*.html` | Sprint cards, week cards, and progression modal | `_includes/` |
+| `_includes/{blog-catalog,post_list_image_card}.html` | Blog filtering and document cards | `_includes/` |
+| `_includes/{announcement_chat,week_chat,lesson_chat}.html` | Course, week, and document chat | `_includes/` |
+| `_includes/lesson-submission-form.html` | Player assignment submission UI | `_includes/` |
+| `_includes/{calendar,ocs_calendar_card,announcement_calendar_demo}.html` | Calendar integration and preview interfaces | `_includes/` |
+| `plugins/lesson_player_pages.rb` | Generates course player pages from schedule data | `_plugins/lesson_player_pages.rb` |
+| `data/{cs,csa,csp,csse,csh}.yml` | Shared sprint definitions and course schedules | `_data/` |
+| `js/player/` | Direct course entry, navigation state, legacy completion helpers | Existing `assets/js/` filenames |
+| `js/announcement-calendar/` | Calendar cards, commands, data, feeds, and composer | `assets/js/chat/calendar/` |
+| `js/courses.js` | Legacy sprint progression and certificates | `assets/js/projects/courses/courses.js` |
+| `sass/main.scss` | Registered project's legacy sprint styling | `_sass/projects/courses/main.scss` |
+| `sass/viewing/` | Player, Blogs, timeline, announcement-calendar styling | Existing `_sass/open-coding/` filenames |
+| `tests/` | Entry, state, completion, rendering, and publication regressions | Not published; root test files delegate here |
+
+The exact file mappings are in [distribution.json](distribution.json). Directory
+mappings include all their files recursively. New shared-path resources must be
+added there and their generated paths ignored in the root `.gitignore`.
+
+`layouts/post.html` intentionally retains both the player and conventional post
+branches. Moving the layout intact preserves assignment/export/chat behavior on
+non-course documents; this kit supplies the shared document-viewing layout.
+
+## Build and development
+
+Like [calendar](../calendar/README.md), this project uses the generated
+[shared Makefile](../../_template/Makefile), not a versioned local override.
+It is already registered as `systems/courses:dev` in
+[_projects/.makeprojects](../../.makeprojects), so the site's `dev` build always
+publishes it before Jekyll starts.
+
+```sh
+make generate-makefiles
+make -C _projects/systems/courses assets
+make -C _projects/systems/courses build
 make -C _projects/systems/courses watch
 ```
 
-Continuously rebuilds on file changes (requires fswatch or inotifywait).
+Use the root [Makefile](../../../Makefile) for normal site workflows. Registered
+builds generate `_sass/projects/_all.scss` after project publication. A standalone
+`assets` command publishes this kit but does not build the whole site.
 
-## Related Systems
+For projects with `distribution.json`, the manifest owns JavaScript and Sass
+publication instead of the generic whole-folder copy. The template still emits
+the project's CSS entry and publishes navigation/index/notebook content.
+Sources are published before the index triggers a Jekyll rebuild.
 
-- **Calendar**: `_projects/systems/calendar/` - Event calendar integration
-- **Sprint Layout**: `_layouts/sprint.html` - Course page layout
-- **Sprint Includes**: `_includes/sprint*.html` - Reusable components
-- **Course Data**: `_data/{csp,csa,csse,cs}.yml` - Content source
-- **Navigation**: `navigation/courses/` - Deployed course entry points
+Publication is content-stable: unchanged files are not rewritten. The watcher
+fingerprints manifest sources, including layouts, includes, plugins, YAML,
+styles, and entry pages, and requests a rebuild when they change. Removing a
+file from a mapped directory or removing a mapping removes its previous output;
+missing explicitly mapped sources fail with an actionable error.
 
-## Future Enhancements
+The ignored `.project-distribution-cache/` records output ownership and content
+checksums. Cleanup removes only previously published manifest files, refuses to
+delete modified output, and leaves sources/shared resources alone. It also
+works after a manifest is removed. Do not use `clean` while the site's watcher
+or server is running. Restart `make dev` after changing the shared template so
+the regenerated project Makefile and watcher use the new rules.
 
-- **Modularize JavaScript**: Break courses.js into focused modules
-- **Search Functionality**: Search across items and goals
-- **Export Progress**: Export completion data (JSON, CSV)
-- **Sync Across Devices**: Cloud sync for completion state
-- **Enhanced Filtering**: Multi-dimensional filters (priority + tag + date)
-- **Item Dependencies**: Prerequisites and unlock conditions
-- **Gamification**: Points, badges, streaks
-- **AI Assistant**: Help with course content and guidance
-- **CSH Course**: Computer Science Honors course integration
+Styles retain their existing import locations and order in
+`_sass/open-coding/_main.scss`; `sass/main.scss` and
+`sass/viewing/timeline.scss` are distinct legacy style layers, not interchangeable
+copies. Relative mixin imports resolve at the published paths. Ruby Sass must
+remain supported.
 
-## Migration Notes
+## Shared dependencies and integration boundaries
 
-This system was consolidated from:
-- JavaScript: `_layouts/sprint.html` (lines 49-1248, ~1199 lines)
-- Styles: `_sass/open-coding/timeline.scss` (2813 lines)
-- Pages: `navigation/courses/*.md` (5 files)
-- Includes: Already in `_includes/sprint*.html` (kept in place)
+This is a reusable frontend kit, not a standalone backend or complete theme:
 
-Benefits of consolidation:
-- ✅ Single location for courses development
-- ✅ Configurable (can disable via `.makeprojects`)
-- ✅ Proper dependency management
-- ✅ Template-ready for student portfolios
-- ✅ Follows calendar system pattern
+- **Site shell:** `_config.yml`, `_layouts/opencs.html`, and
+  `_includes/themes/minima/header.html` remain site-owned. The header uses
+  `[data-course-entry]` and the published course-entry helper.
+- **Authentication/configuration:** `assets/js/api/login.js` and
+  `assets/js/api/config.js` remain shared. Login selects a course through the
+  helper rather than maintaining a second routing policy.
+- **Document services:** reading time, TOC, submenu, Gist export/settings,
+  runner I/O, grading/submission helpers, and Utterances remain shared. Lesson
+  sources remain in their registered lesson projects, notebooks, and DOCX.
+  Subject/activity-specific lesson layouts and games remain separate; their
+  existing completion-helper URLs are supplied by this kit. Legacy study/capture
+  viewers still consume shared Fabric.js and `assets/js/solitaire/ai-grader.js`.
+- **Chat:** shared `assets/js/chat/rich-text.js`, group-management clients,
+  SockJS/STOMP libraries, and Spring `/ws-chat` remain external dependencies.
+  The group dashboard and lesson chat contain parallel chat logic; synchronize
+  relevant fixes rather than creating another implementation.
+- **Calendar:** [calendar](../calendar/README.md) owns its API/UI runtime and
+  `assets/js/projects/calendar/` modules. This kit owns the consuming interfaces.
+  `_data/school_calendar.yml` stays shared. Calendar sync requires calendar to
+  be built; courses being `:dev` does not itself enable calendar's whole dashboard.
+- **Curriculum reporting:** college topic maps, report templates, reference
+  navigation, and curriculum-specific tests remain with the curriculum system.
+- **Backend contracts:** enrollment, calendar, announcements/chat, and assignment
+  submission still call the existing services. Moving sources does not change
+  API origins, credentials, or authorization.
+
+## Preserved behavior
+
+- The header opens `/<course>/blogs/` directly. New guests default to CSSE through
+  `_config.yml`'s `default_course`. Returning guests use `ocs-selected-course`;
+  signed-in users prefer their saved enrolled course, otherwise their first
+  enrolled course in CSSE/CSP/CSA/CSH order.
+- Course homes remain `/navigation/courses/<course>/` and reuse the player with
+  announcements/calendar. Legacy chooser/catalog routes remain available.
+- The generator creates sprint and Blogs pages, and week/chat pages only for
+  weeks with lessons. Sidebar links and generated URLs must stay aligned.
+- Desktop and mobile panels put course buttons first, X at upper-right, and the
+  selected title below. Hamburger controls open navigation; closing returns focus.
+- Blogs, Previous/Next, and reading completion are icon-only with accessible
+  labels. Arrows appear on lessons and sprint/week introductions. Completion
+  appears only on lessons. Week chat remains in navigation, not the top bar.
+- `ocs-course-navigation:<course>:<panel>` stores expanded sections, scroll,
+  and the last document separately for desktop/mobile. Blogs remains in the
+  main pane while the last document is highlighted for resuming; no automatic
+  redirect or completion occurs.
+- Existing lesson completion keys/order, sprint progress, priorities, and
+  certificate behavior are preserved.
+
+## Validation
+
+Root entry points preserve existing test commands while the test implementations
+live with the kit and read source files rather than stale generated copies:
+
+```sh
+node --test tests/course_entry.test.mjs tests/course_navigation_state.test.mjs tests/lesson_completion.test.mjs
+bundle exec ruby scripts/test_course_distribution.rb
+bundle exec ruby scripts/test_course_landing_pages.rb
+bundle exec ruby scripts/test_player_pages.rb
+bundle exec ruby scripts/test_blog_catalog.rb
+```
+
+Publication tests use isolated temporary destinations, not a live site cleanup.
+Also verify a registered-project build, a Jekyll/Ruby-Sass build, and desktop/mobile
+course entry, document selection, Previous/Next, completion, and navigation resume.

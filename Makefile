@@ -232,7 +232,7 @@ build-dev-projects: build-project-includes
 	@echo "Active DEV Projects: $(ACTIVE_DEV_PROJECTS)"
 	$(call run_projects,$(ACTIVE_DEV_PROJECTS),Building,build)
 	@echo "Generating dynamic SASS imports..."
-	@$(PYTHON) scripts/generate_sass_imports.py 2>&1 || echo "⚠️  SASS import generation failed"
+	@$(PYTHON) scripts/generate_sass_imports.py
 
 # Compatibility target for explicitly converting active projects (build already does this).
 convert-registered-notebooks:

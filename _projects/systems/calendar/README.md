@@ -59,7 +59,8 @@ The calendar JavaScript modules are loaded via `_includes/calendar.html` in this
 
 **`_includes/calendar.html` is NOT part of this project:**
 - It's the **interface layer** between sprint pages and the calendar system
-- Lives in `_includes/` (standard Jekyll location for reusable components)
+- Source lives in [courses/_includes/calendar.html](../courses/_includes/calendar.html);
+  the courses manifest publishes it to `_includes/calendar.html`
 - Used by `_layouts/sprint.html` to provide "Sync to Calendar" UI
 - Loads deployed calendar JS modules from `assets/js/projects/calendar/`
 - **Belongs to the courses/sprint system** - it's a consumer of this calendar API
