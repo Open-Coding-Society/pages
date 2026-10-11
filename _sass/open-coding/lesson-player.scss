@@ -67,9 +67,18 @@ body:has(.lesson-player) {
   }
 }
 
-.course-mobile-nav {
-  padding: 16px 24px;
-  border-bottom: 1px solid $bg-3;
+.course-panel-actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+
+  .course-pill-nav {
+    flex: 1;
+    min-width: 0;
+    margin-bottom: 0;
+  }
 }
 
 .sidebar-header h2 {
@@ -765,7 +774,7 @@ body:has(.lesson-player) {
   gap: 12px;
 }
 
-/* Open and close controls share a left-hand position and touch target. */
+/* Shared touch targets for opening navigation and closing its panel. */
 .mobile-course-menu,
 .lesson-course-menu,
 .timeline-close-btn {
@@ -825,9 +834,6 @@ body:has(.lesson-player) {
 }
 
 .timeline-modal-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   padding: 20px 24px;
   border-bottom: 1px solid $bg-3;
 }

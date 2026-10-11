@@ -15,7 +15,7 @@ Dir.mktmpdir("course-landing-") do |source|
   FileUtils.cp(File.join(ROOT, "_layouts/post.html"), File.join(source, "_layouts"))
   File.write(File.join(source, "_layouts/opencs.html"), "{{ content }}")
   FileUtils.mkdir_p(File.join(source, "_includes/player-pages"))
-  %w[course-nav.html lesson-sidebar-nav.html lesson-topbar.html lesson-modals.html announcement_chat.html reading_time.html blog-catalog.html post_list_image_card.html].each do |name|
+  %w[course-nav.html course-title.html lesson-sidebar-nav.html lesson-topbar.html lesson-modals.html announcement_chat.html reading_time.html blog-catalog.html post_list_image_card.html].each do |name|
     FileUtils.cp(File.join(ROOT, "_includes", name), File.join(source, "_includes"))
   end
   %w[home.html sprint.html blogs.html].each do |name|
@@ -80,11 +80,9 @@ Dir.mktmpdir("course-landing-") do |source|
       assert(breadcrumbs.include?('id="lesson-sidebar-toggle"') &&
              breadcrumbs.index('id="lesson-sidebar-toggle"') < breadcrumbs.index('title="Course home"'),
              "#{path} places desktop navigation on the left before the home icon")
-      assert(breadcrumbs.include?('aria-label="Close course navigation"') &&
-             breadcrumbs.include?('class="fas fa-times"'),
-             "#{path} gives desktop close navigation a labeled X")
-      assert(html.match?(%r{<div class="timeline-modal-header">\s*<button[^>]*aria-label="Close course navigation"[^>]*>\s*<i class="fas fa-times"[^>]*></i>\s*</button>\s*<h3>}),
-             "#{path} places the labeled mobile close X left of its heading")
+      assert(breadcrumbs.include?('aria-label="Open course navigation"') &&
+             !breadcrumbs.include?('fa-times'),
+             "#{path} keeps only hamburger open controls beside Home")
       assert(html.match?(%r{<a class="ocs__btn[^"]*" href="/preview/#{course}/blogs/"[^>]*>\s*<i class="fas fa-blog"[^>]*></i> Blogs\s*</a>}),
              "#{path} keeps a labeled course Blogs button in the top bar")
       if path == "#{course}/blogs/index.html"
@@ -93,8 +91,8 @@ Dir.mktmpdir("course-landing-") do |source|
       end
       sidebar = html.split('id="lesson-sidebar"', 2).last.split('<script>', 2).first
       assert(sidebar.include?('aria-label="Courses"'), "#{path} has course pills in the sidebar")
-      assert(sidebar.match?(%r{</a>\s*</nav>\s*<h2>}),
-             "#{path} closes pill wrappers before the sidebar title")
+      assert(sidebar.match?(%r{</a>\s*</nav>\s*<button[^>]*id="lesson-sidebar-close"[^>]*aria-label="Close course navigation"[^>]*>\s*<i class="fas fa-times"[^>]*></i>\s*</button>\s*</div>\s*<h2>}),
+             "#{path} puts desktop close after course buttons and before the title")
       assert(sidebar.index('aria-label="Courses"') < sidebar.index('<h2>'),
              "#{path} places pills above the course title")
       %w[csse csp csa csh].each do |target|
@@ -107,12 +105,17 @@ Dir.mktmpdir("course-landing-") do |source|
              "#{path} keeps the existing sprint route")
       assert(sidebar.include?('data-lesson-id="/' + course + '/example/"'),
              "#{path} preserves lesson completion identity")
-      assert(html.include?('class="course-mobile-nav"'), "#{path} exposes course pills on mobile")
+      assert(html.include?('course-mobile-nav"'), "#{path} exposes course pills on mobile")
       assert(!sidebar.include?("href=\"/preview/#{course}/blogs/\""),
              "#{path} omits redundant sidebar Blogs")
       assert(html.match?(%r{<div class="sprint-nav">\s*<div class="sprint-section">}),
              "#{path} starts sidebar navigation directly with sprints")
-      mobile = html.split('class="course-mobile-nav"', 2).last.split('id="timeline-modal-content"', 2).first
+      mobile = html.split('class="course-panel-actions course-mobile-nav"', 2).last.split('id="timeline-modal-content"', 2).first
+      assert(mobile.match?(%r{</nav>\s*<button[^>]*id="timeline-close-btn"[^>]*>\s*<i class="fas fa-times"[^>]*></i>\s*</button>\s*</div>\s*<h3>}),
+             "#{path} puts mobile close after course buttons and before the title")
+      sidebar_title = sidebar[%r{<h2>(.*?)</h2>}m, 1]
+      assert(mobile.include?("<h3>#{sidebar_title}</h3>") && !mobile.include?("Course Timeline"),
+             "#{path} shows the same selected course title below both button rows")
       assert(!mobile.include?('aria-label="Course home"') && !mobile.include?("/#{course}/blogs/"),
              "#{path} omits the duplicate mobile Home/Blogs row")
       assert(html.include?("href=\"/preview/navigation/courses/#{course}/\" title=\"Course home\" aria-label=\"Course home\""),

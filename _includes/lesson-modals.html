@@ -6,13 +6,13 @@
 <!-- Timeline modal (mobile only) -->
 <div class="timeline-modal" id="timeline-modal">
   <div class="timeline-modal-header">
-    <button class="timeline-close-btn" id="timeline-close-btn" type="button" aria-label="Close course navigation" aria-controls="timeline-modal" title="Close course navigation">
-      <i class="fas fa-times" aria-hidden="true"></i>
-    </button>
-    <h3>Course Timeline</h3>
-  </div>
-  <div class="course-mobile-nav">
-    {% include course-nav.html %}
+    <div class="course-panel-actions course-mobile-nav">
+      {% include course-nav.html %}
+      <button class="timeline-close-btn" id="timeline-close-btn" type="button" aria-label="Close course navigation" aria-controls="timeline-modal" title="Close course navigation">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+    <h3>{% include course-title.html %}</h3>
   </div>
   <div class="timeline-modal-content" id="timeline-modal-content">
     <!-- Sprint cards will be populated by JavaScript -->

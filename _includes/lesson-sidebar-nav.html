@@ -40,16 +40,13 @@
 
 <div class="lesson-sidebar" id="lesson-sidebar">
   <div class="sidebar-header">
-    {% include course-nav.html %}
-    {% if current_course == 'csp' %}
-      <h2>Computer Science Principles</h2>
-    {% elsif current_course == 'csa' %}
-      <h2>Computer Science A</h2>
-    {% elsif current_course == 'csse' %}
-      <h2>Computer Science & Software Engineering</h2>
-    {% elsif current_course == 'csh' %}
-      <h2>Computer Science Honors</h2>
-    {% endif %}
+    <div class="course-panel-actions">
+      {% include course-nav.html %}
+      <button class="lesson-course-menu" id="lesson-sidebar-close" onclick="toggleLessonSidebar()" type="button" aria-controls="lesson-sidebar" aria-label="Close course navigation" title="Close course navigation">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+    <h2>{% include course-title.html %}</h2>
 
     <div class="course-progress-section">
       <div class="progress-label">
@@ -182,7 +179,7 @@
 
 <script>
   /**
-   * Hiding the sidebar, for the button in the top bar. A hidden sidebar has the
+   * Hiding the sidebar, with close in the panel and open in the top bar. A hidden sidebar has the
    * hidden attribute, so the lesson takes the full width with no CSS involved.
    *
    * The reader's choice is saved and applied here, as soon as the sidebar has
@@ -209,14 +206,8 @@
       const button = document.getElementById('lesson-sidebar-toggle');
       const wrapper = document.getElementById('lesson-sidebar-toggle-wrap');
       if (!button || !wrapper) return;
-      const label = sidebar.hidden ? 'Open course navigation' : 'Close course navigation';
-      wrapper.hidden = !wideScreen.matches;
+      wrapper.hidden = !wideScreen.matches || !sidebar.hidden;
       button.setAttribute('aria-expanded', String(!sidebar.hidden));
-      button.setAttribute('aria-label', label);
-      button.title = label;
-      const icon = button.querySelector('i');
-      icon.classList.toggle('fa-bars', sidebar.hidden);
-      icon.classList.toggle('fa-times', !sidebar.hidden);
     }
 
     window.toggleLessonSidebar = function () {
@@ -227,6 +218,7 @@
         // Same as above: the choice just isn't remembered.
       }
       show(hide);
+      document.getElementById(hide ? 'lesson-sidebar-toggle' : 'lesson-sidebar-close').focus();
     };
 
     show(readerHidSidebar());

@@ -100,8 +100,10 @@ being the default. Existing lesson completion keys and lesson ordering are
 unchanged. On mobile, the existing navigation drawer exposes the same menu.
 Its hamburger button sits at the upper left of the course top bar, before the
 breadcrumbs, instead of floating over content in the lower right. The desktop
-sidebar toggle uses that same left-hand position. Both use a hamburger to open
-navigation and an X to close; the mobile drawer's X sits left of its heading.
+sidebar's hamburger appears in that same left-hand position only when the panel
+is closed. Both panels put course buttons across the top with an X at the
+upper right, and the selected course title below. Closing returns focus to the
+hamburger; opening moves focus to the panel's close button.
 
 Styles use the OCS components and `_sass/open-coding/lesson-player.scss`.
 Publish entry-page changes with `make -C _projects/systems/courses assets`.
