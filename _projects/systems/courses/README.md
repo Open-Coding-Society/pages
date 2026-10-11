@@ -114,7 +114,11 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
 
 ## Preserved behavior
 
-- The header opens `/<course>/blogs/` directly. New guests default to CSSE through
+- The header opens `/navigation/courses/<course>/` (Home/Announcements) directly.
+  Blogs remains available through its icon and shows Home > course > Blogs.
+  Course breadcrumbs use the short pill name (CSSE/CSP/CSA/CSH), while the
+  navigation panel retains the full course title.
+  New guests default to CSSE through
   `_config.yml`'s `default_course`. Returning guests use `ocs-selected-course`;
   signed-in users prefer their saved enrolled course, otherwise their first
   enrolled course in CSSE/CSP/CSA/CSH order.

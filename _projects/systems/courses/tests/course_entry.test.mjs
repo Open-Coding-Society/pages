@@ -4,9 +4,9 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { courseEntryUrl, normalizeCourse, rememberCourse, savedCourse, selectEntryCourse } from '../js/player/course-entry.js';
 
-test('first-time visitors enter CSSE Blogs directly', () => {
+test('first-time visitors enter CSSE Home Announcements directly', () => {
   assert.equal(selectEntryCourse([], null), 'csse');
-  assert.equal(courseEntryUrl('/preview', 'csse'), '/preview/csse/blogs/');
+  assert.equal(courseEntryUrl('/preview', 'csse'), '/preview/navigation/courses/csse/');
 });
 
 test('returning visitors enter their saved course without an account', () => {
@@ -15,7 +15,7 @@ test('returning visitors enter their saved course without an account', () => {
   rememberCourse('CSA', storage);
   assert.equal(savedCourse(storage), 'csa');
   assert.equal(selectEntryCourse([], savedCourse(storage)), 'csa');
-  assert.equal(courseEntryUrl('', savedCourse(storage)), '/csa/blogs/');
+  assert.equal(courseEntryUrl('', savedCourse(storage)), '/navigation/courses/csa/');
 });
 
 test('enrollment resolves directly and honors a saved enrolled course', () => {
@@ -54,15 +54,15 @@ test('header routes guests and enrolled users directly without rewriting unrelat
     console: { log() {}, warn() {}, error() {} },
   });
   vm.runInContext(routing, context);
-  assert.equal(courseLink.href, '/preview/csse/blogs/');
+  assert.equal(courseLink.href, '/preview/navigation/courses/csse/');
   selected = 'csp';
   await vm.runInContext('updateNavigation(false)', context);
-  assert.equal(courseLink.href, '/preview/csp/blogs/');
+  assert.equal(courseLink.href, '/preview/navigation/courses/csp/');
   await vm.runInContext('updateNavigation(true)', context);
-  assert.equal(courseLink.href, '/preview/csa/blogs/');
+  assert.equal(courseLink.href, '/preview/navigation/courses/csa/');
   assert.equal(courseLink.textContent, 'APCSA');
   classes = ['CSP', 'CSA'];
   selected = 'csa';
   await vm.runInContext('updateNavigation(true)', context);
-  assert.equal(courseLink.href, '/preview/csa/blogs/');
+  assert.equal(courseLink.href, '/preview/navigation/courses/csa/');
 });

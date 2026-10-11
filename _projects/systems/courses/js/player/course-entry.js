@@ -38,5 +38,5 @@ export function selectEntryCourse(classes, selected, fallback = 'csse') {
 export function courseEntryUrl(baseurl, course) {
   const normalized = normalizeCourse(course);
   if (!normalized) throw new Error(`Unknown course: ${course}`);
-  return `${baseurl}/${normalized}/blogs/`;
+  return `${baseurl}/navigation/courses/${normalized}/`;
 }

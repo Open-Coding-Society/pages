@@ -28,7 +28,10 @@
           the crumb opens the week's intro; currentWeekUrl is set by
           lesson-sidebar-nav.html, which is included first.
         {%- endcomment -%}
-        {%- if page.player_page.kind == "week" %}
+        {%- if page.player_page.kind == "blogs" %}
+        <i class="fas fa-chevron-right"></i>
+        <span><a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}/">{{ current_course | upcase }}</a></span>
+        {%- elsif page.player_page.kind == "week" %}
         <i class="fas fa-chevron-right"></i>
         <span><a href="{{ site.baseurl }}/{{ current_course }}/sprint-{{ page.player_page.sprint }}/">Sprint {{ page.player_page.sprint }}</a></span>
         {%- elsif current_week != null %}
@@ -40,7 +43,7 @@
         {%- endif %}
         {%- endif %}
         <i class="fas fa-chevron-right"></i>
-        <span class="current">{{ page.title }}</span>
+        <span class="current">{% if page.player_page.kind == "home" %}{{ current_course | upcase }}{% else %}{{ page.title }}{% endif %}</span>
         {%- unless page.player_page %}
         <button id="topbar-complete-btn" class="ocs__btn ocs__btn--icon small accent" onclick="toggleComplete()" type="button" aria-label="Mark lesson complete" aria-pressed="false" title="Mark lesson complete">
           <i class="fas fa-circle" id="complete-icon-topbar" aria-hidden="true"></i>

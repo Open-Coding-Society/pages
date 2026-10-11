@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Week 12 - System Contributions and Curriculum Retrospective"
+title: "System Contributions and Curriculum Retrospective"
 description: "Reflect on sustained OCS contributions, mentor and community feedback, individual competence, and the transition into CSA2."
 permalink: /csa/checkpoints/week-12/
 lesson_group: csa1

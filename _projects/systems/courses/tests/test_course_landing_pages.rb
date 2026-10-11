@@ -75,7 +75,7 @@ Dir.mktmpdir("course-landing-") do |source|
     assert(!home.include?('class="timeline-container"'), "#{course} has no duplicate sprint timeline")
     assert(!home.include?('id="lesson-pager"'), "#{course} home has no lesson pager")
     assert(home.scan('data-course-entry ').size == 1 &&
-           home.include?('data-default-course="csse" href="/preview/csse/blogs/"'),
+           home.include?('data-default-course="csse" href="/preview/navigation/courses/csse/"'),
            "#{course} has one direct course entry respecting baseurl")
     assert(home.include?('rememberCourse(COURSE);'), "#{course} remembers the selected course")
     title = site.pages.find { |p| p.name == "#{course}.md" }.data["title"]
@@ -113,6 +113,11 @@ Dir.mktmpdir("course-landing-") do |source|
       assert(html.match?(%r{<div class="breadcrumbs">\s*<button class="mobile-course-menu"[^>]*aria-controls="timeline-modal"}),
              "#{path} places mobile course navigation at the upper left before breadcrumbs")
       breadcrumbs = html.split('class="breadcrumbs"', 2).last.split('</div>', 2).first
+      if path == "navigation/courses/#{course}/index.html"
+        assert(breadcrumbs.include?("<span class=\"current\">#{course.upcase}</span>") &&
+               !breadcrumbs.include?(title),
+               "#{path} uses the short course pill name, not the full title")
+      end
       assert(breadcrumbs.include?('id="lesson-sidebar-toggle"') &&
              breadcrumbs.index('id="lesson-sidebar-toggle"') < breadcrumbs.index('title="Course home"'),
              "#{path} places desktop navigation on the left before the home icon")
@@ -125,6 +130,8 @@ Dir.mktmpdir("course-landing-") do |source|
       assert(!topbar.include?('fa-comments'),
              "#{path} omits the extra topbar chat shortcut")
       if path == "#{course}/blogs/index.html"
+        assert(breadcrumbs.match?(%r{title="Course home".*href="/preview/navigation/courses/#{course}/">#{course.upcase}</a>.*class="current">Blogs</span>}m),
+               "#{path} shows Home, selected course, and Blogs in breadcrumb order")
         assert(html.match?(%r{<a class="ocs__btn[^"]* fill" href="/preview/#{course}/blogs/" aria-current="page"}),
                "#{path} highlights the current Blogs page")
       end
