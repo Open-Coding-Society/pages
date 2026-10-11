@@ -115,6 +115,19 @@ is closed. Both panels put course buttons across the top with an X at the
 upper right, and the selected course title below. Closing returns focus to the
 hamburger; opening moves focus to the panel's close button.
 
+Navigation remembers expanded sections and scroll position per course, separately
+for desktop and mobile, in `ocs-course-navigation:<course>:<panel>` localStorage
+keys. Opening a page (including Previous/Next and browser history) expands its
+containing sprint/week and reveals its selected row only if it is outside the
+restored viewport. Other expanded sections remain open. Hidden panels retain
+their last scroll position until reopened. Mobile resize handling does not
+rebuild the menu or attach duplicate click listeners.
+The last opened document is also remembered separately from the current page.
+Returning to Blogs (or course home) keeps that page in the main pane while the
+last document is highlighted in navigation with a "Continue reading" tooltip
+and its containing sections expanded. It does not redirect or mark it complete.
+Validate persistence with `node --test tests/course_navigation_state.test.mjs`.
+
 Styles use the OCS components and `_sass/open-coding/lesson-player.scss`.
 Publish entry-page changes with `make -C _projects/systems/courses assets`.
 Validate rendering with `bundle exec ruby scripts/test_course_landing_pages.rb`

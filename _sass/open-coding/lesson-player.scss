@@ -206,11 +206,13 @@ body:has(.lesson-player) {
   outline-offset: -2px;
 }
 
-.lesson-item.active {
+.lesson-item.active,
+.lesson-item.navigation-resume {
   background: color-mix(in srgb, var(--pref-accent-color) 10%, transparent);
 }
 
-.lesson-item.active .lesson-title {
+.lesson-item.active .lesson-title,
+.lesson-item.navigation-resume .lesson-title {
   color: $text;
 }
 
@@ -914,7 +916,8 @@ body:has(.lesson-player) {
   border-color: var(--pref-accent-color);
 }
 
-.modal-lesson-item.active {
+.modal-lesson-item.active,
+.modal-lesson-item.navigation-resume {
   border-color: var(--pref-accent-color);
 }
 

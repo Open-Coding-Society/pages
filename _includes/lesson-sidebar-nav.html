@@ -108,7 +108,7 @@
               and the script in _layouts/post.html turns the chevron when a
               week opens or closes.
             {%- endcomment -%}
-            <details data-week-group{% if week == current_week %} open{% endif %}>
+            <details data-week-group data-week="{{ week }}"{% if week == current_week %} open{% endif %}>
               <summary class="sprint-toggle">
                 <i class="fas {% if week == current_week %}fa-chevron-down{% else %}fa-chevron-right{% endif %} sprint-chevron" aria-hidden="true"></i>
                 <span class="sprint-info">
@@ -203,6 +203,7 @@
 
     function show(hide) {
       sidebar.hidden = hide && wideScreen.matches;
+      sidebar.dispatchEvent(new CustomEvent('navigation-visibility'));
       const button = document.getElementById('lesson-sidebar-toggle');
       const wrapper = document.getElementById('lesson-sidebar-toggle-wrap');
       if (!button || !wrapper) return;
@@ -218,7 +219,7 @@
         // Same as above: the choice just isn't remembered.
       }
       show(hide);
-      document.getElementById(hide ? 'lesson-sidebar-toggle' : 'lesson-sidebar-close').focus();
+      document.getElementById(hide ? 'lesson-sidebar-toggle' : 'lesson-sidebar-close').focus({ preventScroll: true });
     };
 
     show(readerHidSidebar());

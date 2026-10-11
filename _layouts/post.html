@@ -185,6 +185,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
   import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
   import { appendGistSettingsLink } from '{{ site.baseurl }}/assets/js/gist-connection-errors.js';
   import { listRunners, unsavedRunners, readRunners } from '{{ site.baseurl }}/assets/js/runner-io.js';
+  import { createNavigationState } from '{{ site.baseurl }}/assets/js/course-navigation-state.js';
 
   /**
    * ============================================
@@ -216,15 +217,22 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
    * SPRINT NAVIGATION: Toggle sprint visibility
    * ============================================
    */
+  function setSprintOpen(lessons, open) {
+    const toggle = lessons.previousElementSibling;
+    const chevron = toggle.querySelector('.sprint-chevron');
+    lessons.style.display = open ? 'block' : 'none';
+    toggle.setAttribute('aria-expanded', String(open));
+    chevron.classList.toggle('fa-chevron-right', !open);
+    chevron.classList.toggle('fa-chevron-down', open);
+  }
+
   window.toggleSprint = function (sprintId) {
     const lessons = document.getElementById(`sprint-${sprintId}-lessons`);
     const chevron = document.getElementById(`chevron-${sprintId}`);
     if (!lessons || !chevron) return;
 
-    const isHidden = lessons.style.display === 'none';
-    lessons.style.display = isHidden ? 'block' : 'none';
-    chevron.classList.toggle('fa-chevron-right', !isHidden);
-    chevron.classList.toggle('fa-chevron-down', isHidden);
+    setSprintOpen(lessons, lessons.style.display === 'none');
+    lessons.dispatchEvent(new CustomEvent('navigation-toggle', { bubbles: true }));
   };
 
   // A week is a <details>, so the browser opens and closes it; this only
@@ -448,16 +456,23 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     }
   }
 
-  function expandCurrentSprint() {
-    // This page's row, or on a week's chat page that week's chat link.
-    const current = document.querySelector('.lesson-item.active, #lesson-sidebar .sprint-nav [aria-current="page"]');
-    if (!current) return;
-
-    const sprintSection = current.closest('.sprint-section');
-    if (sprintSection) {
-      const sprintToggle = sprintSection.querySelector('.sprint-toggle');
-      if (sprintToggle) sprintToggle.click();
-    }
+  function restoreSidebarNavigation() {
+    const sidebar = document.getElementById('lesson-sidebar');
+    const sections = [
+      ...Array.from(sidebar.querySelectorAll('.lesson-list'), element => ({
+        id: element.id, element,
+        isOpen: () => element.style.display !== 'none',
+        setOpen: open => setSprintOpen(element, open)
+      })),
+      ...Array.from(sidebar.querySelectorAll('[data-week-group]'), element => ({
+        id: `week-${element.dataset.week}`, element,
+        isOpen: () => element.open,
+        setOpen: open => { element.open = open; }
+      }))
+    ];
+    const navigation = createNavigationState(sidebar, COURSE, 'desktop', sections);
+    navigation.restore();
+    sidebar.addEventListener('navigation-visibility', () => navigation.restorePosition());
   }
 
   /**
@@ -522,7 +537,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     modalContent.innerHTML = Object.entries(sprintGroups).map(([sprintTitle, lessons]) => {
       const sprintId = sprintTitle.replace(/\s+/g, '-').toLowerCase();
       const lessonHTML = lessons.map(lesson => `
-        <a href="${lesson.url}" class="modal-lesson-item ${lesson.active ? 'active' : ''}">
+        <a href="${lesson.url}" data-lesson-id="${lesson.id || ''}" class="modal-lesson-item ${lesson.active ? 'active' : ''}">
           <i class="${lesson.completed ? 'fa-solid fa-circle-check' : lesson.icon} modal-lesson-status ${lesson.completed ? 'completed' : 'incomplete'}"></i>
           <span class="modal-lesson-title">${lesson.title}</span>
         </a>
@@ -543,19 +558,6 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
       `;
     }).join('');
 
-    // Auto-expand active sprint
-    const sprintGroups_arr = Object.values(sprintGroups);
-    const activeSprintIndex = sprintGroups_arr.findIndex(lessons => 
-      lessons.some(l => l.active)
-    );
-    
-    if (activeSprintIndex !== -1) {
-      const activeSprintTitle = Object.keys(sprintGroups)[activeSprintIndex];
-      const sprintId = activeSprintTitle.replace(/\s+/g, '-').toLowerCase();
-      setTimeout(() => {
-        window.toggleModalSprint(sprintId);
-      }, 0);
-    }
   }
 
   window.toggleModalSprint = function (sprintId) {
@@ -566,6 +568,8 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     lessonsContainer.classList.toggle('expanded');
     toggleBtn.classList.toggle('fa-chevron-down', !lessonsContainer.classList.contains('expanded'));
     toggleBtn.classList.toggle('fa-chevron-up', lessonsContainer.classList.contains('expanded'));
+    toggleBtn.closest('button').setAttribute('aria-expanded', String(lessonsContainer.classList.contains('expanded')));
+    lessonsContainer.dispatchEvent(new CustomEvent('navigation-toggle', { bubbles: true }));
   };
 
   function setupMobileModal() {
@@ -575,15 +579,21 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     const closeBtn = document.getElementById('timeline-close-btn');
     const modalContent = document.getElementById('timeline-modal-content');
 
-    if (window.innerWidth > 768) {
-      if (floatingBtn) floatingBtn.style.display = 'none';
-      return;
-    }
-
-    if (floatingBtn) floatingBtn.style.display = 'flex';
-
     const sprintGroups = buildTimelineModal();
     renderTimelineModal(sprintGroups);
+    const sections = Array.from(modalContent.querySelectorAll('.modal-lessons'), element => ({
+      id: element.id, element,
+      isOpen: () => element.classList.contains('expanded'),
+      setOpen: open => {
+        element.classList.toggle('expanded', open);
+        const button = element.previousElementSibling.querySelector('button');
+        button.setAttribute('aria-expanded', String(open));
+        button.querySelector('i').classList.toggle('fa-chevron-down', !open);
+        button.querySelector('i').classList.toggle('fa-chevron-up', open);
+      }
+    }));
+    const navigation = createNavigationState(modalContent, COURSE, 'mobile', sections);
+    navigation.restore();
 
     const openModal = () => {
       timelineModal.classList.add('open');
@@ -591,6 +601,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
       document.body.style.overflow = 'hidden';
       floatingBtn.setAttribute('aria-expanded', 'true');
       closeBtn.focus();
+      navigation.restorePosition();
     };
 
     const closeModal = () => {
@@ -614,6 +625,9 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
         if (e.target.closest('.modal-lesson-item')) closeModal();
       });
     }
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768 && timelineModal.classList.contains('open')) closeModal();
+    });
   }
 
   /**
@@ -1160,14 +1174,13 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
   function initializePage() {
     // Lesson player setup
     initLessonPlayer();
-    expandCurrentSprint();
+    restoreSidebarNavigation();
     syncCompletionUI();
     fillLessonPager();
     setupSyncListeners();
     
     // Mobile enhancements
     setupMobileModal();
-    window.addEventListener('resize', () => setupMobileModal());
     
     // Auto-create assignment if needed
     autoCreateAssignmentIfNeeded();
