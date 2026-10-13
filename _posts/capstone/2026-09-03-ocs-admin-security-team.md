@@ -2,8 +2,8 @@
 microblog: true
 toc: false
 layout: post
-title: OCS Admin & Security Team
-description: "The systems that protect Open Coding Society as it scales: identity verification and password enforcement across the frontend and both backends, isolated execution for student code, automated database maintenance, and a role-based mentor system."
+title: OCS in a Kit
+description: "Packaging Open Coding Society so other schools can ship it under their own branding, in three sectors: a kit that moves school settings out of the code and into one data file, security for sign-in and student code, and backend for account activation and mentors."
 permalink: /capstone/ocs-admin-security/
 ---
 

@@ -932,14 +932,14 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
-   <!-- OCS Admin & Security Team (CSA) -->
+   <!-- OCS in a Kit, formerly OCS Admin & Security Team (CSA) -->
   <div class="ocs__grid-cell CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-09-03-ocs-admin-security-team %}">
-           <img src="/images/capstone/cccs-security-logo.png" alt="OCS Admin & Security Team" class="ocs__image-frame ocs__image-frame--thumbnail" />
+           <img src="/images/capstone/cccs-security-logo.png" alt="OCS in a Kit" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url capstone/2026-09-03-ocs-admin-security-team %}">OCS Admin & Security Team</a></h3>
-           <p>The OCS Admin & Security team maintains the systems that keep OCS operational, recoverable, and secure. Administration includes backup and restore, schema upgrades, AWS RDS/S3/EC2 operations, administrative MVC/Thymeleaf tools, user recovery and password services, mentor and parent authorization, and year-to-year system resets and data pruning. Security examines how the OCS application can be compromised, including isolated Code Runner containers, protection against injected or unsafe student code, JWT and cookie security, and security boundaries across the Java/Spring and Python/Flask systems. Together, the work moves students from building application features to maintaining and protecting a production system.</p>
+           <h3><a href="{% post_url capstone/2026-09-03-ocs-admin-security-team %}">OCS in a Kit</a></h3>
+           <p>OCS in a Kit packages Open Coding Society so other schools can ship it under their own branding. The team works in three sectors. The kit moves school domains, account types, and policy values out of the code and into one data file, so a new school changes settings and not source. Security protects sign-in and password reset and runs student code in isolated containers. Backend activates and verifies accounts, manages the mentor role, and builds the Account Administration screen for teachers and admins.</p>
            <p>Team: Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengji L, Jacob C, Arnav P</p>
        </div>
    </div>
