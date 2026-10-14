@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 640" xmlns="http://www.w3.org/2000/svg" width="1200" height="640">
+        <title>A student taps the RFID tag on their laptop on the CrowPi reader by the classroom door. Flask logs the tap and the dashboard shows the student as present. A wall camera, drawn dashed, is the next step.</title>
+        <defs><clipPath id="pv-hero-clip"><rect width="1200" height="640" rx="28" fill="rgb(0, 0, 0)" stroke-width="1px"></rect></clipPath></defs>
+        <g clip-path="url(#pv-hero-clip)" fill="rgb(0, 0, 0)" stroke-width="1px" font-size="16px" font-weight="400">
+          <rect width="1200" height="640" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
+          <rect y="478" width="1200" height="162" fill="rgb(207, 216, 227)" stroke-width="1px"></rect>
+          <rect y="470" width="1200" height="10" fill="rgb(195, 206, 219)" stroke-width="1px"></rect>
+          <polygon points="138,480 332,480 410,640 64,640" fill="rgb(241, 233, 211)" stroke-width="1px"></polygon>
+          <rect x="118" y="188" width="234" height="292" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+          <rect x="138" y="208" width="194" height="272" fill="rgb(252, 242, 212)" stroke-width="1px"></rect>
+          <polygon points="276,222 332,208 332,480 276,466" fill="rgb(66, 90, 125)" stroke-width="1px"></polygon>
+          <circle cx="288" cy="350" r="5" fill="rgb(223, 231, 239)" stroke-width="1px"></circle>
+          <rect x="175" y="140" width="120" height="36" rx="8" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+          <text x="235" y="165" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="20px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Room 1</text>
+          <g fill="rgb(0, 0, 0)" stroke-width="1px" opacity="0.75" font-size="16px" font-weight="400">
+            <polygon points="566,136 450,206 562,302" fill="rgb(111, 127, 153)" fill-opacity="0.14" stroke="rgb(111, 127, 153)" stroke-width="2px" stroke-dasharray="6px, 6px"></polygon>
+            <path d="M452 226 v-24 h24 M538 202 h24 v24 M562 282 v24 h-24 M476 306 h-24 v-24" fill="none" stroke="rgb(111, 127, 153)" stroke-width="4px" stroke-dasharray="9px, 7px"></path>
+            <rect x="650" y="108" width="16" height="48" rx="3" fill="none" stroke="rgb(111, 127, 153)" stroke-width="4px" stroke-dasharray="9px, 7px"></rect>
+            <rect x="560" y="120" width="92" height="36" rx="13" transform="rotate(20 606 138)" fill="none" stroke="rgb(111, 127, 153)" stroke-width="4px" stroke-dasharray="9px, 7px"></rect>
+            <circle cx="572" cy="128" r="9" fill="none" stroke="rgb(111, 127, 153)" stroke-width="4px" stroke-dasharray="9px, 7px"></circle>
+          </g>
+          <rect x="676" y="150" width="152" height="34" rx="17" fill="none" stroke="rgb(111, 127, 153)" stroke-width="2.5px" stroke-dasharray="7px, 5px"></rect>
+          <text x="752" y="173" text-anchor="middle" fill="rgb(111, 127, 153)" stroke-width="1px" font-size="19px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Camera · next</text>
+          <ellipse cx="508" cy="606" rx="96" ry="11" fill="rgba(22, 33, 59, 0.12)" stroke-width="1px"></ellipse>
+          <line x1="494" y1="452" x2="470" y2="584" fill="rgb(0, 0, 0)" stroke="rgb(17, 26, 46)" stroke-width="36px" stroke-linecap="round"></line>
+          <line x1="520" y1="452" x2="550" y2="584" fill="rgb(0, 0, 0)" stroke="rgb(38, 53, 90)" stroke-width="36px" stroke-linecap="round"></line>
+          <rect x="442" y="582" width="54" height="22" rx="11" fill="rgb(14, 21, 38)" stroke-width="1px"></rect>
+          <rect x="530" y="582" width="58" height="22" rx="11" fill="rgb(14, 21, 38)" stroke-width="1px"></rect>
+          <line x1="476" y1="330" x2="464" y2="424" fill="rgb(0, 0, 0)" stroke="rgb(201, 143, 62)" stroke-width="28px" stroke-linecap="round"></line>
+          <circle cx="463" cy="432" r="11" fill="rgb(168, 113, 79)" stroke-width="1px"></circle>
+          <rect x="460" y="300" width="96" height="172" rx="46" fill="rgb(224, 166, 79)" stroke-width="1px"></rect>
+          <rect x="496" y="278" width="22" height="28" fill="rgb(196, 138, 102)" stroke-width="1px"></rect>
+          <circle cx="498" cy="246" r="38" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+          <circle cx="510" cy="254" r="33" fill="rgb(196, 138, 102)" stroke-width="1px"></circle>
+          <circle cx="500" cy="260" r="6" fill="rgb(168, 113, 79)" stroke-width="1px"></circle>
+          <circle cx="528" cy="250" r="3.5" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+          <rect x="700" y="455" width="222" height="14" rx="4" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+          <rect x="718" y="469" width="12" height="118" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+          <rect x="892" y="469" width="12" height="118" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+          <rect x="742" y="405" width="160" height="50" rx="8" fill="rgb(36, 50, 77)" stroke-width="1px"></rect>
+          <rect x="752" y="412" width="48" height="36" rx="5" fill="rgb(233, 238, 245)" stroke-width="1px"></rect>
+          <rect x="812" y="414" width="80" height="32" rx="4" fill="rgb(127, 196, 165)" stroke-width="1px"></rect>
+          <line x1="532" y1="334" x2="640" y2="410" fill="rgb(0, 0, 0)" stroke="rgb(201, 143, 62)" stroke-width="28px" stroke-linecap="round"></line>
+          <g transform="translate(36 22) rotate(-12 680 380)" fill="rgb(0, 0, 0)" stroke-width="1px" font-size="16px" font-weight="400">
+            <rect x="600" y="340" width="150" height="92" rx="8" fill="rgb(185, 196, 211)" stroke-width="1px"></rect>
+            <rect x="600" y="424" width="150" height="8" rx="3" fill="rgb(131, 146, 169)" stroke-width="1px"></rect>
+            <rect x="718" y="396" width="24" height="24" rx="5" fill="rgb(59, 111, 212)" stroke-width="1px"></rect>
+            <circle cx="730" cy="408" r="5" fill="rgb(255, 255, 255)" stroke-width="1px"></circle>
+          </g>
+          <circle cx="645" cy="413" r="12" fill="rgb(196, 138, 102)" stroke-width="1px"></circle>
+          <path d="M806 392 q14 16 0 32 M818 384 q22 24 0 48 M830 376 q30 32 0 64" fill="none" stroke="rgb(91, 134, 214)" stroke-width="5px" stroke-linecap="round"></path>
+          <circle cx="700" cy="330" r="24" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+          <text x="700" y="339" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="24px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">1</text>
+          <text x="736" y="339" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Tap laptop tag</text>
+          <line x1="908" y1="428" x2="966" y2="412" fill="rgb(0, 0, 0)" stroke="rgb(22, 33, 59)" stroke-width="4px" stroke-dasharray="10px, 8px"></line>
+          <polygon points="978,409 962,404 965,420" fill="rgb(22, 33, 59)" stroke-width="1px"></polygon>
+          <rect x="984" y="300" width="124" height="36" rx="8" fill="rgb(36, 50, 77)" stroke-width="1px"></rect>
+          <rect x="984" y="344" width="124" height="36" rx="8" fill="rgb(36, 50, 77)" stroke-width="1px"></rect>
+          <rect x="984" y="388" width="124" height="36" rx="8" fill="rgb(36, 50, 77)" stroke-width="1px"></rect>
+          <circle cx="1004" cy="318" r="5" fill="rgb(127, 196, 165)" stroke-width="1px"></circle>
+          <circle cx="1004" cy="362" r="5" fill="rgb(127, 196, 165)" stroke-width="1px"></circle>
+          <circle cx="1004" cy="406" r="5" fill="rgb(127, 196, 165)" stroke-width="1px"></circle>
+          <circle cx="1046" cy="262" r="24" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+          <text x="1046" y="271" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="24px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">2</text>
+          <text x="1046" y="460" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Flask logs it</text>
+          <line x1="1046" y1="232" x2="1046" y2="160" fill="rgb(0, 0, 0)" stroke="rgb(22, 33, 59)" stroke-width="4px" stroke-dasharray="10px, 8px"></line>
+          <polygon points="1046,146 1038,162 1054,162" fill="rgb(22, 33, 59)" stroke-width="1px"></polygon>
+          <rect x="744" y="42" width="420" height="104" rx="20" fill="rgba(22, 33, 59, 0.12)" stroke-width="1px"></rect>
+          <rect x="740" y="36" width="420" height="104" rx="20" fill="rgb(255, 255, 255)" stroke-width="1px"></rect>
+          <circle cx="800" cy="88" r="30" fill="rgb(79, 157, 98)" stroke-width="1px"></circle>
+          <path d="M786 89 l10 10 l19 -21" fill="none" stroke="rgb(255, 255, 255)" stroke-width="6px" stroke-linecap="round" stroke-linejoin="round"></path>
+          <text x="846" y="82" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="30px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Vibha is present</text>
+          <text x="846" y="114" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="22px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Room 1, 8:02 AM</text>
+          <circle cx="700" cy="88" r="24" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+          <text x="700" y="97" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="24px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">3</text>
+        </g>
+      </svg>

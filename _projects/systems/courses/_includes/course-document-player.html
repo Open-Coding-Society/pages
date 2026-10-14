@@ -1,0 +1,1178 @@
+{% comment %}
+=== TWO-PANE LESSON PLAYER FOR CSP COURSES ===
+{% endcomment %}
+
+{% assign posts = null | compact %}
+{% assign posts = posts | concat: site.posts | concat: site.pages %}
+
+{%- comment -%}
+  This course's lessons: the posts and pages whose front matter puts them in
+  this course only. Found once here for the sidebar and the player pages.
+{%- endcomment -%}
+{%- assign coursePosts = "" | split: "" -%}
+{%- for post in posts -%}
+  {%- if post.courses[current_course] and post.courses.size == 1 -%}
+    {%- assign coursePosts = coursePosts | push: post -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- if current_course == 'csa' -%}
+  {%- assign coursePosts = coursePosts | sort: "title" -%}
+{%- endif -%}
+{%- comment -%}
+  The same lessons grouped by week, in the same order, so a week's lessons are
+  one lookup (lessonsByWeek | where: "name", week) instead of a scan of every
+  lesson for every week. plus: 0 reads "2" and 2 alike, as the sidebar always has.
+{%- endcomment -%}
+{%- assign lessonsByWeek = coursePosts | group_by_exp: "post", "post.courses[current_course].week | plus: 0" -%}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<div class="lesson-player">
+  <!-- LEFT SIDEBAR -->
+  {% include lesson-sidebar-nav.html %}
+
+  <!-- MAIN CONTENT -->
+  <div class="lesson-main">
+    <!-- Top Bar -->
+    {% include lesson-topbar.html %}
+
+    <!-- Lesson Content -->
+    <div class="lesson-content">
+      <div class="lesson-content-inner">
+        <div class="lesson-header">
+          <h1>{{ page.title | escape }}</h1>
+          {%- unless page.player_page -%}
+          <div class="lesson-meta">
+            {%- if page.show_reading_time != false -%}
+            <span><i class="fa-solid fa-clock"></i> {% include reading_time.html %}</span>
+            {%- endif -%}
+            {% if page.assignment %}
+            <span>•</span>
+            <span><i class="fa-solid fa-file-alt"></i> Assignment</span>
+            {% endif %}
+          </div>
+          {%- endunless -%}
+        </div>
+
+        {% if page.player_page %}
+        {%- comment -%}
+          Not a lesson, so none of the lesson tools or the pager: the body is the
+          page's own include, built only from OCS components.
+        {%- endcomment -%}
+        <div data-player-page="{{ page.player_page.kind }}">
+          {% include player-pages/{{ page.player_page.kind }}.html %}
+        </div>
+        {% else %}
+        <div class="lesson-body">
+          {%- if page.toc -%}
+          {% include toc.html html=content %}
+          {%- endif -%}
+
+          {%- if page.submenu -%}
+          {%- include submenu.html -%}
+          {%- endif -%}
+
+          {{ content }}
+
+          {% if page.show_gist_export %}
+          {% comment %} Only show the export button when the notebook explicitly requests it {% endcomment %}
+          {% include gist-export-button.html %}
+          {% endif %}
+
+          {% if page.grading_modules %}
+          {% comment %} Render the grading/submission module at the bottom of the lesson content (not above it) {% endcomment %}
+          {% include grading_modules.html %}
+          {% endif %}
+
+          {% if page.assignment %}
+          {% include lesson-submission-form.html %}
+          <p style="margin-top: 12px; color: #9ca3af; font-size: 0.95rem;">
+            Need to update a submission later? Open the <a href="{{ site.baseurl }}/submissions" style="color: #60a5fa; text-decoration: underline;">submissions dashboard</a>.
+          </p>
+          {% endif %}
+
+          {% if page.chat %}
+          {% include lesson_chat.html %}
+          {% endif %}
+
+          <!-- Previous / next lesson, filled in from the sidebar order by fillLessonPager() -->
+          <div class="ocs__pager" id="lesson-pager" hidden>
+            <a href="#" class="ocs__pager-link" id="pager-prev"></a>
+            <a href="#" class="ocs__pager-link next" id="pager-next"></a>
+          </div>
+        </div>
+        {% endif %}
+
+        {%- if page.comments -%}
+        <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid #2a2a2a;">
+          {%- include utterances.html -%}
+        </div>
+        {%- endif -%}
+      </div>
+    </div>
+</div>
+
+{% if page.challenge_submit %}
+<script>
+  // Wire the bottom-bar "Submit Lesson" button to the lesson submit component injected by notebook conversion.
+  (function () {
+    const btn = document.getElementById('submit-lesson-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+      // Prefer clicking the existing lesson submit button if present
+      const lessonSubmitBtn = document.querySelector('.lesson-submit-container .lesson-submit-btn');
+      if (lessonSubmitBtn) {
+        lessonSubmitBtn.click();
+        return;
+      }
+
+      // Fallback: scroll to any submit UI on the page
+      const submitContainer = document.querySelector('.lesson-submit-container');
+      if (submitContainer) {
+        submitContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  })();
+</script>
+{% endif %}
+
+<!-- Modals for lesson player -->
+{% include lesson-modals.html %}
+
+<script type="module">
+  import { pythonURI, fetchOptions, javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
+  import { appendGistSettingsLink } from '{{ site.baseurl }}/assets/js/gist-connection-errors.js';
+  import { listRunners, unsavedRunners, readRunners } from '{{ site.baseurl }}/assets/js/runner-io.js';
+  import { createNavigationState } from '{{ site.baseurl }}/assets/js/course-navigation-state.js';
+  import { rememberCourse } from '{{ site.baseurl }}/assets/js/course-entry.js';
+
+  /**
+   * ============================================
+   * CONFIGURATION & CONSTANTS
+   * ============================================
+   */
+  const COURSE = '{{ current_course }}';
+  rememberCourse(COURSE);
+  const WEEK = '{{ current_week }}';
+  const PAGE_TITLE = {{ page.title | jsonify }};
+  const CURRENT_LESSON_ID = '{{ page.url }}';
+  const SUBMISSION_TYPE = {{ page.assignment_submission_type | default: "file" | downcase | jsonify }};
+  const GITHUB_ISSUE_URL_PATTERN = /^https?:\/\/github\.com\/[^/]+\/[^/#?]+\/issues\/\d+\/?$/i;
+  const STORAGE_KEY = `${COURSE}-lesson-completion`;
+  // Sidebar rows. Every row is a step for Prev / Next and the pager, so a new
+  // sprint or week opens on its intro page. Only lessons carry data-lesson-id,
+  // so only they count toward progress.
+  const STEP_ROWS = '.lesson-item';
+  const LESSON_ROWS = '.lesson-item[data-lesson-id]';
+  const STATUS_AUTO_HIDE_MS = 5000;
+  const FILE_SIZE_LIMIT_MB = 10;
+  const FRONTMATTER_ASSIGNMENT_ID = {{ page.assignment_id | default: 'null' }};
+  const FRONTMATTER_ASSIGNMENT_NAME = {{ page.assignment_name | default: nil | jsonify }};
+  let CURRENT_ASSIGNMENT_ID = FRONTMATTER_ASSIGNMENT_ID;
+  let CURRENT_ASSIGNMENT_NAME = FRONTMATTER_ASSIGNMENT_NAME;
+  let ASSIGNMENT_RESOLVE_PROMISE = null;
+
+  /**
+   * ============================================
+   * SPRINT NAVIGATION: Toggle sprint visibility
+   * ============================================
+   */
+  function setSprintOpen(lessons, open) {
+    const toggle = lessons.previousElementSibling;
+    const chevron = toggle.querySelector('.sprint-chevron');
+    lessons.style.display = open ? 'block' : 'none';
+    toggle.setAttribute('aria-expanded', String(open));
+    chevron.classList.toggle('fa-chevron-right', !open);
+    chevron.classList.toggle('fa-chevron-down', open);
+  }
+
+  window.toggleSprint = function (sprintId) {
+    const lessons = document.getElementById(`sprint-${sprintId}-lessons`);
+    const chevron = document.getElementById(`chevron-${sprintId}`);
+    if (!lessons || !chevron) return;
+
+    setSprintOpen(lessons, lessons.style.display === 'none');
+    lessons.dispatchEvent(new CustomEvent('navigation-toggle', { bubbles: true }));
+  };
+
+  // A week is a <details>, so the browser opens and closes it; this only
+  // turns its chevron to match, the way toggleSprint() turns a sprint's.
+  document.querySelectorAll('[data-week-group]').forEach((week) => {
+    week.addEventListener('toggle', () => {
+      const chevron = week.querySelector('summary .sprint-chevron');
+      if (!chevron) return;
+      chevron.classList.toggle('fa-chevron-right', !week.open);
+      chevron.classList.toggle('fa-chevron-down', week.open);
+    });
+  });
+
+  /**
+   * ============================================
+   * COMPLETION DATA LAYER: LocalStorage operations
+   * ============================================
+   */
+  function getCompletionData() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+      console.error('Error reading completion data:', e);
+      return {};
+    }
+  }
+
+  function saveCompletionData(data) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.error('Error saving completion data:', e);
+    }
+  }
+
+  /**
+   * ============================================
+   * COMPLETION TOGGLING: Toggle lesson status
+   * ============================================
+   */
+  window.toggleComplete = function () {
+    const completionData = getCompletionData();
+    const isCompleted = completionData[CURRENT_LESSON_ID] || false;
+    completionData[CURRENT_LESSON_ID] = !isCompleted;
+    saveCompletionData(completionData);
+
+    syncCompletionUI();
+    window.dispatchEvent(new CustomEvent('completionChanged', {
+      detail: { itemId: CURRENT_LESSON_ID, completed: !isCompleted }
+    }));
+  };
+
+  /**
+   * ============================================
+   * UI UPDATES: Individual responsibility functions
+   * ============================================
+   */
+  function updateCompleteButton(isCompleted) {
+    const updateButton = (iconId, textId) => {
+      const icon = document.getElementById(iconId);
+      const text = document.getElementById(textId);
+      if (!icon) return;
+      
+      icon.classList.toggle('fa-circle', !isCompleted);
+      icon.classList.toggle('fa-circle-check', isCompleted);
+      if (text) text.textContent = isCompleted ? 'Completed' : 'Burndown';
+      const button = icon.closest('button');
+      if (button) {
+        const label = isCompleted ? 'Mark lesson incomplete' : 'Mark lesson complete';
+        button.setAttribute('aria-label', label);
+        button.setAttribute('aria-pressed', String(isCompleted));
+        button.title = label;
+      }
+    };
+    
+    updateButton('complete-icon', 'complete-text');
+    updateButton('complete-icon-topbar', 'complete-text-topbar');
+  }
+
+  function updateLessonItems(completionData) {
+    let completed = 0;
+    const lessonItems = document.querySelectorAll(LESSON_ROWS);
+    
+    lessonItems.forEach(item => {
+      const lessonId = item.dataset.lessonId;
+      const icon = item.querySelector('.lesson-status-icon');
+      const isCompleted = completionData[lessonId] || false;
+      
+      if (icon) {
+        icon.classList.toggle('fa-circle', !isCompleted);
+        icon.classList.toggle('fa-circle-check', isCompleted);
+        icon.classList.toggle('incomplete', !isCompleted);
+        icon.classList.toggle('completed', isCompleted);
+      }
+      
+      if (isCompleted) completed++;
+    });
+    
+    return { total: lessonItems.length, completed };
+  }
+
+  function updateWeekCounts(completionData) {
+    document.querySelectorAll('[data-week-group]').forEach(group => {
+      const counter = group.querySelector('[data-week-count]');
+      if (!counter) return;
+
+      const items = group.querySelectorAll(LESSON_ROWS);
+      let completed = 0;
+      items.forEach(item => {
+        if (completionData[item.dataset.lessonId]) completed++;
+      });
+
+      counter.textContent = `${completed}/${items.length}`;
+    });
+  }
+
+  function updateProgressBars(completionData) {
+    const lessonItems = Array.from(document.querySelectorAll(LESSON_ROWS));
+    const stats = updateLessonItems(completionData);
+    updateWeekCounts(completionData);
+
+    const sidebarProgress = document.getElementById('sidebar-progress');
+    if (sidebarProgress) {
+      const sidebarPercent = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
+      sidebarProgress.style.width = `${sidebarPercent}%`;
+    }
+    
+    const progressCount = document.getElementById('progress-count');
+    if (progressCount) {
+      progressCount.textContent = `${stats.completed}/${stats.total}`;
+    }
+    
+    const lessonProgress = document.getElementById('lesson-progress');
+    if (lessonProgress) {
+      const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
+      const lessonPercent = stats.total > 0 ? ((currentIndex + 1) / stats.total) * 100 : 0;
+      lessonProgress.style.width = `${lessonPercent}%`;
+    }
+  }
+
+  function syncCompletionUI() {
+    const completionData = getCompletionData();
+    const isCompleted = completionData[CURRENT_LESSON_ID] || false;
+    updateCompleteButton(isCompleted);
+    updateProgressBars(completionData);
+  }
+
+  /**
+   * ============================================
+   * LESSON NAVIGATION: Move between lessons
+   * ============================================
+   */
+  window.prevLesson = function () {
+    const lessonItems = Array.from(document.querySelectorAll(STEP_ROWS));
+    const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
+    if (currentIndex > 0) {
+      window.location.href = lessonItems[currentIndex - 1].href;
+    } else {
+      alert('You are on the first lesson!');
+    }
+  };
+
+  window.nextLesson = function () {
+    const lessonItems = Array.from(document.querySelectorAll(STEP_ROWS));
+    const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
+    if (currentIndex >= 0 && currentIndex < lessonItems.length - 1) {
+      window.location.href = lessonItems[currentIndex + 1].href;
+    } else {
+      alert('You\'ve reached the last lesson!');
+    }
+  };
+
+  /**
+   * ============================================
+   * LESSON PAGER: Fill the prev/next links at the
+   * end of the lesson from the sidebar order
+   * ============================================
+   */
+  function fillLessonPager() {
+    const pager = document.getElementById('lesson-pager');
+    if (!pager) return;
+
+    const lessonItems = Array.from(document.querySelectorAll(STEP_ROWS));
+    const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
+    if (currentIndex === -1) return;
+
+    const prev = lessonItems[currentIndex - 1];
+    const next = lessonItems[currentIndex + 1];
+    const titleOf = item => item.querySelector('.lesson-title').textContent.trim();
+
+    const prevLink = document.getElementById('pager-prev');
+    const nextLink = document.getElementById('pager-next');
+
+    if (prev) {
+      prevLink.href = prev.href;
+      prevLink.innerHTML = `&#8592; ${titleOf(prev)}`;
+    } else {
+      prevLink.replaceWith(document.createElement('span'));
+    }
+
+    if (next) {
+      nextLink.href = next.href;
+      nextLink.innerHTML = `Next: ${titleOf(next)} &rarr;`;
+    } else {
+      nextLink.replaceWith(document.createElement('span'));
+    }
+
+    pager.hidden = false;
+  }
+
+  /**
+   * ============================================
+   * INITIALIZATION: Player setup
+   * ============================================
+   */
+  function initLessonPlayer() {
+    if (document.querySelector('.lesson-player')) {
+      document.body.style.margin = '0';
+      document.body.style.padding = '0';
+    }
+  }
+
+  function restoreSidebarNavigation() {
+    const sidebar = document.getElementById('lesson-sidebar');
+    const sections = [
+      ...Array.from(sidebar.querySelectorAll('.lesson-list'), element => ({
+        id: element.id, element,
+        isOpen: () => element.style.display !== 'none',
+        setOpen: open => setSprintOpen(element, open)
+      })),
+      ...Array.from(sidebar.querySelectorAll('[data-week-group]'), element => ({
+        id: `week-${element.dataset.week}`, element,
+        isOpen: () => element.open,
+        setOpen: open => { element.open = open; }
+      }))
+    ];
+    const navigation = createNavigationState(sidebar, COURSE, 'desktop', sections);
+    navigation.restore();
+    sidebar.addEventListener('navigation-visibility', () => navigation.restorePosition());
+  }
+
+  /**
+   * ============================================
+   * CROSS-TAB SYNC: Listen for changes
+   * ============================================
+   */
+  function setupSyncListeners() {
+    window.addEventListener('focus', () => {
+      if (document.querySelector('.lesson-player')) syncCompletionUI();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && document.querySelector('.lesson-player')) syncCompletionUI();
+    });
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY && document.querySelector('.lesson-player')) {
+        syncCompletionUI();
+      }
+    });
+
+    window.addEventListener('completionChanged', () => {
+      if (document.querySelector('.lesson-player')) syncCompletionUI();
+    });
+  }
+
+  /**
+   * ============================================
+   * TIMELINE MODAL: Mobile navigation
+   * ============================================
+   */
+  function buildTimelineModal() {
+    const completionData = getCompletionData();
+    const lessonItems = document.querySelectorAll('#lesson-sidebar .sprint-section .lesson-item, #lesson-sidebar .sprint-section .ocs__links a');
+    const sprintGroups = {};
+
+    lessonItems.forEach(item => {
+      const sprintSection = item.closest('.sprint-section');
+      if (!sprintSection) return;
+      
+      const sprintTitle = sprintSection.querySelector('.sprint-title').textContent;
+      if (!sprintGroups[sprintTitle]) sprintGroups[sprintTitle] = [];
+      
+      sprintGroups[sprintTitle].push({
+        id: item.dataset.lessonId,
+        title: (item.querySelector('.lesson-title') || item).textContent.trim(),
+        url: item.href,
+        completed: item.dataset.lessonId && completionData[item.dataset.lessonId] || false,
+        active: item.classList.contains('active') || item.getAttribute('aria-current') === 'page',
+        icon: item.dataset.lessonId ? 'fa-solid fa-circle' : (item.querySelector('i')?.className || 'fas fa-book')
+      });
+    });
+
+    return sprintGroups;
+  }
+
+  function renderTimelineModal(sprintGroups) {
+    const modalContent = document.getElementById('timeline-modal-content');
+    if (!modalContent) return;
+
+    modalContent.innerHTML = Object.entries(sprintGroups).map(([sprintTitle, lessons]) => {
+      const sprintId = sprintTitle.replace(/\s+/g, '-').toLowerCase();
+      const lessonHTML = lessons.map(lesson => `
+        <a href="${lesson.url}" data-lesson-id="${lesson.id || ''}" class="modal-lesson-item ${lesson.active ? 'active' : ''}">
+          <i class="${lesson.completed ? 'fa-solid fa-circle-check' : lesson.icon} modal-lesson-status ${lesson.completed ? 'completed' : 'incomplete'}"></i>
+          <span class="modal-lesson-title">${lesson.title}</span>
+        </a>
+      `).join('');
+      
+      return `
+        <div class="modal-sprint-card">
+          <div class="modal-sprint-header">
+            <h3 class="modal-sprint-title">${sprintTitle}</h3>
+            <button class="modal-sprint-toggle" onclick="toggleModalSprint('${sprintId}')">
+              <i class="fa-solid fa-chevron-down"></i> View Lessons
+            </button>
+          </div>
+          <div class="modal-lessons" id="modal-${sprintId}">
+            ${lessonHTML}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+  }
+
+  window.toggleModalSprint = function (sprintId) {
+    const lessonsContainer = document.getElementById(`modal-${sprintId}`);
+    const toggleBtn = document.querySelector(`[onclick="toggleModalSprint('${sprintId}')"] i`);
+    if (!lessonsContainer || !toggleBtn) return;
+
+    lessonsContainer.classList.toggle('expanded');
+    toggleBtn.classList.toggle('fa-chevron-down', !lessonsContainer.classList.contains('expanded'));
+    toggleBtn.classList.toggle('fa-chevron-up', lessonsContainer.classList.contains('expanded'));
+    toggleBtn.closest('button').setAttribute('aria-expanded', String(lessonsContainer.classList.contains('expanded')));
+    lessonsContainer.dispatchEvent(new CustomEvent('navigation-toggle', { bubbles: true }));
+  };
+
+  function setupMobileModal() {
+    const floatingBtn = document.getElementById('floating-menu-btn');
+    const timelineModal = document.getElementById('timeline-modal');
+    const overlay = document.getElementById('timeline-modal-overlay');
+    const closeBtn = document.getElementById('timeline-close-btn');
+    const modalContent = document.getElementById('timeline-modal-content');
+
+    const sprintGroups = buildTimelineModal();
+    renderTimelineModal(sprintGroups);
+    const sections = Array.from(modalContent.querySelectorAll('.modal-lessons'), element => ({
+      id: element.id, element,
+      isOpen: () => element.classList.contains('expanded'),
+      setOpen: open => {
+        element.classList.toggle('expanded', open);
+        const button = element.previousElementSibling.querySelector('button');
+        button.setAttribute('aria-expanded', String(open));
+        button.querySelector('i').classList.toggle('fa-chevron-down', !open);
+        button.querySelector('i').classList.toggle('fa-chevron-up', open);
+      }
+    }));
+    const navigation = createNavigationState(modalContent, COURSE, 'mobile', sections);
+    navigation.restore();
+
+    const openModal = () => {
+      timelineModal.classList.add('open');
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      floatingBtn.setAttribute('aria-expanded', 'true');
+      closeBtn.focus();
+      navigation.restorePosition();
+    };
+
+    const closeModal = () => {
+      timelineModal.classList.remove('open');
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+      floatingBtn.setAttribute('aria-expanded', 'false');
+      floatingBtn.focus();
+    };
+
+    if (floatingBtn) floatingBtn.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (overlay) overlay.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && timelineModal.classList.contains('open')) closeModal();
+    });
+
+    if (modalContent) {
+      modalContent.addEventListener('click', (e) => {
+        if (e.target.closest('.modal-lesson-item')) closeModal();
+      });
+    }
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768 && timelineModal.classList.contains('open')) closeModal();
+    });
+  }
+
+  /**
+   * ============================================
+   * ASSIGNMENT SUBMISSION: API operations
+   * ============================================
+   */
+  async function resolveCurrentUser() {
+    const uidRes = await fetch(`${pythonURI}/api/id`, fetchOptions);
+    if (!uidRes.ok) throw new Error('Not authenticated. Please log in.');
+    const { uid } = await uidRes.json();
+    const personRes = await fetch(`${javaURI}/api/person/uid/${encodeURIComponent(uid)}`, fetchOptions);
+    if (!personRes.ok) throw new Error('Could not resolve your account in the gradebook.');
+    const person = await personRes.json();
+    return { uid, personId: person.id };
+  }
+
+  async function resolveAssignmentName() {
+    if (typeof CURRENT_ASSIGNMENT_NAME === 'string') {
+      const normalized = CURRENT_ASSIGNMENT_NAME.trim().toLowerCase();
+      if (normalized && normalized !== 'null' && normalized !== 'undefined') return CURRENT_ASSIGNMENT_NAME;
+    }
+    const assignmentId = await ensureAssignmentId();
+    const res = await fetch(`${javaURI}/api/assignments/${assignmentId}`, fetchOptions);
+    if (!res.ok) throw new Error('Assignment not found on server.');
+    return await res.text();
+  }
+
+  async function ensureAssignmentId() {
+    const hasAssignment = {{ page.assignment | default: false }};
+    if (!hasAssignment) {
+      if (!CURRENT_ASSIGNMENT_ID) throw new Error("Assignment ID not configured.");
+      return CURRENT_ASSIGNMENT_ID;
+    }
+
+    // For assignment pages, always resolve against backend so uploads/submissions
+    // target the backend assignment ID, not only the static frontmatter ID.
+    if (!ASSIGNMENT_RESOLVE_PROMISE) {
+      ASSIGNMENT_RESOLVE_PROMISE = autoCreateAssignmentIfNeeded();
+    }
+    await ASSIGNMENT_RESOLVE_PROMISE;
+
+    if (!CURRENT_ASSIGNMENT_ID) {
+      throw new Error('Could not resolve backend assignment ID. Please log in and refresh.');
+    }
+    return CURRENT_ASSIGNMENT_ID;
+  }
+
+  async function submitLinkToBackend(link, description, selfAssessment) {
+    const assignmentId = await ensureAssignmentId();
+    const { uid, personId } = await resolveCurrentUser();
+    const content = { type: SUBMISSION_TYPE === 'github_issue' ? 'github_issue' : 'link', url: link, notes: description };
+    const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({
+        assignmentId: assignmentId,
+        submitterId: personId,
+        isGroupSubmission: false,
+        content,
+        comment: description,
+        isLate: false,
+        technicalExcellence: selfAssessment.technicalExcellence,
+        communication: selfAssessment.communication,
+        workHabits: selfAssessment.workHabits,
+        aiOrchestration: selfAssessment.aiOrchestration,
+        selfAssessmentReflection: selfAssessment.selfAssessmentReflection
+      })
+    });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e.error || res.statusText);
+    }
+    // Dual-write to EshikaP1's grades system
+    const assignmentLabel = (typeof CURRENT_ASSIGNMENT_NAME === 'string' && CURRENT_ASSIGNMENT_NAME) ? CURRENT_ASSIGNMENT_NAME : String(assignmentId);
+    await fetch(`${javaURI}/api/grades`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: { ...content, selfAssessment }, submittedAt: new Date().toISOString() })
+    }).catch(() => {}); // non-blocking — don't fail submission if grades write fails
+  }
+
+  async function submitCodeToBackend(files, description, selfAssessment) {
+    const assignmentId = await ensureAssignmentId();
+    // Resolve the user first so we don't burn a Gist creation on a request that will fail anyway.
+    const { uid, personId } = await resolveCurrentUser();
+    const gistUrl = await exportToGist(files, { type: 'submission', description: description || 'Code submission' });
+    const content = { type: 'code', url: gistUrl, notes: description };
+    const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({
+        assignmentId: assignmentId,
+        submitterId: personId,
+        isGroupSubmission: false,
+        content,
+        comment: description,
+        isLate: false,
+        technicalExcellence: selfAssessment.technicalExcellence,
+        communication: selfAssessment.communication,
+        workHabits: selfAssessment.workHabits,
+        aiOrchestration: selfAssessment.aiOrchestration,
+        selfAssessmentReflection: selfAssessment.selfAssessmentReflection
+      })
+    });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e.error || res.statusText);
+    }
+    const assignmentLabel = (typeof CURRENT_ASSIGNMENT_NAME === 'string' && CURRENT_ASSIGNMENT_NAME) ? CURRENT_ASSIGNMENT_NAME : String(assignmentId);
+    await fetch(`${javaURI}/api/grades`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: { ...content, selfAssessment }, submittedAt: new Date().toISOString() })
+    }).catch(() => {}); // non-blocking
+    return gistUrl;
+  }
+
+  async function submitFilesToBackend(files, notes, selfAssessment) {
+    const assignmentId = await ensureAssignmentId();
+    const { uid, personId } = await resolveCurrentUser();
+    const assignmentName = await resolveAssignmentName();
+    for (const file of files) {
+      const content = { type: 'file', filename: file.name, notes: notes || '' };
+      const fd = new FormData();
+      fd.append('assignmentName', assignmentName);
+      fd.append('assignmentId', String(assignmentId));
+      fd.append('userId', personId);
+      fd.append('username', uid);
+      fd.append('file', file);
+      if (notes) fd.append('notes', notes);
+      fd.append('technicalExcellence', String(selfAssessment.technicalExcellence));
+      fd.append('communication', String(selfAssessment.communication));
+      fd.append('workHabits', String(selfAssessment.workHabits));
+      fd.append('aiOrchestration', String(selfAssessment.aiOrchestration));
+      fd.append('selfAssessmentReflection', selfAssessment.selfAssessmentReflection);
+      const r = await fetch(`${javaURI}/api/assignment-submissions/upload`, {
+        method: 'POST',
+        mode: fetchOptions.mode,
+        credentials: fetchOptions.credentials,
+        headers: { 'X-Origin': 'client' },
+        body: fd
+      });
+      if (!r.ok) {
+        const e = await r.json().catch(() => ({}));
+        throw new Error(`Upload failed for ${file.name}: ` + (e.error || r.statusText));
+      }
+      // Dual-write to EshikaP1's grades system
+      const assignmentLabel = (typeof CURRENT_ASSIGNMENT_NAME === 'string' && CURRENT_ASSIGNMENT_NAME) ? CURRENT_ASSIGNMENT_NAME : String(assignmentId);
+      await fetch(`${javaURI}/api/grades`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: { ...content, selfAssessment }, submittedAt: new Date().toISOString() })
+      }).catch(() => {}); // non-blocking
+    }
+  }
+
+  /**
+   * ============================================
+   * FILE HANDLING: File operations
+   * ============================================
+   */
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        let encoded = reader.result.toString().replace(/^data:(.*,)?/, '');
+        if ((encoded.length % 4) > 0) {
+          encoded += '='.repeat(4 - (encoded.length % 4));
+        }
+        resolve(encoded);
+      };
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+
+  /**
+   * ============================================
+   * STATUS MESSAGES: Display feedback
+   * ============================================
+   */
+  function showStatus(type, message, error) {
+    const status = document.getElementById('submission-status');
+    if (!status) return;
+    const icon = type === 'success' ? 'check-circle' : type === 'loading' ? 'spinner fa-spin' : 'exclamation-circle';
+    status.className = `submission-status ${type}`;
+    status.innerHTML = `<i class="fa-solid fa-${icon}"></i> ${message}`;
+    appendGistSettingsLink(status, error);
+    status.style.display = 'block';
+    if (type !== 'loading' && !error?.settingsUrl) {
+      setTimeout(() => {
+        status.style.display = 'none';
+      }, STATUS_AUTO_HIDE_MS);
+    }
+  }
+
+  /**
+   * ============================================
+   * SUBMISSION STORAGE: Local persistence
+   * ============================================
+   */
+  function saveSubmissionLocally(type, data) {
+    const submissions = JSON.parse(localStorage.getItem('assignment-submissions') || '{}');
+    const lessonId = window.location.pathname;
+    if (!submissions[lessonId]) submissions[lessonId] = [];
+    submissions[lessonId].push({ type, data, timestamp: new Date().toISOString() });
+    localStorage.setItem('assignment-submissions', JSON.stringify(submissions));
+  }
+
+  /**
+   * ============================================
+   * SUBMISSION UI: Tab switching & file display
+   * ============================================
+   */
+  window.switchSubmissionType = function (type) {
+    document.querySelectorAll('.submission-tab').forEach(tab => tab.classList.remove('active'));
+    event.target.closest('.submission-tab').classList.add('active');
+    
+    document.querySelectorAll('.submission-form').forEach(form => form.classList.remove('active'));
+    document.getElementById(`${type}-form`).classList.add('active');
+    
+    const status = document.getElementById('submission-status');
+    if (status) status.style.display = 'none';
+  };
+
+  window.removeFile = function (index) {
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    if (!fileInput || !fileList) return;
+    
+    const dt = new DataTransfer();
+    Array.from(fileInput.files).forEach((file, i) => {
+      if (i !== index) dt.items.add(file);
+    });
+    fileInput.files = dt.files;
+    updateFileListDisplay();
+  };
+
+  /**
+   * ============================================
+   * FILE DISPLAY: Render file list
+   * ============================================
+   */
+  function updateFileListDisplay() {
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    const fileSubmitBtn = document.getElementById('file-submit-btn');
+    
+    if (!fileList) return;
+    
+    fileList.innerHTML = Array.from(fileInput.files).map((file, index) => `
+      <div class="file-item">
+        <div class="file-info">
+          <i class="fa-solid fa-file"></i>
+          <div>
+            <div class="file-name">${file.name}</div>
+            <div class="file-size">${formatFileSize(file.size)}</div>
+          </div>
+        </div>
+        <button type="button" class="remove-file" onclick="removeFile(${index})">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+    `).join('');
+    
+    if (fileSubmitBtn) fileSubmitBtn.disabled = fileInput.files.length === 0;
+  }
+
+  /**
+   * ============================================
+   * SELF-ASSESSMENT: Collect, validate & reset
+   * ============================================
+   */
+  const SELF_ASSESSMENT_RATING_FIELDS = {
+    technicalExcellence: 'Technical Excellence',
+    communication: 'Communication',
+    workHabits: 'Work Habits',
+    aiOrchestration: 'AI Orchestration'
+  };
+
+  function getSelfAssessmentData() {
+    const data = {};
+    for (const field of Object.keys(SELF_ASSESSMENT_RATING_FIELDS)) {
+      const checked = document.querySelector(`input[name="sa-${field}"]:checked`);
+      data[field] = checked ? parseInt(checked.value, 10) : null;
+    }
+    data.selfAssessmentReflection = document.getElementById('self-assessment-reflection')?.value.trim() || '';
+    return data;
+  }
+
+  function validateSelfAssessment(data) {
+    for (const [field, label] of Object.entries(SELF_ASSESSMENT_RATING_FIELDS)) {
+      const value = data[field];
+      if (!Number.isInteger(value) || value < 1 || value > 5) {
+        return `Please rate "${label}" before submitting.`;
+      }
+    }
+    if (!data.selfAssessmentReflection) {
+      return 'Please add a short self-assessment reflection before submitting.';
+    }
+    return null;
+  }
+
+  function resetSelfAssessment() {
+    document.querySelectorAll('#self-assessment input[type="radio"]').forEach(input => {
+      input.checked = false;
+      input.closest('.rating-option')?.classList.remove('selected');
+    });
+    const reflection = document.getElementById('self-assessment-reflection');
+    if (reflection) reflection.value = '';
+  }
+
+  function setupSelfAssessmentRatings() {
+    const container = document.getElementById('self-assessment');
+    if (!container) return;
+    container.addEventListener('change', (e) => {
+      const input = e.target;
+      if (input.tagName !== 'INPUT' || input.type !== 'radio') return;
+      const group = input.closest('.rating-scale');
+      if (!group) return;
+      group.querySelectorAll('.rating-option').forEach(opt => opt.classList.remove('selected'));
+      input.closest('.rating-option')?.classList.add('selected');
+    });
+  }
+
+  /**
+   * ============================================
+   * CODE SUBMISSION: Show which runners will be sent
+   * ============================================
+   */
+  function renderCodeRunnerSummary() {
+    const list = document.getElementById('code-runner-summary');
+    if (!list) return;
+    const runners = listRunners();
+    if (runners.length === 0) {
+      list.innerHTML = '<li>No code runners found on this page.</li>';
+      return;
+    }
+    const unsaved = new Set(unsavedRunners());
+    list.innerHTML = runners.map((el, i) => {
+      const id = el.dataset.runnerId || `runner_${i + 1}`;
+      return unsaved.has(el)
+        ? `<li>${id} — <span class="code-runner-unsaved">not saved yet</span></li>`
+        : `<li>${id} — <span class="code-runner-saved">saved</span></li>`;
+    }).join('');
+  }
+
+  /**
+   * ============================================
+   * FORM SUBMISSION: Handle submissions
+   * ============================================
+   */
+  function setupSubmissionForms() {
+    const linkForm = document.getElementById('link-form');
+    if (linkForm) {
+      linkForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const link = document.getElementById('submission-link').value.trim();
+        const description = document.getElementById('link-description').value.trim();
+        const submitBtn = linkForm.querySelector('button[type="submit"]');
+        if (SUBMISSION_TYPE === 'github_issue' && !GITHUB_ISSUE_URL_PATTERN.test(link)) {
+          showStatus('error', 'That is not a valid GitHub issue link (expected github.com/owner/repo/issues/N).');
+          return;
+        }
+        const selfAssessment = getSelfAssessmentData();
+        const selfAssessmentError = validateSelfAssessment(selfAssessment);
+        if (selfAssessmentError) {
+          showStatus('error', selfAssessmentError);
+          return;
+        }
+        submitBtn.disabled = true;
+        showStatus('loading', 'Submitting...');
+        try {
+          await submitLinkToBackend(link, description, selfAssessment);
+          saveSubmissionLocally('link', { link, description, selfAssessment });
+          showStatus('success', 'Link submitted successfully!');
+          this.reset();
+          resetSelfAssessment();
+        } catch (err) {
+          showStatus('error', err.message);
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    }
+
+    const fileForm = document.getElementById('file-form');
+    if (fileForm) {
+      fileForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const fileInput = document.getElementById('file-input');
+        const notes = document.getElementById('file-notes')?.value?.trim() || '';
+        const submitBtn = fileForm.querySelector('button[type="submit"]');
+        const selfAssessment = getSelfAssessmentData();
+        const selfAssessmentError = validateSelfAssessment(selfAssessment);
+        if (selfAssessmentError) {
+          showStatus('error', selfAssessmentError);
+          return;
+        }
+        submitBtn.disabled = true;
+        showStatus('loading', 'Uploading...');
+        try {
+          for (const file of fileInput.files) {
+            if (file.size > FILE_SIZE_LIMIT_MB * 1024 * 1024) {
+              throw new Error(`${file.name} exceeds ${FILE_SIZE_LIMIT_MB}MB limit.`);
+            }
+          }
+          await submitFilesToBackend(Array.from(fileInput.files), notes, selfAssessment);
+          saveSubmissionLocally('file', { files: Array.from(fileInput.files).map(f => f.name), notes, selfAssessment });
+          showStatus('success', `${fileInput.files.length} file(s) submitted successfully!`);
+          fileInput.value = '';
+          updateFileListDisplay();
+          this.reset();
+          resetSelfAssessment();
+        } catch (err) {
+          showStatus('error', err.message);
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    }
+
+    const codeForm = document.getElementById('code-form');
+    if (codeForm) {
+      renderCodeRunnerSummary();
+      codeForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const notes = document.getElementById('code-notes')?.value?.trim() || '';
+        const submitBtn = codeForm.querySelector('button[type="submit"]');
+        if (unsavedRunners().length > 0) {
+          showStatus('error', 'Save your code with the 💾 button in each runner before submitting.');
+          return;
+        }
+        const files = readRunners();
+        if (Object.keys(files).length === 0) {
+          showStatus('error', "No saved code found in this lesson's code runner(s).");
+          return;
+        }
+        const selfAssessment = getSelfAssessmentData();
+        const selfAssessmentError = validateSelfAssessment(selfAssessment);
+        if (selfAssessmentError) {
+          showStatus('error', selfAssessmentError);
+          return;
+        }
+        submitBtn.disabled = true;
+        showStatus('loading', 'Checking login...');
+        try {
+          await resolveCurrentUser();
+        } catch (err) {
+          showStatus('error', 'Please log in to submit code.');
+          submitBtn.disabled = false;
+          return;
+        }
+        showStatus('loading', 'Creating Gist and submitting...');
+        try {
+          await submitCodeToBackend(files, notes, selfAssessment);
+          saveSubmissionLocally('code', { notes, selfAssessment });
+          showStatus('success', 'Code submitted successfully!');
+          this.reset();
+          resetSelfAssessment();
+        } catch (err) {
+          showStatus('error', err.message, err);
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    }
+  }
+
+  /**
+   * ============================================
+   * AUTO-CREATE ASSIGNMENT FROM FRONTMATTER
+   * ============================================
+   */
+  async function autoCreateAssignmentIfNeeded() {
+    // For assignment pages, always resolve ID against backend.
+    const hasAssignment = {{ page.assignment | default: false }};
+    if (!hasAssignment) {
+      return; // Not an assignment page
+    }
+    
+    try {
+      // Call the Spring API to auto-create assignment
+      // This endpoint allows any authenticated user (student, person, teacher, admin)
+      const createRes = await fetch(`${javaURI}/api/assignments/auto-create`, {
+        ...fetchOptions,
+        method: 'POST',
+        headers: {
+          ...fetchOptions.headers,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          name: PAGE_TITLE || {{ page.title | jsonify }},
+          contentUrl: CURRENT_LESSON_ID.replace(/^\/+|\/+$/g, ''),
+          description: {{ page.description | default: "" | jsonify }},
+          assignmentType: {{ page.assignment_submission_type | default: "File" | jsonify }},
+          pageContent: {{ page.content | strip_html | normalize_whitespace | truncate: 8000 | jsonify }}
+        })
+      });
+      
+      if (createRes.ok) {
+        const result = await createRes.json();
+        // Update active assignment identity to backend-resolved values.
+        CURRENT_ASSIGNMENT_ID = result.id;
+        CURRENT_ASSIGNMENT_NAME = result.name;
+        window.ASSIGNMENT_ID = result.id;
+        window.ASSIGNMENT_NAME = result.name;
+        
+        // Distinguish between newly created (201) and already existing (200)
+        if (createRes.status === 201) {
+          console.log('✓ Assignment auto-created with ID:', result.id);
+        } else if (createRes.status === 200) {
+          console.log('ℹ Assignment already exists with ID:', result.id, '- reusing for this session');
+        } else {
+          console.log('Assignment resolved with ID:', result.id);
+        }
+      } else if (createRes.status === 401 || createRes.status === 403) {
+        console.warn('Assignment creation requires an active Spring login session. Please log in and refresh the page.');
+      } else if (createRes.status === 400) {
+        const error = await createRes.json();
+        console.error('Bad request for auto-create assignment:', error.error);
+      } else {
+        console.error('Failed to auto-create assignment:', createRes.status, createRes.statusText);
+      }
+    } catch (error) {
+      console.error('Error auto-creating assignment:', error);
+    }
+  }
+
+  /**
+   * ============================================
+   * MASTER INITIALIZATION
+   * ============================================
+   */
+  function initializePage() {
+    // Lesson player setup
+    initLessonPlayer();
+    restoreSidebarNavigation();
+    syncCompletionUI();
+    fillLessonPager();
+    setupSyncListeners();
+    
+    // Mobile enhancements
+    setupMobileModal();
+    
+    // Auto-create assignment if needed
+    autoCreateAssignmentIfNeeded();
+    
+    // Assignment submission
+    setupSubmissionForms();
+    setupSelfAssessmentRatings();
+    
+    // File upload handling
+    const fileUploadArea = document.getElementById('file-upload-area');
+    const fileInput = document.getElementById('file-input');
+    if (fileUploadArea && fileInput) {
+      fileUploadArea.addEventListener('click', () => fileInput.click());
+      fileUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+      });
+      fileUploadArea.addEventListener('dragleave', () => {
+        fileUploadArea.classList.remove('dragover');
+      });
+      fileUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        fileInput.files = e.dataTransfer.files;
+        updateFileListDisplay();
+      });
+      fileInput.addEventListener('change', () => updateFileListDisplay());
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initializePage);
+</script>
+

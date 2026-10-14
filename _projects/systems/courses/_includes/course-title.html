@@ -1,0 +1,7 @@
+{%- case current_course -%}
+  {%- when 'csp' -%}Computer Science Principles
+  {%- when 'csa' -%}Computer Science A
+  {%- when 'csse' -%}Computer Science &amp; Software Engineering
+  {%- when 'csh' -%}Computer Science Honors
+  {%- else -%}{{ current_course | upcase | escape }}
+{%- endcase -%}

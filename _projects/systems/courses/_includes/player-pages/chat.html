@@ -1,0 +1,11 @@
+{%- comment -%}
+  A week's chat as its own page, beside the sidebar. It is the same chat as the
+  week's card on the course page, _includes/week_chat.html: it is passed the
+  course so it joins the same room, and open=true so it connects right away.
+
+  Expects from _layouts/post.html: current_course, current_week.
+  week_chat.html reads unitKey and index, as it does inside a week card.
+{%- endcomment -%}
+{%- assign unitKey = "Sprint" | append: page.player_page.sprint -%}
+{%- assign index = current_week -%}
+{% include week_chat.html course=current_course open=true %}

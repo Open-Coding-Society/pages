@@ -139,9 +139,6 @@
     align-items: flex-start;
     gap: 16px;
     flex-wrap: wrap;
-    border-bottom: 1px solid #1f2338;
-    padding-bottom: 20px;
-    margin-bottom: 24px;
   }
 
   .sprint-title {
@@ -160,23 +157,6 @@
     gap: 12px;
     flex-wrap: wrap;
     align-items: center;
-  }
-
-  .sprint-toggle-btn {
-    @include toggle-button;
-  }
-
-  .sprint-card.collapsed .sprint-toggle-icon {
-    transform: rotate(0deg);
-  }
-
-  .sprint-toggle-icon {
-    transition: transform 0.3s;
-    display: inline-flex;
-    color: var(--pref-accent-color);
-    font-size: 2em;
-    font-weight: bold;
-    margin-right: 4px;
   }
 
   .sprint-weeks {

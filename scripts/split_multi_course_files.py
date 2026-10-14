@@ -182,6 +182,10 @@ def find_and_split_multi_course_files():
     for directory in directories:
         for file_pattern in ['*.md', '*.ipynb']:
             for file_path in directory.rglob(file_pattern):
+                # Project notebooks publish directly to _posts; old staging copies
+                # are not authoritative inputs and must not regenerate stale variants.
+                if directory.name == '_notebooks' and file_path.is_relative_to(directory / 'projects'):
+                    continue
                 # Skip already split files
                 if re.search(r'_(csp|csa|csse|csh)\.(md|ipynb)$', str(file_path)):
                     continue

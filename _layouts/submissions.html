@@ -100,6 +100,8 @@ active_tab: submissions
                         <button type="button" id="admin-clear-filters" class="ocs__btn medium">Clear filters</button>
                         <button type="button" id="summarize-batch-btn" class="ocs__btn medium accent fill">Summarize all with AI</button>
                         <span id="summarize-batch-status" role="status"></span>
+                        <button type="button" id="fix-grades-btn" class="ocs__btn medium" title="Re-grade submissions whose grade is above the assignment's points (e.g. 4/1 from the old scale)">Fix out-of-range grades</button>
+                        <span id="fix-grades-status" role="status"></span>
                     </div>
                 </div>
 
@@ -176,7 +178,7 @@ active_tab: submissions
                     </label>
 
                     <label class="edit-field-label" for="edit-grade">Grade</label>
-                    <input type="number" id="edit-grade" class="edit-input ocs__input" min="0" step="0.5" placeholder="Points">
+                    <input type="number" id="edit-grade" class="edit-input ocs__input" min="0" step="0.01" placeholder="Points">
 
                     <label class="edit-field-label" for="edit-feedback">Feedback</label>
                     <textarea id="edit-feedback" class="edit-textarea ocs__input" rows="3" placeholder="Provide feedback for the student"></textarea>
@@ -620,7 +622,11 @@ active_tab: submissions
                     const gradeInput = document.getElementById('edit-grade');
                     const feedbackInput = document.getElementById('edit-feedback');
                     const gradeValRaw = gradeInput ? gradeInput.value.trim() : '';
-                    if (isAdmin && gradeValRaw !== '') {
+                    // Only save a grade the teacher actually changed: re-posting the pre-filled old
+                    // grade would overwrite the AI re-grade that runs after a content change.
+                    const gradeEdited = gradeValRaw !== (submission.grade != null ? String(submission.grade) : '')
+                        || (feedbackInput ? feedbackInput.value : '') !== (submission.feedback || '');
+                    if (isAdmin && gradeValRaw !== '' && gradeEdited) {
                         const gradeNum = parseFloat(gradeValRaw);
                         if (!isNaN(gradeNum)) {
                             setEditModalStatus('Saving grade...', 'info');
@@ -964,6 +970,49 @@ active_tab: submissions
         if (button) {
             button.addEventListener('click', runSummarizeBatch);
         }
+        const fixButton = document.getElementById('fix-grades-btn');
+        if (fixButton) {
+            fixButton.addEventListener('click', runFixOutOfRangeGrades);
+        }
+    }
+
+    // Re-grades submissions graded above their assignment's points. The backend tries each one
+    // once in the background; this just starts it, shows progress, and reloads when done.
+    async function runFixOutOfRangeGrades() {
+        const button = document.getElementById('fix-grades-btn');
+        const status = document.getElementById('fix-grades-status');
+        const show = (message, type = 'info') => {
+            status.textContent = message;
+            status.style.color = type === 'error' ? 'rgb(248, 113, 113)' : type === 'success' ? 'rgb(134, 239, 172)' : '#9ca3af';
+        };
+        const endpoint = `${javaURI}/api/submissions/fix-out-of-range-grades`;
+        const request = async (method) => {
+            const response = await fetch(endpoint, { method, mode: 'cors', credentials: 'include', headers: { 'X-Origin': 'client' } });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+        };
+
+        button.disabled = true;
+        try {
+            let progress = await request('POST');
+            if (progress.total === 0) {
+                show('No grades are above their assignment points.', 'success');
+                return;
+            }
+            while (progress.running) {
+                show(`Re-grading ${progress.done}/${progress.total}...`);
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                progress = await request('GET');
+            }
+            show(`Re-graded ${progress.fixed} of ${progress.total}`
+                + (progress.failed ? ` · ${progress.failed} failed, click again to retry` : ''),
+                progress.failed ? 'error' : 'success');
+            await loadSubmissions();
+        } catch (error) {
+            show(`Could not fix grades: ${error.message}`, 'error');
+        } finally {
+            button.disabled = false;
+        }
     }
 
     function setupCellExpansion() {
@@ -1205,7 +1254,7 @@ active_tab: submissions
                             <td>${getStatusBadge(submission)}</td>
                             <td>
                                 <input class="ocs__input ocs__admin-grade-input" type="number" min="0"
-                                    ${assignmentPoints != null ? `max="${assignmentPoints}"` : ''} step="0.5"
+                                    ${assignmentPoints != null ? `max="${assignmentPoints}"` : ''} step="0.01"
                                     value="${escapeHtml(String(gradeVal))}"
                                     id="grade-input-${idx}"
                                     placeholder="${assignmentPoints != null ? `0–${assignmentPoints}` : 'Points'}">

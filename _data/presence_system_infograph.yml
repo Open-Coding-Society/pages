@@ -9,3 +9,25 @@ Team:
 
 Repo: "https://github.com/vibha1019/crowpi-attendance"
 Year: "2026-2027"
+
+# Story order for the nav tabs and the Previous / Next pager.
+# key must match each page's rp_active front matter.
+Pages:
+  - key: hub
+    tab: "Overview"
+    url: "/capstone/presence-system/"
+  - key: pipeline
+    tab: "How It Works"
+    url: "/capstone/presence-system/pipeline/"
+  - key: tapreader
+    tab: "Tap Reader Build"
+    url: "/capstone/presence-system/tap-reader/"
+  - key: summary
+    tab: "Research"
+    url: "/capstone/presence-system/summary/"
+  - key: phases
+    tab: "Roadmap"
+    url: "/capstone/presence-system/phases/"
+  - key: technical
+    tab: "Technical"
+    url: "/capstone/presence-system/technical/"

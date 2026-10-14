@@ -181,6 +181,54 @@
   margin: 0;
 }
 
+.jv-decision-card .ocs__status-pill { margin-bottom: 0.35rem; }
+
+/* ── Terminal-style monitor output ── */
+.jv-log {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: var(--jv-text);
+  background: var(--jv-surface);
+  border: 1px solid var(--jv-card-border);
+  border-left: 3px solid var(--jv-accent);
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+  margin: 1rem 0 0;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* ── Screenshot figures (testing evidence) ── */
+.jv-figure-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.jv-figure {
+  margin: 0;
+  background: var(--jv-tag);
+  border: 1px solid var(--jv-card-border);
+  border-radius: 0.75rem;
+  padding: 0.6rem;
+}
+
+.jv-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+.jv-figure figcaption {
+  font-size: 0.75rem;
+  color: var(--jv-text-muted);
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
 /* ── Paper / Patent / Source Cards ── */
 .jv-paper-grid {
   display: grid;

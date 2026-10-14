@@ -1,0 +1,177 @@
+Title: "Phase 1 updates (10/12)"
+Description: "Rack rebuilds, a working Mini-to-Brume network proof of concept, and the next reliability tests."
+
+sections:
+  - id: future-plan
+    title: "Future plan"
+    summary: "Finish the experiment rig, establish repeatable baselines, and test security before a limited student pilot."
+    diagram: |
+      %%{init: {"themeVariables": {"fontSize": "20px"}, "flowchart": {"nodeSpacing": 30, "rankSpacing": 45}}}%%
+      flowchart TD
+        A["Finish Rack 2<br/>Boot · OS · GPUs"] --> B["Record a reproducible setup"]
+        B --> C["Inference engineering<br/>Baselines and stress tests"]
+        B --> D["Basic cyber testing<br/>Prompt injection and access controls"]
+        C --> E["Compare models and serving methods"]
+        D --> F["Test defenses and log failures"]
+        E --> G["Review evidence"]
+        F --> G
+        G --> H["Limited student pilot<br/>Streaming API · keys · health checks"]
+    points:
+      - title: "Experiment rig."
+        detail: "Rack 2 keeps disruptive experiments separate from Rack 1's shared inference service."
+      - title: "Evidence before rollout."
+        detail: "Follow Revollo's crawl, walk, run checkpoints; promote configurations only after performance and security review."
+
+  - id: rack-1-testing
+    title: "Rack 1 inference testing plan"
+    summary: "Find the quality–latency–resource Pareto frontier, then validate the best configurations under concurrent use."
+    diagram: |
+      %%{init: {"themeVariables": {"fontSize": "20px"}, "flowchart": {"nodeSpacing": 30, "rankSpacing": 45}}}%%
+      flowchart TD
+        A["Fixed coding workload"] --> B["Cold and warm baselines"]
+        B --> C["Compare models<br/>Size · quantization · quality"]
+        B --> D["Compare serving methods<br/>Speculative decoding · disaggregation"]
+        D --> E["GPU placement and batching"]
+        C --> F["Measure quality, speed and memory"]
+        E --> F
+        F --> G["Concurrent users and scheduling<br/>Queueing · fairness · stability"]
+        G --> H["Load and recovery tests<br/>Sustained · burst · soak"]
+        H --> I["Pareto frontier<br/>Choose primary and fallback"]
+    points:
+      - title: "Comparable results."
+        detail: "Keep the workload fixed and repeat each configuration; raw throughput alone can hide poor quality or unfair scheduling."
+      - title: "Hardware compatibility."
+        detail: "Treat speculative decoding and disaggregation as experiments, contingent on runtime support and the GTX 1070/PCIe constraints."
+
+  - id: hardware-progress
+    title: "What we have been working on"
+    summary: "Rack 1 has been rebuilt into a cleaner, usable system, and Rack 2 reached BIOS for the first time."
+    diagram: |
+      %%{init: {"themeVariables": {"fontSize": "20px"}, "flowchart": {"nodeSpacing": 30, "rankSpacing": 45}}}%%
+      flowchart TD
+        A["Rack 1: split-power experiment"] --> B["Full rewire and rebuild"]
+        B --> C["Cleaner, usable rack"]
+        C --> D["Next: reliability testing"]
+        E["Rack 2: reworked with Mr. Mort"] --> F["First BIOS boot"]
+        F --> G["Next: experiment-rig setup"]
+        H["Mac mini network setup"] --> I["Brume laptop online<br/>Next: reboot, security and throughput"]
+    points:
+      - title: "Rack 1 rebuild."
+        detail: "We replaced the split-power-supply experiment with a full rewire and rebuild; sustained-load and recovery testing comes next."
+      - title: "Rack 2 milestone."
+        detail: "With Mr. Mort's help, the reworked rack booted into BIOS for the first time, unblocking experiment-rig setup."
+      - title: "Network setup on Mac mini."
+        detail: "Built-in Wi-Fi and shared Ethernet now carry a laptop’s web traffic through the Brume 2. See the network diagrams below."
+
+  - id: network-proof
+    title: "Mac Mini + Brume 2: laptop online"
+    summary: "Proof of concept verified: a wired laptop loads Google through the Mini’s school Wi-Fi uplink."
+    diagram: |
+      flowchart TD
+        A["School Wi-Fi<br/>PUSD-Onboard"] -->|"Built-in Wi-Fi · wlp2s0"| B["Ubuntu Mac Mini<br/>Shared mode: DHCP + forwarding + NAT"]
+        B -->|"Ethernet · enp3s0f0<br/>10.42.0.1/24"| C["Brume 2 WAN<br/>Observed DHCP lease: 10.42.0.185"]
+        C --> D["Brume private LAN<br/>192.168.8.x · second NAT"]
+        D --> E["Wired laptop<br/>Web browsing VERIFIED"]
+        E --> F["Next: reboot without USB dongle<br/>Persistence NOT YET VERIFIED"]
+        classDef verified fill:#164b35,stroke:#56c997,color:#ffffff
+        classDef pending fill:#343b48,stroke:#aab4c4,color:#ffffff
+        class B,C,D,E verified
+        class F pending
+    points:
+      - title: "Two roles."
+        detail: "Mini = school-facing uplink. Brume 2 = private OCS LAN gateway. Addresses shown are observations, not the final address plan."
+      - title: "Security gap."
+        detail: "The working built-in Wi-Fi profile uses the unencrypted side of the school network. Firewall hardening and the EC2 tunnel are still pending."
+
+  - id: network-debugging
+    title: "What unblocked the network"
+    summary: "Identify the adapter → load its driver → find a working connection → share Ethernet."
+    diagram: |
+      flowchart TD
+        A["Adapter discovery"] --> B["0a5c:4500 = Bluetooth<br/>Not the Wi-Fi adapter"]
+        A --> C["USB RT5370 · 148f:5370<br/>rt2800usb · OWE connection works"]
+        A --> D["PCI BCM4360 · 14e4:43a0<br/>Found by Broadcom vendor ID"]
+        D --> E["Installed broadcom-sta-dkms<br/>6.30.223.271 + headers + DKMS"]
+        E --> F["wl loaded · wlp2s0 visible<br/>School SSIDs detected"]
+        F --> G["Cloned / reused / pinned OWE profiles<br/>Connection attempts failed"]
+        G --> H["Dedicated open profile<br/>Connected through built-in card"]
+        H --> I["brume-link: shared Ethernet<br/>Brume lease + laptop web test passed"]
+        classDef passed fill:#164b35,stroke:#56c997,color:#ffffff
+        classDef blocked fill:#632f36,stroke:#e998a4,color:#ffffff
+        class G blocked
+        class F,H,I passed
+    points:
+      - title: "Observed workaround, not a finished uplink."
+        detail: "The setup notes identify legacy wl / OWE incompatibility. The open profile is pinned to one access point; the USB dongle remains the working OWE fallback."
+      - title: "HTTP works; ping failed."
+        detail: "ICMP filtering is a hypothesis, not a confirmed diagnosis. Recheck DNS and HTTPS independently."
+
+  - id: network-rollout
+    title: "From working cable to dependable classroom network"
+    summary: "Only the first milestone is complete. Each remaining gate needs recorded evidence."
+    diagram: |
+      flowchart TD
+        A["DONE<br/>Mini → Brume → laptop online"] --> B["NEXT · Persist<br/>Reboot without dongle<br/>Autoconnect + DNS + HTTPS"]
+        B --> C["MEASURE<br/>Built-in vs USB vs Rig 1 baseline<br/>Upload · download · latency"]
+        C --> D["HARDEN<br/>Address plan + persistent forwarding<br/>Mini / Brume firewall + admin password"]
+        D --> E["EXPAND LAN<br/>DHCP reservations + separate Wi-Fi AP<br/>Confirm ports / switch needs"]
+        E --> F["CONNECT AWS<br/>EC2 ↔ Mini WireGuard<br/>Subnet routing + NGINX services"]
+        F --> G["PROVE RECOVERY<br/>Wi-Fi loss → tunnel reconnect<br/>Driver repair + USB fallback runbook"]
+        G --> H["THEN MIGRATE<br/>Move Rig 1 off its NetBird path"]
+        classDef done fill:#164b35,stroke:#56c997,color:#ffffff
+        classDef todo fill:#343b48,stroke:#aab4c4,color:#ffffff
+        class A done
+        class B,C,D,E,F,G,H todo
+    points:
+      - title: "Measure before committing."
+        detail: "Run iperf3 toward EC2, compare both Wi-Fi adapters with the existing Rig 1 USB + NetBird path, and test available wired uplinks. No throughput result is available yet."
+      - title: "Confirm the deployment path."
+        detail: "Check school IT approval, Mini model year and Secure Boot status. Decide whether WireGuard terminates only on the Mini or also on the Brume."
+
+  - id: network-target
+    title: "Next architecture: one private OCS classroom LAN"
+    summary: "Dashed links are planned. The Mini-to-Brume uplink is the demonstrated foundation."
+    diagram: |
+      flowchart TD
+        A["AWS EC2<br/>NGINX + WireGuard"] -.->|"Planned encrypted tunnel"| B["Mac Mini<br/>School Wi-Fi uplink"]
+        B -->|"Verified Ethernet link"| C["Brume 2<br/>Private LAN + DHCP + firewall"]
+        C -.-> D["AI rigs<br/>Reserved LAN addresses"]
+        C -.-> E["Jarvis 3000"]
+        C -.-> F["Presence"]
+        C -.-> G["Separate Wi-Fi access point<br/>IoT / classroom clients"]
+        E -.-> H["Smart Classroom"]
+        F -.-> H
+        G -.-> H
+        E -.->|"Future camera / vision workload"| D
+    points:
+      - title: "Brume is the wired gateway."
+        detail: "Plan a separate access point for wireless clients; confirm LAN port capacity and whether a switch is needed. Choose IoT/client SSIDs or VLANs before rollout."
+      - title: "Future experiment."
+        detail: "Test routing Jarvis camera workloads to a stronger vision-language model on the rigs, potentially using dedicated Rig 2 GPUs. This is not implemented."
+
+  - id: network-risks
+    title: "What still stands between the demo and deployment"
+    summary: "Working Internet access is the milestone; resilience and security remain the next tests."
+    diagram: |
+      flowchart TD
+        A["Open Wi-Fi + exposed admin risk"] --> A1["TLS / planned WireGuard<br/>Default-deny school-side ingress<br/>Strong Brume admin password"]
+        B["Single pinned AP + one Mini<br/>Legacy DKMS driver"] --> B1["Test roaming and reboot<br/>Health checks + driver recovery<br/>Keep USB fallback"]
+        C["Shared Wi-Fi + double NAT<br/>Mini Ethernet limited to 1 Gb/s"] --> C1["Benchmark simultaneous use<br/>Test wired uplink<br/>Validate routed access / discovery"]
+        D["School policy + subnet collisions"] --> D1["Confirm with school IT<br/>Document non-overlapping subnets<br/>Reserve device addresses"]
+    points:
+      - title: "No production-readiness claim yet."
+        detail: "Boot persistence, throughput, firewall rules, IoT Wi-Fi, EC2 routing, and recovery all need acceptance tests. Double NAT also needs validation for inbound services and mDNS discovery."
+      - title: "Gateway follow-through."
+        detail: "Replace the shared-mode proof of concept with reviewed persistent nftables/forwarding rules, test tunnel reconnection, and document wl recovery after kernel updates. A dedicated router may replace the Mini later."
+
+sources:
+  - title: "Issue #1 — Dual-rack hardware and software allocation"
+    url: "https://github.com/Open-Coding-Society/OCS-Intelligence/issues/1"
+  - title: "Issue #4 — Inference bottlenecks and baseline metrics"
+    url: "https://github.com/Open-Coding-Society/OCS-Intelligence/issues/4"
+  - title: "Issue #16 — Revollo's MVP checklist slide"
+    url: "https://github.com/Open-Coding-Society/OCS-Intelligence/issues/16"
+  - title: "Issue #20 — Blueprint, model bake-off, stress tests, and pilot gates"
+    url: "https://github.com/Open-Coding-Society/OCS-Intelligence/issues/20"
+  - title: "Issue #22 — Revollo meeting notes and weekly playbooks"
+    url: "https://github.com/Open-Coding-Society/OCS-Intelligence/issues/22"

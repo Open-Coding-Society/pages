@@ -38,3 +38,7 @@ make -C _projects/lessons/ap-frq-simulator build
 ## Permalink
 
 `/csa/exam-simulator`
+
+The simulator is an optional CSA reference, without a week assignment. Weekly
+AP-review checklists revisit completed work rather than assigning a new timed
+exam during review weeks.

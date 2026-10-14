@@ -1,0 +1,11 @@
+{
+  "files": [
+    { "source": "pages/search.md", "destination": "navigation/search.md" },
+    { "source": "pages/topics.md", "destination": "navigation/topics.md" },
+    { "source": "_includes", "destination": "_includes" },
+    { "source": "plugins", "destination": "_plugins" },
+    { "source": "data", "destination": "_data" },
+    { "source": "js", "destination": "assets/js/topics" },
+    { "source": "sass/main.scss", "destination": "_sass/projects/topics/main.scss" }
+  ]
+}

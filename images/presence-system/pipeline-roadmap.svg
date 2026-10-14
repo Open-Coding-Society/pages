@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg" width="1200" height="400">
+      <title>Where it's going. Now: tap the laptop tag on the CrowPi, working. Next: tap plus a camera face check. Later: walk through the front or back door and a UHF reader reads the laptop tag automatically.</title>
+      <rect x="0" width="360" height="400" rx="24" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
+      <path d="M0 300 h360 v76 a24 24 0 0 1 -24 24 h-312 a24 24 0 0 1 -24 -24 z" fill="rgb(207, 216, 227)" stroke-width="1px"></path>
+      <circle cx="40" cy="44" r="22" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+      <text x="40" y="53" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="24px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">1</text>
+      <text x="74" y="53" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Now</text>
+      <rect x="236" y="26" width="104" height="34" rx="17" fill="rgb(79, 157, 98)" stroke-width="1px"></rect>
+      <text x="288" y="49" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="19px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Working</text>
+      <line x1="10" y1="168" x2="66" y2="196" fill="rgb(0, 0, 0)" stroke="rgb(201, 143, 62)" stroke-width="28px" stroke-linecap="round"></line>
+      <g transform="rotate(-14 130 196)" fill="rgb(0, 0, 0)" stroke-width="1px" font-size="16px" font-weight="400">
+        <rect x="70" y="156" width="120" height="76" rx="7" fill="rgb(185, 196, 211)" stroke-width="1px"></rect>
+        <rect x="70" y="226" width="120" height="6" rx="3" fill="rgb(131, 146, 169)" stroke-width="1px"></rect>
+        <rect x="162" y="202" width="20" height="20" rx="4" fill="rgb(59, 111, 212)" stroke-width="1px"></rect>
+        <circle cx="172" cy="212" r="4" fill="rgb(255, 255, 255)" stroke-width="1px"></circle>
+      </g>
+      <circle cx="70" cy="198" r="11" fill="rgb(196, 138, 102)" stroke-width="1px"></circle>
+      <rect x="110" y="272" width="210" height="12" rx="4" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+      <rect x="150" y="222" width="150" height="50" rx="8" fill="rgb(36, 50, 77)" stroke-width="1px"></rect>
+      <rect x="160" y="229" width="44" height="36" rx="5" fill="rgb(233, 238, 245)" stroke-width="1px"></rect>
+      <rect x="214" y="231" width="76" height="32" rx="4" fill="rgb(127, 196, 165)" stroke-width="1px"></rect>
+      <path d="M214 190 q12 14 0 28 M226 182 q20 22 0 44" fill="none" stroke="rgb(91, 134, 214)" stroke-width="5px" stroke-linecap="round"></path>
+      <text x="180" y="350" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="22px" font-weight="600" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Tap on CrowPi</text>
+      <polygon points="374,180 404,200 374,220" fill="rgb(170, 170, 170)" stroke-width="1px"></polygon>
+      <rect x="420" width="360" height="400" rx="24" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
+      <path d="M420 300 h360 v76 a24 24 0 0 1 -24 24 h-312 a24 24 0 0 1 -24 -24 z" fill="rgb(207, 216, 227)" stroke-width="1px"></path>
+      <circle cx="460" cy="44" r="22" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+      <text x="460" y="53" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="24px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">2</text>
+      <text x="494" y="53" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Next</text>
+      <rect x="656" y="26" width="104" height="34" rx="17" fill="none" stroke="rgb(111, 127, 153)" stroke-width="2.5px" stroke-dasharray="7px, 5px"></rect>
+      <text x="708" y="49" text-anchor="middle" fill="rgb(111, 127, 153)" stroke-width="1px" font-size="19px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">~Oct 19</text>
+      <circle cx="462" cy="118" r="27" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+      <circle cx="470" cy="124" r="23" fill="rgb(196, 138, 102)" stroke-width="1px"></circle>
+      <g fill="rgb(0, 0, 0)" stroke-width="1px" opacity="0.75" font-size="16px" font-weight="400">
+        <path d="M436 112 v-16 h16 M488 96 h16 v16 M504 140 v16 h-16 M452 156 h-16 v-16" fill="none" stroke="rgb(111, 127, 153)" stroke-width="4px" stroke-dasharray="9px, 7px"></path>
+        <polygon points="676,96 506,100 506,152" fill="rgb(111, 127, 153)" fill-opacity="0.14" stroke="rgb(111, 127, 153)" stroke-width="2px" stroke-dasharray="6px, 6px"></polygon>
+        <rect x="672" y="80" width="72" height="30" rx="11" transform="rotate(16 708 95)" fill="none" stroke="rgb(111, 127, 153)" stroke-width="4px" stroke-dasharray="9px, 7px"></rect>
+        <rect x="742" y="70" width="12" height="40" rx="3" fill="none" stroke="rgb(111, 127, 153)" stroke-width="4px" stroke-dasharray="9px, 7px"></rect>
+      </g>
+      <line x1="430" y1="168" x2="486" y2="196" fill="rgb(0, 0, 0)" stroke="rgb(201, 143, 62)" stroke-width="28px" stroke-linecap="round"></line>
+      <g transform="rotate(-14 550 196)" fill="rgb(0, 0, 0)" stroke-width="1px" font-size="16px" font-weight="400">
+        <rect x="490" y="156" width="120" height="76" rx="7" fill="rgb(185, 196, 211)" stroke-width="1px"></rect>
+        <rect x="490" y="226" width="120" height="6" rx="3" fill="rgb(131, 146, 169)" stroke-width="1px"></rect>
+        <rect x="582" y="202" width="20" height="20" rx="4" fill="rgb(59, 111, 212)" stroke-width="1px"></rect>
+        <circle cx="592" cy="212" r="4" fill="rgb(255, 255, 255)" stroke-width="1px"></circle>
+      </g>
+      <circle cx="490" cy="198" r="11" fill="rgb(196, 138, 102)" stroke-width="1px"></circle>
+      <rect x="530" y="272" width="210" height="12" rx="4" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+      <rect x="570" y="222" width="150" height="50" rx="8" fill="rgb(36, 50, 77)" stroke-width="1px"></rect>
+      <rect x="580" y="229" width="44" height="36" rx="5" fill="rgb(233, 238, 245)" stroke-width="1px"></rect>
+      <rect x="634" y="231" width="76" height="32" rx="4" fill="rgb(127, 196, 165)" stroke-width="1px"></rect>
+      <path d="M634 190 q12 14 0 28 M646 182 q20 22 0 44" fill="none" stroke="rgb(91, 134, 214)" stroke-width="5px" stroke-linecap="round"></path>
+      <text x="600" y="350" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="22px" font-weight="600" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Tap + camera check</text>
+      <polygon points="794,180 824,200 794,220" fill="rgb(170, 170, 170)" stroke-width="1px"></polygon>
+      <g fill="rgb(0, 0, 0)" stroke-width="1px" opacity="0.8" font-size="16px" font-weight="400">
+        <rect x="840" width="360" height="400" rx="24" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
+        <path d="M840 300 h360 v76 a24 24 0 0 1 -24 24 h-312 a24 24 0 0 1 -24 -24 z" fill="rgb(207, 216, 227)" stroke-width="1px"></path>
+        <circle cx="880" cy="44" r="22" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+        <text x="880" y="53" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="24px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">3</text>
+        <text x="914" y="53" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Later</text>
+        <rect x="1076" y="26" width="104" height="34" rx="17" fill="none" stroke="rgb(111, 127, 153)" stroke-width="2.5px" stroke-dasharray="7px, 5px"></rect>
+        <text x="1128" y="49" text-anchor="middle" fill="rgb(111, 127, 153)" stroke-width="1px" font-size="19px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Later</text>
+        <text x="937" y="104" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="22px" font-weight="600" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Front</text>
+        <text x="1103" y="104" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="22px" font-weight="600" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Back</text>
+        <rect x="880" y="116" width="114" height="186" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+        <rect x="892" y="128" width="90" height="174" fill="rgb(252, 242, 212)" stroke-width="1px"></rect>
+        <rect x="1046" y="116" width="114" height="186" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+        <rect x="1058" y="128" width="90" height="174" fill="rgb(252, 242, 212)" stroke-width="1px"></rect>
+        <rect x="917" y="130" width="40" height="12" rx="3" fill="rgb(59, 111, 212)" stroke-width="1px"></rect>
+        <rect x="1083" y="130" width="40" height="12" rx="3" fill="rgb(59, 111, 212)" stroke-width="1px"></rect>
+        <path d="M923 154 q14 10 28 0 M917 166 q20 14 40 0 M1089 154 q14 10 28 0 M1083 166 q20 14 40 0" fill="none" stroke="rgb(91, 134, 214)" stroke-width="5px" stroke-linecap="round"></path>
+        <circle cx="934" cy="190" r="15" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+        <circle cx="938" cy="193" r="13" fill="rgb(196, 138, 102)" stroke-width="1px"></circle>
+        <rect x="918" y="208" width="38" height="58" rx="18" fill="rgb(224, 166, 79)" stroke-width="1px"></rect>
+        <rect x="948" y="222" width="30" height="22" rx="3" fill="rgb(185, 196, 211)" stroke-width="1px"></rect>
+        <line x1="930" y1="264" x2="922" y2="298" fill="rgb(0, 0, 0)" stroke="rgb(38, 53, 90)" stroke-width="12px" stroke-linecap="round"></line>
+        <line x1="944" y1="264" x2="954" y2="298" fill="rgb(0, 0, 0)" stroke="rgb(38, 53, 90)" stroke-width="12px" stroke-linecap="round"></line>
+        <text x="1020" y="350" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="22px" font-weight="600" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Walk through, UHF reads tag</text>
+      </g>
+    </svg>

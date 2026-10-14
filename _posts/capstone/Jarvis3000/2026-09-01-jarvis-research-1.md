@@ -26,6 +26,11 @@ rp_active: research-1
     <p class="ocs__description">Investigating multi-viewpoint optical coverage, synchronized frame capture, network transfer across Linux host nodes, and hardware bill of materials.</p>
   </div>
 
+  <figure class="jv-figure">
+    <img src="{{ '/images/jarvis/jarvis3000-research-1.png' | relative_url }}" alt="Jarvis3000 camera setup with two classroom viewpoints, Linux capture computers, synchronized ten-second photos, and saved timestamped images" width="1774" height="887">
+    <figcaption>Research 1 evaluates synchronized classroom image capture and transfer across the current and planned camera nodes.</figcaption>
+  </figure>
+
   <!-- Research Question -->
   <h2 class="ocs__section-title">Research Question 1</h2>
   <div class="ocs__card">

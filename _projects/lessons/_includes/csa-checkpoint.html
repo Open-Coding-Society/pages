@@ -1,0 +1,19 @@
+<p>This is a review and reflection checkpoint, not a new lesson or assignment. Use already completed work; do not start new CodeRunner submissions or add project requirements.</p>
+{% assign sprint_key = 'Sprint' | append: page.checkpoint_sprint %}
+{% assign sprint = site.data.csa[sprint_key] %}
+{% assign week = page.courses.csa.week %}
+{% assign week_plan = sprint[week] %}
+<h2>Evidence and reflection checklist</h2>
+<ul>
+  {% for goal in week_plan.goals %}
+  <li>{{ goal | escape }}</li>
+  {% endfor %}
+</ul>
+<p>Identify what you can explain independently, point to an existing test or demonstration, and record a misconception or next-step idea. A team demonstration is not evidence that every member implemented each layer. Evaluate only the advanced layers you actually completed.</p>
+<h2>Revisit earlier work</h2>
+<ul>
+  {% for lesson in page.checkpoint_links %}
+  <li><a href="{{ lesson.url | relative_url }}">{{ lesson.title | escape }}</a></li>
+  {% endfor %}
+</ul>
+<p>Alternate examples remain in the <a href="{{ '/csa/cs112/' | relative_url }}">CS112</a>, <a href="{{ '/csa/cs113/' | relative_url }}">CS113</a>, <a href="{{ '/csa/csa2/' | relative_url }}">CSA2</a>, and <a href="{{ '/navigation/java-reference/' | relative_url }}">Java reference</a> collections. Browsing them does not create an assignment.</p>

@@ -1,0 +1,62 @@
+{% assign topics_course_context = false %}
+{% if include.course_context == true and page.topics_context != true %}{% assign topics_course_context = true %}{% endif %}
+<section class="topics-browser ocs__container" data-topics-browser data-course-context="{{ topics_course_context }}" data-initial-category="{{ page.lesson_category | downcase | escape }}" data-index-url="{{ '/assets/js/topics/data.json' | relative_url }}">
+  <header>
+    <h2>Topics</h2>
+  </header>
+  <div class="topics-browser__controls">
+    <div class="topics-browser__filters" id="topics-filters" role="group" aria-label="Topic and category filters">
+      <details class="topics-browser__category-disclosure" data-topics-primary open>
+        <summary><h3>Topic Filter</h3></summary>
+        <fieldset class="topics-browser__categories topics-browser__primary">
+          <legend class="topics-browser__accessible-label">Topic Filter</legend>
+          {% for category in site.data.topics_primary_categories %}
+          <label><input type="checkbox" value="{{ category[0] | escape }}"> {{ category[1] | escape }}</label>
+          {% endfor %}
+        </fieldset>
+      </details>
+      <details class="topics-browser__category-disclosure" data-topics-secondary>
+        <summary><h3>Categories Filter</h3></summary>
+        <fieldset class="topics-browser__categories">
+          <legend class="topics-browser__accessible-label">Categories Filter</legend>
+          {% for category in site.data.topics_secondary_categories %}
+          <label><input type="checkbox" value="{{ category[0] | escape }}"> {{ category[1] | escape }}</label>
+          {% endfor %}
+        </fieldset>
+      </details>
+      <button type="button" class="ocs__btn small accent" data-topics-clear aria-controls="topics-filters" disabled>Clear Filters</button>
+    </div>
+    <div class="topics-browser__search">
+      <h2><label for="topics-query">Search</label></h2>
+      <div class="topics-browser__search-input">
+        <input class="ocs__input" id="topics-query" type="search" placeholder="Search titles and document text" autocomplete="off" disabled>
+        <button type="button" class="ocs__btn small accent" data-topics-search-clear disabled>Clear Search</button>
+      </div>
+    </div>
+    <div class="topics-browser__actions">
+      <label class="topics-browser__accessible-label" for="topics-view">View</label>
+      <select class="ocs__input" id="topics-view"><option value="cards">Cards</option><option value="list">List</option></select>
+    </div>
+  </div>
+  <p role="status" aria-live="polite" data-topics-status>Loading full-text search…</p>
+  <h2 data-topics-title-heading hidden>Title matches <span class="topics-browser__count" data-topics-title-count></span></h2>
+  <div class="topics-browser__results" data-topics-results>
+    {% for document in site.data.topics_catalog %}
+    <article class="topics-browser__card" data-topic-url="{{ document.url | escape }}">
+      <h2><a href="{% if topics_course_context %}{{ document.url | relative_url }}{% else %}{{ document.viewUrl | relative_url }}{% endif %}">{{ document.title | escape }}</a></h2>
+      {% if document.description != empty %}<p>{{ document.description | escape }}</p>{% endif %}
+      <p class="topics-browser__metadata">{{ document.categories | join: ' · ' | escape }}</p>
+      {% if topics_course_context and document.weeks.size > 0 %}
+      <p class="topics-browser__metadata">{{ document.weeks | join: ' · ' | escape }}</p>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+  <section data-topics-body-section hidden>
+    <h2>Text matches <span class="topics-browser__count" data-topics-body-count></span></h2>
+    <ul class="topics-browser__text-results" data-topics-body-results></ul>
+  </section>
+  <noscript>Enable JavaScript to combine category filters and use full-text search. The document links above remain available.</noscript>
+</section>
+<script src="{{ '/assets/js/vendor/lunr.min.js' | relative_url }}"></script>
+<script type="module" src="{{ '/assets/js/topics/browser.js' | relative_url }}"></script>

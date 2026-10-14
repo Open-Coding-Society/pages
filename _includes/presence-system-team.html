@@ -1,0 +1,2 @@
+{%- assign data = site.data.presence_system_infograph -%}
+<div class="ocs__card"><div class="ocs__team"><span class="ocs__team-label">Project Team</span><span class="ocs__team-name">{{ data.Team | join: ", " }}</span></div><div class="ocs__status">Phase 1, Working Prototype</div>{% if data.Repo %}<a href="{{ data.Repo }}" target="_blank" rel="noopener" class="ocs__btn accent fill">View Repo</a>{% endif %}</div>

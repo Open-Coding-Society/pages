@@ -264,6 +264,39 @@ Test Jupyter Notebook conversions (ie .ipynb -> .md), this is the best choice to
   make convert
   ```
 
+Notebook conversion is incremental. Registered projects publish directly from
+`_projects/<category>/<project>/` to `_posts/projects/<project>/`; they no longer
+stage notebook copies under `_notebooks/projects/`. Existing filenames, lesson
+permalinks, and runner markup are retained.
+
+```bash
+# Publish changed notebooks in one project
+make -C _projects/lessons/java build
+
+# Convert one project or legacy source
+make convert-single NOTEBOOK_FILE=_projects/lessons/java/notebooks/2025-09-21-3.1.ipynb
+
+# Force legacy notebook conversion, or reduce conversion workers
+make convert CONVERT_FLAGS=--force CONVERT_JOBS=1
+```
+
+Project builds use one Python batch with up to four workers. Unchanged notebooks
+are skipped using `.notebook-conversion-cache/`; editing the source or converter,
+or deleting/modifying the output, causes reconversion. Identical Markdown is not
+rewritten. `make convert` scans legacy notebook sources only; registered-project
+build targets handle project sources. `make split-courses` still publishes
+multi-course variants from generated posts.
+
+`make dev` now retains generated output and performs one incremental build of
+the selected projects instead of cleaning and converting them twice. Use
+`make clean` explicitly when a fresh start is needed. Generated project Makefiles
+are refreshed by registered builds or `make generate-makefiles`, while tracked
+overrides are preserved. After changing the pipeline, restart existing watchers
+so they use the new recipes.
+
+Converter regression tests:
+`venv/bin/python -m unittest discover -s tests -p test_convert_notebooks.py`.
+
 ---
 
 ## Development Support

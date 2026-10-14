@@ -163,6 +163,16 @@
   border: 1px solid var(--trail-line);
   border-radius: 12px;
 }
+.toolchain-trail-update-card {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--trail-line);
+  border-radius: 12px;
+}
+.toolchain-trail-update-card h3 {
+  margin: 0 0 0.75rem;
+  color: var(--trail-ink);
+}
 .toolchain-trail-station::before {
   content: "";
   display: block;
@@ -381,6 +391,34 @@
       {% endfor %}
     </div>
   </div>
+
+  <section class="toolchain-trail-section">
+    <h2>Recent Changes</h2>
+    <div class="toolchain-trail-section-grid">
+      {% for update in data.RecentChanges %}
+      <article class="toolchain-trail-update-card">
+        <h3>{{ update.title }}</h3>
+        <ul class="toolchain-trail-list">
+          {% for point in update.points %}<li>{{ point }}</li>{% endfor %}
+        </ul>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="toolchain-trail-section">
+    <h2>What We’re Working On</h2>
+    <div class="toolchain-trail-section-grid">
+        {% for item in data.UpcomingWork %}
+        <article class="toolchain-trail-update-card">
+          <h3>{{ item.title }}</h3>
+          <ul class="toolchain-trail-list">
+            {% for point in item.points %}<li>{{ point }}</li>{% endfor %}
+          </ul>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
 
   <div class="toolchain-trail-route">
     <h2>Toolchain Trail Stations</h2>

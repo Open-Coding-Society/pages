@@ -63,6 +63,12 @@ show_reading_time: false
         <!-- Signup Form -->
         <form id="signupForm" onsubmit="handleSignupSubmit(event);">
             <div class="form-group">
+                <select id="signupRole">
+                    <option value="student" selected>I am a Student</option>
+                    <option value="mentor">I am a Mentor</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <input type="text" id="name" placeholder="Name" required>
             </div>
             <div class="form-group">
@@ -244,6 +250,16 @@ show_reading_time: false
         }
     }
 
+    // A mentor has no student ID or school, so those fields are hidden and not required.
+    document.getElementById('signupRole').addEventListener('change', function () {
+        const isMentor = this.value === 'mentor';
+        ['signupSid', 'signupSchool'].forEach(id => {
+            const field = document.getElementById(id);
+            field.required = !isMentor;
+            field.closest('.form-group').style.display = isMentor ? 'none' : '';
+        });
+    });
+
     window.handleSignupSubmit = function(event) {
         event.preventDefault();
 
@@ -269,10 +285,16 @@ show_reading_time: false
             password: document.getElementById("signupPassword").value,
             kasmServerNeeded: false,
             kasm_server_needed: false,
+            accountType: document.getElementById("signupRole").value,
         };
 
-        // Show OAuth verification
-        showOAuthVerification();
+        // A mentor cannot use a school email, so they skip it and wait for a Teacher/Admin
+        // to verify the account. A student verifies with Google first.
+        if (signupFormData.accountType === 'mentor') {
+            signup();
+        } else {
+            showOAuthVerification();
+        }
     }
 
     function showOAuthVerification() {
@@ -304,6 +326,7 @@ show_reading_time: false
                 return;
             }
             verifiedSchoolEmail = email;
+            signupFormData.idToken = response.credential;
             showOAuthStatus(`✅ School email verified: ${email}`);
 
             setTimeout(() => {

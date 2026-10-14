@@ -1,0 +1,985 @@
+---
+layout: opencs
+---
+
+{% comment %}
+Check if this is a course lesson and determine which course context to use
+{% endcomment %}
+{% assign is_course_lesson = false %}
+{% assign current_course = null %}
+{% assign current_week = null %}
+
+{% comment %}Since files are now course-specific, get the single course{% endcomment %}
+{% if page.player_page %}
+{% comment %}
+A sprint, week, chat, or blogs page made by _plugins/lesson_player_pages.rb.
+Sprint and blogs pages are not part of one week, so their current_week is null.
+{% endcomment %}
+{% assign current_course = page.player_page.course %}
+{% assign current_week = page.player_page.week %}
+{% elsif page.courses.csp %}
+{% assign current_course = 'csp' %}
+{% assign current_week = page.courses.csp.week | plus: 0 %}
+{% elsif page.courses.csa %}
+{% assign current_course = 'csa' %}
+{% assign current_week = page.courses.csa.week | plus: 0 %}
+{% elsif page.courses.csse %}
+{% assign current_course = 'csse' %}
+{% assign current_week = page.courses.csse.week | plus: 0 %}
+{% elsif page.courses.csh %}
+{% assign current_course = 'csh' %}
+{% assign current_week = page.courses.csh.week | plus: 0 %}
+{% endif %}
+
+{% if current_course != null and current_week != null %}
+{% assign is_course_lesson = true %}
+{% elsif page.player_page %}
+{% assign is_course_lesson = true %}
+{% endif %}
+
+{% if page.topics_context %}{% assign is_course_lesson = false %}{% endif %}
+{% if is_course_lesson %}
+{% include course-document-player.html %}
+{% else %}
+{% if page.topics_context and page.topics_nav_in_content != true %}
+{% include topics-document-nav.html %}
+<script type="module" src="{{ '/assets/js/topics/document.js' | relative_url }}"></script>
+{% endif %}
+{% comment %}
+=== REGULAR BLOG POST LAYOUT FOR NON-CSP POSTS ===
+{% endcomment %}
+
+<style>
+  /* === Post Header === */
+  .post-header h3 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .page-description {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 1rem;
+  }
+
+  /* === Meta Info (date, author, reading time) === */
+  .post-meta {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+
+  .post-meta time {
+    font-weight: 500;
+  }
+
+  /* === Category & Breadcrumb Links === */
+  .category-tags-link {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    margin: 0.1rem;
+    font-size: 0.85rem;
+    background: #f5f5f5;
+    border-radius: 999px;
+    color: #333;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+
+  .category-tags-link:hover {
+    background: #e0e0e0;
+  }
+
+  .post-header {
+    margin-bottom: 1rem;
+  }
+
+  .post-header-actions {
+    margin-top: 0.85rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .post-primary-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.78rem;
+    border: 1px solid #1d4ed8;
+    border-radius: 999px;
+    background: #2563eb;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.83rem;
+    font-weight: 700;
+    line-height: 1.2;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .post-primary-link:hover,
+  .post-primary-link:focus-visible {
+    background: #1d4ed8;
+    border-color: #1e40af;
+    color: #ffffff;
+  }
+
+  .post-secondary-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #374151;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.2;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .post-secondary-link:hover,
+  .post-secondary-link:focus-visible {
+    background: #eef2f7;
+    border-color: #9ca3af;
+    color: #1f2937;
+  }
+
+  .post-header a.category-tags-link {
+    margin-right: 0.3rem;
+  }
+
+  /* === Main Content Styling === */
+  .post-content {
+    line-height: 1.7;
+    font-size: 1rem;
+  }
+
+  .post-content h2,
+  .post-content h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3rem;
+  }
+
+  /* === Comments Section Separator === */
+  .post-content+div,
+  .post-content+section {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ddd;
+  }
+
+  /* Assignment submission widget styling (self-assessment, forms, file
+     upload, code-runner summary, status) lives in the sitewide
+     _sass/open-coding/lesson-player.scss now, shared with the other layout
+     branch, so both respect the user theme system consistently instead of
+     maintaining two hardcoded copies. */
+</style>
+
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    {%- if page.menu -%}
+    {% include {{page.menu}} html=content %}
+    {%- endif -%}
+    {% if page.menu == 'nav/csp_units/csp_unit3_p4_fundamentals.html' %}
+    {% include csp/p4-progress-data.html %}
+    {% include csp/p4-progress-controller.html %}
+    {% unless page.permalink contains '/fundamentals' %}
+    {% include csp/p4-progress-widget.html %}
+    {% endunless %}
+    {% endif %}
+    {% if page.categories.size > 0 %}
+    Categories:
+    {% for category in page.categories %}
+    {%- assign prefix = category | slice: 0 -%}
+    <a class="category-tags-link" href="{{ '/topics/' | relative_url }}?category={{ category | downcase | url_encode }}">{{ category | escape }}</a>
+    {% unless forloop.last %}&nbsp;{% endunless %}
+    {% endfor %}
+    {% endif %}
+    {% if page.breadcrumb %}
+    {% assign parts = page.permalink | split: '/' %}
+    {% assign num_parts = parts.size | minus: 1 %}
+    {% assign parent_parts = '' %}
+    {% for i in (0..num_parts) %}
+    {% unless forloop.last %}
+    {% if parent_parts == '' %}
+    {% assign parent_parts = parts[i] %}
+    {% else %}
+    {% assign parent_parts = parent_parts | append: '/' | append: parts[i] %}
+    {% endif %}
+    {% endunless %}
+    {% endfor %}
+    Breadcrumb:
+    <a class="category-tags-link" href="{{ site.baseurl }}/{{ parent_parts }}">/{{ parent_parts }}</a>
+    {% assign data = site.data[page.data] %}
+    {% for topic in data.Topics %}
+    {% if page.permalink == topic.link %}
+    &raquo; <span class="font-bold">{{ topic.title }}</span>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    <p class="post-meta post-meta-title">
+      {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+      <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+        {{ page.date | date: date_format }}
+      </time>
+      {%- if page.modified_date -%}
+      ~
+      {%- assign mdate = page.modified_date | date_to_xmlschema -%}
+      <time class="dt-modified" datetime="{{ mdate }}" itemprop="dateModified">
+        {{ mdate | date: date_format }}
+      </time>
+      {%- endif -%}
+      {%- if page.author -%}
+      • {% for author in page.author %}
+      <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-author h-card" itemprop="name">{{ author }}</span></span>
+      {%- if forloop.last == false %}, {% endif -%}
+      {% endfor %}
+      {%- endif -%}
+      {%- if page.show_reading_time != false -%}
+      • {% include reading_time.html -%}
+      {%- endif -%}
+    </p>
+    <h3>{{ page.title | escape }}</h3>
+    {%- if page.description -%}
+    {%- if site.html_escape.description -%}
+    <p class="page-description">{{ page.description | escape }}</p>
+    {%- else -%}
+    <p class="page-description">{{ page.description }}</p>
+    {%- endif -%}
+    {%- endif -%}
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    {%- if page.toc -%}
+    {% include toc.html html=content %}
+    {%- endif -%}
+
+    {%- if page.submenu -%}
+    {%- include submenu.html -%}
+    {%- endif -%}
+
+    {{ content }}
+
+    {% if page.grading_modules %}
+    {% comment %} Grading/submission module at the bottom of the content (non-course-lesson pages) {% endcomment %}
+    {% include grading_modules.html %}
+    {% endif %}
+
+    {% if page.assignment %}
+    {% assign submission_type = page.assignment_submission_type | default: "file" | downcase %}
+    <div class="assignment-submission">
+      <h3>
+        <i class="fa-solid fa-upload assignment-submission-icon"></i>
+        Submit Assignment
+      </h3>
+
+      <div class="self-assessment" id="self-assessment-blog">
+        <h4 class="self-assessment-title">
+          <i class="fas fa-clipboard-check"></i>
+          Self-Assessment
+        </h4>
+        <p class="self-assessment-hint">Rate your work on this assignment, then add a short reflection. All 5 fields are required before you can submit.</p>
+
+        <fieldset class="rating-group" data-field="technicalExcellence">
+          <legend class="rating-label">Technical Excellence</legend>
+          <p class="rating-question">Rate the technical quality of your work on this assignment — your use of tools, problem-solving, and technical growth.</p>
+          <div class="rating-scale" role="radiogroup" aria-label="Technical Excellence rating">
+            <label class="rating-option"><input type="radio" name="sa-technicalExcellence-blog" value="1"><span>1</span></label>
+            <label class="rating-option"><input type="radio" name="sa-technicalExcellence-blog" value="2"><span>2</span></label>
+            <label class="rating-option"><input type="radio" name="sa-technicalExcellence-blog" value="3"><span>3</span></label>
+            <label class="rating-option"><input type="radio" name="sa-technicalExcellence-blog" value="4"><span>4</span></label>
+            <label class="rating-option"><input type="radio" name="sa-technicalExcellence-blog" value="5"><span>5</span></label>
+          </div>
+          <div class="rating-scale-hint">1 Explore &middot; 2 Understand &middot; 3 Apply &middot; 4 Analyze/Evaluate &middot; 5 Create/Extend</div>
+        </fieldset>
+
+        <fieldset class="rating-group" data-field="communication">
+          <legend class="rating-label">Communication</legend>
+          <p class="rating-question">Rate how clearly you communicated your work and process — explanations, documentation, and collaboration or help-seeking.</p>
+          <div class="rating-scale" role="radiogroup" aria-label="Communication rating">
+            <label class="rating-option"><input type="radio" name="sa-communication-blog" value="1"><span>1</span></label>
+            <label class="rating-option"><input type="radio" name="sa-communication-blog" value="2"><span>2</span></label>
+            <label class="rating-option"><input type="radio" name="sa-communication-blog" value="3"><span>3</span></label>
+            <label class="rating-option"><input type="radio" name="sa-communication-blog" value="4"><span>4</span></label>
+            <label class="rating-option"><input type="radio" name="sa-communication-blog" value="5"><span>5</span></label>
+          </div>
+          <div class="rating-scale-hint">1 Beginning &middot; 2 Developing &middot; 3 Consistent &middot; 4 Strong &middot; 5 Model</div>
+        </fieldset>
+
+        <fieldset class="rating-group" data-field="workHabits">
+          <legend class="rating-label">Work Habits</legend>
+          <p class="rating-question">Rate your work habits on this assignment — time management, persistence, responsibility, and follow-through.</p>
+          <div class="rating-scale" role="radiogroup" aria-label="Work Habits rating">
+            <label class="rating-option"><input type="radio" name="sa-workHabits-blog" value="1"><span>1</span></label>
+            <label class="rating-option"><input type="radio" name="sa-workHabits-blog" value="2"><span>2</span></label>
+            <label class="rating-option"><input type="radio" name="sa-workHabits-blog" value="3"><span>3</span></label>
+            <label class="rating-option"><input type="radio" name="sa-workHabits-blog" value="4"><span>4</span></label>
+            <label class="rating-option"><input type="radio" name="sa-workHabits-blog" value="5"><span>5</span></label>
+          </div>
+          <div class="rating-scale-hint">1 Beginning &middot; 2 Developing &middot; 3 Consistent &middot; 4 Strong &middot; 5 Model</div>
+        </fieldset>
+
+        <fieldset class="rating-group" data-field="aiOrchestration">
+          <legend class="rating-label">AI Orchestration</legend>
+          <p class="rating-question">Rate how effectively you used AI tools to support your work — prompting, verifying, extending, or accelerating your development process.</p>
+          <div class="rating-scale" role="radiogroup" aria-label="AI Orchestration rating">
+            <label class="rating-option"><input type="radio" name="sa-aiOrchestration-blog" value="1"><span>1</span></label>
+            <label class="rating-option"><input type="radio" name="sa-aiOrchestration-blog" value="2"><span>2</span></label>
+            <label class="rating-option"><input type="radio" name="sa-aiOrchestration-blog" value="3"><span>3</span></label>
+            <label class="rating-option"><input type="radio" name="sa-aiOrchestration-blog" value="4"><span>4</span></label>
+            <label class="rating-option"><input type="radio" name="sa-aiOrchestration-blog" value="5"><span>5</span></label>
+          </div>
+          <div class="rating-scale-hint">1 Explore &middot; 2 Understand &middot; 3 Apply &middot; 4 Analyze/Evaluate &middot; 5 Create/Extend</div>
+        </fieldset>
+
+        <div class="form-group self-assessment-reflection">
+          <label for="self-assessment-reflection-blog">Reflection</label>
+          <textarea id="self-assessment-reflection-blog" placeholder="In a few sentences, describe what you learned, struggled with, or accomplished on this assignment. Include one specific example."></textarea>
+        </div>
+      </div>
+
+      {% if submission_type == "link" or submission_type == "github_issue" %}
+      {% if submission_type == "github_issue" %}
+        {% assign link_label = "GitHub Issue Link" %}
+        {% assign link_placeholder = "https://github.com/owner/repo/issues/123" %}
+      {% else %}
+        {% assign link_label = "Submission Link" %}
+        {% assign link_placeholder = "https://..." %}
+      {% endif %}
+      <form class="submission-form active" id="link-form-blog">
+        <div class="form-group">
+          <label for="submission-link-blog">{{ link_label }}</label>
+          <input type="url" id="submission-link-blog" placeholder="{{ link_placeholder }}" required>
+          {% if submission_type == "github_issue" %}
+          <p class="form-hint" style="font-size:0.85rem;color:#9ca3af;margin-top:6px;">Must be a public GitHub issue (github.com/owner/repo/issues/N) — it will be validated and reviewed automatically.</p>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label for="link-description-blog">Description</label>
+          <textarea id="link-description-blog" placeholder="Describe what you're submitting..." required></textarea>
+        </div>
+        <button type="submit" class="ocs__btn ocs__btn--icon accent fill">
+          <i class="fa-solid fa-check"></i>
+          Submit Link
+        </button>
+      </form>
+      {% elsif submission_type == "code" %}
+      <form class="submission-form active" id="code-form-blog">
+        <div class="form-group">
+          <p class="form-hint">This submits the code from this lesson's code runner(s) below as a Gist for automatic review. Save each runner with its 💾 button before submitting.</p>
+          <ul class="code-runner-summary" id="code-runner-summary-blog"></ul>
+        </div>
+        <div class="form-group">
+          <label for="code-notes-blog">Notes (Optional)</label>
+          <textarea id="code-notes-blog" placeholder="Add any additional comments..."></textarea>
+        </div>
+        <button type="submit" class="ocs__btn ocs__btn--icon accent fill" id="code-submit-btn-blog">
+          <i class="fas fa-check"></i>
+          Submit Code
+        </button>
+      </form>
+      {% else %}
+      <form class="submission-form active" id="file-form-blog">
+        <div class="form-group">
+          <label>Upload Files</label>
+          <div class="file-upload-area" id="file-upload-area-blog">
+            <input type="file" id="file-input-blog" multiple accept=".pdf,.zip,.png,.jpg,.jpeg,.gif,.doc,.docx,.txt,.ipynb,.java,.py,.js,.md" style="display: none;">
+            <div class="file-upload-icon">
+              <i class="fa-solid fa-cloud-upload-alt"></i>
+            </div>
+            <div class="file-upload-text">Click to upload or drag and drop</div>
+            <div class="file-upload-hint">PDF, ZIP, images, documents, Jupyter notebooks (.ipynb), or code files (.java, .py, .js, .md) (Max 10MB per file)</div>
+          </div>
+          <div class="file-list" id="file-list-blog"></div>
+        </div>
+        <div class="form-group">
+          <label for="file-notes-blog">Notes (Optional)</label>
+          <textarea id="file-notes-blog" placeholder="Add any additional comments..."></textarea>
+        </div>
+        <button type="submit" class="ocs__btn ocs__btn--icon accent fill" id="file-submit-btn-blog" disabled>
+          <i class="fa-solid fa-check"></i>
+          Submit Files
+        </button>
+      </form>
+      {% endif %}
+
+      <div class="submission-status" id="submission-status-blog"></div>
+    </div>
+    <p style="margin-top: 12px; color: #6b7280; font-size: 0.95rem;">
+      Need to update a submission later? Open the <a href="{{ site.baseurl }}/submissions" style="color: #2563eb; text-decoration: underline;">submissions dashboard</a>.
+    </p>
+
+    <script>
+      const FRONTMATTER_ASSIGNMENT_ID_BLOG = {{ page.assignment_id | default: 'null' }};
+      const FRONTMATTER_ASSIGNMENT_NAME_BLOG = {{ page.assignment_name | default: nil | jsonify }};
+      const SUBMISSION_TYPE_BLOG = {{ page.assignment_submission_type | default: "file" | downcase | jsonify }};
+      const GITHUB_ISSUE_URL_PATTERN_BLOG = /^https?:\/\/github\.com\/[^/]+\/[^/#?]+\/issues\/\d+\/?$/i;
+      // This branch (pages whose frontmatter doesn't resolve a course/week - see
+      // is_course_lesson at the top of this layout) never had a working auto-create
+      // implementation: ensureAssignmentIdBlog() below only ever fell back to a static
+      // frontmatter assignment_id or threw, because the real implementation lived
+      // exclusively in the other branch's script, which never renders here. A course
+      // was never actually required by the backend - this was a frontend gap where
+      // the "blog" layout's assignment support was always a stub.
+      const CURRENT_LESSON_ID_BLOG = {{ page.topics_original_url | default: page.url | jsonify }};
+      let CURRENT_ASSIGNMENT_ID_BLOG = FRONTMATTER_ASSIGNMENT_ID_BLOG;
+      let CURRENT_ASSIGNMENT_NAME_BLOG = FRONTMATTER_ASSIGNMENT_NAME_BLOG;
+      let ASSIGNMENT_RESOLVE_PROMISE_BLOG = null;
+
+      async function autoCreateAssignmentIfNeededBlog() {
+        const hasAssignment = {{ page.assignment | default: false }};
+        if (!hasAssignment) {
+          return; // Not an assignment page
+        }
+
+        try {
+          // Call the Spring API to auto-create assignment
+          // This endpoint allows any authenticated user (student, person, teacher, admin)
+          const createRes = await fetch(`${javaURI}/api/assignments/auto-create`, {
+            ...fetchOptions,
+            method: 'POST',
+            headers: {
+              ...fetchOptions.headers,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+              name: {{ page.title | jsonify }},
+              contentUrl: CURRENT_LESSON_ID_BLOG.replace(/^\/+|\/+$/g, ''),
+              description: {{ page.description | default: "" | jsonify }},
+              assignmentType: SUBMISSION_TYPE_BLOG,
+              pageContent: {{ page.content | strip_html | normalize_whitespace | truncate: 8000 | jsonify }}
+            })
+          });
+
+          if (createRes.ok) {
+            const result = await createRes.json();
+            CURRENT_ASSIGNMENT_ID_BLOG = result.id;
+            CURRENT_ASSIGNMENT_NAME_BLOG = result.name;
+            window.ASSIGNMENT_ID = result.id;
+            window.ASSIGNMENT_NAME = result.name;
+
+            if (createRes.status === 201) {
+              console.log('✓ Assignment auto-created with ID:', result.id);
+            } else if (createRes.status === 200) {
+              console.log('ℹ Assignment already exists with ID:', result.id, '- reusing for this session');
+            } else {
+              console.log('Assignment resolved with ID:', result.id);
+            }
+          } else if (createRes.status === 401 || createRes.status === 403) {
+            console.warn('Assignment creation requires an active Spring login session. Please log in and refresh the page.');
+          } else if (createRes.status === 400) {
+            const error = await createRes.json();
+            console.error('Bad request for auto-create assignment:', error.error);
+          } else {
+            console.error('Failed to auto-create assignment:', createRes.status, createRes.statusText);
+          }
+        } catch (error) {
+          console.error('Error auto-creating assignment:', error);
+        }
+      }
+
+      // window.javaURI/fetchOptions come from a module script further down the page,
+      // which (like all module scripts) runs deferred - only after DOMContentLoaded is
+      // it guaranteed to have executed, matching the pattern already used below for
+      // renderCodeRunnerSummaryBlog.
+      document.addEventListener('DOMContentLoaded', autoCreateAssignmentIfNeededBlog);
+
+      function renderCodeRunnerSummaryBlog() {
+        const list = document.getElementById('code-runner-summary-blog');
+        if (!list) return;
+        const runners = window.listRunners();
+        if (runners.length === 0) {
+          list.innerHTML = '<li>No code runners found on this page.</li>';
+          return;
+        }
+        const unsaved = new Set(window.unsavedRunners());
+        list.innerHTML = runners.map((el, i) => {
+          const id = el.dataset.runnerId || `runner_${i + 1}`;
+          return unsaved.has(el)
+            ? `<li>${id} — <span class="code-runner-unsaved">not saved yet</span></li>`
+            : `<li>${id} — <span class="code-runner-saved">saved</span></li>`;
+        }).join('');
+      }
+
+      async function ensureAssignmentIdBlog() {
+        const hasAssignment = {{ page.assignment | default: false }};
+        if (!hasAssignment) {
+          if (!CURRENT_ASSIGNMENT_ID_BLOG) throw new Error("Assignment ID not configured.");
+          return CURRENT_ASSIGNMENT_ID_BLOG;
+        }
+
+        // Always resolve against the backend so uploads/submissions target the real
+        // assignment ID, not only a static frontmatter one. DOMContentLoaded already
+        // kicks this off once; a submit attempt that races ahead of that (or a legacy
+        // page with no listener yet attached) starts it here instead of failing.
+        if (!ASSIGNMENT_RESOLVE_PROMISE_BLOG) {
+          ASSIGNMENT_RESOLVE_PROMISE_BLOG = autoCreateAssignmentIfNeededBlog();
+        }
+        await ASSIGNMENT_RESOLVE_PROMISE_BLOG;
+
+        if (!CURRENT_ASSIGNMENT_ID_BLOG) {
+          throw new Error('Could not resolve backend assignment ID. Please log in and refresh.');
+        }
+        return CURRENT_ASSIGNMENT_ID_BLOG;
+      }
+
+      function currentAssignmentNameBlog() {
+        if (typeof window.ASSIGNMENT_NAME === 'string' && window.ASSIGNMENT_NAME.trim()) {
+          return window.ASSIGNMENT_NAME;
+        }
+        if (typeof FRONTMATTER_ASSIGNMENT_NAME_BLOG === 'string' && FRONTMATTER_ASSIGNMENT_NAME_BLOG.trim()) {
+          return FRONTMATTER_ASSIGNMENT_NAME_BLOG;
+        }
+        return null;
+      }
+
+      // Submission type switching
+      function switchSubmissionType(type) {
+        document.querySelectorAll('.submission-tab').forEach(tab => {
+          tab.classList.remove('active');
+        });
+        event.target.closest('.submission-tab').classList.add('active');
+
+        document.querySelectorAll('.submission-form').forEach(form => {
+          form.classList.remove('active');
+        });
+        const formId = type + '-form-blog';
+        document.getElementById(formId).classList.add('active');
+
+        document.getElementById('submission-status-blog').style.display = 'none';
+      }
+
+      // File upload handling
+      const fileUploadAreaBlog = document.getElementById('file-upload-area-blog');
+      const fileInputBlog = document.getElementById('file-input-blog');
+      const fileListBlog = document.getElementById('file-list-blog');
+      const fileSubmitBtnBlog = document.getElementById('file-submit-btn-blog');
+      let selectedFilesBlog = [];
+
+      if (fileUploadAreaBlog) {
+        fileUploadAreaBlog.addEventListener('click', () => fileInputBlog.click());
+
+        fileUploadAreaBlog.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          fileUploadAreaBlog.classList.add('dragover');
+        });
+
+        fileUploadAreaBlog.addEventListener('dragleave', () => {
+          fileUploadAreaBlog.classList.remove('dragover');
+        });
+
+        fileUploadAreaBlog.addEventListener('drop', (e) => {
+          e.preventDefault();
+          fileUploadAreaBlog.classList.remove('dragover');
+          handleFilesBlog(e.dataTransfer.files);
+        });
+
+        fileInputBlog.addEventListener('change', (e) => {
+          handleFilesBlog(e.target.files);
+        });
+      }
+
+      function handleFilesBlog(files) {
+        Array.from(files).forEach(file => {
+          if (file.size > 10 * 1024 * 1024) {
+            showStatusBlog('error', `File ${file.name} is too large (max 10MB)`);
+            return;
+          }
+          selectedFilesBlog.push(file);
+        });
+        updateFileListBlog();
+      }
+
+      function updateFileListBlog() {
+        fileListBlog.innerHTML = '';
+        selectedFilesBlog.forEach((file, index) => {
+          const fileItem = document.createElement('div');
+          fileItem.className = 'file-item';
+          fileItem.innerHTML = `
+              <div class="file-info">
+                <i class="fa-solid fa-file"></i>
+                <div>
+                  <div class="file-name">${file.name}</div>
+                  <div class="file-size">${formatFileSizeBlog(file.size)}</div>
+                </div>
+              </div>
+              <button type="button" class="remove-file" onclick="removeFileBlog(${index})">
+                <i class="fa-solid fa-times"></i>
+              </button>
+            `;
+          fileListBlog.appendChild(fileItem);
+        });
+        fileSubmitBtnBlog.disabled = selectedFilesBlog.length === 0;
+      }
+
+      function removeFileBlog(index) {
+        selectedFilesBlog.splice(index, 1);
+        updateFileListBlog();
+      }
+
+      function formatFileSizeBlog(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+      }
+
+      // Self-assessment: collect, validate & reset (mirrors the course-lesson
+      // branch's setupSelfAssessmentRatings/getSelfAssessmentData above — this
+      // branch renders its own markup with -blog suffixed ids/names, so it needs
+      // its own copy rather than sharing functions across branches that never
+      // render on the same page).
+      const SELF_ASSESSMENT_RATING_FIELDS_BLOG = {
+        technicalExcellence: 'Technical Excellence',
+        communication: 'Communication',
+        workHabits: 'Work Habits',
+        aiOrchestration: 'AI Orchestration'
+      };
+
+      function getSelfAssessmentDataBlog() {
+        const data = {};
+        for (const field of Object.keys(SELF_ASSESSMENT_RATING_FIELDS_BLOG)) {
+          const checked = document.querySelector(`input[name="sa-${field}-blog"]:checked`);
+          data[field] = checked ? parseInt(checked.value, 10) : null;
+        }
+        data.selfAssessmentReflection = document.getElementById('self-assessment-reflection-blog')?.value.trim() || '';
+        return data;
+      }
+
+      function validateSelfAssessmentBlog(data) {
+        for (const [field, label] of Object.entries(SELF_ASSESSMENT_RATING_FIELDS_BLOG)) {
+          const value = data[field];
+          if (!Number.isInteger(value) || value < 1 || value > 5) {
+            return `Please rate "${label}" before submitting.`;
+          }
+        }
+        if (!data.selfAssessmentReflection) {
+          return 'Please add a short self-assessment reflection before submitting.';
+        }
+        return null;
+      }
+
+      function resetSelfAssessmentBlog() {
+        document.querySelectorAll('#self-assessment-blog input[type="radio"]').forEach(input => {
+          input.checked = false;
+          input.closest('.rating-option')?.classList.remove('selected');
+        });
+        const reflection = document.getElementById('self-assessment-reflection-blog');
+        if (reflection) reflection.value = '';
+      }
+
+      function setupSelfAssessmentRatingsBlog() {
+        const container = document.getElementById('self-assessment-blog');
+        if (!container) return;
+        container.addEventListener('change', (e) => {
+          const input = e.target;
+          if (input.tagName !== 'INPUT' || input.type !== 'radio') return;
+          const group = input.closest('.rating-scale');
+          if (!group) return;
+          group.querySelectorAll('.rating-option').forEach(opt => opt.classList.remove('selected'));
+          input.closest('.rating-option')?.classList.add('selected');
+        });
+      }
+      setupSelfAssessmentRatingsBlog();
+
+      // Helper: resolve current user's UID and numeric person ID
+      async function resolveCurrentUserBlog() {
+        const uidRes = await fetch(`${pythonURI}/api/id`, { ...fetchOptions });
+        if (!uidRes.ok) throw new Error('Not authenticated. Please log in.');
+        const { uid } = await uidRes.json();
+        const personRes = await fetch(`${javaURI}/api/person/uid/${encodeURIComponent(uid)}`, { ...fetchOptions });
+        if (!personRes.ok) throw new Error('Could not find your account in the gradebook.');
+        const person = await personRes.json();
+        return { uid, personId: person.id };
+      }
+
+      // Link submission — POST to Spring API
+      const linkFormBlog = document.getElementById('link-form-blog');
+      if (linkFormBlog) {
+        linkFormBlog.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          const link = document.getElementById('submission-link-blog').value.trim();
+          const description = document.getElementById('link-description-blog').value.trim();
+          const btn = this.querySelector('button[type="submit"]');
+          if (SUBMISSION_TYPE_BLOG === 'github_issue' && !GITHUB_ISSUE_URL_PATTERN_BLOG.test(link)) {
+            showStatusBlog('error', 'That is not a valid GitHub issue link (expected github.com/owner/repo/issues/N).');
+            return;
+          }
+          const selfAssessment = getSelfAssessmentDataBlog();
+          const selfAssessmentError = validateSelfAssessmentBlog(selfAssessment);
+          if (selfAssessmentError) {
+            showStatusBlog('error', selfAssessmentError);
+            return;
+          }
+          btn.disabled = true;
+          showStatusBlog('loading', 'Submitting...');
+          try {
+            const assignmentId = await ensureAssignmentIdBlog();
+            const { uid, personId } = await resolveCurrentUserBlog();
+            const content = { type: SUBMISSION_TYPE_BLOG === 'github_issue' ? 'github_issue' : 'link', url: link, notes: description };
+            const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
+              ...fetchOptions,
+              method: 'POST',
+              body: JSON.stringify({
+                assignmentId: assignmentId,
+                submitterId: personId,
+                isGroupSubmission: false,
+                content,
+                comment: description,
+                isLate: false,
+                technicalExcellence: selfAssessment.technicalExcellence,
+                communication: selfAssessment.communication,
+                workHabits: selfAssessment.workHabits,
+                aiOrchestration: selfAssessment.aiOrchestration,
+                selfAssessmentReflection: selfAssessment.selfAssessmentReflection
+              })
+            });
+            if (!res.ok) {
+              const e = await res.json().catch(() => ({}));
+              throw new Error(e.error || res.statusText);
+            }
+            // Dual-write to EshikaP1's grades system
+            const assignmentName = currentAssignmentNameBlog();
+            const assignmentLabel = assignmentName ? assignmentName : String(assignmentId);
+            await fetch(`${javaURI}/api/grades`, {
+              ...fetchOptions,
+              method: 'POST',
+              body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: { ...content, selfAssessment }, submittedAt: new Date().toISOString() })
+            }).catch(() => {});
+            showStatusBlog('success', 'Link submitted successfully!');
+            this.reset();
+            resetSelfAssessmentBlog();
+          } catch (err) {
+            showStatusBlog('error', err.message);
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      }
+
+      // File submission — POST to Spring file upload API
+      const fileFormBlog = document.getElementById('file-form-blog');
+      if (fileFormBlog) {
+        fileFormBlog.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          if (selectedFilesBlog.length === 0) {
+            showStatusBlog('error', 'Please select at least one file.');
+            return;
+          }
+          const notes = document.getElementById('file-notes-blog').value.trim();
+          const btn = document.getElementById('file-submit-btn-blog');
+          const selfAssessment = getSelfAssessmentDataBlog();
+          const selfAssessmentError = validateSelfAssessmentBlog(selfAssessment);
+          if (selfAssessmentError) {
+            showStatusBlog('error', selfAssessmentError);
+            return;
+          }
+          btn.disabled = true;
+          showStatusBlog('loading', 'Uploading...');
+          try {
+            const assignmentId = await ensureAssignmentIdBlog();
+            const { uid, personId } = await resolveCurrentUserBlog();
+            // Resolve assignment name for the file upload endpoint
+            let assignmentName = null;
+            const preferredName = currentAssignmentNameBlog();
+            if (typeof preferredName === 'string') {
+              const normalized = preferredName.trim().toLowerCase();
+              if (normalized && normalized !== 'null' && normalized !== 'undefined') {
+                assignmentName = preferredName;
+              }
+            }
+            if (!assignmentName) {
+              const nameRes = await fetch(`${javaURI}/api/assignments/${assignmentId}`, { ...fetchOptions });
+              if (!nameRes.ok) throw new Error('Assignment not found on server.');
+              assignmentName = await nameRes.text();
+            }
+            for (const file of selectedFilesBlog) {
+              if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} exceeds 10MB limit.`);
+              const content = { type: 'file', filename: file.name, notes: notes || '' };
+              const fd = new FormData();
+              fd.append('assignmentName', assignmentName);
+              fd.append('assignmentId', String(assignmentId));
+              fd.append('userId', personId);
+              fd.append('username', uid);
+              fd.append('file', file);
+              if (notes) fd.append('notes', notes);
+              fd.append('technicalExcellence', String(selfAssessment.technicalExcellence));
+              fd.append('communication', String(selfAssessment.communication));
+              fd.append('workHabits', String(selfAssessment.workHabits));
+              fd.append('aiOrchestration', String(selfAssessment.aiOrchestration));
+              fd.append('selfAssessmentReflection', selfAssessment.selfAssessmentReflection);
+              const r = await fetch(`${javaURI}/api/assignment-submissions/upload`, {
+                method: 'POST',
+                mode: fetchOptions.mode,
+                credentials: fetchOptions.credentials,
+                headers: { 'X-Origin': 'client' },
+                body: fd
+              });
+              if (!r.ok) {
+                const e = await r.json().catch(() => ({}));
+                throw new Error(`Upload failed for ${file.name}: ` + (e.error || r.statusText));
+              }
+              // Dual-write to EshikaP1's grades system
+              const assignmentNameForGrades = currentAssignmentNameBlog();
+              const assignmentLabel = assignmentNameForGrades ? assignmentNameForGrades : String(assignmentId);
+              await fetch(`${javaURI}/api/grades`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: { ...content, selfAssessment }, submittedAt: new Date().toISOString() })
+              }).catch(() => {});
+            }
+            showStatusBlog('success', `${selectedFilesBlog.length} file(s) submitted successfully!`);
+            selectedFilesBlog = [];
+            updateFileListBlog();
+            this.reset();
+            resetSelfAssessmentBlog();
+          } catch (err) {
+            showStatusBlog('error', err.message);
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      }
+
+      // Code submission — bundled into a Gist, then POST to Spring API
+      const codeFormBlog = document.getElementById('code-form-blog');
+      if (codeFormBlog) {
+        // window.listRunners/etc. come from a module script further down the page, which
+        // (like all module scripts) runs deferred - only after DOMContentLoaded is it
+        // guaranteed to have executed, so the summary render waits for that event too.
+        document.addEventListener('DOMContentLoaded', renderCodeRunnerSummaryBlog);
+        codeFormBlog.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          const notes = document.getElementById('code-notes-blog')?.value?.trim() || '';
+          const btn = this.querySelector('button[type="submit"]');
+          if (window.unsavedRunners().length > 0) {
+            showStatusBlog('error', 'Save your code with the 💾 button in each runner before submitting.');
+            return;
+          }
+          const files = window.readRunners();
+          if (Object.keys(files).length === 0) {
+            showStatusBlog('error', "No saved code found in this lesson's code runner(s).");
+            return;
+          }
+          const selfAssessment = getSelfAssessmentDataBlog();
+          const selfAssessmentError = validateSelfAssessmentBlog(selfAssessment);
+          if (selfAssessmentError) {
+            showStatusBlog('error', selfAssessmentError);
+            return;
+          }
+          btn.disabled = true;
+          showStatusBlog('loading', 'Checking login...');
+          let uid, personId;
+          try {
+            ({ uid, personId } = await resolveCurrentUserBlog());
+          } catch (err) {
+            showStatusBlog('error', 'Please log in to submit code.');
+            btn.disabled = false;
+            return;
+          }
+          showStatusBlog('loading', 'Creating Gist and submitting...');
+          try {
+            const assignmentId = await ensureAssignmentIdBlog();
+            const gistUrl = await window.exportToGist(files, { type: 'submission', description: notes || 'Code submission' });
+            const content = { type: 'code', url: gistUrl, notes };
+            const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
+              ...fetchOptions,
+              method: 'POST',
+              body: JSON.stringify({
+                assignmentId: assignmentId,
+                submitterId: personId,
+                isGroupSubmission: false,
+                content,
+                comment: notes,
+                isLate: false,
+                technicalExcellence: selfAssessment.technicalExcellence,
+                communication: selfAssessment.communication,
+                workHabits: selfAssessment.workHabits,
+                aiOrchestration: selfAssessment.aiOrchestration,
+                selfAssessmentReflection: selfAssessment.selfAssessmentReflection
+              })
+            });
+            if (!res.ok) {
+              const e = await res.json().catch(() => ({}));
+              throw new Error(e.error || res.statusText);
+            }
+            const assignmentName = currentAssignmentNameBlog();
+            const assignmentLabel = assignmentName ? assignmentName : String(assignmentId);
+            await fetch(`${javaURI}/api/grades`, {
+              ...fetchOptions,
+              method: 'POST',
+              body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: { ...content, selfAssessment }, submittedAt: new Date().toISOString() })
+            }).catch(() => {});
+            showStatusBlog('success', 'Code submitted successfully!');
+            this.reset();
+            resetSelfAssessmentBlog();
+          } catch (err) {
+            showStatusBlog('error', err.message, err);
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      }
+
+      function showStatusBlog(type, message, error) {
+        const status = document.getElementById('submission-status-blog');
+        const icon = type === 'success' ? 'check-circle' : type === 'loading' ? 'spinner fa-spin' : 'exclamation-circle';
+        status.className = `submission-status ${type}`;
+        status.innerHTML = `<i class="fa-solid fa-${icon}"></i> ${message}`;
+        window.appendGistSettingsLink(status, error);
+        status.style.display = 'block';
+        if (type !== 'loading' && !error?.settingsUrl) {
+          setTimeout(() => {
+            status.style.display = 'none';
+          }, 5000);
+        }
+      }
+    </script>
+    {% endif %}
+
+    {% if page.chat %}
+    {% include lesson_chat.html %}
+    {% endif %}
+  </div>
+  {%- if page.comments -%}
+  {%- include utterances.html -%}
+  {%- endif -%}
+  {%- if site.disqus.shortname -%}
+  {%- include disqus_comments.html -%}
+  {%- endif -%}
+  <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+
+  <!-- Enhanced Analytics Tracking -->
+  <script type="module">
+    import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
+    import { appendGistSettingsLink } from '{{ site.baseurl }}/assets/js/gist-connection-errors.js';
+    import { listRunners, unsavedRunners, readRunners } from '{{ site.baseurl }}/assets/js/runner-io.js';
+    window.pythonURI = pythonURI;
+    window.javaURI = javaURI;
+    window.fetchOptions = fetchOptions;
+    window.exportToGist = exportToGist;
+    window.appendGistSettingsLink = appendGistSettingsLink;
+    // Used by the blog code-submission form, which runs in a classic script.
+    window.listRunners = listRunners;
+    window.unsavedRunners = unsavedRunners;
+    window.readRunners = readRunners;
+  </script>
+  <script src="{{ site.baseurl }}/assets/js/ocs-analytics-enhanced.js"></script>
+  <script src="{{ site.baseurl }}/assets/js/code-runner-analytics.js"></script>
+  <script src="{{ site.baseurl }}/assets/js/lesson-completion.js"></script>
+  <script src="{{ site.baseurl }}/assets/js/lesson-completion-bigsix.js"></script>
+</article>
+
+{% endif %}

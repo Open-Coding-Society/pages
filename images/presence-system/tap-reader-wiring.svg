@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 560" xmlns="http://www.w3.org/2000/svg" width="1200" height="560">
+        <title>Wiring from the RC522 to the Raspberry Pi 3 GPIO header: SDA to pin 24, SCK to pin 23, MOSI to pin 19, MISO to pin 21, IRQ not connected, GND to pin 6, RST to pin 22, 3.3V to pin 1. The RC522 runs on 3.3 volts, never 5 volts.</title>
+        <rect width="1200" height="560" rx="28" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
+        <rect x="60" y="50" width="330" height="460" rx="10" fill="rgb(47, 106, 168)" stroke-width="1px"></rect>
+        <rect x="84" y="74" width="190" height="300" rx="16" fill="none" stroke="rgba(255, 255, 255, 0.75)" stroke-width="3px"></rect>
+        <rect x="102" y="92" width="154" height="264" rx="12" fill="none" stroke="rgba(255, 255, 255, 0.75)" stroke-width="3px"></rect>
+        <text x="180" y="440" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="30px" font-weight="800" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">RC522</text>
+        <rect x="810" y="50" width="330" height="460" rx="10" fill="rgb(63, 143, 94)" stroke-width="1px"></rect>
+        <text x="1120" y="88" text-anchor="end" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="30px" font-weight="800" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Pi 3 GPIO</text>
+        <line x1="390" y1="130" x2="810" y2="130" fill="none" stroke="rgb(138, 111, 192)" stroke-width="7px" stroke-linecap="round"></line>
+        <line x1="390" y1="175" x2="810" y2="175" fill="none" stroke="rgb(224, 166, 79)" stroke-width="7px" stroke-linecap="round"></line>
+        <line x1="390" y1="220" x2="810" y2="220" fill="none" stroke="rgb(79, 157, 98)" stroke-width="7px" stroke-linecap="round"></line>
+        <line x1="390" y1="265" x2="810" y2="265" fill="none" stroke="rgb(59, 111, 212)" stroke-width="7px" stroke-linecap="round"></line>
+        <line x1="390" y1="355" x2="810" y2="355" fill="none" stroke="rgb(22, 33, 59)" stroke-width="7px" stroke-linecap="round"></line>
+        <line x1="390" y1="400" x2="810" y2="400" fill="none" stroke="rgb(111, 127, 153)" stroke-width="7px" stroke-linecap="round"></line>
+        <line x1="390" y1="445" x2="810" y2="445" fill="none" stroke="rgb(200, 85, 61)" stroke-width="7px" stroke-linecap="round"></line>
+        <line x1="390" y1="310" x2="440" y2="310" fill="none" stroke="rgb(111, 127, 153)" stroke-width="4px" stroke-dasharray="4px, 6px" stroke-linecap="round"></line>
+        <g fill="rgb(217, 180, 90)" stroke-width="1px" font-size="16px" font-weight="400"><circle cx="390" cy="130" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="390" cy="175" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="390" cy="220" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="390" cy="265" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="390" cy="310" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="390" cy="355" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="390" cy="400" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="390" cy="445" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle></g>
+        <g fill="rgb(217, 180, 90)" stroke-width="1px" font-size="16px" font-weight="400"><circle cx="810" cy="130" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="810" cy="175" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="810" cy="220" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="810" cy="265" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="810" cy="355" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="810" cy="400" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="810" cy="445" r="7" fill="rgb(217, 180, 90)" stroke-width="1px"></circle></g>
+        <text x="370" y="137" text-anchor="end" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">SDA</text>
+        <text x="370" y="182" text-anchor="end" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">SCK</text>
+        <text x="370" y="227" text-anchor="end" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">MOSI</text>
+        <text x="370" y="272" text-anchor="end" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">MISO</text>
+        <text x="370" y="317" text-anchor="end" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">IRQ</text>
+        <text x="370" y="362" text-anchor="end" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">GND</text>
+        <text x="370" y="407" text-anchor="end" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">RST</text>
+        <text x="370" y="452" text-anchor="end" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">3.3V</text>
+        <text x="830" y="137" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Pin 24 · GPIO8 (CE0)</text>
+        <text x="830" y="182" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Pin 23 · GPIO11 (SCLK)</text>
+        <text x="830" y="227" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Pin 19 · GPIO10 (MOSI)</text>
+        <text x="830" y="272" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Pin 21 · GPIO9 (MISO)</text>
+        <text x="830" y="362" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Pin 6 · GND</text>
+        <text x="830" y="407" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Pin 22 · GPIO25</text>
+        <text x="830" y="452" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="21px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Pin 1 · 3.3V</text>
+        <text x="456" y="317" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">not connected</text>
+        <rect x="470" y="470" width="260" height="56" rx="14" fill="rgb(200, 85, 61)" stroke-width="1px"></rect>
+        <text x="600" y="497" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="22px" font-weight="800" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">3.3 V only. NOT 5 V</text>
+        <text x="600" y="518" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="16px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">chip max is 4.0 V</text>
+      </svg>

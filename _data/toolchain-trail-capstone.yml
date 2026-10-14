@@ -13,3 +13,31 @@ NPCFeedback: "A new NPC dialogue system appears when a student completes a stati
 RequiredAssets: ["Seven building sprites", "Icons representing each development tool or station", "Seven NPC portraits", "Status icons for completion, progress, warnings, and locked areas"]
 OverallGoal: "Transform development-environment setup from a complicated technical process into a guided, measurable, and interactive learning experience."
 SystemFlow: ["Environment Verification", "Automated Onboarding", "Progress Tracking", "Gamified Learning", "Teacher Dashboard Evidence"]
+RecentChanges:
+  - title: "Spline barriers and road"
+    points:
+      - "Added invisible barriers along paths and below the score bar."
+      - "Moved the road beside the buildings; players start at its entrance."
+      - "The road now loops around the map, with stations in clockwise order."
+  - title: "Sound settings"
+    points:
+      - "Added voice, volume, speed, and pitch controls."
+      - "Settings persist across levels and reloads without changing each level's voice style."
+      - "Choose English, Chinese, or Spanish, plus fun voice effects."
+      - "Removed the extra effects menu from dialogue."
+  - title: "Saving setup check results"
+    points:
+      - "One command checks tools, saves results locally, and sends them to the server."
+      - "Results appear in-game with status, fixes, date, time, and duration."
+      - "Latest results are stored; manual paste is still available."
+      - "An AI summary highlights missing setup items."
+UpcomingWork:
+  - title: "Progress alerts"
+    points:
+      - "Show student progress and flag failed checks or stalled activity."
+  - title: "Bring the setup flow to other levels"
+    points:
+      - "Add guided steps, automatic results, and a teacher view to other levels."
+  - title: "Block progression after setup failure"
+    points:
+      - "On failure, block progress and flash a large red “0.55” until fixed."

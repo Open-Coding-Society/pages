@@ -27,6 +27,11 @@ rp_active: research-2
     <p style="font-size:0.8rem;color:var(--jv-text-muted);margin-top:0.5rem;">Individual research by <strong style="color:var(--jv-text);">Shriya Paladugu</strong></p>
   </div>
 
+  <figure class="jv-figure">
+    <img src="{{ '/images/jarvis/jarvis3000-research-2.png' | relative_url }}" alt="Jarvis3000 object-recognition pipeline progressing from a classroom photo to labeled detections and SAM 3 object masks" width="1774" height="887">
+    <figcaption>Research 2 turns classroom images into labeled detections and pixel-level object masks for counting and inventory.</figcaption>
+  </figure>
+
   <!-- Problem Statement -->
   <h2 class="ocs__section-title">Problem Statement</h2>
   <div class="ocs__card">

@@ -1,22 +1,16 @@
-import glob
 import html as html_lib
-from nbconvert import MarkdownExporter
-from nbconvert.utils.exceptions import ConversionException
 import os
-import nbformat
 import yaml
 import sys
 import subprocess
+import argparse
+import json
+from pathlib import Path
+from functools import lru_cache
 from hashlib import sha256
 import concurrent.futures, traceback, re
 from dataclasses import dataclass, asdict
 from typing import Any, Optional
-
-if __name__ == "__main__":
-    from progress_bar import ProgressBar
-else:
-    from scripts.progress_bar import ProgressBar
-
 
 ###########################################
 ### Section for Constants and Patterns  ###
@@ -87,6 +81,10 @@ Notes on CodeFence and MermaidGraph:
 notebook_directory = "_notebooks"
 destination_directory = "_posts"
 mermaid_output_directory = "assets/mermaid"
+repository_root = Path(__file__).resolve().parent.parent
+cache_directory = ".notebook-conversion-cache"
+project_index_date = "2026-04-15"
+project_navigation_date = "2026-09-12"
 
 # Comment patterns for different languages
 CODE_RUNNER_PATTERNS = {
@@ -830,11 +828,9 @@ class MermaidGraph:
 
 def error_cleanup(notebook_file):
     """Delete generated markdown output for a notebook when conversion fails."""
-    destination_file = os.path.basename(notebook_file).replace(".ipynb", "_IPYNB_2_.md")
-    destination_path = os.path.join(destination_directory, destination_file)
-
-    if os.path.exists(destination_path):
-        os.remove(destination_path)
+    destination_path = Path(get_relative_output_path(notebook_file))
+    destination_path.unlink(missing_ok=True)
+    cache_path(destination_path).unlink(missing_ok=True)
 
 
 def extract_front_matter(notebook_file, cell):
@@ -846,19 +842,81 @@ def extract_front_matter(notebook_file, cell):
         try:
             front_matter = yaml.safe_load(source.split("---", 2)[1])
         except yaml.YAMLError as e:
-            print(f"Error parsing YAML front matter: {e}")
-            error_cleanup(notebook_file)
-            sys.exit(1)
+            raise ValueError(f"Invalid YAML front matter in {notebook_file}: {e}") from e
+        if not isinstance(front_matter, dict):
+            raise ValueError(f"Front matter in {notebook_file} must be a mapping")
     return front_matter
 
 
 def get_relative_output_path(notebook_file):
-    """Map a notebook path to the mirrored markdown output path under _posts."""
-    relative_path = os.path.relpath(notebook_file, notebook_directory)
+    """Map legacy and project sources to their existing published filenames."""
+    source = Path(notebook_file).resolve()
+    legacy_root = (repository_root / notebook_directory).resolve()
+    projects_root = (repository_root / "_projects").resolve()
+    posts_root = (repository_root / destination_directory).resolve()
+    if source.suffix != ".ipynb":
+        raise ValueError(f"Expected an .ipynb source: {notebook_file}")
 
-    markdown_filename = relative_path.replace(".ipynb", "_IPYNB_2_.md")
+    if source.is_relative_to(legacy_root):
+        relative = source.relative_to(legacy_root)
+    elif source.is_relative_to(projects_root):
+        parts = source.relative_to(projects_root).parts
+        # Templates support flat projects as well as category/project directories.
+        if len(parts) == 2 and parts[1] == "index.ipynb":
+            relative = Path("projects", parts[0], f"{project_index_date}-{parts[0]}.ipynb")
+        elif len(parts) == 3 and parts[2] == "index.ipynb" and parts[1] not in ("notebooks", "navigation"):
+            relative = Path("projects", parts[1], f"{project_index_date}-{parts[1]}.ipynb")
+        elif len(parts) in (3, 4) and parts[-2] in ("notebooks", "navigation"):
+            filename = parts[-1]
+            if parts[-2] == "navigation":
+                filename = f"{project_navigation_date}-{filename}"
+            relative = Path("projects", parts[-3], filename)
+        else:
+            raise ValueError(f"Unsupported project notebook location: {notebook_file}")
+    else:
+        raise ValueError(f"Notebook must be inside _notebooks or a registered project: {notebook_file}")
 
-    return os.path.join(destination_directory, markdown_filename)
+    output = (posts_root / relative.with_name(f"{relative.stem}_IPYNB_2_.md")).resolve()
+    if not output.is_relative_to(posts_root):
+        raise ValueError(f"Notebook output escapes _posts: {notebook_file}")
+    return str(output)
+
+
+def cache_path(output):
+    key = sha256(str(output).encode("utf-8")).hexdigest()
+    return repository_root / cache_directory / f"{key}.json"
+
+
+def conversion_fingerprint(source):
+    return {
+        "source": str(Path(source).resolve()),
+        "source_hash": sha256(Path(source).read_bytes()).hexdigest(),
+        "converter_hash": sha256(Path(__file__).read_bytes()).hexdigest(),
+    }
+
+
+def output_signature(output):
+    stat = output.stat()
+    return {"size": stat.st_size, "mtime_ns": stat.st_mtime_ns}
+
+
+def needs_conversion(source, force=False):
+    output = Path(get_relative_output_path(source))
+    stamp = cache_path(output)
+    if force or not output.is_file() or not stamp.is_file():
+        return True
+    try:
+        cached = json.loads(stamp.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        print(f"Invalid conversion cache {stamp}; rebuilding {source}: {e}", file=sys.stderr)
+        return True
+    return cached != {**conversion_fingerprint(source), "output": output_signature(output)}
+
+
+@lru_cache(maxsize=1)
+def markdown_exporter():
+    from nbconvert import MarkdownExporter
+    return MarkdownExporter()
 
 
 def fix_js_code_blocks(markdown):
@@ -1330,8 +1388,12 @@ def process_custom_cells(notebook, permalink):
 # Function to convert the notebook to Markdown with front matter
 def convert_notebook_to_markdown_with_front_matter(notebook_file):
     """Convert one notebook into markdown and prepend YAML front matter."""
+    import nbformat
+
     with open(notebook_file, "r", encoding="utf-8") as file:
         notebook = nbformat.read(file, as_version=nbformat.NO_CONVERT)
+        if not notebook.cells:
+            raise ValueError(f"Notebook has no front matter cell: {notebook_file}")
         front_matter = extract_front_matter(notebook_file, notebook.cells[0])
 
         # Get permalink for runner_id generation
@@ -1344,7 +1406,7 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
         
         mermaid_graph = MermaidGraph(mermaid_output_directory)
         mermaid_graph.process_cells(notebook)
-        exporter = MarkdownExporter()
+        exporter = markdown_exporter()
         markdown, _ = exporter.from_notebook_node(notebook)
         markdown = fix_js_code_blocks(markdown) # Fix JS code blocks
         
@@ -1359,74 +1421,131 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
         markdown_with_front_matter = front_matter_content + markdown
         destination_path = get_relative_output_path(notebook_file)
         ensure_directory_exists(destination_path)
-        with open(destination_path, "w", encoding="utf-8") as file:
-            file.write(markdown_with_front_matter)
+        output = Path(destination_path)
+        # Avoid a Jekyll rebuild when a source edit does not change published content.
+        if not output.is_file() or output.read_text(encoding="utf-8") != markdown_with_front_matter:
+            temporary = output.with_name(f".{output.name}.{os.getpid()}.tmp")
+            try:
+                temporary.write_text(markdown_with_front_matter, encoding="utf-8")
+                temporary.replace(output)
+            finally:
+                temporary.unlink(missing_ok=True)
 
 
 # Function to convert the Jupyter Notebook files to Markdown
-def convert_single_notebook(notebook_file):
-    """Convert one notebook and fail fast on conversion exceptions."""
+def convert_single_notebook(notebook_file, force=False):
+    """Convert a changed source, record freshness, and propagate failures."""
+    fingerprint = conversion_fingerprint(notebook_file)
+    if not needs_conversion(notebook_file, force=force):
+        return False
     try:
         convert_notebook_to_markdown_with_front_matter(notebook_file)
-    except ConversionException as e:
-        print(f"Conversion error for {notebook_file}: {str(e)}")
+    except Exception:
+        # A failed source must not leave a stale, apparently successful published lesson.
         error_cleanup(notebook_file)
-        sys.exit(1)
+        raise
+    output = Path(get_relative_output_path(notebook_file))
+    stamp = cache_path(output)
+    stamp.parent.mkdir(parents=True, exist_ok=True)
+    stamp.write_text(json.dumps({**fingerprint, "output": output_signature(output)}), encoding="utf-8")
+    return True
 
 
-def process_notebook(notebook_file):
-    """Process one notebook with broad exception handling for batch execution."""
-    try:
-        convert_single_notebook(notebook_file)
-    except ConversionException as e:
-        print(f"Conversion error for {notebook_file}: {str(e)}")
-        error_cleanup(notebook_file)
-    except Exception as e:
-        print(f"Unexpected error for {notebook_file}: {traceback.format_exc()}")
+def process_notebook(notebook_file, force=False):
+    """Worker entry point; errors are collected by the batch caller."""
+    return convert_single_notebook(notebook_file, force=force)
 
 
-def convert_notebooks():
-    """Convert all notebooks in parallel while reporting progress."""
-    maxCores = os.cpu_count()  # get the number of cores available on the system
+def configure_conversion_worker(root, index_date, navigation_date):
+    global repository_root, project_index_date, project_navigation_date
+    repository_root = Path(root)
+    project_index_date = index_date
+    project_navigation_date = navigation_date
 
-    notebook_files = glob.glob(f"{notebook_directory}/**/*.ipynb", recursive=True)
 
-    # create progress bar
-    convertBar = ProgressBar(
-        userInfo="Notebook conversion progress:", total=(len(notebook_files))
-    )
+def convert_notebooks(notebook_files=None, force=False, jobs=4):
+    """Convert a batch in one invocation, skipping unchanged published lessons."""
+    if jobs < 1:
+        raise ValueError("Conversion jobs must be at least 1")
+    if notebook_files is None:
+        legacy = repository_root / notebook_directory
+        notebook_files = [
+            str(source) for source in sorted(legacy.rglob("*.ipynb"))
+            if not source.is_relative_to(legacy / "projects")
+        ]
+    notebook_files = list(dict.fromkeys(str(Path(source).resolve()) for source in notebook_files))
+    outputs = {}
+    pending = []
+    for source in notebook_files:
+        output = get_relative_output_path(source)
+        if output in outputs:
+            raise ValueError(f"Sources share output {output}: {outputs[output]} and {source}")
+        outputs[output] = source
+        if needs_conversion(source, force=force):
+            pending.append(source)
 
-    with concurrent.futures.ProcessPoolExecutor(max_workers=maxCores) as executor:
-        futures = {
-            executor.submit(process_notebook, notebook_file): notebook_file
-            for notebook_file in notebook_files
-        }
-
-        for future in concurrent.futures.as_completed(futures):
-            notebook_file = futures[future]
+    failures = []
+    converted = 0
+    if jobs == 1 or len(pending) <= 1:
+        for source in pending:
             try:
-                future.result()
+                converted += convert_single_notebook(source, force=force)
             except Exception as e:
-                print(
-                    f"Error occurred during notebook processing: {notebook_file}\n{traceback.format_exc()}"
-                )
-            finally:
-                rel_path = os.path.relpath(notebook_file, notebook_directory)
-                convertBar.set_suffix(rel_path)
-                convertBar.continue_progress()
+                failures.append(f"{source}: {e}")
+                traceback.print_exc()
+    else:
+        with concurrent.futures.ProcessPoolExecutor(
+            max_workers=min(jobs, len(pending)),
+            initializer=configure_conversion_worker,
+            initargs=(str(repository_root), project_index_date, project_navigation_date),
+        ) as executor:
+            futures = {executor.submit(process_notebook, source, force): source for source in pending}
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    converted += future.result()
+                except Exception as e:
+                    failures.append(f"{futures[future]}: {e}")
+                    traceback.print_exc()
+    print(f"Notebooks: {converted} converted, {len(notebook_files) - len(pending)} unchanged, {len(failures)} failed")
+    if failures:
+        raise RuntimeError("Notebook conversion failed:\n" + "\n".join(failures))
+    return converted
 
-    convertBar.end_progress()
+
+def project_notebooks(project):
+    project = Path(project).resolve()
+    projects_root = (repository_root / "_projects").resolve()
+    if not project.is_relative_to(projects_root) or len(project.relative_to(projects_root).parts) not in (1, 2):
+        raise ValueError(f"Expected _projects/project or _projects/category/project: {project}")
+    if not project.is_dir():
+        raise ValueError(f"Project directory does not exist: {project}")
+    if (project / "index.ipynb").is_file() and (project / "index.md").is_file():
+        raise ValueError(f"Project has both index.ipynb and index.md: {project}")
+    return (
+        list(project.glob("index.ipynb"))
+        + sorted((project / "notebooks").glob("*.ipynb"))
+        + sorted((project / "navigation").glob("*.ipynb"))
+    )
 
 
 if __name__ == "__main__":
-    # Check if a specific file was passed as an argument
-    if len(sys.argv) > 1:
-        notebook_file = sys.argv[1]
-        if os.path.exists(notebook_file):
-            print(f"Converting single notebook: {notebook_file}")
-            convert_single_notebook(notebook_file)
-        else:
-            print(f"Error: File not found: {notebook_file}")
-            sys.exit(1)
-    else:
-        convert_notebooks()
+    parser = argparse.ArgumentParser(description="Incrementally publish legacy or project notebooks to _posts.")
+    parser.add_argument("notebooks", nargs="*", help="One or more source notebooks")
+    parser.add_argument("--project", help="Convert the index, lessons, and navigation of one project")
+    parser.add_argument("--force", action="store_true", help="Reconvert even when unchanged")
+    parser.add_argument("--jobs", type=int, default=4, help="Maximum conversion workers (default: 4)")
+    parser.add_argument("--index-date", default=project_index_date)
+    parser.add_argument("--navigation-date", default=project_navigation_date)
+    args = parser.parse_args()
+    project_index_date = args.index_date
+    project_navigation_date = args.navigation_date
+    try:
+        sources = args.notebooks or None
+        if args.project:
+            if args.notebooks:
+                parser.error("Use either --project or explicit notebook paths, not both")
+            sources = project_notebooks(args.project)
+        convert_notebooks(sources, force=args.force, jobs=args.jobs)
+    except (ValueError, RuntimeError, OSError) as e:
+        print(f"Notebook conversion error: {e}", file=sys.stderr)
+        sys.exit(1)

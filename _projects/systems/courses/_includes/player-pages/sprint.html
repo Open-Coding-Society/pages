@@ -1,0 +1,74 @@
+{%- comment -%}
+  A sprint's intro page: what the sprint is about, then its weeks, each linking
+  to its week's intro. Next from the last lesson of the sprint before lands
+  here. Only OCS components; no CSS of its own.
+
+  Expects from _layouts/post.html: current_course, lessonsByWeek.
+  A shared sprint's title and description come from _data/cs.yml, the way
+  _layouts/sprint.html reads them. Its weeks always come from this course.
+{%- endcomment -%}
+{%- assign sprintKey = "Sprint" | append: page.player_page.sprint -%}
+{%- assign sprint = site.data[current_course][sprintKey] -%}
+{%- assign sprintInfo = sprint -%}
+{%- if sprint.shared -%}{%- assign sprintInfo = site.data.cs[sprint.shared] -%}{%- endif -%}
+
+{%- comment -%} The weeks that have lessons, the same ones the sidebar lists. {%- endcomment -%}
+{%- assign firstWeek = nil -%}
+{%- assign lessonCount = 0 -%}
+{%- assign assignmentCount = 0 -%}
+{%- capture weekCards -%}
+{%- for week in (sprint.start..sprint.end) -%}
+  {%- assign weekGroup = lessonsByWeek | where: "name", week | first -%}
+  {%- if weekGroup -%}
+    {%- assign weekLessons = weekGroup.size -%}
+    {%- assign weekAssignments = weekGroup.items | where_exp: "post", "post.assignment == true" | size -%}
+    {%- if firstWeek == nil -%}{%- assign firstWeek = week -%}{%- endif -%}
+    {%- assign lessonCount = lessonCount | plus: weekLessons -%}
+    {%- assign assignmentCount = assignmentCount | plus: weekAssignments -%}
+    {%- assign weekData = sprint[week] %}
+    <a class="ocs__nav-card" href="{{ site.baseurl }}/{{ current_course }}/week-{{ week }}/">
+      {%- if weekData.theme %}
+      <span class="ocs__nav-card-kicker">Week {{ week }}</span>
+      <span class="ocs__nav-card-title">{{ weekData.theme | escape }}</span>
+      {%- else %}
+      <span class="ocs__nav-card-title">Week {{ week }}</span>
+      {%- endif %}
+      <span class="ocs__text">{{ weekLessons }} {% if weekLessons == 1 %}lesson{% else %}lessons{% endif %}{% if weekAssignments > 0 %} &middot; {{ weekAssignments }} {% if weekAssignments == 1 %}assignment{% else %}assignments{% endif %}{% endif %}</span>
+    </a>
+  {%- endif -%}
+{%- endfor -%}
+{%- endcapture -%}
+
+{%- comment -%}
+  The title, description, and diagram open the page the way a lesson's own
+  title, first paragraph, and code block do. lesson-body gives them the
+  lessons' look; a bare h2 picks up site-wide h2 rules from other pages' SASS.
+{%- endcomment %}
+<div class="lesson-body">
+  <h2>{{ page.title | escape }}</h2>
+  {%- if sprintInfo.description %}
+  <p>{{ sprintInfo.description | strip | escape }}</p>
+  {%- endif %}
+  {%- if sprintInfo.illustration %}
+  <pre>{{ sprintInfo.illustration | escape }}</pre>
+  {%- endif %}
+</div>
+
+<div class="ocs__card">
+  <h2 class="ocs__section-title">Weeks</h2>
+  {%- if firstWeek != nil %}
+  <div class="ocs__links">
+    <a class="ocs__btn accent fill" href="{{ site.baseurl }}/{{ current_course }}/week-{{ firstWeek }}/" data-player-start>Start Week {{ firstWeek }} &rarr;</a>
+  </div>
+  <div class="ocs__nav-grid ocs__nav-grid--in-card">
+    {{ weekCards }}
+  </div>
+  {%- else %}
+  <div class="ocs__text">No lessons have been posted for this sprint yet.</div>
+  {%- endif %}
+  <div class="ocs__stats">
+    <div class="ocs__stat"><span class="ocs__stat-value">{{ sprint.start }}&ndash;{{ sprint.end }}</span><span class="ocs__stat-label">Weeks</span></div>
+    <div class="ocs__stat"><span class="ocs__stat-value">{{ lessonCount }}</span><span class="ocs__stat-label">{% if lessonCount == 1 %}Lesson{% else %}Lessons{% endif %}</span></div>
+    <div class="ocs__stat"><span class="ocs__stat-value">{{ assignmentCount }}</span><span class="ocs__stat-label">{% if assignmentCount == 1 %}Assignment{% else %}Assignments{% endif %}</span></div>
+  </div>
+</div>
