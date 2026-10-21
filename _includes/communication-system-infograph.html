@@ -13,6 +13,11 @@
   {% include ocs_kanban_board.html url=data.Board.url filter=data.Board.filter %}
   {% endif %}
 
+  <!-- Reviews: mentors and N@tM visitors, as microblog posts on this page -->
+  {% if data.Review %}
+  {% include ocs_review_card.html roles=data.Review.roles issues=data.Review.issues board=data.Board.url %}
+  {% endif %}
+
   <!-- Project Cards -->
   {% for topic in data.Topics %}
   {% if topic.link contains '://' %}

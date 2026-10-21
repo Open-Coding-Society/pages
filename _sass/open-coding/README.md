@@ -383,6 +383,55 @@ See [`elements/kanban`](elements/kanban) and
 [`ocs_kanban_board.html`](../../_includes/ocs_kanban_board.html). The
 Communication Systems capstone shows the UGRC-CSA board this way.
 
+### Review card
+
+A smart card where mentors, N@tM visitors, partners and teachers review a
+capstone on its own page. It has no element of its own: it is built entirely
+from the grammar above.
+
+```liquid
+{% include ocs_review_card.html roles="mentor,community,teacher" issues="UGRC-CSA/Pages" board="https://github.com/orgs/UGRC-CSA/projects/1" %}
+```
+
+- `roles` (optional): who is asked, in order, from `mentor`, `community`,
+  `partner` and `teacher`. Default: all four.
+- `issues` (optional): the team's repo as `owner/repo`. Signed-in readers then
+  get "Turn into issue" on each review, which opens GitHub's new-issue form
+  filled in from it.
+- `board` (optional): the team's board, the kanban's `url`. An issue made from
+  a review goes on that board, so it shows up in the kanban.
+- `title` (optional): a heading instead of "Reviews".
+
+Each review is a microblog post on the page, so it also shows in the Microblog
+panel. Its role, its 1 to 5 scores for the project, the working demo and how
+it's made, and an optional "what next" ride in the post's `data`. Anyone can
+read the reviews; signed out, they come from the backend's public page list. A
+signed-in, verified account posts one. New guest and mentor accounts wait for
+a teacher to verify them, so a team member can type a review in for a visitor
+at the booth or after a mentor meeting, and the review says who typed it in.
+Names show by first name only. The page's address plus `#reviews` opens the
+card directly, and "Copy review link" copies that.
+
+Elements it is built from (`assets/js/review-card.js` builds them):
+
+- `ocs__split` with an `ocs__checklist` (who has reviewed, by role) beside an
+  `ocs__stats` row (each question's average)
+- `ocs__grid ocs__grid--card` for the reviews, one column on a phone, with an
+  `ocs__status-pill` for each review's role. The script writes the class
+  attribute as `ocs__grid--card ocs__grid`, so it doesn't end in `-card`, which
+  a capstone's `*-infograph` include restyles.
+- `ocs__btn small pill`, filled with `accent fill` when chosen, for the role and
+  score choices and the review filters, like the kanban's filter buttons
+- `ocs__label`, `textarea.ocs__input` and `input.ocs__input` for the form. Inside
+  an `ocs__keypoints` grid they fill the row with no width rule; the script sets
+  `cols` and `size` to 1 so their default width never pushes a phone-width card
+  wider.
+- `ocs__toggle` for typing a review in for someone else, and `ocs__callout` for
+  the signed-out note
+
+See [`ocs_review_card.html`](../../_includes/ocs_review_card.html). The
+Communication Systems capstone shows it under its board.
+
 ## Theme file reference
 
 `user-preferences.scss` defines the current user-selectable theme contract.

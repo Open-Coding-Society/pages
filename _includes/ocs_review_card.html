@@ -1,0 +1,44 @@
+{% comment %}
+  Review card: reviews of a capstone from its mentors, N@tM visitors, partners
+  and teachers, on the capstone's own page.
+
+  {% raw %}{% include ocs_review_card.html roles="mentor,community,teacher" issues="UGRC-CSA/Pages" board="https://github.com/orgs/UGRC-CSA/projects/1" %}{% endraw %}
+
+  Options (all optional):
+    roles    who is asked to review, in order: mentor, community,      default: all four
+             partner, teacher
+    issues   the team's repo as owner/repo. Signed-in readers get a     default: no button
+             "Turn into issue" button that opens GitHub's new-issue
+             form, filled in from the review
+    board    the team's GitHub project board (the kanban's url), so     default: none
+             an issue made from a review goes on the board
+    title    the heading                                                default: "Reviews"
+
+  Each review is a microblog post on this page, so it also shows in the
+  Microblog panel. Anyone can read them; a signed-in, verified account posts
+  them, and a team member can type one in for a visitor or a mentor. Link
+  straight to the card with the page's address plus #reviews.
+
+  The card loads itself (assets/js/review-card.js) when it scrolls near the
+  screen. It is existing OCS elements only (ocs__card, ocs__links, ocs__btn,
+  ocs__split, ocs__checklist, ocs__stats, ocs__grid--card, ocs__status-pill,
+  ocs__toggle, ocs__input, ocs__callout), with names that hold up inside a
+  capstone's *-infograph include. The parts the script shows and hides are
+  plain wrappers, because ocs__ elements that set display beat [hidden].
+{% endcomment %}
+{% assign ocs_review_title = include.title | default: "Reviews" %}
+<section class="ocs__card ocs__keypoints" id="reviews" data-ocs-review data-topic-path="{{ page.permalink | default: page.url | escape }}" data-roles="{{ include.roles | escape }}" data-issues="{{ include.issues | escape }}" data-board-url="{{ include.board | escape }}" data-login-url="{{ site.baseurl }}/login" aria-label="{{ ocs_review_title | escape }}">
+  <div class="ocs__links">
+    <strong>{{ ocs_review_title | escape }}</strong>
+    <span class="ocs__text" data-hook="meta"></span>
+    <button type="button" class="ocs__btn small pill" data-hook="copy">Copy review link</button>
+  </div>
+  <div class="ocs__text" data-hook="status" role="status" hidden></div>
+  <div data-hook="mount" hidden></div>
+  <noscript><div class="ocs__text">Turn on JavaScript to read and leave reviews.</div></noscript>
+</section>
+
+{% unless ocs_review_card_assets %}
+{% assign ocs_review_card_assets = true %}
+<script type="module" src="{{ site.baseurl }}/assets/js/review-card.js"></script>
+{% endunless %}

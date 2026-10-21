@@ -7,6 +7,12 @@ Board:
   url: "https://github.com/orgs/UGRC-CSA/projects/1"
   filter: "Team"
 
+# Mentor and N@tM reviews, under the board (_includes/ocs_review_card.html).
+# Turning a review into an issue files it in this repo and puts it on the board.
+Review:
+  roles: "mentor,community,teacher"
+  issues: "UGRC-CSA/Pages"
+
 Topics:
   - title: "Class Announcements"
     image: "csa-chat/announcement-chat.png"
