@@ -21,7 +21,8 @@ export async function reverify(pythonURI, fetchOptions, idToken) {
             body: JSON.stringify({ idToken }),
         });
         const body = await response.json().catch(() => ({}));
-        return { ok: response.ok, message: body.message || `Verification failed (${response.status})` };
+        // 409 means no verification is due: already verified, for example from another tab
+        return { ok: response.ok || response.status === 409, message: body.message || `Verification failed (${response.status})` };
     } catch (error) {
         return { ok: false, message: 'Could not reach the server. Please try again.' };
     }

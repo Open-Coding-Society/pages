@@ -317,6 +317,9 @@ show_reading_time: false
     }
 
     function showOAuthVerification() {
+        // Starting a signup drops any re-verification that was waiting on the same Google button
+        reverifying = false;
+        document.getElementById('reverify').style.display = 'none';
         document.getElementById('signupForm').style.display = 'none';
         document.getElementById('oauth-verification').style.display = 'block';
     }
@@ -441,7 +444,7 @@ show_reading_time: false
                 return;
             }
             if (staffMustVerify(flaskBody)) {
-                showStaffVerifyNotice();
+                showStaffVerifyNotice(finish);
                 return;
             }
             finish();
@@ -449,12 +452,17 @@ show_reading_time: false
     };
     // A Mentor's verification has lapsed. Only a Teacher or Admin can verify it, and the
     // account still works, so say so and let them carry on.
-    function showStaffVerifyNotice() {
+    function showStaffVerifyNotice(finish) {
         const messageEl = document.getElementById('message');
+        const carryOn = springLink('{{site.baseurl}}/profile', 'Continue');
+        carryOn.addEventListener('click', (event) => {
+            event.preventDefault();
+            finish();
+        });
         messageEl.innerHTML = '';
         messageEl.append(
             'Your verification has lapsed. Ask your Teacher or Admin to verify your account. ',
-            springLink('{{site.baseurl}}/profile', 'Continue'),
+            carryOn,
         );
     }
     // Flask accepted the login but Spring did not. The navbar would still show the
