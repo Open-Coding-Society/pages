@@ -14,8 +14,8 @@ rp_active: summary
 <div class="rfid-presence-infograph">
   <div class="rfid-presence-header">
     <div class="ocs__badge">Research</div>
-    <h1 class="rfid-presence-title">Can classroom presence be measured with zero teacher effort?</h1>
-    <p class="ocs__description"><strong>Can classroom presence be measured with zero teacher effort?</strong> Four hypotheses, tested in design-based research cycles against a hand-logged ground truth.</p>
+    <h1 class="rfid-presence-title">Can classroom presence be measured with very low teacher effort?</h1>
+    <p class="ocs__description"><strong>Can classroom presence be measured with very low teacher effort?</strong> Four hypotheses, tested in design-based research cycles against a hand-logged ground truth.</p>
   </div>
 
   {% include presence-system-nav.html %}
@@ -34,8 +34,8 @@ rp_active: summary
       </div>
       <div class="ocs__grid-cell">
         <span class="ocs__badge">H3</span>
-        <p><strong>Zero teacher attendance actions</strong></p>
-        <p>Needs a precise operational definition, does one-time tag registration count, or only ongoing per-period actions? As built today, periods are still admin-managed, so this would fail under a strict reading.</p>
+        <p><strong>Very low teacher effort: the teacher reviews exceptions instead of taking attendance</strong></p>
+        <p>"Zero" overstated it (mentor feedback): exceptions still need a person, such as a forgotten or dead card, a visitor, a substitute, or a schedule change. Target to measure, not assume: under 1 minute per period on typical days. One-time setup (enrollment, card registration) is counted separately.</p>
       </div>
       <div class="ocs__grid-cell">
         <span class="ocs__badge">H4</span>
@@ -106,6 +106,16 @@ student, room, time, direction]
             <td>Review feedback pointed out the project had drifted into "an RFID project" rather than a presence system, and was missing key objectives visible in the teacher communication and survey. See the <a href="https://github.com/vibha1019/crowpi-attendance/issues/5" target="_blank" rel="noopener">Research Proposal</a>.</td>
           </tr>
           <tr>
+            <td>2026-10-12</td>
+            <td>Second mentor review. Adopted his direction: CSSE sprints toward Phase&nbsp;4 by MVP, deeper OCS integration, one story per page with cartoon and real versions for N@TM, and a circular enclosure that is open only at the tap area.</td>
+            <td>See the feedback tracker on the <a href="/capstone/presence-system/phases/">Roadmap</a> page and <a href="https://github.com/vibha1019/crowpi-attendance/issues/15" target="_blank" rel="noopener">issue #15</a>.</td>
+          </tr>
+          <tr>
+            <td>2026-10-19</td>
+            <td>Integrated into OCS upstream: the presence API was merged into the shared OCS backend (PRs #96 and #97) with generic rooms, schedules in the database instead of code, Resource-style endpoints, and backup/restore. Switched the reader to a Raspberry Pi&nbsp;4 with a Waveshare PN532 NFC HAT and S50 cards.</td>
+            <td>Mentor feedback asked for visible progress integrating with OCS, and for rooms (not just classrooms) so it also works for events. The PN532 HAT plugs straight onto the Pi, with no loose wiring.</td>
+          </tr>
+          <tr>
             <td>2026-09-21</td>
             <td>Split into three parallel input tracks, RFID, QR, and face scan, each with an owner: Vibha (RFID), Ruta (QR), Kush (Camera). Added a shared index issue and moved cross-cutting requirements (attendance reporting, roster import, door monitor) out of any single track.</td>
             <td>RFID alone can't answer RQ4 (which input works best) or test H4 (does combining inputs beat any single one). The three tracks needed to exist and be comparable before Cycle&nbsp;3 could run. See the <a href="https://github.com/vibha1019/crowpi-attendance/issues/9" target="_blank" rel="noopener">Presence System Index</a>.</td>
@@ -162,6 +172,7 @@ student, room, time, direction]
         <h3 class="ocs__section-title">Privacy, Scope &amp; Governance</h3>
         <p class="rfid-presence-about">Set by the teacher in the room-approval discussion. These are the boundaries mentors should know the project operates inside.</p>
         <ul class="ocs__checklist">
+          <li class="done"><span class="ocs__checklist-box"></span><span>A student can always opt out of tapping and be checked in manually by the teacher, for medical or any other reason (see Medical Device Considerations below).</span></li>
           <li class="done"><span class="ocs__checklist-box"></span><span>Face scanning is opt-in. A student can decline and still get correct device-only presence tracking. That is a policy choice, not a system failure.</span></li>
           <li class="done"><span class="ocs__checklist-box"></span><span>Scope is one CS classroom, for now. No wider rollout is planned or implied at this stage.</span></li>
           <li class="done"><span class="ocs__checklist-box"></span><span>The project is fully open. Implementation is shared with anyone who asks, and nothing is treated as confidential.</span></li>
@@ -171,10 +182,30 @@ student, room, time, direction]
       </div>
     <div class="ocs__card">
         <h3 class="ocs__section-title">Where It Stands Today</h3>
-        <p class="rfid-presence-about">The RFID track has a working contact-tap prototype on a CrowPi board, with one scan pad, a Flask backend integrated into OCS, and a live dashboard, proving the core read, log, and display loop end to end. It does not yet include the camera correlation, UHF doorway detection, or tamper-evident tags described above; that hardware work is intentionally paused until the research cycles show it's worth deepening. QR and camera integration have not started.</p>
+        <p class="rfid-presence-about">The RFID track has a working tap reader: a Raspberry Pi&nbsp;4 with a Waveshare PN532 NFC HAT reading S50 (MIFARE Classic) cards at 13.56&nbsp;MHz. The presence API it posts to is merged into the shared OCS backend (PRs #96 and #97), with rooms, schedules stored in the database, and backup/restore for upgrades. Deployment to the OCS server is pending. End to end (tap, OCS backend, live dashboard showing Present within about 2 seconds) runs on our local copy of OCS today.</p>
         <div class="ocs__callout">
-          Current status per track is on the <a href="/capstone/presence-system/">Overview</a> page. What the paused later hardware stages would involve is on the <a href="/capstone/presence-system/phases/">Roadmap</a> page.
+          What comes next, and the mentor feedback it answers, is on the <a href="/capstone/presence-system/phases/">Roadmap</a> page.
         </div>
+      </div>
+    <div class="ocs__card">
+        <h3 class="ocs__section-title">Medical Device Considerations</h3>
+        <p class="rfid-presence-about">Raised in our first peer review (<a href="https://github.com/vibha1019/crowpi-attendance/issues/10" target="_blank" rel="noopener">issue #10</a>): some people, such as those with pacemakers or implantable cardioverter-defibrillators (ICDs), may be sensitive to RFID readers.</p>
+        <div class="rfid-presence-table-wrap"><table class="ocs__table rfid-presence-table">
+          <thead><tr><th>Reader</th><th>Band</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Waveshare PN532 NFC HAT</td><td>HF, 13.56&nbsp;MHz, contact range (a few cm)</td><td>In use now</td></tr>
+            <tr><td>RC522 board (CrowPi built-in, earlier plan)</td><td>HF, 13.56&nbsp;MHz</td><td>Earlier prototype</td></tr>
+            <tr><td>UHF doorway reader</td><td>UHF, 902&ndash;928&nbsp;MHz (US)</td><td>Later phases only, not built</td></tr>
+          </tbody>
+        </table></div>
+        <p class="rfid-presence-about">The system is <strong>not</strong> UHF today; every reader we run is HF. An FDA-led lab study (Seidman et al., <em>Heart Rhythm</em> 7(1), 2010) tested 15 pacemakers and 15 ICDs against low-frequency (134&nbsp;kHz), high-frequency (13.56&nbsp;MHz), and UHF (915&nbsp;MHz) readers. Low-frequency readers caused most reactions. High-frequency readers, like ours, caused reactions in 6% of pacemaker tests and 1% of ICD tests, only at close range (at most 22.5&nbsp;cm for pacemakers and 7.5&nbsp;cm for ICDs). UHF caused none. The authors and the FDA did not consider it an urgent public health risk, and the FDA had no field reports of RFID interference with these devices. The FDA's advice to patients who feel symptoms near a reader is to move away and contact their doctor.</p>
+        <ul class="ocs__checklist">
+          <li class="done"><span class="ocs__checklist-box"></span><span>Readers are mounted at the door at hand height, where people pass through briefly, not where anyone sits or stands for long.</span></li>
+          <li class="done"><span class="ocs__checklist-box"></span><span>A tap is a short read at a few centimeters; the reader is not used for long-range or continuous scanning.</span></li>
+          <li class="done"><span class="ocs__checklist-box"></span><span>Opt-out: any student can skip tapping and be checked in manually by the teacher.</span></li>
+          <li class="open"><span class="ocs__checklist-box"></span><span>To do: cite the PN532 HAT's datasheet (frequency, transmit power) and FCC ID.</span></li>
+          <li class="open"><span class="ocs__checklist-box"></span><span>To do: before any UHF phase, note where the reader sits within FCC Part 15 power limits and keep transmit power at the minimum that reads reliably.</span></li>
+        </ul>
       </div>
     <div class="ocs__card">
         <h3 class="ocs__section-title">Prior Research &amp; Comparable Systems</h3>
