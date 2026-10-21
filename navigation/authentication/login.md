@@ -25,6 +25,19 @@ show_reading_time: false
                 <button type="submit" class="large primary submit-button">Login</button>
             </p>
             <p id="message" style="color: red;"></p>
+            <!-- Shown after login when a student's verification has lapsed -->
+            <div id="reverify" style="display: none; text-align: center;">
+                <h3>School Email Verification</h3>
+                <p>Your verification has lapsed. Sign in with your school Google account to continue.</p>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="filled_blue"
+                     data-text="signin_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left"></div>
+                <p id="reverify-status"></p>
+            </div>
             <p style="text-align: center;">
                 <a href="{{site.baseurl}}/support?topic=reset">Forgot your password?</a>
             </p>
@@ -121,6 +134,7 @@ show_reading_time: false
 
 <script type="module">
     import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { reverifyNeeded, staffMustVerify, reverify } from '{{site.baseurl}}/assets/js/api/reverify.js';
     import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
 
     let signupFormData = {};
@@ -322,7 +336,31 @@ show_reading_time: false
         statusDiv.innerHTML = `<div class="${isError ? 'oauth-error' : 'oauth-success'}">${message}</div>`;
     }
 
+    // After login, a student whose verification has lapsed signs in with Google once more.
+    // The same Google button callback serves signup and this, so it needs to know which.
+    let reverifying = false;
+    let afterReverify = null;
+
+    async function finishReverify(idToken) {
+        const status = document.getElementById('reverify-status');
+        status.className = '';
+        status.textContent = 'Checking with Google...';
+        const result = await reverify(pythonURI, fetchOptions, idToken);
+        if (!result.ok) {
+            status.className = 'oauth-error';
+            status.textContent = result.message;
+            return;
+        }
+        reverifying = false;
+        document.getElementById('reverify').style.display = 'none';
+        afterReverify();
+    }
+
     window.handleGoogleSignIn = function(response) {
+        if (reverifying) {
+            finishReverify(response.credential);
+            return;
+        }
         try {
             const userInfo = parseJwt(response.credential);
             const email = userInfo.email;
@@ -388,14 +426,37 @@ show_reading_time: false
         });
         // pythonPromise only settles when Flask accepts the login; on a Flask failure
         // login() shows the error in #message and the page stays put.
-        Promise.all([javaPromise, pythonPromise]).then(([springLoggedIn]) => {
-            if (springLoggedIn) {
-                window.location.href = '{{site.baseurl}}/profile';
+        Promise.all([javaPromise, pythonPromise]).then(([springLoggedIn, flaskBody]) => {
+            const finish = () => {
+                if (springLoggedIn) {
+                    window.location.href = '{{site.baseurl}}/profile';
+                    return;
+                }
+                showSpringLoginWarning();
+            };
+            if (reverifyNeeded(flaskBody)) {
+                reverifying = true;
+                afterReverify = finish;
+                document.getElementById('reverify').style.display = 'block';
                 return;
             }
-            showSpringLoginWarning();
+            if (staffMustVerify(flaskBody)) {
+                showStaffVerifyNotice();
+                return;
+            }
+            finish();
         });
     };
+    // A Mentor's verification has lapsed. Only a Teacher or Admin can verify it, and the
+    // account still works, so say so and let them carry on.
+    function showStaffVerifyNotice() {
+        const messageEl = document.getElementById('message');
+        messageEl.innerHTML = '';
+        messageEl.append(
+            'Your verification has lapsed. Ask your Teacher or Admin to verify your account. ',
+            springLink('{{site.baseurl}}/profile', 'Continue'),
+        );
+    }
     // Flask accepted the login but Spring did not. The navbar would still show the
     // user as signed in, while every Spring feature returns 401, so say so here.
     function showSpringLoginWarning() {
@@ -419,8 +480,8 @@ show_reading_time: false
     window.pythonLogin = function (done) {
         const options = {
             URL: `${pythonURI}/api/authenticate`,
-            callback: function() {
-                if (done) done();
+            callback: function(body) {
+                if (done) done(body);
             },
             message: "message",
             method: "POST",
