@@ -15,10 +15,11 @@
         theme: "Onboarding & Readiness"
         goals: ["Tool Setup", "Scrum Habits"]
 
-  Blogs, each sprint's intro, each week's intro (its learning goals), and each
-  week's chat are pages of their own, made by _plugins/lesson_player_pages.rb.
+  Blogs, each sprint's intro, each week's intro (its learning goals), and
+  enabled week chats are pages of their own, made by _plugins/lesson_player_pages.rb.
   The URLs below must match the ones that plugin gives them:
-    /<course>/blogs/  /<course>/sprint-<n>/  /<course>/week-<w>/  /<course>/week-<w>/chat/
+    /<course>/blogs/  /<course>/sprint-<n>/  /<course>/week-<w>/
+    /<course>/week-<w>/chat/ (when week_chat is not false)
 
   Expects lessonsByWeek, this course's lessons grouped by week, from
   _layouts/post.html.
@@ -30,9 +31,8 @@
     - .lesson-status-icon                   -> per-lesson complete/incomplete
     - [data-week-group] [data-week-count]    -> per-week completion count
 
-  Sets currentWeekUrl and currentWeekChatUrl when it draws the page's own week,
-  for the top bar's week crumb and chat button. A lesson whose week is in no
-  sprint has neither page, so both stay blank.
+  Sets currentWeekUrl when it draws the page's own week. A lesson whose week is
+  in no sprint has no intro page, so it stays blank.
 
   The script at the bottom of this file hides and shows the sidebar, for the
   button in _includes/lesson-topbar.html.
@@ -62,7 +62,6 @@
   <div class="sprint-nav">
     {%- assign courseData = site.data[current_course] -%}
     {%- assign currentWeekUrl = "" -%}
-    {%- assign currentWeekChatUrl = "" -%}
 
     {%- for i in (1..9) -%}
       {%- assign sprintKey = "Sprint" | append: i -%}
@@ -108,7 +107,7 @@
               narrow it would break mid-word, and the phone menu shows it whole.
               The sidebar is only 250px wide, so the row has no chevron, which
               leaves the title as much room as it can.
-              The week's intro, lessons and chat sit in an ocs__tree (the OCS
+              The week's intro, lessons and optional chat sit in an ocs__tree (the OCS
               tree grammar, in _sass/open-coding/elements/trees), which indents
               them one level under the summary and draws a guide line. Each row
               stays on one line the same way. The intro and lessons use 12px
@@ -153,14 +152,8 @@
                 </a>
                 {%- endfor -%}
 
-                {%- comment -%}
-                  The week's chat opens as its own page, beside this sidebar.
-                  It is a link, not a step, so Prev / Next pass it by.
-                {%- endcomment -%}
-                {%- assign chatUrl = weekUrl | append: "chat/" -%}
                 {%- if week == current_week -%}
                   {%- assign currentWeekUrl = weekUrl -%}
-                  {%- assign currentWeekChatUrl = chatUrl -%}
                 {%- endif -%}
                 <div class="ocs__links ocs__tree-item">
                   {%- if assignmentCount > 0 -%}
@@ -168,10 +161,17 @@
                     <i class="fas fa-calendar"></i> {{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due
                   </span>
                   {%- endif -%}
+                  {%- unless courseData.week_chat == false -%}
+                  {%- comment -%}
+                    The week's chat is optional course-wide and is not a step in
+                    Prev / Next navigation.
+                  {%- endcomment -%}
+                  {%- assign chatUrl = weekUrl | append: "chat/" -%}
                   <a class="ocs__btn ocs__btn--icon small accent{% if page.url == chatUrl %} fill{% endif %}" href="{{ site.baseurl }}{{ chatUrl }}"{% if page.url == chatUrl %} aria-current="page"{% endif %}>
                     <i class="fas fa-comments" aria-hidden="true"></i>
                     Week {{ week }} Chat
                   </a>
+                  {%- endunless -%}
                 </div>
               </div>
             </details>

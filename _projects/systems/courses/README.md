@@ -35,6 +35,10 @@ The exact file mappings are in [distribution.json](distribution.json). Directory
 mappings include all their files recursively. New shared-path resources must be
 added there and their generated paths ignored in the root `.gitignore`.
 
+Course schedules may set `week_chat: false` to omit the generated weekly chat
+pages and their navigation links. CSA uses this option; its course-home
+announcements chat remains enabled.
+
 Blogs owns `layouts/post.html`. Its course branch delegates to the Courses-owned
 player include; conventional documents render without that adapter. Courses'
 Blogs page delegates to Blogs' reusable reader with `course=` and `search=true`,

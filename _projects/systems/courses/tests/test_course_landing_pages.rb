@@ -36,6 +36,7 @@ Dir.mktmpdir("course-landing-") do |source|
                  File.join(source, "#{course}.md"))
     File.write(File.join(source, "_data/#{course}.yml"), YAML.dump(
       "course" => { "code" => course.upcase },
+      "week_chat" => course != "csa",
       "Sprint1" => { "title" => "Onboarding", "start" => 1, "end" => 1,
                      1 => { "theme" => "Foundations" } }
     ))
@@ -184,8 +185,17 @@ Dir.mktmpdir("course-landing-") do |source|
              "#{path} highlights the current course even without page.course")
       assert(sidebar.include?("href=\"/preview/#{course}/sprint-1/\""),
              "#{path} keeps the existing sprint route")
-      assert(sidebar.include?("href=\"/preview/#{course}/week-1/chat/\""),
-             "#{path} retains week chat access in course navigation")
+      if course == "csa"
+        assert(!sidebar.include?("/preview/#{course}/week-1/chat/"),
+               "#{path} omits weekly chat from CSA course navigation")
+      else
+        assert(sidebar.include?("href=\"/preview/#{course}/week-1/chat/"),
+               "#{path} retains week chat access in course navigation")
+      end
+      if path == "#{course}/week-1/index.html"
+        assert(html.include?("Week 1 Chat") != (course == "csa"),
+               "#{path} shows the week chat only when the course enables it")
+      end
       assert(sidebar.include?('data-lesson-id="/' + course + '/example/"'),
              "#{path} preserves lesson completion identity")
       week = sidebar[%r{<details data-week-group data-week="1".*?</details>}m].to_s

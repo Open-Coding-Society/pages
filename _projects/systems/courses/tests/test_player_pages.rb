@@ -79,6 +79,13 @@ pages.each do |page|
   assert(page.data["search_exclude"] == true, "#{page.url} stays out of site search")
 end
 
+csa_pages = generate({ "csa" => course.merge("week_chat" => false) }, [{ "csa" => { "week" => 0 } }])
+csa_urls = csa_pages.map(&:url)
+assert(csa_urls.sort == %w[
+  /csa/sprint-1/ /csa/week-0/ /csa/sprint-2/ /csa/sprint-3/ /csa/blogs/
+].sort,
+       "A course with week_chat false keeps its sprint, week, and blogs pages but has no weekly chat pages; got #{csa_urls.inspect}")
+
 broken = { "course" => { "code" => "CSY" }, "Sprint3" => { "title" => "No weeks" } }
 error = begin
   generate("csy" => broken)
@@ -89,4 +96,4 @@ end
 assert(error&.message&.include?("_data/csy.yml") && error.message.include?("Sprint3"),
        "A sprint without start and end weeks fails the build and names the file and sprint; got #{error.inspect}")
 
-puts "PASS: sprint and blogs pages, week and chat pages for weeks with lessons, their titles and front matter, and the missing-weeks error"
+puts "PASS: sprint, week, chat, and blogs pages, the weekly-chat opt-out, titles and front matter, and the missing-weeks error"

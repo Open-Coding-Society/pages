@@ -86,6 +86,8 @@ course:
     - "Spring Framework Projects"
   zone_title: "CSA Zone - Computer Science A"
 
+week_chat: false
+
 Sprint1:
   title: Java Onboarding 
   description: In this Sprint, students will become familiar with Java types, booleans, iteration, recursion, using, and writing objects. Student teaching labs will introduce AP-required aspects of Java while learning the Spring Framework. This will teach key Java concepts while learning JWT login system, a Rest Controller, Plain Old Java Objects (POJOs), Object Relational Model (ORM), and Java Persistence API (JPA).

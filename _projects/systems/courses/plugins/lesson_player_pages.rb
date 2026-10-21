@@ -2,7 +2,7 @@
 #
 #   /<course>/sprint-<n>/      the sprint's intro: what it is about and its weeks
 #   /<course>/week-<w>/        the week's intro: its learning goals and lessons
-#   /<course>/week-<w>/chat/   the week's chat
+#   /<course>/week-<w>/chat/   the week's chat, when enabled in course data
 #   /<course>/blogs/           every post on the site
 #
 # A course is a data file with a `course:` block and Sprint1, Sprint2, ... keys,
@@ -33,7 +33,9 @@ module LessonPlayerPages
             next unless lesson_weeks.include?(week)
 
             site.pages << page(site, course, "week", number, week, week_title(sprint, week))
-            site.pages << page(site, course, "chat", number, week, "Week #{week} Chat")
+            if data["week_chat"] != false
+              site.pages << page(site, course, "chat", number, week, "Week #{week} Chat")
+            end
           end
         end
         site.pages << page(site, course, "blogs", nil, nil, "Blogs")
