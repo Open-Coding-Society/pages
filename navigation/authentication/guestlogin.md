@@ -241,6 +241,8 @@ show_reading_time: false
         const passwordField = document.getElementById('signupPassword');
         const confirmPasswordField = document.getElementById('confirmPassword');
 
+        attachPasswordChecklist(passwordField);
+
         if (passwordField && confirmPasswordField) {
             // Add debounced validation listeners
             passwordField.addEventListener('input', validatePasswordsDebounced);
