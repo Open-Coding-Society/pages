@@ -163,6 +163,13 @@ Names should:
 
 * **Update this file:** As you iterate, make mistakes, and learn new system patterns or constraints, actively update `AGENTS.md` (and its optimized counterpart) with important notes so the system improves over time.
 
+## Personal AI connections
+
+Profile's `_includes/profile-ai-connections.html` uses Spring `/api/ai-connections`, independently
+of personal-information and Gist saves. Never log, echo, or persist keys in browser storage;
+clear inputs after every save attempt. AI grading failure must not block submission saving.
+Check provider eligibility/privacy before school rollout. Test: `node tests/test_ai_connections.mjs`.
+
 ## Anti-Patterns
 
 ### God Functions

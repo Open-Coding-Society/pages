@@ -1,0 +1,39 @@
+<section class="ai-connections" aria-labelledby="ai-connections-heading">
+  <h2 id="ai-connections-heading">AI grading connections</h2>
+  <p>Use your own API quota for grading. Keys are encrypted and never shown again.</p>
+  <p class="ai-connections-order">Personal Gemini → personal Groq → system Gemini → system Groq</p>
+  <p>AI failures do not block saving your submission. Requests send your assignment content to the selected provider and may incur charges on that account, including later teacher-triggered or automatic regrading.</p>
+  <p>Only connect accounts approved for your school use. Both providers have eligibility requirements;
+    <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener noreferrer">Gemini terms</a> and
+    <a href="https://console.groq.com/docs/legal/services-agreement" target="_blank" rel="noopener noreferrer">Groq terms</a> apply. Free Gemini services are not suitable for sensitive or personal information.</p>
+  <p data-ai-availability role="status" aria-live="polite">Checking AI key storage…</p>
+  {% assign ai_providers = "gemini,groq" | split: "," %}
+  {% for provider in ai_providers %}
+  <section class="ai-connections-provider" data-ai-provider="{{ provider }}" aria-labelledby="ai-{{ provider }}-heading">
+    <h3 id="ai-{{ provider }}-heading">{{ provider | capitalize }}</h3>
+    <p data-ai-state role="status" aria-live="polite">Checking connection…</p>
+    <p>{% if provider == "gemini" %}
+      <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener noreferrer">Create a Gemini API key</a>.
+      {% else %}
+      <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Create a Groq API key</a>.
+      {% endif %}
+      Copy your key, paste it below, and select Save key. Do not share or commit it.</p>
+    <form data-ai-form>
+      <label for="ai-{{ provider }}-key">{{ provider | capitalize }} API key</label>
+      <input class="ocs__input" id="ai-{{ provider }}-key" data-ai-key type="password" autocomplete="off"
+        spellcheck="false" required maxlength="512" aria-describedby="ai-connections-help" disabled>
+      <div class="ai-connections-actions">
+        <button class="ocs__btn accent fill" data-ai-save type="submit" disabled>Save key</button>
+        <button class="ocs__btn" data-ai-disconnect type="button" hidden disabled>Disconnect</button>
+      </div>
+    </form>
+    <p data-ai-message role="status" aria-live="polite"></p>
+  </section>
+  {% endfor %}
+  <p id="ai-connections-help" class="ai-connections-note">Saving verifies access to provider metadata, not available grading quota.
+    Disconnect removes the stored key from OCS; revoke it separately with the provider. Manual review remains available when AI cannot run.</p>
+</section>
+<script type="module">
+  import { initAiConnections } from '{{ site.baseurl }}/assets/js/profile/ai-connections.js';
+  initAiConnections(document.querySelector('.ai-connections'));
+</script>

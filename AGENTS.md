@@ -166,6 +166,10 @@ while preserving all critical instructions. The agent must still communicate wit
 
 * **同步更新文档：** 随着你在迭代中犯错、学习新的系统模式或约束，主动用重要的注意事项更新 `AGENTS.md`，并确保同步更新 `AGENTS_MD_DOCUMENTATION.md`（英文说明版本），以便系统随时间不断改进。
 
+## 个人 AI 密钥
+
+* **个人 AI 密钥：** Profile 的 `_includes/profile-ai-connections.html` 使用 Spring `/api/ai-connections`，独立于个人信息与 Gist 保存。不要记录、回显或在浏览器存储密钥；每次保存尝试后清空输入。评分与保存提交必须解耦，学校部署前检查供应商资格/隐私条件。测试：`node tests/test_ai_connections.mjs`。
+
 ## 群组与实时聊天（Groups & realtime chat）
 
 * **架构：** 群聊客户端使用 SockJS + STOMP.js（CDN 加载），连接 Spring 后端（Pirna-spring）的 `/ws-chat` 端点。发送到 `/app/groups.chat`，订阅 `/topic/group/${groupId}`；事件含 message/joinGroup/typing/heartbeat(25s)/文件图片，用 JSON event-key 集合去重并自动重连。
