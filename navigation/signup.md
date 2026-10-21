@@ -75,10 +75,15 @@ search_exclude: true
 
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { attachPasswordChecklist } from '{{ site.baseurl }}/assets/js/api/passwordRules.js';
+
+  // Show each password rule under the field, ticking off as the user types
+  attachPasswordChecklist(document.getElementById("signupPassword"));
 
   // Sign up function to handle form submission
   window.signup = async function() {
     const signupMessage = document.getElementById("signupMessage");
+
     const signupData = {
       uid: document.getElementById("signupUid").value,
       sid: document.getElementById("sid").value,
