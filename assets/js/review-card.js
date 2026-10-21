@@ -106,7 +106,7 @@ export function reviewFromPost(post) {
     text,
     next: clean(review.next, MAX_NEXT),
     scores: cleanScores(review.scores),
-    by: recorded ? clean(review.by, MAX_NAME) : '',
+    by: recorded ? firstName(clean(review.by, MAX_NAME)) : '',
     recorded,
     poster: firstName(post.userName),
     time: utcTime(post.timestamp),
@@ -153,7 +153,7 @@ export function buildPost({ text, next, role, own, scores, by, recorded, topicPa
   const ask = clean(next, MAX_NEXT);
   if (ask) review.next = ask;
   if (recorded || role !== own) {
-    const name = clean(by, MAX_NAME);
+    const name = firstName(clean(by, MAX_NAME));
     if (name) review.by = name;
     review.recorded = true;
   }

@@ -67,7 +67,7 @@ test('a post with a review becomes a review, with the poster shown by first name
         text: 'Replies and threads already feel like Slack. Show one message going from a week thread to the announcements.',
         next: 'Unread counts on the task row',
         scores: { project: 5, demo: 4, made: 4 },
-        by: 'Dana R.',
+        by: 'Dana',
         recorded: true,
         poster: 'Samarth',
         time: Date.UTC(2026, 9, 15, 22, 5, 0, 123),
@@ -86,6 +86,12 @@ test('plain microblog posts and reviews with an unknown role are not reviews', (
     assert.equal(reviewFromPost({ ...MENTOR, review: { ...MENTOR.review, role: 'judge' } }), null);
     assert.equal(reviewFromPost({ ...MENTOR, review: 'mentor' }), null);
     assert.equal(reviewFromPost({ ...MENTOR, content: '' }), null);
+});
+
+test('a typed-in name keeps only the first name, because anyone can read the reviews', () => {
+    assert.equal(reviewFromPost({ ...MENTOR, review: { ...MENTOR.review, by: 'Maria Garcia Lopez' } }).by, 'Maria');
+    const post = buildPost({ text: 'Fun demo.', next: '', role: 'community', own: '', scores: {}, by: ' Maria Garcia Lopez ', recorded: true, topicPath: TOPIC_PATH });
+    assert.equal(post.data.review.by, 'Maria');
 });
 
 test('only whole scores from 1 to 5 on the three questions are kept', () => {
