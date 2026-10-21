@@ -395,3 +395,5 @@ show_reading_time: false
             });
     }
 </script>
+
+<script type="module" src="{{site.baseurl}}/assets/js/api/passwordFields.js"></script>
