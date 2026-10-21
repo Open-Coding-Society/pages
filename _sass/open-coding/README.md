@@ -240,6 +240,87 @@ See [`elements/typography`](elements/typography). The course sidebar's lesson
 rows and the phone menu use both classes. The sidebar's week titles use
 `ocs__truncate` alone: their space is too narrow to wrap without breaking words.
 
+### Tabs
+
+```html
+<div class="ocs__tabs">
+  <ul class="ocs__tabs-list">
+    <li><a class="ocs__tabs-btn active" href="#">Overview</a></li>
+    <li><a class="ocs__tabs-btn" href="#">Details</a></li>
+  </ul>
+</div>
+<div class="ocs__tabs-panels">
+  <div class="ocs__tabs-panel">Overview content</div>
+</div>
+```
+
+- `ocs__tabs`, `ocs__tabs-list`: the tab bar and its bottom border
+- `ocs__tabs-btn`: an individual tab; add `active` for the selected one
+- `ocs__tabs-underline`: optional sliding indicator under the active tab
+- `ocs__tabs-panels`, `ocs__tabs-panel`: the swapped content area
+
+See [`elements/tabs`](elements/tabs). Dashboard, Analytics Dashboard, and
+Submissions all use this for their tab bars.
+
+### Modals
+
+```html
+<div class="ocs__modal">
+  <div class="ocs__modal-card">
+    <div class="ocs__modal-header">
+      <h3 class="ocs__modal-title">Title</h3>
+      <button class="ocs__btn ocs__btn--icon small ocs__modal-close">&times;</button>
+    </div>
+    <p>Modal content.</p>
+    <div class="ocs__modal-actions">
+      <button class="ocs__btn accent fill medium">Confirm</button>
+    </div>
+  </div>
+</div>
+```
+
+- `ocs__modal`: the fixed, centered backdrop
+- `ocs__modal-card`: the content card
+- `ocs__modal-close`: positions a close control in the card's corner; pair
+  it with `ocs__btn ocs__btn--icon` for the icon button treatment, or put
+  it inside `ocs__modal-header` instead for a modal with a title bar
+- `ocs__modal-header`, `ocs__modal-title`, `ocs__modal-actions`: optional
+  header row and action-button row for a fuller modal
+
+How a page shows/hides the modal (a `hidden`/`open` class, an
+`aria-hidden` attribute) is up to the page — this only styles the chrome.
+See [`elements/modals`](elements/modals). Dashboard and Analytics
+Dashboard use the plain card+close shape; Calendar uses the full
+header/actions shape.
+
+### Card headers
+
+```html
+<div class="ocs__card">
+  <div class="ocs__card-header">
+    <h2 class="ocs__section-title">Title</h2>
+    <button class="ocs__btn accent fill medium">Action</button>
+  </div>
+</div>
+```
+
+`ocs__card-header`: a title/action row inside a card (flex,
+space-between, aligned). See [`elements/capstone`](elements/capstone).
+
+### Loading spinner
+
+```html
+<div class="ocs__loading">
+  <div class="ocs__spinner"></div>
+</div>
+```
+
+`ocs__loading`/`ocs__spinner`: an inline, theme-aware loading state for a
+tab panel or card. See [`elements/loaders`](elements/loaders). (`.spinner`/
+`.loading-container` in the same directory are an older, non-`ocs__`
+full-page overlay variant with hardcoded colors — use the `ocs__` pair for
+anything new.)
+
 ### Capstone document elements
 
 These shared classes are used by the RFID and Jarvis capstone documents:

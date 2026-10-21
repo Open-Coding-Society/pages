@@ -55,4 +55,15 @@ select {
 }
 @import "profile-gist-connection";
 @import "profile-v2";
+@import "submissions-v2";
+
+// Shared by every ocs__<page>-v2 partial above: several of them toggle the
+// literal class "hidden" from JS (a Tailwind-style utility, not a grammar
+// element) to show/hide panels, modals, and form fields. Declared once
+// here, after every page partial, instead of each page redeclaring it --
+// this also guarantees it beats any single-class selector that also sets
+// `display`, since it's always last in the compiled stylesheet.
+.hidden {
+    display: none;
+}
 @import "analytics-dashboard-v2";

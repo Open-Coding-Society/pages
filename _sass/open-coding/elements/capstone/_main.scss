@@ -16,6 +16,17 @@
   color: var(--pref-text-color);
 }
 
+// A title/action row inside a card -- extracted from 5 pages that had
+// reimplemented this identically (Profile, Dashboard, Analytics
+// Dashboard, Bathroom Pass, Calendar).
+.ocs__card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
 .ocs__capstone-footer {
   display: flex;
   align-items: center;

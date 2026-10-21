@@ -288,8 +288,6 @@ show_reading_time: false
             school: document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
-            kasmServerNeeded: false,
-            kasm_server_needed: false,
             accountType: document.getElementById("signupRole").value,
         };
 
@@ -493,8 +491,6 @@ show_reading_time: false
             school: document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
-            kasmServerNeeded: false,
-            kasm_server_needed: false,
         };
 
         // Never log `data`: it holds the plaintext password and the Google ID token.

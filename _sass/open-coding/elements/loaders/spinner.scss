@@ -44,3 +44,32 @@
         transform: rotate(360deg);
     }
 }
+
+// Inline, theme-aware spinner for a loading state inside a tab panel or
+// card -- unlike .spinner above (a full-page overlay with hardcoded
+// colors), this is sized to sit in normal document flow and uses theme
+// variables so it works in every preset. Extracted from 2 pages that had
+// reimplemented this identically (Analytics Dashboard, Submissions).
+.ocs__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+}
+
+.ocs__spinner {
+    width: 3rem;
+    height: 3rem;
+    margin: 0 auto 1rem;
+    border: 3px solid color-mix(in srgb, var(--pref-text-color) 16%, transparent);
+    border-bottom-color: var(--pref-accent-color);
+    border-radius: 50%;
+    animation: ocs__spin 0.75s linear infinite;
+}
+
+@keyframes ocs__spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
