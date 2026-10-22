@@ -85,5 +85,9 @@ permalink: /capstone/shoreline-volunteer/
     </div>
 </div>
 
+---
+
+{% include ocs_kanban_board.html url="https://github.com/users/vanshikak210/projects/8" title="Kanban Board (CPT)" %}
+
 </div>
 <!-- markdownlint-enable MD033 -->
