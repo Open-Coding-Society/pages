@@ -25,6 +25,19 @@ show_reading_time: false
                 <button type="submit" class="large primary submit-button">Login</button>
             </p>
             <p id="message" style="color: red;"></p>
+            <!-- Shown after login when a student's verification has lapsed -->
+            <div id="reverify" style="display: none; text-align: center;">
+                <h3>School Email Verification</h3>
+                <p>Your verification has lapsed. Sign in with your school Google account to continue.</p>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="filled_blue"
+                     data-text="signin_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left"></div>
+                <p id="reverify-status"></p>
+            </div>
             <p style="text-align: center;">
                 <a href="{{site.baseurl}}/support?topic=reset">Forgot your password?</a>
             </p>
@@ -121,6 +134,7 @@ show_reading_time: false
 
 <script type="module">
     import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { reverifyNeeded, staffMustVerify, reverify } from '{{site.baseurl}}/assets/js/api/reverify.js';
     import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
 
     let signupFormData = {};
@@ -224,7 +238,7 @@ show_reading_time: false
         }
     }
 
-    function updateOverallStatus(springErrorMessage = '') {
+    function updateOverallStatus(springErrorMessage = '', flaskErrorMessage = '') {
         const flaskEl = document.getElementById('flaskStatus');
         const springEl = document.getElementById('springStatus');
         const overallEl = document.getElementById('overallStatus');
@@ -249,9 +263,11 @@ show_reading_time: false
         } else if (flaskError && springSuccess) {
             overallEl.classList.add('partial');
             overallEl.textContent = '⚠️ Spring account created! Flask failed - please try again.';
-        } else if (flaskError && springError) {
+        } else if (flaskError) {
+            // Flask is tried first and Spring only after Flask succeeds, so Spring was not tried
             overallEl.classList.add('error');
-            overallEl.textContent = '💥 Both backends failed. Please check your information and try again.';
+            overallEl.textContent = `❌ Signup failed: ${flaskErrorMessage || 'the account could not be created.'}`
+                + ' Please check your details and try again.';
         }
     }
 
@@ -301,6 +317,9 @@ show_reading_time: false
     }
 
     function showOAuthVerification() {
+        // Starting a signup drops any re-verification that was waiting on the same Google button
+        reverifying = false;
+        document.getElementById('reverify').style.display = 'none';
         document.getElementById('signupForm').style.display = 'none';
         document.getElementById('oauth-verification').style.display = 'block';
     }
@@ -320,7 +339,31 @@ show_reading_time: false
         statusDiv.innerHTML = `<div class="${isError ? 'oauth-error' : 'oauth-success'}">${message}</div>`;
     }
 
+    // After login, a student whose verification has lapsed signs in with Google once more.
+    // The same Google button callback serves signup and this, so it needs to know which.
+    let reverifying = false;
+    let afterReverify = null;
+
+    async function finishReverify(idToken) {
+        const status = document.getElementById('reverify-status');
+        status.className = '';
+        status.textContent = 'Checking with Google...';
+        const result = await reverify(pythonURI, fetchOptions, idToken);
+        if (!result.ok) {
+            status.className = 'oauth-error';
+            status.textContent = result.message;
+            return;
+        }
+        reverifying = false;
+        document.getElementById('reverify').style.display = 'none';
+        afterReverify();
+    }
+
     window.handleGoogleSignIn = function(response) {
+        if (reverifying) {
+            finishReverify(response.credential);
+            return;
+        }
         try {
             const userInfo = parseJwt(response.credential);
             const email = userInfo.email;
@@ -386,14 +429,42 @@ show_reading_time: false
         });
         // pythonPromise only settles when Flask accepts the login; on a Flask failure
         // login() shows the error in #message and the page stays put.
-        Promise.all([javaPromise, pythonPromise]).then(([springLoggedIn]) => {
-            if (springLoggedIn) {
-                window.location.href = '{{site.baseurl}}/profile';
+        Promise.all([javaPromise, pythonPromise]).then(([springLoggedIn, flaskBody]) => {
+            const finish = () => {
+                if (springLoggedIn) {
+                    window.location.href = '{{site.baseurl}}/profile';
+                    return;
+                }
+                showSpringLoginWarning();
+            };
+            if (reverifyNeeded(flaskBody)) {
+                reverifying = true;
+                afterReverify = finish;
+                document.getElementById('reverify').style.display = 'block';
                 return;
             }
-            showSpringLoginWarning();
+            if (staffMustVerify(flaskBody)) {
+                showStaffVerifyNotice(finish);
+                return;
+            }
+            finish();
         });
     };
+    // A Mentor's verification has lapsed. Only a Teacher or Admin can verify it, and the
+    // account still works, so say so and let them carry on.
+    function showStaffVerifyNotice(finish) {
+        const messageEl = document.getElementById('message');
+        const carryOn = springLink('{{site.baseurl}}/profile', 'Continue');
+        carryOn.addEventListener('click', (event) => {
+            event.preventDefault();
+            finish();
+        });
+        messageEl.innerHTML = '';
+        messageEl.append(
+            'Your verification has lapsed. Ask your Teacher or Admin to verify your account. ',
+            carryOn,
+        );
+    }
     // Flask accepted the login but Spring did not. The navbar would still show the
     // user as signed in, while every Spring feature returns 401, so say so here.
     function showSpringLoginWarning() {
@@ -417,8 +488,8 @@ show_reading_time: false
     window.pythonLogin = function (done) {
         const options = {
             URL: `${pythonURI}/api/authenticate`,
-            callback: function() {
-                if (done) done();
+            callback: function(body) {
+                if (done) done(body);
             },
             message: "message",
             method: "POST",
@@ -516,11 +587,15 @@ show_reading_time: false
             try {
                 flaskData = flaskRaw ? JSON.parse(flaskRaw) : {};
             } catch (_) {
-                flaskData = { message: flaskRaw };
+                flaskData = null;
+            }
+            // Not a JSON object (an error page from a proxy, or "null"): a failure, and do not show its text
+            if (flaskData === null || typeof flaskData !== 'object') {
+                flaskData = { success: false };
             }
 
             if (!flaskResponse.ok || flaskData.success === false) {
-                const flaskMessage = flaskData.message || flaskRaw || `Flask signup failed (${flaskResponse.status})`;
+                const flaskMessage = flaskData.message || `Flask signup failed (${flaskResponse.status})`;
                 throw new Error(flaskMessage);
             }
 
@@ -548,12 +623,19 @@ show_reading_time: false
         } catch (error) {
             console.error("Flask signup error:", error);
             updateBackendStatus('flask', 'error');
-            updateBackendStatus('spring', 'error');
-            setTimeout(updateOverallStatus, 500);
+            setTimeout(() => updateOverallStatus('', flaskFailureMessage(error)), 500);
         } finally {
             signupButton.disabled = false;
             signupButton.classList.remove("disabled");
         }
+    }
+    // What to tell the user when Flask refused the signup. A TypeError means fetch() itself failed
+    // (offline, CORS, server down), so there is no reply from Flask to quote.
+    function flaskFailureMessage(error) {
+        if (error instanceof TypeError) {
+            return 'Could not reach the server. Check your connection and try again.';
+        }
+        return error.message;
     }
     // Spring's /api/person/create answers errors as {"error": "..."}, e.g. a uid conflict.
     function readSpringError(raw, status) {
