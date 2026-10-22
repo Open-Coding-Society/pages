@@ -8,144 +8,197 @@ permalink: /capstone/powaynec-2026-2027/
 year: "2026-2027"
 ---
 
-> **CSP 2026–2027 · Samanvi, Joan, and Ainsley.** We are continuing the previous PNEC team's project. Our team proposes the features below to extend the inherited project, with scope and implementation to be reviewed with PNEC.
+<div class="pnec-capstone">
+  <header class="pnec-capstone__intro">
+    <p class="pnec-capstone__eyebrow">CSP 2026–2027 · Community capstone</p>
+    <h2>Prepared neighbors. A stronger Poway.</h2>
+    <p class="pnec-capstone__lead">Samanvi, Joan, and Ainsley are continuing the previous PNEC team's project. Our team proposes the features below to extend the inherited project, with scope and implementation to be reviewed with PNEC.</p>
+    <nav class="pnec-capstone__links" aria-label="PNEC project sections">
+      <a class="ocs__btn accent fill" href="#team-kanban-board">Team Kanban Board</a>
+      <a class="ocs__btn accent fill" href="#proposed-improvements">Nine proposed improvements</a>
+      <a class="ocs__btn accent fill" href="#team-and-review">Meet the team</a>
+      <a class="ocs__btn accent fill" href="#delivery-lifecycle">GitHub lifecycle</a>
+    </nav>
+  </header>
 
-## Poway Neighborhood Emergency Corps 2026–2027
-
-<div class="ocs__grid ocs__grid--standard cols-2">
-    <div class="ocs__grid-cell ocs__grid-cell--header">Project Summary</div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Why we chose PNEC</strong>
-        <p>We chose PNEC to help our community prepare for emergencies. Our team identified wildfires, high temperatures, and earthquakes as reasons to make preparedness information and planning easier to access. The project combines community impact with opportunities to build useful technical skills.</p>
-        <a class="ocs__btn alert-green fill small" href="https://pnec.opencodingsociety.com" target="_blank" rel="noopener noreferrer">Existing Project Site</a>
+  <section class="pnec-capstone__board ocs__card" aria-labelledby="team-kanban-board">
+    <p class="pnec-capstone__eyebrow">Plan · Track · Review</p>
+    <h2 id="team-kanban-board">Team Kanban Board</h2>
+    <p>Follow our team's actual issues, assignments, and progress on GitHub.</p>
+    <div class="pnec-capstone__links">
+      <a class="ocs__btn accent fill" href="https://github.com/users/samanviy17-crypto/projects/1/views/1" target="_blank" rel="noopener noreferrer">Open the PNEC Kanban Board ↗</a>
+      <a href="https://github.com/samanviy17-crypto/team-portfolio" target="_blank" rel="noopener noreferrer">Browse the team repository</a>
     </div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Project Direction</strong>
+    <p class="pnec-capstone__note">This personal GitHub Projects board opens on GitHub. GitHub blocks embedded frames, and its personal-board cards require authentication through the API, so live cards are not displayed here. GitHub controls which items each visitor can view.</p>
+    <p class="pnec-capstone__note">Supported alternatives are this direct board link or an approved public, organization-owned project using the existing OCS board component. Moving a board or creating a credentialed server integration requires a separate decision; no board settings were changed.</p>
+  </section>
+
+  <section class="pnec-capstone__section" aria-labelledby="project-overview">
+    <p class="pnec-capstone__eyebrow">Project overview</p>
+    <h2 id="project-overview">Why we chose PNEC</h2>
+    <p>We chose PNEC to help our community prepare for emergencies. Our team identified wildfires, high temperatures, and earthquakes as reasons to make preparedness information and planning easier to access. The project combines community impact with opportunities to build useful technical skills.</p>
+    <div class="pnec-capstone__summary-grid">
+      <div class="pnec-capstone__panel">
+        <h3>Project direction</h3>
         <p>Extend the existing information platform with personalized household planning, preparedness learning, volunteer coordination, and community feedback. These features are proposed work for our team.</p>
-        <a class="ocs__btn alert-yellow fill small" href="https://github.com/samanviy17-crypto/team-portfolio/issues/3" target="_blank" rel="noopener noreferrer">Team Feature Plan</a>
-    </div>
-</div>
-
-<div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn large" href="https://github.com/samanviy17-crypto/team-portfolio" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
-</div>
-
----
-
-<div class="ocs__grid ocs__grid--standard cols-2">
-    <div class="ocs__grid-cell ocs__grid-cell--header">Inherited Project and Opportunities</div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Existing Foundation</strong>
-        <p>The previous team's handoff describes Risk Watch, the Helper Bot, a neighborhood map, member accounts, and a browser-based site editor. We will review these inherited features before extending them.</p>
-        <a class="ocs__btn alert-green fill small" href="{{ '/capstone/powaynec/' | relative_url }}">Previous Team's Handoff</a>
-    </div>
-    <div class="ocs__grid-cell">
-        <strong>Community Participation</strong>
+        <a href="https://github.com/samanviy17-crypto/team-portfolio/issues/3" target="_blank" rel="noopener noreferrer">Read the Team Feature Plan ↗</a>
+      </div>
+      <div class="pnec-capstone__panel">
+        <h3>Community participation</h3>
         <p>Our proposed direction connects preparedness information with saved plans, learning activities, volunteer tasks, and feedback from residents.</p>
-        <a class="ocs__btn alert-yellow fill small" href="#proposed-improvements">Proposed Improvements</a>
+        <a href="https://pnec.opencodingsociety.com" target="_blank" rel="noopener noreferrer">Visit the existing project site ↗</a>
+      </div>
     </div>
+  </section>
+
+  <section class="pnec-capstone__section" aria-labelledby="inherited-foundation">
+    <p class="pnec-capstone__eyebrow">Inherited project and opportunities</p>
+    <h2 id="inherited-foundation">Build on the existing foundation</h2>
+    <p>The previous team's handoff describes Risk Watch, the Helper Bot, a neighborhood map, member accounts, and a browser-based site editor. We will review these inherited features before extending them.</p>
+    <ul class="pnec-capstone__foundation" aria-label="Inherited features">
+      <li>Risk Watch</li><li>Helper Bot</li><li>Neighborhood map</li><li>Member accounts</li><li>Browser-based site editor</li>
+    </ul>
+    <div class="pnec-capstone__links">
+      <a href="{{ '/capstone/powaynec/' | relative_url }}">Previous Team's Handoff</a>
+      <a href="https://github.com/whitelunarium/Beasts_FrontEnd" target="_blank" rel="noopener noreferrer">Inherited Frontend ↗</a>
+      <a href="https://github.com/whitelunarium/Beasts_Flask" target="_blank" rel="noopener noreferrer">Inherited Backend ↗</a>
+    </div>
+  </section>
+
+  <section class="pnec-capstone__section" aria-labelledby="proposed-improvements">
+    <p class="pnec-capstone__eyebrow">Proposed features and acceptance checks</p>
+    <h2 id="proposed-improvements">Nine ways to support our community</h2>
+    <p>These are proposals for review, not claims of completed features. Each improvement includes an acceptance check to guide a future implementation.</p>
+    <div class="pnec-capstone__features">
+    <section class="pnec-capstone__feature" aria-labelledby="pnec-feature-1">
+      <span class="pnec-capstone__eyebrow">Proposed improvement 01</span>
+      <h3 id="pnec-feature-1">Family / household preparedness checklist tracker</h3>
+      <p>Save a personalized checklist to each resident account for a 72-hour kit, evacuation plan, and meeting point. Show household progress and remaining tasks alongside the existing preparedness information.</p>
+      <div class="pnec-capstone__acceptance"><p><strong>Proposed acceptance check:</strong> Completed tasks remain saved after signing in again, progress updates correctly, and each household sees only its own checklist.</p></div>
+    </section>
+    <section class="pnec-capstone__feature" aria-labelledby="pnec-feature-2">
+      <span class="pnec-capstone__eyebrow">Proposed improvement 02</span>
+      <h3 id="pnec-feature-2">Interactive preparedness quiz</h3>
+      <p>Ask residents 8–10 questions about their emergency kit, evacuation route, and other preparedness steps. Show a preparedness score and the top actions suggested by their answers.</p>
+      <div class="pnec-capstone__acceptance"><p><strong>Proposed acceptance check:</strong> All questions can be answered with a keyboard, the same answers produce the same score, and recommendations match the gaps identified. The score describes quiz responses, not a guarantee of safety.</p></div>
+    </section>
+    <section class="pnec-capstone__feature" aria-labelledby="pnec-feature-3">
+      <span class="pnec-capstone__eyebrow">Proposed improvement 03</span>
+      <h3 id="pnec-feature-3">Volunteer shift / task board</h3>
+      <p>Let coordinators post door-to-door check-ins, supply drives, and CERT training sessions. Residents and volunteers can claim available slots.</p>
+      <div class="pnec-capstone__acceptance"><p><strong>Proposed acceptance check:</strong> A volunteer can sign up or cancel, the remaining capacity stays accurate, and filled slots cannot be overbooked.</p></div>
+    </section>
+    <section class="pnec-capstone__feature" aria-labelledby="pnec-feature-4">
+      <span class="pnec-capstone__eyebrow">Proposed improvement 04</span>
+      <h3 id="pnec-feature-4">Post-disaster check-in / well-being board</h3>
+      <p>Let residents mark themselves as safe or needing help by neighborhood, with their update visible to their coordinator.</p>
+      <div class="pnec-capstone__acceptance"><p><strong>Proposed acceptance check:</strong> A resident can update their status and timestamp, and only authorized coordinators can view their neighborhood’s reports. The page clearly explains that a check-in does not contact emergency services.</p></div>
+    </section>
+    <section class="pnec-capstone__feature" aria-labelledby="pnec-feature-5">
+      <span class="pnec-capstone__eyebrow">Proposed improvement 05</span>
+      <h3 id="pnec-feature-5">Multilingual support</h3>
+      <p>Offer key pages such as Risk Watch, evacuation information, and the Helper Bot in Spanish and additional languages selected with PNEC. Explore translation support with review of critical information.</p>
+      <div class="pnec-capstone__acceptance"><p><strong>Proposed acceptance check:</strong> A language selector opens the corresponding content, missing translations are clearly identified, and critical preparedness wording is reviewed before publication.</p></div>
+    </section>
+    <section class="pnec-capstone__feature" aria-labelledby="pnec-feature-6">
+      <span class="pnec-capstone__eyebrow">Proposed improvement 06</span>
+      <h3 id="pnec-feature-6">Donation / supply drive goal tracker</h3>
+      <p>List current needs such as flashlights, water, and first-aid kits, with a running progress tracker so residents and local businesses can see how to contribute.</p>
+      <div class="pnec-capstone__acceptance"><p><strong>Proposed acceptance check:</strong> Each drive shows its item, goal, and recorded progress. Authorized volunteers can update totals, and pledges are distinguished from supplies received.</p></div>
+    </section>
+    <section class="pnec-capstone__feature" aria-labelledby="pnec-feature-7">
+      <span class="pnec-capstone__eyebrow">Proposed improvement 07</span>
+      <h3 id="pnec-feature-7">Report a hazard</h3>
+      <p>Provide a resident form for reporting a downed tree, blocked evacuation route, or broken fire hydrant. Route the report to the relevant coordinator or admin dashboard.</p>
+      <div class="pnec-capstone__acceptance"><p><strong>Proposed acceptance check:</strong> Required location and description fields are validated, submitted reports appear for the authorized coordinator, and the form distinguishes community reports from urgent emergency requests.</p></div>
+    </section>
+    <section class="pnec-capstone__feature" aria-labelledby="pnec-feature-8">
+      <span class="pnec-capstone__eyebrow">Proposed improvement 08</span>
+      <h3 id="pnec-feature-8">Community-driven FAQ feedback</h3>
+      <p>Add a “Was this helpful?” option and a way to submit questions that stump the Helper Bot. Volunteers can review gaps and improve the knowledge base.</p>
+      <div class="pnec-capstone__acceptance"><p><strong>Proposed acceptance check:</strong> Feedback is saved, unanswered questions appear in a volunteer review queue, and reviewed FAQ changes can be tracked.</p></div>
+    </section>
+    <section class="pnec-capstone__feature" aria-labelledby="pnec-feature-9">
+      <span class="pnec-capstone__eyebrow">Proposed improvement 09</span>
+      <h3 id="pnec-feature-9">Weekly tips and tricks</h3>
+      <p>Publish weekly preparedness tips and volunteer or learning events. Adapt the topics to current community threats, such as flood preparedness during flooding.</p>
+      <div class="pnec-capstone__acceptance"><p><strong>Proposed acceptance check:</strong> Each update shows a publication date, relevant sources, and upcoming event details. Authorized volunteers can review and update time-sensitive content.</p></div>
+    </section>
+    </div>
+  </section>
+
+  <section class="pnec-capstone__section" aria-labelledby="team-and-review">
+    <p class="pnec-capstone__eyebrow">Teammates / Collaborators</p>
+    <h2 id="team-and-review">Our team and review process</h2>
+    <div class="pnec-capstone__team">
+      <div class="pnec-capstone__panel"><h3>Joan Kim</h3><p>Scrum Master / Developer</p></div>
+      <div class="pnec-capstone__panel"><h3>Ainsley Albert</h3><p>Technologist / Developer 1</p></div>
+      <div class="pnec-capstone__panel"><h3>Samanvi Yachareni</h3><p>Technologist / Developer 2</p></div>
+    </div>
+    <h3 class="pnec-capstone__subheading">Iteration process</h3>
+    <ol class="pnec-capstone__process">
+<li><h3>1 · Investigate and scope</h3><p>Review the inherited repositories and handoff, reproduce a user problem, and discuss priorities with PNEC. Record the selected scope, owner, and acceptance checks in an issue.</p></li>
+<li><h3>2 · Build and test</h3><p>Implement one agreed improvement in a small branch. Test the main workflow, failure cases, keyboard navigation, and phone layouts. Keep screenshots and results with the issue.</p></li>
+<li><h3>3 · Review and revise</h3><p>Open a focused PR with the problem, changes, and actual test results. Have a teammate review it, address feedback, and record the next iteration before the class review.</p></li>
+    </ol>
+  </section>
+
+  <section class="pnec-capstone__section" aria-labelledby="delivery-lifecycle">
+    <p class="pnec-capstone__eyebrow">GitHub issues · Evidence · Review</p>
+    <h2 id="delivery-lifecycle">Our five-stage Kanban lifecycle</h2>
+    <p>Mr. Mortensen is our Product Owner. Samanvi, Joan, and Ainsley are the Scrum Team. These are the required stage criteria, not claims that our cards have already passed them. All 20 proposals in the <a href="https://github.com/samanviy17-crypto/team-portfolio/issues/42">Product Backlog #42</a> await his approval.</p>
+    <p class="pnec-capstone__note">October 21 board audit: the current columns are Backlog, Todo, In Progress, Testing and Done. Renaming Testing to In Review requires teacher approval. Issues <a href="https://github.com/samanviy17-crypto/team-portfolio/issues/31">#31</a>–<a href="https://github.com/samanviy17-crypto/team-portfolio/issues/34">#34</a> still need scope, priority and owner decisions; Done issues <a href="https://github.com/samanviy17-crypto/team-portfolio/issues/1">#1</a> and <a href="https://github.com/samanviy17-crypto/team-portfolio/issues/5">#5</a>–<a href="https://github.com/samanviy17-crypto/team-portfolio/issues/9">#9</a> lack confirmed acceptance evidence in the reviewed records. These gaps remain pending; no board statuses or assignments were changed.</p>
+    <div class="pnec-capstone__lifecycle">
+      <section class="pnec-capstone__panel"><h3>1 · Parking Lot (Backlog)</h3>
+        <ul><li>Hold a success meeting with the teacher, Product Owner, mentors or community stakeholders.</li><li>Use empathy research, interviews or surveys to understand user needs and a point of view (POV).</li><li>Explore solutions with “How might we?” (HMW).</li><li>Define a proposed design and acceptance criteria before committing resources.</li></ul>
+        <p><strong>Exit:</strong> An understood, actionable solution ready for prioritization.</p>
+      </section>
+      <section class="pnec-capstone__panel"><h3>2 · To Do</h3>
+        <ul><li>Agree on weighted priority with the Product Owner.</li><li>Confirm one accountable owner and the authorized scope.</li></ul>
+        <p><strong>Exit:</strong> Prioritized, owned and ready to start.</p>
+      </section>
+      <section class="pnec-capstone__panel"><h3>3 · In Progress</h3>
+        <ul><li>Implement an authorized prototype in code.</li><li>Complete unit tests and retain actual results.</li><li>Create and link a focused pull request.</li></ul>
+        <p><strong>Exit:</strong> Development evidence is complete.</p>
+      </section>
+      <section class="pnec-capstone__panel"><h3>4 · In Review</h3>
+        <ul><li>Deploy to an appropriate, approved testing or review environment.</li><li>Run system tests and present the outcome to reviewers.</li><li>Obtain acceptance from the authorized reviewer.</li></ul>
+        <p><strong>Exit:</strong> The solution satisfies its acceptance criteria.</p>
+      </section>
+      <section class="pnec-capstone__panel"><h3>5 · Done</h3>
+        <ul><li>Deliver the accepted outcome.</li><li>Retain evidence in the GitHub issue.</li><li>Link key commits and pull request history.</li></ul>
+        <p><strong>Exit:</strong> Accepted delivery and its evidence are retained. Proposed or incomplete work is not Done.</p>
+      </section>
+    </div>
+    <h3 class="pnec-capstone__subheading">Choose the right issue format</h3>
+    <div class="pnec-capstone__summary-grid">
+      <div class="pnec-capstone__panel"><h3>Quick Issue</h3><p>Use for a small bug, revision, non-invasive prototype or minor improvement. Record the applicable problem, task, owner, acceptance checks, commits, PR and tests.</p><p>It may start in To Do or In Progress when understood and appropriately authorized. It does not bypass approval for our proposed backlog.</p></div>
+      <div class="pnec-capstone__panel"><h3>Formal Issue</h3><p>Use for research, new features and substantial changes. Include user needs, stakeholder evidence, POV/HMW, alternatives, design, acceptance criteria, priority and owner.</p><p>Then link implementation tasks, unit/system tests, commits, PRs, presentation, review and final acceptance. Missing evidence stays pending.</p></div>
+    </div>
+    <p class="pnec-capstone__note">Both templates are prepared locally in the team repository's issue-template directory; publication is pending. No issues, assignments or Kanban statuses were changed.</p>
+  </section>
+
+  <section class="pnec-capstone__section" aria-labelledby="real-project-evidence">
+    <h2 id="real-project-evidence">Connect the lifecycle to real PNEC work</h2>
+    <div class="pnec-capstone__summary-grid">
+      <div class="pnec-capstone__panel"><h3>Planning and research</h3><ul><li><a href="https://github.com/samanviy17-crypto/team-portfolio/issues/42">#42 · Product Backlog and API research</a>: 20 proposed scopes; Product Owner approval and priorities remain pending.</li><li><a href="https://github.com/samanviy17-crypto/team-portfolio/issues/14">#14 · Official weather alerts</a>: open proposal with research, dependencies and acceptance criteria; not an approved live integration.</li></ul></div>
+      <div class="pnec-capstone__panel"><h3>Implementation and testing evidence</h3><ul><li><a href="https://github.com/samanviy17-crypto/team-portfolio/issues/8">#8 · Authentication and recovery</a>: open issue describing existing local implementation and tests; production is unverified.</li><li><a href="https://github.com/samanviy17-crypto/team-portfolio/issues/11">#11 · Authentication testing</a> and <a href="https://github.com/samanviy17-crypto/team-portfolio/issues/10">#10 · Reliability tests</a>: closed historical issues; closure does not prove deployment or Product Owner acceptance.</li><li><a href="https://github.com/samanviy17-crypto/team-portfolio/issues/25">#25 · Coordination acceptance testing</a>: open proposed testing scope, awaiting approval.</li></ul></div>
+    </div>
+    <p>Review the <a href="https://github.com/samanviy17-crypto/team-portfolio/issues/43">API and full-stack evidence #43</a> and <a href="https://github.com/samanviy17-crypto/team-portfolio/issues/44">Phase 1 assignment hub #44</a>. Issue states were inspected on October 21, 2026; they may change. Existing status inconsistencies are preserved rather than silently corrected.</p>
+    <p>Working accounts, saved preparedness data and owner analytics belong to the PNEC frontend and Flask database. This capstone page is informational. Local verification does not establish public API availability, production persistence or accepted delivery; production 404/CORS diagnosis and deployment still require the EC2 administrator.</p>
+  </section>
+
+  <section class="pnec-capstone__section" aria-labelledby="microblog-updates">
+    <h2 id="microblog-updates">Keep project updates in the existing Microblog</h2>
+    <p>Use the page's Microblog button to open the existing OCS panel. Keep meeting notes, issue links, stakeholder feedback and short progress updates together. Clearly distinguish plans, local tests, reviewer decisions and accepted outcomes.</p>
+    <ul><li>Link the relevant issue and describe the next step.</li><li>Record decisions with the reviewer and date; do not invent approval.</li><li>Never post passwords, tokens, resident records or sensitive household information.</li></ul>
+    <p class="pnec-capstone__note">The OCS Microblog uses the course site's services and accounts, separate from PNEC accounts. The panel is reused, not duplicated. Posting and persistence require those services and authorization; they have not been verified against production in this update.</p>
+  </section>
+
+  <section class="pnec-capstone__section" aria-labelledby="next-iteration">
+    <h2 id="next-iteration">Evidence for the next iteration</h2>
+    <p>This update organizes the capstone overview only. The nine improvements remain proposals; this page does not establish implementation or stakeholder validation. Subsequent updates should record the selected scope, each teammate's contributions, test results, and review feedback.</p>
+    <p>The <a href="https://github.com/samanviy17-crypto/team-portfolio/issues/3" target="_blank" rel="noopener noreferrer">team feature plan</a> and Kanban board provide the next steps for review.</p>
+    <p class="pnec-capstone__note">Built with existing OCS components and page-scoped Sass. Explore the <a href="https://github.com/samanviy17-crypto/pages/tree/main/_sass/open-coding/elements/buttons">OCS button styles</a> and <a href="https://github.com/samanviy17-crypto/pages/tree/main/_sass/open-coding/elements/grids">OCS grid styles</a>.</p>
+  </section>
 </div>
-
-<div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn alert-green fill small" href="https://github.com/whitelunarium/Beasts_FrontEnd" target="_blank" rel="noopener noreferrer">Inherited Frontend</a>
-    <a class="ocs__btn alert-green fill small" href="https://github.com/whitelunarium/Beasts_Flask" target="_blank" rel="noopener noreferrer">Inherited Backend</a>
-</div>
-
----
-
-## Proposed improvements
-
-<div class="ocs__grid ocs__grid--standard cols-3">
-    <div class="ocs__grid-cell ocs__grid-cell--header">Proposed Features and Acceptance Checks</div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>1. Family / household preparedness checklist tracker</strong>
-        <p>Save a personalized checklist to each resident account for a 72-hour kit, evacuation plan, and meeting point. Show household progress and remaining tasks alongside the existing preparedness information.</p>
-        <p><strong>Proposed acceptance check:</strong> Completed tasks remain saved after signing in again, progress updates correctly, and each household sees only its own checklist.</p>
-    </div>
-    <div class="ocs__grid-cell">
-        <strong>2. Interactive preparedness quiz</strong>
-        <p>Ask residents 8–10 questions about their emergency kit, evacuation route, and other preparedness steps. Show a preparedness score and the top actions suggested by their answers.</p>
-        <p><strong>Proposed acceptance check:</strong> All questions can be answered with a keyboard, the same answers produce the same score, and recommendations match the gaps identified. The score describes quiz responses, not a guarantee of safety.</p>
-    </div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>3. Volunteer shift / task board</strong>
-        <p>Let coordinators post door-to-door check-ins, supply drives, and CERT training sessions. Residents and volunteers can claim available slots.</p>
-        <p><strong>Proposed acceptance check:</strong> A volunteer can sign up or cancel, the remaining capacity stays accurate, and filled slots cannot be overbooked.</p>
-    </div>
-    <div class="ocs__grid-cell">
-        <strong>4. Post-disaster check-in / well-being board</strong>
-        <p>Let residents mark themselves as safe or needing help by neighborhood, with their update visible to their coordinator.</p>
-        <p><strong>Proposed acceptance check:</strong> A resident can update their status and timestamp, and only authorized coordinators can view their neighborhood’s reports. The page clearly explains that a check-in does not contact emergency services.</p>
-    </div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>5. Multilingual support</strong>
-        <p>Offer key pages such as Risk Watch, evacuation information, and the Helper Bot in Spanish and additional languages selected with PNEC. Explore translation support with review of critical information.</p>
-        <p><strong>Proposed acceptance check:</strong> A language selector opens the corresponding content, missing translations are clearly identified, and critical preparedness wording is reviewed before publication.</p>
-    </div>
-    <div class="ocs__grid-cell">
-        <strong>6. Donation / supply drive goal tracker</strong>
-        <p>List current needs such as flashlights, water, and first-aid kits, with a running progress tracker so residents and local businesses can see how to contribute.</p>
-        <p><strong>Proposed acceptance check:</strong> Each drive shows its item, goal, and recorded progress. Authorized volunteers can update totals, and pledges are distinguished from supplies received.</p>
-    </div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>7. Report a hazard</strong>
-        <p>Provide a resident form for reporting a downed tree, blocked evacuation route, or broken fire hydrant. Route the report to the relevant coordinator or admin dashboard.</p>
-        <p><strong>Proposed acceptance check:</strong> Required location and description fields are validated, submitted reports appear for the authorized coordinator, and the form distinguishes community reports from urgent emergency requests.</p>
-    </div>
-    <div class="ocs__grid-cell">
-        <strong>8. Community-driven FAQ feedback</strong>
-        <p>Add a “Was this helpful?” option and a way to submit questions that stump the Helper Bot. Volunteers can review gaps and improve the knowledge base.</p>
-        <p><strong>Proposed acceptance check:</strong> Feedback is saved, unanswered questions appear in a volunteer review queue, and reviewed FAQ changes can be tracked.</p>
-    </div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>9. Weekly tips and tricks</strong>
-        <p>Publish weekly preparedness tips and volunteer or learning events. Adapt the topics to current community threats, such as flood preparedness during flooding.</p>
-        <p><strong>Proposed acceptance check:</strong> Each update shows a publication date, relevant sources, and upcoming event details. Authorized volunteers can review and update time-sensitive content.</p>
-    </div>
-</div>
-
----
-
-## Team and review process
-
-<div class="ocs__grid ocs__grid--standard cols-3">
-    <div class="ocs__grid-cell ocs__grid-cell--header">Teammates / Collaborators</div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Joan Kim</strong>
-        <p>Scrum Master / Developer</p>
-    </div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Ainsley Albert</strong>
-        <p>Technologist / Developer 1</p>
-    </div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Samanvi Yachareni</strong>
-        <p>Technologist / Developer 2</p>
-    </div>
-</div>
-
-### Iteration process
-
-<div class="ocs__grid ocs__grid--standard cols-3">
-    <div class="ocs__grid-cell">
-        <h3>1 · Investigate and scope</h3>
-        <p>Review the inherited repositories and handoff, reproduce a user problem, and discuss priorities with PNEC. Record the selected scope, owner, and acceptance checks in an issue.</p>
-    </div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <h3>2 · Build and test</h3>
-        <p>Implement one agreed improvement in a small branch. Test the main workflow, failure cases, keyboard navigation, and phone layouts. Keep screenshots and results with the issue.</p>
-    </div>
-    <div class="ocs__grid-cell">
-        <h3>3 · Review and revise</h3>
-        <p>Open a focused PR with the problem, changes, and actual test results. Have a teammate review it, address feedback, and record the next iteration before the class review.</p>
-    </div>
-</div>
-
-## Evidence for the next iteration
-
-This PR updates the capstone overview only. Feature implementation and stakeholder validation remain future work. The team feature plan is linked above. Subsequent updates should record the selected scope, each teammate's contributions, test results, and review feedback.
-
-
-**Powered by OCS grids and buttons**
-
-[Buttons]({{ '/navigation/sass/buttons/' | relative_url }}) | [Grids]({{ '/navigation/sass/grids/' | relative_url }})

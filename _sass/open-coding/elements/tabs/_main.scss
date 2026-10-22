@@ -1,0 +1,70 @@
+// Underline-style tab bar: a horizontal list of tabs with a bottom border
+// and a sliding active-state underline, paired with a swapped content pane
+// per tab. Extracted from 3 pages that had reimplemented this identically
+// (Dashboard, Analytics Dashboard, Submissions).
+
+.ocs__tabs {
+  position: relative;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.ocs__tabs-list {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// A consuming page's own JS may toggle the literal tokens "active",
+// "text-blue-500", and "border-blue-500" on this element (carried over
+// from an earlier Tailwind-based implementation) -- these compound
+// selectors give those exact tokens real color without the page having
+// to redefine them itself.
+.ocs__tabs-btn {
+  display: inline-block;
+  padding: 1rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--pref-text-color);
+    border-color: color-mix(in srgb, var(--pref-text-color) 24%, transparent);
+  }
+
+  &.active.text-blue-500 {
+    color: var(--pref-accent-color);
+  }
+
+  &.active.border-blue-500 {
+    border-color: var(--pref-accent-color);
+  }
+}
+
+// Sliding active-tab indicator; a consuming page positions it with its own
+// inline style/JS, this only supplies the color.
+.ocs__tabs-underline {
+  background: var(--pref-accent-color);
+}
+
+.ocs__tabs-panels {
+  position: relative;
+  min-height: 400px;
+}
+
+// A consuming page's own JS may toggle the literal token "block" on this
+// element to show it; ".hidden" (the sitewide utility in _main.scss)
+// hides it the same way it hides everything else.
+.ocs__tabs-panel {
+  padding: 1.5rem 0;
+  color: var(--pref-text-color);
+
+  &.block {
+    display: block;
+  }
+}

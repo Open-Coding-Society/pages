@@ -17,58 +17,10 @@
     gap: 1.5rem;
 }
 
-.ocs__analytics-tabbar {
-    position: relative;
-    border-bottom: 1px solid var(--ui-border);
-}
-
-.ocs__analytics-tabbar-list {
-    display: flex;
-    flex-wrap: wrap;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-// JS hook: querySelectorAll('.tab-btn') finds these; classList
-// add/remove("active", "text-blue-500", "border-blue-500") marks the
-// active tab across all 4 tabs.
-.ocs__analytics-tab-btn {
-    display: inline-block;
-    padding: 1rem;
-    border-bottom: 2px solid transparent;
-    color: var(--text-muted);
-    text-decoration: none;
-
-    &:hover {
-        color: var(--pref-text-color);
-        border-color: color-mix(in srgb, var(--pref-text-color) 24%, transparent);
-    }
-
-    &.active.text-blue-500 {
-        color: var(--pref-accent-color);
-    }
-
-    &.active.border-blue-500 {
-        border-color: var(--pref-accent-color);
-    }
-}
-
-.ocs__analytics-tab-underline {
-    background: var(--pref-accent-color);
-}
-
-.ocs__analytics-tab-content-container {
-    position: relative;
-    min-height: 400px;
-}
-
-// JS hook: querySelectorAll('.tab-content') finds these; classList
-// add/remove("hidden", "block") switches the visible pane.
-.ocs__analytics-tab-content {
-    padding: 1.5rem 0;
-    color: var(--pref-text-color);
-}
+// .ocs__tabs / -list / -btn / -underline / -panels / -panel (elements/tabs)
+// now cover the tab bar instead of a page-scoped duplicate. The compound
+// JS-coupled selectors (.active.text-blue-500 etc., keyed off
+// querySelectorAll('.tab-btn') / ('.tab-content')) live there too.
 
 .ocs__analytics-page-title {
     margin-bottom: 1rem;
@@ -125,31 +77,9 @@
     gap: 0.75rem;
 }
 
-// Loading spinner used on the OCS Analytics placeholder and the Skill
-// Passport loading state.
-.ocs__analytics-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 400px;
-    text-align: center;
-}
-
-.ocs__analytics-spinner {
-    width: 3rem;
-    height: 3rem;
-    margin: 0 auto 1rem;
-    border: 3px solid color-mix(in srgb, var(--pref-text-color) 16%, transparent);
-    border-bottom-color: var(--pref-accent-color);
-    border-radius: 50%;
-    animation: ocs__analytics-spin 0.75s linear infinite;
-}
-
-@keyframes ocs__analytics-spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
+// .ocs__loading / .ocs__spinner (elements/loaders) now cover the OCS
+// Analytics placeholder and Skill Passport loading states instead of a
+// page-scoped duplicate.
 
 .ocs__analytics-stat-grid {
     display: grid;
@@ -335,52 +265,23 @@
     color: var(--pref-text-color);
 }
 
-.ocs__analytics-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-}
+// .ocs__card-header (elements/capstone) now covers this page's card
+// headers instead of a page-scoped duplicate.
 
-// JS hook: classList.add/remove("hidden") shows/hides this modal — keep
-// literal. Positioning/backdrop chrome (not JS-coupled) lives here.
-.ocs__analytics-modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.6);
-}
-
+// .ocs__modal / .ocs__modal-card (elements/modals) now cover this modal's
+// chrome; this page's dialog is wider/shorter and flex-column than the
+// shared default, so that delta stays here, paired in markup with
+// .ocs__modal-card. JS still shows/hides the modal by toggling the
+// literal class "hidden" (now a single rule at the end of _main.scss) and
+// finds its close control via the literal class "close"
+// (dataModal.querySelector(".close")) -- the close control's own visual
+// styling now comes from ocs__btn ocs__btn--icon small, paired with
+// .ocs__modal-close for its positioning, instead of page-scoped CSS.
 .ocs__analytics-modal-card {
-    position: relative;
-    width: 100%;
     max-width: 48rem;
     max-height: 24rem;
     display: flex;
     flex-direction: column;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    background: var(--panel);
-    border: 1px solid var(--ui-border);
-}
-
-// JS hook: dataModal.querySelector(".close") finds this exact class —
-// keep literal.
-.ocs__analytics-modal-close {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    font-size: 1.5rem;
-    line-height: 1;
-    color: var(--text-muted);
-    cursor: pointer;
-
-    &:hover {
-        color: var(--pref-text-color);
-    }
 }
 
 .ocs__analytics-modal-body {
@@ -395,13 +296,4 @@
     font-size: 0.875rem;
     white-space: pre-wrap;
     word-break: break-word;
-}
-
-// Declared last on purpose: .hidden and several classes above (the modal
-// overlay) are single-class selectors of equal specificity, so source
-// order decides which `display` wins when both are present on one
-// element. Keep this rule last in the file so .hidden's display:none
-// always wins.
-.hidden {
-    display: none;
 }

@@ -98,6 +98,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * 新项目遵循 [_projects/REGISTRATION.md](_projects/REGISTRATION.md) 注册/构建约定；架构示例见 [_projects/ARCHITECTURE.md](_projects/ARCHITECTURE.md)。
 * 样式优先使用 SCSS；主题切换与样式约定见 [README.md](README.md)。
 * 主题预设（[assets/js/user-preferences.js](assets/js/user-preferences.js)）会用 `!important` 把所有 `span`、`div`、`p`、`li` 和标题改成主题文字色。按钮的图标和文字要直接写在 `ocs__btn` 里（像 [_layouts/post.html](_layouts/post.html) 的 Submit 按钮），不要包在 `<span>` 里，否则 `fill` 按钮上的文字会变成主题文字色，可能看不清。
+* Profile（`/profile`）是系统套件 [_projects/systems/profile/](_projects/systems/profile/README.md)；改源文件，不改发布副本（`_layouts/profile.html`、`assets/js/profile/`、`navigation/authentication/profile.md`）。`layouts/profile.html` 只放标记（OCS 语法，无页面样式表）；其启动脚本用 `{{ site.baseurl }}` 导入共享函数（`assets/js/api/config.js`、`assets/js/api/profile.js`）并传给 `initProfilePage(api)`，所以各模块之间只用 `./` 路径导入，不要加 `../` 导入。`/profile/v2` 重定向到 `/profile`。见[其架构](_projects/systems/profile/docs/ARCHITECTURE.md)。表单的载入值必须在异步加载填好字段之后再记录：之前与仍为空的字段比较，使 Save 重发所有字段（包括 User ID）并弹出“will be logged out”提示。每个字段用共享的 `putUpdate`/`postUpdate`（结果为 true 或 false）保存到 Flask（`PUT /api/user`）和 Spring（`POST /api/person/update`），并等待两者。测试：`node --test tests/profile_model.test.mjs tests/test_gist_connection.mjs`。
 * Mermaid 图源里不要写 `var(--panel)` 或 `style` 色值：括号会被当成节点语法。颜色由 [_includes/mermaid.html](_includes/mermaid.html) 读取偏好变量，并由 [user-preferences.scss](_sass/open-coding/theme/user-preferences.scss) 的 `.mermaid` 规则在主题切换后保持同步。
 
 ### 后端边界
@@ -168,9 +169,10 @@ while preserving all critical instructions. The agent must still communicate wit
 
 ## 群组与实时聊天（Groups & realtime chat）
 
-* **架构：** 群聊客户端使用 SockJS + STOMP.js（CDN 加载），连接 Spring 后端（Pirna-spring）的 `/ws-chat` 端点。发送到 `/app/groups.chat`，订阅 `/topic/group/${groupId}`；事件含 message/joinGroup/typing/heartbeat(25s)/文件图片，用 JSON event-key 集合去重并自动重连。
-* **端点分支：** localhost 直连 `${protocol}//${host}:8589/ws-chat`，生产环境走 `javaURI + '/ws-chat'`（nginx 转发 8589）。注意：`groups.js` 与 `lesson_chat.html` 中 8589 端口是硬编码的（代码注释标记为待迁移到 config.js）；`assets/js/api/config.js` 已导出 `javaWebSocketURI` 但聊天代码尚未使用。
-* **代码重复警告：** 聊天逻辑存在于多处——规范源是 [assets/js/projects/student-management-groups/groups.js](assets/js/projects/student-management-groups/groups.js)（"CHAT FUNCTIONALITY" 段），但 [_includes/group_dashboard.html](_includes/group_dashboard.html) 与 [_includes/lesson_chat.html](_includes/lesson_chat.html) 内嵌了副本；修改后必须手动同步这些 include，否则行为不一致。
+* **Messages（`/dm`）：** 群组与私信在同一页面，源码在 [_projects/systems/messages/](_projects/systems/messages/README.md)（注册为 `systems/messages:dev`）；旧的 `/student/groups/` 与 `/student/groups/dashboard/` 重定向到 `/dm`。页面只用 OCS 语法，消息列表与输入框复用课程聊天共享的 `.announcement-chat` 类，没有自己的样式表（唯一的布局类 `ocs__split--aside` 加在语法中）。模块之间只用 `./` 导入；页面用 `{{ site.baseurl }}` 导入 `config.js` 与 `rich-text.js` 并传给 `startMessagesPage`。纯函数在 `messages-model.js` 与 `formation-model.js`，测试：`node --test _projects/systems/messages/tests/*.test.mjs`。
+* **协议：** SockJS + STOMP.js（cdnjs 加载）连接 Spring 的 `/ws-chat`（`config.js` 的 `javaWebSocketURI`，localhost 为 8589 端口）。Messages 页经 REST 发送（私信 `POST /api/dm/conversations/{id}/messages`，群组 `POST /api/groups/chat/{id}/messages` 带 `{name, message}`），socket 只接收 `/topic/dm/{id}` 或 `/topic/group/{id}`。群组消息只保存发送者显示名，Spring 用它校验编辑和删除，所以发送时用账户名，也按名字识别自己的消息。课程聊天（announcement/week/lesson）仍经 STOMP `/app/groups.chat` 发送。
+* **群组过滤：** `lessons`、`<course>-announcements`、`<course>-week-<n>` 是课程页聊天用的群组，不在 Find a group 中显示；班级群组（CSSE、CSP、CSA、CSH，即 Spring 的 `courses.class-groups`）由 Profile 课程同步、日历会读取，所以不提供 Leave，Find a group 也不提供 Join（提示去 Profile 添加课程）。
+* **代码重复警告：** 课程聊天在 [_projects/systems/courses/_includes/](_projects/systems/courses/_includes/) 的 `announcement_chat.html`、`week_chat.html`、`lesson_chat.html` 中各有一份，并仍硬编码 8589 端口（待改用 `javaWebSocketURI`）；修改协议时同步这些 include 与 Messages 的 `thread.js`。
 * **课程聊天约定：** lesson 页面通过 frontmatter `chat: true` 启用，共享 backbone 群组 `"lessons"`，以 `[[lesson:<url>]]` 标记按页面隔离。
 
 ## 反模式

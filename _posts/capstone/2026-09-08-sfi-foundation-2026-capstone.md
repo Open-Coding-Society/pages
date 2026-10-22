@@ -28,6 +28,12 @@ permalink: /capstone/sfi-foundation/
     </div>
 </div>
 
+<!-- Sprint Board: live from the team's GitHub project, like Communication Systems -->
+{% assign sfi_data = site.data.sfi_foundation %}
+{% if sfi_data.Board %}
+{% include ocs_kanban_board.html url=sfi_data.Board.url filter=sfi_data.Board.filter %}
+{% endif %}
+
 <br>
 
 <div class="ocs__links ocs__links--wide">

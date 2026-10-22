@@ -18,59 +18,14 @@
     gap: 1.5rem;
 }
 
-.ocs__dashboard-tabbar {
-    position: relative;
-    border-bottom: 1px solid var(--ui-border);
-}
+// .ocs__tabs / -list / -btn / -underline / -panels (elements/tabs) now
+// cover the tab bar instead of a page-scoped duplicate. The compound
+// JS-coupled selectors (.active.text-blue-500 etc., keyed off
+// querySelectorAll('.tab-btn') / ('.tab-content')) live there too.
 
-.ocs__dashboard-tabbar-list {
-    display: flex;
-    flex-wrap: wrap;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-// JS hooks: querySelectorAll('.tab-btn') finds these; classList
-// add/remove("active", "text-blue-500", "border-blue-500") marks the
-// active one. Only one tab is ever visible to non-admins today, but the
-// mechanism stays live — give the state classes real color instead of
-// Tailwind's.
-.ocs__dashboard-tab-btn {
-    display: inline-block;
-    padding: 1rem;
-    border-bottom: 2px solid transparent;
-    color: var(--text-muted);
-    text-decoration: none;
-
-    &:hover {
-        color: var(--pref-text-color);
-        border-color: color-mix(in srgb, var(--pref-text-color) 24%, transparent);
-    }
-
-    &.active.text-blue-500 {
-        color: var(--pref-accent-color);
-    }
-
-    &.active.border-blue-500 {
-        border-color: var(--pref-accent-color);
-    }
-}
-
-.ocs__dashboard-tab-underline {
-    background: var(--pref-accent-color);
-}
-
-.ocs__dashboard-tab-content-container {
-    position: relative;
-    min-height: 400px;
-}
-
-// JS hook: querySelectorAll('.tab-content') finds these; classList
-// add/remove("hidden", "block") switches the visible pane.
+// Page-specific delta on top of the shared .ocs__tabs-panel: this page's
+// panes are narrower and centered.
 .ocs__dashboard-tab-content {
-    padding: 1.5rem 0;
-    color: var(--pref-text-color);
     max-width: 64rem;
     margin: 0 auto;
 }
@@ -98,16 +53,9 @@
     margin-top: 0.75rem;
 }
 
-.ocs__dashboard-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-}
-
-.ocs__dashboard-card-header-gap {
-    gap: 0.75rem;
-}
+// .ocs__card-header (elements/capstone) now covers this row (it already
+// includes the gap this page used to add separately) instead of a
+// page-scoped duplicate.
 
 .ocs__dashboard-card-title {
     margin: 0;
@@ -153,12 +101,8 @@
     padding: 0;
 }
 
-.ocs__dashboard-button-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-}
+// .ocs__links (elements/buttons) now covers this page's button rows
+// instead of a page-scoped duplicate.
 
 .ocs__dashboard-link {
     color: var(--pref-accent-color);
@@ -175,7 +119,7 @@
     cursor: pointer;
 }
 
-// Standard visually-hidden pattern (same as Profile's .ocs__profile-settings-sr-only).
+// Standard visually-hidden pattern.
 .ocs__dashboard-sr-only {
     position: absolute;
     width: 1px;
@@ -293,43 +237,12 @@
     grid-column: 1 / -1;
 }
 
-// JS hook: classList.add/remove("hidden") shows/hides this modal — keep
-// literal. Positioning/backdrop chrome (not JS-coupled) lives here.
-.ocs__dashboard-modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.6);
-}
-
-.ocs__dashboard-modal-card {
-    position: relative;
-    width: 100%;
-    max-width: 32rem;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    background: var(--panel);
-    border: 1px solid var(--ui-border);
-}
-
-.ocs__dashboard-modal-close {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-}
+// .ocs__modal / -card / -close (elements/modals) now cover this modal's
+// chrome instead of a page-scoped duplicate. JS still shows/hides it by
+// toggling the literal class "hidden" -- that rule now lives once,
+// globally, at the end of _main.scss (after every page partial, so it
+// still always wins over this page's own display-setting classes).
 
 .ocs__dashboard-modal-status {
     margin-top: 0.75rem;
-}
-
-// Declared last on purpose: .hidden and several classes above (the modal
-// overlay, the Ask-AI dropdown spacing class) are all single-class
-// selectors of equal specificity, so source order decides which `display`
-// wins when both are present on one element. Keep this rule last in the
-// file so .hidden's display:none always wins.
-.hidden {
-    display: none;
 }

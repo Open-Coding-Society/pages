@@ -50,12 +50,12 @@ links:
         label: Request Pass
 
   - id: groups
-    href: student/groups
-    label: Group Page
+    href: dm
+    label: Groups and Messages
     description:
-      - Create new collaborative groups
-      - View existing groups and their members
-      - Organize class projects and activities
+      - Chat with your groups and classmates
+      - Find a group to join, or make one
+      - See who is in a group and share files with it
     icon: images/toolkit-nav-buttons/groups.png
 
   - id: queue

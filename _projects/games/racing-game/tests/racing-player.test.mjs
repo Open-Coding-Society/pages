@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import Player from '../levels/RacingPlayer.js';
+import RacingPlayer from '../levels/RacingPlayer.js';
+import AccelDecelRacingPlayer from '../levels/AccelDecelRacingPlayer.js';
 import {
   createKeyboardPlayer,
   pressKey,
@@ -11,7 +12,25 @@ const arrows = { up: 38, left: 37, down: 40, right: 39 };
 const wasd = { up: 87, left: 65, down: 83, right: 68 };
 
 function fixture(keypress = arrows) {
-  return createKeyboardPlayer(Player, { keypress });
+  return createKeyboardPlayer(RacingPlayer, { keypress });
+}
+
+function accelerationFixture() {
+  const player = createKeyboardPlayer(AccelDecelRacingPlayer, { keypress: wasd });
+  Object.assign(player, {
+    keysPressed: {},
+    currentSpeed: 0,
+    maxSpeed: 12,
+    acceleration: 0.4,
+    deceleration: 0.4,
+    reverseSpeed: -4,
+    scale: { width: 100, height: 100 },
+    stepFactor: 100,
+  });
+  player.draw = () => {};
+  player.collisionChecks = () => {};
+  player.move = () => {};
+  return player;
 }
 
 test('racing inherits arrow scroll prevention and real engine movement', () => {
@@ -63,4 +82,38 @@ test('a key released while paused does not leave the car moving', () => {
   releaseKey(player, 40);
   assert.deepEqual(player.pressedKeys, {});
   assert.deepEqual(player.velocity, { x: 0, y: 0 });
+});
+
+test('holding accelerate gradually increases speed up to the maximum', () => {
+  const player = accelerationFixture();
+  pressKey(player, wasd.up);
+
+  player.update();
+  assert.equal(player.currentSpeed, 0.4);
+  assert.ok(Math.abs(player.velocity.y) < 3);
+
+  player.update();
+  assert.equal(player.currentSpeed, 0.8);
+  assert.ok(Math.abs(player.velocity.y) > 0.1);
+
+  for (let frame = 0; frame < 40; frame += 1) {
+    player.update();
+  }
+  assert.equal(player.currentSpeed, player.maxSpeed);
+});
+
+test('releasing accelerate lets the car gradually coast to a stop', () => {
+  const player = accelerationFixture();
+  pressKey(player, wasd.up);
+  player.update();
+  player.update();
+  releaseKey(player, wasd.up);
+
+  player.update();
+  assert.equal(player.currentSpeed, 0.4);
+  assert.ok(Math.abs(player.velocity.y) > 0);
+
+  player.update();
+  assert.equal(player.currentSpeed, 0);
+  assert.equal(player.velocity.y, 0);
 });

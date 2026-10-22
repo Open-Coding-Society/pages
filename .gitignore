@@ -78,6 +78,14 @@ images/projects/
 /navigation/search.md
 /navigation/topics.md
 /assets/js/topics/
+
+# Profile system distributions (authoritative sources in _projects/systems/profile)
+/navigation/authentication/profile.md
+/navigation/authentication/profile-v2.md
+/_layouts/profile.html
+/_includes/profile-gist-connection.html
+/assets/js/profile/
+/_sass/open-coding/profile-gist-connection.scss
 /_includes/post_list_image_card.html
 /_includes/announcement_calendar_demo.html
 /_includes/ocs_calendar_card.html

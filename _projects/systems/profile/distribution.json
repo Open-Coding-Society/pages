@@ -1,0 +1,10 @@
+{
+  "files": [
+    { "source": "pages/profile.md", "destination": "navigation/authentication/profile.md" },
+    { "source": "pages/profile-v2.md", "destination": "navigation/authentication/profile-v2.md" },
+    { "source": "layouts", "destination": "_layouts" },
+    { "source": "_includes", "destination": "_includes" },
+    { "source": "js", "destination": "assets/js/profile" },
+    { "source": "sass/profile-gist-connection.scss", "destination": "_sass/open-coding/profile-gist-connection.scss" }
+  ]
+}
