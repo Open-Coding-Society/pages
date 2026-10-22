@@ -238,7 +238,7 @@ show_reading_time: false
         }
     }
 
-    function updateOverallStatus(springErrorMessage = '') {
+    function updateOverallStatus(springErrorMessage = '', flaskErrorMessage = '') {
         const flaskEl = document.getElementById('flaskStatus');
         const springEl = document.getElementById('springStatus');
         const overallEl = document.getElementById('overallStatus');
@@ -263,9 +263,11 @@ show_reading_time: false
         } else if (flaskError && springSuccess) {
             overallEl.classList.add('partial');
             overallEl.textContent = '⚠️ Spring account created! Flask failed - please try again.';
-        } else if (flaskError && springError) {
+        } else if (flaskError) {
+            // Flask is tried first and Spring only after Flask succeeds, so Spring was not tried
             overallEl.classList.add('error');
-            overallEl.textContent = '💥 Both backends failed. Please check your information and try again.';
+            overallEl.textContent = `❌ Signup failed: ${flaskErrorMessage || 'the account could not be created.'}`
+                + ' Please check your details and try again.';
         }
     }
 
@@ -589,11 +591,15 @@ show_reading_time: false
             try {
                 flaskData = flaskRaw ? JSON.parse(flaskRaw) : {};
             } catch (_) {
-                flaskData = { message: flaskRaw };
+                flaskData = null;
+            }
+            // Not a JSON object (an error page from a proxy, or "null"): a failure, and do not show its text
+            if (flaskData === null || typeof flaskData !== 'object') {
+                flaskData = { success: false };
             }
 
             if (!flaskResponse.ok || flaskData.success === false) {
-                const flaskMessage = flaskData.message || flaskRaw || `Flask signup failed (${flaskResponse.status})`;
+                const flaskMessage = flaskData.message || `Flask signup failed (${flaskResponse.status})`;
                 throw new Error(flaskMessage);
             }
 
@@ -621,12 +627,19 @@ show_reading_time: false
         } catch (error) {
             console.error("Flask signup error:", error);
             updateBackendStatus('flask', 'error');
-            updateBackendStatus('spring', 'error');
-            setTimeout(updateOverallStatus, 500);
+            setTimeout(() => updateOverallStatus('', flaskFailureMessage(error)), 500);
         } finally {
             signupButton.disabled = false;
             signupButton.classList.remove("disabled");
         }
+    }
+    // What to tell the user when Flask refused the signup. A TypeError means fetch() itself failed
+    // (offline, CORS, server down), so there is no reply from Flask to quote.
+    function flaskFailureMessage(error) {
+        if (error instanceof TypeError) {
+            return 'Could not reach the server. Check your connection and try again.';
+        }
+        return error.message;
     }
     // Spring's /api/person/create answers errors as {"error": "..."}, e.g. a uid conflict.
     function readSpringError(raw, status) {
