@@ -1745,6 +1745,7 @@ class GameLevelCsPath4Toolchain {
     this._reportCheckBusy = true;
     try {
       const res = await fetch(`${javaURI}/api/cs-pathway/setup-report`, { ...fetchOptions, method: 'GET' });
+<<<<<<< HEAD
       if (!res.ok) {
         this._reportCheckFailures = (this._reportCheckFailures || 0) + 1;
         if (this._reportCheckFailures >= 3) {
@@ -1754,6 +1755,20 @@ class GameLevelCsPath4Toolchain {
         return;
       }
       this._reportCheckFailures = 0;
+=======
+      if (this._reportBackoff) {
+        this._reportBackoff = false;
+        if (this._setupReportInterval) clearInterval(this._setupReportInterval);
+        this._setupReportInterval = setInterval(() => this._checkSetupReport(), SETUP_REPORT_POLL_MS);
+      }
+      if (!res.ok) {
+        if (!this._reportStatusWarned) {
+          console.warn(`[Toolchain Trail] setup report request returned ${res.status}${res.status === 401 ? ' (not signed in)' : ''}`);
+          this._reportStatusWarned = true;
+        }
+        return;
+      }
+>>>>>>> d442b48f0 (fix failure for pairing)
       const data = await res.json();
       if (!data?.reportedAt) return;
 
@@ -1762,9 +1777,16 @@ class GameLevelCsPath4Toolchain {
       if (String(data.reportedAt) === lastSeen) return;
       try { localStorage.setItem(LAST_REPORT_STORAGE_KEY, String(data.reportedAt)); } catch (err) { /* storage unavailable */ }
 
-      if (String(data.overall).toUpperCase() === 'FAIL') {
+      // Lock if the agent labels the report FAIL, OR if the report text itself
+      // contains a FAIL line / real error (e.g. "No such file or directory"),
+      // even when the agent's overall label is softer than FAIL.
+      const overall = String(data.overall || '').toUpperCase();
+      const textFailure = detectTerminalFailure(String(data.report || ''));
+      console.info(`[Toolchain Trail] new setup report: overall=${overall || '(none)'}, error found in text: ${textFailure ? textFailure.line : 'no'}`);
+
+      if (overall === 'FAIL' || textFailure) {
         const lines = String(data.report || '').split(/\r?\n/);
-        const failLine = (lines.find((l) => /\bFAIL\b/.test(l)) || 'Setup check reported FAIL').trim();
+        const failLine = (textFailure?.line || lines.find((l) => /\bFAIL\b/.test(l)) || 'Setup check reported FAIL').trim();
         const stationId = this._openTrialStationId || this._getActiveStationId() || this._nonBossOrder[0];
         this._setFailure(stationId, failLine.length > 160 ? `${failLine.slice(0, 157)}...` : failLine, 'setup-report');
       } else if (this.failureState?.source === 'setup-report') {
@@ -1772,14 +1794,14 @@ class GameLevelCsPath4Toolchain {
         this.showToast('✦ Setup check passed. Trail unlocked.');
       }
     } catch (err) {
-      // Network/CORS failure: the backend isn't reachable from this site, so
-      // stop polling instead of logging an error every 5 seconds. Pasted-output
-      // detection keeps working without the backend.
-      if (this._setupReportInterval) {
-        clearInterval(this._setupReportInterval);
-        this._setupReportInterval = null;
+      // Network/CORS failure: slow down to every 30s instead of giving up, so
+      // a backend restart doesn't permanently stop the game from listening.
+      if (!this._reportBackoff) {
+        this._reportBackoff = true;
+        if (this._setupReportInterval) clearInterval(this._setupReportInterval);
+        this._setupReportInterval = setInterval(() => this._checkSetupReport(), 30000);
+        console.warn(`${this.logPrefix}: can't reach the backend for setup reports; retrying every 30s.`, err);
       }
-      console.warn(`${this.logPrefix}: setup report check unavailable (backend unreachable or CORS); polling stopped.`, err);
     } finally {
       this._reportCheckBusy = false;
     }
