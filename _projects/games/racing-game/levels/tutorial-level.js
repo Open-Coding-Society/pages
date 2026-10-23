@@ -39,7 +39,7 @@ class GameLevelTutorial {
         src: path + '/images/projects/racing-game/Directions_blue_car.png',
         SCALE_FACTOR: 10,
         STEP_FACTOR: 1100,
-        INIT_POSITION: {x: 340 / 740, y: 500 / 585},
+        INIT_POSITION: { x: 700 / 1800, y: 440 / 600},
         direction: { default: 'right', index: 1 }, // facing right initially
         pixels: { height: 1024, width: 1536 },
         orientation: { rows: 4, columns: 4 },
