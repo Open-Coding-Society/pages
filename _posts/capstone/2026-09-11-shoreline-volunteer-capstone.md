@@ -121,6 +121,10 @@ permalink: /capstone/shoreline-volunteer/
 
 ## Project Kanban Board
 
+<a class="ocs__btn small" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+    Open in GitHub
+</a>
+
 Click any card to open our live project board on GitHub.
 
 <div class="shoreline-kanban">
