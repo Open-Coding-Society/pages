@@ -5,6 +5,7 @@ const ARROW_KEYS = new Set([37, 38, 39, 40]);
 export default class Player extends EnginePlayer {
   constructor(data, gameEnv) {
     super(data, gameEnv);
+    this.clearPressedKeysOnCollision = false;
     this.keysPressed = {};
     this.currentSpeed = data.currentSpeed ?? 0;
     this.maxSpeed = data.maxSpeed;

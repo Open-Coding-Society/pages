@@ -117,3 +117,25 @@ test('releasing accelerate lets the car gradually coast to a stop', () => {
   assert.equal(player.currentSpeed, 0);
   assert.equal(player.velocity.y, 0);
 });
+
+test('collisions do not clear held acceleration input', () => {
+  const player = accelerationFixture();
+  pressKey(player, wasd.up);
+  player.gameEnv.gameObjects = [player];
+  player.state = { collisionEvents: [] };
+  player.collisionData = {
+    touchPoints: {
+      this: {},
+      other: { id: 'barrier' },
+    },
+  };
+  player.handleCollisionReaction = () => {};
+  player.handleCollisionState = () => {};
+
+  player.handleCollisionEvent();
+  player.update();
+
+  assert.equal(player.pressedKeys[wasd.up], true);
+  assert.equal(player.currentSpeed, 0.4);
+  assert.ok(Math.abs(player.velocity.y) > 0);
+});
