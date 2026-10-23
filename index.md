@@ -7,5 +7,8 @@ description: Redirect to Gamified Home Pilot.
 ---
 
 <script>
-  window.location.replace("{{ site.baseurl }}/cs-pathway");
+  const destination = window.location.hostname === "vanshikak210.github.io"
+    ? "{{ site.baseurl }}/capstone/shoreline-volunteer/"
+    : "{{ site.baseurl }}/cs-pathway";
+  window.location.replace(destination);
 </script>
