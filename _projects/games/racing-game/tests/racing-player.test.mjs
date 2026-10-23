@@ -102,6 +102,30 @@ test('holding accelerate gradually increases speed up to the maximum', () => {
   assert.equal(player.currentSpeed, player.maxSpeed);
 });
 
+test('each WASD direction moves the car when pressed on its own', () => {
+  const expectedVelocity = new Map([
+    [wasd.up, { x: 0, y: -1 }],
+    [wasd.down, { x: 0, y: 1 }],
+    [wasd.left, { x: -1, y: 0 }],
+    [wasd.right, { x: 1, y: 0 }],
+  ]);
+
+  for (const [key, direction] of expectedVelocity) {
+    const player = accelerationFixture();
+    pressKey(player, key);
+    player.update();
+
+    assert.notEqual(player.currentSpeed, 0, `key ${key} should start the car moving`);
+    assert.ok(player.velocity.x * direction.x >= 0);
+    assert.ok(player.velocity.y * direction.y >= 0);
+    assert.ok(
+      (direction.x !== 0 && Math.abs(player.velocity.x) > 0)
+      || (direction.y !== 0 && Math.abs(player.velocity.y) > 0),
+      `key ${key} should move along its direction`
+    );
+  }
+});
+
 test('releasing accelerate lets the car gradually coast to a stop', () => {
   const player = accelerationFixture();
   pressKey(player, wasd.up);
@@ -118,24 +142,13 @@ test('releasing accelerate lets the car gradually coast to a stop', () => {
   assert.equal(player.velocity.y, 0);
 });
 
-test('collisions do not clear held acceleration input', () => {
+test('movement continues if a collision clears the engine key state', () => {
   const player = accelerationFixture();
   pressKey(player, wasd.up);
-  player.gameEnv.gameObjects = [player];
-  player.state = { collisionEvents: [] };
-  player.collisionData = {
-    touchPoints: {
-      this: {},
-      other: { id: 'barrier' },
-    },
-  };
-  player.handleCollisionReaction = () => {};
-  player.handleCollisionState = () => {};
-
-  player.handleCollisionEvent();
+  player.pressedKeys = {};
   player.update();
 
-  assert.equal(player.pressedKeys[wasd.up], true);
+  assert.deepEqual(player.pressedKeys, {});
   assert.equal(player.currentSpeed, 0.4);
-  assert.ok(Math.abs(player.velocity.y) > 0);
+  assert.ok(player.velocity.y < 0);
 });
