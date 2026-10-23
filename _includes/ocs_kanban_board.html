@@ -7,9 +7,14 @@
     url      the board's address on GitHub (required). It has to be a public
              board owned by an organization (github.com/orgs/...): the page
              reads it without signing in, and GitHub keeps a personal board's
-             cards for signed-in users.
+             cards for signed-in users. A team without an organization can
+             give its repository's issues instead
+             (github.com/<owner>/<repo>/issues): closed issues are Done,
+             assigned ones In progress, the rest To do, and a label with a
+             stage's name (in review, backlog) moves a card to that column.
     filter   a single-select field to filter cards by, e.g. Team    default: no filter
-             (each option that has cards becomes a button)
+             (each option that has cards becomes a button; for a
+             repository's issues, filter="Assignee" filters by person)
     title    the heading                                            default: the board's name
 
   The board loads itself (assets/js/kanban-board.js) when it scrolls near the

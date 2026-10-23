@@ -8,6 +8,12 @@ permalink: /capstone/goodbrain/
 
 Team: Rashi, Aashni, and Kelervia
 
+<!-- Sprint Board: live from the team's GitHub project -->
+{% assign mgb_data = site.data.mygoodbrain %}
+{% if mgb_data.Board %}
+{% include ocs_kanban_board.html url=mgb_data.Board.url %}
+{% endif %}
+
 <!-- Hero Header Block (2-Column Grid Layout matching reference) -->
 <div class="ocs__grid ocs__grid--standard cols-1 mb-4">
     <div class="ocs__grid-cell ocs__grid-cell--header">

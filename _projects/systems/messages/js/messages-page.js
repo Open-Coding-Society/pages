@@ -3,11 +3,12 @@
 // in config.js and rich-text.js, which it imports with {{ site.baseurl }}, so the modules
 // here only import each other, with ./ paths.
 import { createChatSocket } from './chat-socket.js';
+import { initDeleteGroup } from './delete-group.js';
 import { initGroupFormation } from './group-formation.js';
 import { initFiles, initFindGroup, initMembers } from './group-dialogs.js';
 import { createMessagesApi } from './messages-api.js';
 import {
-  canFormGroups, conversationLabel, groupSubtitle, isAdmin, isClassGroup, isCourseChannel, sortGroups,
+  canFormGroups, conversationLabel, groupSubtitle, isClassGroup, isCourseChannel, sortGroups,
 } from './messages-model.js';
 import { initNewChat } from './new-chat.js';
 import { conversationHref, createSidebar } from './sidebar.js';
@@ -51,7 +52,6 @@ export async function startMessagesPage({ config, richText }) {
 
   const me = await signedInPerson(api, setStatus);
   if (!me) return;
-  const admin = isAdmin(me);
   const state = { groups: [], conversations: [], active: null };
   const findItem = (kind, id) => (kind === 'group' ? state.groups : state.conversations).find(item => item.id === id);
 
@@ -98,7 +98,6 @@ export async function startMessagesPage({ config, richText }) {
     groupActions.classList.toggle('hidden', !group);
     if (!group) return;
     byId('messagesLeaveGroup').classList.toggle('hidden', isClassGroup(group));
-    byId('messagesDeleteGroup').classList.toggle('hidden', !admin);
   }
 
   function openConversation(kind, id) {
@@ -169,13 +168,28 @@ export async function startMessagesPage({ config, richText }) {
     }
   }
 
+  const deleteGroup = initDeleteGroup({
+    api,
+    onDeleted: group => {
+      groupGone(group.id);
+      notice.textContent = `Deleted ${group.name}.`;
+    },
+    elements: {
+      dialog: byId('deleteGroupDialog'), form: byId('deleteGroupForm'), title: byId('deleteGroupTitle'),
+      warning: byId('deleteGroupWarning'), nameToType: byId('deleteGroupNameToType'), name: byId('deleteGroupName'),
+      status: byId('deleteGroupStatus'), confirm: byId('deleteGroupConfirm'),
+    },
+  });
   const members = initMembers({
     api,
     me,
     onChanged: groupChanged,
+    // Cancel returns focus to the header's Members button, where this started.
+    onDelete: group => deleteGroup.open(group, byId('messagesMembers')),
     elements: {
       dialog: byId('membersDialog'), title: byId('membersTitle'), list: byId('membersList'),
       search: byId('membersSearch'), results: byId('membersResults'), status: byId('membersStatus'),
+      deleteSection: byId('membersDeleteSection'), deleteWarning: byId('membersDeleteWarning'), deleteOpen: byId('membersDelete'),
     },
   });
   byId('messagesMembers').addEventListener('click', event => {
@@ -198,19 +212,6 @@ export async function startMessagesPage({ config, richText }) {
       notice.textContent = `Could not leave ${group.name}. Try again.`;
     }
   });
-  byId('messagesDeleteGroup').addEventListener('click', async () => {
-    const group = openGroup();
-    if (!group || !window.confirm(`Delete ${group.name} for all ${group.members.length} members? This can’t be undone.`)) return;
-    try {
-      await api.deleteGroup(group.id);
-      groupGone(group.id);
-      notice.textContent = `Deleted ${group.name}.`;
-    } catch (error) {
-      console.warn('Messages: could not delete the group', error);
-      notice.textContent = `Could not delete ${group.name}. Try again.`;
-    }
-  });
-
   initFindGroup({
     api,
     me,

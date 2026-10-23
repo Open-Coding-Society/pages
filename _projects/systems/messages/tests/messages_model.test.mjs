@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  canFormGroups, classifyDmEvent, classifyGroupEvent, conversationLabel, dayLabel, dmMessage, downloadName,
-  groupMessage, groupSubtitle, initialsFor, isAdmin, isClassGroup, isCourseChannel, isGroupMember,
-  isImageFile, pfpSrc, sortGroups, tintFor,
+  canDeleteGroup, canFormGroups, classifyDmEvent, classifyGroupEvent, confirmsGroupName, conversationLabel, dayLabel,
+  deleteGroupWarning, dmMessage, downloadName, groupMessage, groupSubtitle, initialsFor, isAdmin, isClassGroup,
+  isCourseChannel, isGroupMember, isImageFile, pfpSrc, sortGroups, tintFor,
 } from '../js/messages-model.js';
 
 test('dmMessage keeps the sender uid as the key that marks your own messages', () => {
@@ -153,6 +153,58 @@ test('isClassGroup spots the class groups that profile classes keep in step', ()
   assert.equal(isClassGroup({ name: 'CSA' }), true);
   assert.equal(isClassGroup({ name: 'csse' }), true);
   assert.equal(isClassGroup({ name: 'CSA Study Group' }), false);
+});
+
+test('canDeleteGroup offers Delete to site admins only', () => {
+  const team = { name: 'Fruit Empire' };
+  assert.equal(canDeleteGroup({ roles: [{ name: 'ROLE_USER' }, { name: 'ROLE_ADMIN' }] }, team), true);
+  assert.equal(canDeleteGroup({ roles: ['ROLE_TEACHER'] }, team), false);
+  assert.equal(canDeleteGroup({ roles: [{ name: 'ROLE_STUDENT' }] }, team), false);
+  assert.equal(canDeleteGroup(null, team), false);
+});
+
+test('canDeleteGroup never offers Delete on a class group, the same rule as Leave', () => {
+  const admin = { roles: [{ name: 'ROLE_ADMIN' }] };
+  for (const name of ['CSA', 'csse', 'CSP', 'CSH']) {
+    assert.equal(canDeleteGroup(admin, { name }), false, name);
+  }
+  assert.equal(canDeleteGroup(admin, { name: 'CSA Study Group' }), true);
+});
+
+test('confirmsGroupName needs the whole name typed, with the same capitals', () => {
+  const group = { name: 'Fruit Empire' };
+  assert.equal(confirmsGroupName('Fruit Empire', group), true);
+  for (const typed of ['', 'Fruit', 'Fruit Empir', 'fruit empire', 'Fruit Empire!', 'Fruit Empire Team']) {
+    assert.equal(confirmsGroupName(typed, group), false, typed);
+  }
+});
+
+test('confirmsGroupName ignores extra spaces, which the page does not show in a name', () => {
+  assert.equal(confirmsGroupName('  Fruit Empire ', { name: 'Fruit Empire' }), true);
+  assert.equal(confirmsGroupName('Team Turing', { name: 'Team  Turing' }), true);
+});
+
+test('confirmsGroupName never confirms a group without a name', () => {
+  assert.equal(confirmsGroupName('', { name: '' }), false);
+  assert.equal(confirmsGroupName(' ', { name: '   ' }), false);
+  assert.equal(confirmsGroupName('', {}), false);
+});
+
+test('deleteGroupWarning names the group and how many members lose it', () => {
+  const team = deleteGroupWarning({ name: 'Fruit Empire', members: [{}, {}, {}, {}] });
+  assert.match(team, /Fruit Empire/);
+  assert.match(team, /all 4 members/i);
+  const solo = deleteGroupWarning({ name: 'Solo Project', members: [{}] });
+  assert.match(solo, /Solo Project/);
+  assert.match(solo, /its only member/i);
+  assert.doesNotMatch(solo, /all 1|1 members/i);
+});
+
+test('deleteGroupWarning says the group\'s grades and submitted assignments are deleted too', () => {
+  // Spring deletes a group's grades with it, and its submissions cascade.
+  const warning = deleteGroupWarning({ name: 'Fruit Empire', members: [{}, {}] });
+  assert.match(warning, /grades/);
+  assert.match(warning, /assignments/);
 });
 
 test('sortGroups orders by name with numbers in counting order, without changing the input', () => {

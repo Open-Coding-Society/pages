@@ -67,12 +67,24 @@ const BOARD_PATH = /^\/(orgs|users)\/([A-Za-z0-9-]+)\/projects\/(\d+)(?:\/|$)/;
 // board's own address. Anything that isn't a GitHub project board is null.
 // A personal board (/users/...) is marked: GitHub answers 401 for its cards
 // without a token, so only boards owned by an organization can be shown.
+// A repository's issues as a board, e.g.
+// "https://github.com/rex0dex/fops-pages/issues" (the address must end in
+// /issues; a plain repository address still isn't a board). Its issues are
+// public, so this works for personal repositories too.
+const REPO_PATH = /^\/([A-Za-z0-9-]+)\/([A-Za-z0-9._-]+)\/issues\/?$/;
+
 export function parseBoardUrl(address) {
   let url;
   try { url = new URL(address); } catch (_) { return null; }
   if (url.protocol !== 'https:' || url.hostname !== 'github.com') return null;
   const match = url.pathname.match(BOARD_PATH);
-  if (!match) return null;
+  if (!match) {
+    const repo = url.pathname.match(REPO_PATH);
+    if (!repo || repo[1] === 'orgs' || repo[1] === 'users') return null;
+    const [, owner, name] = repo;
+    return { apiPath: `repos/${owner}/${name}`, url: `https://github.com/${owner}/${name}/issues`, repo: `${owner}/${name}`, personal: false };
+  }
+
   const [, kind, owner, number] = match;
   return {
     apiPath: `${kind}/${owner}/projectsV2/${number}`,
@@ -298,6 +310,7 @@ async function getJson(url, fetchImpl, now) {
 // from `meta` when they are under a day old (metaAt), so a refresh is usually
 // just the cards: per_page=100, following Link rel="next" for up to 5 pages.
 export async function refreshBoard(ref, { filterName = '', meta = null, metaAt = 0, fetchImpl = fetch, now = Date.now() } = {}) {
+  if (ref.repo) return refreshRepoBoard(ref, { filterName, fetchImpl, now });
   let { title, fields } = meta || {};
   let fetchedMetaAt = metaAt;
   if (!meta || now - metaAt >= META_MS) {
@@ -323,6 +336,59 @@ export async function refreshBoard(ref, { filterName = '', meta = null, metaAt =
     board: normalizeBoard({ project: { title }, fields, items }, { filterName, url: ref.url }),
     meta: { title, fields },
     metaAt: fetchedMetaAt,
+    fetchedAt: now,
+  };
+}
+
+// A repository's issues, shaped like a project board so the
+// rest of the embed draws them unchanged. Each issue's column comes from a
+// label with a familiar stage name ("in progress", "in review", "backlog"),
+// otherwise: closed → Done, open and assigned → In progress, open → To do.
+// The filter (filter="Assignee") makes a button for each assignee.
+const REPO_STATUSES = ['Backlog', 'To do', 'In progress', 'In review', 'Done'];
+
+export function repoStatusOf(issue) {
+  for (const label of issue.labels || []) {
+    const stage = stageOf(typeof label === 'string' ? label : label.name);
+    if (stage) return REPO_STATUSES[STAGES.findIndex((s) => s.key === stage)];
+  }
+  if (issue.state === 'closed') return 'Done';
+  return (issue.assignees || []).length ? 'In progress' : 'To do';
+}
+
+export function repoToProject(repo, issues, filterName = '') {
+  const people = [...new Set(issues.flatMap((issue) => (issue.assignees || []).map((p) => p.login)))];
+  const fields = [{ id: 1, name: 'Status', data_type: 'single_select', options: REPO_STATUSES.map((name) => ({ name })) }];
+  if (filterName) fields.push({ id: 2, name: filterName, data_type: 'single_select', options: people.map((name) => ({ name })) });
+  const items = issues
+    // Pull requests aren't work items, and issues closed as "not planned" were dropped.
+    .filter((issue) => !issue.pull_request && issue.state_reason !== 'not_planned')
+    .map((issue) => ({
+      id: issue.id,
+      content_type: 'Issue',
+      content: issue,
+      updated_at: issue.updated_at,
+      fields: [
+        { id: 1, value: { name: repoStatusOf(issue) } },
+        ...(filterName && issue.assignees?.[0] ? [{ id: 2, value: { name: issue.assignees[0].login } }] : []),
+      ],
+    }));
+  return { project: { title: `${repo} — issues` }, fields, items };
+}
+
+async function refreshRepoBoard(ref, { filterName = '', fetchImpl = fetch, now = Date.now() } = {}) {
+  const issues = [];
+  let next = `${API}/${ref.apiPath}/issues?state=all&per_page=100`;
+  for (let page = 0; next && page < MAX_PAGES; page += 1) {
+    const result = await getJson(next, fetchImpl, now);
+    issues.push(...result.body);
+    next = result.next;
+  }
+  const payload = repoToProject(ref.repo, issues, filterName);
+  return {
+    board: normalizeBoard(payload, { filterName, url: ref.url }),
+    meta: null,
+    metaAt: 0,
     fetchedAt: now,
   };
 }

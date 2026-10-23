@@ -8,14 +8,15 @@ same way they reach a direct message.
 
 | File | What it does |
 | --- | --- |
-| `navigation/dm.md` | The page (`/dm`) and its five dialogs. OCS grammar only; the message list and composer use the chat classes the course chats share (`.announcement-chat`). |
+| `navigation/dm.md` | The page (`/dm`) and its six dialogs. OCS grammar only; the message list and composer use the chat classes the course chats share (`.announcement-chat`). |
 | `navigation/groups-redirect.md`, `navigation/group-dashboard-redirect.md` | `/student/groups/` and `/student/groups/dashboard/` send people to `/dm`. |
 | `js/messages-page.js` | Starts the page: who is signed in, the two lists, opening a conversation, the group header buttons, the socket. |
 | `js/thread.js` | The open conversation: loads it, follows its socket topic, sends, edits and deletes, and keeps DM read state. |
 | `js/message-log.js` | Draws the messages: day dividers, avatars, edit and delete buttons. |
 | `js/sidebar.js` | The Groups and Direct messages lists, as `ocs__nav-card` links. |
 | `js/new-chat.js` | The New chat dialog. |
-| `js/group-dialogs.js` | Find a group (search, join, make a group), Members, and Files. |
+| `js/group-dialogs.js` | Find a group (search, join, make a group), Members (with Delete group at the bottom, for admins), and Files. |
+| `js/delete-group.js` | The Delete group dialog: says what deleting takes away, and waits for the group's name. |
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
 | `js/messages-api.js` | Every Spring and Flask request. |
@@ -72,13 +73,29 @@ Flask, for Form groups: `POST /api/persona/evaluate-group`, `POST /api/persona/f
   the groups the course pages chat in. They never show in Find a group.
 - **Class groups** (`CSSE`, `CSP`, `CSA`, `CSH`, Spring's `courses.class-groups`) follow
   the classes on a student's Profile, and the calendar reads them. They show under
-  Groups, but have no Leave button, and Find a group points to the Profile instead of
-  offering Join.
+  Groups, but have no Leave or Delete, and Find a group points to the Profile instead
+  of offering Join.
+
+## Deleting a group
+
+- Only site admins can delete a group, and never a class group (`canDeleteGroup`).
+  Delete isn't in the conversation header with the everyday buttons. It's a "Delete
+  group" section at the bottom of the group's Members dialog.
+- "Delete this group" opens a dialog that warns what goes: the group's grades and any
+  assignments it submitted are deleted, and its members lose the group, its chat and its
+  files. Delete stays off until the group's name is typed
+  (`confirmsGroupName`: capitals count, extra spaces don't). Only then does the page
+  call `DELETE /api/groups/{id}`.
 
 ## Things to know
 
-- Spring lets any signed-in user delete a group or change its members. The page shows
+- Spring lets any signed-in user delete a group or change its members. The page offers
   Delete only to admins, but the API doesn't check.
+- Deleting a group deletes its Spring record: its member list, its grades and, by
+  cascade, any assignments submitted as the group. Its chat and files stay in S3 under
+  the group's name, where this page can't open them, since it looks groups up by id. A
+  new group with the same name starts with an empty chat, since making a group writes a
+  new chat file, but it lists the old group's files.
 - Group names are unique across the site, and group chat history is stored by group
   name.
 
