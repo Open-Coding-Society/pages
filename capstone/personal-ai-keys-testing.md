@@ -49,6 +49,26 @@ teacher permissions, and keeping saved submissions when grading fails.
 
 ## Local acceptance and compatibility history
 
+### Redesigned Profile integration — October 23, 2026
+
+Integrated Pages upstream `9a29b407d` without restoring its retired Profile layout.
+AI connection sources now live in `_projects/systems/profile/_includes/` and `js/`
+and are published by the existing distribution manifest. The card follows the new
+shared OCS grammar with no page stylesheet; it appears after Gist only when Spring
+is enabled. The existing setup checklist is unchanged: personal AI keys are optional.
+
+The source-layout checks cover both providers, independent forms, direct setup links,
+baseurl-safe configuration injection and omission of all AI controls/starters on
+Flask-only sites. The 25 Node tests and 5 layout tests pass. Spring was fast-forwarded
+to `c1d576e6`, which already contains the backend feature; all 230 Spring tests pass.
+Upstream's paused self-assessment behavior and submission-author validation are retained.
+No encryption key, environment file, database or rubric was changed for this integration.
+
+The Makefile build passed after publication of the final sources. An isolated Firefox
+check with mocked API responses verified that saving a fake Gemini key shows connected
+status, clears the input and reveals only Gemini's Disconnect button. Mobile browser
+verification was blocked by repeated tool-approval timeouts; it is not claimed as passed.
+
 ### Current upstream integration — October 21, 2026
 
 Integrated Pages `08fd2d85c` and Spring `e5a7650b` on the `personal-ai-keys` branches.

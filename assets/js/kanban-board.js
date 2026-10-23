@@ -13,9 +13,12 @@
 // doesn't answer, the last copy stays up with a note saying so.
 //
 // Every board names its columns its own way ("Todo", "📋 To Do", "Ready"), so
-// familiar names are grouped into five shared stages; any other column keeps
-// its own name, and cards with no status get a "No status" column. Only
-// UGRC-CSA's note columns ("Team Map", "Reflections") are left out.
+// familiar names are grouped into five shared stages, the same five as the OCS
+// issue lifecycle (Parking Lot, ToDo, In Progress, In Review, Done); any other
+// column keeps its own name, and cards with no status get a "No status"
+// column. Only UGRC-CSA's note columns ("Team Map", "Reflections") are left
+// out. Each card shows the evidence for its column's gate: its checklist
+// progress and the pull requests linked to it.
 //
 // The filters, counts and backlog toggle are existing OCS elements
 // (ocs__links, ocs__btn, ocs__status-pill, ocs__toggle); the columns and cards
@@ -45,7 +48,7 @@ const STAGE_RULES = [
   ['done', /done|shipped|complete|closed|merged|released|deployed|finished|resolved/i],
   ['doing', /progress|doing|active|\bwip\b|building|block|hold|wait|stuck/i],
   ['todo', /to ?do|ready|next|planned|sprint/i],
-  ['backlog', /backlog|idea|planning|icebox|someday|triage|\bnew\b/i],
+  ['backlog', /backlog|parking|idea|planning|icebox|someday|triage|\bnew\b/i],
 ];
 
 // The stage a status belongs to, or null when its name isn't a familiar one
@@ -64,12 +67,24 @@ const BOARD_PATH = /^\/(orgs|users)\/([A-Za-z0-9-]+)\/projects\/(\d+)(?:\/|$)/;
 // board's own address. Anything that isn't a GitHub project board is null.
 // A personal board (/users/...) is marked: GitHub answers 401 for its cards
 // without a token, so only boards owned by an organization can be shown.
+// A repository's issues as a board, e.g.
+// "https://github.com/rex0dex/fops-pages/issues" (the address must end in
+// /issues; a plain repository address still isn't a board). Its issues are
+// public, so this works for personal repositories too.
+const REPO_PATH = /^\/([A-Za-z0-9-]+)\/([A-Za-z0-9._-]+)\/issues\/?$/;
+
 export function parseBoardUrl(address) {
   let url;
   try { url = new URL(address); } catch (_) { return null; }
   if (url.protocol !== 'https:' || url.hostname !== 'github.com') return null;
   const match = url.pathname.match(BOARD_PATH);
-  if (!match) return null;
+  if (!match) {
+    const repo = url.pathname.match(REPO_PATH);
+    if (!repo || repo[1] === 'orgs' || repo[1] === 'users') return null;
+    const [, owner, name] = repo;
+    return { apiPath: `repos/${owner}/${name}`, url: `https://github.com/${owner}/${name}/issues`, repo: `${owner}/${name}`, personal: false };
+  }
+
   const [, kind, owner, number] = match;
   return {
     apiPath: `${kind}/${owner}/projectsV2/${number}`,
@@ -88,15 +103,21 @@ function findField(fields, type, name) {
 }
 
 // The fields the embed reads, found by name in any case: the status (or the
-// board's first single-select), the field to filter by, a People multi-select
-// and a Shipped date. Assignees come with each issue, not as a field.
+// board's first single-select), the field to filter by, a People multi-select,
+// Priority and Topic single-selects and a Shipped date. Linked pull requests is
+// GitHub's own field, found by its type. Assignees come with each issue, not as
+// a field.
 export function pickFields(fields, filterName) {
   const firstSingle = fields.find((f) => f.data_type === 'single_select');
+  const prs = fields.find((f) => f.data_type === 'linked_pull_requests');
   return {
     status: findField(fields, 'single_select', 'Status') || (firstSingle ? findField(fields, 'single_select', firstSingle.name) : null),
     group: filterName ? findField(fields, 'single_select', filterName) : null,
     people: findField(fields, 'multi_select', 'People'),
     shipped: findField(fields, 'date', 'Shipped'),
+    priority: findField(fields, 'single_select', 'Priority'),
+    topic: findField(fields, 'single_select', 'Topic'),
+    prs: prs ? { id: prs.id, name: prs.name, options: [] } : null,
   };
 }
 
@@ -118,6 +139,36 @@ function valueOf(item, field) {
 }
 
 const dayOf = (iso) => (iso ? String(iso).slice(0, 10) : null);
+
+// The boxes in a card's checklist ("- [x] Unit tested", "1. [ ] Deployed"),
+// leaving out examples inside code blocks: the evidence of how far it is
+// through its column's gate.
+const TASK = /^\s*(?:[-*+]|\d+[.)])\s+\[([ xX])\](?:\s|$)/;
+function checklistOf(body) {
+  let done = 0;
+  let total = 0;
+  let fenced = false;
+  for (const line of String(body || '').split('\n')) {
+    if (/^\s*(```|~~~)/.test(line)) fenced = !fenced;
+    const box = !fenced && TASK.exec(line);
+    if (!box) continue;
+    total += 1;
+    if (box[1] !== ' ') done += 1;
+  }
+  return total ? { done, total } : null;
+}
+
+// Pull requests linked to the card's issue, each merged, open, draft or closed.
+function linkedPrs(value) {
+  return (Array.isArray(value) ? value : [])
+    .filter((pr) => String(pr?.html_url || '').startsWith('https://github.com/'))
+    .map((pr) => ({
+      number: pr.number,
+      url: pr.html_url,
+      title: pr.title || '',
+      state: pr.merged_at ? 'merged' : pr.draft ? 'draft' : pr.state === 'closed' ? 'closed' : 'open',
+    }));
+}
 
 // The board as the embed draws it: its columns and its work cards, each card
 // with just what is shown. GitHub's own payload (card bodies and all) is
@@ -141,8 +192,13 @@ export function normalizeBoard({ project, fields, items }, { filterName = '', ur
         const key = stage || `status:${status}`;
         column = columns.find((c) => c.key === key);
         if (!column) {
-          column = { key, label: stage ? LABELS[stage] : status, stage, toggle: stage === 'backlog' };
+          // The backlog keeps the board's own name for it ("Parking Lot",
+          // "Icebox"); the other stages use the embed's.
+          const label = stage === 'backlog' ? status : (stage ? LABELS[stage] : status);
+          column = { key, label, stage, toggle: stage === 'backlog' };
           columns.push(column);
+        } else if (stage === 'backlog') {
+          column.label = LABELS.backlog;   // two of the board's columns share it
         }
       }
       columnOf.set(status, column);
@@ -184,7 +240,11 @@ export function normalizeBoard({ project, fields, items }, { filterName = '', ur
       status,
       column: column.key,
       group: optionName(valueOf(item, picked.group)),
+      priority: optionName(valueOf(item, picked.priority)),
+      topic: optionName(valueOf(item, picked.topic)),
       people,
+      checklist: checklistOf(content.body),
+      prs: linkedPrs(valueOf(item, picked.prs)),
       shipped: dayOf(valueOf(item, picked.shipped)) || (stage === 'done' ? dayOf(content.merged_at || content.closed_at) : null),
     });
     if (!updated || item.updated_at > updated) updated = item.updated_at;
@@ -250,6 +310,7 @@ async function getJson(url, fetchImpl, now) {
 // from `meta` when they are under a day old (metaAt), so a refresh is usually
 // just the cards: per_page=100, following Link rel="next" for up to 5 pages.
 export async function refreshBoard(ref, { filterName = '', meta = null, metaAt = 0, fetchImpl = fetch, now = Date.now() } = {}) {
+  if (ref.repo) return refreshRepoBoard(ref, { filterName, fetchImpl, now });
   let { title, fields } = meta || {};
   let fetchedMetaAt = metaAt;
   if (!meta || now - metaAt >= META_MS) {
@@ -262,7 +323,8 @@ export async function refreshBoard(ref, { filterName = '', meta = null, metaAt =
     fetchedMetaAt = now;
   }
   const picked = pickFields(fields, filterName);
-  const ids = [picked.status, picked.group, picked.people, picked.shipped].filter(Boolean).map((f) => f.id);
+  const ids = [picked.status, picked.group, picked.people, picked.shipped, picked.priority, picked.topic, picked.prs]
+    .filter(Boolean).map((f) => f.id);
   const items = [];
   let next = `${API}/${ref.apiPath}/items?per_page=100${ids.length ? `&fields=${ids.join(',')}` : ''}`;
   for (let page = 0; next && page < MAX_PAGES; page += 1) {
@@ -274,6 +336,59 @@ export async function refreshBoard(ref, { filterName = '', meta = null, metaAt =
     board: normalizeBoard({ project: { title }, fields, items }, { filterName, url: ref.url }),
     meta: { title, fields },
     metaAt: fetchedMetaAt,
+    fetchedAt: now,
+  };
+}
+
+// A repository's issues, shaped like a project board so the
+// rest of the embed draws them unchanged. Each issue's column comes from a
+// label with a familiar stage name ("in progress", "in review", "backlog"),
+// otherwise: closed → Done, open and assigned → In progress, open → To do.
+// The filter (filter="Assignee") makes a button for each assignee.
+const REPO_STATUSES = ['Backlog', 'To do', 'In progress', 'In review', 'Done'];
+
+export function repoStatusOf(issue) {
+  for (const label of issue.labels || []) {
+    const stage = stageOf(typeof label === 'string' ? label : label.name);
+    if (stage) return REPO_STATUSES[STAGES.findIndex((s) => s.key === stage)];
+  }
+  if (issue.state === 'closed') return 'Done';
+  return (issue.assignees || []).length ? 'In progress' : 'To do';
+}
+
+export function repoToProject(repo, issues, filterName = '') {
+  const people = [...new Set(issues.flatMap((issue) => (issue.assignees || []).map((p) => p.login)))];
+  const fields = [{ id: 1, name: 'Status', data_type: 'single_select', options: REPO_STATUSES.map((name) => ({ name })) }];
+  if (filterName) fields.push({ id: 2, name: filterName, data_type: 'single_select', options: people.map((name) => ({ name })) });
+  const items = issues
+    // Pull requests aren't work items, and issues closed as "not planned" were dropped.
+    .filter((issue) => !issue.pull_request && issue.state_reason !== 'not_planned')
+    .map((issue) => ({
+      id: issue.id,
+      content_type: 'Issue',
+      content: issue,
+      updated_at: issue.updated_at,
+      fields: [
+        { id: 1, value: { name: repoStatusOf(issue) } },
+        ...(filterName && issue.assignees?.[0] ? [{ id: 2, value: { name: issue.assignees[0].login } }] : []),
+      ],
+    }));
+  return { project: { title: `${repo} — issues` }, fields, items };
+}
+
+async function refreshRepoBoard(ref, { filterName = '', fetchImpl = fetch, now = Date.now() } = {}) {
+  const issues = [];
+  let next = `${API}/${ref.apiPath}/issues?state=all&per_page=100`;
+  for (let page = 0; next && page < MAX_PAGES; page += 1) {
+    const result = await getJson(next, fetchImpl, now);
+    issues.push(...result.body);
+    next = result.next;
+  }
+  const payload = repoToProject(ref.repo, issues, filterName);
+  return {
+    board: normalizeBoard(payload, { filterName, url: ref.url }),
+    meta: null,
+    metaAt: 0,
     fetchedAt: now,
   };
 }
@@ -350,9 +465,35 @@ function setStatus(section, text) {
   status.hidden = !text;
 }
 
+const PR_MARKS = { merged: ' ✓', open: '', draft: ' draft', closed: ' closed' };
+
+// The evidence a card carries for its column's gate: how much of its checklist
+// is ticked, and the pull requests linked to it. Pills, in the accent when
+// complete (every box ticked, a PR merged). They are text, not links: the
+// whole card is already a link, and the issue lists its pull requests.
+function evidence(card) {
+  const pills = [];
+  if (card.checklist) {
+    const { done, total } = card.checklist;
+    const pill = statusPill(done === total ? 'good' : 'neutral', `☑ ${done}/${total}`);
+    pill.title = `Checklist: ${done} of ${total} done`;
+    pills.push(pill);
+  }
+  (card.prs || []).forEach((pr) => {
+    const pill = statusPill(pr.state === 'merged' ? 'good' : 'neutral', `PR #${pr.number}${PR_MARKS[pr.state]}`);
+    pill.title = `Pull request #${pr.number} (${pr.state}): ${pr.title}`;
+    pills.push(pill);
+  });
+  if (!pills.length) return null;
+  const row = el('div', 'ocs__kanban-evidence');
+  row.append(...pills);
+  return row;
+}
+
 // One card: a link to the issue, pull request or draft. Above the name, its
-// group (when every group is showing) and its number; under it, its people
-// and, once done, the day it shipped.
+// group (when every group is showing) and its number; under it, its people,
+// once done the day it shipped, its Priority and Topic when the board has
+// them, then its evidence.
 function cardLink(card, showGroup) {
   const link = el('a', 'ocs__kanban-item');
   link.href = card.url;
@@ -363,6 +504,10 @@ function cardLink(card, showGroup) {
   link.appendChild(el('div', 'ocs__kanban-name', card.title));
   const note = [card.people.join(', '), card.stage === 'done' && card.shipped && shortDay(card.shipped)].filter(Boolean).join(' · ');
   if (note) link.appendChild(el('div', 'ocs__kanban-note', note));
+  if (card.priority) link.appendChild(el('div', 'ocs__kanban-note', `Priority: ${card.priority}`));
+  if (card.topic) link.appendChild(el('div', 'ocs__kanban-note', `Topic: ${card.topic}`));
+  const proof = evidence(card);
+  if (proof) link.appendChild(proof);
   return link;
 }
 
@@ -414,7 +559,9 @@ function boardView(section) {
       });
       const track = el('span', 'ocs__toggle-track');
       track.setAttribute('aria-hidden', 'true');
-      toggle.append(input, track, el('span', 'ocs__toggle-label', `Backlog (${backlog})`));
+      // The toggle uses the board's own name for its backlog ("Parking Lot").
+      const named = board.columns.find((col) => col.stage === 'backlog' && col.key !== 'none');
+      toggle.append(input, track, el('span', 'ocs__toggle-label', `${named ? named.label : LABELS.backlog} (${backlog})`));
       row.appendChild(toggle);
     }
     return row.childElementCount ? [row] : [];
@@ -519,7 +666,7 @@ async function mountBoard(section) {
     return;
   }
   const filterName = section.dataset.filter || '';
-  const key = `ocs-kanban:v2:${ref.apiPath}:${filterName}`;
+  const key = `ocs-kanban:v4:${ref.apiPath}:${filterName}`;
   const view = boardView(section);
   let entry = readEntry(key);
   if (entry?.board) view.show(entry.board);

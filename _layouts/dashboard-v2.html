@@ -7,34 +7,34 @@ active_tab: dashboard
 <!-- Preline and ApexCharts CSS are loaded in <head> via aesthetihawk.html for dashboard pages, but unused on this page -->
 <div class="ocs__dashboard-page">
     <div class="ocs__dashboard-stack">
-        <div class="ocs__dashboard-tabbar">
-            <ul class="ocs__dashboard-tabbar-list" id="tab-bar">
+        <div class="ocs__tabs">
+            <ul class="ocs__tabs-list" id="tab-bar">
                 <li>
                     <a href="#" id="tab-admin-evaluation"
-                        class="tab-btn active ocs__dashboard-tab-btn" aria-current="page">
+                        class="tab-btn active ocs__tabs-btn" aria-current="page">
                         Preferences
                     </a>
                 </li>
             </ul>
             <!-- sliding underline indicator -->
-            <div id="tab-underline" class="ocs__dashboard-tab-underline"
+            <div id="tab-underline" class="ocs__tabs-underline"
                 style="position:absolute;bottom:0;left:0;height:2px;width:0;transition:all 0.3s cubic-bezier(.4,0,.2,1);">
             </div>
         </div>
 
         <!-- tab content container -->
-        <div id="tab-content-container" class="ocs__dashboard-tab-content-container">
+        <div id="tab-content-container" class="ocs__tabs-panels">
             <!-- Admin Evaluation UI (hidden by default, shown only for admins) -->
             <div id="admin-only" style="display:none;">
-                <div id="tab-content-admin-evaluation" class="tab-content block ocs__dashboard-tab-content">
+                <div id="tab-content-admin-evaluation" class="tab-content block ocs__tabs-panel ocs__dashboard-tab-content">
                     <h2 class="ocs__section-title">Admin: Search &amp; Evaluate Users</h2>
                 <div id="admin-people-list" class="ocs__dashboard-people-grid">
                     <p class="ocs__text ocs__dashboard-span-full" id="admin-people-loading">Loading users...</p>
                 </div>
                 <!-- Modal for evaluation -->
-                <div id="admin-eval-modal" class="hidden ocs__dashboard-modal-overlay">
-                    <div class="ocs__dashboard-modal-card">
-                        <button id="admin-eval-modal-close" class="ocs__btn ocs__btn--icon small ocs__dashboard-modal-close">&times;</button>
+                <div id="admin-eval-modal" class="hidden ocs__modal">
+                    <div class="ocs__modal-card">
+                        <button id="admin-eval-modal-close" class="ocs__btn ocs__btn--icon small ocs__modal-close">&times;</button>
                         <h3 id="admin-eval-modal-title" class="ocs__section-title"></h3>
                         <form id="admin-eval-form" class="ocs__grid--col2">
                             <!-- Sliders will be injected here -->
@@ -53,13 +53,13 @@ active_tab: dashboard
             </div>
 
             <!-- Preferences tab content -->
-            <div id="tab-content-preferences" class="tab-content block ocs__dashboard-tab-content">
+            <div id="tab-content-preferences" class="tab-content block ocs__tabs-panel ocs__dashboard-tab-content">
                 <h2 class="ocs__section-title ocs__dashboard-page-title">Preferences</h2>
                 <p class="ocs__text ocs__dashboard-page-subtitle">Customize how the site looks. Changes apply across the site and are saved locally.</p>
 
                 <!-- Language/Translation Section (moved to top) -->
                 <div class="ocs__dashboard-card">
-                    <div class="ocs__dashboard-card-header">
+                    <div class="ocs__card-header">
                         <h3 class="ocs__dashboard-card-title">🌐 Language Translation</h3>
                     </div>
                     <p class="ocs__text ocs__dashboard-card-desc">Translate the entire site into your preferred language. Use "Save All" below to apply, or "Reset" to return to English.</p>
@@ -96,9 +96,9 @@ active_tab: dashboard
 
                 <!-- Text-to-Speech Section (moved to second) -->
                 <div class="ocs__dashboard-card ocs__dashboard-card-spaced">
-                    <div class="ocs__dashboard-card-header">
+                    <div class="ocs__card-header">
                         <h3 class="ocs__dashboard-card-title">Text-to-Speech</h3>
-                        <div class="ocs__dashboard-button-row">
+                        <div class="ocs__links">
                             <button type="button" id="tts-test-btn" class="ocs__btn accent small">Test Voice</button>
                             <button type="button" class="save-section-btn ocs__btn accent fill small" data-section="tts">Save</button>
                         </div>
@@ -133,7 +133,7 @@ active_tab: dashboard
 
                 <!-- Head Tracking Cursor Section -->
                 <div class="ocs__dashboard-card ocs__dashboard-card-spaced">
-                    <div class="ocs__dashboard-card-header ocs__dashboard-card-header-gap">
+                    <div class="ocs__card-header">
                         <h3 class="ocs__dashboard-card-title">Head Tracking Cursor</h3>
                         <label class="ocs__dashboard-toggle-label">
                             <input id="pref-head-tracking-enabled" type="checkbox" class="ocs__dashboard-sr-only" />
@@ -161,7 +161,7 @@ active_tab: dashboard
                             <button type="button" id="head-calibrate-up" class="ocs__btn small">Capture Up</button>
                             <button type="button" id="head-calibrate-down" class="ocs__btn small">Capture Down</button>
                         </div>
-                        <div class="ocs__dashboard-button-row ocs__dashboard-card-spaced-sm">
+                        <div class="ocs__links ocs__dashboard-card-spaced-sm">
                             <button type="button" id="head-calibration-save" class="ocs__btn accent fill small">Save Calibration</button>
                             <button type="button" id="head-calibration-load" class="ocs__btn accent small">Load Calibration</button>
                             <button type="button" id="head-calibration-reset" class="ocs__btn small">Reset Calibration</button>
@@ -175,7 +175,7 @@ active_tab: dashboard
                 <div class="ocs__grid--col2 ocs__dashboard-card-spaced">
                     <!-- Column 1: Text (font size, font family only) -->
                     <div class="ocs__dashboard-card">
-                        <div class="ocs__dashboard-card-header">
+                        <div class="ocs__card-header">
                             <h3 class="ocs__dashboard-card-title">Text</h3>
                             <button type="button" class="save-section-btn ocs__btn accent fill small" data-section="text">Save</button>
                         </div>
@@ -207,7 +207,7 @@ active_tab: dashboard
 
                     <!-- Column 2: Colors (background, accent, selection, button style) -->
                     <div class="ocs__dashboard-card">
-                        <div class="ocs__dashboard-card-header">
+                        <div class="ocs__card-header">
                             <h3 class="ocs__dashboard-card-title">Colors</h3>
                             <button type="button" class="save-section-btn ocs__btn accent fill small" data-section="colors">Save</button>
                         </div>
@@ -242,7 +242,7 @@ active_tab: dashboard
                 <!-- Actions Row -->
                 <div class="ocs__dashboard-card ocs__dashboard-card-spaced">
                     <div class="ocs__dashboard-actions-row">
-                        <div class="ocs__dashboard-button-row">
+                        <div class="ocs__links">
                             <button id="save-preferences" type="button" class="ocs__btn accent fill medium">Save All</button>
                             <button id="restore-styles" type="button" class="ocs__btn alert-red medium">Reset</button>
                         </div>
@@ -261,7 +261,7 @@ active_tab: dashboard
                     <!-- Custom Themes -->
                     <div class="ocs__dashboard-card">
                         <h3 class="ocs__dashboard-card-title ocs__dashboard-card-spaced-sm">Custom Themes</h3>
-                        <div class="ocs__dashboard-button-row ocs__dashboard-card-spaced-sm">
+                        <div class="ocs__links ocs__dashboard-card-spaced-sm">
                             <input id="new-theme-name" class="ocs__input ocs__dashboard-theme-name-input" placeholder="Theme name" />
                             <button id="save-theme-btn" class="ocs__btn accent fill small">Save</button>
                         </div>
@@ -270,9 +270,9 @@ active_tab: dashboard
                 </div>
 
                 <div class="ocs__dashboard-card ocs__dashboard-card-spaced" id="ask-ai-panel">
-                    <div class="ocs__dashboard-card-header">
+                    <div class="ocs__card-header">
                         <h3 class="ocs__dashboard-card-title">Ask AI: Generate a Theme</h3>
-                        <div class="ocs__dashboard-button-row">
+                        <div class="ocs__links">
                         <button id="ask-ai-toggle" type="button" class="ocs__btn accent fill small">Ask AI</button>
                         </div>
                     </div>
@@ -282,7 +282,7 @@ active_tab: dashboard
                         <textarea id="ask-ai-prompt" class="ocs__input ocs__dashboard-full-width ocs__dashboard-textarea" rows="4"
                         placeholder="Describe colors, tones, fonts, mood, and any words like 'modern', 'playful', 'professional', etc."></textarea>
 
-                        <div class="ocs__dashboard-button-row ocs__dashboard-card-spaced-sm">
+                        <div class="ocs__links ocs__dashboard-card-spaced-sm">
                         <button id="ask-ai-send" class="ocs__btn accent fill small">Get Suggestions</button>
                         <button id="ask-ai-clear" class="ocs__btn small">Clear</button>
                         </div>
@@ -291,7 +291,7 @@ active_tab: dashboard
 
                         <div id="ask-ai-response" class="ocs__dashboard-ai-response"></div>
 
-                        <div class="ocs__dashboard-button-row ocs__dashboard-card-spaced-sm">
+                        <div class="ocs__links ocs__dashboard-card-spaced-sm">
                         <button id="ask-ai-apply" class="ocs__btn accent fill small">Apply to Form</button>
                         <a id="ask-ai-open" href="#" target="_blank" class="hidden ocs__dashboard-link ocs__dashboard-fineprint">Open full response</a>
                         </div>

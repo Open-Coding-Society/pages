@@ -1,10 +1,8 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { initAiConnections as initialize } from '../_projects/systems/profile/js/ai-connections.js';
 
-const source = (await readFile(new URL('../assets/js/profile/ai-connections.js', import.meta.url), 'utf8'))
-  .replace("import { javaURI } from '../api/config.js';", "const javaURI = 'http://spring.test';");
-const { initAiConnections } = await import(`data:text/javascript,${encodeURIComponent(source)}`);
+const initAiConnections = (root, options = {}) => initialize(root, { apiBase: 'http://spring.test', ...options });
 
 function element() {
   return { textContent: '', value: '', disabled: false, hidden: false, dataset: {}, listeners: {},
@@ -30,6 +28,7 @@ test('loads secret-free status and enables independent provider controls', async
   await initAiConnections(root, { request: async (...args) => { requests.push(args); return response(disconnected); } });
   assert.equal(root.providers[0].fields['[data-ai-save]'].textContent, 'Save key');
   assert.equal(root.providers[1].fields['[data-ai-key]'].disabled, false);
+  assert.equal(requests[0][0], 'http://spring.test/api/ai-connections');
   assert.equal(requests[0][1].credentials, 'include');
   assert.equal(requests[0][1].cache, 'no-store');
 });
@@ -49,7 +48,10 @@ test('saving Gemini uses only its endpoint and clears input after success', asyn
   assert.equal(row.fields['[data-ai-key]'].value, '');
   assert.equal(row.fields['[data-ai-save]'].textContent, 'Replace key');
   assert.equal(row.fields['[data-ai-state]'].dataset.connected, 'true');
+  assert.equal(row.fields['[data-ai-state]'].className, 'ocs__status-pill ocs__status-pill--good');
   assert.equal(root.providers[1].fields['[data-ai-disconnect]'].hidden, true);
+  assert.equal(root.providers[0].fields['[data-ai-disconnect]'].className, 'ocs__btn');
+  assert.equal(root.providers[1].fields['[data-ai-disconnect]'].className, 'ocs__btn hidden');
 });
 
 test('failed replacement retains connected status and clears the secret', async () => {
@@ -71,6 +73,8 @@ test('disconnecting one provider does not disconnect the other', async () => {
     : response(null, 204) });
   await root.providers[0].fields['[data-ai-disconnect]'].listeners.click();
   assert.equal(root.providers[0].fields['[data-ai-state]'].dataset.connected, 'false');
+  assert.equal(root.providers[0].fields['[data-ai-state]'].className, 'ocs__status-pill ocs__status-pill--neutral');
+  assert.equal(root.providers[0].fields['[data-ai-disconnect]'].className, 'ocs__btn hidden');
   assert.equal(root.providers[1].fields['[data-ai-state]'].dataset.connected, 'true');
 });
 
@@ -84,6 +88,7 @@ test('missing encryption or Groq model disables the affected controls', async ()
     ...disconnected.providers, groq: { connected: false, modelConfigured: false } } }) });
   assert.equal(second.providers[0].fields['[data-ai-save]'].disabled, false);
   assert.equal(second.providers[1].fields['[data-ai-save]'].disabled, true);
+  assert.equal(second.providers[1].fields['[data-ai-state]'].className, 'ocs__text');
 });
 
 test('unauthenticated status shows sign-in guidance without enabling key input', async () => {

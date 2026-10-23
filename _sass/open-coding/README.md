@@ -174,9 +174,49 @@ Common layout classes:
 - `ocs__grid--standard`, `ocs__grid--card`, `ocs__grid--gallery`: grid variants
 - `cols-2`, `cols-3`, `cols-4`: standard-grid column counts
 - `ocs__grid-cell--header`, `--accent`, `--muted`, `--wide`: cell modifiers
+- `ocs__stack`: a vertical stack with a 1rem gap between its children, so they
+  need no margins; `ocs__stack--wide` uses the 1.5rem gap between cards.
+  Children stretch to the full width, so put buttons in an `ocs__links` row.
+- `ocs__split`: two equal columns; `ocs__split ocs__split--aside` makes the first
+  a narrow list (14 to 18rem) beside a wide pane. Both become one column at 768px
+  and below. Messages (`/dm`) puts its conversation list beside the open chat this way.
 
 See [`elements/containers`](elements/containers), [`elements/grids`](elements/grids),
 and [`grids.md`](../../_projects/lessons/sass/navigation/grids.md).
+
+### Form fields
+
+```html
+<div class="ocs__grid--col2">
+  <div class="ocs__field">
+    <label class="ocs__label" for="email">Email</label>
+    <input class="ocs__input" id="email" type="email" aria-describedby="email-help">
+    <small id="email-help">We send grades here.</small>
+  </div>
+  <div class="ocs__field">
+    <label class="ocs__label" for="effort">Effort: <output for="effort">3</output> of 5</label>
+    <input id="effort" type="range" min="1" max="5" value="3">
+  </div>
+</div>
+```
+
+- `ocs__field`: a label, its control at the full width of the field, and
+  optional help text in a plain `<small>`, evenly spaced.
+- A range slider in a field fills it and takes the accent color.
+
+See [`elements/forms/fields`](elements/forms/fields). The Profile page
+(`/profile`) lays out its account form and skill check-in this way.
+
+### Avatars
+
+```html
+<abbr class="ocs__avatar" title="Ada Lovelace">AL</abbr>
+```
+
+`ocs__avatar`: a round avatar with a person's initials in the accent color.
+Write it as an `<abbr>` with the full name in `title`, not a `<span>` or
+`<div>`: preset themes recolor every span and div to the text color. See
+[`elements/avatars`](elements/avatars).
 
 ### Tables
 
@@ -240,6 +280,106 @@ See [`elements/typography`](elements/typography). The course sidebar's lesson
 rows and the phone menu use both classes. The sidebar's week titles use
 `ocs__truncate` alone: their space is too narrow to wrap without breaking words.
 
+### Tabs
+
+```html
+<div class="ocs__tabs">
+  <ul class="ocs__tabs-list">
+    <li><a class="ocs__tabs-btn active" href="#">Overview</a></li>
+    <li><a class="ocs__tabs-btn" href="#">Details</a></li>
+  </ul>
+</div>
+<div class="ocs__tabs-panels">
+  <div class="ocs__tabs-panel">Overview content</div>
+</div>
+```
+
+- `ocs__tabs`, `ocs__tabs-list`: the tab bar and its bottom border
+- `ocs__tabs-btn`: an individual tab; add `active` for the selected one
+- `ocs__tabs-underline`: optional sliding indicator under the active tab
+- `ocs__tabs-panels`, `ocs__tabs-panel`: the swapped content area
+
+See [`elements/tabs`](elements/tabs). Dashboard, Analytics Dashboard, and
+Submissions all use this for their tab bars.
+
+### Modals
+
+```html
+<div class="ocs__modal">
+  <div class="ocs__modal-card">
+    <div class="ocs__modal-header">
+      <h3 class="ocs__modal-title">Title</h3>
+      <button class="ocs__btn ocs__btn--icon small ocs__modal-close">&times;</button>
+    </div>
+    <p>Modal content.</p>
+    <div class="ocs__modal-actions">
+      <button class="ocs__btn accent fill medium">Confirm</button>
+    </div>
+  </div>
+</div>
+```
+
+- `ocs__modal`: the fixed, centered backdrop
+- `ocs__modal-card`: the content card
+- `ocs__modal-close`: positions a close control in the card's corner; pair
+  it with `ocs__btn ocs__btn--icon` for the icon button treatment, or put
+  it inside `ocs__modal-header` instead for a modal with a title bar
+- `ocs__modal-header`, `ocs__modal-title`, `ocs__modal-actions`: optional
+  header row and action-button row for a fuller modal
+
+How a page shows/hides the modal (a `hidden`/`open` class, an
+`aria-hidden` attribute) is up to the page — this only styles the chrome.
+See [`elements/modals`](elements/modals).
+Dashboard and Analytics Dashboard use the plain card+close shape; Calendar
+and Profile's face scanner use the full header/actions shape.
+
+### Card headers
+
+```html
+<div class="ocs__card">
+  <div class="ocs__card-header">
+    <h2 class="ocs__section-title">Title</h2>
+    <button class="ocs__btn accent fill medium">Action</button>
+  </div>
+</div>
+```
+
+`ocs__card-header`: a title/action row inside a card (flex,
+space-between, aligned). An `ocs__section-title` in the row drops its bottom
+margin, so it sits level with the action. See [`elements/capstone`](elements/capstone).
+
+### Picker cards
+
+```html
+<div class="ocs__hub-grid" role="group" aria-label="Student archetype">
+  <button type="button" class="ocs__hub-card ocs__hub-card--selected" aria-pressed="true">
+    <strong class="ocs__hub-card-title">Technologist</strong>
+  </button>
+  <button type="button" class="ocs__hub-card" aria-pressed="false">
+    <strong class="ocs__hub-card-title">Scrummer</strong>
+  </button>
+</div>
+```
+
+An `ocs__hub-card` can also be one choice in a picker: a `<button>` fills its
+grid cell with its content at the top. Mark the current choice with
+`ocs__hub-card--selected` and `aria-pressed="true"`. Profile's persona groups
+use this.
+
+### Loading spinner
+
+```html
+<div class="ocs__loading">
+  <div class="ocs__spinner"></div>
+</div>
+```
+
+`ocs__loading`/`ocs__spinner`: an inline, theme-aware loading state for a
+tab panel or card. See [`elements/loaders`](elements/loaders). (`.spinner`/
+`.loading-container` in the same directory are an older, non-`ocs__`
+full-page overlay variant with hardcoded colors — use the `ocs__` pair for
+anything new.)
+
 ### Capstone document elements
 
 These shared classes are used by the RFID and Jarvis capstone documents:
@@ -275,10 +415,14 @@ Everything else comes from the board, so any board works as it is. Columns
 follow the board's own order: familiar names share a stage's column ("Todo",
 "To Do" and "Ready" are all To do, "Blocked" is In progress), any other column
 keeps its own name, and cards with no status get a "No status" column, as on
-GitHub. A Backlog column starts hidden behind a toggle, and so does No status on
-a board that has a Backlog of its own. Only UGRC-CSA's note columns ("Team Map",
+GitHub. The backlog keeps the board's own name (the OCS issue lifecycle calls it
+"Parking Lot") and starts hidden behind a toggle, and so does No status on a
+board that has a backlog of its own. Only UGRC-CSA's note columns ("Team Map",
 "Reflections") are left out. Cards show their number, a `People` field or the
-assignees, and once done, a `Shipped` date or the day they closed. The board
+assignees, and once done, a `Shipped` date or the day they closed. Under that is
+the evidence for the column's exit gate: how many boxes of the card's checklist
+are ticked (`☑ 3/4`), and the pull requests linked to its issue (`PR #123`,
+marked merged, draft or closed). Both are in the accent once complete. The board
 keeps a copy for 10 minutes, because visitors without a token share 60 GitHub
 requests an hour per network, and keeps showing that copy, with a note, when
 GitHub doesn't answer.
@@ -291,7 +435,8 @@ Kanban classes (`assets/js/kanban-board.js` builds them):
   top, with more accent the closer the stage is to done; a column of the board's
   own name gets backlog's quiet line.
 - `ocs__kanban-item`: a card, with `ocs__kanban-kicker`, `ocs__kanban-name` and
-  `ocs__kanban-note` for its three lines.
+  `ocs__kanban-note` for its three lines, and `ocs__kanban-evidence` for its row
+  of evidence pills.
 
 The names avoid the suffixes `_sass/capstone/infograph.scss` restyles (`-card`,
 `-title` and others), so the board looks the same inside a capstone's

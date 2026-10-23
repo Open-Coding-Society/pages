@@ -1,0 +1,4 @@
+# Reuse the same public-project Kanban as the UGRC CSA capstone.
+Board:
+  url: "https://github.com/orgs/GameMaker-CSP/projects/1"
+  filter: "Owner"

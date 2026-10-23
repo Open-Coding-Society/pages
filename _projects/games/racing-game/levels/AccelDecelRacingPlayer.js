@@ -3,9 +3,14 @@ import EnginePlayer from '@assets/js/GameEnginev1.1/essentials/Player.js';
 const ARROW_KEYS = new Set([37, 38, 39, 40]);
 
 export default class Player extends EnginePlayer {
-  constructor(gameEnv, data) {
-    super(gameEnv, data);
+  constructor(data, gameEnv) {
+    super(data, gameEnv);
     this.keysPressed = {};
+    this.currentSpeed = data.currentSpeed ?? 0;
+    this.maxSpeed = data.maxSpeed;
+    this.acceleration = data.acceleration;
+    this.deceleration = data.deceleration;
+    this.reverseSpeed = data.reverseSpeed;
   }
 
   handleKeyDown(event) {
@@ -21,6 +26,7 @@ export default class Player extends EnginePlayer {
       event.preventDefault();
     }
     super.handleKeyDown(event);
+    this.updateMovementSpeed();
   }
 
   handleKeyUp(event) {
@@ -50,8 +56,16 @@ export default class Player extends EnginePlayer {
         }
       }
 
-      // Map currentSpeed back to STEP_FACTOR so the parent engine moves the car
-      this.STEP_FACTOR = Math.abs(this.currentSpeed) * 100; 
+      this.updateMovementSpeed();
     }
+  }
+
+  updateMovementSpeed() {
+    if (this.maxSpeed === undefined) return;
+
+    const speedRatio = Math.min(Math.abs(this.currentSpeed) / this.maxSpeed, 1);
+    this.xVelocity = (this.scale.width / this.stepFactor) * 3 * speedRatio;
+    this.yVelocity = (this.scale.height / this.stepFactor) * 3 * speedRatio;
+    this.updateVelocity();
   }
 }

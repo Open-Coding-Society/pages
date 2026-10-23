@@ -29,6 +29,12 @@ default_course: csse
 # build time via Liquid, so the two can never drift out of sync with each other again.
 google_client_id: "65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com"
 
+# Whether this site runs Spring next to Flask: true for OCS for Education (Flask + Spring),
+# false for OCS for Business (Flask only). assets/js/api/config.js's springEnabled and the
+# profile layout read it at build time, so login, logout, the navbar's DM bell and /profile
+# use Flask alone when it is false. See _projects/systems/profile/README.md.
+spring: true
+
 # Exclude from Jekyll watch - these are processed by our conversion scripts
 # This prevents double-regeneration when saving notebooks/docx files
 exclude:

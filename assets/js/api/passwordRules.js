@@ -20,21 +20,24 @@ export function meetsSpringPasswordRules(password) {
 export function attachPasswordChecklist(input) {
     if (!input) return;
 
+    // Plain <ul> styled by the shared OCS grammar (.ocs__checklist), no local CSS.
     const list = document.createElement('ul');
-    list.className = 'password-checklist';
+    list.className = 'ocs__checklist';
     list.setAttribute('aria-live', 'polite');
 
     const items = PASSWORD_RULES.map((rule) => {
         const item = document.createElement('li');
-        item.textContent = rule.label;
+        const box = document.createElement('span');
+        box.className = 'ocs__checklist-box';
+        box.setAttribute('aria-hidden', 'true');
+        item.append(box, rule.label);
         list.appendChild(item);
         return { rule, item };
     });
 
     const update = () => {
         const password = input.value;
-        list.classList.toggle('is-empty', password === '');
-        items.forEach(({ rule, item }) => item.classList.toggle('met', rule.test(password)));
+        items.forEach(({ rule, item }) => item.classList.toggle('done', rule.test(password)));
     };
 
     input.insertAdjacentElement('afterend', list);

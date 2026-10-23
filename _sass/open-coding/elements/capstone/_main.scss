@@ -16,6 +16,22 @@
   color: var(--pref-text-color);
 }
 
+// A title/action row inside a card -- extracted from 5 pages that had
+// reimplemented this identically (Profile, Dashboard, Analytics
+// Dashboard, Bathroom Pass, Calendar).
+.ocs__card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+// A section title in the row sits level with the row's action.
+.ocs__card-header > .ocs__section-title {
+  margin: 0;
+}
+
 .ocs__capstone-footer {
   display: flex;
   align-items: center;
@@ -129,6 +145,12 @@
 
 .ocs__split {
   grid-template-columns: 1fr 1fr;
+}
+
+// A narrow list beside a wide pane, like Messages' conversations beside the open chat.
+// Declared before the 768px rule below, so it becomes one column on phones too.
+.ocs__split--aside {
+  grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
 }
 
 .ocs__facts {
@@ -366,6 +388,26 @@ html.user-theme-active .ocs__nav-card-title {
   border-color: var(--pref-accent-color);
   background: color-mix(in srgb, var(--pref-accent-color) 8%, var(--panel));
   transform: translateY(-2px);
+}
+
+// A hub card can also be one choice in a picker: a <button> that fills its grid
+// cell. The current choice adds --selected and aria-pressed="true". The doubled
+// class outranks the preset themes' plain `button` background.
+button.ocs__hub-card {
+  // A column, so the content starts at the top: a button centers it otherwise.
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid var(--ui-border);
+  background: var(--panel);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ocs__hub-card.ocs__hub-card--selected {
+  border-color: var(--pref-accent-color);
+  background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
 }
 
 .ocs__hub-card-title {

@@ -1,0 +1,33 @@
+// Page-scoped styles for /submissions/v2 (_layouts/submissions-v2.html).
+//
+// Most of this page (the admin "All Submissions" section, the submission
+// edit modal, and the included creator-dashboard.html) is already styled
+// by the existing global _sass/open-coding/submissions.scss and is reused
+// unmodified here — this partial only covers the tab bar and wrappers,
+// which were the only genuinely Tailwind-only parts of the page.
+//
+// This page's JavaScript (one continuous inline <script>, plus the
+// imported assets/js/submissions/creator-dashboard.js) is copied/left
+// verbatim and is NOT edited here. A few class names below are read
+// directly by that JS (classList.add/remove/toggle, querySelectorAll) —
+// they keep their original literal names on purpose, each marked below.
+
+.ocs__submissions-v2-page {
+    width: 100%;
+}
+
+.ocs__submissions-v2-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+// .ocs__tabs / -list / -btn / -underline / -panels / -panel (elements/tabs)
+// now cover the tab bar instead of a page-scoped duplicate. The compound
+// JS-coupled selectors (.active.text-blue-500 etc., keyed off
+// querySelectorAll('.tab-btn') / ('.tab-content'), also used by the
+// included creator-dashboard.html's own tab-content element) live there
+// too.
+//
+// .ocs__loading / .ocs__spinner (elements/loaders) now cover both loading
+// spinners instead of a page-scoped duplicate.

@@ -373,6 +373,10 @@
     <div class="toolchain-trail-stat"><strong>{{ data.Stations.size | minus: 1 }}</strong>core stations</div>
   </div>
 
+  {% if data.Board %}
+  {% include ocs_kanban_board.html url=data.Board.url title="Toolchain Trail Kanban Board" %}
+  {% endif %}
+
   <div class="toolchain-trail-section">
     <h2>Project Stages</h2>
     <div class="toolchain-trail-section-grid">

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
     BoardError, cacheState, columnCards, filterCards, normalizeBoard, parseBoardUrl, pickFields, readEntry, refreshBoard,
-    stageOf, writeEntry,
+    repoStatusOf, stageOf, writeEntry,
 } from '../assets/js/kanban-board.js';
 
 // Shaped like GitHub's REST projectsV2 responses (fields, items), trimmed to
@@ -22,6 +22,7 @@ const FIELDS = [
     { id: 4, name: 'Team', data_type: 'single_select', options: ['Chat + Calendar', 'SASS', 'DMs', 'Everyone'].map(option) },
     { id: 5, name: 'People', data_type: 'multi_select', options: ['Sathwik', 'Samarth', 'Tarun'].map(option) },
     { id: 6, name: 'Shipped', data_type: 'date' },
+    { id: 7, name: 'Linked pull requests', data_type: 'linked_pull_requests' },
 ];
 
 const statusValue = (name) => ({ id: 3, name: 'Status', data_type: 'single_select', value: name ? option(name) : null });
@@ -67,6 +68,11 @@ test('statuses from different boards land on the shared stages, and non-work col
     assert.equal(stageOf(null), 'backlog');
 });
 
+test('the column names in OCS\'s issue lifecycle land on their stages', () => {
+    const cases = { 'Parking Lot': 'backlog', 'Parking lot': 'backlog', ToDo: 'todo', 'In Progress': 'doing', 'In Review': 'review', Done: 'done' };
+    for (const [status, stage] of Object.entries(cases)) assert.equal(stageOf(status), stage, status);
+});
+
 test('blocked or waiting work stays in progress and released work is done, instead of disappearing', () => {
     const cases = {
         '🚫 Blocked': 'doing', 'On hold': 'doing', 'Waiting on mentor': 'doing', Stuck: 'doing',
@@ -95,6 +101,8 @@ test('fields are found by name in any case, and a filter the board lacks is left
     assert.deepEqual(picked.group, { id: 4, name: 'Team', options: ['Chat + Calendar', 'SASS', 'DMs', 'Everyone'] });
     assert.equal(picked.people.id, 5);
     assert.equal(picked.shipped.id, 6);
+    // Linked pull requests is found by its type: GitHub names it, not the board.
+    assert.equal(picked.prs.id, 7);
     assert.equal(pickFields(FIELDS, 'Squad').group, null);
     // A board whose status field has another name still gets columns.
     const stage = { id: 9, name: 'Stage', data_type: 'single_select', options: [option('Todo')] };
@@ -125,7 +133,8 @@ test('a board keeps its work cards with links, groups, people and shipped dates'
 
     // Columns follow the board's Status options in order; Team Map and
     // Reflections are left out, and no card is missing a status.
-    assert.deepEqual(board.columns.map((c) => c.label), ['Backlog', 'To do', 'In progress', 'In review', 'Done']);
+    // The backlog column keeps the board's own name for it.
+    assert.deepEqual(board.columns.map((c) => c.label), ['💡 Backlog', 'To do', 'In progress', 'In review', 'Done']);
     assert.deepEqual(board.columns.map((c) => c.toggle), [true, false, false, false, false]);
     assert.equal(issue.column, 'done');
 
@@ -201,6 +210,48 @@ test('only filter options that have cards become buttons', () => {
     assert.deepEqual(normalizeBoard({ project: PROJECT, fields, items: one }, { filterName: 'Team', url: BOARD_URL }).groups, ['Squad 2']);
 });
 
+test('a board that follows OCS\'s lifecycle keeps its own name for the Parking Lot, behind the toggle', () => {
+    const fields = [{ id: 3, name: 'Status', data_type: 'single_select', options: ['Parking Lot', 'ToDo', 'In Progress', 'In Review', 'Done'].map(option) }];
+    const board = normalizeBoard({ project: PROJECT, fields, items: [] }, { url: BOARD_URL });
+    assert.deepEqual(board.columns.map((c) => c.label), ['Parking Lot', 'To do', 'In progress', 'In review', 'Done']);
+    assert.deepEqual(board.columns.map((c) => c.toggle), [true, false, false, false, false]);
+});
+
+test('when two of a board\'s columns are both backlog, the shared column is just "Backlog"', () => {
+    const fields = [{ id: 3, name: 'Status', data_type: 'single_select', options: ['Icebox', 'Backlog', 'Todo', 'Done'].map(option) }];
+    assert.equal(normalizeBoard({ project: PROJECT, fields, items: [] }, { url: BOARD_URL }).columns[0].label, 'Backlog');
+});
+
+const withBody = (id, body) => item(id, 'Issue', { ...ISSUE.content, number: id, body }, [statusValue('📋 To Do')], '2026-10-14T00:00:00Z');
+
+test('a card counts the boxes in its checklist; a card without one has none', () => {
+    const body = [
+        '## In Progress', '- [x] Prototyped', '* [X] Unit tested', '   - [ ] PR created and linked',
+        '```md', '- [ ] an example inside a code block', '```', 'Notes, not a box: [ ] here',
+    ].join('\n');
+    const board = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [withBody(501, body), withBody(502, 'Just prose.'), withBody(503, null)] }, { url: BOARD_URL });
+    assert.deepEqual(board.cards.map((c) => c.checklist), [{ done: 2, total: 3 }, null, null]);
+});
+
+// Shaped like a value of GitHub's "Linked pull requests" field (trimmed).
+const pr = (number, extra = {}) => ({ number, title: `PR ${number}`, html_url: `https://github.com/Open-Coding-Society/pages/pull/${number}`, state: 'open', merged_at: null, draft: false, ...extra });
+const prsValue = (...prs) => ({ id: 7, name: 'Linked pull requests', data_type: 'linked_pull_requests', value: prs });
+
+test('a card lists its linked pull requests as merged, open, draft or closed', () => {
+    const issue = item(601, 'Issue', { ...ISSUE.content, number: 60, body: '' }, [statusValue('👀 In Review'), prsValue(
+        pr(1823, { state: 'closed', merged_at: '2026-10-21T12:52:17Z' }), pr(1830), pr(1831, { draft: true }), pr(1799, { state: 'closed' }),
+        { ...pr(9), html_url: 'javascript:alert(1)' },
+    )], '2026-10-21T13:00:00Z');
+    const [card] = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [issue] }, { url: BOARD_URL }).cards;
+    assert.deepEqual(card.prs, [
+        { number: 1823, url: 'https://github.com/Open-Coding-Society/pages/pull/1823', title: 'PR 1823', state: 'merged' },
+        { number: 1830, url: 'https://github.com/Open-Coding-Society/pages/pull/1830', title: 'PR 1830', state: 'open' },
+        { number: 1831, url: 'https://github.com/Open-Coding-Society/pages/pull/1831', title: 'PR 1831', state: 'draft' },
+        { number: 1799, url: 'https://github.com/Open-Coding-Society/pages/pull/1799', title: 'PR 1799', state: 'closed' },
+    ]);
+    assert.deepEqual(normalizeBoard({ project: PROJECT, fields: FIELDS, items: [ISSUE] }, { url: BOARD_URL }).cards[0].prs, []);
+});
+
 test('without a filter there are no groups to choose from', () => {
     const board = normalizeBoard({ project: PROJECT, fields: FIELDS, items: ITEMS }, { url: BOARD_URL });
     assert.deepEqual(board.groups, []);
@@ -232,7 +283,7 @@ test('the done column lists the most recently shipped work first; other columns 
 /* ── Fetching ────────────────────────────────────────────────────────── */
 
 const json = (body, init = {}) => new Response(JSON.stringify(body), { status: 200, headers: { 'content-type': 'application/json' }, ...init });
-const NEXT = 'https://api.github.com/organizations/321096333/projectsV2/1/items?per_page=100&fields=3%2C4%2C5%2C6&after=abc';
+const NEXT = 'https://api.github.com/organizations/321096333/projectsV2/1/items?per_page=100&fields=3%2C4%2C5%2C6%2C7&after=abc';
 
 // Answers like GitHub for the one board above. Every URL it was asked for is
 // kept, and anything it doesn't know is a 404, so a wrong URL fails the test.
@@ -246,7 +297,7 @@ function fakeGitHub() {
         if (url === `${API}/fields`) return json(FIELDS);
         if (pathname.endsWith('/projectsV2/1/items')) {
             assert.equal(searchParams.get('per_page'), '100');
-            assert.deepEqual(searchParams.get('fields').split(',').sort(), ['3', '4', '5', '6']);
+            assert.deepEqual(searchParams.get('fields').split(',').sort(), ['3', '4', '5', '6', '7']);
             if (searchParams.get('after') === 'abc') return json(ITEMS.slice(3));
             return json(ITEMS.slice(0, 3), { headers: { link: `<${NEXT}>; rel="next"` } });
         }
@@ -338,4 +389,76 @@ test('saved copies survive a round trip, and blocked or broken storage reads as 
     const blocked = { getItem() { throw new Error('SecurityError'); }, setItem() { throw new Error('QuotaExceededError'); } };
     assert.equal(readEntry('ocs-kanban:v1:test', blocked), null);
     assert.doesNotThrow(() => writeEntry('ocs-kanban:v1:test', { fetchedAt: 5 }, blocked));
+});
+
+
+test('Area filters and Priority and Topic values survive normalization and fetching', async () => {
+    const priority = { id: 20, name: 'Priority', data_type: 'single_select', options: [option('High')] };
+    const topic = { id: 21, name: 'Topic', data_type: 'single_select', options: [option('Chatbot')] };
+    const area = { id: 22, name: 'Area', data_type: 'single_select', options: [option('Frontend'), option('Backend')] };
+    const fields = [...MINIMAL_FIELDS, priority, topic, area];
+    const items = ['Frontend', 'Backend'].map((name, index) => item(900 + index, 'DraftIssue', draft(name + ' task'), [
+        statusValue('Todo'),
+        { id: 20, value: option('High') },
+        { id: 21, value: option('Chatbot') },
+        { id: 22, value: option(name) },
+    ], '2026-10-22T00:00:00Z'));
+    const fetched = [];
+    const fetchImpl = async (url) => {
+        fetched.push(url);
+        if (url.endsWith('/fields')) return json(fields);
+        if (url.includes('/items?')) return json(items);
+        return json(PROJECT);
+    };
+    const entry = await refreshBoard(parseBoardUrl(BOARD_URL), { filterName: 'Area', fetchImpl, now: 0 });
+    assert.deepEqual(entry.board.groups, ['Frontend', 'Backend']);
+    assert.equal(filterCards(entry.board, 'Backend')[0].title, 'Backend task');
+    assert.equal(entry.board.cards[0].priority, 'High');
+    assert.equal(entry.board.cards[0].topic, 'Chatbot');
+    const requested = new URL(fetched.find(url => url.includes('/items?'))).searchParams.get('fields').split(',');
+    assert.ok(requested.includes('20'));
+    assert.ok(requested.includes('21'));
+    const empty = normalizeBoard({ project: PROJECT, fields, items: [item(999, 'DraftIssue', draft('Unassigned'), [statusValue('Todo')], '2026-10-22T00:00:00Z')] }, { url: BOARD_URL });
+    assert.equal(empty.cards[0].priority, '');
+    assert.equal(empty.cards[0].topic, '');
+});
+
+// A repository's issues as a board: for personal boards GitHub won't show
+// signed out, a team can point the embed at its repository's issues instead.
+test('a repository issues address is a board; a plain repository address is not', () => {
+    assert.deepEqual(parseBoardUrl('https://github.com/rex0dex/fops-pages/issues'), {
+        apiPath: 'repos/rex0dex/fops-pages', url: 'https://github.com/rex0dex/fops-pages/issues', repo: 'rex0dex/fops-pages', personal: false,
+    });
+    assert.equal(parseBoardUrl('https://github.com/rex0dex/fops-pages'), null);
+    assert.equal(parseBoardUrl('https://github.com/users/rex0dex/projects/3').personal, true);
+});
+
+test('an issue goes to a column by its stage label, else closed, assigned or open', () => {
+    const person = { login: 'rex0dex' };
+    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'In review' }], assignees: [person] }), 'In review');
+    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'bug' }, { name: 'backlog' }], assignees: [] }), 'Backlog');
+    assert.equal(repoStatusOf({ state: 'closed', labels: [], assignees: [person] }), 'Done');
+    assert.equal(repoStatusOf({ state: 'open', labels: [], assignees: [person] }), 'In progress');
+    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'bug' }], assignees: [] }), 'To do');
+});
+
+test('a repository board leaves out pull requests and issues closed as not planned, and filters by assignee', async () => {
+    const issue = (number, extra) => ({
+        id: 7000 + number, number, title: `Issue ${number}`, html_url: `https://github.com/rex0dex/fops-pages/issues/${number}`,
+        state: 'open', labels: [], assignees: [], body: '', updated_at: `2026-10-2${number % 10}T00:00:00Z`, ...extra,
+    });
+    const issues = [
+        issue(1, { assignees: [{ login: 'rex0dex' }] }),
+        issue(2, { state: 'closed', state_reason: 'not_planned' }),
+        issue(3, { pull_request: { url: 'https://api.github.com/repos/rex0dex/fops-pages/pulls/3' } }),
+        issue(4, { state: 'closed', state_reason: 'completed', assignees: [{ login: 'Kash484' }] }),
+        issue(5),
+    ];
+    const fetched = [];
+    const fetchImpl = async (url) => { fetched.push(url); return json(issues); };
+    const entry = await refreshBoard(parseBoardUrl('https://github.com/rex0dex/fops-pages/issues'), { filterName: 'Assignee', fetchImpl, now: 0 });
+    assert.deepEqual(fetched, ['https://api.github.com/repos/rex0dex/fops-pages/issues?state=all&per_page=100']);
+    assert.deepEqual(entry.board.cards.map(card => [card.number, card.stage]), [[1, 'doing'], [4, 'done'], [5, 'todo']]);
+    assert.deepEqual(entry.board.groups, ['rex0dex', 'Kash484']);
+    assert.equal(filterCards(entry.board, 'Kash484')[0].number, 4);
 });

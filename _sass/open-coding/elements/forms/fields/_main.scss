@@ -1,0 +1,30 @@
+// A form field: an ocs__label, its control at the full width of the field, and
+// optional help text below. Write the help text as a plain <small>.
+.ocs__field {
+  display: grid;
+  gap: 0.375rem;
+  align-content: start;
+
+  > .ocs__label {
+    margin-bottom: 0;
+  }
+
+  > .ocs__input,
+  > input[type="range"] {
+    width: 100%;
+  }
+
+  // The global input rule pads and frames every input, range sliders included.
+  > input[type="range"] {
+    padding: 0;
+    border: 0;
+    filter: none;
+    accent-color: var(--pref-accent-color);
+  }
+
+  > small {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+}

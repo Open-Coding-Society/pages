@@ -1,0 +1,9 @@
+# PNEC board configuration for the shared OCS Kanban include.
+# This personal board supports the component's link/availability notice only.
+# Do not replace it with an organization board without explicit approval.
+Board:
+  url: "https://github.com/users/samanviy17-crypto/projects/1/views/1"
+  title: "PNEC Team Kanban"
+  # No Area filter is configured: PNEC has no approved matching field.
+  # For a separately approved public organization board, use its real field name.
+  filter: ""
