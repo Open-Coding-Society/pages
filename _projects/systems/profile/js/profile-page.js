@@ -1,8 +1,9 @@
 // Starts every part of /profile (layouts/profile.html in this system) and keeps the
 // identity card and the setup checklist at the top of the page in step with them.
 // `api` holds the shared helpers the layout imports with the site's baseurl
-// ({ pythonURI, javaURI, fetchOptions, putUpdate, postUpdate }), so these modules
-// only import each other, with ./ paths.
+// ({ pythonURI, javaURI, springEnabled, fetchOptions, putUpdate, postUpdate }), so these
+// modules only import each other, with ./ paths. springEnabled is false on a Flask-only
+// site, where the layout leaves out the Face ID and Gist cards.
 import { initAccountForm } from './profile-account.js';
 import { initClasses } from './profile-classes.js';
 import { initFaceRegistration } from './profile-face.js';
@@ -23,10 +24,10 @@ function renderIdentity(user) {
 }
 
 // Returns update(partial): merge what one part of the page learned and redraw the list.
-function createSetupChecklist(list) {
+function createSetupChecklist(list, springEnabled) {
     const state = {};
     function render() {
-        list.replaceChildren(...setupSteps(state).map(step => {
+        list.replaceChildren(...setupSteps(state, { springEnabled }).map(step => {
             const item = document.createElement('li');
             const mark = document.createElement('span');
             mark.className = 'ocs__check';
@@ -71,7 +72,7 @@ function readCourses() {
 }
 
 export function initProfilePage(api) {
-    const updateSetup = createSetupChecklist(byId('profileSetup'));
+    const updateSetup = createSetupChecklist(byId('profileSetup'), api.springEnabled);
     const report = part => error => console.error(`Error starting the ${part}:`, error);
 
     initAccountForm({
@@ -111,6 +112,9 @@ export function initProfilePage(api) {
         project: byId('snapshotProjectName'),
         status: byId('snapshotStatus'),
     });
+
+    // Face ID and the Gist connection are saved in Spring.
+    if (!api.springEnabled) return;
 
     initFaceRegistration({
         api,

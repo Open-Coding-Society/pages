@@ -1,5 +1,5 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from './RacingPlayer.js';
+import Player from './PlayerCar.js';
 import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
 import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
 import TimeLapScreen from './TimeLapScreen.js';
@@ -10,7 +10,7 @@ class GameLevelAutumn {
     const background_data = {
       name: "Autumn Course",
       greeting: "Welcome to the Autumn Level!",
-      src: path + '/images/projects/racing-game/Autumn_Mud_Track.png',
+      src: path + '/images/projects/racing-game/Autumn_Mud_track.png',
       pixels: { height: 360, width: 643 }
     };
     const player_data = {

@@ -722,11 +722,10 @@
       fd.append('username', uid);
       fd.append('file', file);
       if (notes) fd.append('notes', notes);
-      fd.append('technicalExcellence', String(selfAssessment.technicalExcellence));
-      fd.append('communication', String(selfAssessment.communication));
-      fd.append('workHabits', String(selfAssessment.workHabits));
-      fd.append('aiOrchestration', String(selfAssessment.aiOrchestration));
-      fd.append('selfAssessmentReflection', selfAssessment.selfAssessmentReflection);
+      // Skip unanswered fields: String(null) would send "null", which Spring cannot bind to an Integer.
+      for (const [field, value] of Object.entries(selfAssessment)) {
+        if (value !== null && value !== '') fd.append(field, String(value));
+      }
       const r = await fetch(`${javaURI}/api/assignment-submissions/upload`, {
         method: 'POST',
         mode: fetchOptions.mode,
@@ -965,11 +964,12 @@
           return;
         }
         const selfAssessment = getSelfAssessmentData();
-        const selfAssessmentError = validateSelfAssessment(selfAssessment);
-        if (selfAssessmentError) {
-          showStatus('error', selfAssessmentError);
-          return;
-        }
+        // Self-assessment is paused, so its required-field check is off for now.
+        // const selfAssessmentError = validateSelfAssessment(selfAssessment);
+        // if (selfAssessmentError) {
+        //   showStatus('error', selfAssessmentError);
+        //   return;
+        // }
         submitBtn.disabled = true;
         showStatus('loading', 'Submitting...');
         try {
@@ -994,11 +994,12 @@
         const notes = document.getElementById('file-notes')?.value?.trim() || '';
         const submitBtn = fileForm.querySelector('button[type="submit"]');
         const selfAssessment = getSelfAssessmentData();
-        const selfAssessmentError = validateSelfAssessment(selfAssessment);
-        if (selfAssessmentError) {
-          showStatus('error', selfAssessmentError);
-          return;
-        }
+        // Self-assessment is paused, so its required-field check is off for now.
+        // const selfAssessmentError = validateSelfAssessment(selfAssessment);
+        // if (selfAssessmentError) {
+        //   showStatus('error', selfAssessmentError);
+        //   return;
+        // }
         submitBtn.disabled = true;
         showStatus('loading', 'Uploading...');
         try {
@@ -1039,11 +1040,12 @@
           return;
         }
         const selfAssessment = getSelfAssessmentData();
-        const selfAssessmentError = validateSelfAssessment(selfAssessment);
-        if (selfAssessmentError) {
-          showStatus('error', selfAssessmentError);
-          return;
-        }
+        // Self-assessment is paused, so its required-field check is off for now.
+        // const selfAssessmentError = validateSelfAssessment(selfAssessment);
+        // if (selfAssessmentError) {
+        //   showStatus('error', selfAssessmentError);
+        //   return;
+        // }
         submitBtn.disabled = true;
         showStatus('loading', 'Checking login...');
         try {

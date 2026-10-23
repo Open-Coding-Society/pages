@@ -1,540 +1,79 @@
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-.sub-cap {
-  --ink: #101820;
-  --surface: #18232e;
-  --surface-raised: #202e3b;
-  --hairline: #344453;
-  --signal: #63d6b5;
-  --signal-soft: #183d3a;
-  --paper: #f4f7fa;
-  --text: #d9e1e8;
-  --text-muted: #a2b0bd;
-  --blue: #76b8ff;
-  --blue-soft: #203b55;
-  --gold: #f2bd68;
-
-  --sans: 'DM Sans', system-ui, -apple-system, sans-serif;
-  --display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
-
-  background: var(--ink);
-  color: var(--text);
-  font-family: var(--sans);
-  border-radius: 1.35rem;
-  padding: clamp(1.25rem, 4vw, 2.5rem);
-  max-width: 1100px;
-  margin: 0 auto;
-  border: 1px solid var(--hairline);
-  box-shadow: 0 18px 50px rgba(0,0,0,.18);
-  line-height: 1.6;
-}
-
-.sub-cap * {
-  box-sizing: border-box;
-}
-
-.sub-cap a {
-  transition: color .18s ease, border-color .18s ease, background .18s ease;
-}
-
-.sub-cap .crumb {
-  font-size: .73rem;
-  font-weight: 700;
-  letter-spacing: .12em;
-  color: var(--text-muted);
-  text-decoration: none;
-  margin-bottom: 1.25rem;
-  display: inline-block;
-  text-transform: uppercase;
-}
-
-.sub-cap .crumb:hover {
-  color: var(--signal);
-}
-
-.sub-cap .crumb b {
-  color: var(--paper);
-  font-weight: 700;
-}
-
-.sub-cap h1 {
-  font-family: var(--display);
-  font-weight: 700;
-  font-size: clamp(2rem, 5vw, 3.25rem);
-  letter-spacing: -.045em;
-  line-height: 1.12;
-  margin: 0 0 1rem;
-  color: var(--paper);
-  max-width: 20ch;
-}
-
-.sub-cap .intro {
-  font-size: 1rem;
-  color: var(--text);
-  line-height: 1.75;
-  margin: 0 0 1.35rem;
-  max-width: 78ch;
-}
-
-.sub-cap .kanban-link {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-  font-size: .85rem;
-  font-weight: 700;
-  color: var(--paper);
-  text-decoration: none;
-  border: 1px solid var(--signal);
-  background: var(--signal-soft);
-  border-radius: .7rem;
-  padding: .7rem 1rem;
-  margin-bottom: 2rem;
-}
-
-.sub-cap .kanban-link:hover {
-  background: #24534d;
-}
-
-.sub-cap .board-label {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  font-family: var(--display);
-  font-size: .8rem;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--signal);
-  padding: 0 0 .75rem;
-  margin: 2rem 0 0;
-}
-
-.sub-cap .board-label::after {
-  content: "";
-  height: 1px;
-  background: var(--hairline);
-  flex: 1;
-}
-
-.sub-cap .board {
-  border: 1px solid var(--hairline);
-  border-radius: 1rem;
-  overflow: hidden;
-  margin: 0 0 1.25rem;
-  background: var(--surface);
-}
-
-.sub-cap .priorities {
-  list-style: none;
-  counter-reset: priority;
-  margin: 0 0 1.5rem;
-  padding: 0;
-}
-
-.sub-cap .priorities li {
-  counter-increment: priority;
-  display: grid;
-  grid-template-columns: 2.5rem minmax(0, 1fr);
-  gap: .5rem 1rem;
-  padding: 1.15rem 1.25rem;
-  background: var(--surface);
-  border-bottom: 1px solid var(--hairline);
-}
-
-.sub-cap .priorities li:last-child {
-  border-bottom: none;
-}
-
-.sub-cap .priorities li::before {
-  content: counter(priority, decimal-leading-zero);
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: .15rem;
-  color: var(--gold);
-  font-family: var(--display);
-  font-size: .85rem;
-  font-weight: 700;
-}
-
-.sub-cap .priorities h3,
-.sub-cap .sub-row h3,
-.sub-cap .note-card h3,
-.sub-cap .plan-block h3 {
-  font-family: var(--display);
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--paper);
-  line-height: 1.35;
-  margin: 0 0 .4rem;
-}
-
-.sub-cap .priorities p {
-  font-size: .9rem;
-  color: var(--text-muted);
-  line-height: 1.65;
-  margin: 0 0 .45rem;
-}
-
-.sub-cap .priorities .owner {
-  font-size: .78rem;
-  color: var(--text-muted);
-  margin: .6rem 0 0;
-}
-
-.sub-cap .priorities .owner b {
-  color: var(--paper);
-  font-weight: 700;
-}
-
-.sub-cap .sub-row {
-  display: block;
-  padding: 1.25rem 1.4rem;
-  background: var(--surface);
-  border-bottom: 1px solid var(--hairline);
-}
-
-.sub-cap .sub-row:last-child {
-  border-bottom: none;
-}
-
-.sub-cap .sub-row h3 {
-  margin-bottom: .25rem;
-}
-
-.sub-cap .sub-row .team {
-  display: inline-block;
-  font-size: .75rem;
-  font-weight: 700;
-  color: var(--blue);
-  margin: 0 0 .65rem;
-}
-
-.sub-cap .sub-row p.desc {
-  font-size: .9rem;
-  color: var(--text-muted);
-  line-height: 1.65;
-  margin: 0 0 .6rem;
-  max-width: 85ch;
-}
-
-.sub-cap .tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .4rem;
-  margin: 0 0 .75rem;
-}
-
-.sub-cap .tag {
-  display: inline-flex;
-  font-size: .7rem;
-  font-weight: 700;
-  color: var(--signal);
-  background: var(--signal-soft);
-  border: 1px solid #2c5c54;
-  border-radius: 999px;
-  padding: .2rem .65rem;
-}
-
-.sub-cap .sub-row .link {
-  display: inline-block;
-  font-size: .8rem;
-  font-weight: 700;
-  color: var(--paper);
-  text-decoration: none;
-  border-bottom: 1px solid var(--signal);
-  padding-bottom: 2px;
-  white-space: nowrap;
-}
-
-.sub-cap .sub-row .link:hover {
-  color: var(--signal);
-}
-
-.sub-cap .notes {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: .85rem;
-  margin: 0 0 1.75rem;
-}
-
-.sub-cap .note-card {
-  background: var(--surface);
-  border: 1px solid var(--hairline);
-  border-top: 3px solid var(--blue);
-  border-radius: .9rem;
-  padding: 1.15rem 1.15rem 1.25rem;
-  min-width: 0;
-}
-
-.sub-cap .note-card:nth-child(2) {
-  border-top-color: var(--signal);
-}
-
-.sub-cap .note-card:nth-child(3) {
-  border-top-color: var(--gold);
-}
-
-.sub-cap .note-card h3 {
-  margin-bottom: .7rem;
-}
-
-.sub-cap .note-card ul {
-  margin: 0;
-  padding-left: 1.1rem;
-}
-
-.sub-cap .note-card li {
-  font-size: .85rem;
-  color: var(--text-muted);
-  line-height: 1.65;
-  margin-bottom: .55rem;
-}
-
-.sub-cap .note-card li:last-child {
-  margin-bottom: 0;
-}
-
-.sub-cap .plan-block {
-  margin-bottom: 1.5rem;
-}
-
-.sub-cap .plan-block:last-child {
-  margin-bottom: 0;
-}
-
-.sub-cap .plan-block p {
-  font-size: .9rem;
-  color: var(--text);
-  line-height: 1.7;
-  margin: 0;
-  max-width: 75ch;
-}
-
-.sub-cap .plan-block strong {
-  color: var(--paper);
-}
-
-.sub-cap .grading-label {
-  font-size: .78rem;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--signal);
-  padding: 0 0 .75rem;
-  margin-top: 2rem;
-}
-
-.sub-cap .grading-img {
-  border: 1px solid var(--hairline);
-  border-radius: .9rem;
-  overflow: hidden;
-  margin: 0 0 1.25rem;
-  max-width: 380px;
-  background: var(--surface);
-}
-
-.sub-cap .grading-img img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.sub-cap code {
-  color: #b8d8ff;
-  background: #23364a;
-  border-radius: .3rem;
-  padding: .08rem .3rem;
-  font-size: .9em;
-}
-
-@media (max-width: 760px) {
-  .sub-cap .notes {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .sub-cap {
-    padding: 1.25rem 1rem 1.5rem;
-    border-radius: 1rem;
-  }
-
-  .sub-cap .sub-row,
-  .sub-cap .priorities li {
-    padding: 1rem;
-  }
-
-  .sub-cap .priorities li {
-    grid-template-columns: 2rem minmax(0, 1fr);
-    gap: .5rem;
-  }
-
-  .sub-cap .kanban-link {
-    max-width: 100%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sub-cap a {
-    transition: none;
-  }
-}
-</style>
-
-<div class="sub-cap">
-
-  <a href="{{ '/capstone/' | relative_url }}" class="crumb">OCS CAPSTONES &rsaquo; <b>SUBMISSIONS</b></a>
-
-  <h1>OCS Assignments System</h1>
-
-  <p class="intro">The goal right now is to make grading faster and more trustworthy, and to let teachers do everything they need from the Pages frontend without digging into the Spring admin views. Below are the six things we're focused on, who's working on what, and the design notes we're working from.</p>
-
-  <a href="https://github.com/orgs/AAApages/projects/1/views/1" class="kanban-link" target="_blank" rel="noopener">Track progress on the Kanban board →</a>
-
-  <p class="board-label">Current priorities</p>
-
-  <ol class="board priorities">
-    <li>
-      <div>
-        <h3>Faster grading with your own AI key</h3>
-        <p>Graders add their own Gemini key so AI grading isn't stuck waiting on one shared key.</p>
-        <p class="owner">Owner: <b>Aditya</b></p>
-      </div>
-    </li>
-    <li>
-      <div>
-        <h3>Fix, build, and standardize lessons with CRUD</h3>
-        <p>Add and delete operations so lessons can be cleaned up and kept consistent, instead of being patched one by one.</p>
-        <p class="owner">Owners: <b>Rishabh</b> (CSSE lesson) &middot; <b>Aneesh</b> (Units 1 + 2)</p>
-      </div>
-    </li>
-    <li>
-      <div>
-        <h3>Grading corrections from the admin page</h3>
-        <p>Example: a CSSE object literals lesson had a nested conditionals permalink, and that wrong link got saved in the database. Resubmitting doesn't fix the record because the submission process never updates it, so admins need a way to correct it from the admin page.</p>
-        <p class="owner">Owners: <b>William + Nick</b> &middot; <b>Katherine + Bridget</b></p>
-      </div>
-    </li>
-    <li>
-      <div>
-        <h3>Data collection for self-assessment</h3>
-        <p>Collecting the data that self-assessment will be built on before it goes back into OCS.</p>
-        <p class="owner">Owner: <b>Jacob</b></p>
-      </div>
-    </li>
-    <li>
-      <div>
-        <h3>Using OCS AI</h3>
-        <p>Deciding whether grading goes through an OCS AI API or another option.</p>
-        <p class="owner">Owner: <b>Whole team</b> &middot; approach still being decided</p>
-      </div>
-    </li>
-    <li>
-      <div>
-        <h3>Aaryav's <code>omake</code></h3>
-        <p>Speeding up make run time. This is on the agenda for the second mentor meeting.</p>
-        <p class="owner">Owner: <b>Aaryav</b></p>
-      </div>
-    </li>
-  </ol>
-
-  <p class="board-label">Who's working on what</p>
-
-  <div class="board">
-
-    <div class="sub-row">
-      <h3>AI Grading with Your Own Key</h3>
-      <p class="team">Aditya</p>
-      <div class="tags"><span class="tag">#1 Faster grading</span><span class="tag">#5 OCS AI</span></div>
-      <p class="desc">Letting each assignment be AI-graded with a key the user uploads from Gemini or Claude. Every assignment's AI grade is out of 1 point.</p>
-      <a href="{{ '/capstone/work-submission-grading/' | relative_url }}" class="link">View project →</a>
-    </div>
-
-    <div class="sub-row">
-      <h3>Student Grades Alongside AI Grades + Make Run Time</h3>
-      <p class="team">Aaryav</p>
-      <div class="tags"><span class="tag">#6 omake</span></div>
-      <p class="desc">Letting a student grade go in next to the AI grade without overwriting it. Separately, cutting down make run time with <code>omake</code>.</p>
-    </div>
-
-    <div class="sub-row">
-      <h3>CSSE Lesson Fix</h3>
-      <p class="team">Rishabh</p>
-      <div class="tags"><span class="tag">#2 Lessons</span><span class="tag">#3 Corrections</span></div>
-      <p class="desc">Fixing the CSSE lesson behind the mismatched permalink, so new submissions land on the right lesson.</p>
-    </div>
-
-    <div class="sub-row">
-      <h3>Kanban, Admin Dashboard + Student Success Insights</h3>
-      <p class="team">Katherine &middot; Bridget</p>
-      <div class="tags"><span class="tag">#3 Corrections</span></div>
-      <p class="desc">Keeping the Kanban board and this capstone page up to date, organizing the admin dashboard and the Spring backend behind it, and building Student Success Insights.</p>
-      <a href="{{ '/capstone/analytics_selfassessment/' | relative_url }}" class="link">View project →</a>
-    </div>
-
-    <div class="sub-row">
-      <h3>Admin Dashboard: Assignments by Year</h3>
-      <p class="team">William &middot; Nick</p>
-      <div class="tags"><span class="tag">#3 Corrections</span></div>
-      <p class="desc">Organizing assignments by year in the admin dashboard. There are about 20 pages of assignments from several years, so the focus is on making them easy to find and fix.</p>
-    </div>
-
-    <div class="sub-row">
-      <h3>Unit 1 + 2 Teaching</h3>
-      <p class="team">Aneesh</p>
-      <div class="tags"><span class="tag">#2 Lessons</span></div>
-      <p class="desc">Units 1 and 2 still need to be taught. This means working out the schedule and trying a new way of teaching lessons to get more engagement. Right now the focus is the homework for Mort's data structures lesson.</p>
-    </div>
-
-    <div class="sub-row">
-      <h3>Self-Assessment Rework</h3>
-      <p class="team">Jacob</p>
-      <div class="tags"><span class="tag">#4 Self-assessment</span></div>
-      <p class="desc">Taking self-grading out for now and reworking it, using the data being collected, before it goes back into OCS.</p>
-      <a href="{{ '/capstone/analytics_selfassessment/' | relative_url }}" class="link">View project →</a>
-    </div>
-
+{% assign data = site.data.submissions_capstone_infograph %}
+
+<div class="submissions-infograph">
+  <!-- Header Section -->
+  <div class="submissions-header">
+    <a href="{{ '/capstone/' | relative_url }}" class="submissions-badge">{{ data.Badge }}</a>
+    <h1 class="submissions-title">{{ data.Title }}</h1>
+    <p class="submissions-description">{{ data.Description }}</p>
   </div>
 
-  <p class="board-label">Design notes</p>
+  <!-- Sprint Board: live from the team's GitHub project -->
+  {% if data.Board %}
+  {% include ocs_kanban_board.html url=data.Board.url filter=data.Board.filter %}
+  {% endif %}
 
-  <div class="notes">
-
-    <div class="note-card">
-      <h3>Spring backend</h3>
-      <ul>
-        <li>The "view grades" page in Spring has gotten huge. Teachers would be better served by a teacher view on the frontend.</li>
-        <li>Leave the legacy pages in place rather than ripping them out.</li>
-        <li>Grading still needs a proper design before more gets built on it.</li>
-        <li>The assignment tracker spans about 20 pages across several years. Starting from scratch would be cleaner but is too much work, so we're improving what's there.</li>
-        <li>AI grading uses a rubric out of 1 point.</li>
-        <li>Add only the CRUD operations admins actually need, not every possible one.</li>
-      </ul>
+  <!-- Current Priorities -->
+  {% if data.Priorities %}
+  <div class="submissions-card">
+    <h2 class="submissions-project-title">{{ data.Priorities.title }}</h2>
+    <div class="submissions-impact-list">
+      {% for item in data.Priorities.items %}
+      <div class="submissions-impact-item">
+        <strong>#{{ forloop.index }} {{ item.title }}</strong> — {{ item.description }}
+        <br>{{ item.owner }}
+      </div>
+      {% endfor %}
     </div>
-
-    <div class="note-card">
-      <h3>Pages frontend</h3>
-      <ul>
-        <li>Submission screens for both graders and teachers.</li>
-        <li>Teachers should only ever need the frontend to do their work.</li>
-        <li>That includes starting AI grading from the frontend.</li>
-      </ul>
-    </div>
-
-    <div class="note-card">
-      <h3>How we're working</h3>
-      <ul>
-        <li>PRs should remove sharp edges, not add band-aids.</li>
-        <li>An AI grade and a student or grader grade should sit side by side. Neither one overwrites the other.</li>
-        <li>Fix bad data at the source. If a record is wrong, there should be an admin way to correct it.</li>
-      </ul>
-    </div>
-
   </div>
+  {% endif %}
 
+  <!-- Project Cards: who's working on what -->
+  {% for topic in data.Topics %}
+  <div class="submissions-card">
+    <div class="submissions-card-grid">
+
+      <!-- Left: Team -->
+      <div class="submissions-visual">
+        <div class="submissions-team">
+          <span class="submissions-team-label">Project Leads</span>
+          <span class="submissions-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <!-- Center: Title & Priority Tags -->
+      <div class="submissions-content">
+        <h2 class="submissions-project-title">{{ topic.title }}</h2>
+        <div class="submissions-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="submissions-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: Description -->
+      <div class="submissions-details">
+        <h3 class="submissions-section-title">About</h3>
+        <p class="submissions-about">{{ topic.description }}</p>
+        {% if topic.link %}
+        <a href="{{ topic.link | relative_url }}" class="submissions-btn">{{ topic.linkLabel | default: "Learn More" }}</a>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Design Notes -->
+  {% for section in data.Sections %}
+  <div class="submissions-card">
+    <h2 class="submissions-project-title">{{ section.title }}</h2>
+    <p class="submissions-subtitle">{{ section.subtitle }}</p>
+    <div class="submissions-impact-list">
+      {% for item in section.items %}
+      <div class="submissions-impact-item">{{ item }}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
 </div>

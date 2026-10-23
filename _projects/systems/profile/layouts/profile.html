@@ -7,7 +7,8 @@ active_tab: profile
 /profile: profile settings built only from the ocs__ grammar
 (_sass/open-coding/README.md), with no page stylesheet. Source: _projects/systems/profile
 (see its README). profile-page.js starts the account form, classes, personas, skill
-check-in and Face ID, and keeps the setup checklist at the top current.
+check-in and Face ID, and keeps the setup checklist at the top current. Face ID and the
+Gist card need Spring, so a Flask-only site (spring: false in _config.yml) leaves them out.
 {%- endcomment -%}
 {%- assign profile_course_codes = "csse,csp,csa,csh" | split: "," -%}
 <script type="application/json" id="profileCourses">
@@ -102,7 +103,7 @@ check-in and Face ID, and keeps the setup checklist at the top current.
             <ul class="ocs__entity-list" id="classesContainer">
                 <li>Loading your classes…</li>
             </ul>
-            <p class="ocs__text">Adding or removing a class saves right away. Your classes decide which course calendars you see.</p>
+            <p class="ocs__text">Adding or removing a class saves right away.{% if site.spring != false %} Your classes decide which course calendars you see.{% endif %}</p>
             <p class="ocs__text" id="classesStatus" role="status" hidden></p>
         </div>
     </section>
@@ -150,6 +151,7 @@ check-in and Face ID, and keeps the setup checklist at the top current.
         </form>
     </section>
 
+    {%- if site.spring != false %}
     <!-- Face ID: used by the Bathroom Pass -->
     <section class="ocs__card" aria-labelledby="face-id">
         <div class="ocs__card-header">
@@ -184,17 +186,18 @@ check-in and Face ID, and keeps the setup checklist at the top current.
         </div>
     </section>
 
-    <!-- GitHub Gist connection (its own include, shared with /profile) -->
+    <!-- GitHub Gist connection (its own include) -->
     <div id="github">
         {% include profile-gist-connection.html %}
     </div>
+    {%- endif %}
 </div>
 
 <script type="module">
     // The shared helpers are imported here, where Jekyll fills in the site's baseurl, and
     // handed to the profile modules, which import each other only with ./ paths.
-    import { fetchOptions, javaURI, pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { fetchOptions, javaURI, pythonURI, springEnabled } from '{{ site.baseurl }}/assets/js/api/config.js';
     import { postUpdate, putUpdate } from '{{ site.baseurl }}/assets/js/api/profile.js';
     import { initProfilePage } from '{{ site.baseurl }}/assets/js/profile/profile-page.js';
-    initProfilePage({ fetchOptions, javaURI, pythonURI, postUpdate, putUpdate });
+    initProfilePage({ fetchOptions, javaURI, pythonURI, springEnabled, postUpdate, putUpdate });
 </script>

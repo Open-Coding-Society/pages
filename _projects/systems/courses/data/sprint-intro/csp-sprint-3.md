@@ -17,10 +17,10 @@ This sprint brings together your trimester work in one review ticket for AI eval
 |----------------------------|---------------|----------|
 | Beyond Perfunctory         | 1   Bonus     | Phase 1  |
 | Sprint 1-2,Quiz Retro      | 1             | Phase 1  |
-| Project Phase: Define      | 1  Capstone/Kanban | Phase 1  |
+| Project Phase: Ideate      | 1  Capstone/Kanban | Phase 1  |
 | SASS: 4 best lessons       | 2             | Phase 2  |
 | Python Homeworks x 4 best  | 2             | Phase 2  |
-| Project Phase: Ideate      | 1  Capstone/Kanban | Phase 2  |
+| Project Phase: Define      | 1  Capstone/Kanban | Phase 2  |
 | Teaching, Honework Grading | 1             | Phase 3  |
 | Project Phase: Prototype   | 1  Home/Login/Survey | Phase 3  |
 | Work Habits (Analytics)    | 2             | Phase 4  |

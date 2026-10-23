@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
     BoardError, cacheState, columnCards, filterCards, normalizeBoard, parseBoardUrl, pickFields, readEntry, refreshBoard,
-    stageOf, writeEntry,
+    repoStatusOf, stageOf, writeEntry,
 } from '../assets/js/kanban-board.js';
 
 // Shaped like GitHub's REST projectsV2 responses (fields, items), trimmed to
@@ -421,4 +421,44 @@ test('Area filters and Priority and Topic values survive normalization and fetch
     const empty = normalizeBoard({ project: PROJECT, fields, items: [item(999, 'DraftIssue', draft('Unassigned'), [statusValue('Todo')], '2026-10-22T00:00:00Z')] }, { url: BOARD_URL });
     assert.equal(empty.cards[0].priority, '');
     assert.equal(empty.cards[0].topic, '');
+});
+
+// A repository's issues as a board: for personal boards GitHub won't show
+// signed out, a team can point the embed at its repository's issues instead.
+test('a repository issues address is a board; a plain repository address is not', () => {
+    assert.deepEqual(parseBoardUrl('https://github.com/rex0dex/fops-pages/issues'), {
+        apiPath: 'repos/rex0dex/fops-pages', url: 'https://github.com/rex0dex/fops-pages/issues', repo: 'rex0dex/fops-pages', personal: false,
+    });
+    assert.equal(parseBoardUrl('https://github.com/rex0dex/fops-pages'), null);
+    assert.equal(parseBoardUrl('https://github.com/users/rex0dex/projects/3').personal, true);
+});
+
+test('an issue goes to a column by its stage label, else closed, assigned or open', () => {
+    const person = { login: 'rex0dex' };
+    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'In review' }], assignees: [person] }), 'In review');
+    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'bug' }, { name: 'backlog' }], assignees: [] }), 'Backlog');
+    assert.equal(repoStatusOf({ state: 'closed', labels: [], assignees: [person] }), 'Done');
+    assert.equal(repoStatusOf({ state: 'open', labels: [], assignees: [person] }), 'In progress');
+    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'bug' }], assignees: [] }), 'To do');
+});
+
+test('a repository board leaves out pull requests and issues closed as not planned, and filters by assignee', async () => {
+    const issue = (number, extra) => ({
+        id: 7000 + number, number, title: `Issue ${number}`, html_url: `https://github.com/rex0dex/fops-pages/issues/${number}`,
+        state: 'open', labels: [], assignees: [], body: '', updated_at: `2026-10-2${number % 10}T00:00:00Z`, ...extra,
+    });
+    const issues = [
+        issue(1, { assignees: [{ login: 'rex0dex' }] }),
+        issue(2, { state: 'closed', state_reason: 'not_planned' }),
+        issue(3, { pull_request: { url: 'https://api.github.com/repos/rex0dex/fops-pages/pulls/3' } }),
+        issue(4, { state: 'closed', state_reason: 'completed', assignees: [{ login: 'Kash484' }] }),
+        issue(5),
+    ];
+    const fetched = [];
+    const fetchImpl = async (url) => { fetched.push(url); return json(issues); };
+    const entry = await refreshBoard(parseBoardUrl('https://github.com/rex0dex/fops-pages/issues'), { filterName: 'Assignee', fetchImpl, now: 0 });
+    assert.deepEqual(fetched, ['https://api.github.com/repos/rex0dex/fops-pages/issues?state=all&per_page=100']);
+    assert.deepEqual(entry.board.cards.map(card => [card.number, card.stage]), [[1, 'doing'], [4, 'done'], [5, 'todo']]);
+    assert.deepEqual(entry.board.groups, ['rex0dex', 'Kash484']);
+    assert.equal(filterCards(entry.board, 'Kash484')[0].number, 4);
 });
