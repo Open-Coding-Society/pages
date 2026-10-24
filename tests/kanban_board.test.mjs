@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
     BoardError, boardConfig, cacheState, columnCards, filterCards, normalizeBoard, parseBoardUrl, pickFields, readEntry,
-    refreshBoard, stageOf, writeEntry,
+    refreshBoard, repoStatusOf, repoToProject, stageOf, writeEntry,
 } from '../assets/js/kanban-board.js';
 
 // The board's defaults, read from _data/kanban.yml with Ruby's YAML, the parser
@@ -483,4 +483,61 @@ test('Area filters and Priority and Topic values survive normalization and fetch
     assert.ok(requested.includes('21'));
     const empty = normalizeBoard({ project: PROJECT, fields, items: [item(999, 'DraftIssue', draft('Unassigned'), [statusValue('Todo')], '2026-10-22T00:00:00Z')] }, { url: BOARD_URL, config: CONFIG });
     assert.deepEqual(empty.cards[0].details, []);
+});
+
+// A repository's issues as a board: for personal boards GitHub won't show
+// signed out, a team can point the embed at its repository's issues instead.
+test('a repository issues address is a board; a plain repository address is not', () => {
+    assert.deepEqual(parseBoardUrl('https://github.com/rex0dex/fops-pages/issues'), {
+        apiPath: 'repos/rex0dex/fops-pages', url: 'https://github.com/rex0dex/fops-pages/issues', repo: 'rex0dex/fops-pages', personal: false,
+    });
+    assert.equal(parseBoardUrl('https://github.com/rex0dex/fops-pages'), null);
+    assert.equal(parseBoardUrl('https://github.com/users/rex0dex/projects/3').personal, true);
+});
+
+test('an issue goes to a column by its stage label, else closed, assigned or open', yaml, () => {
+    const person = { login: 'rex0dex' };
+    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'In review' }], assignees: [person] }, CONFIG), 'In review');
+    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'bug' }, { name: 'backlog' }], assignees: [] }, CONFIG), 'Backlog');
+    assert.equal(repoStatusOf({ state: 'closed', labels: [], assignees: [person] }, CONFIG), 'Done');
+    assert.equal(repoStatusOf({ state: 'open', labels: [], assignees: [person] }, CONFIG), 'In progress');
+    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'bug' }], assignees: [] }, CONFIG), 'To do');
+});
+
+test('where a repository\'s issues go, and its board\'s title, come from the data too', yaml, () => {
+    const config = boardConfig({
+        ...DEFAULTS,
+        stages: DEFAULTS.stages.map((stage) => (stage.key === 'doing' ? { ...stage, label: 'Underway' } : stage)),
+        issues: { ...DEFAULTS.issues, assigned: 'review' },
+        text: { ...DEFAULTS.text, issues_title: 'Issues in {repo}' },
+    });
+    const assigned = { id: 1, number: 1, title: 'Assigned', state: 'open', labels: [], assignees: [{ login: 'rex0dex' }], updated_at: '2026-10-22T00:00:00Z' };
+    const working = { ...assigned, id: 2, number: 2, labels: [{ name: 'underway' }] };
+    assert.equal(repoStatusOf(assigned, config), 'In review');
+    const board = normalizeBoard(repoToProject('rex0dex/fops-pages', [assigned, working], '', config), { url: 'https://github.com/rex0dex/fops-pages/issues', config });
+    assert.equal(board.title, 'Issues in rex0dex/fops-pages');
+    // A status named for a stage's label joins that stage, words or not.
+    assert.deepEqual(board.cards.map((c) => [c.number, c.stage]), [[1, 'review'], [2, 'doing']]);
+    assert.equal(board.columns.find((c) => c.key === 'doing').label, 'Underway');
+});
+
+test('a repository board leaves out pull requests and issues closed as not planned, and filters by assignee', yaml, async () => {
+    const issue = (number, extra) => ({
+        id: 7000 + number, number, title: `Issue ${number}`, html_url: `https://github.com/rex0dex/fops-pages/issues/${number}`,
+        state: 'open', labels: [], assignees: [], body: '', updated_at: `2026-10-2${number % 10}T00:00:00Z`, ...extra,
+    });
+    const issues = [
+        issue(1, { assignees: [{ login: 'rex0dex' }] }),
+        issue(2, { state: 'closed', state_reason: 'not_planned' }),
+        issue(3, { pull_request: { url: 'https://api.github.com/repos/rex0dex/fops-pages/pulls/3' } }),
+        issue(4, { state: 'closed', state_reason: 'completed', assignees: [{ login: 'Kash484' }] }),
+        issue(5),
+    ];
+    const fetched = [];
+    const fetchImpl = async (url) => { fetched.push(url); return json(issues); };
+    const entry = await refreshBoard(parseBoardUrl('https://github.com/rex0dex/fops-pages/issues'), { filterName: 'Assignee', config: CONFIG, fetchImpl, now: 0 });
+    assert.deepEqual(fetched, ['https://api.github.com/repos/rex0dex/fops-pages/issues?state=all&per_page=100']);
+    assert.deepEqual(entry.board.cards.map(card => [card.number, card.stage]), [[1, 'doing'], [4, 'done'], [5, 'todo']]);
+    assert.deepEqual(entry.board.groups, ['rex0dex', 'Kash484']);
+    assert.equal(filterCards(entry.board, 'Kash484')[0].number, 4);
 });

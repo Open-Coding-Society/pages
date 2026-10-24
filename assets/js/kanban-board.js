@@ -10,7 +10,9 @@
 // so a board is kept in localStorage: reused for 10 minutes, and its title and
 // field ids for a day. A first visit costs one request for the project, one for
 // its fields and one per 100 cards; a repeat visit, only the cards. When GitHub
-// doesn't answer, the last copy stays up with a note saying so.
+// doesn't answer, the last copy stays up with a note saying so. A team
+// without an organization can show its repository's issues instead (see
+// repoToProject).
 //
 // Nothing about columns or wording is written here. The stages, the field
 // names and everything the board says come from _data/kanban.yml, which the
@@ -61,6 +63,7 @@ export function boardConfig(defaults, columns) {
     stages: listOf(data.stages).filter((stage) => stage?.key).map((stage) => ({
       key: String(stage.key),
       label: String(stage.label ?? stage.key),
+      labelKey: nameKey(stage.label ?? stage.key),
       words: listOf(stage.words).map(wordsOf).filter((phrase) => phrase.length),
       collapsed: Boolean(stage.collapsed),
       boardName: Boolean(stage.board_name),
@@ -69,6 +72,7 @@ export function boardConfig(defaults, columns) {
     shared: listOf(data.shared).map(nameKey),
     fields: data.fields || {},
     cardFields: listOf(data.card_fields),
+    issues: data.issues || {},
     perColumn: Number(data.per_column) > 0 ? Number(data.per_column) : Infinity,
     text: data.text || {},
     overrides,
@@ -87,12 +91,16 @@ function textOf(config, key, values = {}) {
 // and "to do" matches "📋 To-Do".
 const hasPhrase = (words, phrase) => words.some((_, i) => phrase.every((part, j) => words[i + j]?.startsWith(part)));
 
-// The stage a status belongs to, or null when it has none of the stages'
-// words (that column then keeps its own name). A status with words from two
-// stages ("Waiting for review") belongs to the later one.
+// The stage a status belongs to: the one it is named for ("In review"), else
+// the one whose words it has, or null when it has none (that column then
+// keeps its own name). A status with words from two stages ("Waiting for
+// review") belongs to the later one.
 function stageFor(status, config) {
+  const name = nameKey(status);
   const words = wordsOf(status);
-  return [...config.stages].reverse().find((stage) => stage.words.some((phrase) => hasPhrase(words, phrase))) || null;
+  return config.stages.find((stage) => stage.labelKey === name)
+    || [...config.stages].reverse().find((stage) => stage.words.some((phrase) => hasPhrase(words, phrase)))
+    || null;
 }
 
 export const stageOf = (status, config) => stageFor(status, config)?.key ?? null;
@@ -105,12 +113,24 @@ const BOARD_PATH = /^\/(orgs|users)\/([A-Za-z0-9-]+)\/projects\/(\d+)(?:\/|$)/;
 // board's own address. Anything that isn't a GitHub project board is null.
 // A personal board (/users/...) is marked: GitHub answers 401 for its cards
 // without a token, so only boards owned by an organization can be shown.
+// A repository's issues as a board, e.g.
+// "https://github.com/rex0dex/fops-pages/issues" (the address must end in
+// /issues; a plain repository address still isn't a board). Its issues are
+// public, so this works for personal repositories too.
+const REPO_PATH = /^\/([A-Za-z0-9-]+)\/([A-Za-z0-9._-]+)\/issues\/?$/;
+
 export function parseBoardUrl(address) {
   let url;
   try { url = new URL(address); } catch (_) { return null; }
   if (url.protocol !== 'https:' || url.hostname !== 'github.com') return null;
   const match = url.pathname.match(BOARD_PATH);
-  if (!match) return null;
+  if (!match) {
+    const repo = url.pathname.match(REPO_PATH);
+    if (!repo || repo[1] === 'orgs' || repo[1] === 'users') return null;
+    const [, owner, name] = repo;
+    return { apiPath: `repos/${owner}/${name}`, url: `https://github.com/${owner}/${name}/issues`, repo: `${owner}/${name}`, personal: false };
+  }
+
   const [, kind, owner, number] = match;
   return {
     apiPath: `${kind}/${owner}/projectsV2/${number}`,
@@ -335,6 +355,7 @@ async function getJson(url, fetchImpl, now) {
 // from `meta` when they are under a day old (metaAt), so a refresh is usually
 // just the cards: per_page=100, following Link rel="next" for up to 5 pages.
 export async function refreshBoard(ref, { filterName = '', config, meta = null, metaAt = 0, fetchImpl = fetch, now = Date.now() } = {}) {
+  if (ref.repo) return refreshRepoBoard(ref, { filterName, config, fetchImpl, now });
   let { title, fields } = meta || {};
   let fetchedMetaAt = metaAt;
   if (!meta || now - metaAt >= META_MS) {
@@ -360,6 +381,59 @@ export async function refreshBoard(ref, { filterName = '', config, meta = null, 
     board: normalizeBoard({ project: { title }, fields, items }, { filterName, url: ref.url, config }),
     meta: { title, fields },
     metaAt: fetchedMetaAt,
+    fetchedAt: now,
+  };
+}
+
+// A repository's issues, shaped like a project board so the rest of the embed
+// draws them unchanged: each stage is a status, by its label. An issue joins
+// the stage of its first label with a stage's name or words ("in review",
+// "backlog"); otherwise the settings' issues say which stage closed, assigned
+// and other open issues join. The filter (filter="Assignee") makes a button
+// for each assignee.
+export function repoStatusOf(issue, config) {
+  for (const label of issue.labels || []) {
+    const stage = stageFor(typeof label === 'string' ? label : label.name, config);
+    if (stage) return stage.label;
+  }
+  const where = config.issues;
+  const key = issue.state === 'closed' ? where.closed : (issue.assignees || []).length ? where.assigned : where.open;
+  return config.stages.find((stage) => stage.key === key)?.label ?? '';
+}
+
+export function repoToProject(repo, issues, filterName, config) {
+  const people = [...new Set(issues.flatMap((issue) => (issue.assignees || []).map((p) => p.login)))];
+  const fields = [{ id: 1, name: String(config.fields.status ?? ''), data_type: 'single_select', options: config.stages.map((stage) => ({ name: stage.label })) }];
+  if (filterName) fields.push({ id: 2, name: filterName, data_type: 'single_select', options: people.map((name) => ({ name })) });
+  const items = issues
+    // Pull requests aren't work items, and issues closed as "not planned" were dropped.
+    .filter((issue) => !issue.pull_request && issue.state_reason !== 'not_planned')
+    .map((issue) => ({
+      id: issue.id,
+      content_type: 'Issue',
+      content: issue,
+      updated_at: issue.updated_at,
+      fields: [
+        { id: 1, value: { name: repoStatusOf(issue, config) } },
+        ...(filterName && issue.assignees?.[0] ? [{ id: 2, value: { name: issue.assignees[0].login } }] : []),
+      ],
+    }));
+  return { project: { title: textOf(config, 'issues_title', { repo }) }, fields, items };
+}
+
+async function refreshRepoBoard(ref, { filterName = '', config, fetchImpl = fetch, now = Date.now() } = {}) {
+  const issues = [];
+  let next = `${API}/${ref.apiPath}/issues?state=all&per_page=100`;
+  for (let page = 0; next && page < MAX_PAGES; page += 1) {
+    const result = await getJson(next, fetchImpl, now);
+    issues.push(...result.body);
+    next = result.next;
+  }
+  const payload = repoToProject(ref.repo, issues, filterName, config);
+  return {
+    board: normalizeBoard(payload, { filterName, url: ref.url, config }),
+    meta: null,
+    metaAt: 0,
     fetchedAt: now,
   };
 }

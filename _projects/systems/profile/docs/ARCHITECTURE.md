@@ -13,7 +13,8 @@ show_reading_time: false
 toolkit's `aesthetihawk` layout. The layout holds:
 
 - the markup: the top card, then the Account, Classes, Persona, Skill check-in and
-  Face ID cards, then the Gist card include
+  Face ID cards, then the Gist card include. Face ID and the Gist card are built only
+  when the site runs Spring (`spring` in `_config.yml` isn't `false`).
 - a JSON list of courses, built from each course's `course.title` in
   `_projects/systems/courses/data/<course>.yml` (published to `_data/`)
 - one starter script that imports the shared helpers with the `site.baseurl` path and
@@ -22,14 +23,16 @@ toolkit's `aesthetihawk` layout. The layout holds:
 ## Modules
 
 Each module runs one part of the page. They receive the shared helpers as `api`
-(`pythonURI`, `javaURI`, `fetchOptions`, `putUpdate`, `postUpdate`) and import
-each other only with `./` paths.
+(`pythonURI`, `javaURI`, `springEnabled`, `fetchOptions`, `putUpdate`, `postUpdate`)
+and import each other only with `./` paths. When `springEnabled` is false, none of
+them calls Spring: Account saves to Flask only, Classes skips the course-group sync,
+and `profile-page.js` doesn't start Face ID or watch the Gist card.
 
 | Module | Runs | Endpoints |
 |---|---|---|
 | `profile-page.js` | Starts the others; the top card and its setup checklist | none |
-| `profile-account.js` | The Account form | Flask `GET /api/id`; for each changed field, Flask `PUT /api/user` and Spring `POST /api/person/update` |
-| `profile-classes.js` | The course list, Add class and Remove | Flask `GET`/`POST /api/user/class`; Spring `PUT /api/groups/class-memberships` |
+| `profile-account.js` | The Account form | Flask `GET /api/id`; for each changed field, Flask `PUT /api/user` and, with Spring, Spring `POST /api/person/update` |
+| `profile-classes.js` | The course list, Add class and Remove | Flask `GET`/`POST /api/user/class`; with Spring, Spring `PUT /api/groups/class-memberships` |
 | `profile-personas.js` | The persona summary and picker cards | Flask `GET /api/persona`, `GET /api/user/personas`, `POST /api/user/persona` |
 | `profile-skills.js` | The skill check-in (four 1–6 ratings) | Flask `POST /api/user/skill-snapshot` |
 | `profile-face.js` | Face ID status and the camera scanner | Spring `GET /api/person/get`, `POST /api/face/register` |
@@ -53,6 +56,12 @@ Each part saves on its own, so no single Save button covers the whole page:
   session stops working once it changes.
 - Course changes run one at a time, so Spring's course groups never get a stale list.
 - Persona cards and course rows are built with `textContent`, not HTML strings.
+- The layout reads `site.spring` and the modules read `springEnabled` from `config.js`.
+  Both treat a missing setting as Spring on, so the cards on the page and the calls
+  the modules make always agree.
+- `config.js` and `pages/profile.md` have `regenerate: true` in their front matter.
+  Incremental builds don't notice a change to `_config.yml`, so without it they would
+  keep the old `springEnabled` after `spring` changes.
 - Text that must keep an accent color is in an element preset themes don't recolor,
   such as the avatar's `<abbr>` (see "Avatars" in `_sass/open-coding/README.md`).
 
@@ -65,3 +74,5 @@ Each part saves on its own, so no single Save button covers the whole page:
   - Adding and removing courses re-syncs the course groups.
   - Persona picks save.
   - The scanner opens and closes.
+- Build again with `spring: false` and check that the page has no Face ID or Gist
+  card, the setup list has two steps, and nothing on the page calls Spring.

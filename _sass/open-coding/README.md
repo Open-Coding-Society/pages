@@ -405,10 +405,15 @@ it the board's link and it builds itself from that board:
 
 - `url` (required): a public board owned by an organization
   (`github.com/orgs/...`). The page reads it from GitHub's REST API without
-  signing in; GitHub keeps a personal board's cards for signed-in users.
+  signing in; GitHub keeps a personal board's cards for signed-in users. A team
+  without an organization can give its repository's issues instead
+  (`github.com/<owner>/<repo>/issues`): an issue with a label named for a stage
+  goes to that column, and the rest go by the `issues` settings (closed issues
+  Done, assigned ones In progress, the others To do).
 - `filter` (optional): a single-select field, such as `Team`. Each option that
   has cards becomes a filter button. An option named Everyone or All is for
-  shared cards, which show under every button.
+  shared cards, which show under every button. For a repository's issues,
+  `filter="Assignee"` filters by person.
 - `title` (optional): a heading to use instead of the board's own name.
 - `columns` (optional): the capstone's own changes to its board's columns, a
   list from its page data (below).

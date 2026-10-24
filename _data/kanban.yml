@@ -7,7 +7,8 @@
 # The stages a board's columns are grouped into.
 #   key         names the stage. backlog, todo, doing, review and done also pick
 #               the color of the line across the column's top.
-#   label       the column's name on the page.
+#   label       the column's name on the page. A status with this name joins
+#               the stage too, whatever its words.
 #   words       a status with one of these words joins this stage ("📋 To Do"
 #               has "to do"; "block" also matches "Blocked"). A status with words
 #               from two stages ("Waiting for review") joins the one listed
@@ -49,13 +50,21 @@ fields:
 # Single-select fields a card shows as "Name: value", when the board has them.
 card_fields: [Priority, Topic]
 
+# A repository's issues as a board (a url ending in /issues): the stage an
+# issue joins when none of its labels names a stage.
+issues:
+  closed: done
+  assigned: doing
+  open: todo
+
 # Cards a column shows before "+N more".
 per_column: 5
 
 # Everything the board says. {n}, {done}, {total}, {date}, {time}, {name},
-# {value} and {title} are filled in.
+# {value}, {title} and {repo} are filled in.
 text:
   title: Project board
+  issues_title: "{repo} — issues"
   open: Open on GitHub
   noscript: Turn on JavaScript to see the board here, or open it on GitHub.
   loading: Loading the board from GitHub…

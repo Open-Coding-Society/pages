@@ -69,7 +69,6 @@ messages-page.js at the bottom; README.md in that folder explains how it fits to
           <button type="button" class="ocs__btn small" id="messagesMembers">Members</button>
           <button type="button" class="ocs__btn small" id="messagesFiles">Files</button>
           <button type="button" class="ocs__btn small" id="messagesLeaveGroup">Leave</button>
-          <button type="button" class="ocs__btn small alert-red hidden" id="messagesDeleteGroup">Delete</button>
         </div>
         <div class="chat-messages" id="messagesLog" role="log" aria-live="polite"></div>
         <form class="chat-form" id="messagesForm" autocomplete="off">
@@ -169,7 +168,33 @@ messages-page.js at the bottom; README.md in that folder explains how it fits to
     </div>
     <div class="ocs__links" id="membersResults"></div>
     <p class="ocs__text" id="membersStatus" role="status"></p>
+    <section class="ocs__callout ocs__stack hidden" id="membersDeleteSection" aria-labelledby="membersDeleteTitle">
+      <h4 class="ocs__section-title" id="membersDeleteTitle">Delete group</h4>
+      <p class="ocs__text" id="membersDeleteWarning"></p>
+      <div class="ocs__links">
+        <button type="button" class="ocs__btn small alert-red" id="membersDelete">Delete this group</button>
+      </div>
+    </section>
   </div>
+</div>
+
+<div class="ocs__modal hidden" id="deleteGroupDialog" role="dialog" aria-modal="true" aria-labelledby="deleteGroupTitle" aria-describedby="deleteGroupWarning">
+  <form class="ocs__modal-card ocs__stack" id="deleteGroupForm" autocomplete="off">
+    <div class="ocs__modal-header">
+      <h3 class="ocs__modal-title" id="deleteGroupTitle">Delete group?</h3>
+      <button type="button" class="ocs__btn small" data-close aria-label="Close">&times;</button>
+    </div>
+    <p class="ocs__text" id="deleteGroupWarning"></p>
+    <div class="ocs__field">
+      <label class="ocs__label" for="deleteGroupName">Type <strong id="deleteGroupNameToType"></strong> to confirm</label>
+      <input class="ocs__input" id="deleteGroupName" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-focus>
+    </div>
+    <p class="ocs__text" id="deleteGroupStatus" role="status"></p>
+    <div class="ocs__modal-actions">
+      <button type="button" class="ocs__btn" data-close>Cancel</button>
+      <button type="submit" class="ocs__btn alert-red fill" id="deleteGroupConfirm" disabled>Delete group</button>
+    </div>
+  </form>
 </div>
 
 <div class="ocs__modal hidden" id="filesDialog" role="dialog" aria-modal="true" aria-labelledby="filesTitle">

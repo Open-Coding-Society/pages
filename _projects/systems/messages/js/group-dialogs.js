@@ -1,8 +1,11 @@
 // The group dialogs: find a group to join or make a new one, see and change a group's
-// members, and share files with a group. Leaving and deleting a group are buttons in
-// the conversation header (messages-page.js).
+// members, and share files with a group. Leaving a group is a button in the conversation
+// header (messages-page.js). Deleting one starts at the bottom of Members, for site
+// admins only, and is confirmed in delete-group.js.
 import { button, cell, createDialog } from './dialogs.js';
-import { downloadName, groupSubtitle, isClassGroup, isCourseChannel, isGroupMember, sortGroups } from './messages-model.js';
+import {
+  canDeleteGroup, deleteGroupWarning, downloadName, groupSubtitle, isClassGroup, isCourseChannel, isGroupMember, sortGroups,
+} from './messages-model.js';
 
 const byName = (a, b) => String(a.name).localeCompare(String(b.name));
 
@@ -130,7 +133,7 @@ export function initFindGroup({ elements, api, me, onJoined }) {
   });
 }
 
-export function initMembers({ elements, api, me, onChanged }) {
+export function initMembers({ elements, api, me, onChanged, onDelete }) {
   let group = null;
   let lastResults = [];
   let searchCount = 0;
@@ -165,6 +168,9 @@ export function initMembers({ elements, api, me, onChanged }) {
   function render() {
     elements.title.textContent = `Members of ${group.name}`;
     elements.list.replaceChildren(...[...(group.members || [])].sort(byName).map(memberRow));
+    const deletable = canDeleteGroup(me, group);
+    elements.deleteSection.classList.toggle('hidden', !deletable);
+    if (deletable) elements.deleteWarning.textContent = deleteGroupWarning(group);
   }
 
   function renderResults(people) {
@@ -221,6 +227,12 @@ export function initMembers({ elements, api, me, onChanged }) {
     searchCount += 1;
     renderResults([]);
     elements.status.textContent = '';
+  });
+
+  // One dialog at a time: Members closes before the confirm dialog opens.
+  elements.deleteOpen.addEventListener('click', () => {
+    dialog.close();
+    onDelete(group);
   });
 
   return {
