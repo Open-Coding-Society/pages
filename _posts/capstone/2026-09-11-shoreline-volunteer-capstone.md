@@ -81,7 +81,7 @@ permalink: /capstone/shoreline-volunteer/
 <a class="ocs__btn large" href="https://github.com/vanshikak210/shorelineproject.git">
     Github Repository
 </a>
-<a class="ocs__btn large" href="https://github.com/users/vanshikak210/projects/2">
+<a class="ocs__btn large" href="https://github.com/users/vanshikak210/projects/8">
     Open Live Board on GitHub
 </a>
 
