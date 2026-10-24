@@ -64,6 +64,7 @@ show_reading_time: false
 
 <script type="module">
     import { login, pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
 
     let signupFormData = {};
     let validationTimeout = null;
@@ -97,10 +98,10 @@ show_reading_time: false
             return true;
         }
 
-        if (password.length < 2) {
+        if (!meetsSpringPasswordRules(password)) {
             confirmField.classList.add('password-length');
             messageDiv.classList.add('error');
-            messageDiv.textContent = '✗ Passwords must be at least 2 characters long';
+            messageDiv.textContent = `✗ ${SPRING_PASSWORD_RULES}`;
             return false;
         }
 
@@ -128,8 +129,8 @@ show_reading_time: false
             return false;
         }
 
-        if (password.length < 2) {
-            alert('Password must be at least 2 characters long.');
+        if (!meetsSpringPasswordRules(password)) {
+            alert(SPRING_PASSWORD_RULES);
             document.getElementById('signupPassword').focus();
             return false;
         }
@@ -239,6 +240,8 @@ show_reading_time: false
     window.addEventListener('load', function() {
         const passwordField = document.getElementById('signupPassword');
         const confirmPasswordField = document.getElementById('confirmPassword');
+
+        attachPasswordChecklist(passwordField);
 
         if (passwordField && confirmPasswordField) {
             // Add debounced validation listeners
@@ -392,3 +395,5 @@ show_reading_time: false
             });
     }
 </script>
+
+<script type="module" src="{{site.baseurl}}/assets/js/api/passwordFields.js"></script>
