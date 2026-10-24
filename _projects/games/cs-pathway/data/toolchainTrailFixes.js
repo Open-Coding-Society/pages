@@ -108,7 +108,29 @@ export const STUCK_HELP = Object.freeze({
     { text: 'Start it in your blueprint-spring folder and wait for "Started Main". On a new computer, run the first command once to set up the database:', commands: ['python3 scripts/db_init.py', './mvnw spring-boot:run'] },
     'Then click Get pairing code again.',
   ],
+  // 404: the server answers but has no pairing endpoint yet (backend not deployed).
+  serverNotReady: [
+    "The server isn't ready for pairing yet, so no pairing code was made. You can still finish this station with the Practice Check box:",
+    'In your terminal, run the commands the practice check names.',
+    'Copy everything they print and paste it into the practice check box.',
+    'Click Verify Output.',
+  ],
+  serverError: [
+    'The server had a problem, so no pairing code was made. You can still finish this station.',
+    'Use the Practice Check box: run the commands it names, paste what they print, and click Verify Output.',
+    'To try the agent again later, click Get pairing code in a few minutes.',
+  ],
 });
+
+/** Which STUCK_HELP entry fits a failed pairing-code request. */
+export function stuckHelpFor(error, { localBackend = false } = {}) {
+  if (error?.status === 401) return STUCK_HELP.notSignedIn;
+  if (error?.status === 404) return STUCK_HELP.serverNotReady;
+  if (error instanceof TypeError) { // fetch got no answer at all
+    return localBackend ? STUCK_HELP.localBackendDown : STUCK_HELP.serverUnreachable;
+  }
+  return STUCK_HELP.serverError;
+}
 
 /** The fix steps for one failed check on one OS, with {project} and {agent} filled in. */
 export function fixStepsFor(checkId, os, agentCommand) {
