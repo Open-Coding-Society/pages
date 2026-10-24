@@ -15,6 +15,61 @@ permalink: /capstone/shoreline-volunteer/
 .shoreline-capstone-card .ocs__grid-cell:not(.ocs__grid-cell--header) strong {
     font-size: 1rem;
 }
+.shoreline-kanban {
+    display: flex;
+    gap: 0.9rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+.shoreline-kanban__column {
+    flex: 0 0 230px;
+    background: var(--panel);
+    border: 1px solid var(--ui-border);
+    border-radius: 10px;
+    padding: 0.75rem;
+}
+.shoreline-kanban__column-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid var(--pref-accent-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.shoreline-kanban__count {
+    font-size: 0.72rem;
+    opacity: 0.6;
+    font-weight: 400;
+}
+.shoreline-kanban__card {
+    display: block;
+    background: color-mix(in srgb, var(--pref-text-color) 4%, var(--panel));
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    padding: 0.55rem 0.65rem;
+    margin-bottom: 0.55rem;
+    text-decoration: none;
+    color: inherit;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.shoreline-kanban__card:hover {
+    border-color: var(--pref-accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.shoreline-kanban__card strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.83rem;
+}
+.shoreline-kanban__card span {
+    opacity: 0.6;
+    font-size: 0.7rem;
+}
 </style>
 
 <div class="shoreline-capstone-card" markdown="1">
@@ -26,7 +81,7 @@ permalink: /capstone/shoreline-volunteer/
 <a class="ocs__btn large" href="https://github.com/vanshikak210/shorelineproject.git">
     Github Repository
 </a>
-<a class="ocs__btn large" href="https://github.com/users/vanshikak210/projects/2">
+<a class="ocs__btn large" href="https://github.com/users/vanshikak210/projects/8">
     Open Live Board on GitHub
 </a>
 
@@ -66,95 +121,96 @@ permalink: /capstone/shoreline-volunteer/
 
 ## Project Kanban Board
 
-<section class="ocs__card" aria-label="Shoreline project Kanban board snapshot">
-    <p class="ocs__text">Static snapshot from the supplied board image; it does not update automatically. <a href="https://github.com/users/vanshikak210/projects/2">Open the live board on GitHub</a>.</p>
-    <ul class="ocs__kanban-board" aria-label="Project status columns">
-        <li class="ocs__kanban-column" data-stage="backlog">
-            <h3 class="ocs__kanban-name">Backlog</h3>
-            <div class="ocs__kanban-note">10 / 5 · Estimate: 0</div>
-            <div class="ocs__kanban-note">This item hasn't been started</div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #3</div>
-                <div class="ocs__kanban-name">Work plans</div>
-            </div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #6</div>
-                <div class="ocs__kanban-name">Create Performance Task - Nitya Kasse</div>
-                <div class="ocs__kanban-note">0 / 4 · 0%</div>
-            </div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #7</div>
-                <div class="ocs__kanban-name">frontend thoughts</div>
-            </div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #8</div>
-                <div class="ocs__kanban-name">Fix log in backend issue</div>
-            </div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #9</div>
-                <div class="ocs__kanban-name">Create Performance Task - Vanshika</div>
-                <div class="ocs__kanban-note">1 / 3 · 33%</div>
-            </div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #10</div>
-                <div class="ocs__kanban-name">Design log in page</div>
-            </div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #12</div>
-                <div class="ocs__kanban-name">Add estimate numbers for the impact dashboard</div>
-            </div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #13</div>
-                <div class="ocs__kanban-name">Create Performance Task - Hsu-Cheng Lin</div>
-            </div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #14</div>
-                <div class="ocs__kanban-name">design donation page and connect it to backend</div>
-            </div>
-        </li>
-        <li class="ocs__kanban-column" data-stage="todo">
-            <h3 class="ocs__kanban-name">Ready</h3>
-            <div class="ocs__kanban-note">0 · Estimate: 0</div>
-            <div class="ocs__kanban-note">This is ready to be picked up</div>
-        </li>
-        <li class="ocs__kanban-column" data-stage="doing">
-            <h3 class="ocs__kanban-name">In progress</h3>
-            <div class="ocs__kanban-note">1 / 3 · Estimate: 0</div>
-            <div class="ocs__kanban-note">This item is actively being worked on</div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #4</div>
-                <div class="ocs__kanban-name">figuring out the backend</div>
-            </div>
-        </li>
-        <li class="ocs__kanban-column" data-stage="review">
-            <h3 class="ocs__kanban-name">In review</h3>
-            <div class="ocs__kanban-note">0 / 5 · Estimate: 0</div>
-            <div class="ocs__kanban-note">This item is in review</div>
-        </li>
-        <li class="ocs__kanban-column" data-stage="done">
-            <h3 class="ocs__kanban-name">Done</h3>
-            <div class="ocs__kanban-note">4 · Estimate: 0</div>
-            <div class="ocs__kanban-note">This item has been completed</div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #1</div>
-                <div class="ocs__kanban-name">Nitya - Working on Frontend</div>
-            </div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #2</div>
-                <div class="ocs__kanban-name">Vanshika - Working on Backend</div>
-            </div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #5</div>
-                <div class="ocs__kanban-name">Program Code</div>
-            </div>
-            <div class="ocs__kanban-item">
-                <div class="ocs__kanban-kicker">shoreline.csp #11</div>
-                <div class="ocs__kanban-name">Design front page</div>
-            </div>
-        </li>
-    </ul>
-    <p class="ocs__text">The screenshot indicates 10 backlog items, but only 9 cards are visible in it.</p>
-</section>
+<a class="ocs__btn small" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+    Open in GitHub
+</a>
+
+Click any card to open our live project board on GitHub.
+
+<!-- KANBAN:START (auto-generated by scripts/sync_kanban.py — do not edit by hand) -->
+<div class="shoreline-kanban">
+    <div class="shoreline-kanban__column">
+        <div class="shoreline-kanban__column-title">Backlog <span class="shoreline-kanban__count">4</span></div>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>Add estimate numbers for the impact dashboard</strong>
+            <span>Nitya</span>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>design donation page and conenct it to backedn</strong>
+            <span>Nitya, Vanshika</span>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>research on homeless hostpot in central beach, la jolla area</strong>
+            <span>Nitya, Vanshika</span>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>got the data for the homelessness hotpost</strong>
+        </a>
+    </div>
+    <div class="shoreline-kanban__column">
+        <div class="shoreline-kanban__column-title">Edit <span class="shoreline-kanban__count">2</span></div>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>Adding login page</strong>
+            <span>Nitya, Vanshika</span>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>figuring out the survey backend</strong>
+        </a>
+    </div>
+    <div class="shoreline-kanban__column">
+        <div class="shoreline-kanban__column-title">Testing <span class="shoreline-kanban__count">2</span></div>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>figuring out the backend</strong>
+            <span>Vanshika</span>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>frontend thoughts</strong>
+            <span>Nitya</span>
+        </a>
+    </div>
+    <div class="shoreline-kanban__column">
+        <div class="shoreline-kanban__column-title">In Progress <span class="shoreline-kanban__count">3</span></div>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>Create Performance Task - Nitya Kasse</strong>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>Create Performance Task- Vanshika</strong>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>Create Performance Task - Hsu-Cheng Lin</strong>
+        </a>
+    </div>
+    <div class="shoreline-kanban__column">
+        <div class="shoreline-kanban__column-title">Done <span class="shoreline-kanban__count">7</span></div>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>Design front page</strong>
+            <span>Nitya</span>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>Nitya - Working on Frontend</strong>
+            <span>Nitya</span>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>Vanshika - Working on Backend</strong>
+            <span>Vanshika</span>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>Program Code</strong>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>Design log in page</strong>
+            <span>Nitya</span>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>Add kanban board on portfolio</strong>
+        </a>
+        <a class="shoreline-kanban__card" href="https://github.com/users/vanshikak210/projects/8" target="_blank" rel="noopener">
+            <strong>Fix log in backend issue</strong>
+            <span>Vanshika</span>
+        </a>
+    </div>
+</div>
+<!-- KANBAN:END -->
 
 ---
 
