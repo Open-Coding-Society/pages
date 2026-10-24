@@ -1,11 +1,13 @@
 // Imports: Level objects and UI helpers.
 import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import CsPathwayPlayer from './CsPathwayPlayer.js';
 import FriendlyNpc from '@assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import AiChallengeNpc from '@assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import { pythonURI, javaURI, fetchOptions } from '@assets/js/api/config.js';
+import PathwayScoreboard from './PathwayScoreboard.js';
+import { completeLevelTask } from '../model/pathwayScores.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 
 
@@ -120,6 +122,8 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       fontFamily: '"Courier New", monospace',
     });
     this.profilePanelView.render();
+    this.scoreboard = new PathwayScoreboard({ currentLevelKey: 'assessment-observatory', basePath: this.gameEnv.path });
+    this.scoreboard.show();
     this.profilePanelView.update({ grade: '—' });
 
     // ── Background ──────────────────────────────────────────────
@@ -262,6 +266,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       color: '#3b82f6',
       expertise: 'Personal learning analytics, skill assessment, performance coaching, sprint comparisons, and progress tracking. Help students understand their strengths and growth areas with actionable feedback.',
       interact: async function() {
+        completeLevelTask('assessment-observatory', 'ai-skill-advisor');
         await level.showAnalyticsDashboard();
       },
     });
@@ -274,6 +279,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       color: '#10b981',
       expertise: 'Code contribution analysis, GitHub metrics interpretation, code quality insights, collaboration patterns, and commit history analysis. Help students understand their coding productivity and collaboration effectiveness.',
       interact: async function() {
+        completeLevelTask('assessment-observatory', 'github-analytics');
         await level.showGitHubStats();
       },
     });
@@ -286,13 +292,14 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       color: '#f59e0b',
       expertise: 'Self-reflection coaching, skill radar visualisation, strength identification, and growth-area planning.',
       interact: async function() {
+        completeLevelTask('assessment-observatory', 'sprint-coach');
         await level.showSkillRadar();
       },
     });
 
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
-      { class: Player, data: player_data },
+      { class: CsPathwayPlayer, data: player_data },
       { class: FriendlyNpc, data: missionPortalData },
       { class: FriendlyNpc, data: npc_data_analyticsGuide },
       { class: FriendlyNpc, data: npc_data_githubGuide },
