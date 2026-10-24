@@ -8,6 +8,8 @@ permalink: /capstone/doingexceptionaldeeds/
 
 > Doing Exceptional Deeds (D.A.D.) is a nonprofit focused on helping students and the community. The organization has strong programs and resources, but the website can be improved by making important information easier to find, reducing excessive text, and creating a simpler experience for students, teachers, and families.
 
+{% include ocs_kanban_board.html url="https://github.com/Blazific11/Teamportfolio/issues" filter="Assignee" title="D.A.D. Website Redesign - Project board" %}
+
 <div class="ocs__links">
 
   <a class="ocs__btn" href="https://www.doingexceptionaldeeds.org/">
