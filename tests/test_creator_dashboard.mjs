@@ -3,7 +3,9 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const source = await readFile(new URL("../assets/js/submissions/creator-dashboard.js", import.meta.url), "utf8");
-const { assignmentPageUrl, filterCreatorSubmissions, withFrontmatterCourses } = await import(
+const {
+  assignmentPageUrl, filterCreatorSubmissions, gradeSourceLabel, parseGradeInput, withFrontmatterCourses,
+} = await import(
   `data:text/javascript;charset=utf-8,${encodeURIComponent(source)}`
 );
 
@@ -53,4 +55,21 @@ test("frontmatter courses appear immediately without Spring synchronization", ()
   assert.deepEqual(withFrontmatterCourses(assignments, manifest).map((assignment) => assignment.courseCodes), [
     ["CSSE", "CSP", "CSA", "CSH"], ["CSA"],
   ]);
+});
+
+test("creator grades must be within the assignment's points", () => {
+  assert.deepEqual(parseGradeInput("3.5", 4), { grade: 3.5 });
+  assert.deepEqual(parseGradeInput("0", 4), { grade: 0 });
+  assert.ok(parseGradeInput("5", 4).error);
+  assert.ok(parseGradeInput("-1", 4).error);
+  assert.ok(parseGradeInput("", 4).error);
+  assert.ok(parseGradeInput("abc", null).error);
+  assert.deepEqual(parseGradeInput("12", null), { grade: 12 });
+});
+
+test("grade source distinguishes instructor overrides from AI grades", () => {
+  assert.equal(gradeSourceLabel({ grade: null, gradedManually: true }), "");
+  assert.equal(gradeSourceLabel({ grade: 4, gradedManually: true, feedback: "x", aiSummary: "x" }), "Instructor grade");
+  assert.equal(gradeSourceLabel({ grade: 3, gradedManually: false, feedback: "Good.", aiSummary: "Good." }), "AI grade");
+  assert.equal(gradeSourceLabel({ grade: 3, gradedManually: null, feedback: "Teacher note", aiSummary: "Summary" }), "");
 });
