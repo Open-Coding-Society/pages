@@ -167,6 +167,18 @@ Names should:
 
 * **Update this file:** As you iterate, make mistakes, and learn new system patterns or constraints, actively update `AGENTS.md` (and its optimized counterpart) with important notes so the system improves over time.
 
+## Personal AI connections
+
+Edit `_projects/systems/profile/_includes/profile-ai-connections.html` and `js/ai-connections.js`,
+not generated root copies. Use shared OCS controls without a page stylesheet; the starter
+include injects `javaURI` instead of a parent-directory configuration import. Render only
+when `site.spring != false`; personal keys are optional, not a required Setup step.
+The card uses Spring `/api/ai-connections`, independently of personal-information and Gist saves.
+Never log, echo, or persist keys in browser storage;
+clear inputs after every save attempt. AI grading failure must not block submission saving.
+Check provider eligibility/privacy before school rollout. Tests: `node tests/test_ai_connections.mjs`
+and `bundle exec ruby tests/test_ai_profile_layout.rb`.
+
 ## CS Pathway level scores
 
 * **Data flow:** each level's score is its percent complete (0–100). The game records it through [model/pathwayScores.js](_projects/games/cs-pathway/model/pathwayScores.js) (`completeLevelTask` for task-based levels, `recordLevelRatio` for ratio levels like Mission Tools and Toolchain Trail) and saves it via [services/PathwayScoreApi.js](_projects/games/cs-pathway/services/PathwayScoreApi.js) to Spring `PUT /api/cs-pathway/scores/{levelKey}`. The student comes from the Spring JWT cookie; never send a uid in the body.
