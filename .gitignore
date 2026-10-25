@@ -76,6 +76,7 @@ images/projects/
 /_includes/topics-document-nav.html
 /_plugins/topics.rb
 /_data/topics_primary.yml
+/_data/topics_units.yml
 /navigation/search.md
 /navigation/topics.md
 /assets/js/topics/
