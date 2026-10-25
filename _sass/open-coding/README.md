@@ -405,43 +405,79 @@ it the board's link and it builds itself from that board:
 
 - `url` (required): a public board owned by an organization
   (`github.com/orgs/...`). The page reads it from GitHub's REST API without
-  signing in; GitHub keeps a personal board's cards for signed-in users.
+  signing in; GitHub keeps a personal board's cards for signed-in users. A team
+  without an organization can give its repository's issues instead
+  (`github.com/<owner>/<repo>/issues`): an issue with a label named for a stage
+  goes to that column, and the rest go by the `issues` settings (closed issues
+  Done, assigned ones In progress, the others To do).
 - `filter` (optional): a single-select field, such as `Team`. Each option that
   has cards becomes a filter button. An option named Everyone or All is for
-  shared cards, which show under every button.
+  shared cards, which show under every button. For a repository's issues,
+  `filter="Assignee"` filters by person.
 - `title` (optional): a heading to use instead of the board's own name.
+- `columns` (optional): the capstone's own changes to its board's columns, a
+  list from its page data (below).
 
 Everything else comes from the board, so any board works as it is. Columns
-follow the board's own order: familiar names share a stage's column ("Todo",
-"To Do" and "Ready" are all To do, "Blocked" is In progress), any other column
-keeps its own name, and cards with no status get a "No status" column, as on
-GitHub. The backlog keeps the board's own name (the OCS issue lifecycle calls it
-"Parking Lot") and starts hidden behind a toggle, and so does No status on a
-board that has a backlog of its own. Only UGRC-CSA's note columns ("Team Map",
-"Reflections") are left out. Cards show their number, a `People` field or the
-assignees, and once done, a `Shipped` date or the day they closed. Under that is
-the evidence for the column's exit gate: how many boxes of the card's checklist
-are ticked (`☑ 3/4`), and the pull requests linked to its issue (`PR #123`,
-marked merged, draft or closed). Both are in the accent once complete. The board
-keeps a copy for 10 minutes, because visitors without a token share 60 GitHub
+follow the board's own order: a column whose name has a stage's words shares
+that stage's column ("Todo", "To Do" and "Ready" are all To do, "Blocked" is In
+progress), any other column keeps its own name, and cards with no status get a
+"No status" column, as on GitHub. The backlog keeps the board's own name (the
+OCS issue lifecycle calls it "Parking Lot") and starts collapsed behind a
+toggle, and No status goes along with it. Cards show their number, a `People`
+field or the assignees, a `Priority` and `Topic` when the board has them, and
+once done, a `Shipped` date or the day they closed. Under that is the evidence
+for the column's exit gate: how many boxes of the card's checklist are ticked
+(`☑ 3/4`), and the pull requests linked to its issue (`PR #123`, marked
+merged, draft or closed). Both are in the accent once complete. The board keeps
+a copy for 10 minutes, because visitors without a token share 60 GitHub
 requests an hour per network, and keeps showing that copy, with a note, when
 GitHub doesn't answer.
+
+Nothing about columns or wording is in the code. The stages (their words,
+names, and which start collapsed), the field names and everything the board
+says are in [`_data/kanban.yml`](../../_data/kanban.yml) for the whole site. A
+capstone changes its own board with a `columns` list beside the board's link,
+matched to the board's statuses by name (case and emoji don't matter). Each
+entry can:
+
+- `label`: give the status a column of its own, by this name.
+- `stage`: put the status in a stage's column (`backlog`, `todo`, `doing`,
+  `review` or `done`).
+- `collapsed`: start its column collapsed behind the toggle (`true`) or open
+  (`false`).
+- `hidden: true`: leave it off the board.
+
+```yaml
+Board:
+  url: "https://github.com/orgs/UGRC-CSA/projects/1"
+  filter: "Team"
+  columns:
+    - status: "Team Map"
+      hidden: true
+    - status: "Reflections"
+      hidden: true
+```
+
+```liquid
+{% include ocs_kanban_board.html url=data.Board.url filter=data.Board.filter columns=data.Board.columns %}
+```
 
 Kanban classes (`assets/js/kanban-board.js` builds them):
 
 - `ocs__kanban-board`: the stage columns, side by side. A column is at least
   11.5rem wide (or the whole board on a phone); past that the board scrolls sideways.
 - `ocs__kanban-column`: one column. Its `data-stage` colors the line across its
-  top, with more accent the closer the stage is to done; a column of the board's
-  own name gets backlog's quiet line.
+  top, with more accent the closer the stage is to done; a column with no stage
+  (one of the board's own, or No status) gets backlog's quiet line.
 - `ocs__kanban-item`: a card, with `ocs__kanban-kicker`, `ocs__kanban-name` and
   `ocs__kanban-note` for its three lines, and `ocs__kanban-evidence` for its row
   of evidence pills.
 
 The names avoid the suffixes `_sass/capstone/infograph.scss` restyles (`-card`,
 `-title` and others), so the board looks the same inside a capstone's
-`*-infograph` include. The filter buttons, backlog toggle and counts are
-`ocs__btn`, `ocs__toggle` and `ocs__status-pill`.
+`*-infograph` include. The filter buttons, the toggle for collapsed columns and
+the counts are `ocs__btn`, `ocs__toggle` and `ocs__status-pill`.
 
 See [`elements/kanban`](elements/kanban) and
 [`ocs_kanban_board.html`](../../_includes/ocs_kanban_board.html). The

@@ -105,6 +105,7 @@ while preserving all critical instructions. The agent must still communicate wit
 ### 后端边界
 
 * 后端服务位于 [node_backend/README.md](node_backend/README.md)，与站点构建流程分离；改动前先阅读该文档。
+* **人工评分优先：** 作业创建者和教师可在 Submissions 页面的“Assignments You Created”中直接改分（[creator-dashboard.js](assets/js/submissions/creator-dashboard.js)，调用 Spring `POST /api/submissions/grade/{id}`）。该接口设置 `gradedManually`；AI 评分只能通过 `applyAiGradeUnlessManuallyGraded` 条件 UPDATE 写入，不能 `save()` 过期实体，否则会覆盖评分途中的人工评分。内容变更会重置该标记。测试：`node --test tests/test_creator_dashboard.mjs`。
 
 ## 编码标准
 
