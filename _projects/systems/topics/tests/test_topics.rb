@@ -122,12 +122,12 @@ class TopicsTest < Minitest::Test
       assert_operator browser.index('data-topics-match'), :<, browser.index('<legend class="topics-browser__accessible-label">Topic Filter</legend>')
       refute_includes primary, 'data-topics-match'
       refute_includes browser, "Explore reference material by category."
-      assert_includes browser, '<h2><label for="topics-query">Search</label></h2>'
+      assert_includes browser, '<label class="topics-browser__accessible-label" for="topics-query">Search</label>'
       assert_includes browser, '<select class="ocs__input" id="topics-view">'
       filter_box = browser.split('id="topics-filters"', 2).last.split('</div>', 2).first
       assert_includes filter_box, 'data-topics-clear'
       assert_match(/<button[^>]*data-topics-clear[^>]*\bdisabled\b/, filter_box)
-      assert_includes browser, '<label class="topics-browser__accessible-label" for="topics-view">View</label>'
+      assert_includes browser, '<label for="topics-view">View</label>'
       assert_operator browser.index('id="topics-query"'), :<, browser.index('id="topics-view"')
       assert_operator browser.index('data-topics-clear'), :<, browser.index('data-topics-results')
       assert_includes browser, 'aria-controls="topics-filters"'
