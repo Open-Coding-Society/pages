@@ -31,11 +31,11 @@ year: "2026-2027"
     {% include ocs_kanban_board.html url=pnec_data.Board.url filter=pnec_data.Board.filter title=pnec_data.Board.title %}
     {% endif %}
     <div class="ocs__links">
+      <a class="ocs__btn small pill" href="{{ pnec_data.Board.project_url | escape }}" target="_blank" rel="noopener noreferrer">Open personal GitHub Project ↗</a>
       <a href="https://github.com/samanviy17-crypto/team-portfolio" target="_blank" rel="noopener noreferrer">Browse the team repository</a>
     </div>
-    <p class="ocs__text">The shared OCS component provides the board link and its availability message. Live cards, filters, and card metadata are unavailable for this personal board; no priorities or topics are inferred.</p>
-    <p class="ocs__callout">This personal GitHub Projects board opens on GitHub. GitHub blocks embedded frames, and its personal-board cards require authentication through the API, so live cards are not displayed here. GitHub controls which items each visitor can view.</p>
-    <p class="ocs__callout">Supported alternatives are this direct board link or an approved public, organization-owned project using the existing OCS board component. Moving a board or creating a credentialed server integration requires a separate decision; no board settings were changed.</p>
+    <p class="ocs__text">Cards load from our public repository issues. Stage labels determine columns first; otherwise, closed issues appear in Done, assigned open issues in In progress, and other open issues in To do. These columns are derived from issue data and may differ from our personal GitHub Project.</p>
+    <p class="ocs__text">Filter by an issue's first assignee; each card lists all assignees. The shared board reuses cached data for 10 minutes and checks GitHub again on a later page load. Pull requests and issues closed as not planned are omitted. Issue closure alone does not establish stakeholder acceptance.</p>
   </section>
 
   <section class="ocs__card" aria-labelledby="project-overview">

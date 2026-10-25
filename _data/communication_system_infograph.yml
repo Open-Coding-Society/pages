@@ -6,6 +6,12 @@ Description: "Students are extending the OCS communication system with chat, ann
 Board:
   url: "https://github.com/orgs/UGRC-CSA/projects/1"
   filter: "Team"
+  # Our board's note columns hold notes about the team, not work.
+  columns:
+    - status: "Team Map"
+      hidden: true
+    - status: "Reflections"
+      hidden: true
 
 Topics:
   - title: "Class Announcements"

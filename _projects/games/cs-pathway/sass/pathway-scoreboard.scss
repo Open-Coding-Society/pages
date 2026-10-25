@@ -1,0 +1,63 @@
+// Level-scores bar (levels/PathwayScoreboard.js), top-centre on every level.
+// Levels stack toasts/"Press E" alerts top-right and a status panel top-left,
+// so the centre is the free spot. z-index stays below the levels' own overlays
+// (Present.js 1200+, station panels 9999) but above the game canvas.
+$scoreboard-accent: #4ecca3;
+$scoreboard-text: #e0e0e0;
+$scoreboard-muted: #94a3b8;
+
+.cs-pathway-scoreboard {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(620px, calc(100vw - 32px));
+  padding: 6px 12px;
+  border: 1px solid $scoreboard-accent;
+  border-radius: 999px;
+  background: rgba(13, 13, 26, 0.88);
+  color: $scoreboard-text;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  pointer-events: none;
+
+  &__title {
+    color: $scoreboard-accent;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    gap: 4px;
+    color: $scoreboard-muted;
+    white-space: nowrap;
+
+    strong {
+      color: $scoreboard-text;
+    }
+
+    &.is-current {
+      color: $scoreboard-accent;
+
+      strong {
+        color: $scoreboard-accent;
+      }
+    }
+  }
+}
