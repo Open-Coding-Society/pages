@@ -110,3 +110,26 @@ export function wrappableParts(text, longest = 20) {
   }
   return parts;
 }
+
+// Browsing groups each document under one topic so the page reads as sections,
+// not one long grid. Checked topics (in Topic Filter order) take precedence,
+// otherwise every primary topic does; a document joins the first topic it has,
+// and documents with none go to `other`. Empty groups are left out.
+export function topicGroups(documents, categories, primary = [], other = 'other') {
+  const checked = primary.filter((topic) => categories.includes(topic));
+  const order = checked.length ? checked : primary;
+  const groups = new Map([...order, other].map((key) => [key, []]));
+  for (const document of documents) {
+    const key = order.find((topic) => document.categories.includes(topic)) || other;
+    groups.get(key).push(document);
+  }
+  return [...groups].filter(([, members]) => members.length)
+    .map(([key, members]) => ({ key, documents: members }));
+}
+
+export function categoryCounts(documents) {
+  const counts = new Map();
+  documents.forEach((document) => document.categories.forEach((category) =>
+    counts.set(category, (counts.get(category) || 0) + 1)));
+  return counts;
+}

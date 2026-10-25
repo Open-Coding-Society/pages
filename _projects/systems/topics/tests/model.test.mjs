@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { filterGroups, selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts } from '../js/model.js';
+import { filterGroups, selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts } from '../js/model.js';
 
 const require = createRequire(import.meta.url);
 const lunr = require('../../../../assets/js/vendor/lunr.min.js');
@@ -147,4 +147,14 @@ test('long words get break points so a phone-width card never outgrows the scree
     assert.ok(parts.length > 1);
     assert.ok(parts.every((part) => part.split(/\s+/).every((word) => word.length <= 20)));
   }
+});
+
+test('browsing groups each document once under its first topic, checked topics first', () => {
+  const shared = [...documents, { url: '/misc/', title: 'Misc', content: '', categories: ['algorithms'] }];
+  const summary = (groups) => groups.map((group) => [group.key, group.documents.map((doc) => doc.url)]);
+  assert.deepEqual(summary(topicGroups(shared, [], topics)),
+    [['java', ['/java/', '/objects/']], ['python', ['/python/']], ['other', ['/misc/']]]);
+  assert.deepEqual(summary(topicGroups(shared, ['python', 'algorithms'], topics)),
+    [['python', ['/python/']], ['other', ['/java/', '/objects/', '/misc/']]]);
+  assert.deepEqual(categoryCounts(documents), new Map([['java', 2], ['algorithms', 2], ['python', 1]]));
 });
