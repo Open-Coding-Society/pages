@@ -103,6 +103,7 @@ Split logic into clear layers:
 ### Backend Boundary
 
 * The backend service lives under [node_backend/README.md](node_backend/README.md) and is separate from the site build pipeline; read it before making backend changes.
+* **Manual grades win:** assignment creators and teachers edit grades directly in the Submissions page's "Assignments You Created" tab ([creator-dashboard.js](assets/js/submissions/creator-dashboard.js), which calls Spring `POST /api/submissions/grade/{id}`). That endpoint sets `gradedManually`; AI grading must write only through the conditional `applyAiGradeUnlessManuallyGraded` UPDATE, never `save()` a stale entity, or it overwrites a manual grade made mid-grading. A content change resets the flag. Test: `node --test tests/test_creator_dashboard.mjs`.
 
 ## Coding Standards
 

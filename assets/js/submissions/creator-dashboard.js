@@ -46,10 +46,30 @@ export function filterCreatorSubmissions(submissions, filters, getFilterStatus) 
   });
 }
 
+export function parseGradeInput(rawValue, maxPoints) {
+  const trimmed = String(rawValue ?? "").trim();
+  const grade = Number(trimmed);
+  const hasMax = maxPoints != null && Number.isFinite(Number(maxPoints));
+  if (trimmed === "" || !Number.isFinite(grade) || grade < 0 || (hasMax && grade > Number(maxPoints))) {
+    return { error: `Enter a grade from 0 to ${hasMax ? maxPoints : "the assignment's points"}` };
+  }
+  return { grade };
+}
+
+// AI grading writes identical feedback and aiSummary; older manual grades predate the flag,
+// so a grade that matches neither rule gets no label instead of a guessed one.
+export function gradeSourceLabel(submission) {
+  if (submission?.grade == null) return "";
+  if (submission.gradedManually) return "Instructor grade";
+  if (submission.feedback && submission.feedback === submission.aiSummary) return "AI grade";
+  return "";
+}
+
 export function createCreatorDashboard(options) {
   const {
     managedAssignmentsUrl,
     managedSubmissionsUrl,
+    gradeSubmissionUrl,
     courseManifestUrl,
     fetchOptions,
     baseUrl,
@@ -164,12 +184,24 @@ export function createCreatorDashboard(options) {
           <th>Student</th><th>Student course</th><th>Assignment</th><th>Submission</th><th>Status</th><th>Grade</th><th>Feedback</th><th>AI summary</th><th>Quality</th>
         </tr></thead>
         <tbody>${rows.map((submission) => {
-          const grade = submission.grade == null
-            ? '<span class="creator-muted">Not graded</span>'
-            : `<span class="grade-display">${text(submission.grade)}</span>`;
-          const feedback = submission.feedback
-            ? text(submission.feedback)
-            : '<span class="creator-muted">No feedback</span>';
+          const points = assignmentPoints(submission);
+          const source = gradeSourceLabel(submission);
+          const grade = `
+            <input class="ocs__input creator-grade-input" type="number" min="0" step="0.01"
+              ${points != null ? `max="${text(points)}"` : ""}
+              value="${text(submission.grade ?? "")}"
+              placeholder="${points != null ? `0–${text(points)}` : "Points"}"
+              aria-label="Grade for ${text(submission.submitterName, "this student")}"
+              data-grade-input>
+            ${source ? `<small class="creator-grade-source">${text(source)}</small>` : ""}`;
+          const feedback = `
+            <textarea class="ocs__input creator-feedback-input" rows="2" placeholder="Feedback"
+              aria-label="Feedback for ${text(submission.submitterName, "this student")}"
+              data-feedback-input>${text(submission.feedback ?? "")}</textarea>
+            <div class="creator-grade-actions">
+              <button type="button" class="ocs__btn small accent fill" data-save-grade="${text(submission.id)}">Save grade</button>
+              <small class="creator-grade-status" role="status" data-grade-status></small>
+            </div>`;
           return `<tr>
             <td><strong>${text(submission.submitterName, "Unknown")}</strong><span class="creator-student-uid">${text(submission.submitterUid)}</span></td>
             <td><span class="creator-course-list">${courseList(submission.submitterCourseCodes)}</span></td>
@@ -177,12 +209,51 @@ export function createCreatorDashboard(options) {
             <td><div class="cell-clamp">${renderContent(submission.content)}</div></td>
             <td>${getStatusBadge(submission)}</td>
             <td>${grade}</td>
-            <td><div class="cell-clamp"${cellTitle(submission.feedback)}>${feedback}</div></td>
+            <td>${feedback}</td>
             <td><div class="cell-clamp"${cellTitle(submission.aiSummary)}>${renderAiSummary(submission)}</div></td>
             <td>${renderQualityScore(submission)}</td>
           </tr>`;
         }).join("")}</tbody>
       </table>`;
+  }
+
+  function assignmentPoints(submission) {
+    const assignment = assignments.find((current) => String(current.id) === String(submission.assignmentId));
+    return assignment?.points ?? null;
+  }
+
+  // Saving marks the grade as manual on the server, so the AI will not replace it later.
+  async function saveGrade(button) {
+    const row = button.closest("tr");
+    const status = row.querySelector("[data-grade-status]");
+    const submission = submissions.find((current) => String(current.id) === button.dataset.saveGrade);
+    if (!submission) return;
+
+    const { grade, error } = parseGradeInput(row.querySelector("[data-grade-input]").value, assignmentPoints(submission));
+    if (error) {
+      status.textContent = error;
+      return;
+    }
+    const feedback = row.querySelector("[data-feedback-input]").value;
+
+    button.disabled = true;
+    status.textContent = "Saving…";
+    try {
+      const query = new URLSearchParams({ grade: String(grade), feedback });
+      const response = await fetch(`${gradeSubmissionUrl}/${encodeURIComponent(submission.id)}?${query}`, {
+        ...fetchOptions,
+        method: "POST",
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || body.message || `HTTP ${response.status}`);
+      }
+      Object.assign(submission, { grade, feedback, gradedManually: true });
+      renderSubmissions();
+    } catch (saveError) {
+      status.textContent = `Could not save grade: ${saveError.message}`;
+      button.disabled = false;
+    }
   }
 
   function renderPagination(totalRows, totalPages) {
@@ -237,6 +308,11 @@ export function createCreatorDashboard(options) {
         behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
         block: "start",
       });
+    });
+
+    element("creator-submissions-container").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-save-grade]");
+      if (button && !button.disabled) saveGrade(button);
     });
 
     element("creator-pagination").addEventListener("click", (event) => {
