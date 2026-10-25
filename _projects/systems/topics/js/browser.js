@@ -1,4 +1,4 @@
-import { selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts } from './model.js';
+import { selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts } from './model.js';
 
 const root = document.querySelector('[data-topics-browser]');
 if (root) {
@@ -10,7 +10,12 @@ if (root) {
   const matchButtons = [...root.querySelectorAll('[data-topics-match] button')];
   const status = root.querySelector('[data-topics-status]');
   const cards = [...root.querySelectorAll('[data-topic-url]')];
-  const results = root.querySelector('[data-topics-results]');
+  const flat = root.querySelector('[data-topics-flat]');
+  const flatGrid = flat.querySelector('.topics-browser__results');
+  const groupList = root.querySelector('[data-topics-groups]');
+  const labels = new Map(filters.map((filter) => [filter.value, filter.closest('label').dataset.topicsLabel]));
+  const OTHER = 'other-references';
+  const collapsed = new Set();
   const titleHeading = root.querySelector('[data-topics-title-heading]');
   const bodySection = root.querySelector('[data-topics-body-section]');
   const bodyResults = root.querySelector('[data-topics-body-results]');
@@ -62,6 +67,35 @@ if (root) {
     });
   }
 
+  // One collapsible section per topic; collapsing survives re-renders.
+  function topicSection({ key, documents: members }) {
+    const section = document.createElement('details');
+    section.className = 'topics-browser__category-disclosure';
+    section.open = !collapsed.has(key);
+    section.addEventListener('toggle', () => {
+      if (section.open) collapsed.delete(key); else collapsed.add(key);
+    });
+    const summary = document.createElement('summary');
+    const heading = document.createElement('h3');
+    const count = document.createElement('span');
+    count.className = 'topics-browser__count';
+    count.textContent = `(${members.length})`;
+    heading.append(`${labels.get(key) || 'Other references'} `, count);
+    summary.append(heading);
+    const grid = document.createElement('div');
+    grid.className = 'topics-browser__results';
+    members.forEach((member) => grid.append(cardByUrl.get(member.url)));
+    section.append(summary, grid);
+    return section;
+  }
+
+  function showFilterCounts() {
+    const counts = categoryCounts(documents);
+    filters.forEach((filter) => {
+      filter.closest('label').append(` (${counts.get(filter.value) || 0})`);
+    });
+  }
+
   function render() {
     query.value = state.query;
     view.value = state.view;
@@ -85,7 +119,15 @@ if (root) {
       highlight(link, document.title, titlePositions.get(document.url) || []);
       link.href = contextLink(document);
     });
-    selected.forEach((document) => results.append(cardByUrl.get(document.url)));
+    // Park every card in the flat grid first so rebuilt groups never drop one.
+    flatGrid.append(...cards);
+    flat.hidden = !searching;
+    if (searching) {
+      selected.forEach((document) => flatGrid.append(cardByUrl.get(document.url)));
+      groupList.replaceChildren();
+    } else {
+      groupList.replaceChildren(...topicGroups(selected, state.categories, primary, OTHER).map(topicSection));
+    }
     root.classList.toggle('topics-browser--list', !searching && state.view === 'list');
     titleHeading.hidden = !searching || !groups.title.length;
     bodySection.hidden = !searching || !groups.body.length;
@@ -157,6 +199,7 @@ if (root) {
         documents.forEach((document) => this.add(document));
       });
       query.disabled = false;
+      showFilterCounts();
       render();
       query.addEventListener('input', update);
       filters.forEach((filter) => filter.addEventListener('change', update));
