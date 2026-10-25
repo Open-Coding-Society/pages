@@ -169,6 +169,10 @@ while preserving all critical instructions. The agent must still communicate wit
 
 * **同步更新文档：** 随着你在迭代中犯错、学习新的系统模式或约束，主动用重要的注意事项更新 `AGENTS.md`，并确保同步更新 `AGENTS_MD_DOCUMENTATION.md`（英文说明版本），以便系统随时间不断改进。
 
+## 个人 AI 密钥
+
+* **个人 AI 密钥：** 规范源是 `_projects/systems/profile/_includes/profile-ai-connections.html` 与 `js/ai-connections.js`；使用共享 OCS 控件，无页面样式表。启动 include 注入 `javaURI`，不从模块用 `../` 导入配置。只在 `site.spring != false` 时渲染，独立于个人信息与 Gist 保存，不作为必填 Setup 步骤。不要记录、回显或在浏览器存储密钥；每次保存尝试后清空输入。评分失败不阻止保存提交，学校部署前检查供应商资格/隐私条件。测试：`node tests/test_ai_connections.mjs`、`bundle exec ruby tests/test_ai_profile_layout.rb`。
+
 ## 群组与实时聊天（Groups & realtime chat）
 
 * **Messages（`/dm`）：** 群组与私信在同一页面，源码在 [_projects/systems/messages/](_projects/systems/messages/README.md)（注册为 `systems/messages:dev`）；旧的 `/student/groups/` 与 `/student/groups/dashboard/` 重定向到 `/dm`。页面只用 OCS 语法，消息列表与输入框复用课程聊天共享的 `.announcement-chat` 类，没有自己的样式表（唯一的布局类 `ocs__split--aside` 加在语法中）。模块之间只用 `./` 导入；页面用 `{{ site.baseurl }}` 导入 `config.js` 与 `rich-text.js` 并传给 `startMessagesPage`。纯函数在 `messages-model.js` 与 `formation-model.js`，测试：`node --test _projects/systems/messages/tests/*.test.mjs`。

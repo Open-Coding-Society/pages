@@ -76,6 +76,7 @@ images/projects/
 /_includes/topics-document-nav.html
 /_plugins/topics.rb
 /_data/topics_primary.yml
+/_data/topics_units.yml
 /navigation/search.md
 /navigation/topics.md
 /assets/js/topics/
@@ -85,6 +86,7 @@ images/projects/
 /navigation/authentication/profile-v2.md
 /_layouts/profile.html
 /_includes/profile-gist-connection.html
+/_includes/profile-ai-connections.html
 /assets/js/profile/
 /_sass/open-coding/profile-gist-connection.scss
 /_includes/post_list_image_card.html

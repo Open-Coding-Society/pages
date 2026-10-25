@@ -1,0 +1,11 @@
+# Optional unit names for Topics: topic key (lowercase) -> unit number -> name.
+# Lessons find their unit from their title ("1.01 ...", "Unit 2 Quiz").
+java:
+  1: Using Objects and Methods
+  2: Selection and Iteration
+  3: Class Creation
+  4: Data Collections
+python:
+  3: Algorithms and Programming
+javascript:
+  3: Algorithms and Programming
