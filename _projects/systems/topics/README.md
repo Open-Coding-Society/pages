@@ -30,6 +30,12 @@ Hidden, draft and search-excluded documents are omitted.
 JavaScript, Flask, Spring, CS111, CS112 and CS113 into a separate, ordered
 disclosure labeled Topic Filter, expanded by default. All remaining category
 names appear in Categories Filter, collapsed by default. Both remain multi-select.
+The page uses `ocs__split ocs__split--aside`: Search and both filters sit in a
+sidebar (one column on phones), each filter box showing its document count, and
+results fill the wide pane. While browsing, results are grouped into collapsible
+sections, one per Topic Filter topic (checked topics only, when any are checked),
+then Other references; a document appears once, under its first topic in YAML
+order. Search results are not grouped.
 Search follows the grouped filters and uses the same heading typography as
 Title matches and Text matches. Topics uses a semantic `h2`; filter titles use
 `h3` headings kept inline with their disclosure markers. Clear Filters sits inside the filter box; the Cards/List selector sits
