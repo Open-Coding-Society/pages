@@ -26,18 +26,36 @@ YAML topic inventory is required.
 Document membership is discovered at build time from posts/pages.
 Hidden, draft and search-excluded documents are omitted.
 
-[Primary topics YAML](data/topics_primary.yml) promotes SASS, Python, Java,
-JavaScript, Flask, Spring, CS111, CS112 and CS113 into a separate, ordered
-disclosure labeled Topic Filter, expanded by default. All remaining category
-names appear in Categories Filter, collapsed by default. Both remain multi-select.
-Search follows the grouped filters and uses the same heading typography as
-Title matches and Text matches. Topics uses a semantic `h2`; filter titles use
-`h3` headings kept inline with their disclosure markers. Clear Filters sits inside the filter box; the Cards/List selector sits
-above the output with an accessible, visually hidden View label.
+[Primary topics YAML](data/topics_primary.yml) orders SASS, Python, Java,
+JavaScript, Flask, Spring, CS111, CS112 and CS113.
+
+### Page layout
+
+`/topics/` sets `full_width: true` (the base layout's existing full-width rule)
+and lays out with `ocs__split ocs__split--aside`, one column on phones:
+
+- **Sidebar:** Search; a Browse list (`ocs__tree`) of All topics and each primary
+  topic with published documents, each with an `ocs__status` count; More
+  categories, shortcut buttons for the twelve largest remaining categories; and a
+  collapsed Advanced filters disclosure.
+- **Landing (nothing chosen):** one `ocs__hub-card` tile per topic in an
+  `ocs__grid--card`, showing its lesson count and unit range.
+- **A chosen topic or category:** an `ocs__grid--col2` of unit cards. A lesson's
+  unit comes from its title ("1.01 …", "Unit 2 Quiz"); lessons without one go to
+  More lessons. [Unit names](data/topics_units.yml) are optional per topic. Each
+  lesson is a `<details>` dropdown: number and title, then the full description
+  and an Open lesson link. Quizzes, MCQs and FRQ practice become buttons in the
+  unit's Practice row. Several topics (Advanced filters) get one heading each,
+  and a document appears once, under its first topic in YAML order.
+- **Search:** title-match cards, then text matches, both within the filters.
+
+Advanced filters keeps the original controls. Topic Filter, expanded inside it,
+holds the primary topics with the OR/AND buttons; Categories Filter, collapsed,
+holds every remaining category. Both are multi-select with document counts.
 Clear Filters clears only topic/category selections, not the OR/AND choice;
 Clear Search clears only the query. Each clear button is dimmed and disabled when
-its corresponding selection is empty. Each search result heading shows its own
-count beside the heading.
+its corresponding selection is empty. The View selector (Compact list, the
+default, or Cards; `?view=cards`) picks lesson dropdowns or cards inside units.
 Both boxes filter `categories`; YAML controls prominence,
 not document membership. Primary topics remain visible even when they have no
 published documents. No `topics:` attribute is required.
@@ -90,6 +108,7 @@ course player; `layout: opencs` bypasses that adapter.
 | `pages/` | Top-menu Topics landing and Search compatibility entry |
 | `plugins/topics.rb` | `_plugins/topics.rb`; builds category index and document views |
 | `data/topics_primary.yml` | `_data/topics_primary.yml`; ordered primary category names |
+| `data/topics_units.yml` | `_data/topics_units.yml`; optional unit names per topic |
 | `_includes/` | Shared Topics browser and document navigation |
 | `js/` | `assets/js/topics/`; search, filters, view and link context |
 | `sass/main.scss` | Registered project style import |
