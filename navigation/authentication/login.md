@@ -255,7 +255,7 @@ show_reading_time: false
             overallEl.classList.add(flaskSuccess ? 'success' : 'error');
             overallEl.textContent = flaskSuccess
                 ? '🎉 Account created! You can now login.'
-                : '💥 Signup failed. Please check your information and try again.';
+                : `❌ Signup failed: ${flaskErrorMessage || 'the account could not be created.'} Please check your details and try again.`;
             return;
         }
         if (flaskSuccess && springSuccess) {
