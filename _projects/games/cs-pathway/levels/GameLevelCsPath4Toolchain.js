@@ -1676,10 +1676,21 @@ class GameLevelCsPath4Toolchain {
    */
   async _checkSetupReport() {
     if (this._reportCheckBusy) return;
+    // The route can be missing on a server that has not deployed it yet. Stop
+    // asking for a while instead of filling the console with 404s.
+    if (this._reportCheckPausedUntil && Date.now() < this._reportCheckPausedUntil) return;
     this._reportCheckBusy = true;
     try {
       const res = await fetch(`${javaURI}/api/cs-pathway/setup-report`, { ...fetchOptions, method: 'GET' });
-      if (!res.ok) return;
+      if (!res.ok) {
+        this._reportCheckFailures = (this._reportCheckFailures || 0) + 1;
+        if (this._reportCheckFailures >= 3) {
+          this._reportCheckPausedUntil = Date.now() + 5 * 60 * 1000;
+          this._reportCheckFailures = 0;
+        }
+        return;
+      }
+      this._reportCheckFailures = 0;
       const data = await res.json();
       if (!data?.reportedAt) return;
 
