@@ -93,6 +93,12 @@ permalink: /capstone/poway-scripps-rotary/
     </div>
 </div>
 
+<!-- Sprint Board: live from the team's GitHub project, like Communication Systems -->
+{% assign rotary_data = site.data.rotary_club %}
+{% if rotary_data.Board %}
+{% include ocs_kanban_board.html url=rotary_data.Board.url filter=rotary_data.Board.filter %}
+{% endif %}
+
 <p style="display:flex;flex-wrap:wrap;gap:.7rem;margin-bottom:1.5rem;">
     <a class="glowOnHover" style="padding:.65rem 1.15rem;text-decoration:none;display:inline-block;" href="https://powayscrippsrotary.org/">The Current Site ↗</a>
 </p>

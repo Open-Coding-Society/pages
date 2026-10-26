@@ -9,7 +9,7 @@ class GameLevelTutorial {
     const background_data = {
       name: "Tutorial Course",
       greeting: "Welcome to the Tutorial Level!",
-      src: path + '/images/projects/racing-game/Tutorial_Track.jpeg',
+      src: path + '/images/projects/racing-game/Tutorial_Mud_Track.png',
       pixels: { height: 360, width: 643 }
     };
     const player_data = {

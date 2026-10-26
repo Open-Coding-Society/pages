@@ -133,7 +133,7 @@ show_reading_time: false
 </div>
 
 <script type="module">
-    import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, springEnabled } from '{{site.baseurl}}/assets/js/api/config.js';
     import { reverifyNeeded, staffMustVerify, reverify } from '{{site.baseurl}}/assets/js/api/reverify.js';
     import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
 
@@ -250,6 +250,14 @@ show_reading_time: false
 
         overallEl.classList.remove('hidden', 'success', 'partial', 'error');
 
+        // A Flask-only site (spring: false in _config.yml) creates the account in Flask alone.
+        if (!springEnabled) {
+            overallEl.classList.add(flaskSuccess ? 'success' : 'error');
+            overallEl.textContent = flaskSuccess
+                ? '🎉 Account created! You can now login.'
+                : '💥 Signup failed. Please check your information and try again.';
+            return;
+        }
         if (flaskSuccess && springSuccess) {
             overallEl.classList.add('success');
             overallEl.textContent = '🎉 Account created on both backends! You can now login.';
@@ -270,6 +278,9 @@ show_reading_time: false
                 + ' Please check your details and try again.';
         }
     }
+
+    // A Flask-only site has no Spring account, so sign-up shows only Flask's status.
+    if (!springEnabled) document.getElementById('springStatus').style.display = 'none';
 
     // A mentor has no student ID or school, so those fields are hidden and not required.
     document.getElementById('signupRole').addEventListener('change', function () {
@@ -304,8 +315,6 @@ show_reading_time: false
             school: document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
-            kasmServerNeeded: false,
-            kasm_server_needed: false,
             accountType: document.getElementById("signupRole").value,
         };
 
@@ -422,6 +431,11 @@ show_reading_time: false
 
     // Function to handle both Python and Java login simultaneously
     window.loginBoth = function () {
+        // A Flask-only site (spring: false in _config.yml) signs in to Flask alone.
+        if (!springEnabled) {
+            window.pythonLogin(() => { window.location.href = '{{site.baseurl}}/profile'; });
+            return;
+        }
         // Wrap both logins in Promises and only redirect after both finish
         let javaPromise = new Promise((resolve) => {
             window.javaLogin(resolve);
@@ -554,7 +568,7 @@ show_reading_time: false
         signupButton.classList.add("disabled");
         // Reset status indicators
         updateBackendStatus('flask', 'pending');
-        updateBackendStatus('spring', 'pending');
+        if (springEnabled) updateBackendStatus('spring', 'pending');
         document.getElementById('overallStatus').classList.add('hidden');
 
         const data = signupFormData && Object.keys(signupFormData).length > 0 ? signupFormData : {
@@ -564,8 +578,6 @@ show_reading_time: false
             school: document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
-            kasmServerNeeded: false,
-            kasm_server_needed: false,
         };
 
         // Never log `data`: it holds the plaintext password and the Google ID token.
@@ -604,6 +616,10 @@ show_reading_time: false
             }
 
             updateBackendStatus('flask', 'success');
+            if (!springEnabled) {
+                setTimeout(updateOverallStatus, 500);
+                return;
+            }
 
             // Spring is best-effort; do not block signup success on this path.
             fetch(`${javaURI}/api/person/create`, springRequest)

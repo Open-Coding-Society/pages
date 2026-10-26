@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
-"""Local Linux setup checks and an opt-in live Bash companion. Fixes are advice only."""
+"""Local Linux setup checks and an opt-in live Bash companion. Fixes are advice only.
+
+With --check --report <upload-url> (the CS Pathway game shows the exact command), the
+report is also saved to setup-report.md in the project and sent to that URL, so the
+game can show it without copy and paste."""
 import argparse
+import time
+import urllib.error
+import urllib.request
 import os
 import platform
 import re
@@ -10,10 +17,15 @@ import subprocess
 import sys
 import tempfile
 import uuid
+from datetime import datetime
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ANSI = re.compile(r'\x1b\][^\x07]*(?:\x07|\x1b\\)|\x1b\[[0-?]*[ -/]*[@-~]')
+REPORT_VERSION = 1
+REPORT_FILE_NAME = 'setup-report.md'
+# Same rule as verifyToolsTerminal.sh: never send a report over plain HTTP to another host.
+UPLOAD_URL = re.compile(r'^(?:https://|http://localhost:|http://127\.0\.0\.1:)\S+$')
 
 
 def plain(text):
@@ -32,7 +44,7 @@ def diagnose(log, debian, project=PROJECT_ROOT):
     advice = []
     folder = shlex.quote(str(project))
     if re.search(r'\bcd:.*(?:no such file or directory|not a directory)', lower):
-        advice.append(f'That folder does not exist at the typed path. Return to this checkout with: cd -- {folder}. The repository name is toolchain_trail, not toolchian_trail. Use pwd to verify your location.')
+        advice.append(f'That folder does not exist at the typed path. Return to this checkout with: cd -- {folder}. The repository name is blueprints_pages, not bluepritns_pages. Use pwd to verify your location.')
     if "externally-managed-environment" in lower:
         advice.append("System Python rejected installation. From the project folder: python3 -m venv venv; source venv/bin/activate; python -m pip install -r requirements.txt. Do not use sudo pip or --break-system-packages.")
     if "ensurepip is not available" in lower or "no module named venv" in lower:
@@ -232,17 +244,139 @@ def probe(command):
         return False, str(exc)
 
 
+def is_wsl():
+    """Return True when the Linux agent is running inside Windows Subsystem for Linux."""
+    if os.environ.get('WSL_DISTRO_NAME') or os.environ.get('WSL_INTEROP'):
+        return True
+    try:
+        return 'microsoft' in Path('/proc/version').read_text(errors='replace').lower()
+    except OSError:
+        return False
+
+
+def _report_check(check_id, label, ok, fix):
+    return {'id': check_id, 'label': label, 'passed': bool(ok), 'fix': fix}
+
+
+def collect_setup_checks(project, debian):
+    """Run the read-only checks used by the Toolchain Trail setup panel."""
+    package_prefix = 'sudo apt update && sudo apt install' if debian else 'your distribution package manager to install'
+    command_checks = [
+        ('git', 'Git', ['git', '--version'], r'git version \d', f'Run: {package_prefix} git'),
+        ('git-name', 'Git user.name set', ['git', 'config', '--global', 'user.name'], r'\S', 'Run: git config --global user.name "Your Name"'),
+        ('git-email', 'Git user.email set', ['git', 'config', '--global', 'user.email'], r'^[^\s@]+@[^\s@]+$', 'Run: git config --global user.email "you@example.com"'),
+        ('python3', 'Python 3', ['python3', '--version'], r'Python 3\.\d+', f'Run: {package_prefix} python3'),
+        ('pip', 'pip', ['python3', '-m', 'pip', '--version'], r'pip \d', f'Run: {package_prefix} python3-pip'),
+        ('ruby', 'Ruby', ['ruby', '--version'], r'ruby \d', f'Run: {package_prefix} ruby-full'),
+        ('rubygems', 'RubyGems', ['gem', '--version'], r'^\d+\.\d+', f'Run: {package_prefix} ruby-full'),
+        ('bundler', 'Bundler', ['bundle', '--version'], r'(?:Bundler version )?\d+\.\d+', 'Run: gem install bundler'),
+        ('java', 'Java', ['java', '-version'], r'version "?\d', f'Run: {package_prefix} default-jdk'),
+        ('vscode', 'VS Code code command', ['code', '--version'], r'^\d+\.\d+', 'Install VS Code and its command-line launcher. In WSL, install VS Code on Windows with the WSL extension.'),
+    ]
+    results = []
+    for check_id, label, command, pattern, fix in command_checks:
+        executable = shutil.which(command[0])
+        ok, detail = probe([executable, *command[1:]]) if executable else (False, 'Not found in PATH')
+        passed = ok and bool(re.search(pattern, detail, re.IGNORECASE | re.MULTILINE))
+        results.append(_report_check(check_id, label, passed, fix))
+
+    venv_ok = (project / 'venv' / 'bin' / 'python3').exists()
+    results.extend([
+        _report_check(
+            'pages-repo',
+            'Pages repository cloned',
+            (project / '.git').is_dir() and (project / '_config.yml').is_file(),
+            'Clone your pages repository and run this command from inside it.',
+        ),
+        _report_check(
+            'project-venv',
+            'Project venv created',
+            venv_ok,
+            'From the project folder run: ./scripts/venv.sh',
+        ),
+    ])
+    return results
+
+
+def format_setup_report(results, system, started_at='', duration_seconds=None):
+    """Format a stable report that the Toolchain Trail can parse after pasting.
+
+    The Summary:/Overall: lines match verifyToolsTerminal.sh, because Spring reads
+    them when the report is uploaded. This agent has no warnings, so warned is 0."""
+    system = system.upper()
+    lines = [f'=== {system} SETUP CHECK v{REPORT_VERSION} ===']
+    if started_at:
+        lines.append(f'Started: {started_at}')
+    for result in results:
+        if result['passed']:
+            lines.append(f"PASS {result['id']} | {result['label']}")
+        else:
+            lines.append(f"FAIL {result['id']} | {result['label']} | {result['fix']}")
+    passed = sum(1 for result in results if result['passed'])
+    failed = len(results) - passed
+    if duration_seconds is not None:
+        lines.append(f"Duration: {duration_seconds} second{'' if duration_seconds == 1 else 's'}")
+    lines.append(f'Summary: {passed} passed, 0 warned, {failed} failed')
+    lines.append(f"Overall: {'FAIL' if failed else 'PASS'}")
+    lines.append(f'=== END {system} SETUP CHECK ===')
+    return '\n'.join(lines)
+
+
+def run_setup_check(project, debian, system):
+    """Time the checks and return the formatted report plus whether every check passed."""
+    started_at = datetime.now().astimezone().strftime('%Y-%m-%d %H:%M:%S %Z')
+    start = time.monotonic()
+    results = collect_setup_checks(project, debian)
+    duration_seconds = round(time.monotonic() - start)
+    report = format_setup_report(results, system, started_at, duration_seconds)
+    return report, all(result['passed'] for result in results)
+
+
+def write_report_file(report, project):
+    report_file = project / REPORT_FILE_NAME
+    created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    try:
+        report_file.write_text(f'# Setup report\n\nCreated {created} by scripts/linux_setup_agent.py\n\n```text\n{report}\n```\n')
+    except OSError as exc:
+        print(f'Could not write {report_file}: {exc}', file=sys.stderr)
+        return
+    print(f'Saved these results to {report_file}')
+
+
+def upload_report(report, upload_url):
+    request = urllib.request.Request(
+        upload_url,
+        data=report.encode(),
+        method='POST',
+        headers={'Content-Type': 'text/plain'},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=20):
+            pass
+    except (urllib.error.URLError, OSError) as exc:
+        print(f'Could not send the results ({exc}). If the code expired, copy the check command from the game again, or paste the results into the game.', file=sys.stderr)
+        return False
+    print('Sent these results to the game. Look at the setup panel in your browser.')
+    return True
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--log', type=Path, help='Analyze a saved terminal error locally')
     mode.add_argument('--watch', action='store_true', help='Open live Bash help in this project (Linux/WSL only)')
+    mode.add_argument('--check', action='store_true', help='Print a setup report for the Toolchain Trail game')
+    parser.add_argument('--report', metavar='UPLOAD_URL', help='With --check: save the report to setup-report.md and send it to the game')
     parser.add_argument('--project', type=Path, default=PROJECT_ROOT, help='Project folder; defaults to the checkout containing this script')
     parser.add_argument('--color', choices=['auto', 'always', 'never'], default='auto', help='Yellow diagnostic text (default: auto)')
     parser.add_argument('--distro', choices=['debian', 'other'], help='Target Linux family for saved logs; useful when analyzing on a Mac')
     args = parser.parse_args()
     project = args.project.expanduser().resolve()
     color = args.color == 'always' or (args.color == 'auto' and sys.stdout.isatty() and 'NO_COLOR' not in os.environ and os.environ.get('TERM') != 'dumb')
+    if args.report and not args.check:
+        parser.error('--report is only used with --check')
+    if args.report and not UPLOAD_URL.match(args.report):
+        parser.error(f"'{args.report}' is not an upload URL; copy the full command from the game")
     if args.distro and not args.log:
         parser.error('--distro is for saved --log output; live checks detect the Linux distribution')
     is_linux = platform.system() == 'Linux'
@@ -252,7 +386,7 @@ def main():
         info = {}
     family = (info.get('ID', '') + ' ' + info.get('ID_LIKE', '')).split()
     debian = args.distro == 'debian' or (args.distro is None and bool(set(family) & {'debian', 'ubuntu', 'linuxmint', 'kali'}))
-    print('Linux setup helper — local, rule-based feedback; no AI service or uploads.')
+    print('Linux setup helper — local, rule-based feedback; no AI service. Results are only uploaded with --report.')
     print('Host:', info.get('PRETTY_NAME', platform.system()))
     if args.log:
         try:
@@ -266,13 +400,22 @@ def main():
             print(highlighted('Unresolved: no known error pattern matched. Supply the exact command, full error, Linux distribution, and shell to your assistant. This does not establish success.', color))
         return 1 if advice else 2
     if not is_linux:
-        print(highlighted('Linux system checks skipped. Open Ubuntu or WSL, cd to your Linux toolchain_trail checkout, and run python3 scripts/linux_setup_agent.py --watch. Use --log with --distro to analyze saved Linux output here.', color))
+        print(highlighted('Linux system checks skipped. Open Ubuntu or WSL, cd to your Linux blueprints_pages checkout, and run python3 scripts/linux_setup_agent.py --watch. Use --log with --distro to analyze saved Linux output here.', color))
         return 2
     if not project.is_dir():
-        print(highlighted(f'CHECK: Project folder does not exist: {project}. Check the spelling (toolchain_trail) and pass --project /actual/path/to/toolchain_trail.', color))
+        print(highlighted(f'CHECK: Project folder does not exist: {project}. Check the spelling (blueprints_pages) and pass --project /actual/path/to/blueprints_pages.', color))
         return 2
     if args.watch:
         return watch(project, debian, color)
+    if args.check:
+        system = 'WINDOWS' if is_wsl() else 'LINUX'
+        report, all_passed = run_setup_check(project, debian, system)
+        print(report)
+        if args.report:
+            print()
+            write_report_file(report, project)
+            upload_report(report, args.report)
+        return 0 if all_passed else 1
     print(f'Project: {project}\nEnter it with: cd -- {shlex.quote(str(project))}')
     print('For help after each failed command: python3 scripts/linux_setup_agent.py --watch')
     failed = False

@@ -6,6 +6,12 @@ title: "Integra: An AI-Driven Recovery System for the Poway Recovery Center"
 permalink: /capstone/integra/
 ---
 
+<!-- Sprint Board: live from the team's GitHub project, like SFI Foundation -->
+{% assign integra_data = site.data.integra %}
+{% if integra_data.Board %}
+{% include ocs_kanban_board.html url=integra_data.Board.url %}
+{% endif %}
+
 Integra pairs AI-driven support with clear progress tracking to help Poway Recovery Center clients stay engaged and connected.
 
 <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">

@@ -12,3 +12,16 @@
 .ocs__container * {
   box-sizing: border-box;
 }
+
+// A vertical stack: even gaps between its children, so they need no margins.
+// --wide uses the gap between cards. Children stretch to the full width, so put
+// buttons in an ocs__links row.
+.ocs__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &--wide {
+    gap: 1.5rem;
+  }
+}

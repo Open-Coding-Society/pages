@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { readFile } from 'node:fs/promises';
 import { gistExportError, appendGistSettingsLink } from '../assets/js/gist-connection-errors.js';
 
 test('connection failures link to settings without exposing upstream content', () => {
@@ -21,9 +20,9 @@ test('settings links use safe DOM construction', () => {
     assert.equal(link.href, '/profile');
   } finally { globalThis.document = previous; }
 });
-const source = await readFile(new URL('../assets/js/profile/gist-connection.js', import.meta.url), 'utf8');
-const { initGistConnection } = await import('data:text/javascript,' + encodeURIComponent(
-  source.replace("import { javaURI } from '../api/config.js';", "const javaURI = 'http://localhost:8585';")));
+// The page passes javaURI in, so the module loads straight from its system source.
+const { initGistConnection } = await import('../_projects/systems/profile/js/gist-connection.js');
+const javaURI = 'http://localhost:8585';
 function fixture() {
   const elements = Object.fromEntries(['form', 'token', 'state', 'message', 'save', 'disconnect'].map(name => [name,
     { value: '', dataset: {}, listeners: {}, addEventListener(event, listener) { this.listeners[event] = listener; } }]));
@@ -37,7 +36,7 @@ test('save and disconnect target only the session and clear the field', async ()
     return { ok: true, status: options.method === 'DELETE' ? 204 : 200,
       json: async () => ({ available: true, connected: options.method === 'PUT', githubUsername: 'github-owner' }) };
   };
-  await initGistConnection(section, request);
+  await initGistConnection(section, { javaURI, request });
   assert.equal(elements.state.dataset.connected, 'false');
   elements.token.value = 'fixture-token';
   await elements.form.listeners.submit({ preventDefault() {} });
@@ -56,7 +55,7 @@ test('failed replacement preserves displayed account and clears input', async ()
   const request = async (url, options) => ({ ok: options.method === 'GET', status: options.method === 'GET' ? 200 : 403,
     json: async () => options.method === 'GET' ? { available: true, connected: true, githubUsername: 'original' }
       : { error: 'Invalid token' } });
-  await initGistConnection(section, request);
+  await initGistConnection(section, { javaURI, request });
   elements.token.value = 'bad-token';
   await elements.form.listeners.submit({ preventDefault() {} });
   assert.equal(elements.token.value, '');
@@ -65,8 +64,8 @@ test('failed replacement preserves displayed account and clears input', async ()
 });
 test('unavailable connections do not display connected styling', async () => {
   const { elements, section } = fixture();
-  await initGistConnection(section, async () => ({ ok: true, status: 200,
-    json: async () => ({ available: false, connected: false }) }));
+  await initGistConnection(section, { javaURI, request: async () => ({ ok: true, status: 200,
+    json: async () => ({ available: false, connected: false }) }) });
   assert.equal(elements.state.dataset.connected, 'false');
   assert.equal(elements.save.disabled, true);
 });

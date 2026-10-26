@@ -41,6 +41,7 @@ $kanban-item: (
   gap: $spacing-xxxs * 0.5,
   radius: $radius-md,
   lift: -1px,
+  evidence-gap: $spacing-xxxs,
 );
 
 // Text sits on both tints, so they stay light: a column is a little text
@@ -49,6 +50,11 @@ $kanban-item: (
 // own text on the panel is 4.75:1: these keep the board's text above 4.5:1.
 $kanban-column-tint: 3%;
 $kanban-hover-tint: 4%;
+
+// A complete gate's pill (every box ticked, a PR merged): an accent ring
+// carries "complete", over a faint tint. The shared pill's 12% tint took its
+// text to 4.15:1 under Sepia; at 4% it stays above 4.5:1.
+$kanban-complete-tint: 4%;
 
 // The card's three lines: the kicker (group and number), the name, the note
 // (people and the day it shipped). In rem, so they follow the reader's font

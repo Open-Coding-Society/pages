@@ -28,10 +28,16 @@ permalink: /capstone/sfi-foundation/
     </div>
 </div>
 
+<!-- Sprint Board: live from the team's GitHub project, like Communication Systems -->
+{% assign sfi_data = site.data.sfi_foundation %}
+{% if sfi_data.Board %}
+{% include ocs_kanban_board.html url=sfi_data.Board.url filter=sfi_data.Board.filter columns=sfi_data.Board.columns %}
+{% endif %}
+
 <br>
 
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">
+    <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://github.com/SFI-Foundation/Frontend" target="_blank" rel="noreferrer noopener">
         <span class="ocs__btn-icon" aria-hidden="true">
             <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                 <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
@@ -39,7 +45,7 @@ permalink: /capstone/sfi-foundation/
         </span>
         <span>Frontend Repository</span>
     </a>
-    <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">
+    <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="https://github.com/SFI-Foundation/Backend" target="_blank" rel="noreferrer noopener">
         <span class="ocs__btn-icon" aria-hidden="true">
             <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                 <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
@@ -164,11 +170,23 @@ permalink: /capstone/sfi-foundation/
 <br>
 
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn alert-green iridescent" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">Explore Frontend ↗</a>
-    <a class="ocs__btn alert-yellow iridescent" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">Explore Backend ↗</a>
+    <a class="ocs__btn alert-green iridescent" href="https://github.com/SFI-Foundation/Frontend" target="_blank" rel="noreferrer noopener">Explore Frontend ↗</a>
+    <a class="ocs__btn alert-yellow iridescent" href="https://github.com/SFI-Foundation/Backend" target="_blank" rel="noreferrer noopener">Explore Backend ↗</a>
 </div>
 
 <br>
+
+---
+
+## Official SFI Foundation contact
+
+For technical questions, specification information, or product certification inquiries, contact SFI Foundation directly.
+
+- **Email:** [sfi@sfifoundation.com](mailto:sfi@sfifoundation.com)
+- **Phone:** [(858) 451-8868](tel:+18584518868)
+- **Website:** [Official SFI contact page](https://sfifoundation.com/contact/)
+
+This is SFI Foundation's public contact information. For feedback on this student capstone, use the [project's GitHub organization](https://github.com/SFI-Foundation).
 
 ---
 
@@ -216,6 +234,6 @@ permalink: /capstone/sfi-foundation/
 <br>
 
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn large iridescent" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">View Frontend Repository</a>
-    <a class="ocs__btn large iridescent" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">View Backend Repository</a>
+    <a class="ocs__btn large iridescent" href="https://github.com/SFI-Foundation/Frontend" target="_blank" rel="noreferrer noopener">View Frontend Repository</a>
+    <a class="ocs__btn large iridescent" href="https://github.com/SFI-Foundation/Backend" target="_blank" rel="noreferrer noopener">View Backend Repository</a>
 </div>

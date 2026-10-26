@@ -77,7 +77,7 @@ class LoginManager {
       const flaskRes = await fetch(`${pythonURI}/api/user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, uid, sid, school, email, password, kasm_server_needed: false }),
+        body: JSON.stringify({ name, uid, sid, school, email, password }),
       });
 
       if (!flaskRes.ok) {
@@ -92,7 +92,6 @@ class LoginManager {
         body: JSON.stringify({
           uid, sid, email, name, password,
           dob: '11-01-2024',
-          kasmServerNeeded: false,
         }),
       }).catch(() => {});
 

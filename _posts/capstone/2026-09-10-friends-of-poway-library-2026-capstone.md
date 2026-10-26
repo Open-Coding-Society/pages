@@ -31,13 +31,30 @@ permalink: /capstone/poway-library-2026-27/
 <br>
 
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://github.com/Boolean-Boyz/bb-pages" target="_blank" rel="noreferrer noopener">
+    <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://github.com/FOPL-Team-2026/bb-pages" target="_blank" rel="noreferrer noopener">
         <span>Frontend Repository</span>
     </a>
     <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noreferrer noopener">
         <span>Backend Repository</span>
     </a>
     <a class="ocs__btn iridescent" href="https://fopl.opencodingsociety.com/home" target="_blank" rel="noreferrer noopener">Previous Prototype ↗</a>
+</div>
+
+<br>
+
+---
+
+## FOPL Kanban
+
+Live sprint work from the team's planning issues, connected to the active FOPL frontend repository.
+
+{% assign fopl_data = site.data.fopl_2026_27 %}
+{% if fopl_data.Board %}
+{% include ocs_kanban_board.html url=fopl_data.Board.url filter=fopl_data.Board.filter title=fopl_data.Board.title %}
+{% endif %}
+
+<div class="ocs__links ocs__links--wide">
+    <a class="ocs__btn iridescent" href="{{ fopl_data.Repository.url }}" target="_blank" rel="noreferrer noopener">Open FOPL Frontend on GitHub ↗</a>
 </div>
 
 <br>

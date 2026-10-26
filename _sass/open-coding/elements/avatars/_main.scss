@@ -1,0 +1,19 @@
+// A round avatar that shows a person's initials. Write it as an <abbr> with the
+// full name in `title`: preset themes recolor every span and div to the text
+// color, and an abbr keeps the accent.
+.ocs__avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border: 1px solid var(--pref-accent-color);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pref-accent-color) 14%, var(--panel));
+  color: var(--pref-accent-color);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}

@@ -219,6 +219,7 @@ active_tab: submissions
     const creatorDashboard = createCreatorDashboard({
         managedAssignmentsUrl,
         managedSubmissionsUrl,
+        gradeSubmissionUrl: `${javaURI}/api/submissions/grade`,
         courseManifestUrl: '{{ site.baseurl }}/assets/data/assignment-course-manifest.json',
         fetchOptions,
         baseUrl: '{{ site.baseurl }}',
