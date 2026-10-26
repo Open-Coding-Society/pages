@@ -8,7 +8,7 @@ permalink: /capstone/doingexceptionaldeeds/
 
 > Doing Exceptional Deeds (D.A.D.) is a nonprofit focused on helping students and the community. The organization has strong programs and resources, but the website can be improved by making important information easier to find, reducing excessive text, and creating a simpler experience for students, teachers, and families.
 
-{% include ocs_kanban_board.html url="https://github.com/Blazific11/Teamportfolio/issues" filter="Assignee" title="D.A.D. Website Redesign - Project board" %}
+{% include dad_project_board.html %}
 
 <div class="ocs__links">
 
@@ -328,6 +328,11 @@ permalink: /capstone/doingexceptionaldeeds/
 
 <div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
 
+
+
+
+
+
   <div class="ocs__grid-cell ocs__grid-cell--accent">
 
     <strong>Ishaan</strong>
@@ -335,16 +340,6 @@ permalink: /capstone/doingexceptionaldeeds/
     <p>UI/UX Design & Content Strategy</p>
 
     <p>Impact tier design, registration form backend, and content storytelling.</p>
-
-  </div>
-
-  <div class="ocs__grid-cell">
-
-    <strong>Noah</strong>
-
-    <p>Full-Stack Development & Integrations</p>
-
-    <p>Site functionality, backend development, and integrations.</p>
 
   </div>
 
@@ -358,6 +353,15 @@ permalink: /capstone/doingexceptionaldeeds/
 
   </div>
 
+  <div class="ocs__grid-cell">
+
+    <strong>Noah</strong>
+
+    <p>Full-Stack Development & Integrations</p>
+
+    <p>Site functionality, backend development, and integrations.</p>
+
+  </div>
 </div>
 
 ---
