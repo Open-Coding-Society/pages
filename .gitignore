@@ -18,6 +18,7 @@ venv/
 .venv
 port_venv/
 verifyTools.md
+setup-report.md
 _notebooks/CSP/big-ideas/big-idea-3-part-1-fundamentals/Period3/2024-9-27-fundamentals-3.6.4.ipynb
 .vscode/
 .bundle
@@ -75,6 +76,7 @@ images/projects/
 /_includes/topics-document-nav.html
 /_plugins/topics.rb
 /_data/topics_primary.yml
+/_data/topics_units.yml
 /navigation/search.md
 /navigation/topics.md
 /assets/js/topics/
@@ -84,6 +86,7 @@ images/projects/
 /navigation/authentication/profile-v2.md
 /_layouts/profile.html
 /_includes/profile-gist-connection.html
+/_includes/profile-ai-connections.html
 /assets/js/profile/
 /_sass/open-coding/profile-gist-connection.scss
 /_includes/post_list_image_card.html
@@ -157,3 +160,4 @@ _notebooks/**/*_content.md
 
 # Claude Code session artifacts
 .claude/
+.gstack/

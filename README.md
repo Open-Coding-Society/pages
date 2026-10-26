@@ -119,14 +119,17 @@ git merge upstream/main --allow-unrelated-histories -X theirs # destructive reso
 #### Windows WSL and/or Ubuntu or Kali Users
 
 - Execute the script: `./scripts/activate_ubuntu.sh` or `./scripts/activate_kali.sh`
+- Then run `./scripts/verifyTools.sh` to confirm your setup.
 
 #### macOS Users
 
 - Execute the script: `./scripts/activate_macos.sh`
+- Then run `./scripts/verifyTools.sh` to confirm your setup.
 
 #### Setup connection to GitHub
 
 - Execute the script: `./scripts/activate.sh`
+- Then run `./scripts/verifyTools.sh` to confirm your setup.
 
 #### Prep project to serve on localhost
 
@@ -134,6 +137,60 @@ git merge upstream/main --allow-unrelated-histories -X theirs # destructive reso
 - Source the virtual environment: `source venv/bin/activate`
 - Build localhost server:  `make`
 - Look for and click on server line output, perhaps `Server address: http://localhost:4500/portfolio/`.  The Port and baseurl may change.```
+
+### Verify Your Environment
+
+Run this after cloning and before starting any sprint work:
+
+```bash
+./scripts/verifyTools.sh
+```
+
+It auto-detects your repo location, checks required tools (git, ruby, bundler,
+python, pip), validates `_config.yml` and `venv/` setup, and confirms Jekyll can
+run. Its Markdown report lists each check as `PASS`, `WARN` (non-blocking, e.g.
+optional tools like Jupyter/Java), or `FAIL` with a remediation hint. Exit code
+`0` means there are no failures; exit code `1` means at least one check failed.
+The full report is written to `verifyTools.md` in the repo root.
+
+To print every check and its remediation directly in the terminal without
+creating a Markdown report, run:
+
+```bash
+bash scripts/verifyToolsTerminal.sh
+```
+
+### macOS Terminal Setup Helper (optional)
+
+On macOS, you can opt into a live terminal companion that watches setup commands
+(`brew`, `xcode-select`, `java`, `git`, `python3`, `pip3`, `code`, ...) as you run them
+and prints an inline fix the moment one fails. It's local-only — no network calls, no
+browser/game integration, and it never runs for commands outside that list. Add one
+line to `~/.zshrc` to enable it:
+
+```bash
+source /absolute/path/to/pages/scripts/mac_setup_agent.zsh
+```
+
+Run `mac_agent_pause` / `mac_agent_resume` in a shell to temporarily turn it off/on.
+
+To check your whole Mac setup at once (Xcode tools, Homebrew, Git and its name/email, Python/pip/venv,
+Ruby/Bundler, Java, VS Code's `code` command, this repo and its venv), run from the repo folder:
+
+```bash
+python3 scripts/mac_setup_agent.py --check
+```
+
+It only reads versions and settings; nothing is installed or changed. It prints a report with a fix for
+each failed check and exits `0` (all passed), `1` (something to fix), or `2` (not a Mac).
+
+In the CS Pathway game, the **Set up & check my Mac** button in Toolchain Trail (shown when macOS is selected)
+walks students through these commands in their own Terminal: `source scripts/mac_setup_agent.zsh` (agent on),
+`bash scripts/activate_macos.sh` (install), `source ~/.zshrc`, then `bash scripts/verifyToolsTerminal.sh`
+(verify). They paste the verifier's output back and the page shows what passed and the next steps. The agent
+also watches the install script, so a failed install gets a fix tip. Scripts are run with `bash` because they
+are committed without the execute bit. Tests: `python3 -m unittest discover -s scripts -p 'test_mac_setup_agent.py'`
+and `node --test tests/test_verify_tools_report.mjs`.
 
 ### Jupyter Kernels
 

@@ -16,6 +16,16 @@
              (each option that has cards becomes a button; for a
              repository's issues, filter="Assignee" filters by person)
     title    the heading                                            default: the board's name
+    columns  the capstone's own changes to its board's columns, a list from
+             its page data (columns=data.Board.columns). Each entry names a
+             status and gives it a label (its own column, by that name), a
+             stage (into that stage's column), collapsed: true or false, or
+             hidden: true. See "Kanban board" in _sass/open-coding/README.md.
+
+  The stages, field names and everything the board says are in
+  _data/kanban.yml. Its defaults go on the page once, and each board's columns
+  list inside its section, both as JSON for the script, with every "<"
+  escaped so no value can end the script element early.
 
   The board loads itself (assets/js/kanban-board.js) when it scrolls near the
   screen, and keeps a copy for 10 minutes. The frame, filters and toggle are
@@ -26,19 +36,22 @@
   hides are plain wrappers, because ocs__ elements that set display beat
   [hidden].
 {% endcomment %}
-{% assign ocs_kanban_title = include.title | default: "Project board" %}
+{% assign ocs_kanban_text = site.data.kanban.text %}
+{% assign ocs_kanban_title = include.title | default: ocs_kanban_text.title %}
 <section class="ocs__card ocs__keypoints" data-ocs-kanban data-board-url="{{ include.url | escape }}" data-filter="{{ include.filter | escape }}"{% if include.title %} data-title-fixed{% endif %} aria-label="{{ ocs_kanban_title | escape }}">
   <div class="ocs__links">
     <strong data-hook="title">{{ ocs_kanban_title | escape }}</strong>
     <span class="ocs__text" data-hook="meta"></span>
-    <a class="ocs__btn small pill" href="{{ include.url | escape }}" target="_blank" rel="noopener">Open on GitHub</a>
+    <a class="ocs__btn small pill" href="{{ include.url | escape }}" target="_blank" rel="noopener">{{ ocs_kanban_text.open | escape }}</a>
   </div>
   <div class="ocs__text" data-hook="status" role="status" hidden></div>
   <div data-hook="mount" hidden></div>
-  <noscript><div class="ocs__text">Turn on JavaScript to see the board here, or open it on GitHub.</div></noscript>
+  {% if include.columns %}<script type="application/json" data-hook="columns">{{ include.columns | jsonify | replace: "<", "\u003c" }}</script>{% endif %}
+  <noscript><div class="ocs__text">{{ ocs_kanban_text.noscript | escape }}</div></noscript>
 </section>
 
 {% unless ocs_kanban_board_assets %}
 {% assign ocs_kanban_board_assets = true %}
+<script type="application/json" id="ocs-kanban-defaults">{{ site.data.kanban | jsonify | replace: "<", "\u003c" }}</script>
 <script type="module" src="{{ site.baseurl }}/assets/js/kanban-board.js"></script>
 {% endunless %}
