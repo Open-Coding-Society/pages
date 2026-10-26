@@ -236,6 +236,12 @@ export function sanitizeRichText(raw) {
   return holder.innerHTML;
 }
 
+// Plain text with its web addresses turned into links (new tab). Used where
+// text is never HTML, such as calendar event details.
+export function linkify(text) {
+  return linkifyText(text, false);
+}
+
 export function renderRichMessage(container, raw) {
   container.appendChild(sanitizeToFragment(raw));
 }
