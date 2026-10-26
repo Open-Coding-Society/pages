@@ -1,0 +1,194 @@
+{
+  "title": "Frontend Development Sprint.",
+  "url": "https://github.com/users/nathantrieu360/projects/2/views/1",
+  "updated": "2026-10-26T04:43:17Z",
+  "count": 16,
+  "columns": [
+    {
+      "label": "To do",
+      "stage": "todo",
+      "cards": [
+        {
+          "id": 239763513,
+          "title": "#2 — Build a Better Book and DVD Catalog Experience",
+          "url": "https://github.com/nathantrieu360/apcspteam/issues/8",
+          "repository": "nathantrieu360/apcspteam",
+          "number": 8,
+          "assignees": [
+            "raadinansari-pixel"
+          ]
+        },
+        {
+          "id": 239763515,
+          "title": "#3 — Design the FOPL Storyboard and Visual System",
+          "url": "https://github.com/nathantrieu360/apcspteam/issues/9",
+          "repository": "nathantrieu360/apcspteam",
+          "number": 9,
+          "assignees": [
+            "nathantrieu360"
+          ]
+        },
+        {
+          "id": 239763516,
+          "title": "#4 — Test and Demo the FOPL Frontend",
+          "url": "https://github.com/nathantrieu360/apcspteam/issues/10",
+          "repository": "nathantrieu360/apcspteam",
+          "number": 10,
+          "assignees": [
+            "raadinansari-pixel"
+          ]
+        },
+        {
+          "id": 239763518,
+          "title": "#5 — Enhance Volunteer, Contact, and Getting Involved Experience",
+          "url": "https://github.com/nathantrieu360/apcspteam/issues/11",
+          "repository": "nathantrieu360/apcspteam",
+          "number": 11,
+          "assignees": [
+            "ArjunG1031"
+          ]
+        },
+        {
+          "id": 239763519,
+          "title": "#6 — Build Events and Community Engagement Experience",
+          "url": "https://github.com/nathantrieu360/apcspteam/issues/12",
+          "repository": "nathantrieu360/apcspteam",
+          "number": 12,
+          "assignees": [
+            "nathantrieu360"
+          ]
+        },
+        {
+          "id": 283059075,
+          "title": "Merge portfolio upstream updates into bb-pages",
+          "url": "https://github.com/FOPL-Team-2026/bb-pages/issues/4",
+          "repository": "FOPL-Team-2026/bb-pages",
+          "number": 4,
+          "assignees": [
+            "nathantrieu360"
+          ]
+        },
+        {
+          "id": 283059225,
+          "title": "Connect catalog search and filters to the backend API",
+          "url": "https://github.com/FOPL-Team-2026/bb-pages/issues/12",
+          "repository": "FOPL-Team-2026/bb-pages",
+          "number": 12,
+          "assignees": [
+            "raadinansari-pixel"
+          ]
+        },
+        {
+          "id": 283059220,
+          "title": "Filter catalog items by category and format",
+          "url": "https://github.com/FOPL-Team-2026/bb-pages/issues/10",
+          "repository": "FOPL-Team-2026/bb-pages",
+          "number": 10,
+          "assignees": [
+            "raadinansari-pixel"
+          ]
+        },
+        {
+          "id": 283059228,
+          "title": "Search the catalog by title and author",
+          "url": "https://github.com/FOPL-Team-2026/bb-pages/issues/9",
+          "repository": "FOPL-Team-2026/bb-pages",
+          "number": 9,
+          "assignees": [
+            "ArjunG1031"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "In progress",
+      "stage": "doing",
+      "cards": [
+        {
+          "id": 239763511,
+          "title": "#1 — Improve FOPL Homepage and Navigation",
+          "url": "https://github.com/nathantrieu360/apcspteam/issues/7",
+          "repository": "nathantrieu360/apcspteam",
+          "number": 7,
+          "assignees": [
+            "ArjunG1031"
+          ]
+        },
+        {
+          "id": 283059443,
+          "title": "Plan FOPL backend data and APIs",
+          "url": "https://github.com/FOPL-Team-2026/bb-pages/issues/8",
+          "repository": "FOPL-Team-2026/bb-pages",
+          "number": 8,
+          "assignees": [
+            "nathantrieu360"
+          ]
+        },
+        {
+          "id": 283059438,
+          "title": "Show clear loading, no-results, and error messages in the catalog",
+          "url": "https://github.com/FOPL-Team-2026/bb-pages/issues/11",
+          "repository": "FOPL-Team-2026/bb-pages",
+          "number": 11,
+          "assignees": [
+            "raadinansari-pixel"
+          ]
+        },
+        {
+          "id": 283059433,
+          "title": "Plan FOPL frontend changes",
+          "url": "https://github.com/FOPL-Team-2026/bb-pages/issues/7",
+          "repository": "FOPL-Team-2026/bb-pages",
+          "number": 7,
+          "assignees": [
+            "nathantrieu360"
+          ]
+        },
+        {
+          "id": 283059428,
+          "title": "Define FOPL users, needs, scope, and acceptance criteria",
+          "url": "https://github.com/FOPL-Team-2026/bb-pages/issues/6",
+          "repository": "FOPL-Team-2026/bb-pages",
+          "number": 6,
+          "assignees": [
+            "ArjunG1031"
+          ]
+        },
+        {
+          "id": 283059435,
+          "title": "Test catalog searches and combined filters",
+          "url": "https://github.com/FOPL-Team-2026/bb-pages/issues/13",
+          "repository": "FOPL-Team-2026/bb-pages",
+          "number": 13,
+          "assignees": [
+            "ArjunG1031"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "In review",
+      "stage": "review",
+      "cards": []
+    },
+    {
+      "label": "Done",
+      "stage": "done",
+      "cards": [
+        {
+          "id": 283059522,
+          "title": "Merge Flask upstream updates into bb-flask",
+          "url": "https://github.com/FOPL-Team-2026/bb-pages/issues/5",
+          "repository": "FOPL-Team-2026/bb-pages",
+          "number": 5,
+          "assignees": [
+            "ArjunG1031",
+            "nathantrieu360",
+            "raadinansari-pixel"
+          ]
+        }
+      ]
+    }
+  ],
+  "synced_at": "2026-10-26T18:32:52.875215+00:00"
+}
