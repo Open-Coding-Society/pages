@@ -79,7 +79,12 @@ show_reading_time: false
                 <select id="signupRole">
                     <option value="student" selected>I am a Student</option>
                     <option value="mentor">I am a Mentor</option>
+                    <option value="guest">I am a guest</option>
                 </select>
+                <p id="guest-note" hidden>
+                    A guest can view pages and comment on the microblog. It needs no GitHub or school account,
+                    and it expires after a short time.
+                </p>
             </div>
             <div class="form-group">
                 <input type="text" id="name" placeholder="Name" required>
@@ -250,8 +255,8 @@ show_reading_time: false
 
         overallEl.classList.remove('hidden', 'success', 'partial', 'error');
 
-        // A Flask-only site (spring: false in _config.yml) creates the account in Flask alone.
-        if (!springEnabled) {
+        // A Flask-only site (spring: false in _config.yml), or a guest, creates the account in Flask alone.
+        if (!usesSpring()) {
             overallEl.classList.add(flaskSuccess ? 'success' : 'error');
             overallEl.textContent = flaskSuccess
                 ? '🎉 Account created! You can now login.'
@@ -279,16 +284,23 @@ show_reading_time: false
         }
     }
 
+    // Spring is used when the site has it. A guest never gets a Spring account: it would be a full account.
+    function usesSpring() {
+        return springEnabled && signupFormData.accountType !== 'guest';
+    }
+
     // A Flask-only site has no Spring account, so sign-up shows only Flask's status.
     if (!springEnabled) document.getElementById('springStatus').style.display = 'none';
 
-    // A mentor has no student ID or school, so those fields are hidden and not required.
+    // A mentor or a guest has no student ID or school, so those fields are hidden and not required.
     document.getElementById('signupRole').addEventListener('change', function () {
-        const isMentor = this.value === 'mentor';
+        const noSchool = this.value === 'mentor' || this.value === 'guest';
+        document.getElementById('guest-note').hidden = this.value !== 'guest';
+        if (springEnabled) document.getElementById('springStatus').style.display = this.value === 'guest' ? 'none' : '';
         ['signupSid', 'signupSchool'].forEach(id => {
             const field = document.getElementById(id);
-            field.required = !isMentor;
-            field.closest('.form-group').style.display = isMentor ? 'none' : '';
+            field.required = !noSchool;
+            field.closest('.form-group').style.display = noSchool ? 'none' : '';
         });
     });
 
@@ -307,20 +319,25 @@ show_reading_time: false
             return;
         }
 
+        // A mentor or a guest has no student ID or school: do not send what was typed before the role changed.
+        const role = document.getElementById("signupRole").value;
+        const hasSchool = role !== 'mentor' && role !== 'guest';
+
         // Store form data
         signupFormData = {
             name: document.getElementById("name").value,
             uid: document.getElementById("signupUid").value,
-            sid: document.getElementById("signupSid").value,
-            school: document.getElementById("signupSchool").value,
+            sid: hasSchool ? document.getElementById("signupSid").value : '',
+            school: hasSchool ? document.getElementById("signupSchool").value : '',
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
             accountType: document.getElementById("signupRole").value,
         };
 
         // A mentor cannot use a school email, so they skip it and wait for a Teacher/Admin
-        // to verify the account. A student verifies with Google first.
-        if (signupFormData.accountType === 'mentor') {
+        // to verify the account. A guest needs no verification at all. A student verifies with
+        // Google first.
+        if (signupFormData.accountType === 'mentor' || signupFormData.accountType === 'guest') {
             signup();
         } else {
             showOAuthVerification();
@@ -443,6 +460,11 @@ show_reading_time: false
         // login() shows the error in #message and the page stays put.
         Promise.all([javaPromise, pythonPromise]).then(([springLoggedIn, flaskBody]) => {
             const finish = () => {
+                // A limited account (a guest) has no Spring account and no profile: it goes to the home page.
+                if (flaskBody && flaskBody.user && flaskBody.user.limited) {
+                    window.location.href = '{{site.baseurl}}/';
+                    return;
+                }
                 if (springLoggedIn) {
                     window.location.href = '{{site.baseurl}}/profile';
                     return;
@@ -564,7 +586,7 @@ show_reading_time: false
         signupButton.classList.add("disabled");
         // Reset status indicators
         updateBackendStatus('flask', 'pending');
-        if (springEnabled) updateBackendStatus('spring', 'pending');
+        if (usesSpring()) updateBackendStatus('spring', 'pending');
         document.getElementById('overallStatus').classList.add('hidden');
 
         const data = signupFormData && Object.keys(signupFormData).length > 0 ? signupFormData : {
@@ -612,7 +634,7 @@ show_reading_time: false
             }
 
             updateBackendStatus('flask', 'success');
-            if (!springEnabled) {
+            if (!usesSpring()) {
                 setTimeout(updateOverallStatus, 500);
                 return;
             }
