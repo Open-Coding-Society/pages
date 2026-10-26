@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { filterGroups, selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts } from '../js/model.js';
+import { filterGroups, selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, unitOf, unitGroups, isPractice } from '../js/model.js';
 
 const require = createRequire(import.meta.url);
 const lunr = require('../../../../assets/js/vendor/lunr.min.js');
@@ -65,10 +65,10 @@ test('full-text matches cannot escape the selected categories', () => {
 });
 
 test('category and query context round trips without interpreting Lunr syntax', () => {
-  const state = readState('?category=Java&category=Algorithms&category=Java&q=a%3Ab%20%22x%22&view=list');
+  const state = readState('?category=Java&category=Algorithms&category=Java&q=a%3Ab%20%22x%22&view=cards');
   assert.deepEqual(state.categories, ['java', 'algorithms']);
   assert.deepEqual(readState(`?${writeState(state)}`), state);
-  assert.equal(readState('?view=invalid').view, 'cards');
+  assert.equal(readState('?view=invalid').view, 'list');
 });
 
 test('AND is shareable in the URL and OR, the default, is left out', () => {
@@ -147,4 +147,29 @@ test('long words get break points so a phone-width card never outgrows the scree
     assert.ok(parts.length > 1);
     assert.ok(parts.every((part) => part.split(/\s+/).every((word) => word.length <= 20)));
   }
+});
+
+test('browsing groups each document once under its first topic, checked topics first', () => {
+  const shared = [...documents, { url: '/misc/', title: 'Misc', content: '', categories: ['algorithms'] }];
+  const summary = (groups) => groups.map((group) => [group.key, group.documents.map((doc) => doc.url)]);
+  assert.deepEqual(summary(topicGroups(shared, [], topics)),
+    [['java', ['/java/', '/objects/']], ['python', ['/python/']], ['other', ['/misc/']]]);
+  assert.deepEqual(summary(topicGroups(shared, ['python', 'algorithms'], topics)),
+    [['python', ['/python/']], ['other', ['/java/', '/objects/', '/misc/']]]);
+  assert.deepEqual(categoryCounts(documents), new Map([['java', 2], ['algorithms', 2], ['python', 1]]));
+});
+
+test('lessons group by the unit in their title, with unnumbered lessons last', () => {
+  assert.equal(unitOf('1.10 Calling Class Methods'), 1);
+  assert.equal(unitOf('Unit 2 Quiz'), 2);
+  assert.equal(unitOf('2016 FRQ 3 - 2D Array Operations'), null);
+  assert.equal(unitOf('MCQ1 - Unit 1 Quiz'), 1);
+  assert.ok(isPractice('Unit 2 FRQ Practice') && isPractice('MCQ1 - Unit 1 Quiz'));
+  assert.ok(!isPractice('2.08 for Loops'));
+  const lessons = ['Arrays', '3.10 Lists', 'Unit 3 Quiz', '1.10 Math', '1.02 Variables'].map((title) => ({ title }));
+  assert.deepEqual(unitGroups(lessons).map((group) => [group.unit, group.documents.map((doc) => doc.title)]),
+    [[1, ['1.02 Variables', '1.10 Math']], [3, ['3.10 Lists', 'Unit 3 Quiz']], [null, ['Arrays']]]);
+  const [, unit3] = unitGroups(lessons);
+  assert.deepEqual([unit3.lessons.map((doc) => doc.title), unit3.practice.map((doc) => doc.title)],
+    [['3.10 Lists'], ['Unit 3 Quiz']]);
 });

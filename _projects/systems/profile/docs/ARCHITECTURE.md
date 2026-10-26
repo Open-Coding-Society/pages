@@ -37,6 +37,7 @@ and `profile-page.js` doesn't start Face ID or watch the Gist card.
 | `profile-skills.js` | The skill check-in (four 1–6 ratings) | Flask `POST /api/user/skill-snapshot` |
 | `profile-face.js` | Face ID status and the camera scanner | Spring `GET /api/person/get`, `POST /api/face/register` |
 | `gist-connection.js` | The Gist card | Spring `GET`/`PUT`/`DELETE /api/gist-connection` |
+| `ai-connections.js` | Optional AI grading card | Spring `GET /api/ai-connections`, `PUT`/`DELETE /api/ai-connections/{gemini\|groq}` |
 | `profile-model.js` | Pure helpers: changed fields, initials, persona sections, setup steps | none |
 
 ## What saves when
@@ -47,6 +48,11 @@ Each part saves on its own, so no single Save button covers the whole page:
   high school.
 - Adding or removing a course, picking a persona, saving a check-in, registering
   a face and saving a Gist token each save right away.
+- Gemini and Groq keys also save independently, including from Gist and Account saves.
+  Their include supplies `javaURI` to the module as `apiBase`; the module never imports
+  shared configuration via a parent path. Like Gist, the card and its starter are omitted
+  when `spring: false`. It uses existing OCS cards, fields, status pills and links with
+  no page stylesheet. Personal keys remain optional and are not a setup-checklist requirement.
 
 ## Rules the code depends on
 

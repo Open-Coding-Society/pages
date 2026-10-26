@@ -4,7 +4,7 @@ layout: post
 codemirror: true
 data: flask
 title: Flask, REST Client, and Backend UIs
-description: A Holistic Overview of Flask and Backend Operations
+description: Learn how Flask routes turn Python into API endpoints, test them with the VS Code REST Client, and see how backend UIs let people manage data.
 categories:
 - Python
 - flask
