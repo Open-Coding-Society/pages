@@ -5,6 +5,7 @@ layout: post
 title: Shoreline Community Services, Volunteer Page
 permalink: /capstone/shoreline-volunteer/
 ---
+{% assign shoreline_data = site.data.shoreline_volunteer %}
 <!-- markdownlint-disable MD033 -->
 <style>
 .shoreline-capstone-card .ocs__grid-cell:not(.ocs__grid-cell--header) {
@@ -60,6 +61,18 @@ permalink: /capstone/shoreline-volunteer/
 *Homelessness Hotspot and Volunteer Shift Calendar can go together to create one combined idea.*
 
 *Donations Page and Needs Right Now Page can go together to create one combined idea (Needs Right Now can be a part of the donations page).*
+
+---
+
+## Project Kanban Board
+
+Follow our team's actual issues, assignments, and progress on GitHub.
+
+{% if shoreline_data.Board %}
+{% include ocs_kanban_board.html url=shoreline_data.Board.url filter=shoreline_data.Board.filter title=shoreline_data.Board.title %}
+{% endif %}
+
+<a class="ocs__btn small pill" href="{{ shoreline_data.Board.project_url | escape }}" target="_blank" rel="noopener noreferrer">Open personal GitHub Project ↗</a>
 
 ---
 
