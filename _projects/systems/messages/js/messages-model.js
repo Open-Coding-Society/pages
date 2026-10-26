@@ -20,7 +20,7 @@ export function dmMessage(raw) {
     sentAt: raw.sentAt || null,
     edited: Boolean(raw.edited),
     deleted,
-    image: null,
+    image: raw.image || null,
   };
 }
 

@@ -79,6 +79,9 @@ export async function startMessagesPage({ config, richText }) {
       title: byId('messagesThreadTitle'), subtitle: byId('messagesThreadSubtitle'), messages: byId('messagesLog'),
       form: byId('messagesForm'), send: byId('messagesSend'), cancelEdit: byId('messagesCancelEdit'),
       formStatus: byId('messagesFormStatus'),
+      imageAttach: byId('messagesImageAttach'), imageInput: byId('messagesImage'),
+      imagePreview: byId('messagesImagePreview'), imageThumb: byId('messagesImageThumb'),
+      imageRemove: byId('messagesImageRemove'),
     },
     onDmRead: id => {
       const conversation = findItem('dm', id);

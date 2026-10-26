@@ -32,7 +32,7 @@ export function createMessagesApi({ javaURI, pythonURI, fetchOptions }) {
     conversations: () => spring('/api/dm/conversations'),
     startConversation: otherPersonIds => spring('/api/dm/conversations', 'POST', { otherPersonIds }),
     dmMessages: id => spring(`/api/dm/conversations/${part(id)}/messages`),
-    sendDm: (id, body) => spring(`/api/dm/conversations/${part(id)}/messages`, 'POST', { body }),
+    sendDm: (id, body, image = null) => spring(`/api/dm/conversations/${part(id)}/messages`, 'POST', { body, image }),
     editDm: (id, messageId, body) => spring(`/api/dm/conversations/${part(id)}/messages/${part(messageId)}`, 'PATCH', { body }),
     deleteDm: (id, messageId) => spring(`/api/dm/conversations/${part(id)}/messages/${part(messageId)}`, 'DELETE'),
     markDmRead: id => spring(`/api/dm/conversations/${part(id)}/read`, 'POST'),
@@ -48,7 +48,9 @@ export function createMessagesApi({ javaURI, pythonURI, fetchOptions }) {
     // A saved group message stores only its sender's name, and Spring checks that name
     // before an edit or delete, so `name` must be the account's name.
     groupMessages: groupId => spring(`/api/groups/chat/${part(groupId)}/messages`),
-    sendGroupMessage: (groupId, name, message) => spring(`/api/groups/chat/${part(groupId)}/messages`, 'POST', { name, message }),
+    // `image` is a data URL, stored on the message itself (Spring's GroupChatMessage
+    // has an image field); null when the message is text only.
+    sendGroupMessage: (groupId, name, message, image = null) => spring(`/api/groups/chat/${part(groupId)}/messages`, 'POST', { name, message, image }),
     editGroupMessage: (groupId, messageId, message) => spring(`/api/groups/chat/${part(groupId)}/messages/${part(messageId)}`, 'PATCH', { message }),
     deleteGroupMessage: (groupId, messageId) => spring(`/api/groups/chat/${part(groupId)}/messages/${part(messageId)}`, 'DELETE'),
     groupFiles: groupId => spring(`/api/groups/chat/${part(groupId)}/files`),
