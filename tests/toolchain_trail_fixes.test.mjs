@@ -55,6 +55,8 @@ test('every pairing failure says what to do next', () => {
   assert.equal(stuckHelpFor(failure(500)), STUCK_HELP.serverError);
   assert.equal(stuckHelpFor(new Error('unexpected response')), STUCK_HELP.serverError);
   assert.equal(stuckHelpFor(new TypeError('Failed to fetch')), STUCK_HELP.serverUnreachable);
+  assert.match(STUCK_HELP.serverUnreachable.join(' '), /Practice Check/);
+  assert.match(STUCK_HELP.serverUnreachable.join(' '), /Verify Output/);
   assert.equal(stuckHelpFor(new TypeError('Failed to fetch'), { localBackend: true }), STUCK_HELP.localBackendDown);
   for (const help of Object.values(STUCK_HELP)) assert.ok(help.length >= 2, 'has a next step');
 });

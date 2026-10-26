@@ -308,9 +308,10 @@ class GameLevelCsPath4Toolchain {
           ],
           macos: [
             'Open Terminal (keep it in the Dock for easy access).',
-            { text: "See where you currently are:", commands: ["pwd"] },
-            { text: "List the files here (cat shows a file's contents):", commands: ["ls"] },
-            { text: "Create the trail folder:", commands: ["mkdir toolchain-trail"] },
+            { text: "Go to your home folder:", commands: ["cd ~"] },
+            { text: "Create the trail folder. This is safe to run if the folder already exists:", commands: ["mkdir -p toolchain-trail"] },
+            { text: "Show your current folder. You should see a path ending with your username:", commands: ["pwd"] },
+            { text: "Show the trail folder. You should see a line ending with toolchain-trail:", commands: ["ls -ld toolchain-trail"] },
           ],
           linux: [
             'Open a Terminal.',
@@ -354,9 +355,10 @@ class GameLevelCsPath4Toolchain {
           ],
           macos: [
             'Open Terminal.',
-            { text: "Confirm Python is installed:", commands: ["python --version", "pip --version"] },
-            { text: "Confirm the Ruby tools too (the class stack uses them):", commands: ["ruby -v", "bundle -v", "gem --version"] },
-            { text: "If anything is missing, install Homebrew from brew.sh, then run this from your project folder:", commands: ["./scripts/activate.sh"] },
+            { text: "Go into your cloned portfolio folder:", commands: ["cd ~/opencs/portfolio"] },
+            { text: "Check Python and pip. Each command should print a version number:", commands: ["python3 --version", "python3 -m pip --version"] },
+            { text: "Check the Ruby tools. Each command should print a version number:", commands: ["ruby -v", "bundle -v", "gem --version"] },
+            { text: "If a tool is missing, install Homebrew from brew.sh, then run the macOS setup script and reload your shell:", commands: ["bash scripts/activate_macos.sh", "source ~/.zshrc"] },
           ],
           kasm: [
             'Open a Terminal in your Kasm Workspace.',
@@ -409,7 +411,9 @@ class GameLevelCsPath4Toolchain {
           ],
           macos: [
             'Download and install VS Code for Mac from code.visualstudio.com.',
-            { text: "Open a new Terminal, cd into your project folder, and open it:", commands: ["code ."] },
+            "In VS Code, press Cmd+Shift+P, search for Shell Command, and choose Install 'code' command in PATH.",
+            { text: "Open a new Terminal and check the command. You should see a version number:", commands: ["code --version"] },
+            { text: "Go into your project folder and open it:", commands: ["cd ~/opencs/portfolio", "code ."] },
             'Install one recommended extension.',
           ],
           kasm: [
@@ -451,9 +455,11 @@ class GameLevelCsPath4Toolchain {
             { text: "Set your email (use your real email):", commands: ["git config --global user.email you@example.com"] },
           ],
           macos: [
-            { text: "Confirm git is installed (if it's missing, install Homebrew from brew.sh, then run the second command):", commands: ["git --version", "brew install git"] },
-            { text: "Set your Git UID and personal email (it asks for them):", commands: ["./scripts/activate.sh"] },
-            { text: "Confirm it worked:", commands: ["git config --global --list"] },
+            { text: "Confirm Git is installed. You should see a version number. If it is missing, install Homebrew from brew.sh, then run the second command:", commands: ["git --version", "brew install git"] },
+            { text: "Go into your cloned portfolio folder:", commands: ["cd ~/opencs/portfolio"] },
+            { text: "Set your Git name and email. Do not include your email in a screenshot:", commands: ["bash scripts/activate.sh"] },
+            { text: "Check your name:", commands: ["git config --global --get user.name"] },
+            { text: "Check your email. Before pasting into the Practice Check, you may replace the domain with [redacted]:", commands: ["git config --global --get user.email"] },
           ],
           kasm: [
             'Open a Terminal in your Kasm Workspace.',

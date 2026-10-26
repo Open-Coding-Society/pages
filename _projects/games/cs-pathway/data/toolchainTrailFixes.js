@@ -102,7 +102,11 @@ export const FIXES = Object.freeze({
 /** Help for getting stuck before any check runs. */
 export const STUCK_HELP = Object.freeze({
   notSignedIn: ['You are not signed in, so no pairing code was made.', 'Sign in from the Login page, come back to this station, and click Get pairing code.'],
-  serverUnreachable: ["The game can't reach the Toolchain server, so no pairing code was made.", 'Check your internet connection, reload the page, and click Get pairing code again.'],
+  serverUnreachable: [
+    "The Toolchain server did not answer. It may be offline or not deployed yet. You can still finish this station with the Practice Check below.",
+    'Run the commands named in the Practice Check, paste their output, and click Verify Output.',
+    'To try the agent again later, reload the page and click Get pairing code.',
+  ],
   localBackendDown: [
     "The game can't reach your local backend.",
     { text: 'Start it in your blueprint-spring folder and wait for "Started Main". On a new computer, run the first command once to set up the database:', commands: ['python3 scripts/db_init.py', './mvnw spring-boot:run'] },
