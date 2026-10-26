@@ -85,9 +85,6 @@ search_exclude: true
       email: document.getElementById("email").value,
       name: document.getElementById("name").value,
       password: document.getElementById("signupPassword").value,
-      kasmServerNeeded: false,
-      // Keep snake_case alias so Flask handlers expecting either key still work.
-      kasm_server_needed: false,
     };
 
     const springURL = `${javaURI}/api/person/create`;

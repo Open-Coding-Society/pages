@@ -1,4 +1,4 @@
-import { javaURI, fetchOptions } from './config.js';
+import { javaURI, fetchOptions, springEnabled } from './config.js';
 
 // Navbar notification bell (_includes/themes/minima/header.html). The badge is the
 // number of different people who have sent the signed-in user unread direct messages.
@@ -12,7 +12,8 @@ const badge = document.getElementById('dmBellBadge');
 
 let requestSeq = 0;
 let pollTimer = null;
-let stopped = false;
+// DMs live in Spring, so a Flask-only site (spring: false in _config.yml) never asks.
+let stopped = !springEnabled;
 
 function render(summary) {
     if (!bell || !badge) return;

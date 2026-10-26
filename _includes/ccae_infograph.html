@@ -1,0 +1,79 @@
+{% assign data = site.data.ccae_infograph %}
+
+<div>
+  
+  <blockquote>{{ data.quote }}</blockquote>
+
+  <h2>{{ data.title }} {{ data.subtitle }}</h2>
+
+  <!-- Project Summary Section -->
+  <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Project Summary</div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+      <strong>Main Problems</strong>
+      <p>{{ data.summary.main_problems }}</p>
+      <a class="ocs__btn alert-green fill small" href="{{ data.summary.original_url }}" target="_blank" rel="noopener">
+        See Original
+      </a>
+    </div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+      <strong>Project Direction</strong>
+      <p>{{ data.summary.project_direction }}</p>
+    </div>
+  </div>
+
+  <!-- GitHub Button -->
+  <a class="ocs__btn large" href="{{ data.github }}" target="_blank" rel="noopener" style="margin-bottom: 1.5rem;">
+    GitHub Repository
+  </a>
+
+  <!-- Live Kanban Board Embed (Option A) -->
+  {% if data.board %}
+  {% include ocs_kanban_board.html url=data.board.url filter=data.board.filter %}
+  {% endif %}
+
+  <hr />
+
+  <!-- Strengths vs Improvement Section -->
+  <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Strengths vs Improvement For Website</div>
+
+    {% for item in data.strengths_and_improvements %}
+    <div class="ocs__grid-cell {% if item.accent %}ocs__grid-cell--accent{% endif %}">
+      <strong>{{ item.title }}</strong>
+      <p>{{ item.description }}</p>
+      {% for link in item.links %}
+      <a class="ocs__btn {{ link.btn_class }} fill small" href="{{ link.url }}" target="_blank" rel="noopener">
+        {{ link.label }}
+      </a>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <hr />
+
+  <!-- Team Section -->
+  <div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Teammates/Collaborators</div>
+    
+    {% for member in data.team %}
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+      <strong>{{ member.name }}</strong>
+      <p>{{ member.role }}</p>
+      <a class="ocs__btn alert-green iridescent fill small" href="{{ member.portfolio }}" target="_blank" rel="noopener">
+        Portfolio
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <p><strong>Powered by OCS grids and buttons</strong></p>
+  <p>
+    <a href="{{ '/navigation/sass/buttons/' | relative_url }}">Buttons</a> | 
+    <a href="{{ '/navigation/sass/grids/' | relative_url }}">Grids</a>
+  </p>
+
+</div>

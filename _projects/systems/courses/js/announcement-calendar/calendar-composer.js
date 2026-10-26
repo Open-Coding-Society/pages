@@ -12,7 +12,7 @@ import {
 // V1 — "Add to calendar" button in the composer.
 // The teacher writes the announcement as usual, clicks 📅, fills a small form,
 // and Send posts the message and creates the calendar event together.
-// Pattern follows the /calendar modal in _includes/group_dashboard.html.
+// Pattern follows the /calendar command the old Groups page's chat had.
 
 
 function firstLine(text) {

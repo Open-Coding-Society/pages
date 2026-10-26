@@ -1,0 +1,35 @@
+// Full-window standalone level pages (navigation/*.md using .cs-pathway-fullpage).
+// Imported globally via _sass/projects/_all.scss, so every rule is scoped to
+// a page that contains .cs-pathway-fullpage.
+// The site header sits at a huge z-index, so hide it instead of out-layering it;
+// in-game panels and dialogues (z-index 1200+) still render above the game.
+body:has(.cs-pathway-fullpage) {
+  overflow: hidden;
+  background: #000;
+
+  .site-header {
+    display: none;
+  }
+}
+
+.cs-pathway-fullpage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: #000;
+
+  canvas {
+    display: block;
+  }
+}
+
+// Fixed-size stage that fullPageLevel.js scales to fit the window. The black
+// body shows above/below or beside it, and fixed-position HUD panels mounted
+// inside it scale with the map.
+.cs-pathway-fullpage--fitted {
+  inset: auto;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  transform-origin: 0 0;
+}

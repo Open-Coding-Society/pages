@@ -8,8 +8,18 @@ permalink: /capstone/srfsc/
 author: Krish Kelageri, Jasan Boprai, Shourya Patel
 year: "2026-2027"
 ---
- 
-> The SRFSC homepage can be more direct and action-focused. The strongest example is to make the mission, volunteer path, and urgent neighborhood context visible immediately.
+
+<div class="comms-infograph">
+  <div class="comms-header">
+    <div class="comms-badge">Design-Based Research Capstone</div>
+    <h1 class="comms-title">SRFSC Website Redesign Examples</h1>
+    <p class="comms-description">The SRFSC homepage can be more direct and action-focused. The strongest example is to make the mission, volunteer path, and urgent neighborhood context visible immediately.</p>
+  </div>
+
+  <div class="comms-card">
+    {% include ocs_kanban_board.html url="https://github.com/orgs/SRFSC-Organization/projects/1" title="SRFSC Project Board" %}
+  </div>
+</div>
 
 <!-- markdownlint-disable MD033 MD010 MD012 -->
 <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">

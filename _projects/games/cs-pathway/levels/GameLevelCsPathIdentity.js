@@ -441,6 +441,7 @@ class GameLevelCsPathIdentity {
     if (this.profilePanelView) {
       this.profilePanelView.destroy();
     }
+    this.scoreboard?.destroy();
     this.present?.destroy();
   }
 

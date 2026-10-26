@@ -1,0 +1,37 @@
+// Next-level link (levels/NextLevelLink.js): always shown, pulses once the level is complete.
+// Above the game canvas but below the levels' own overlays and station panels (1200+).
+$next-level-accent: #4ecca3;
+
+.cs-pathway-next-level {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  padding: 12px 22px;
+  border: 2px solid $next-level-accent;
+  border-radius: 999px;
+  background: rgba(13, 13, 26, 0.92);
+  color: $next-level-accent;
+  font-family: "Courier New", monospace;
+  font-weight: bold;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &.is-complete {
+    animation: cs-pathway-next-level-pulse 2s ease-out infinite;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: $next-level-accent;
+    color: #0d0d1a;
+    text-decoration: none;
+  }
+}
+
+@keyframes cs-pathway-next-level-pulse {
+  0% { box-shadow: 0 0 0 0 rgba($next-level-accent, 0.6); }
+  70% { box-shadow: 0 0 0 14px rgba($next-level-accent, 0); }
+  100% { box-shadow: 0 0 0 0 rgba($next-level-accent, 0); }
+}

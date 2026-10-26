@@ -1,4 +1,4 @@
-import { baseurl, pythonURI, javaURI, fetchOptions } from './config.js';
+import { baseurl, pythonURI, javaURI, fetchOptions, springEnabled } from './config.js';
 import { savedCourse, selectEntryCourse, courseEntryUrl } from '../course-entry.js';
 
 console.log("login.js loaded");
@@ -100,7 +100,9 @@ function waitForElement(selector, maxAttempts = 20, interval = 100) {
 // The name in the navbar only reflects the Flask login. DMs, calendar and announcements
 // need a separate Spring login, which can fail on its own (e.g. a different Spring
 // password), so flag that in the account menu instead of letting those features 401 silently.
+// A Flask-only site (spring: false in _config.yml) has no Spring login to check.
 function warnIfSpringSignedOut(loginArea) {
+    if (!springEnabled) return;
     fetch(`${javaURI}/api/person/get`, fetchOptions)
         .then(response => {
             if (response.ok) return;

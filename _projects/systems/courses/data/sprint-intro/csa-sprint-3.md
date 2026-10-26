@@ -21,7 +21,7 @@ demonstrate your individual contribution, not just the team's finished product.
 |----------------------------|---------------|----------|
 | Beyond Perfunctory         | 1   Bonus     | Phase 1  |
 | Sprint 1-2, CB Quiz Retro  | 1             | Phase 1  |
-| Sprint 3, Team Issue/Kanban| 1             | Phase 1 - Team |
+| Sprint 3, Capstone/Kanban  | 1             | Phase 1 - Team |
 | CB Unit 1 x 2 best         | 1  Auto Grade | Phase 2  |
 | Project Phase: Ideate      | 1             | Phase 2 - Team |
 | Sprint 3, Personal Issue(s)| 1             | Phase 2  |

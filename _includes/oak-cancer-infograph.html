@@ -1,0 +1,645 @@
+{% assign data = site.data.oak_cancer_infograph %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Oncology and Kids · Capstone</title>
+
+    <meta
+        name="description"
+        content="Oncology and Kids student capstone project focused on cancer education, community support, interactive learning, and kid-friendly experiences."
+    >
+
+    <style>
+        :root {
+            --bg: #f7f9fc;
+            --surface: #ffffff;
+            --surface-alt: #eef5f5;
+            --text: #17202a;
+            --muted: #5f6b76;
+            --border: #dbe3e8;
+            --accent: #2d7d7a;
+            --accent-light: #e5f4f2;
+            --green: #dff3e8;
+            --yellow: #fff3c9;
+            --shadow: 0 8px 24px rgba(23, 32, 42, 0.08);
+            --radius: 16px;
+            --max-width: 1100px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Helvetica,
+                Arial,
+                sans-serif;
+            line-height: 1.65;
+        }
+
+        main {
+            width: min(100% - 32px, var(--max-width));
+            margin: 0 auto;
+            padding: 48px 0 72px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            line-height: 1.2;
+            margin-top: 0;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 16px;
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 3vw, 2.2rem);
+            margin-top: 56px;
+            margin-bottom: 24px;
+        }
+
+        p {
+            margin: 0 0 16px;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        /* Intro notice */
+        .capstone-notice {
+            margin-bottom: 32px;
+            padding: 18px 22px;
+            border-left: 5px solid var(--accent);
+            border-radius: 12px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            color: var(--muted);
+        }
+
+        .capstone-notice strong {
+            color: var(--text);
+        }
+
+        /* Grid system */
+        .ocs__grid {
+            display: grid;
+            gap: 18px;
+            margin: 24px 0;
+        }
+
+        .ocs__grid--standard {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .ocs__grid--standard.cols-4 {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .ocs__grid--card {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .ocs__grid-cell {
+            padding: 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .ocs__grid-cell--header {
+            grid-column: 1 / -1;
+            padding: 18px 24px;
+            background: var(--text);
+            color: white;
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        .ocs__grid-cell--accent {
+            background: var(--accent-light);
+            border-color: #c9e6e3;
+        }
+
+        .ocs__grid-cell strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.05rem;
+        }
+
+        .ocs__grid-cell p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Buttons */
+        .ocs__links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin: 28px 0;
+        }
+
+        .ocs__links--wide {
+            width: 100%;
+        }
+
+        .ocs__btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 52px;
+            padding: 13px 22px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-decoration: none;
+            font-weight: 700;
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                opacity 0.2s ease;
+        }
+
+        .ocs__btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(23, 32, 42, 0.12);
+        }
+
+        .ocs__btn:focus-visible {
+            outline: 3px solid #4c9f9b;
+            outline-offset: 3px;
+        }
+
+        .alert-green {
+            background: var(--green);
+            color: #174f36;
+        }
+
+        .alert-yellow {
+            background: var(--yellow);
+            color: #6a4d00;
+        }
+
+        .iridescent {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Blockquote */
+        blockquote {
+            margin: 18px 0 28px;
+            padding: 16px 20px;
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--muted);
+            box-shadow: var(--shadow);
+        }
+
+        /* Image */
+        .project-image {
+            max-width: 220px;
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px;
+            border-radius: 12px;
+        }
+
+        /* Footer */
+        footer {
+            width: min(100% - 32px, var(--max-width));
+            margin: 0 auto;
+            padding: 24px 0 48px;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Mobile */
+        @media (max-width: 800px) {
+            main {
+                padding-top: 32px;
+            }
+
+            .ocs__grid--standard,
+            .ocs__grid--standard.cols-4,
+            .ocs__grid--card {
+                grid-template-columns: 1fr;
+            }
+
+            .ocs__grid-cell--header {
+                grid-column: auto;
+            }
+
+            .ocs__links {
+                flex-direction: column;
+            }
+
+            .ocs__btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main {
+                width: min(100% - 20px, var(--max-width));
+            }
+
+            .ocs__grid-cell {
+                padding: 20px;
+            }
+
+            .capstone-notice {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main>
+
+    <!-- Project disclaimer -->
+    <div class="capstone-notice">
+        <strong>Student capstone · In development.</strong>
+        This project aims to create a more engaging, supportive, and educational
+        digital experience for cancer patients and their families. It is a
+        student-built concept and is not a medical platform or official
+        cancer-care service.
+    </div>
+
+
+    <!-- Project introduction -->
+    <div class="ocs__grid ocs__grid--standard">
+
+        <div class="ocs__grid-cell ocs__grid-cell--header">
+            Oncology and Kids · Capstone
+        </div>
+
+        <div class="ocs__grid-cell ocs__grid-cell--accent">
+            <strong>Connecting learning, care, and community</strong>
+
+            <p>
+                This capstone project is designed to make cancer education and
+                support more accessible, interactive, and welcoming. The goal
+                is to help patients and families learn about cancer in an easier
+                way while also creating a space for connection, play, and
+                encouragement.
+            </p>
+
+            <p>
+                <strong>Experience:</strong>
+                learn → connect → explore → play → feel supported
+            </p>
+        </div>
+
+        <div class="ocs__grid-cell">
+            <img
+                src="images/capstone/oak.png"
+                alt="Oncology and Kids capstone project"
+                loading="lazy"
+                class="project-image"
+            >
+
+            <p>
+                <strong>Project focus:</strong>
+                educational modules, community support, mood check-ins,
+                interactive games, reading level filters, risk education,
+                and a kid-friendly learning experience.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Project links -->
+    <div class="ocs__links ocs__links--wide">
+
+        <a
+            class="ocs__btn ocs__btn--icon alert-green iridescent"
+            href="https://github.com/undergroundrapclub/oak_spring"
+            target="_blank"
+            rel="noreferrer noopener"
+        >
+            <span>Backend Repository</span>
+        </a>
+
+        <a
+            class="ocs__btn ocs__btn--icon alert-yellow iridescent"
+            href="https://oncologyandkids.org/"
+            target="_blank"
+            rel="noreferrer noopener"
+        >
+            <span>Frontend</span>
+        </a>
+
+    </div>
+
+
+    <!-- Problem to product direction -->
+    <section>
+
+        <h2>From problem to product direction</h2>
+
+        <div class="ocs__grid ocs__grid--standard">
+
+            <div class="ocs__grid-cell ocs__grid-cell--header">
+                Why we are building it
+            </div>
+
+            <div class="ocs__grid-cell ocs__grid-cell--accent">
+                <strong>Current challenge</strong>
+
+                <p>
+                    Many cancer resources are difficult to navigate,
+                    overly text-heavy, or not designed to feel welcoming
+                    for younger patients. Kids with cancer often need a
+                    space that is both informative and emotionally supportive.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell">
+                <strong>Project direction</strong>
+
+                <p>
+                    Build a more engaging and inclusive website that combines
+                    education, community support, and interactive play in a way
+                    that feels friendly, understandable, and empowering.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Core features -->
+    <section>
+
+        <h2>Core features</h2>
+
+        <div class="ocs__grid ocs__grid--card">
+
+            <div class="ocs__grid-cell">
+                <strong>Community support</strong>
+
+                <p>
+                    Create a welcoming space for kids and families to feel
+                    connected, supported, and less isolated while navigating
+                    cancer treatment and recovery.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell ocs__grid-cell--accent">
+                <strong>Daily check-in</strong>
+
+                <p>
+                    Offer a simple daily mood check-in so users can share
+                    how they are feeling and connect with others in a
+                    supportive, low-pressure way.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell">
+                <strong>Interactive games</strong>
+
+                <p>
+                    Include puzzles, memory activities, and playful
+                    educational tools that make the experience more
+                    enjoyable and interactive.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell ocs__grid-cell--accent">
+                <strong>Reading level filters</strong>
+
+                <p>
+                    Organize information by age or reading level so kids,
+                    teens, and parents can access content that is easier
+                    to understand.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell">
+                <strong>Risk calculator</strong>
+
+                <p>
+                    Provide educational guidance through a risk-informed
+                    feature that helps users explore relevant health
+                    information in a clearer way.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell ocs__grid-cell--accent">
+                <strong>Cell lab</strong>
+
+                <p>
+                    Refresh the past cell lab concept into a more accessible,
+                    interactive learning experience that explains cancer
+                    science in a simpler format.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell">
+                <strong>Body map</strong>
+
+                <p>
+                    Create a kid-friendly body map tool that helps users
+                    better understand cancer-related health information
+                    through interaction and visual learning.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- System flow -->
+    <section>
+
+        <h2>System flow</h2>
+
+        <blockquote>
+            The project is designed as a connected experience where educational
+            content, community features, and interactive tools work together.
+        </blockquote>
+
+        <div class="ocs__grid ocs__grid--standard cols-4">
+
+            <div class="ocs__grid-cell ocs__grid-cell--header">
+                One connected support and learning workflow
+            </div>
+
+            <div class="ocs__grid-cell ocs__grid-cell--accent">
+                <strong>1 · User interface</strong>
+
+                <p>
+                    Visitors access educational modules, games, check-ins,
+                    and support features through a welcoming and
+                    easy-to-navigate website.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell">
+                <strong>2 · User actions</strong>
+
+                <p>
+                    Users explore information, interact with content,
+                    participate in activities, and connect with a community
+                    designed around support and understanding.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell">
+                <strong>3 · Content and tools</strong>
+
+                <p>
+                    Educational content, risk-related guidance, and
+                    interactive features help make cancer information
+                    more helpful and approachable.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell ocs__grid-cell--accent">
+                <strong>4 · Community value</strong>
+
+                <p>
+                    Users leave with more knowledge, stronger support,
+                    and a more engaging experience that encourages
+                    learning and connection.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Technical foundation -->
+    <section>
+
+        <h2>Technical foundation</h2>
+
+        <div class="ocs__grid ocs__grid--card">
+
+            <div class="ocs__grid-cell">
+                <strong>Frontend</strong>
+
+                <p>
+                    Jekyll, HTML, JavaScript, and accessible web design
+                    for a child-friendly learning and support platform.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell ocs__grid-cell--accent">
+                <strong>Backend</strong>
+
+                <p>
+                    Python Flask services can support data-backed
+                    information, user interactions, and future community
+                    or educational workflows.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell">
+                <strong>Content</strong>
+
+                <p>
+                    Educational modules, reading-level filters, and
+                    interactive learning features are designed to make
+                    complex information easier to understand.
+                </p>
+            </div>
+
+            <div class="ocs__grid-cell ocs__grid-cell--accent">
+                <strong>Project goal</strong>
+
+                <p>
+                    Turn the strongest ideas from earlier work into a clear,
+                    maintainable product direction focused on inclusion,
+                    education, and support.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Team -->
+    <section>
+
+        <h2>Our team</h2>
+
+        <blockquote>
+            The project brings together a small team focused on building
+            a supportive and engaging educational platform.
+        </blockquote>
+
+        <div class="ocs__grid ocs__grid--standard">
+
+            <div class="ocs__grid-cell ocs__grid-cell--header">
+                Current project team
+            </div>
+
+            <div class="ocs__grid-cell ocs__grid-cell--accent">
+                <strong>Salma</strong>
+                <p>Scrum Master</p>
+            </div>
+
+            <div class="ocs__grid-cell">
+                <strong>Isha</strong>
+                <p>Developer</p>
+            </div>
+
+            <div class="ocs__grid-cell">
+                <strong>Aashi</strong>
+                <p>Developer</p>
+            </div>
+
+            <div class="ocs__grid-cell ocs__grid-cell--accent">
+                <strong>Emily</strong>
+                <p>Developer</p>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+    <p>
+        Oncology and Kids · Student Capstone · In Development
+    </p>
+</footer>
+
+</body>
+</html>

@@ -13,22 +13,25 @@ export function putUpdate(options) {
     // Clear the message area
 
     // Send PUT request
-    fetch(options.URL, requestOptions)
+    // Resolves to true when the server accepted the update and false when it didn't,
+    // so a caller can await it.
+    return fetch(options.URL, requestOptions)
         .then(response => {
             // Trap error response from Web API
             if (!response.ok) {
                 const errorMsg = 'Error: ' + response.status;
                 console.log(errorMsg);
-                return;
+                return false;
             }
             // Success!!!
-            // Call the callback function
-            options.callback();
+            // Call the callback function, if there is one
+            options.callback?.();
+            return true;
         })
         .catch(error => {
             // Handle network errors
             console.log('Possible CORS or Service Down error: ' + error);
-           
+            return false;
         });
 }
 
@@ -46,22 +49,25 @@ export function postUpdate(options) {
 
     // Clear the message area
     // Send POST request
-    fetch(options.URL, requestOptions)
+    // Resolves to true when the server accepted the update and false when it didn't,
+    // so a caller can await it.
+    return fetch(options.URL, requestOptions)
         .then(response => {
             // Trap error response from Web API
             if (!response.ok) {
                 const errorMsg = 'Error: ' + response.status;
                 console.log(errorMsg);
-                return;
+                return false;
             }
             // Success!!!
-            // Call the callback function
-            options.callback();
+            // Call the callback function, if there is one
+            options.callback?.();
+            return true;
         })
         .catch(error => {
             // Handle network errors
             console.log('Possible CORS or Service Down error: ' + error);
-           
+            return false;
         });
 }
 

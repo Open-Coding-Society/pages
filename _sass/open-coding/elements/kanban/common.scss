@@ -4,6 +4,8 @@
 //                            when its status has a familiar name
 //   a.ocs__kanban-item       a card, linking to its issue, pull request or draft
 //   .ocs__kanban-kicker, .ocs__kanban-name, .ocs__kanban-note   the card's lines
+//   .ocs__kanban-evidence    the card's checklist progress and linked pull
+//                            requests, as ocs__status-pills
 //
 // The names stay clear of the suffixes _sass/capstone/infograph.scss restyles
 // inside *-infograph includes ("-card", "-title", "-header", "-status" ...),
@@ -95,4 +97,20 @@
 
 .ocs__kanban-note {
   color: var(--text-muted);
+}
+
+// A row of pills that wraps, a little apart from the lines above it.
+.ocs__kanban-evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: map-get($kanban-item, evidence-gap);
+  margin-top: map-get($kanban-item, gap);
+
+  // A complete gate (every box ticked, a PR merged) keeps the shared pill's
+  // accent ring, over a fainter tint, and its text stays the theme's text:
+  // accent text on the shared tint measured 3.3:1 in the site's default theme.
+  .ocs__status-pill--good {
+    background: kanban-mix(var(--pref-accent-color), $kanban-complete-tint);
+    color: var(--pref-text-color);
+  }
 }

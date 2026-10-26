@@ -1,0 +1,204 @@
+---
+title: Profile Settings
+layout: aesthetihawk
+active_tab: profile
+---
+{%- comment -%}
+/profile: profile settings built only from the ocs__ grammar
+(_sass/open-coding/README.md), with no page stylesheet. Source: _projects/systems/profile
+(see its README). profile-page.js starts the account form, classes, personas, skill
+check-in and Face ID, and keeps the setup checklist at the top current. Face ID and the
+Gist card need Spring, so a Flask-only site (spring: false in _config.yml) leaves them out.
+{%- endcomment -%}
+{%- assign profile_course_codes = "csse,csp,csa,csh" | split: "," -%}
+<script type="application/json" id="profileCourses">
+[{%- for code in profile_course_codes -%}
+  {%- assign course_title = site.data[code].course.title | default: code -%}
+  {"code": {{ code | upcase | jsonify }}, "name": {{ course_title | split: " - " | last | jsonify }}}{% unless forloop.last %},{% endunless %}
+{%- endfor -%}]
+</script>
+
+<div class="ocs__container">
+
+    <!-- Who the student is, and what is left to set up -->
+    <section class="ocs__card" aria-labelledby="profileName">
+        <div class="ocs__grid--col2">
+            <div class="ocs__keypoint">
+                <abbr class="ocs__avatar" id="profileAvatar">?</abbr>
+                <div>
+                    <h2 class="ocs__hub-card-title" id="profileName">Your profile</h2>
+                    <p class="ocs__text" id="profileHandle">Loading your account…</p>
+                    <p class="ocs__text" id="profileSchool"></p>
+                </div>
+            </div>
+            <div>
+                <h3 class="ocs__section-title">Setup</h3>
+                <ul class="ocs__checklist" id="profileSetup"></ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Account: the only fields the Save button covers -->
+    <form class="ocs__card" id="profileSettingsForm" aria-labelledby="account" novalidate>
+        <div class="ocs__card-header">
+            <h2 class="ocs__section-title" id="account">Account</h2>
+            <div class="ocs__links">
+                <p class="ocs__text" id="saveStatus" role="status"></p>
+                <button type="submit" class="ocs__btn accent fill" id="saveChangesBtn" disabled>Save changes</button>
+            </div>
+        </div>
+        <div class="ocs__grid--col2">
+            <div class="ocs__field">
+                <label class="ocs__label" for="nameChangeInput">Full name</label>
+                <input class="ocs__input" type="text" id="nameChangeInput" name="name" autocomplete="name">
+            </div>
+            <div class="ocs__field">
+                <label class="ocs__label" for="uidChangeInput">User ID</label>
+                <input class="ocs__input" type="text" id="uidChangeInput" name="uid" autocomplete="username"
+                    autocapitalize="none" spellcheck="false" aria-describedby="uidHelp">
+                <small id="uidHelp">Your GitHub username. Changing it signs you out.</small>
+            </div>
+            <div class="ocs__field">
+                <label class="ocs__label" for="emailChangeInput">Email</label>
+                <input class="ocs__input" type="email" id="emailChangeInput" name="email" autocomplete="email" spellcheck="false">
+            </div>
+            <div class="ocs__field">
+                <span class="ocs__label">Password</span>
+                <div class="ocs__links">
+                    <a class="ocs__btn" href="{{ site.baseurl }}/support?topic=reset">Reset password</a>
+                </div>
+            </div>
+            <div class="ocs__field">
+                <label class="ocs__label" for="schoolChangeInput">High school</label>
+                <select class="ocs__input" id="schoolChangeInput" name="school">
+                    <option value="" disabled selected>Choose your high school</option>
+                    <option value="Abraxas High School">Abraxas</option>
+                    <option value="Del Norte High School">Del Norte</option>
+                    <option value="Mt Carmel High School">Mt Carmel</option>
+                    <option value="Poway High School">Poway</option>
+                    <option value="Poway to Palomar">Poway to Palomar</option>
+                    <option value="Rancho Bernardo High School">Rancho Bernardo</option>
+                    <option value="Westview High School">Westview</option>
+                </select>
+            </div>
+            <div class="ocs__field">
+                <label class="ocs__label" for="sidChangeInput">Student ID</label>
+                <input class="ocs__input" type="text" id="sidChangeInput" name="sid" inputmode="numeric" maxlength="7"
+                    autocomplete="off" aria-describedby="sidHelp">
+                <small id="sidHelp">The 7 digits on your school ID card.</small>
+            </div>
+        </div>
+    </form>
+
+    <!-- Classes: adding or removing one saves right away -->
+    <section class="ocs__card" aria-labelledby="classes">
+        <div class="ocs__card-header">
+            <h2 class="ocs__section-title" id="classes">Classes</h2>
+            <form class="ocs__links" id="addClassForm">
+                <select class="ocs__input" id="addClassSelect" aria-label="Class to add"></select>
+                <button type="submit" class="ocs__btn accent fill" id="addClassBtn">Add class</button>
+            </form>
+        </div>
+        <div class="ocs__stack">
+            <ul class="ocs__entity-list" id="classesContainer">
+                <li>Loading your classes…</li>
+            </ul>
+            <p class="ocs__text">Adding or removing a class saves right away.{% if site.spring != false %} Your classes decide which course calendars you see.{% endif %}</p>
+            <p class="ocs__text" id="classesStatus" role="status" hidden></p>
+        </div>
+    </section>
+
+    <!-- Persona: one choice per group, each saved when it is clicked -->
+    <section class="ocs__card" aria-labelledby="persona">
+        <div class="ocs__card-header">
+            <h2 class="ocs__section-title" id="persona">Persona</h2>
+            <div class="ocs__links">
+                <span class="ocs__status-pill ocs__status-pill--neutral" id="personaProgress">Loading…</span>
+                <button type="button" class="ocs__btn" id="personaEditBtn" hidden>Change</button>
+            </div>
+        </div>
+        <div class="ocs__stack ocs__stack--wide" id="personaSelectionContainer">
+            <p class="ocs__text">Loading personas…</p>
+        </div>
+    </section>
+
+    <!-- Skill check-in: shown once all four persona groups are chosen -->
+    <section class="ocs__card" id="skillsCard" aria-labelledby="skills" hidden>
+        <div class="ocs__card-header">
+            <h2 class="ocs__section-title" id="skills">Skill check-in</h2>
+            <a class="ocs__btn" href="{{ site.baseurl }}/analytics-dashboard">Skill Passport</a>
+        </div>
+        <form class="ocs__stack" id="skillSnapshotForm" novalidate>
+            <p class="ocs__text">Rate yourself on one project. Each check-in is added to your Skill Passport.</p>
+            <div class="ocs__field">
+                <label class="ocs__label" for="snapshotProjectName">Project</label>
+                <input class="ocs__input" type="text" id="snapshotProjectName" name="project_name" placeholder="Web App Sprint 1…" autocomplete="off">
+            </div>
+            <div class="ocs__grid--col2">
+                {%- assign profile_skills = "codingAbility:Coding ability,collaboration:Collaboration,problemSolving:Problem solving,initiative:Initiative" | split: "," -%}
+                {%- for skill in profile_skills -%}
+                {%- assign skill_parts = skill | split: ":" %}
+                <div class="ocs__field">
+                    <label class="ocs__label" for="{{ skill_parts[0] }}">{{ skill_parts[1] }}: <output id="{{ skill_parts[0] }}Val" for="{{ skill_parts[0] }}">3</output> of 6</label>
+                    <input type="range" id="{{ skill_parts[0] }}" min="1" max="6" step="1" value="3">
+                </div>
+                {%- endfor %}
+            </div>
+            <div class="ocs__links">
+                <button type="submit" class="ocs__btn accent fill">Save check-in</button>
+                <p class="ocs__text" id="snapshotStatus" role="status"></p>
+            </div>
+        </form>
+    </section>
+
+    {%- if site.spring != false %}
+    <!-- Face ID: used by the Bathroom Pass -->
+    <section class="ocs__card" aria-labelledby="face-id">
+        <div class="ocs__card-header">
+            <h2 class="ocs__section-title" id="face-id">Face ID</h2>
+            <span class="ocs__status-pill ocs__status-pill--neutral" id="regStatusText">Checking…</span>
+        </div>
+        <div class="ocs__stack">
+            <p class="ocs__text">The Bathroom Pass recognizes you by your face. The photo is stored with your account and used only to identify you.</p>
+            <div class="ocs__links">
+                <button type="button" class="ocs__btn accent fill" id="openScannerBtn">Register your face</button>
+            </div>
+        </div>
+
+        <div class="ocs__modal hidden" id="webcamOverlay" role="dialog" aria-modal="true" aria-labelledby="scannerTitle">
+            <div class="ocs__modal-card">
+                <div class="ocs__modal-header">
+                    <h3 class="ocs__modal-title" id="scannerTitle">Register your face</h3>
+                    <button type="button" class="ocs__btn small" data-close-scanner aria-label="Close the scanner">&times;</button>
+                </div>
+                <div class="ocs__stack">
+                    <div class="ocs__image-frame ocs__image-frame--cover">
+                        <video id="webcamControl" autoplay playsinline muted></video>
+                    </div>
+                    <canvas id="captureCanvas" hidden></canvas>
+                    <p class="ocs__text" id="scannerStatus" role="status"></p>
+                </div>
+                <div class="ocs__modal-actions">
+                    <button type="button" class="ocs__btn" data-close-scanner>Cancel</button>
+                    <button type="button" class="ocs__btn accent fill" id="captureFaceBtn" disabled>Capture</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GitHub Gist connection (its own include) -->
+    <div id="github">
+        {% include profile-gist-connection.html %}
+    </div>
+    {% include profile-ai-connections.html %}
+    {%- endif %}
+</div>
+
+<script type="module">
+    // The shared helpers are imported here, where Jekyll fills in the site's baseurl, and
+    // handed to the profile modules, which import each other only with ./ paths.
+    import { fetchOptions, javaURI, pythonURI, springEnabled } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { postUpdate, putUpdate } from '{{ site.baseurl }}/assets/js/api/profile.js';
+    import { initProfilePage } from '{{ site.baseurl }}/assets/js/profile/profile-page.js';
+    initProfilePage({ fetchOptions, javaURI, pythonURI, springEnabled, postUpdate, putUpdate });
+</script>
