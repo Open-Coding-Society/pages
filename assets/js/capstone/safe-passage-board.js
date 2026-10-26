@@ -4,6 +4,7 @@
 
   const issueSearchUrl = "https://api.github.com/search/issues?q=project%3AYimingYin1213%2F7&per_page=100";
   const initialCardLimit = 5;
+  const highPriorityIssueNumbers = new Set([1, 5, 16]);
   const boardColumns = [
     { name: "Parking Lot", countLabel: "3/5", cards: [
       [10, "Support Simulation – Frontend Page"],
@@ -39,6 +40,7 @@
     number,
     title,
     status: column.name,
+    priority: highPriorityIssueNumbers.has(number) ? "high" : "medium",
     repository_url: "https://api.github.com/repos/YimingYin1213/flaskandfurious",
     html_url: `https://github.com/YimingYin1213/flaskandfurious/issues/${number}`,
     labels: [],
@@ -62,8 +64,9 @@
   }
 
   function getPriority(issue) {
+    if (["low", "medium", "high"].includes(issue.priority)) return issue.priority;
     const label = matchingLabel(issue.labels || [], /^(?:priority\s*:?\s*)?(low|medium|high)$/i);
-    return label ? label.match(/low|medium|high/i)[0].toLowerCase() : "Not set";
+    return label ? label.match(/low|medium|high/i)[0].toLowerCase() : "medium";
   }
 
   function getTopic(issue) {
