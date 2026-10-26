@@ -1,0 +1,36 @@
+name: Sync public FOPL project board
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: sync-fopl-board
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch complete public project snapshot
+        run: python scripts/sync_fopl_board.py
+      - name: Publish changed snapshot
+        run: |
+          if git diff --quiet -- _data/fopl_board.json; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add _data/fopl_board.json
+          git commit -m 'Sync FOPL project board snapshot'
+          git push
+          # GITHUB_TOKEN commits do not trigger push workflows. Explicitly
+          # dispatch the existing Pages build so the changed board goes live.
+          gh workflow run jekyll-gh-pages.yml --ref "$GITHUB_REF_NAME"
+        env:
+          GH_TOKEN: ${{ github.token }}
