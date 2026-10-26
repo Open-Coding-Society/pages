@@ -66,7 +66,12 @@ show_reading_time: false
                 <select id="signupRole">
                     <option value="student" selected>I am a Student</option>
                     <option value="mentor">I am a Mentor</option>
+                    <option value="test" id="testAccountOption" hidden disabled>I am a test account</option>
                 </select>
+                <p id="test-account-note" hidden>
+                    A test account is a student with a test tag. It needs no real GitHub account and no school
+                    Google sign-in, and it starts inactive: activate it in Account Administration.
+                </p>
             </div>
             <div class="form-group">
                 <input type="text" id="name" placeholder="Name" required>
@@ -266,8 +271,25 @@ show_reading_time: false
     // A Flask-only site has no Spring account, so sign-up shows only Flask's status.
     if (!springEnabled) document.getElementById('springStatus').style.display = 'none';
 
+    // An Admin can also make a test account: a student with a tag, with no GitHub or Google check.
+    // The option stays hidden until Flask says the person who is logged in is an Admin; Flask
+    // checks it again when the account is created.
+    let adminSession = false;
+    fetch(`${pythonURI}/api/id`, fetchOptions)
+        .then(response => (response.ok ? response.json() : null))
+        .then(person => {
+            if (person && person.is_admin === true) {
+                adminSession = true;
+                const option = document.getElementById('testAccountOption');
+                option.hidden = false;
+                option.disabled = false;
+            }
+        })
+        .catch(() => {});
+
     // A mentor has no student ID or school, so those fields are hidden and not required.
     document.getElementById('signupRole').addEventListener('change', function () {
+        document.getElementById('test-account-note').hidden = this.value !== 'test';
         const isMentor = this.value === 'mentor';
         ['signupSid', 'signupSchool'].forEach(id => {
             const field = document.getElementById(id);
@@ -302,9 +324,19 @@ show_reading_time: false
             accountType: document.getElementById("signupRole").value,
         };
 
+        // An Admin's test account is a student with a test tag: no school Google sign-in. Without an
+        // Admin login it is just a student, whatever the form says.
+        const wantsTest = signupFormData.accountType === 'test';
+        if (wantsTest) {
+            signupFormData.accountType = 'student';
+        }
+
         // A mentor cannot use a school email, so they skip it and wait for a Teacher/Admin
         // to verify the account. A student verifies with Google first.
-        if (signupFormData.accountType === 'mentor') {
+        if (wantsTest && adminSession) {
+            signupFormData.isTest = true;
+            signup();
+        } else if (signupFormData.accountType === 'mentor') {
             signup();
         } else {
             showOAuthVerification();
