@@ -1,0 +1,23 @@
+{% assign board = site.data.fopl_board %}
+<section class="ocs__card ocs__keypoints" aria-label="FOPL Kanban">
+  <div class="ocs__links">
+    <strong>FOPL Kanban</strong>
+    <span class="ocs__text">{{ board.count }} cards · project updated {{ board.updated | date: "%b %-d" }}</span>
+    <a class="ocs__btn small pill" href="{{ board.url | escape }}" target="_blank" rel="noopener">Open on GitHub</a>
+  </div>
+  <p class="ocs__text">Project snapshot synced {{ board.synced_at | date: "%b %-d, %Y %H:%M UTC" }}. Automatic sync checks hourly; GitHub Actions and site deployment may add a delay.</p>
+  <ul class="ocs__kanban-board">
+    {% for column in board.columns %}
+    <li class="ocs__kanban-column" data-stage="{{ column.stage | escape }}">
+      <div><strong>{{ column.label | escape }}</strong> <span class="ocs__status-pill ocs__status-pill--neutral">{{ column.cards.size }}</span></div>
+      {% for card in column.cards %}
+      <a class="ocs__kanban-item" href="{{ card.url | escape }}" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">{{ card.repository | escape }}{% if card.number %} #{{ card.number }}{% endif %}</div>
+        <div class="ocs__kanban-name">{{ card.title | escape }}</div>
+        {% if card.assignees.size > 0 %}<div class="ocs__kanban-note">{{ card.assignees | join: ", " | escape }}</div>{% endif %}
+      </a>
+      {% else %}<div class="ocs__text">Nothing here</div>{% endfor %}
+    </li>
+    {% endfor %}
+  </ul>
+</section>
