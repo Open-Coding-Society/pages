@@ -79,11 +79,12 @@ show_reading_time: false
                 <select id="signupRole">
                     <option value="student" selected>I am a Student</option>
                     <option value="mentor">I am a Mentor</option>
-                    <option value="guest">I am a guest</option>
+                    <option value="guest" id="guestOption" hidden disabled>I am a guest</option>
                 </select>
                 <p id="guest-note" hidden>
-                    A guest can view pages and comment on the microblog. It needs no GitHub or school account,
-                    and it expires after a short time.
+                    A guest can view pages, comment on the microblog and react to posts. It needs no GitHub or school
+                    account, and it lasts only a few hours. Guest sign-up is open until <span id="guest-closes"></span>:
+                    log in with the same account during a later guest window to come back.
                 </p>
             </div>
             <div class="form-group">
@@ -292,9 +293,32 @@ show_reading_time: false
     // A Flask-only site has no Spring account, so sign-up shows only Flask's status.
     if (!springEnabled) document.getElementById('springStatus').style.display = 'none';
 
+    // A guest can sign up only while a Teacher or Admin has the Guest Window open, so the option is
+    // offered only then. If Flask cannot be asked, it stays hidden.
+    async function offerGuestOption() {
+        try {
+            const response = await fetch(`${pythonURI}/api/guest/window`, fetchOptions);
+            const guestWindow = response.ok ? await response.json() : null;
+            if (!guestWindow || guestWindow.open !== true) return;
+            const option = document.getElementById('guestOption');
+            option.hidden = false;
+            option.disabled = false;
+            // Flask gives UTC with no zone mark: say so, so the time shown is the visitor's own
+            document.getElementById('guest-closes').textContent =
+                new Date(guestWindow.closes_at + 'Z').toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        } catch (_) {
+            // no Guest Window to offer
+        }
+    }
+    offerGuestOption();
+
     // A mentor or a guest has no student ID or school, so those fields are hidden and not required.
+    // A guest is asked for an email only to keep one account, so it is optional for them.
     document.getElementById('signupRole').addEventListener('change', function () {
         const noSchool = this.value === 'mentor' || this.value === 'guest';
+        const email = document.getElementById('signupEmail');
+        email.required = this.value !== 'guest';
+        email.placeholder = this.value === 'guest' ? 'Email (optional, helps you keep one account)' : 'Personal (not school) Email';
         document.getElementById('guest-note').hidden = this.value !== 'guest';
         if (springEnabled) document.getElementById('springStatus').style.display = this.value === 'guest' ? 'none' : '';
         ['signupSid', 'signupSchool'].forEach(id => {
@@ -333,6 +357,7 @@ show_reading_time: false
             password: document.getElementById("signupPassword").value,
             accountType: document.getElementById("signupRole").value,
         };
+        if (role === 'guest' && !signupFormData.email) delete signupFormData.email;  // optional for a guest
 
         // A mentor cannot use a school email, so they skip it and wait for a Teacher/Admin
         // to verify the account. A guest needs no verification at all. A student verifies with
