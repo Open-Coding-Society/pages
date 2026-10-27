@@ -925,6 +925,7 @@
       console.log('Submitting grade data:', gradeData);
       const response = await fetch(`${API_BASE}/api/grades`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -979,6 +980,7 @@
       // Fetch all grades/submissions from the backend
       const resp = await fetch(`${API_BASE}/api/grades`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -1437,6 +1439,7 @@
       
       fetch(`${API_BASE}/api/grades/${gradeId}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
