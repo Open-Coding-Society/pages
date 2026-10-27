@@ -328,13 +328,16 @@
   let currentRubricContext = null;
   let currentHackToSubmit = null;
 
-  // API base URL - adjust if needed for same-origin API (used for /api/id and /api/grade_data)
-  const API_BASE = 'https://spring.opencodingsociety.com';
+  // Same backends as assets/js/api/config.js (this is a classic script, so it can't import it).
+  // Spring serves /api/grades; Flask serves /api/id and /api/grade_data.
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const API_BASE = window.javaURI || (isLocal ? 'http://localhost:8585' : 'https://spring.opencodingsociety.com');
+  const FLASK_BASE = isLocal ? 'http://localhost:8587' : 'https://flask.opencodingsociety.com';
 
   // Load user's grade data from backend (with localStorage fallback)
   async function loadGradeData() {
     try {
-      const response = await fetch(`${API_BASE}/api/grade_data`, {
+      const response = await fetch(`${FLASK_BASE}/api/grade_data`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -390,7 +393,7 @@
   async function saveGradeData() {
     if (isAuthenticated) {
       try {
-        const response = await fetch(`${API_BASE}/api/grade_data`, {
+        const response = await fetch(`${FLASK_BASE}/api/grade_data`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -883,7 +886,7 @@
     } else {
       // Fallback: try to fetch if window.user doesn't exist yet
       try {
-        const userResp = await fetch(`${API_BASE}/api/id`, { credentials: 'include' });
+        const userResp = await fetch(`${FLASK_BASE}/api/id`, { credentials: 'include' });
         if (userResp.ok) {
           const userData = await userResp.json();
           if (userData && userData.uid) {
@@ -925,6 +928,7 @@
       console.log('Submitting grade data:', gradeData);
       const response = await fetch(`${API_BASE}/api/grades`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -979,6 +983,7 @@
       // Fetch all grades/submissions from the backend
       const resp = await fetch(`${API_BASE}/api/grades`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -1437,6 +1442,7 @@
       
       fetch(`${API_BASE}/api/grades/${gradeId}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -1477,7 +1483,7 @@
   // Load and log credentials data
   async function loadCredentials() {
     try {
-      const response = await fetch(`${API_BASE}/api/id`, { credentials: 'include' });
+      const response = await fetch(`${FLASK_BASE}/api/id`, { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         console.log('Credentials data:', data);
