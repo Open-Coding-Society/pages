@@ -1,12 +1,12 @@
 <section class="ocs__card" id="ai-connections" aria-labelledby="ai-connections-heading">
   <div class="ocs__card-header">
-    <h2 class="ocs__section-title" id="ai-connections-heading">AI grading connections</h2>
+    <h2 class="ocs__section-title" id="ai-connections-heading">AI connections</h2>
     <p class="ocs__text" data-ai-availability role="status" aria-live="polite">Checking AI key storage…</p>
   </div>
   <div class="ocs__stack">
-  <p class="ocs__text">Use your own API quota for grading. Keys are encrypted and never shown again.</p>
+  <p class="ocs__text">Use your own API quota for grading and AI themes. Keys are encrypted and never shown again.</p>
   <p class="ocs__text"><strong>Personal Gemini → personal Groq → system Gemini → system Groq</strong></p>
-  <p class="ocs__text">AI failures do not block saving your submission. Requests send your assignment content to the selected provider and may incur charges on that account, including later teacher-triggered or automatic regrading.</p>
+  <p class="ocs__text">AI failures do not block saving your submission. Requests send your assignment content, or your theme description from the dashboard's AI theme, to the selected provider and may incur charges on that account, including later teacher-triggered or automatic regrading.</p>
   <details>
     <summary>Provider eligibility and privacy</summary>
     <p class="ocs__text">Only connect accounts approved for your school use. Both providers have eligibility requirements;
@@ -42,7 +42,7 @@
   </section>
   {% endfor %}
   </div>
-  <p id="ai-connections-help" class="ocs__text">Saving verifies access to provider metadata, not available grading quota.
+  <p id="ai-connections-help" class="ocs__text">Saving verifies access to provider metadata, not available quota.
     Disconnect removes the stored key from OCS; revoke it separately with the provider. Manual review remains available when AI cannot run.</p>
   </div>
 </section>

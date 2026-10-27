@@ -269,7 +269,9 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+  import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
   // Topics data from Jekyll
   const HACK_TOPICS = {{ page.lxdData.Topics | jsonify }};
   
@@ -328,18 +330,14 @@
   let currentRubricContext = null;
   let currentHackToSubmit = null;
 
-  // API base URL - adjust if needed for same-origin API (used for /api/id and /api/grade_data)
-  const API_BASE = 'https://spring.opencodingsociety.com';
+  // Spring (javaURI) serves /api/grades; Flask (pythonURI) serves /api/id and /api/grade_data.
 
   // Load user's grade data from backend (with localStorage fallback)
   async function loadGradeData() {
     try {
-      const response = await fetch(`${API_BASE}/api/grade_data`, {
+      const response = await fetch(`${pythonURI}/api/grade_data`, {
+        ...fetchOptions,
         method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
       });
 
       if (response.ok) {
@@ -390,12 +388,9 @@
   async function saveGradeData() {
     if (isAuthenticated) {
       try {
-        const response = await fetch(`${API_BASE}/api/grade_data`, {
+        const response = await fetch(`${pythonURI}/api/grade_data`, {
+          ...fetchOptions,
           method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
           body: JSON.stringify({ grade_data: userGradeData })
         });
 
@@ -883,7 +878,7 @@
     } else {
       // Fallback: try to fetch if window.user doesn't exist yet
       try {
-        const userResp = await fetch(`${API_BASE}/api/id`, { credentials: 'include' });
+        const userResp = await fetch(`${pythonURI}/api/id`, fetchOptions);
         if (userResp.ok) {
           const userData = await userResp.json();
           if (userData && userData.uid) {
@@ -923,11 +918,9 @@
     // Send POST request to grades API to create a new grade
     try {
       console.log('Submitting grade data:', gradeData);
-      const response = await fetch(`${API_BASE}/api/grades`, {
+      const response = await fetch(`${javaURI}/api/grades`, {
+        ...fetchOptions,
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify(gradeData)
       });
       
@@ -945,7 +938,7 @@
       
       // Check if it's a network/CORS error
       if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-        alert(`Warning: Could not connect to grading API at ${API_BASE}. Your submission was saved locally.`);
+        alert(`Warning: Could not connect to grading API at ${javaURI}. Your submission was saved locally.`);
       } else {
         alert(`Warning: Could not submit to grading API (${errorMsg}). Your submission was saved locally.`);
       }
@@ -977,11 +970,9 @@
   async function loadGradingAssignments() {
     try {
       // Fetch all grades/submissions from the backend
-      const resp = await fetch(`${API_BASE}/api/grades`, {
+      const resp = await fetch(`${javaURI}/api/grades`, {
+        ...fetchOptions,
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
       });
       
       if (!resp.ok) throw new Error(`API error: ${resp.status}`);
@@ -1435,11 +1426,9 @@
         submission: ctx.submission.submission_link || ctx.submission.text
       };
       
-      fetch(`${API_BASE}/api/grades/${gradeId}`, {
+      fetch(`${javaURI}/api/grades/${gradeId}`, {
+        ...fetchOptions,
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify(gradeData)
       })
       .then(response => {
@@ -1477,7 +1466,7 @@
   // Load and log credentials data
   async function loadCredentials() {
     try {
-      const response = await fetch(`${API_BASE}/api/id`, { credentials: 'include' });
+      const response = await fetch(`${pythonURI}/api/id`, fetchOptions);
       if (response.ok) {
         const data = await response.json();
         console.log('Credentials data:', data);
@@ -1492,6 +1481,12 @@
       return null;
     }
   }
+
+  // Module scope isn't global, so expose the handlers used by inline onclick attributes
+  Object.assign(window, {
+    openGradingView, openGradingRubricModal, closeGradingRubricModal, saveGradingRubric,
+    addGradingCategory, removeGradingCategory, addGradingSub, removeGradingSub
+  });
 
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', async () => {
