@@ -43,9 +43,9 @@ Year of teacher and student work have gone into this project.  All of the code a
 
 ### Contributions
 
-- **Notable Contributions**: Highlights significant contributions to the project, including theme development, search and tagging functionality, GitHub API integration, and the incorporation of GitHub Projects into GitHub pages. Contributors such as Tirth Thakker, Mirza Beg, and Toby Ledder have played crucial roles in these developments.
+- **Notable Contributions**: Highlights significant contributions to the project, including profile development, topics, course, Code Runners, OCS SASS, GitHub API integration, and the incorporation of _projects into GitHub pages.
 
-- **Blog Contributions**:  Often students contribute articles and blogs to this project.  Their names are typically listed in the front matter of their contributing post.
+- **Blog Contributions**:  Often students contribute articles and blogs to this project.  Their names are typically listed in the front matter of their contributing post.  These contributors span many years.
 
 ---
 
