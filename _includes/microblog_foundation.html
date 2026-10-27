@@ -37,6 +37,7 @@
 <script type="module">
 // Import required functions from config
 import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
 
 // Microblog panel open/close logic
 const microblogPanel = document.getElementById('microblog-panel');
@@ -86,24 +87,32 @@ window.handleGuestSignup = async function(event) {
     password: password
   };
 
+  // A new account needs the shared password rule. A password that breaks it can
+  // still log in to a guest account made before the rule, so only skip signup.
+  const canSignUp = meetsSpringPasswordRules(password);
+
   try {
-    let accountExists = false;
+    let accountExists = !canSignUp;
 
     // Step 1: Try to create guest account using Flask backend
-    statusMessage.textContent = 'Creating guest account...';
-    const signupResponse = await fetch(`${pythonURI}/api/user/guest`, {
-      ...fetchOptions,
-      method: 'POST',
-      body: JSON.stringify(signupData)
-    });
+    if (canSignUp) {
+      statusMessage.textContent = 'Creating guest account...';
+      const signupResponse = await fetch(`${pythonURI}/api/user/guest`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify(signupData)
+      });
 
-    if (!signupResponse.ok) {
-      // Account might already exist, so we'll try to login instead
-      accountExists = true;
-      statusMessage.textContent = 'Account exists, logging in...';
+      if (!signupResponse.ok) {
+        // Account might already exist, so we'll try to login instead
+        accountExists = true;
+        statusMessage.textContent = 'Account exists, logging in...';
+      } else {
+        await signupResponse.json();
+        statusMessage.textContent = 'Account created! Logging in...';
+      }
     } else {
-      await signupResponse.json();
-      statusMessage.textContent = 'Account created! Logging in...';
+      statusMessage.textContent = 'Logging in...';
     }
 
     // Step 2: Login with the credentials (whether account was just created or already existed)
@@ -114,7 +123,8 @@ window.handleGuestSignup = async function(event) {
     });
 
     if (!loginResponse.ok) {
-      throw new Error('Login failed - please check your credentials');
+      // No account to log in to: a new one needs a password that follows the rule
+      throw new Error(canSignUp ? 'Login failed - please check your credentials' : SPRING_PASSWORD_RULES);
     }
 
     await loginResponse.json();
