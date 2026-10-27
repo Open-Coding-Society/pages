@@ -11,12 +11,6 @@
     width: 100%;
 }
 
-.ocs__analytics-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
 // .ocs__tabs / -list / -btn / -underline / -panels / -panel (elements/tabs)
 // now cover the tab bar instead of a page-scoped duplicate. The compound
 // JS-coupled selectors (.active.text-blue-500 etc., keyed off

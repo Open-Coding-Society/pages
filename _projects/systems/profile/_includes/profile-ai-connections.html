@@ -1,0 +1,53 @@
+<section class="ocs__card" id="ai-connections" aria-labelledby="ai-connections-heading">
+  <div class="ocs__card-header">
+    <h2 class="ocs__section-title" id="ai-connections-heading">AI grading connections</h2>
+    <p class="ocs__text" data-ai-availability role="status" aria-live="polite">Checking AI key storage…</p>
+  </div>
+  <div class="ocs__stack">
+  <p class="ocs__text">Use your own API quota for grading. Keys are encrypted and never shown again.</p>
+  <p class="ocs__text"><strong>Personal Gemini → personal Groq → system Gemini → system Groq</strong></p>
+  <p class="ocs__text">AI failures do not block saving your submission. Requests send your assignment content to the selected provider and may incur charges on that account, including later teacher-triggered or automatic regrading.</p>
+  <details>
+    <summary>Provider eligibility and privacy</summary>
+    <p class="ocs__text">Only connect accounts approved for your school use. Both providers have eligibility requirements;
+    <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener noreferrer">Gemini terms</a> and
+    <a href="https://console.groq.com/docs/legal/services-agreement" target="_blank" rel="noopener noreferrer">Groq terms</a> apply. Free Gemini services are not suitable for sensitive or personal information.</p>
+  </details>
+  <div class="ocs__grid--col2">
+  {% assign ai_providers = "gemini,groq" | split: "," %}
+  {% for provider in ai_providers %}
+  <section class="ocs__stack" data-ai-provider="{{ provider }}" aria-labelledby="ai-{{ provider }}-heading">
+    <div class="ocs__card-header">
+      <h3 class="ocs__section-title" id="ai-{{ provider }}-heading">{{ provider | capitalize }}</h3>
+      <span class="ocs__status-pill ocs__status-pill--neutral" data-ai-state role="status" aria-live="polite">Checking connection…</span>
+    </div>
+    <p class="ocs__text">{% if provider == "gemini" %}
+      <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener noreferrer">Create a Gemini API key</a>.
+      {% else %}
+      <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Create a Groq API key</a>.
+      {% endif %}
+      Copy your key, paste it below, and select Save key. Do not share or commit it.</p>
+    <form class="ocs__stack" data-ai-form>
+      <div class="ocs__field">
+      <label class="ocs__label" for="ai-{{ provider }}-key">{{ provider | capitalize }} API key</label>
+      <input class="ocs__input" id="ai-{{ provider }}-key" data-ai-key type="password" autocomplete="off"
+        spellcheck="false" required maxlength="512" aria-describedby="ai-connections-help" disabled>
+      </div>
+      <div class="ocs__links">
+        <button class="ocs__btn accent fill" data-ai-save type="submit" disabled>Save key</button>
+        <button class="ocs__btn hidden" data-ai-disconnect type="button" hidden disabled>Disconnect</button>
+      </div>
+    </form>
+    <p class="ocs__text" data-ai-message role="status" aria-live="polite"></p>
+  </section>
+  {% endfor %}
+  </div>
+  <p id="ai-connections-help" class="ocs__text">Saving verifies access to provider metadata, not available grading quota.
+    Disconnect removes the stored key from OCS; revoke it separately with the provider. Manual review remains available when AI cannot run.</p>
+  </div>
+</section>
+<script type="module">
+  import { javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { initAiConnections } from '{{ site.baseurl }}/assets/js/profile/ai-connections.js';
+  initAiConnections(document.getElementById('ai-connections'), { apiBase: javaURI });
+</script>

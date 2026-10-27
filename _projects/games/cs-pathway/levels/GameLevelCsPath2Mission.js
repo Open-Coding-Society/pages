@@ -1,11 +1,13 @@
 import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import CsPathwayPlayer from './CsPathwayPlayer.js';
 import FriendlyNpc from '@assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import AiChallengeNpc, { CHALLENGE_ERROR_TYPES, CHALLENGE_VERDICTS } from '@assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 import ProfileManager from '@assets/js/projects/cs-pathway/model/ProfileManager.js';
 import GameLevelCsPath3Analytics from './GameLevelCsPath3Analytics.js';
+import PathwayScoreboard from './PathwayScoreboard.js';
+import { recordLevelRatio } from '../model/pathwayScores.js';
 
 // Prompt templates for AI question generation and grading.
 const CHALLENGE_PROMPT_TEXT = {
@@ -169,6 +171,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       fontFamily: '"Courier New", monospace',
     });
     this.profilePanelView.render();
+    this.scoreboard = new PathwayScoreboard({ currentLevelKey: 'mission-tools', basePath: this.gameEnv.path });
+    this.scoreboard.show();
     this.profilePanelView.update({
       desk1: '—',
       desk2: '—',
@@ -406,7 +410,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
 
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
-      { class: Player, data: player_data },
+      { class: CsPathwayPlayer, data: player_data },
       ...missionDeskZones.map((zone) => ({ class: FriendlyNpc, data: zone })),
       { class: FriendlyNpc, data: assessmentObservatoryPortalData },
     ];
@@ -909,6 +913,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       'missionCompletedStations',
       Array.from(this._missionCompletedStations),
     ).catch(() => {});
+    recordLevelRatio('mission-tools', this._missionProgressCount, 4);
   }
 
   /** @private */

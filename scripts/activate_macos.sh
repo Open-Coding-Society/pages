@@ -3,6 +3,13 @@ set -ex
 
 BASHRC="$HOME/.zshrc"
 
+# Everything below needs Homebrew; stop with a clear next step if it's missing.
+if ! command -v brew >/dev/null 2>&1; then
+    set +x
+    echo "Homebrew isn't installed. Install it from https://brew.sh, open a new Terminal, then run this script again."
+    exit 1
+fi
+
 log() {
     echo "=== ✅ $1 ==="
 }
@@ -23,12 +30,17 @@ brew install python ruby
 # Add Homebrew Ruby to PATH (before system Ruby)
 RUBY_PATH=$(brew --prefix ruby)/bin
 add_to_bashrc "export PATH=\"$RUBY_PATH:\$PATH\""
+# Also use it in this script, so gem installs into Homebrew Ruby instead of
+# macOS's built-in Ruby (which fails with a /Library/Ruby/Gems permission error).
+export PATH="$RUBY_PATH:$PATH"
 
 # Set GEM_HOME to user-accessible location
 GEM_HOME="$HOME/.local/gems"
 mkdir -p "$GEM_HOME"
 add_to_bashrc "export GEM_HOME=\"$GEM_HOME\""
 add_to_bashrc "export PATH=\"$GEM_HOME/bin:\$PATH\""
+export GEM_HOME
+export PATH="$GEM_HOME/bin:$PATH"
 
 # Install gems (no sudo needed now)
 gem install bundler jekyll benchmark openssl zlib racc bigdecimal drb unicode-display_width \
@@ -39,9 +51,10 @@ mkdir -p "$HOME/.local/bin"
 ln -sf "$(which python3)" "$HOME/.local/bin/python"
 ln -sf "$(which pip3)" "$HOME/.local/bin/pip"
 add_to_bashrc 'export PATH="$HOME/.local/bin:$PATH"'
+export PATH="$HOME/.local/bin:$PATH"
 
-# 4. Python3 is Python
-source $BASHRC
+# 4. Check the tools. The exports above already apply here; sourcing ~/.zshrc
+# from bash can fail on zsh-only syntax and stop this script (set -e).
 python --version
 pip --version
 ruby -v

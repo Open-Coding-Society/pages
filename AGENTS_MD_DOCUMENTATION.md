@@ -103,6 +103,7 @@ Split logic into clear layers:
 ### Backend Boundary
 
 * The backend service lives under [node_backend/README.md](node_backend/README.md) and is separate from the site build pipeline; read it before making backend changes.
+* **Manual grades win:** assignment creators and teachers edit grades directly in the Submissions page's "Assignments You Created" tab ([creator-dashboard.js](assets/js/submissions/creator-dashboard.js), which calls Spring `POST /api/submissions/grade/{id}`). That endpoint sets `gradedManually`; AI grading must write only through the conditional `applyAiGradeUnlessManuallyGraded` UPDATE, never `save()` a stale entity, or it overwrites a manual grade made mid-grading. A content change resets the flag. Test: `node --test tests/test_creator_dashboard.mjs`.
 
 ## Coding Standards
 
@@ -166,6 +167,30 @@ Names should:
 
 * **Update this file:** As you iterate, make mistakes, and learn new system patterns or constraints, actively update `AGENTS.md` (and its optimized counterpart) with important notes so the system improves over time.
 
+## Personal AI connections
+
+Edit `_projects/systems/profile/_includes/profile-ai-connections.html` and `js/ai-connections.js`,
+not generated root copies. Use shared OCS controls without a page stylesheet; the starter
+include injects `javaURI` instead of a parent-directory configuration import. Render only
+when `site.spring != false`; personal keys are optional, not a required Setup step.
+The card uses Spring `/api/ai-connections`, independently of personal-information and Gist saves.
+Never log, echo, or persist keys in browser storage;
+clear inputs after every save attempt. AI grading failure must not block submission saving.
+Check provider eligibility/privacy before school rollout. Tests: `node tests/test_ai_connections.mjs`
+and `bundle exec ruby tests/test_ai_profile_layout.rb`.
+
+## CS Pathway level scores
+
+* **Data flow:** each level's score is its percent complete (0–100). The game records it through [model/pathwayScores.js](_projects/games/cs-pathway/model/pathwayScores.js) (`completeLevelTask` for task-based levels, `recordLevelRatio` for ratio levels like Mission Tools and Toolchain Trail) and saves it via [services/PathwayScoreApi.js](_projects/games/cs-pathway/services/PathwayScoreApi.js) to Spring `PUT /api/cs-pathway/scores/{levelKey}`. The student comes from the Spring JWT cookie; never send a uid in the body.
+* **Storage:** Spring (blueprint-spring `mvc/cspathway`) reuses the existing `stats` table: `module = "cs-pathway"`, `submodule` 0–4 for the five levels, `grades` = percent, `finished` = reached 100%. Don't change the `stats` schema or renumber submodules. Scores only go up, on both client and server.
+* **Adding tasks/levels:** add task ids to `PATHWAY_LEVELS` and keep level keys in sync with Spring's `CsPathwayLevel` enum. The `PathwayScoreboard` scores bar (top-centre on every level page; the top-right is reserved for each level's toasts and "Press E" alerts, the top-left for its status panel) picks them up. Teacher view: Spring `/mvc/cs-pathway/read`.
+* **Mac setup check:** when macOS is selected, Toolchain Trail shows a "Set up & check my Mac" button ([levels/MacSetupCheck.js](_projects/games/cs-pathway/levels/MacSetupCheck.js)). A web page can't run programs on a student's computer, so the panel lists commands to paste into their own Terminal, in order: `source scripts/mac_setup_agent.zsh` (agent on) → `bash scripts/activate_macos.sh` (install) → `source ~/.zshrc` → `bash scripts/verifyToolsTerminal.sh` (verify). The student pastes the verifier output back and [model/verifyToolsReport.js](_projects/games/cs-pathway/model/verifyToolsReport.js) parses it; if verifyToolsTerminal.sh's output format changes, update the parser too (`tests/test_verify_tools_report.mjs` runs the real script as a contract test). Scripts lack the execute bit, so always run them as `bash scripts/...`.
+* **Station verification (pair once):** each Toolchain Trail station is verified through Spring `/api/toolchain` by [levels/StationVerificationTrial.js](_projects/games/cs-pathway/levels/StationVerificationTrial.js). The student runs `python3 scripts/toolchain_agent.py --server <backend>` once for the whole trail (macOS, Windows and Linux; stdlib only) and enters one pairing code. The agent then moves to the background (stop it with `--stop`, or use `--foreground`) and re-reads the PATH a new terminal would get before each check, so students install tools in the same terminal without re-pairing. After that, at each station the game calls `POST /sessions/{id}/check` and the agent, polling `GET /sessions/{id}/next` with its Bearer token (valid 4 hours), runs the checks and posts results. The paired sessionId lives in localStorage `ocs-toolchain-agent-session`. The exact fix commands shown for a failed check live in [data/toolchainTrailFixes.js](_projects/games/cs-pathway/data/toolchainTrailFixes.js), by check id and OS; a new check needs fix steps too (`tests/toolchain_trail_fixes.test.mjs` enforces it). Game timings live in [data/toolchainTrailSettings.js](_projects/games/cs-pathway/data/toolchainTrailSettings.js) and the agent's poll interval is `--poll-seconds`; don't hardcode them in code. Check ids must match Spring's `ToolchainStations`; run `python3 scripts/test_toolchain_agent.py` after changing the agent.
+* **Automatic Mac results upload:** a Terminal has no login cookie, so for a signed-in student the panel first asks Spring for a pairing code valid for 30 minutes (`POST /api/cs-pathway/setup-report/pairing-code`, [services/SetupReportApi.js](_projects/games/cs-pathway/services/SetupReportApi.js)) and swaps the verify command for `bash scripts/verifyToolsTerminal.sh --report <upload URL>`. The script writes the results to `setup-report.md` in the repo root (gitignored) and POSTs the raw text to that URL; the panel polls `GET /api/cs-pathway/setup-report` every 4 seconds and shows the results by itself. Without a sign-in, or if the upload fails, the paste flow remains (pasted results are shown only, never saved). Spring stores reports in its own `cs_pathway_setup_report` table (one row per student, latest report only; the `stats` table is untouched) and the teacher view gains a "Setup check" column. The upload endpoint is public and the report is self-reported, so do not award score from it automatically. Spring reads the `Overall:`/`Summary:` lines with regexes, so keep it in sync when the script's output format changes. The script also prints `Started: <date time zone>` and `Duration: N seconds` (how long the checks took); the parser reads them as `startedAt`/`durationSeconds` (null for output from older copies of the script).
+* **Linux/Windows results upload:** the Linux/Kasm/Windows panel ([levels/SystemSetupCheck.js](_projects/games/cs-pathway/levels/SystemSetupCheck.js)) uses the same pairing code, upload endpoint, and 4-second polling, swapping its command for `python3 scripts/linux_setup_agent.py --check --report <upload URL>` (Windows: `windows_setup_agent.py`, run inside WSL). The agent saves `setup-report.md` and POSTs with urllib. The report between the `=== ... SETUP CHECK v1 ===` markers also contains `Started:`, `Duration:`, `Summary: N passed, 0 warned, M failed`, and `Overall:` lines, because Spring requires `Summary:`/`Overall:` when saving; [model/systemSetupReport.js](_projects/games/cs-pathway/model/systemSetupReport.js) reads `startedAt`/`durationSeconds`. Each student keeps only their latest report regardless of OS, so the panel ignores an uploaded report for another system. Spring's AI review also reads `FAIL <id> | <label>` lines. Tests: `tests/test_system_setup_report.mjs` and `scripts/test_linux_setup_agent.py`.
+* **Help red flag:** the red flag button at the bottom right of Toolchain Trail ([levels/HelpFlag.js](_projects/games/cs-pathway/levels/HelpFlag.js)) sends a pre-written message ([model/helpRequestMessage.js](_projects/games/cs-pathway/model/helpRequestMessage.js): current station, OS, and whether the student is stuck) in one click to Spring `POST /api/cs-pathway/help-requests`; the student comes from the JWT cookie. Spring keeps a separate `cs_pathway_help_request` table (one row per request, never overwritten), returns 429 if the same student sends again within 1 minute, and teachers see the requests in the Help requests table at the top of `/mvc/cs-pathway/read`. The 500-character message cap must match on both sides. Tests: `node --test tests/test_help_request_message.mjs` and Spring's `CsPathwayHelpRequestServiceTest`.
+* **Nested-project gotcha:** `make`'s `watch-projects` derives the wrong folder name for nested projects like `games/cs-pathway`, so it won't rebuild them. After edits, run `make -C _projects/games/cs-pathway build` and restart `make`.
+
 ## Anti-Patterns
 
 ### God Functions
@@ -180,3 +205,10 @@ Names should:
 
 * **YAGNI (You Aren’t Gonna Need It):** Don’t build features unless required now. Avoid speculative generalization.
 * Optimize only after correctness is guaranteed (Profile before optimizing).
+
+## Linux terminal setup assistance
+
+For Linux tool installation or virtual-environment troubleshooting, follow
+[the Linux setup assistant guide](docs/linux-setup-agent.md). Run
+`scripts/linux_setup_agent.py` in the affected Linux terminal; local Mac
+checks are not evidence about another user's Linux system.
