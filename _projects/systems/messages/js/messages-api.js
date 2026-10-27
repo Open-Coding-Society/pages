@@ -48,9 +48,10 @@ export function createMessagesApi({ javaURI, pythonURI, fetchOptions }) {
     // A saved group message stores only its sender's name, and Spring checks that name
     // before an edit or delete, so `name` must be the account's name.
     groupMessages: groupId => spring(`/api/groups/chat/${part(groupId)}/messages`),
-    // `image` is a data URL, stored on the message itself (Spring's GroupChatMessage
-    // has an image field); null when the message is text only.
-    sendGroupMessage: (groupId, name, message, image = null) => spring(`/api/groups/chat/${part(groupId)}/messages`, 'POST', { name, message, image }),
+    // No sender is sent: Spring resolves the author from the session and ignores
+    // anything the client claims. `image` is a data URL, stored on the message itself;
+    // null when the message is text only.
+    sendGroupMessage: (groupId, message, image = null) => spring(`/api/groups/chat/${part(groupId)}/messages`, 'POST', { message, image }),
     editGroupMessage: (groupId, messageId, message) => spring(`/api/groups/chat/${part(groupId)}/messages/${part(messageId)}`, 'PATCH', { message }),
     deleteGroupMessage: (groupId, messageId) => spring(`/api/groups/chat/${part(groupId)}/messages/${part(messageId)}`, 'DELETE'),
     // Unread counts for group chat, the group-side twin of /api/dm/unread. Groups with

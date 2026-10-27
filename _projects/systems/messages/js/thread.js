@@ -21,7 +21,7 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
     },
     group: {
       load: id => api.groupMessages(id).then(list => (list || []).map(groupMessage)),
-      send: (id, html, image) => api.sendGroupMessage(id, me.name, html, image),
+      send: (id, html, image) => api.sendGroupMessage(id, html, image),
       supportsImages: true,
       edit: (id, messageId, html) => api.editGroupMessage(id, messageId, html),
       remove: (id, messageId) => api.deleteGroupMessage(id, messageId),
