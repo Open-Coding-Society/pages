@@ -39,7 +39,7 @@ What Profile does in each:
 | Classes | saved in Flask | saved in Flask, then Spring's course groups updated |
 | Persona and Skill check-in | saved in Flask | saved in Flask |
 | Face ID and GitHub Gist cards | left out | shown; both save in Spring |
-| Optional AI grading connections | left out | Gemini/Groq keys save independently in Spring |
+| Optional AI connections (grading and AI themes) | left out | Gemini/Groq keys save independently in Spring |
 | Setup list | Classes, Persona | Classes, Persona, Face ID, GitHub |
 
 The setting covers Profile, the login page's sign-up and sign-in, logout and the
