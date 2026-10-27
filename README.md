@@ -2,11 +2,13 @@
 
 Founded and maintained by John Mortensen.
 
-Open Coding Society `Pages` is a project designed to support students in their Computer Science education. It offers a wide range of resources including tech talks, code examples, and educational blogs.
+Open Coding Society `Pages` is a project originally designed to support students in their Computer Science education. It offers a wide range of resources including in class lessons (team teach), code runners (hacks), and refactored educational blogs (tech talks).  It has also become the basis of an emeging community outreach to non-profits, assisting local communities and businesses.  This has raised a new need OCS-in-a-Kit.
 
 This GitHub Pages repository can be customized by the blogger to support computer science learning as the student works through the pathways of using Javascript, Python/Flask, Java/Spring. It is intended to support course work for Computer Science and Software Engineering (CSSE), AP Computer Science Principles (APCSP or CSP), AP Computer Science 'A' (APCSA or CSA), and Computer Science Honors (CSH).
 
-"Open Coding Society's instructional model is grounded in **Connectivism**, recognizing that learning happens through diverse networks of people, platforms, and AI. OCS is refining `pages` using **Merrill's structure**, deepening learning through **Fink**, ensuring access via **UDL**, and supporting our classroom through **Agile and Design Thinking ceremonies**, with a touch of **Gagné** to focus each classroom day. OCS wants to create projects that support learning for today's digital, open, and connected world."
+"Open Coding Society's instructional model is grounded in **Connectivism**, recognizing that learning happens through diverse networks of people, platforms, and AI. OCS is refining `pages` using **Merrill's structure**, deepening learning through **Fink**, ensuring access via **UDL**, and supporting our classroom through **Agile and Design Thinking ceremonies**, with a touch of **Gagné** to focus each classroom day. 
+
+OCS-in-a-Kit is an new generative idea.  It realizes that educational models are limited unless we iinvolve community.  OCS wants to create projects that support learning for today's digital, open, and connected world."  That start by helping those in the community that fund our educaton and purpose.  This extend the dimension of OCS to OCS Education and OCS Buiness. 
 
 ## Student Requirements
 
@@ -18,17 +20,19 @@ Exchange of information from this repository to you personal GitHub Pages can be
 2. creating a template from this repository to break off into custom projects
 3. creating a fork to be shared by you and team members to contribute back to OCS `pages`
 
+This gets even better as we use OCS to fork and build community projects.  These project share with each other and the structure and commitment to OCS archeticture let key ideas to be shred back and keep up a perpetual contriution cycle.  These skills help everyone involved.  Win-Win.
+
 ---
 
 ## History
 
-This project is in its 4th revision (aka 4.0).
+This project is in its 5th revision (aka 5.0).
 
-The project was initially based on a project called Fastpages. But this project has diverged from those roots into an independent entity, in fact most things (like the build system), are completely different.  The decision to separate from Fastpages was influenced by it's deprecation by the original authors.  It is believed by our community that the authors of Fastpages turned toward the support of Quatro.  After that change of direction Fastpages did not align with the OCS `pages` goals. Thus, `pages` has more of a raw development and classroom blogging purpose. But, as we parted we were grateful to Fastpages for their inspiration.  Also, this project originations were focused around the GitHub Pages Minima theme and still uses it as a remote.
+The project was initially ideated on a project called Fastpages. But this project seem to diverge from its early roots into an independent entity, in fact all things (like the build system), are completely different.  The decision to separate from Fastpages was influenced by it's deprecation by its original authors.  It is believed, that the authors of Fastpages turned toward the support of Quatro.  After that change of direction Fastpages did not align with the OCS `pages` goals. Thus, `pages` has more of a raw development and open sharing model. But, as we parted we were grateful to Fastpages for their inspiration.  Also, this project originations were focused around the GitHub Pages Minima theme, at this point in time we have diverged from that as well.  We now use a custom sass implementaton based on a grammer based UI.  All tracess of minima are planned to be removed.  
 
 ### License
 
-The Apache license has its roots in Fastpages.  Thus, it carries that license forward.  However, most of the code is likely unrecognizable from those original roots.
+Year of teacher and student work have gone into this project.  All of the code and lessons is likely unrecognizable from any original seeds. There is a lot of teacher and student inspiration and AI orchestrated contribution.  
 
 ### Key Features
 
