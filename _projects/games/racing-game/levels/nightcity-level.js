@@ -1,6 +1,7 @@
 import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
 
 class TimeLapScreen extends GameObject {
   constructor(data = {}, gameEnv = null) {
@@ -73,13 +74,14 @@ class GameLevelNightcity {
     const background_data = {
       name: "Night City Course",
       greeting: "Welcome to the Night City!",
-      src: "/images/projects/racing-game/Night_City_Track.jpeg",
-      pixels: { height: 360, width: 643 }
+      src: "/images/projects/racing-game/nightcitylevel.png",
+      pixels: { height: 522, width: 815 }
     };
     const player_data = {
         name: "Red Car",
         greeting: "I'm the red car!",
         src: "/images/projects/racing-game/Directions_red_car.png",
+        INIT_POSITION: { x: 0.47, y: 0.76 },
         SCALE_FACTOR: 10,
         STEP_FACTOR: 1600,
         pixels: { height: 1024, width: 1536 },
@@ -99,10 +101,107 @@ class GameLevelNightcity {
       currentLap: 1,
       totalLaps: 3
     };
+    const trackBarrierData = [
+      {
+        id: 'nightcity-outer-track-barrier',
+        visible: false,
+        collisionWidth: 12,
+        coordinateSpace: 'normalized',
+        splinePoints: [
+          { x: 0.13, y: 0.24 },
+          { x: 0.19, y: 0.21 },
+          { x: 0.25, y: 0.24 },
+          { x: 0.31, y: 0.30 },
+          { x: 0.38, y: 0.32 },
+          { x: 0.44, y: 0.29 },
+          { x: 0.49, y: 0.26 },
+          { x: 0.55, y: 0.29 },
+          { x: 0.61, y: 0.36 },
+          { x: 0.67, y: 0.39 },
+          { x: 0.74, y: 0.37 },
+          { x: 0.82, y: 0.35 },
+          { x: 0.88, y: 0.39 },
+          { x: 0.91, y: 0.45 },
+          { x: 0.89, y: 0.51 },
+          { x: 0.85, y: 0.54 },
+          { x: 0.79, y: 0.54 },
+          { x: 0.73, y: 0.51 },
+          { x: 0.67, y: 0.47 },
+          { x: 0.62, y: 0.47 },
+          { x: 0.59, y: 0.52 },
+          { x: 0.60, y: 0.58 },
+          { x: 0.65, y: 0.62 },
+          { x: 0.72, y: 0.62 },
+          { x: 0.79, y: 0.61 },
+          { x: 0.85, y: 0.65 },
+          { x: 0.88, y: 0.71 },
+          { x: 0.87, y: 0.77 },
+          { x: 0.83, y: 0.81 },
+          { x: 0.77, y: 0.82 },
+          { x: 0.71, y: 0.79 },
+          { x: 0.67, y: 0.75 },
+          { x: 0.64, y: 0.70 },
+          { x: 0.60, y: 0.68 },
+          { x: 0.56, y: 0.70 },
+          { x: 0.54, y: 0.75 },
+          { x: 0.56, y: 0.80 },
+          { x: 0.61, y: 0.83 },
+          { x: 0.66, y: 0.84 }
+        ]
+      },
+      {
+        id: 'nightcity-inner-track-barrier',
+        visible: false,
+        collisionWidth: 12,
+        coordinateSpace: 'normalized',
+        splinePoints: [
+          { x: 0.39, y: 0.36 },
+          { x: 0.33, y: 0.37 },
+          { x: 0.28, y: 0.34 },
+          { x: 0.24, y: 0.30 },
+          { x: 0.20, y: 0.29 },
+          { x: 0.16, y: 0.31 },
+          { x: 0.14, y: 0.36 },
+          { x: 0.16, y: 0.40 },
+          { x: 0.21, y: 0.42 },
+          { x: 0.28, y: 0.43 },
+          { x: 0.34, y: 0.41 },
+          { x: 0.40, y: 0.37 },
+          { x: 0.46, y: 0.35 },
+          { x: 0.51, y: 0.37 },
+          { x: 0.55, y: 0.42 },
+          { x: 0.56, y: 0.47 },
+          { x: 0.53, y: 0.51 },
+          { x: 0.48, y: 0.53 },
+          { x: 0.43, y: 0.56 },
+          { x: 0.40, y: 0.61 },
+          { x: 0.41, y: 0.66 },
+          { x: 0.45, y: 0.70 },
+          { x: 0.51, y: 0.72 },
+          { x: 0.56, y: 0.71 },
+          { x: 0.60, y: 0.69 },
+          { x: 0.63, y: 0.67 },
+          { x: 0.67, y: 0.67 },
+          { x: 0.70, y: 0.70 },
+          { x: 0.72, y: 0.74 },
+          { x: 0.71, y: 0.78 },
+          { x: 0.68, y: 0.80 },
+          { x: 0.63, y: 0.79 },
+          { x: 0.59, y: 0.76 },
+          { x: 0.55, y: 0.72 },
+          { x: 0.51, y: 0.70 },
+          { x: 0.48, y: 0.71 },
+          { x: 0.46, y: 0.75 },
+          { x: 0.47, y: 0.79 },
+          { x: 0.51, y: 0.82 }
+        ]
+      }
+    ];
     this.classes = [
         {class: GameEnvBackground, data: background_data},
         {class: Player, data: player_data},
-        {class: TimeLapScreen, data: timer_data}
+        {class: TimeLapScreen, data: timer_data},
+        ...trackBarrierData.map((data) => ({ class: SplineBarrier, data }))
     ];
   }
 }
