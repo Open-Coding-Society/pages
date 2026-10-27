@@ -105,6 +105,7 @@ while preserving all critical instructions. The agent must still communicate wit
 ### 后端边界
 
 * 后端服务位于 [node_backend/README.md](node_backend/README.md)，与站点构建流程分离；改动前先阅读该文档。
+* **人工评分优先：** 作业创建者和教师可在 Submissions 页面的“Assignments You Created”中直接改分（[creator-dashboard.js](assets/js/submissions/creator-dashboard.js)，调用 Spring `POST /api/submissions/grade/{id}`）。该接口设置 `gradedManually`；AI 评分只能通过 `applyAiGradeUnlessManuallyGraded` 条件 UPDATE 写入，不能 `save()` 过期实体，否则会覆盖评分途中的人工评分。内容变更会重置该标记。测试：`node --test tests/test_creator_dashboard.mjs`。
 
 ## 编码标准
 
@@ -167,6 +168,10 @@ while preserving all critical instructions. The agent must still communicate wit
 ### 自我更新与持续学习
 
 * **同步更新文档：** 随着你在迭代中犯错、学习新的系统模式或约束，主动用重要的注意事项更新 `AGENTS.md`，并确保同步更新 `AGENTS_MD_DOCUMENTATION.md`（英文说明版本），以便系统随时间不断改进。
+
+## 个人 AI 密钥
+
+* **个人 AI 密钥：** 规范源是 `_projects/systems/profile/_includes/profile-ai-connections.html` 与 `js/ai-connections.js`；使用共享 OCS 控件，无页面样式表。启动 include 注入 `javaURI`，不从模块用 `../` 导入配置。只在 `site.spring != false` 时渲染，独立于个人信息与 Gist 保存，不作为必填 Setup 步骤。不要记录、回显或在浏览器存储密钥；每次保存尝试后清空输入。评分失败不阻止保存提交，学校部署前检查供应商资格/隐私条件。测试：`node tests/test_ai_connections.mjs`、`bundle exec ruby tests/test_ai_profile_layout.rb`。
 
 ## 群组与实时聊天（Groups & realtime chat）
 

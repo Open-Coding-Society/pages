@@ -103,6 +103,7 @@ Split logic into clear layers:
 ### Backend Boundary
 
 * The backend service lives under [node_backend/README.md](node_backend/README.md) and is separate from the site build pipeline; read it before making backend changes.
+* **Manual grades win:** assignment creators and teachers edit grades directly in the Submissions page's "Assignments You Created" tab ([creator-dashboard.js](assets/js/submissions/creator-dashboard.js), which calls Spring `POST /api/submissions/grade/{id}`). That endpoint sets `gradedManually`; AI grading must write only through the conditional `applyAiGradeUnlessManuallyGraded` UPDATE, never `save()` a stale entity, or it overwrites a manual grade made mid-grading. A content change resets the flag. Test: `node --test tests/test_creator_dashboard.mjs`.
 
 ## Coding Standards
 
@@ -165,6 +166,18 @@ Names should:
 ### Self-Updating and Continuous Learning
 
 * **Update this file:** As you iterate, make mistakes, and learn new system patterns or constraints, actively update `AGENTS.md` (and its optimized counterpart) with important notes so the system improves over time.
+
+## Personal AI connections
+
+Edit `_projects/systems/profile/_includes/profile-ai-connections.html` and `js/ai-connections.js`,
+not generated root copies. Use shared OCS controls without a page stylesheet; the starter
+include injects `javaURI` instead of a parent-directory configuration import. Render only
+when `site.spring != false`; personal keys are optional, not a required Setup step.
+The card uses Spring `/api/ai-connections`, independently of personal-information and Gist saves.
+Never log, echo, or persist keys in browser storage;
+clear inputs after every save attempt. AI grading failure must not block submission saving.
+Check provider eligibility/privacy before school rollout. Tests: `node tests/test_ai_connections.mjs`
+and `bundle exec ruby tests/test_ai_profile_layout.rb`.
 
 ## CS Pathway level scores
 

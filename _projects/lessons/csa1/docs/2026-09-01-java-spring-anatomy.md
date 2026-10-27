@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Anatomy of a Spring Boot Project
-description: A discussion of key elements in a Java Spring Boot backend project.  This includes preparing a project for deployment.
+description: Find your way around a Spring Boot project, from where entities, repositories, controllers, and security settings live to how Main.java starts the app.
 permalink: /java/spring/anatomy
 courses: {'csa': {'week': 4}}
 categories: [Java, Spring]
