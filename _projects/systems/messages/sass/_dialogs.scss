@@ -4,6 +4,9 @@
 // without needing !important.
 
 .dm .ocs__modal {
+  // Above the thread header and the site's own sticky chrome (the grammar's default of
+  // 50 let the open conversation's title paint over the card).
+  z-index: 10000;
   padding: var(--dm-space-md);
   background: rgba(0, 0, 0, 0.72);
 }
