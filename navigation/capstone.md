@@ -541,11 +541,11 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 
    <div class="ocs__grid-cell CSA" data-year="2026-2027">
-       <a href="{% post_url capstone/2026-08-28-toolchain-trail %}">
+       <a href="{{ '/capstone/toolchain-trail/' | relative_url }}">
          <img src="{{ '/images/' | append: site.data.toolchain-trail-capstone.Logo | relative_url }}" alt="{{ site.data.toolchain-trail-capstone.Title }} logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-         <h3><a href="{% post_url capstone/2026-08-28-toolchain-trail %}"></a>{{ site.data.toolchain-trail-capstone.Title }}</h3>
+         <h3><a href="{{ '/capstone/toolchain-trail/' | relative_url }}">{{ site.data.toolchain-trail-capstone.Title }}</a></h3>
          <p>{{ site.data.toolchain-trail-capstone.Overview }}</p>
        </div>
    </div>

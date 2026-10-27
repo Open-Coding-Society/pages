@@ -110,6 +110,8 @@
   // Make project titles read like links when a card is explored with a mouse
   // or keyboard. The underline is scoped to card headings so image links and
   // the card's folder button keep their existing treatment.
+  .ocs__grid-cell:hover h3 > a,
+  .ocs__grid-cell:focus-within h3 > a,
   h3 > a:hover,
   h3 > a:focus-visible {
     text-decoration: underline;
