@@ -87,6 +87,8 @@ OCS provides a foundation for students to explore emerging technologies by build
 
 Students explore large language models (LLMs), AI-assisted development and assessment, intelligent search, chatbots, and AI-enabled applications. OCS Intelligence investigates hosting open-weight language models on locally available GPU hardware, making AI coding assistance more accessible without requiring every student to purchase a separate subscription.
 
+OCS's AI initiatives have also benefited from mentorship and technical discussions with **Eduardo Revollo, Founder/CEO of Prometheus**. OCS welcomes continued collaboration with industry practitioners as students explore open intelligence, AI infrastructure, and practical applications of emerging technology.
+
 ### Connected Classrooms and Intelligent Systems
 
 Projects explore how software can connect physical devices, classroom environments, and digital services. Examples include RFID-based classroom presence prototypes, QR-based workflows, computer vision, object detection, and systems that combine sensor events with application data and dashboards.
