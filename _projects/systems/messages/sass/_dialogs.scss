@@ -278,9 +278,18 @@
   width: 2rem;
   height: 1rem;
   flex: none;
+  box-sizing: border-box;
   border: 1px solid var(--dm-rule-strong);
   border-radius: 999px;
+  // The site toggle fills the track with the accent when checked and draws its own
+  // 23px thumb in ::before; this page draws a smaller thumb in ::after instead, so both
+  // of those have to be switched off or the oversized thumb spills over the label.
+  background: transparent;
   transition: background-color $transition-fast ease, border-color $transition-fast ease;
+
+  &::before {
+    content: none;
+  }
 
   &::after {
     content: '';
@@ -296,6 +305,7 @@
 }
 
 .dm .ocs__toggle-label {
+  white-space: nowrap;
   font-size: 0.8125rem;
   color: var(--dm-muted);
 }
@@ -308,6 +318,7 @@
 }
 
 .dm .ocs__toggle-input:checked + .ocs__toggle-track {
+  background: transparent;
   border-color: var(--dm-accent);
 
   &::after {
@@ -319,6 +330,15 @@
 .dm .ocs__toggle-input:focus-visible + .ocs__toggle-track {
   outline: 2px solid var(--dm-accent);
   outline-offset: 2px;
+}
+
+// A fieldset of toggles (the past group's personas): drop the browser's boxed border and
+// let the legend read like the other field labels.
+.dm fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 // ── "Find or make a group": one dialog, two steps, split by a labelled rule ────
