@@ -277,53 +277,9 @@ permalink: /capstone/doingexceptionaldeeds/
 
 ---
 
-## How We Would Work It
-
-> We would complete the redesign in three rounds so the basic structure works before adding more advanced features.
-
-<div class="ocs__grid ocs__grid--standard cols-4" style="margin-bottom: 1.5rem;">
-
-  <div class="ocs__grid-cell ocs__grid-cell--header">Build Order</div>
-
-  <div class="ocs__grid-cell ocs__grid-cell--accent">
-
-    <strong>Round 1</strong><br>
-
-    Navigation, page structure, and content cleanup
-
-  </div>
-
-  <div class="ocs__grid-cell">
-
-    <strong>Round 2</strong><br>
-
-    Program pages, teacher profiles, and events calendar
-
-  </div>
-
-  <div class="ocs__grid-cell ocs__grid-cell--muted">
-
-    <strong>Round 3</strong><br>
-
-    Accounts, impact metrics, and animations
-
-  </div>
-
-  <div class="ocs__grid-cell">
-
-    <strong>Tracked In</strong><br>
-
-    <a class="ocs__btn alert-green fill small" href="https://github.com/Blazific11/Teamportfolio/issues/2">
-      GitHub Issue
-    </a>
-
-  </div>
-
-</div>
-
----
-
 ## Team Kanban Board
+
+Current tasks, assignees, and progress are tracked in our GitHub Projects board below. Open the board to manage the work.
 
 {% include ocs_kanban_board.html
    url="https://github.com/orgs/ComputerScienceDudes/projects/7"
@@ -332,7 +288,7 @@ permalink: /capstone/doingexceptionaldeeds/
 
 ---
 
-## Work Distribution
+## Team Roles
 
 <div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
 
@@ -342,8 +298,6 @@ permalink: /capstone/doingexceptionaldeeds/
 
     <p>UI/UX Design & Content Strategy</p>
 
-    <p>Impact tier design, registration form backend, and content storytelling.</p>
-
   </div>
 
   <div class="ocs__grid-cell ocs__grid-cell--accent">
@@ -352,8 +306,6 @@ permalink: /capstone/doingexceptionaldeeds/
 
     <p>Frontend Build & SEO</p>
 
-    <p>UI implementation, SEO strategy, page copy, and registration form frontend.</p>
-
   </div>
 
   <div class="ocs__grid-cell">
@@ -361,8 +313,6 @@ permalink: /capstone/doingexceptionaldeeds/
     <strong>Noah</strong>
 
     <p>Full-Stack Development & Integrations</p>
-
-    <p>Site functionality, backend development, and integrations.</p>
 
   </div>
 </div>
