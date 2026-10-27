@@ -75,8 +75,8 @@ export function login(options) {
             document.getElementById(options.message).textContent = errorMsg;
             return response;  // Exit early if response is not OK
         }
-        // Success: Proceed with callback
-        options.callback();
+        // Success: Proceed with callback, passing the response body when it has one
+        return response.json().catch(() => undefined).then(body => options.callback(body));
     })
     .catch(error => {
         // Handle network errors
