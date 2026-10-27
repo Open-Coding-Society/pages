@@ -2,13 +2,13 @@
 
 Founded and maintained by John Mortensen.
 
-Open Coding Society `Pages` is a project originally designed to support students in their Computer Science education. It offers a wide range of resources including in class lessons (team teach), code runners (hacks), and refactored educational blogs (tech talks).  It has also become the basis of an emeging community outreach to non-profits, assisting local communities and businesses.  This has raised a new need OCS-in-a-Kit.
+Open Coding Society `Pages` began as a project to support students studying computer science. It offers in-class, team-taught lessons; coding challenges and runners ("hacks"); and educational blogs ("tech talks"). The project has also grown to support community outreach, helping nonprofits, local communities, and businesses. This work has created a need for OCS-in-a-Kit.
 
-This GitHub Pages repository can be customized by the blogger to support computer science learning as the student works through the pathways of using Javascript, Python/Flask, Java/Spring. It is intended to support course work for Computer Science and Software Engineering (CSSE), AP Computer Science Principles (APCSP or CSP), AP Computer Science 'A' (APCSA or CSA), and Computer Science Honors (CSH).
+Educators and students can customize this GitHub Pages repository to support computer science learning through pathways using JavaScript, Python/Flask, and Java/Spring. It supports coursework in Computer Science and Software Engineering (CSSE), AP Computer Science Principles (APCSP or CSP), AP Computer Science A (APCSA or CSA), and Computer Science Honors (CSH).
 
-"Open Coding Society's instructional model is grounded in **Connectivism**, recognizing that learning happens through diverse networks of people, platforms, and AI. OCS is refining `pages` using **Merrill's structure**, deepening learning through **Fink**, ensuring access via **UDL**, and supporting our classroom through **Agile and Design Thinking ceremonies**, with a touch of **Gagné** to focus each classroom day. 
+Open Coding Society's instructional model is grounded in **connectivism**: learning happens through networks of people, platforms, and AI. OCS is refining `Pages` with **Merrill's structure**, **Fink's approach to learning**, and **Universal Design for Learning (UDL)**. **Agile and design-thinking ceremonies** support classroom collaboration, while **Gagné's instructional events** help focus each class session.
 
-OCS-in-a-Kit is an new generative idea.  It realizes that educational models are limited unless we iinvolve community.  OCS wants to create projects that support learning for today's digital, open, and connected world."  That start by helping those in the community that fund our educaton and purpose.  This extend the dimension of OCS to OCS Education and OCS Buiness. 
+OCS-in-a-Kit is an emerging initiative that brings community partners into the educational process. OCS aims to create projects that support learning in today's digital, open, and connected world, beginning with projects that serve the communities supporting its educational mission. This expands OCS's work across two areas: OCS Education and OCS Business.
 
 ## Student Requirements
 
@@ -546,4 +546,3 @@ UDL is not a method but a **design lens** to make learning **accessible and mean
 | **Depth & Growth** | Fink | Human, affective, reflective development |
 | **Access & Design** | UDL | Inclusive and flexible access to all learners |
 | **Workflow & Rhythm** | Agile + Design Thinking + Gagné | Iteration, planning, feedback, reflection ceremonies |
-
