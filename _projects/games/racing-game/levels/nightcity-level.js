@@ -9,11 +9,15 @@ class TimeLapScreen extends GameObject {
     this.data = data;
     this.totalLaps = Number.isFinite(data.totalLaps) ? data.totalLaps : 3;
     this.currentLap = Number.isFinite(data.currentLap) ? data.currentLap : 1;
-    this.startedAt = performance.now();
-    this.panel = { x: 18, y: 18, width: 240, height: 92 };
+    this.startedAt = null;
+    this.player = gameEnv?.gameObjects?.find((object) => object instanceof NightCityPlayer);
+    this.panel = { x: 18, y: 18, width: 240, height: 138 };
   }
 
   update() {
+    if (this.player?.selected && this.startedAt === null) {
+      this.startedAt = performance.now();
+    }
     this.draw();
   }
 
@@ -23,7 +27,7 @@ class TimeLapScreen extends GameObject {
       return;
     }
 
-    const elapsedMs = performance.now() - this.startedAt;
+    const elapsedMs = this.startedAt === null ? 0 : performance.now() - this.startedAt;
     const timeLabel = this.formatTime(elapsedMs);
     const lapLabel = 'Lap ' + this.currentLap + '/' + this.totalLaps;
     const { x, y, width, height } = this.panel;
@@ -46,6 +50,13 @@ class TimeLapScreen extends GameObject {
     ctx.fillText('LAP', x + 16, y + 80);
     ctx.fillStyle = '#bbf7d0';
     ctx.fillText(lapLabel, x + 72, y + 80);
+
+    ctx.fillStyle = '#facc15';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText(this.player?.getBoostLabel() || 'BOOST READY', x + 16, y + 105);
+    ctx.fillStyle = '#cbd5e1';
+    ctx.font = '11px sans-serif';
+    ctx.fillText('WASD DRIVE   SPACE DRIFT   SHIFT BOOST', x + 16, y + 126);
   }
 
   formatTime(ms) {
@@ -69,6 +80,240 @@ class TimeLapScreen extends GameObject {
   }
 }
 
+class NightCityPlayer extends Player {
+  constructor(data = {}, gameEnv = null) {
+    super(data, gameEnv);
+    this.isPlayer = true;
+    this.selected = false;
+    this.visible = false;
+    this.heading = -Math.PI / 2;
+    this.motionVelocity = { x: 0, y: 0 };
+    this.lastPhysicsUpdate = performance.now();
+    this.boostDuration = 3000;
+    this.boostCooldown = 12000;
+    this.boostEndsAt = 0;
+    this.boostReadyAt = 0;
+    this.normalTopSpeed = 0.34;
+    this.boostTopSpeed = 0.38;
+  }
+
+  handleKeyDown(event) {
+    const keyCode = event.keyCode ?? event.which ?? (event.key === 'Shift' ? 16 : event.key === ' ' ? 32 : 0);
+    if (keyCode === 16 || keyCode === 32) {
+      event.preventDefault();
+    }
+    if (keyCode === 16 && !event.repeat) {
+      this.activateBoost();
+    }
+    super.handleKeyDown({ keyCode });
+  }
+
+  handleKeyUp(event) {
+    const keyCode = event.keyCode ?? event.which ?? (event.key === 'Shift' ? 16 : event.key === ' ' ? 32 : 0);
+    super.handleKeyUp({ keyCode });
+  }
+
+  updateVelocity() {
+    this.moved = Boolean(
+      this.pressedKeys[this.keypress.up]
+      || this.pressedKeys[this.keypress.down]
+      || this.pressedKeys[this.keypress.left]
+      || this.pressedKeys[this.keypress.right]
+    );
+  }
+
+  updateDirection() {}
+
+  selectCar(src) {
+    this.spriteData.src = src;
+    this.spriteReady = false;
+    this.spriteSheet = new Image();
+    this.spriteSheet.onload = () => {
+      this.spriteReady = true;
+      this.resize();
+    };
+    this.spriteSheet.onerror = () => {
+      console.error(`Night City car sprite failed to load: ${src}`);
+    };
+    this.spriteSheet.src = src;
+    this.lastPhysicsUpdate = performance.now();
+    this.selected = true;
+    this.visible = true;
+  }
+
+  activateBoost(now = performance.now()) {
+    if (!this.selected || now < this.boostReadyAt) {
+      return;
+    }
+    this.boostEndsAt = now + this.boostDuration;
+    this.boostReadyAt = now + this.boostCooldown;
+  }
+
+  getBoostLabel(now = performance.now()) {
+    if (now < this.boostEndsAt) {
+      return `BOOST ${((this.boostEndsAt - now) / 1000).toFixed(1)}s`;
+    }
+    if (now < this.boostReadyAt) {
+      return `BOOST RECHARGING ${Math.ceil((this.boostReadyAt - now) / 1000)}s`;
+    }
+    return 'BOOST READY';
+  }
+
+  update() {
+    if (!this.selected) {
+      this.draw();
+      return;
+    }
+
+    if (this.gameEnv?.gameControl?.isPaused) {
+      this.draw();
+      return;
+    }
+
+    this.updateDrivingPhysics(performance.now());
+    super.update();
+  }
+
+  updateDrivingPhysics(now) {
+    const elapsedSeconds = Math.min(Math.max(now - this.lastPhysicsUpdate, 0), 50) / 1000;
+    this.lastPhysicsUpdate = now;
+    if (elapsedSeconds === 0) return;
+
+    const steering = Number(Boolean(this.pressedKeys[this.keypress.right]))
+      - Number(Boolean(this.pressedKeys[this.keypress.left]));
+    const throttle = Number(Boolean(this.pressedKeys[this.keypress.up]))
+      - Number(Boolean(this.pressedKeys[this.keypress.down]));
+    const driftRequested = this.pressedKeys[32] && steering !== 0;
+
+    const referenceSize = Math.min(this.gameEnv.innerWidth, this.gameEnv.innerHeight);
+    const normalTopSpeed = referenceSize * this.normalTopSpeed;
+    const topSpeed = referenceSize * (now < this.boostEndsAt ? this.boostTopSpeed : this.normalTopSpeed);
+    const currentSpeed = Math.hypot(this.motionVelocity.x, this.motionVelocity.y);
+    const speedRatio = Math.min(currentSpeed / Math.max(normalTopSpeed * 0.65, 1), 1);
+    const reverse = Math.cos(this.heading) * this.motionVelocity.x
+      + Math.sin(this.heading) * this.motionVelocity.y < -1;
+
+    this.heading += steering * (reverse ? -1 : 1) * 2.2 * (0.25 + speedRatio * 0.75) * elapsedSeconds;
+    this.heading = ((this.heading + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+
+    const forwardX = Math.cos(this.heading);
+    const forwardY = Math.sin(this.heading);
+    const rightX = -forwardY;
+    const rightY = forwardX;
+    let forwardSpeed = this.motionVelocity.x * forwardX + this.motionVelocity.y * forwardY;
+    let lateralSpeed = this.motionVelocity.x * rightX + this.motionVelocity.y * rightY;
+
+    forwardSpeed += throttle * referenceSize * 0.72 * elapsedSeconds;
+    if (now < this.boostEndsAt && forwardSpeed > 0) {
+      forwardSpeed += referenceSize * 0.38 * elapsedSeconds;
+    }
+    forwardSpeed = Math.max(-referenceSize * 0.1, forwardSpeed);
+    forwardSpeed *= Math.exp(-0.45 * elapsedSeconds);
+    lateralSpeed *= Math.exp(-(driftRequested ? 1.4 : 7) * elapsedSeconds);
+
+    const speed = Math.hypot(forwardSpeed, lateralSpeed);
+    if (speed > topSpeed) {
+      const speedScale = topSpeed / speed;
+      forwardSpeed *= speedScale;
+      lateralSpeed *= speedScale;
+    }
+
+    this.motionVelocity.x = forwardX * forwardSpeed + rightX * lateralSpeed;
+    this.motionVelocity.y = forwardY * forwardSpeed + rightY * lateralSpeed;
+    this.direction = this.getSpriteDirection();
+    this.velocity.x = this.motionVelocity.x * elapsedSeconds * 60;
+    this.velocity.y = this.motionVelocity.y * elapsedSeconds * 60;
+  }
+
+  getSpriteDirection() {
+    const octant = (Math.round(this.heading / (Math.PI / 4)) + 8) % 8;
+    return ['right', 'downRight', 'down', 'downLeft', 'left', 'upLeft', 'up', 'upRight'][octant];
+  }
+}
+
+class NightCityCarSelection extends GameObject {
+  constructor(data = {}, gameEnv = null) {
+    super(gameEnv);
+    this.player = gameEnv?.gameObjects?.find((object) => object instanceof NightCityPlayer);
+    if (!this.player) {
+      throw new Error('Night City car selection requires a NightCityPlayer');
+    }
+
+    this.element = document.createElement('div');
+    this.element.setAttribute('role', 'dialog');
+    this.element.setAttribute('aria-labelledby', 'nightcity-car-title');
+    Object.assign(this.element.style, {
+      position: 'absolute',
+      inset: '0',
+      zIndex: '30',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'rgba(2, 6, 23, 0.68)',
+      fontFamily: 'sans-serif'
+    });
+
+    const panel = document.createElement('div');
+    Object.assign(panel.style, {
+      padding: '24px',
+      border: '2px solid #facc15',
+      borderRadius: '12px',
+      background: '#0f172a',
+      color: '#f8fafc',
+      textAlign: 'center'
+    });
+
+    const title = document.createElement('h2');
+    title.id = 'nightcity-car-title';
+    title.textContent = 'Choose your car';
+    panel.appendChild(title);
+
+    const buttons = document.createElement('div');
+    Object.assign(buttons.style, { display: 'flex', gap: '12px', justifyContent: 'center' });
+    buttons.append(
+    this.createCarButton('Red car', '#dc2626', '/images/projects/racing-game/Red_Car.png'),
+    this.createCarButton('Blue car', '#2563eb', '/images/projects/racing-game/Blue_Car.png')
+    );
+    panel.appendChild(buttons);
+    this.element.appendChild(panel);
+    gameEnv.container.appendChild(this.element);
+  }
+
+  createCarButton(label, color, sprite) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = label;
+    button.setAttribute('aria-label', `Choose the ${label.toLowerCase()}`);
+    Object.assign(button.style, {
+      padding: '12px 20px',
+      border: '0',
+      borderRadius: '8px',
+      background: color,
+      color: '#fff',
+      fontSize: '16px',
+      fontWeight: 'bold',
+      cursor: 'pointer'
+    });
+    button.addEventListener('click', () => {
+      this.player.selectCar(sprite);
+      this.element.remove();
+    });
+    return button;
+  }
+
+  update() {}
+
+  draw() {}
+
+  resize() {}
+
+  destroy() {
+    this.element.remove();
+    const index = this.gameEnv?.gameObjects?.indexOf(this) ?? -1;
+    if (index >= 0) this.gameEnv.gameObjects.splice(index, 1);
+  }
+}
+
 class GameLevelNightcity {
   constructor(gameEnv = {}) {
     const background_data = {
@@ -80,11 +325,11 @@ class GameLevelNightcity {
     const player_data = {
         name: "Red Car",
         greeting: "I'm the red car!",
-        src: "/images/projects/racing-game/Directions_red_car.png",
+        src: "/images/projects/racing-game/Red_Car.png",
         INIT_POSITION: { x: 0.47, y: 0.76 },
         SCALE_FACTOR: 10,
         STEP_FACTOR: 1600,
-        pixels: { height: 1024, width: 1536 },
+        pixels: { height: 768, width: 1152 },
         orientation: { rows: 4, columns: 4 },
         up:        { row: 3, start: 0, columns: 1 },
         upRight:   { row: 0, start: 2, columns: 1, rotate: Math.PI },
@@ -199,7 +444,8 @@ class GameLevelNightcity {
     ];
     this.classes = [
         {class: GameEnvBackground, data: background_data},
-        {class: Player, data: player_data},
+        {class: NightCityPlayer, data: player_data},
+        {class: NightCityCarSelection, data: {}},
         {class: TimeLapScreen, data: timer_data},
         ...trackBarrierData.map((data) => ({ class: SplineBarrier, data }))
     ];
