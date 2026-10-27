@@ -418,6 +418,7 @@ export class ThemeRenderer {
                     ttsPitch: PreferencesStore.cachedPrefs?.ttsPitch || 1.0,
                     ttsVolume: PreferencesStore.cachedPrefs?.ttsVolume || 1.0
                 };
+                window.SitePreferences?.setThemeDecor?.(theme); // this theme's wallpaper (or none) wins after the reload
                 await PreferencesStore.set({
                     ...theme,
                     language: currentLang,

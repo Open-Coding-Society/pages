@@ -475,7 +475,7 @@
   // RESPONSIBILITY: Which emoji wallpaper goes with the active colors
   // ============================================
   class ThemeDecorStore {
-    // The last theme kept with a wallpaper, as { bg, text, accent, decor }. Matched by color
+    // The last theme kept or picked, as { bg, text, accent, decor } (decor [] = wallpaper off). Matched by color
     // rather than stored in the prefs: Spring's preferences have no field for it, and picking
     // any theme with other colors (a preset, Reset, Save) then drops the wallpaper by itself.
     static KEY = 'siteThemeDecor';
@@ -488,11 +488,11 @@
       }
     }
 
-    /** Remember theme's wallpaper (prefs-shaped: bg, text, accent, decor); null forgets it */
+    /** Remember theme's wallpaper choice (prefs-shaped: bg, text, accent, decor; no decor = off); null forgets it */
     static set(theme) {
       try {
-        if (theme?.decor?.length) {
-          const { bg, text, accent, decor } = theme;
+        if (theme) {
+          const { bg, text, accent, decor = [] } = theme;
           window.localStorage.setItem(ThemeDecorStore.KEY, JSON.stringify({ bg, text, accent, decor }));
         } else {
           window.localStorage.removeItem(ThemeDecorStore.KEY);
@@ -500,12 +500,15 @@
       } catch (_) { /* storage blocked: the wallpaper still shows on this page */ }
     }
 
-    /** The emoji for prefs: its own decor, the kept theme's, or a saved custom theme's with the same colors */
+    /** The emoji for prefs: its own decor ([] = wallpaper turned off), the kept theme's, or a saved custom theme's with the same colors */
     static decorFor(prefs) {
       if (!prefs) return null;
-      if (prefs.decor?.length) return prefs.decor;
-      const same = t => t?.decor?.length && ['bg', 'text', 'accent'].every(k => String(t[k]).toLowerCase() === String(prefs[k]).toLowerCase());
-      const match = [ThemeDecorStore.get(), ...Object.values(prefs.customThemes || {})].find(same);
+      if (Array.isArray(prefs.decor)) return prefs.decor.length ? prefs.decor : null;
+      const same = t => t && ['bg', 'text', 'accent'].every(k => String(t[k]).toLowerCase() === String(prefs[k]).toLowerCase());
+      // The theme the student kept or picked wins, even when they chose no wallpaper.
+      const kept = ThemeDecorStore.get();
+      if (same(kept)) return kept.decor?.length ? kept.decor : null;
+      const match = Object.values(prefs.customThemes || {}).find(t => t?.decor?.length && same(t));
       return match ? match.decor : null;
     }
   }

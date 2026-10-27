@@ -30,12 +30,13 @@ function contrast(a, b) {
     return (hi + 0.05) / (lo + 0.05);
 }
 
-/** An AI answer ({background, text, ...}) as site prefs, keeping the student's size, language and voice */
-function toPrefs(theme) {
+/** An AI answer ({background, text, ...}) as site prefs, keeping the student's size, language and voice.
+ *  wallpaper false keeps the colors and font but leaves out the emoji (decor [] means "no wallpaper"). */
+function toPrefs(theme, wallpaper = true) {
     return {
         ...(PreferencesStore.cachedPrefs || PreferencesConfig.SITE_DEFAULT),
         bg: theme.background, text: theme.text, accent: theme.accent,
-        selectionColor: theme.selection, font: theme.font, decor: theme.decor,
+        selectionColor: theme.selection, font: theme.font, decor: wallpaper ? theme.decor : [],
     };
 }
 
@@ -59,6 +60,9 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
     const promptEl = $('ai-theme-prompt'), generateBtn = $('ai-theme-generate'), statusEl = $('ai-theme-status');
     const result = $('ai-theme-result'), card = $('ai-theme-preview'), nameInput = $('ai-theme-name');
     let theme = null, lastPrompt = '', previewBar = null;
+    const wallpaperBox = $('ai-theme-wallpaper');
+    const wallpaper = () => !wallpaperBox || wallpaperBox.checked;
+    const prefsFor = t => toPrefs(t, wallpaper());
 
     const status = (msg, isError = false) => {
         statusEl.textContent = msg;
@@ -88,6 +92,7 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
         $('ai-theme-title').textContent = theme.name;
         $('ai-theme-description').textContent = theme.description;
         $('ai-theme-emoji').textContent = theme.decor.join(' ');
+        $('ai-theme-emoji').hidden = !wallpaper();
         $('ai-theme-swatches').replaceChildren(...['background', 'text', 'accent', 'selection'].map(key => {
             const swatch = document.createElement('span');
             swatch.className = 'inline-block w-6 h-6 rounded border';
@@ -159,7 +164,7 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
 
     $('ai-theme-try').addEventListener('click', () => {
         if (!theme || previewBar) return;
-        site().preview(toPrefs(theme));
+        site().preview(prefsFor(theme));
         previewBar = document.createElement('div');
         previewBar.setAttribute('role', 'region');
         previewBar.setAttribute('aria-label', 'Theme preview');
@@ -172,7 +177,7 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
         keep.className = 'px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white';
         keep.textContent = 'Keep';
         keep.addEventListener('click', async () => {
-            const prefs = { ...toPrefs(theme), customThemes: PreferencesStore.getThemes() };
+            const prefs = { ...prefsFor(theme), customThemes: PreferencesStore.getThemes() };
             site().setThemeDecor(prefs);
             site().keepPreview();
             endPreview(false);
@@ -197,13 +202,19 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
             status(`You can keep ${PreferencesConfig.MAX_CUSTOM} custom themes. Delete one first.`, true);
             return;
         }
-        const { bg, text, accent, selectionColor, font, size, decor } = toPrefs(theme);
+        const { bg, text, accent, selectionColor, font, size, decor } = prefsFor(theme);
         themes[name] = { bg, text, accent, selectionColor, font, size, decor, source: 'ai' };
         const previewing = Boolean(previewBar);
         await PreferencesStore.setThemes(themes); // re-applies the saved theme
-        if (previewing) site().preview(toPrefs(theme));
+        if (previewing) site().preview(prefsFor(theme));
         ThemeRenderer.setCustom();
         status(`Saved "${name}" to Custom Themes.`);
+    });
+
+    // Emoji wallpaper on/off: the card hides the emoji, and an open preview updates right away.
+    wallpaperBox?.addEventListener('change', () => {
+        $('ai-theme-emoji').hidden = !wallpaper();
+        if (theme && previewBar) site().preview(prefsFor(theme));
     });
 
     showKeyStatus($('ai-theme-key'), javaURI, fetchOptions, profileURL);
