@@ -1,7 +1,7 @@
 title: "North County Special Needs Community Foundation"
 subtitle: "2026-27 Capstone Infographic"
 quote: "The North County Special Needs Community Foundation provides vital community outreach and support. While the foundational mission is strong, the site currently suffers from a non-cohesive design, an unused event calendar, and a lack of sophisticated features necessary to seamlessly serve families and donors."
-github: "https://github.com/ncsncf-redesign-team/NCSNCF-FE"
+github: "https://github.com/NCSNCF-Redesign/NCSNCF-FE"
 
 summary:
   main_problems: "The website lacks visual cohesion across its pages, features an underutilized event calendar, and lacks modern, sophisticated features for community engagement, resource matching, and donor interactions."
@@ -10,7 +10,7 @@ summary:
 
 board:
   title: "Project Kanban Board"
-  url: "https://github.com/orgs/ncsncf-redesign-team/projects/2" 
+  url: "https://github.com/orgs/NCSNCF-Redesign/projects/2" 
   filter: "NCSNCF Team"
 
 strengths_and_improvements:
