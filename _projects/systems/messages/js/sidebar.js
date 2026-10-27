@@ -53,16 +53,17 @@ export function createSidebar({ groupList, dmList, onOpen }) {
     return `${count > 99 ? '99+' : count} new`;
   }
 
-  // Anything unread goes to the top. Sorting on the flag rather than the count keeps a
-  // conversation still while you read it, and `sort` is stable, so the order the server
-  // sent is preserved within the unread and the read halves. A copy, because the caller
-  // owns the array.
-  const unreadFirst = conversations => [...conversations]
+  // Anything unread goes to the top, in both lists. Sorting on the flag rather than the
+  // count keeps a row still while you read it, and `sort` is stable, so the order the
+  // server sent is preserved within the unread and the read halves. A copy, because the
+  // caller owns the array.
+  const unreadFirst = rows => [...rows]
     .sort((a, b) => Number(Boolean(b.unreadCount)) - Number(Boolean(a.unreadCount)));
 
   function render({ groups, conversations, active }) {
     groupList.replaceChildren(...(groups.length
-      ? groups.map(group => row('group', group.id, group.name, groupSubtitle(group), '', active))
+      ? unreadFirst(groups).map(group => row('group', group.id, group.name, groupSubtitle(group),
+        unreadNote(group.unreadCount), active))
       : [emptyLine('No groups yet. Find one to join, or make one.')]));
     dmList.replaceChildren(...(conversations.length
       ? unreadFirst(conversations).map(conversation => row('dm', conversation.id, conversationLabel(conversation), '',

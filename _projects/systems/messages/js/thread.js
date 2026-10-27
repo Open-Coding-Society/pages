@@ -6,7 +6,7 @@ import { classifyDmEvent, classifyGroupEvent, dmMessage, groupMessage } from './
 import { createMessageLog } from './message-log.js';
 import { readImageFile, saveFile } from './dialogs.js';
 
-export function createThread({ elements, api, socket, richText, me, onDmRead, onFileShared }) {
+export function createThread({ elements, api, socket, richText, me, onDmRead, onGroupRead = () => {}, onFileShared }) {
   // A group message's only sender field is a display name, so that is what marks yours.
   const kinds = {
     dm: {
@@ -236,9 +236,16 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
     switch (change.type) {
       case 'message':
         log.append(change.message, isMine(kind, change.message));
-        if (kind !== 'dm' || isMine(kind, change.message)) break;
-        if (document.visibilityState === 'visible') markRead(id);
-        else unseenWhileHidden = true;
+        if (isMine(kind, change.message)) break;
+        // Arriving in the conversation you are looking at means you have read it. A
+        // group advances its read marker the same way a DM does, or a message received
+        // while the group was open would still be counted as unread on the next load.
+        if (document.visibilityState !== 'visible') {
+          unseenWhileHidden = true;
+          break;
+        }
+        if (kind === 'dm') markRead(id);
+        else onGroupRead(id);
         break;
       case 'edit':
         log.updateBody(change.id, change.body);
@@ -343,6 +350,7 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
     if (document.visibilityState !== 'visible' || !unseenWhileHidden) return;
     unseenWhileHidden = false;
     if (current?.kind === 'dm') markRead(current.id);
+    else if (current?.kind === 'group') onGroupRead(current.id);
   });
 
   elements.form.addEventListener('submit', event => {

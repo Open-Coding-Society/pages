@@ -53,6 +53,11 @@ export function createMessagesApi({ javaURI, pythonURI, fetchOptions }) {
     sendGroupMessage: (groupId, name, message, image = null) => spring(`/api/groups/chat/${part(groupId)}/messages`, 'POST', { name, message, image }),
     editGroupMessage: (groupId, messageId, message) => spring(`/api/groups/chat/${part(groupId)}/messages/${part(messageId)}`, 'PATCH', { message }),
     deleteGroupMessage: (groupId, messageId) => spring(`/api/groups/chat/${part(groupId)}/messages/${part(messageId)}`, 'DELETE'),
+    // Unread counts for group chat, the group-side twin of /api/dm/unread. Groups with
+    // nothing unread are absent from unreadByGroup rather than present as zero.
+    groupUnread: () => spring('/api/groups/chat/unread'),
+    markGroupRead: groupId => spring(`/api/groups/chat/${part(groupId)}/read`, 'POST'),
+
     groupFiles: groupId => spring(`/api/groups/chat/${part(groupId)}/files`),
     uploadGroupFile: (groupId, filename, base64Data) => spring(`/api/groups/chat/${part(groupId)}/files`, 'POST', { filename, base64Data }),
 
