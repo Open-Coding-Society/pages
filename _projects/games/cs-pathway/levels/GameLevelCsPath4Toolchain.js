@@ -1456,7 +1456,58 @@ class GameLevelCsPath4Toolchain {
       this._activeZoneStationId = null;
     }
   }
+/**
+   * Displays a closeable popup modal when a failure score (0.55) is triggered.
+   */
+_showFailurePopup() {
+  if (document.getElementById('ocs-failure-popup')) return;
 
+  const overlay = document.createElement('div');
+  overlay.id = 'ocs-failure-popup';
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(4, 6, 15, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+  `;
+
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    background: var(--ocs-game-panel-bg, rgba(6, 8, 22, 0.96));
+    border: 2px solid #ef4444;
+    padding: 24px 32px;
+    border-radius: 12px;
+    text-align: center;
+    color: #dbeafe;
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+    max-width: 400px;
+    font-family: inherit;
+  `;
+
+  modal.innerHTML = `
+    <h3 style="margin-top: 0; color: #ef4444; font-size: 1.25rem;">⚠️ Toolchain Failure</h3>
+    <p style="font-size: 1.1rem; margin: 16px 0;">Grade is 0.55, Failing</p>
+    <button id="ocs-close-failure-popup" style="
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+    ">Close</button>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  document.getElementById('ocs-close-failure-popup').addEventListener('click', () => {
+    overlay.remove();
+  });
+}
   _applyBarriers(player) {
     try {
       const w = player.width || 0, h = player.height || 0;
