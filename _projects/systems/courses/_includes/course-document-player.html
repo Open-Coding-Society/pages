@@ -146,6 +146,7 @@
   import { appendGistSettingsLink } from '{{ site.baseurl }}/assets/js/gist-connection-errors.js';
   import { listRunners, unsavedRunners, readRunners } from '{{ site.baseurl }}/assets/js/runner-io.js';
   import { createNavigationState } from '{{ site.baseurl }}/assets/js/course-navigation-state.js';
+  import { readGradingResponse } from '{{ site.baseurl }}/assets/js/submissions/grading.js';
   import { rememberCourse } from '{{ site.baseurl }}/assets/js/course-entry.js';
 
   /**
@@ -661,8 +662,7 @@
       })
     });
     if (!res.ok) {
-      const e = await res.json().catch(() => ({}));
-      throw new Error(e.error || res.statusText);
+      throw new Error((await readGradingResponse(res)).message);
     }
     // Dual-write to EshikaP1's grades system
     const assignmentLabel = (typeof CURRENT_ASSIGNMENT_NAME === 'string' && CURRENT_ASSIGNMENT_NAME) ? CURRENT_ASSIGNMENT_NAME : String(assignmentId);
@@ -697,8 +697,7 @@
       })
     });
     if (!res.ok) {
-      const e = await res.json().catch(() => ({}));
-      throw new Error(e.error || res.statusText);
+      throw new Error((await readGradingResponse(res)).message);
     }
     const assignmentLabel = (typeof CURRENT_ASSIGNMENT_NAME === 'string' && CURRENT_ASSIGNMENT_NAME) ? CURRENT_ASSIGNMENT_NAME : String(assignmentId);
     await fetch(`${javaURI}/api/grades`, {
@@ -734,8 +733,7 @@
         body: fd
       });
       if (!r.ok) {
-        const e = await r.json().catch(() => ({}));
-        throw new Error(`Upload failed for ${file.name}: ` + (e.error || r.statusText));
+        throw new Error(`Upload failed for ${file.name}: ` + (await readGradingResponse(r)).message);
       }
       // Dual-write to EshikaP1's grades system
       const assignmentLabel = (typeof CURRENT_ASSIGNMENT_NAME === 'string' && CURRENT_ASSIGNMENT_NAME) ? CURRENT_ASSIGNMENT_NAME : String(assignmentId);
