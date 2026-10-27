@@ -8,7 +8,6 @@ permalink: /capstone/doingexceptionaldeeds/
 
 > Doing Exceptional Deeds (D.A.D.) is a nonprofit focused on helping students and the community. The organization has strong programs and resources, but the website can be improved by making important information easier to find, reducing excessive text, and creating a simpler experience for students, teachers, and families.
 
-{% include dad_project_board.html %}
 
 <div class="ocs__links">
 
@@ -324,14 +323,18 @@ permalink: /capstone/doingexceptionaldeeds/
 
 ---
 
+## Team Kanban Board
+
+{% include ocs_kanban_board.html
+   url="https://github.com/orgs/ComputerScienceDudes/projects/7"
+   title="ComputerScienceDudes Kanban Board"
+%}
+
+---
+
 ## Work Distribution
 
 <div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
-
-
-
-
-
 
   <div class="ocs__grid-cell ocs__grid-cell--accent">
 
@@ -374,7 +377,7 @@ permalink: /capstone/doingexceptionaldeeds/
 
   <a class="ocs__btn" href="https://github.com/Blazific11/Teamportfolio/issues/2">
     View GitHub Issue
-  </a>
+  </a>m
 
   <a class="ocs__btn" href="https://www.doingexceptionaldeeds.org/about">
     About D.A.D.
