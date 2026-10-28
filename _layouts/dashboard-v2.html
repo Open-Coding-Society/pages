@@ -6,7 +6,7 @@ active_tab: dashboard
 
 <!-- Preline and ApexCharts CSS are loaded in <head> via aesthetihawk.html for dashboard pages, but unused on this page -->
 <div class="ocs__dashboard-page">
-    <div class="ocs__dashboard-stack">
+    <div class="ocs__stack ocs__stack--wide">
         <div class="ocs__tabs">
             <ul class="ocs__tabs-list" id="tab-bar">
                 <li>
@@ -269,31 +269,44 @@ active_tab: dashboard
                     </div>
                 </div>
 
-                <div class="ocs__dashboard-card ocs__dashboard-card-spaced" id="ask-ai-panel">
-                    <div class="ocs__card-header">
-                        <h3 class="ocs__dashboard-card-title">Ask AI: Generate a Theme</h3>
-                        <div class="ocs__links">
-                        <button id="ask-ai-toggle" type="button" class="ocs__btn accent fill small">Ask AI</button>
-                        </div>
-                    </div>
-
-                    <div id="ask-ai-dropdown" class="hidden ocs__dashboard-card-spaced-sm">
-                        <label class="ocs__label ocs__dashboard-block-label">Describe the style you want (e.g. "modern, playful, cool blues")</label>
-                        <textarea id="ask-ai-prompt" class="ocs__input ocs__dashboard-full-width ocs__dashboard-textarea" rows="4"
-                        placeholder="Describe colors, tones, fonts, mood, and any words like 'modern', 'playful', 'professional', etc."></textarea>
-
+                <!-- AI Theme: assets/js/pages/dashboard/ai-theme.js -->
+                <div class="ocs__dashboard-card ocs__dashboard-card-spaced" id="ai-theme-panel">
+                    <h3 class="ocs__dashboard-card-title">AI Theme</h3>
+                    <p class="ocs__text ocs__dashboard-card-desc">Describe a look and the AI designs a theme: colors, font and an emoji wallpaper.</p>
+                    <p class="ocs__text ocs__dashboard-fineprint" id="ai-theme-key"></p>
+                    <form id="ai-theme-form" class="ocs__dashboard-card-spaced-sm" novalidate>
+                        <label for="ai-theme-prompt" class="ocs__label">Describe your theme</label>
+                        <textarea id="ai-theme-prompt" maxlength="200" rows="2" class="ocs__input ocs__dashboard-full-width ocs__dashboard-textarea"
+                            placeholder="cozy rainy library, neon arcade, Halloween…"></textarea>
+                        <div id="ai-theme-chips" class="ocs__links ocs__dashboard-card-spaced-sm" role="group" aria-label="Suggestions"></div>
                         <div class="ocs__links ocs__dashboard-card-spaced-sm">
-                        <button id="ask-ai-send" class="ocs__btn accent fill small">Get Suggestions</button>
-                        <button id="ask-ai-clear" class="ocs__btn small">Clear</button>
+                            <button type="submit" id="ai-theme-generate" class="ocs__btn accent fill small">Generate</button>
+                            <span id="ai-theme-status" class="ocs__text ocs__dashboard-fineprint" role="status" aria-live="polite"></span>
                         </div>
+                    </form>
 
-                        <div id="ask-ai-status" class="ocs__text ocs__dashboard-fineprint ocs__dashboard-card-spaced-sm"></div>
-
-                        <div id="ask-ai-response" class="ocs__dashboard-ai-response"></div>
-
+                    <div id="ai-theme-result" class="ocs__dashboard-card-spaced-sm" hidden>
+                        <!-- Drawn in the theme's own colors and font by ai-theme.js -->
+                        <div id="ai-theme-preview" class="p-4 rounded-lg border-2 flex flex-col gap-2">
+                            <div class="flex flex-wrap justify-between items-center gap-2">
+                                <h4 id="ai-theme-title" class="text-lg font-semibold"></h4>
+                                <span id="ai-theme-emoji" class="text-2xl" aria-hidden="true"></span>
+                            </div>
+                            <p id="ai-theme-description" class="text-sm"></p>
+                            <p class="text-sm">Sample text: this is how lessons will read.</p>
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <span id="ai-theme-sample-btn" class="px-3 py-1 rounded text-sm font-medium">Sample button</span>
+                                <span id="ai-theme-swatches" class="flex gap-1"></span>
+                                <span id="ai-theme-badge" class="text-sm"></span>
+                            </div>
+                        </div>
                         <div class="ocs__links ocs__dashboard-card-spaced-sm">
-                        <button id="ask-ai-apply" class="ocs__btn accent fill small">Apply to Form</button>
-                        <a id="ask-ai-open" href="#" target="_blank" class="hidden ocs__dashboard-link ocs__dashboard-fineprint">Open full response</a>
+                            <button type="button" id="ai-theme-try" class="ocs__btn accent fill small">Try it</button>
+                            <button type="button" id="ai-theme-regenerate" class="ocs__btn small">Regenerate</button>
+                            <label class="ocs__text ocs__dashboard-fineprint"><input type="checkbox" id="ai-theme-wallpaper" checked> Emoji wallpaper</label>
+                            <label for="ai-theme-name" class="ocs__dashboard-sr-only">Custom theme name</label>
+                            <input id="ai-theme-name" maxlength="30" class="ocs__input" />
+                            <button type="button" id="ai-theme-save" class="ocs__btn accent fill small">Save as custom theme</button>
                         </div>
                     </div>
                 </div>
@@ -304,9 +317,11 @@ active_tab: dashboard
                 <script type="module">
                 import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
                 import { initializePreferences } from '{{ site.baseurl }}/assets/js/pages/dashboard/preferences.js';
+                import { initAiTheme } from '{{ site.baseurl }}/assets/js/pages/dashboard/ai-theme.js';
 
                 // Initialize the preferences module with API configuration
                 initializePreferences(javaURI, fetchOptions);
+                initAiTheme({ javaURI, fetchOptions, profileURL: '{{ site.baseurl }}/profile#ai-connections' });
                 </script>
 
         </div>
@@ -396,264 +411,6 @@ active_tab: dashboard
             console.error('Error loading preferences on DOMContentLoaded', e);
         }
     });
-</script>
-
-<script type="module">
-  import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
-  (function () {
-
-    // UI elements
-    const toggleBtn = document.getElementById('ask-ai-toggle');
-    const dropdown = document.getElementById('ask-ai-dropdown');
-    const sendBtn = document.getElementById('ask-ai-send');
-    const clearBtn = document.getElementById('ask-ai-clear');
-    const promptEl = document.getElementById('ask-ai-prompt');
-    const statusEl = document.getElementById('ask-ai-status');
-    const responseEl = document.getElementById('ask-ai-response');
-    const applyBtn = document.getElementById('ask-ai-apply');
-    const openLink = document.getElementById('ask-ai-open');
-
-    if (!toggleBtn || !dropdown) return;
-
-    function showStatus(msg, isError) {
-      statusEl.textContent = msg;
-      statusEl.style.color = isError ? '#f87171' : '';
-    }
-
-    toggleBtn.addEventListener('click', () => {
-      dropdown.classList.toggle('hidden');
-    });
-
-    clearBtn.addEventListener('click', () => {
-      promptEl.value = '';
-      responseEl.textContent = '';
-      openLink.classList.add('hidden');
-      showStatus('');
-    });
-
-    // Try to capture the current preference form values (read DOM inputs directly)
-    function readCurrentPrefs() {
-      try {
-        return {
-          bg: document.getElementById('pref-bg-color')?.value,
-          text: document.getElementById('pref-text-color')?.value,
-          accent: document.getElementById('pref-accent-color')?.value,
-          selectionColor: document.getElementById('pref-selection-color')?.value,
-          font: document.getElementById('pref-font-family')?.value,
-          size: Number(document.getElementById('pref-font-size')?.value || 14),
-          buttonStyle: document.getElementById('pref-button-style')?.value
-        };
-      } catch (e) {
-        return {};
-      }
-    }
-
-    // Map possible names to the font <select> values used in the form
-    const FONT_MAP = {
-      'inter': "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
-      'roboto': "Roboto, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial",
-      'open sans': "'Open Sans', Arial, sans-serif",
-      'lato': "Lato, Arial, sans-serif",
-      'montserrat': "Montserrat, Arial, sans-serif",
-      'georgia': "Georgia, 'Times New Roman', Times, serif",
-      'source code pro': "'Source Code Pro', monospace",
-      'sourcecodepro': "'Source Code Pro', monospace"
-    };
-
-    function tryParseResponsePayload(data) {
-      // Data may be JSON like { background: "#...", button: "#...", text: "#...", font: "Roboto" }
-      // Or it may be { response: "..." } or plain text.
-      const parsed = { raw: data };
-
-      if (!data) return parsed;
-
-      // If data is an object with fields, copy known fields.
-      if (typeof data === 'object') {
-        parsed.bg = data.background || data.bg || data.backgroundColor || data.background_color;
-        parsed.button = data.button || data.buttonColor || data.button_color;
-        parsed.selectionColor = data.selection || data.selectionColor || data.selection_color || data.selectionColorHex;
-        parsed.text = data.text || data.textColor || data.text_color;
-        parsed.font = data.font || data.fontFamily || data.font_family;
-        parsed.accent = data.accent || data.accentColor || data.accent_color;
-        return parsed;
-      }
-
-      // If it's a string, try to find hex color values and font names.
-      if (typeof data === 'string') {
-        const s = data;
-        const hexes = [...s.matchAll(/#([0-9a-f]{3,6})/ig)].map(m => '#' + m[1]);
-        if (hexes.length) {
-          parsed.bg = hexes[0];
-          if (hexes[1]) parsed.button = hexes[1];
-          if (hexes[2]) parsed.text = hexes[2];
-          if (hexes[3]) parsed.accent = hexes[3];
-        }
-        // look for font keywords
-        Object.keys(FONT_MAP).forEach(k => {
-          if (s.toLowerCase().includes(k)) parsed.font = FONT_MAP[k];
-        });
-        return parsed;
-      }
-
-      return parsed;
-    }
-
-    async function sendPromptToBackend(promptText) {
-
-      try {
-        showStatus('Sending to AI...', false);
-        sendBtn.disabled = true;
-
-        const res = await fetch(`${javaURI}/api/upai`, {
-          ...fetchOptions,
-          method: 'POST',
-          body: JSON.stringify({
-            prompt: promptText
-          })
-        });
-
-        if (!res.ok) {
-          const txt = await res.text().catch(() => '');
-          showStatus('Server error: ' + (res.status + ' ' + txt), true);
-          responseEl.textContent = txt || `Status: ${res.status}`;
-          openLink.classList.add('hidden');
-          return null;
-        }
-
-        // Try JSON first, then text
-        let json;
-        try { json = await res.json(); } catch (e) { json = null; }
-        let payload = json;
-        if (json && json.response) {
-          payload = json.response;
-        }
-        if (!payload) {
-          payload = await res.text();
-        }
-
-        showStatus('Response received', false);
-        return payload;
-
-      } catch (err) {
-        showStatus('Network error: ' + (err.message || err), true);
-        return null;
-      } finally {
-        sendBtn.disabled = false;
-      }
-    }
-
-        sendBtn.addEventListener('click', async () => {
-      const promptText = promptEl.value && promptEl.value.trim();
-      if (!promptText) { showStatus('Please write a description first', true); return; }
-
-      responseEl.textContent = '';
-      openLink.classList.add('hidden');
-
-      const payload = await sendPromptToBackend(promptText);
-      if (!payload) return;
-            // Normalize the response so frontend can apply values consistently.
-            // Use tryParseResponsePayload to extract common tokens from text or object
-            const parsedRaw = (typeof payload === 'object') ? tryParseResponsePayload(payload) : tryParseResponsePayload(String(payload));
-
-            const normalized = {
-                background: (payload && (payload.background || payload.bg || payload.backgroundColor || payload.background_color)) || parsedRaw.bg || parsedRaw.background,
-                button: (payload && (payload.button || payload.buttonColor || payload.button_color)) || parsedRaw.button,
-                selectionColor: (payload && (payload.selectionColor || payload.selection || payload.selection_color)) || parsedRaw.selectionColor || parsedRaw.selection,
-                textColor: (payload && (payload.textColor || payload.text || payload.text_color)) || parsedRaw.text,
-                fontFamily: (payload && (payload.fontFamily || payload.font || payload.font_family)) || parsedRaw.font,
-                suggestions: (payload && (payload.suggestions || payload.response)) || (typeof payload === 'string' ? payload : parsedRaw.raw)
-            };
-
-            // Display the human-friendly suggestion (if present) instead of raw JSON
-            responseEl.textContent = normalized.suggestions || JSON.stringify(payload, null, 2);
-
-            // Keep the normalized object on the element for Apply to read
-            try { responseEl.dataset.parsed = JSON.stringify(normalized); } catch (e) { /* ignore */ }
-
-            // Provide a quick link to view response in a new tab (use a data: URI)
-            const safeText = encodeURIComponent(responseEl.textContent);
-            openLink.href = `data:text/plain;charset=utf-8,${safeText}`;
-            openLink.classList.remove('hidden');
-
-            showStatus('AI suggestions ready — review below. Use "Apply to Form" to copy values', false);
-    });
-
-    applyBtn.addEventListener('click', () => {
-            const raw = responseEl.textContent;
-            if (!raw && !responseEl.dataset.parsed) { showStatus('No AI response to apply', true); return; }
-
-            let parsed = null;
-            if (responseEl.dataset.parsed) {
-                try { parsed = JSON.parse(responseEl.dataset.parsed); } catch (e) { parsed = null; }
-            }
-
-            if (!parsed) {
-                // Fallbacks: try JSON in the box, then try to parse free text
-                try { parsed = JSON.parse(raw); } catch (e) { parsed = tryParseResponsePayload(raw); }
-            }
-
-            if (!parsed) { showStatus('Could not parse AI response', true); return; }
-
-            // Set form fields if found (normalized keys: background, button, selectionColor, textColor, fontFamily)
-            try {
-                if (parsed.background) {
-                    const el = document.getElementById('pref-bg-color');
-                    if (el) el.value = parsed.background;
-                }
-                if (parsed.textColor) {
-                    const el = document.getElementById('pref-text-color');
-                    if (el) el.value = parsed.textColor;
-                }
-                const accent = parsed.button || parsed.accent || parsed.buttonColor;
-        if (accent) {
-          const el = document.getElementById('pref-accent-color');
-          if (el) el.value = accent;
-        }
-                const selection = parsed.selectionColor || parsed.selection || parsed.selection_color;
-        if (selection) {
-          const el = document.getElementById('pref-selection-color');
-          if (el) el.value = selection;
-        }
-                // Handle fontFamily mapping
-                const fontVal = (parsed.fontFamily || parsed.font || '').toString().toLowerCase();
-                if (fontVal) {
-                    let mapped = null;
-                    Object.keys(FONT_MAP).forEach(k => {
-                        if (fontVal.includes(k)) mapped = FONT_MAP[k];
-                    });
-                    const fontSelect = document.getElementById('pref-font-family');
-                    if (fontSelect) {
-                        if (mapped) {
-                            fontSelect.value = mapped;
-                        } else {
-                            for (const opt of fontSelect.options) {
-                                if ((opt.value || '').toLowerCase().includes(fontVal)) {
-                                    fontSelect.value = opt.value;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-        showStatus('Values applied to the form. Click "Save All" to persist.', false);
-
-        // Optionally trigger the Save All button so user doesn't need to click twice
-        const saveBtn = document.getElementById('save-preferences');
-        if (saveBtn) {
-          // give tiny delay so UI updates are visible
-          setTimeout(() => {
-            saveBtn.click();
-            showStatus('Preferences saved (via Save All)', false);
-          }, 300);
-        }
-
-      } catch (e) {
-        showStatus('Error applying values: ' + (e.message || e), true);
-      }
-    });
-
-  })();
 </script>
 
 <!-- ============================================================

@@ -1,0 +1,335 @@
+{
+  "fetchedAt": "2026-10-25T05:42:03.763785+00:00",
+  "board": {
+    "title": "Jarvis3000 KanBan",
+    "url": "https://github.com/users/Arnav210/projects/3",
+    "filterName": "Assignee",
+    "groups": [
+      "SoniDhenuva"
+    ],
+    "shared": [],
+    "columns": [
+      {
+        "key": "Y3Vyc29yOnYyOpLOGcZDUadCYWNrbG9n",
+        "label": "Backlog",
+        "stage": "backlog",
+        "toggle": false
+      },
+      {
+        "key": "Y3Vyc29yOnYyOpLOGcZDUaVSZWFkeQ==",
+        "label": "Ready",
+        "stage": "todo",
+        "toggle": false
+      },
+      {
+        "key": "Y3Vyc29yOnYyOpLOGcZDUatJbiBwcm9ncmVzcw==",
+        "label": "In progress",
+        "stage": "doing",
+        "toggle": false
+      },
+      {
+        "key": "Y3Vyc29yOnYyOpLOGcZDUalJbiByZXZpZXc=",
+        "label": "In review",
+        "stage": "review",
+        "toggle": false
+      },
+      {
+        "key": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "label": "Done",
+        "stage": "done",
+        "toggle": false
+      }
+    ],
+    "cards": [
+      {
+        "id": 282335432,
+        "title": "Presence System: take a picture on each RFID tap (needed by Oct 21)",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/17",
+        "number": 17,
+        "stage": "backlog",
+        "status": "Backlog",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUadCYWNrbG9n",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282340199,
+        "title": "Funding Requests",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/23",
+        "number": 23,
+        "stage": "todo",
+        "status": "Ready",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaVSZWFkeQ==",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282342721,
+        "title": "New Technology Usage",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/24",
+        "number": 24,
+        "stage": "todo",
+        "status": "Ready",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaVSZWFkeQ==",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282344885,
+        "title": "Plan Trimester 2",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/26",
+        "number": 26,
+        "stage": "todo",
+        "status": "Ready",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaVSZWFkeQ==",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335436,
+        "title": "Mentor Notes",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/19",
+        "number": 19,
+        "stage": "doing",
+        "status": "In progress",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUatJbiBwcm9ncmVzcw==",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282339539,
+        "title": "File/Code Architecture Updates",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/22",
+        "number": 22,
+        "stage": "doing",
+        "status": "In progress",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUatJbiBwcm9ncmVzcw==",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282344257,
+        "title": "Finalize MVP for N@tM",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/25",
+        "number": 25,
+        "stage": "doing",
+        "status": "In progress",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUatJbiBwcm9ncmVzcw==",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335439,
+        "title": "Design Thinking Framework",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/21",
+        "number": 21,
+        "stage": "review",
+        "status": "In review",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUalJbiByZXZpZXc=",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335438,
+        "title": "Future Plans for MVP",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/20",
+        "number": 20,
+        "stage": "review",
+        "status": "In review",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUalJbiByZXZpZXc=",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335435,
+        "title": "compatability of servers",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/18",
+        "number": 18,
+        "stage": "review",
+        "status": "In review",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUalJbiByZXZpZXc=",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335401,
+        "title": "Onboarding Challenge - Arnav",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/1",
+        "number": 1,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335404,
+        "title": "Onboarding Challenge - Soni",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/2",
+        "number": 2,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335407,
+        "title": "Onboarding Challenge - Xavier",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/4",
+        "number": 4,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335408,
+        "title": "Onboarding Challenge - Shriya",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/5",
+        "number": 5,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335411,
+        "title": "8/27/2026 Notes - Future Plans",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/6",
+        "number": 6,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335414,
+        "title": "Research - Arnav",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/9",
+        "number": 9,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335416,
+        "title": "Research - soni",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/10",
+        "number": 10,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335419,
+        "title": "Research -Shriya",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/11",
+        "number": 11,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335424,
+        "title": "Project Visual Designs",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/12",
+        "number": 12,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335427,
+        "title": "Milestone 1 Tasks",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/14",
+        "number": 14,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335429,
+        "title": "System Architecture Proposal",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/16",
+        "number": 16,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335413,
+        "title": "Team Research Master Issue",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/8",
+        "number": 8,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335412,
+        "title": "Project Timeline",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/7",
+        "number": 7,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335406,
+        "title": "Spatial Awareness & Distance Estimation Research",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/3",
+        "number": 3,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "SoniDhenuva",
+        "people": [
+          "SoniDhenuva"
+        ]
+      },
+      {
+        "id": 282335428,
+        "title": "Hand Gestures",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/15",
+        "number": 15,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282335426,
+        "title": "Legal Research",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/13",
+        "number": 13,
+        "stage": "done",
+        "status": "Done",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaREb25l",
+        "group": "",
+        "people": []
+      }
+    ],
+    "updated": "2026-10-25T05:33:41Z"
+  }
+}

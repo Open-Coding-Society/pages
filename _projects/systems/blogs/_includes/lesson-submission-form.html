@@ -11,6 +11,10 @@
     Submit Assignment
   </h2>
 
+  {% comment %}
+    Self-assessment is paused while it is reworked. The backend must also stop
+    requiring these fields; the matching JS checks in course-document-player.html
+    are commented out. Remove this comment block to bring it back.
   <div class="self-assessment" id="self-assessment">
     <h4 class="self-assessment-title">
       <i class="fas fa-clipboard-check"></i>
@@ -75,6 +79,7 @@
       <textarea id="self-assessment-reflection" placeholder="In a few sentences, describe what you learned, struggled with, or accomplished on this assignment. Include one specific example."></textarea>
     </div>
   </div>
+  {% endcomment %}
 
   {% if submission_type == "link" or submission_type == "github_issue" %}
   {% if submission_type == "github_issue" %}

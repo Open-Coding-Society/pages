@@ -12,6 +12,14 @@
 
 const RUNNER_SELECTOR = '.code-runner-container';
 
+/**
+ * Reflection runners (_includes/runners/reflection.html) share the container class so they
+ * are saved, listed and bundled with the code runners; they mark themselves with
+ * `data-runner-kind="reflection"` and their written answer travels as Markdown.
+ */
+export const REFLECTION_KIND = 'reflection';
+const REFLECTION_EXTENSION = 'md';
+
 /** Runner language -> file extension. Unknown languages fall back to .txt */
 const EXTENSIONS = {
   python: 'py',
@@ -61,22 +69,48 @@ export function readRunners(opts = {}) {
     const code = readRunner(container);
     if (!code) return;
 
-    const runnerId = container.dataset.runnerId || `runner_${index + 1}`;
-    const lang = container.querySelector('.languageSelect')?.value || 'java';
-    const ext = EXTENSIONS[lang] || 'txt';
+    const { runnerId, name, kind } = runnerFile(container, index);
 
     let content = code;
     if (includeQuestion) {
       const box = container.querySelector('.challenge-box');
       const title = box?.querySelector('h3')?.textContent.trim() || `Part ${index + 1}`;
       const desc = box?.querySelector('p')?.textContent.trim() || '';
-      content = `Question: ${title}\n${desc}\n\nAnswer (runner: ${runnerId}):\n\n${code}`;
+      const label = kind === REFLECTION_KIND ? 'reflection' : 'runner';
+      content = `Question: ${title}\n${desc}\n\nAnswer (${label}: ${runnerId}):\n\n${code}`;
     }
 
-    files[`${safeName(runnerId)}.${ext}`] = { content };
+    files[name] = { content };
   });
 
   return files;
+}
+
+/**
+ * What each file readRunners() produces holds: "code" or "reflection". Sent in the gist
+ * manifest so the grader knows which answers are written prose rather than code.
+ *
+ * @returns {Object} { "runner_id.java": "code", "reflection_id.md": "reflection", ... }
+ */
+export function readRunnerKinds() {
+  const kinds = {};
+  listRunners().forEach((container, index) => {
+    if (!readRunner(container)) return;
+    const { name, kind } = runnerFile(container, index);
+    kinds[name] = kind;
+  });
+  return kinds;
+}
+
+/** The bundle filename and kind for one runner element. */
+function runnerFile(container, index) {
+  const runnerId = container.dataset.runnerId || `runner_${index + 1}`;
+  if (container.dataset.runnerKind === REFLECTION_KIND) {
+    return { runnerId, name: `${safeName(runnerId)}.${REFLECTION_EXTENSION}`, kind: REFLECTION_KIND };
+  }
+  const lang = container.querySelector('.languageSelect')?.value || 'java';
+  const ext = EXTENSIONS[lang] || 'txt';
+  return { runnerId, name: `${safeName(runnerId)}.${ext}`, kind: 'code' };
 }
 
 /**

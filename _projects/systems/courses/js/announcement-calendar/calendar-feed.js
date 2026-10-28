@@ -4,7 +4,7 @@
 // existing OCS elements (ocs__card, ocs__callout, ocs__table, ocs__links,
 // ocs__btn, ocs__status-pill) and plain HTML, so they need no CSS of their own.
 
-import { renderRichMessage } from '../rich-text.js';
+import { linkify, renderRichMessage } from '../rich-text.js';
 import {
   eventMatchesPeriod, extractEventMarkers, findSchoolWeek, formatPeriods,
   formatShortDate, fromIsoDate, neighborWeek, PRIORITY_LABELS, schoolWeekDays, todayIso, TYPE_LABELS,
@@ -185,12 +185,13 @@ function plainTitle(title) {
   return text.replace(/\s+/g, ' ').trim();
 }
 
-// The teacher's details, one line per line they typed (<br>, not CSS).
+// The teacher's details, one line per line they typed (<br>, not CSS), with
+// web addresses as clickable links.
 function detailsBlock(text) {
   const block = el('div');
   String(text).split('\n').forEach((line, i) => {
     if (i) block.appendChild(document.createElement('br'));
-    block.appendChild(document.createTextNode(line));
+    block.appendChild(linkify(line));
   });
   return block;
 }
@@ -229,7 +230,8 @@ function renderCard(event, { store, isTeacher, calendarUrl }) {
   const card = el('div', 'ocs__callout ocs__keypoints');
 
   const date = statusPill('good', formatShortDate(event.date));
-  const title = el('strong', '', plainTitle(event.title));
+  const title = el('strong');
+  title.appendChild(linkify(plainTitle(event.title)));
   const heading = el('div', 'ocs__links');
   heading.append(date, title);
 

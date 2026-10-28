@@ -1,0 +1,62 @@
+title: "North County Special Needs Community Foundation"
+subtitle: "2026-27 Capstone Infographic"
+quote: "The North County Special Needs Community Foundation provides vital community outreach and support. While the foundational mission is strong, the site currently suffers from a non-cohesive design, an unused event calendar, and a lack of sophisticated features necessary to seamlessly serve families and donors."
+github: "https://github.com/NCSNCF-Redesign/NCSNCF-FE"
+
+summary:
+  main_problems: "The website lacks visual cohesion across its pages, features an underutilized event calendar, and lacks modern, sophisticated features for community engagement, resource matching, and donor interactions."
+  original_url: "https://ncsncf.org/"
+  project_direction: "This capstone project aims to modernize and streamline the NCSNCF web presence. We are creating a cohesive design system, activating and automating the event calendar, and integrating sophisticated interactive tools—such as a personalized resource navigator and dynamic community updates."
+
+board:
+  title: "Project Kanban Board"
+  url: "https://github.com/orgs/NCSNCF-Redesign/projects/2" 
+  filter: "NCSNCF Team"
+
+strengths_and_improvements:
+  - title: "Community Impact & Mission"
+    type: "strength"
+    accent: true
+    description: "Strong community purpose with clear intent to support local special needs families and programs."
+    links:
+      - label: "Visit Site"
+        url: "https://www.ncspecialneedsfoundation.com/"
+        btn_class: "alert-green"
+
+  - title: "Non-Cohesive Design"
+    type: "improvement"
+    accent: false
+    description: "Inconsistent typography, mismatched layouts, and fragmented color schemes create a disjointed experience across pages."
+    links:
+      - label: "Design Audit"
+        url: "https://www.ncspecialneedsfoundation.com/"
+        btn_class: "alert-yellow"
+
+  - title: "Unused Event Calendar"
+    type: "improvement"
+    accent: false
+    description: "The current event calendar is inactive and underutilized, missing key opportunities to inform families about community events and workshops."
+    links:
+      - label: "Events Section"
+        url: "https://www.ncspecialneedsfoundation.com/events-calendar"
+        btn_class: "alert-red"
+
+  - title: "Lack of Sophisticated Features"
+    type: "improvement"
+    accent: false
+    description: "The platform lacks modern elements such as smart resource filtering, personalized survey routing, and dynamic donor or member interaction."
+    links:
+      - label: "Feature Roadmap"
+        url: "https://www.ncspecialneedsfoundation.com/links"
+        btn_class: "alert-yellow"
+
+team:
+  - name: "Mateo Amador"
+    role: "Technologist/Developer"
+    portfolio: "https://avg11235.opencodingsociety.com/"
+  - name: "Tristan Chiu"
+    role: "Technologist/Developer"
+    portfolio: "https://tristan-chiu0.github.io/portfolio/"
+  - name: "Yue Barbara Zhao"
+    role: "Technologist/Developer"
+    portfolio: "https://3rii0.github.io/portfolio/"

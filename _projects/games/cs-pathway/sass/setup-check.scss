@@ -1,0 +1,214 @@
+// Shared setup-agent button and report panel for every supported operating system:
+// MacSetupCheck.js (macOS: step-by-step Terminal flow) and SystemSetupCheck.js
+// (Linux/Kasm/Windows). Buttons sit above the game canvas but below station
+// panels (1200+); panels match the OS picker (z-index 100060) to cover dialogues.
+$setup-check-accent: #38bdf8;
+$setup-check-pass: #4ecca3;
+$setup-check-fail: #f87171;
+$setup-check-partial: #fbbf24;
+$setup-check-text: #dbeafe;
+$setup-check-bg: #04060f;
+$setup-check-font: "Courier New", monospace;
+
+.cs-pathway-mac-check-button,
+.cs-pathway-system-check-button {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  padding: 12px 22px;
+  border: 2px solid $setup-check-accent;
+  border-radius: 999px;
+  background: rgba(13, 13, 26, 0.92);
+  color: $setup-check-accent;
+  font-family: $setup-check-font;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: $setup-check-accent;
+    color: $setup-check-bg;
+  }
+}
+
+.cs-pathway-mac-check,
+.cs-pathway-system-check {
+  position: fixed;
+  inset: 0;
+  z-index: 100060;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.78);
+
+  &__dialog {
+    position: relative;
+    width: 92%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 24px 28px;
+    border: 1.5px solid $setup-check-accent;
+    border-radius: 10px;
+    background: $setup-check-bg;
+    color: $setup-check-text;
+    font-family: $setup-check-font;
+    font-size: 0.9em;
+    line-height: 1.5;
+
+    h2 {
+      margin: 0 0 12px;
+      color: $setup-check-accent;
+      font-size: 1.15em;
+    }
+
+    p { margin: 10px 0 6px; }
+    code { color: $setup-check-pass; }
+
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      border: 1px solid $setup-check-accent;
+      border-radius: 6px;
+      background: #0b1026;
+      color: $setup-check-text;
+      font-family: $setup-check-font;
+      font-size: 0.85em;
+      resize: vertical;
+    }
+  }
+
+  &__close {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    border: none;
+    background: transparent;
+    color: $setup-check-text;
+    font-size: 1.6em;
+    cursor: pointer;
+  }
+
+  &__command {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: #0b1026;
+
+    code {
+      flex: 1;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__copy,
+  &__submit {
+    padding: 8px 14px;
+    border: 1px solid $setup-check-accent;
+    border-radius: 6px;
+    background: #0b1026;
+    color: $setup-check-text;
+    font-family: $setup-check-font;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover,
+    &:focus-visible {
+      background: $setup-check-accent;
+      color: $setup-check-bg;
+    }
+  }
+
+  &__submit { margin-top: 10px; }
+
+  &__steps {
+    margin: 8px 0 14px;
+    padding-left: 22px;
+  }
+
+  &__step {
+    margin-bottom: 12px;
+
+    strong {
+      display: block;
+      margin-bottom: 4px;
+      color: $setup-check-accent;
+    }
+
+    .cs-pathway-mac-check__note {
+      margin: 4px 0 0;
+    }
+  }
+
+  &__note {
+    color: #94a3b8;
+    font-size: 0.85em;
+  }
+
+  &__summary {
+    font-weight: bold;
+
+    &.is-ok { color: $setup-check-pass; }
+    &.is-partial { color: $setup-check-partial; }
+    &.is-error { color: $setup-check-fail; }
+  }
+
+  &__results ul {
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+    }
+
+    // Mac panel colours the row (PASS/WARN/FAIL); the system panel colours a span.
+    li.is-pass,
+    li.is-pass span { color: $setup-check-pass; }
+    li.is-warn { color: $setup-check-partial; }
+    li.is-fail,
+    li.is-fail span { color: $setup-check-fail; }
+
+    li code {
+      display: block;
+      margin: 2px 0 0 18px;
+      color: $setup-check-text;
+    }
+  }
+
+  // Mac panel: next steps printed by verifyToolsTerminal.sh.
+  &__next-heading {
+    margin-top: 12px;
+    color: $setup-check-accent;
+    font-weight: bold;
+  }
+
+  &__results ul.cs-pathway-mac-check__next-steps {
+    padding-left: 18px;
+    list-style: disc;
+
+    li {
+      color: $setup-check-text;
+    }
+  }
+}
+
+@media (max-width: 520px) {
+  .cs-pathway-mac-check__dialog,
+  .cs-pathway-system-check__dialog {
+    padding: 20px 16px;
+  }
+
+  .cs-pathway-mac-check__command,
+  .cs-pathway-system-check__command {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

@@ -12,6 +12,11 @@ permalink: /capstone/oak/
 
 ---
 
+{% assign oak_data = site.data.oak %}
+{% if oak_data.Board %}
+{% include ocs_kanban_board.html url=oak_data.Board.url %}
+{% endif %}
+
 > **Student capstone · In development.** This project aims to create a more engaging, supportive, and educational digital experience for cancer patients and their families. It is a student-built concept and is not a medical platform or official cancer-care service.
 
 <div class="ocs__grid ocs__grid--standard cols-2">
