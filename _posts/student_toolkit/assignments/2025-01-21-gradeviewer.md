@@ -6,7 +6,7 @@ permalink: /student/view-grades
 comments: false
 ---
 
-<div class="min-h-screen bg-neutral-900 py-10">
+<div class="min-h-screen bg-neutral-900">
   <div>
     <!-- Grades Card -->
     <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-6">
