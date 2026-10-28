@@ -1,0 +1,160 @@
+// Chat helper (levels/ChatHelper.js). Bottom-right, just left of the red flag: the
+// "Press E" prompt and profile panel fill the bottom-left, the setup-check button the center.
+// Above station panels (100040) so students can ask for help while one is open,
+// below the OS picker (100060).
+$chat-accent: #38bdf8;
+$chat-text: #e0f2fe;
+$chat-muted: #94a3b8;
+$chat-bg: rgba(8, 12, 32, 0.96);
+$chat-student-bg: rgba(56, 189, 248, 0.16);
+$chat-helper-bg: rgba(30, 41, 59, 0.85);
+$chat-error: #f87171;
+
+.cs-pathway-chat {
+  position: fixed;
+  right: 72px; // the red flag is 40px wide at right: 20px
+  bottom: 24px;
+  z-index: 100050;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  font-family: "Courier New", monospace;
+
+  // Station panels span the width here, with Verify Output in the bottom-right corner.
+  @media (max-width: 860px) {
+    bottom: 96px;
+  }
+
+  &__button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 2px solid $chat-accent;
+    border-radius: 50%;
+    background: $chat-bg;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible,
+    &[aria-expanded="true"] {
+      background: rgba(56, 189, 248, 0.3);
+    }
+  }
+
+  &__panel {
+    width: min(360px, calc(100vw - 92px)); // stays on screen with the 72px right offset
+    max-height: min(480px, calc(100vh - 180px)); // fits above the raised button on small screens
+    display: flex;
+    flex-direction: column;
+    border: 2px solid $chat-accent;
+    border-radius: 12px;
+    background: $chat-bg;
+    color: $chat-text;
+    box-shadow: 0 0 24px rgba(56, 189, 248, 0.25);
+
+    &[hidden] { display: none; }
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.35);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #67e8f9;
+  }
+
+  &__close {
+    border: none;
+    background: none;
+    color: $chat-muted;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  &__log {
+    flex: 1;
+    min-height: 120px;
+    overflow-y: auto;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__message {
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: $chat-text;
+
+    &--student {
+      align-self: flex-end;
+      max-width: 85%;
+      background: $chat-student-bg;
+    }
+
+    &--helper {
+      align-self: flex-start;
+      max-width: 95%;
+      background: $chat-helper-bg;
+    }
+
+    &[data-tone="error"] { color: $chat-error; }
+  }
+
+  &__form {
+    display: flex;
+    gap: 6px;
+    padding: 10px 12px 4px;
+    border-top: 1px solid rgba(56, 189, 248, 0.35);
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px;
+    border: 1px solid rgba(56, 189, 248, 0.5);
+    border-radius: 8px;
+    background: #000;
+    color: $chat-text;
+    font-family: inherit;
+    font-size: 12.5px;
+  }
+
+  &__send {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    background: $chat-accent;
+    color: #061225;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
+  &__note {
+    margin: 0;
+    padding: 4px 12px 10px;
+    font-size: 10.5px;
+    color: $chat-muted;
+  }
+}

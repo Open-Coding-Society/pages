@@ -57,6 +57,8 @@ import MacSetupCheck from './MacSetupCheck.js';
 import SystemSetupCheck from './SystemSetupCheck.js';
 import HelpFlag from './HelpFlag.js';
 import { buildHelpRequestMessage } from '../model/helpRequestMessage.js';
+import ChatHelper from './ChatHelper.js';
+import { buildChatProgress } from '../model/chatContext.js';
 import { sampleSpline, resolveCircle, clampToCorridor, roundedLoop } from '../model/splineBarriers.js';
 import { recordLevelRatio } from '../model/pathwayScores.js';
 import {
@@ -1011,6 +1013,22 @@ class GameLevelCsPath4Toolchain {
             stuck: stationId ? this.getStationStatus(stationId) === STATION_STATUS.STUCK : false,
           }),
         };
+      },
+    });
+    // Chat helper: answers questions using the station the student is on right now.
+    this.chatHelper = new ChatHelper({
+      levelKey: 'toolchain-trail',
+      getProgress: () => {
+        const stationId = this._getActiveStationId();
+        const station = stationId ? this._stationById[stationId] : null;
+        return buildChatProgress({
+          stations: this.STATIONS,
+          completedIds: this.completedStations,
+          activeStation: station ? this._localizeStation(station) : null,
+          activeStatus: stationId && this.getStationStatus(stationId) === STATION_STATUS.STUCK ? 'stuck' : 'active',
+          failure: this.failureState?.stationId === stationId ? this.failureState : null,
+          osLabel: OS_OPTIONS.find((option) => option.id === this.selectedOS)?.label,
+        });
       },
     });
 
@@ -2080,6 +2098,7 @@ class GameLevelCsPath4Toolchain {
     this.macSetupCheck?.destroy();
     this.systemSetupCheck?.destroy();
     this.helpFlag?.destroy();
+    this.chatHelper?.destroy();
     if (this._stuckCheckInterval) clearInterval(this._stuckCheckInterval);
     if (this._setupReportInterval) clearInterval(this._setupReportInterval);
     this._hideLoading();
