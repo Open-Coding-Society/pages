@@ -59,6 +59,67 @@ permalink: /capstone/sfi-foundation/
 
 ---
 
+## Our community partner: SFI Foundation
+
+**Who we serve.** [SFI Foundation, Inc.](https://www.sfifoundation.com/) is an organization working in motorsports safety through equipment specifications and certification programs. Our community-focused capstone supports people who need to find and understand motorsports safety information, including racers, equipment users, and manufacturers. We are partnering with SFI to explore improving its online experience—not to issue certifications or replace SFI's official standards.
+
+**The partner's website.** [sfifoundation.com](https://www.sfifoundation.com/) is SFI Foundation's official website. The student project continues a website prototype developed during the previous semester; our 2026–27 effort is intended to explore improvements and a possible path toward a more useful, maintainable experience, subject to SFI's feedback and project scope.
+
+### Client contacts and project communication
+
+| Contact | Role | Details |
+| --- | --- | --- |
+| **Jennifer Faye** | President, SFI Foundation; primary partner contact in the October 2026 email thread | [jfaye@sfifoundation.com](mailto:jfaye@sfifoundation.com) |
+| **SFI Foundation** | Organization contact | [sfi@sfifoundation.com](mailto:sfi@sfifoundation.com) · [(858) 451-8868](tel:+18584518868) |
+| **Katie Salo** | PUSD Partners in Education Manager; school–community partnership coordinator | [ksalo@powayusd.com](mailto:ksalo@powayusd.com) |
+| **John Mortensen** | Del Norte High School Computer Science teacher; project liaison | [jmortensen@powayusd.com](mailto:jmortensen@powayusd.com) |
+
+**SFI mailing address:** 15708 Pomerado Rd., Ste. N208, Poway, CA 92064, USA.  
+**Official website:** [www.sfifoundation.com](https://www.sfifoundation.com/) · **Contact page:** [SFI Contact](https://sfifoundation.com/contact/)
+
+The contacts above come from the October 2026 partnership correspondence. This capstone is student work rather than an official SFI service.
+
+---
+
+## Partner communication microblog
+
+A dated record of conversations and decisions with our community partner. Entries summarize correspondence rather than reproducing private email messages. New discussions, client feedback, decisions, and action items should be added here as they happen.
+
+### October 28, 2026 — Capstone documentation update
+
+**Context:** CSP class assignment, periods 3 and 4.  
+**Update:** Documented whom the project serves, the partner's website and contact information, and a chronological communication record.  
+**Next steps:** Confirm SFI's representative for the Electives Fair, discuss desired improvements with the partner, and translate feedback into a prioritized project scope. No client approval of specific features is implied by this documentation.
+
+### October 26, 2026 — Jennifer Faye confirms interest in continuing
+
+**Participants:** Jennifer Faye (SFI Foundation), Katie Salo (PUSD), John Mortensen (Del Norte), and Ruhaan Bansal (student team).  
+**Summary:** Jennifer apologized for the delayed reply and said she was impressed with the previous semester's SFI website prototype and student team. She confirmed that SFI is **very interested in continuing** with the new student group working on the upgrade. She cannot attend the November 2 Electives Fair because she will be out of town, but said a colleague might attend on SFI's behalf. She planned to provide an update about that colleague's availability.  
+**Outcome:** Positive partner interest; representative attendance was **not yet confirmed** in the supplied thread.  
+**Next steps:** Follow up regarding the colleague's attendance and arrange a conversation about SFI's needs and priorities.
+
+### October 26, 2026 — Katie Salo follows up with RSVP details
+
+**Participants:** Katie Salo, Jennifer Faye, John Mortensen, and Ruhaan Bansal.  
+**Summary:** Katie thanked Jennifer and explained that an SFI representative can use the [RSVP form](https://forms.gle/rU9gojMELnqBm4G17) to express interest even if the organization cannot attend in person. She reiterated the value of the school–nonprofit partnership.  
+**Event details:** Monday, **November 2, 2026**, 6:00–7:30 p.m.; Del Norte High School, Room A101, 16601 Nighthawk Lane, San Diego, CA 92127.  
+**Next steps:** Confirm whether SFI will send a colleague or participate through later discussions.
+
+### October 26, 2026 — Katie Salo reconnects with SFI
+
+**Participants:** Katie Salo, Jennifer Faye, SFI Foundation, and John Mortensen.  
+**Summary:** Katie explained that Del Norte's Computer Science program was resuming its nonprofit website work on a larger scale than the previous spring pilot. She invited SFI to meet students, view previous work, and consider participating in a spring 2027 project.  
+**Outcome:** Formal invitation to the Electives Fair and an opportunity to renew the partnership.
+
+### October 22, 2026 — John Mortensen invites SFI to renew the partnership
+
+**Participants:** John Mortensen, SFI Foundation, and Katie Salo.  
+**Summary:** John invited SFI to reconnect with Del Norte Computer Science students for projects targeting **spring 2027 completion**. Potential work included website improvements, prototypes, exploring a path from previous student work to production, and investigating AI, data, or automation. He described Open Coding Society resources and emphasized that actual projects would be evaluated for scope and student capacity.  
+**Outcome:** Invitation to build on the prior prototype and discuss concrete requirements; no production deployment commitment was made.  
+**Next steps:** Obtain client priorities and agree on a realistic student project plan.
+
+---
+
 ## Core experience
 
 > Four connected parts of the user journey, from finding a standard to returning to saved gear later.
