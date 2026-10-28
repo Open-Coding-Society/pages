@@ -26,6 +26,12 @@
 //     a 0.55 and fail unless they fix it. The lock survives refreshes and
 //     clears when the failing station is verified with clean output, a new
 //     setup report passes, or the level is reset.
+//   - IN-PANEL FAILURE ALERT: the banner above is hidden while a station
+//     panel is open, so a closeable red alert is shown on top of the panel
+//     instead. It appears the moment a failure is detected while the panel
+//     is open, and again when the failing station is reopened, unless the
+//     student closed it with ✕ (that choice is remembered for this failure).
+//   - FAILURE SIREN: a 2-second siren plays whenever a failure message pops up.
 //
 // ASSET TODO (see design doc section 6 "Assets Needed" — not blocking):
 //   - Six stations now use real building art from images/gamify/toolchain/
@@ -96,6 +102,8 @@ const OS_STORAGE_KEY = 'ocs-toolchain-trail-os';
  */
 const FAILURE_STORAGE_KEY = 'ocs-toolchain-trail-failure';
 const FAILURE_GRADE = 0.55;
+// Siren that plays whenever a failure message pops up (banner or in-panel alert).
+const SIREN_DURATION_MS = 2000;
 // The setup check runs in the student's Terminal and uploads its report to the
 // backend (CsPathwaySetupReportApiController), so the game never sees it as
 // pasted text. Poll the backend for new reports and lock on overall FAIL.
@@ -243,19 +251,14 @@ class GameLevelCsPath4Toolchain {
     // student can't escape it by leaving. It clears when the failing station
     // is verified with clean output, or with the Reset Toolchain Trail button.
     this.failureState = null;
-    this.failureState = null;
     try {
       const raw = localStorage.getItem(FAILURE_STORAGE_KEY);
       this.failureState = raw ? JSON.parse(raw) : null;
-      
-      // ADD THIS:
-      if (this.failureState) {
-        this._showFailurePopup();
-      }
     } catch (err) {
       this.failureState = null;
     }
     this._failureBannerEl = null;
+    this._panelFailureAlertEl = null;
     this._lockOverlays = {};
     this._openTrialStationId = null;
     this._lastPastedOutput = '';
@@ -1170,6 +1173,7 @@ class GameLevelCsPath4Toolchain {
         onComplete: async ({ stationId: completedId, output }) => {
           this._stationTrialOpen = false;
           this._openTrialStationId = null;
+          this._hidePanelFailureAlert();
           // Never verify a station whose pasted output shows an error. Falls
           // back to the text captured from the trial's input box, so this
           // works even if StationVerificationTrial doesn't pass `output`.
@@ -1194,9 +1198,12 @@ class GameLevelCsPath4Toolchain {
         onClose: () => {
           this._stationTrialOpen = false;
           this._openTrialStationId = null;
+          this._hidePanelFailureAlert();
         },
       });
       trial.start();
+      // Reopening the failing station: show the in-panel alert right away.
+      if (this.failureState) this._showPanelFailureAlert();
     };
 
     /**
@@ -1462,58 +1469,7 @@ class GameLevelCsPath4Toolchain {
       this._activeZoneStationId = null;
     }
   }
-/**
-   * Displays a closeable popup modal when a failure score (0.55) is triggered.
-   */
-  _showFailurePopup() {
-    if (document.getElementById('ocs-failure-popup')) return;
 
-    const overlay = document.createElement('div');
-    overlay.id = 'ocs-failure-popup';
-    overlay.style.cssText = `
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(4, 6, 15, 0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-    `;
-
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-      background: var(--ocs-game-panel-bg, rgba(6, 8, 22, 0.96));
-      border: 2px solid #ef4444;
-      padding: 24px 32px;
-      border-radius: 12px;
-      text-align: center;
-      color: #dbeafe;
-      box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
-      max-width: 400px;
-      font-family: inherit;
-    `;
-
-    modal.innerHTML = `
-      <h3 style="margin-top: 0; color: #ef4444; font-size: 1.25rem;">⚠️ Toolchain Failure</h3>
-      <p style="font-size: 1.1rem; margin: 16px 0;">Grade is 0.55, Failing</p>
-      <button id="ocs-close-failure-popup" style="
-        background: #ef4444;
-        color: #fff;
-        border: none;
-        padding: 8px 16px;
-        font-weight: bold;
-        border-radius: 6px;
-        cursor: pointer;
-      ">Close</button>
-    `;
-
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-
-    document.getElementById('ocs-close-failure-popup').addEventListener('click', () => {
-      overlay.remove();
-    });
-  }
   _applyBarriers(player) {
     try {
       const w = player.width || 0, h = player.height || 0;
@@ -1719,6 +1675,8 @@ class GameLevelCsPath4Toolchain {
     try { localStorage.setItem(FAILURE_STORAGE_KEY, JSON.stringify(this.failureState)); } catch (err) { /* storage unavailable */ }
     this._recomputeStationStates(false);
     this._showFailureBanner();
+    // If the student is inside a station panel, alert them there right away.
+    this._showPanelFailureAlert();
   }
 
   _clearFailure() {
@@ -1726,6 +1684,8 @@ class GameLevelCsPath4Toolchain {
     this.failureState = null;
     try { localStorage.removeItem(FAILURE_STORAGE_KEY); } catch (err) { /* storage unavailable */ }
     this._hideFailureBanner();
+    this._hidePanelFailureAlert();
+    this._stopSiren();
     this._removeLockOverlays();
     this._recomputeStationStates(false);
   }
@@ -1843,6 +1803,7 @@ class GameLevelCsPath4Toolchain {
       `;
       document.body.appendChild(el);
       this._failureBannerEl = el;
+      this._playSiren();
     }
 
     const el = this._failureBannerEl;
@@ -1915,6 +1876,146 @@ class GameLevelCsPath4Toolchain {
     this._failureBannerEl = null;
   }
 
+  /**
+   * Section: in-panel failure alert.
+   * The banner above is hidden while a station panel is open, so this
+   * closeable alert is drawn ON TOP of the panel instead. It appears as
+   * soon as a failure is detected inside the panel, and again every time
+   * the failing station is reopened. The ✕ hides it for that visit only.
+   */
+  _showPanelFailureAlert() {
+    const station = this._stationById?.[this.failureState?.stationId];
+    if (!station || !this._stationTrialOpen) return;
+    // Once the student closes it with ✕, it stays closed for this failure,
+    // even after leaving and re-entering the panel or refreshing the page.
+    // A new failure starts with a fresh failureState, so it shows again.
+    if (this.failureState.panelAlertDismissed) return;
+    this._ensureFailureStyles();
+    this._hidePanelFailureAlert();
+
+    const el = document.createElement('div');
+    el.className = 'tt-fail-banner';
+    el.setAttribute('role', 'alertdialog');
+    el.setAttribute('aria-live', 'assertive');
+    el.style.cssText = `
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      z-index: 2147483000;
+      width: min(420px, calc(100vw - 32px)); box-sizing: border-box;
+      background: linear-gradient(180deg, #ff1744 0%, #b00020 100%);
+      border: 2px solid #ffcdd2; border-radius: 8px;
+      color: #ffffff; font-family: "Courier New", monospace;
+      font-size: 13px; line-height: 1.4; text-align: center;
+      padding: 12px 40px 12px 16px;
+    `;
+
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.textContent = '✕';
+    close.setAttribute('aria-label', 'Close failure alert');
+    close.style.cssText = `
+      position: absolute; top: 6px; right: 8px;
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1px solid #ffcdd2; background: rgba(0,0,0,0.35);
+      color: #ffffff; font-size: 14px; line-height: 1; cursor: pointer;
+    `;
+    close.onclick = () => {
+      if (this.failureState) {
+        this.failureState.panelAlertDismissed = true;
+        try { localStorage.setItem(FAILURE_STORAGE_KEY, JSON.stringify(this.failureState)); } catch (err) { /* storage unavailable */ }
+      }
+      this._hidePanelFailureAlert();
+    };
+
+    const title = document.createElement('div');
+    title.textContent = '⚠ A COMMAND FAILED ⚠';
+    title.style.cssText = 'font-size:1.2em;font-weight:900;margin-bottom:4px;';
+
+    const where = document.createElement('div');
+    where.textContent = this.failureState.source === 'setup-report'
+      ? `Your Terminal setup check FAILED at ${station.icon} ${station.name}:`
+      : `At ${station.icon} ${station.name}:`;
+
+    // textContent (not innerHTML): this is student-pasted text.
+    const errLine = document.createElement('code');
+    errLine.textContent = this.failureState.line || '(error output)';
+    errLine.style.cssText = `
+      display:block;margin:6px auto;padding:4px 8px;
+      background:rgba(0,0,0,0.45);border-radius:4px;color:#ffeb3b;
+      font-size:0.92em;overflow-wrap:anywhere;
+    `;
+
+    const grade = document.createElement('div');
+    grade.textContent = `Fix it here and paste clean output, or you will get a ${FAILURE_GRADE} and FAIL.`;
+    grade.style.cssText = 'font-weight:900;margin-top:2px;';
+
+    el.append(close, title, where, errLine, grade);
+    document.body.appendChild(el);
+    this._panelFailureAlertEl = el;
+    this._playSiren();
+  }
+
+  _hidePanelFailureAlert() {
+    this._panelFailureAlertEl?.remove();
+    this._panelFailureAlertEl = null;
+  }
+
+  /**
+   * Section: failure siren.
+   * A 2-second rising/falling siren, generated with the browser's Web Audio
+   * API (no sound file needed). When the banner and the in-panel alert pop
+   * up at the same moment, it only plays once. Browsers may block sound
+   * until the student has clicked or typed on the page; in that case it
+   * fails silently.
+   */
+  _playSiren() {
+    const now = Date.now();
+    if (this._sirenLastAt && now - this._sirenLastAt < SIREN_DURATION_MS + 500) return;
+    this._sirenLastAt = now;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      this._audioCtx = this._audioCtx || new AudioCtx();
+      const ctx = this._audioCtx;
+      if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+
+      const duration = SIREN_DURATION_MS / 1000;
+      const t0 = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+
+      // Wail between a low and high pitch, 4 times over the 2 seconds.
+      const low = 650;
+      const high = 1300;
+      const cycles = 4;
+      const half = duration / (cycles * 2);
+      osc.frequency.setValueAtTime(low, t0);
+      for (let i = 0; i < cycles; i++) {
+        osc.frequency.linearRampToValueAtTime(high, t0 + (2 * i + 1) * half);
+        osc.frequency.linearRampToValueAtTime(low, t0 + (2 * i + 2) * half);
+      }
+
+      // Short fade in/out so it doesn't click.
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.15, t0 + 0.05);
+      gain.gain.setValueAtTime(0.15, t0 + duration - 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t0);
+      osc.stop(t0 + duration);
+      this._sirenOsc = osc;
+      osc.onended = () => { if (this._sirenOsc === osc) this._sirenOsc = null; };
+    } catch (err) {
+      // Audio unavailable or blocked: the visual alerts still show.
+    }
+  }
+
+  _stopSiren() {
+    try { this._sirenOsc?.stop(); } catch (err) { /* already stopped */ }
+    this._sirenOsc = null;
+  }
+
   // Big red padlock drawn over every station except the one that failed.
   _syncLockOverlays() {
     const failedId = this.failureState?.stationId;
@@ -1983,6 +2084,10 @@ class GameLevelCsPath4Toolchain {
     if (this._setupReportInterval) clearInterval(this._setupReportInterval);
     this._hideLoading();
     this._hideFailureBanner();
+    this._hidePanelFailureAlert();
+    this._stopSiren();
+    this._audioCtx?.close?.().catch?.(() => {});
+    this._audioCtx = null;
     this._removeLockOverlays();
     if (this._onTerminalTextInput) document.removeEventListener('input', this._onTerminalTextInput, true);
     if (this._onTerminalPaste) document.removeEventListener('paste', this._onTerminalPaste, true);
