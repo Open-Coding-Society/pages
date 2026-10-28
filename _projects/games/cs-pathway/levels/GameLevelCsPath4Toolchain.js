@@ -1745,17 +1745,6 @@ class GameLevelCsPath4Toolchain {
     this._reportCheckBusy = true;
     try {
       const res = await fetch(`${javaURI}/api/cs-pathway/setup-report`, { ...fetchOptions, method: 'GET' });
-<<<<<<< HEAD
-      if (!res.ok) {
-        this._reportCheckFailures = (this._reportCheckFailures || 0) + 1;
-        if (this._reportCheckFailures >= 3) {
-          this._reportCheckPausedUntil = Date.now() + 5 * 60 * 1000;
-          this._reportCheckFailures = 0;
-        }
-        return;
-      }
-      this._reportCheckFailures = 0;
-=======
       if (this._reportBackoff) {
         this._reportBackoff = false;
         if (this._setupReportInterval) clearInterval(this._setupReportInterval);
@@ -1766,9 +1755,14 @@ class GameLevelCsPath4Toolchain {
           console.warn(`[Toolchain Trail] setup report request returned ${res.status}${res.status === 401 ? ' (not signed in)' : ''}`);
           this._reportStatusWarned = true;
         }
+        this._reportCheckFailures = (this._reportCheckFailures || 0) + 1;
+        if (this._reportCheckFailures >= 3) {
+          this._reportCheckPausedUntil = Date.now() + 5 * 60 * 1000;
+          this._reportCheckFailures = 0;
+        }
         return;
       }
->>>>>>> d442b48f0 (fix failure for pairing)
+      this._reportCheckFailures = 0;
       const data = await res.json();
       if (!data?.reportedAt) return;
 
