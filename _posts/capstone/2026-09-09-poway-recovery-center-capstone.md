@@ -2,8 +2,8 @@
 microblog: true
 toc: false
 layout: post
-title: "Integra: An AI-Driven Recovery System for the Poway Recovery Center"
-permalink: /capstone/integra/
+title: "Poway Recovery Center: An AI-Driven Recovery System"
+permalink: /capstone/poway-recovery-center/
 ---
 
 <!-- Sprint Board: live from the team's GitHub project, like SFI Foundation -->
@@ -88,7 +88,7 @@ Integra pairs AI-driven support with clear progress tracking to help Poway Recov
     <div class="ocs__grid-cell">
         <strong>Jailene Tang</strong>
         <p>Developer</p>
-        <p>Email: gangjailene@gmail.com</p>
+        <p>Email: tangjailene@gmail.com</p>
     </div>
 </div>
 
