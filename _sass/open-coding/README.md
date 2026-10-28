@@ -168,7 +168,9 @@ See [`elements/buttons`](elements/buttons) and [`buttons.md`](../../_projects/le
 
 Common layout classes:
 
-- `ocs__container`: reusable page-width container
+- `ocs__container`: reusable page-width container; `ocs__container--fill` drops
+  its 900px cap and padding for a page inside a layout that already pads its
+  content, like the sidebar layout's Profile page.
 - `ocs__card`: framed content panel
 - `ocs__grid`: grid root
 - `ocs__grid--standard`, `ocs__grid--card`, `ocs__grid--gallery`: grid variants

@@ -32,7 +32,7 @@ export function createMessagesApi({ javaURI, pythonURI, fetchOptions }) {
     conversations: () => spring('/api/dm/conversations'),
     startConversation: otherPersonIds => spring('/api/dm/conversations', 'POST', { otherPersonIds }),
     dmMessages: id => spring(`/api/dm/conversations/${part(id)}/messages`),
-    sendDm: (id, body) => spring(`/api/dm/conversations/${part(id)}/messages`, 'POST', { body }),
+    sendDm: (id, body, image = null) => spring(`/api/dm/conversations/${part(id)}/messages`, 'POST', { body, image }),
     editDm: (id, messageId, body) => spring(`/api/dm/conversations/${part(id)}/messages/${part(messageId)}`, 'PATCH', { body }),
     deleteDm: (id, messageId) => spring(`/api/dm/conversations/${part(id)}/messages/${part(messageId)}`, 'DELETE'),
     markDmRead: id => spring(`/api/dm/conversations/${part(id)}/read`, 'POST'),
@@ -48,9 +48,17 @@ export function createMessagesApi({ javaURI, pythonURI, fetchOptions }) {
     // A saved group message stores only its sender's name, and Spring checks that name
     // before an edit or delete, so `name` must be the account's name.
     groupMessages: groupId => spring(`/api/groups/chat/${part(groupId)}/messages`),
-    sendGroupMessage: (groupId, name, message) => spring(`/api/groups/chat/${part(groupId)}/messages`, 'POST', { name, message }),
+    // No sender is sent: Spring resolves the author from the session and ignores
+    // anything the client claims. `image` is a data URL, stored on the message itself;
+    // null when the message is text only.
+    sendGroupMessage: (groupId, message, image = null) => spring(`/api/groups/chat/${part(groupId)}/messages`, 'POST', { message, image }),
     editGroupMessage: (groupId, messageId, message) => spring(`/api/groups/chat/${part(groupId)}/messages/${part(messageId)}`, 'PATCH', { message }),
     deleteGroupMessage: (groupId, messageId) => spring(`/api/groups/chat/${part(groupId)}/messages/${part(messageId)}`, 'DELETE'),
+    // Unread counts for group chat, the group-side twin of /api/dm/unread. Groups with
+    // nothing unread are absent from unreadByGroup rather than present as zero.
+    groupUnread: () => spring('/api/groups/chat/unread'),
+    markGroupRead: groupId => spring(`/api/groups/chat/${part(groupId)}/read`, 'POST'),
+
     groupFiles: groupId => spring(`/api/groups/chat/${part(groupId)}/files`),
     uploadGroupFile: (groupId, filename, base64Data) => spring(`/api/groups/chat/${part(groupId)}/files`, 'POST', { filename, base64Data }),
 
