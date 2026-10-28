@@ -181,12 +181,22 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete }) {
   }
 
   // A line between messages that isn't anyone's message, like a shared file.
-  function note(text) {
+  // `link` turns part of the line into a control: { label, onClick }. A button, not an
+  // anchor, because the file's bytes are fetched on click rather than sitting at a URL.
+  function note(text, link) {
     element.querySelector('[data-empty]')?.remove();
     const stickToBottom = isNearBottom();
     const line = document.createElement('p');
     line.className = 'chat-system';
     line.textContent = text;
+    if (link) {
+      const control = document.createElement('button');
+      control.type = 'button';
+      control.className = 'chat-system-link';
+      control.textContent = link.label;
+      control.addEventListener('click', () => link.onClick(control));
+      line.append(' ', control);
+    }
     element.appendChild(line);
     if (stickToBottom) element.scrollTop = element.scrollHeight;
   }

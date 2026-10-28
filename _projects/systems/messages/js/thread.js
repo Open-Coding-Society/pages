@@ -4,13 +4,15 @@
 // visible, marks it read and tells the navbar bell (assets/js/api/dm-notifications.js).
 import { classifyDmEvent, classifyGroupEvent, dmMessage, groupMessage } from './messages-model.js';
 import { createMessageLog } from './message-log.js';
+import { readImageFile, saveFile } from './dialogs.js';
 
-export function createThread({ elements, api, socket, richText, me, onDmRead, onFileShared }) {
+export function createThread({ elements, api, socket, richText, me, onDmRead, onGroupRead = () => {}, onFileShared }) {
   // A group message's only sender field is a display name, so that is what marks yours.
   const kinds = {
     dm: {
       load: id => api.dmMessages(id).then(list => (list || []).map(dmMessage)),
-      send: (id, html) => api.sendDm(id, html),
+      send: (id, html, image) => api.sendDm(id, html, image),
+      supportsImages: true,
       edit: (id, messageId, html) => api.editDm(id, messageId, html),
       remove: (id, messageId) => api.deleteDm(id, messageId),
       topic: id => `/topic/dm/${id}`,
@@ -19,7 +21,8 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
     },
     group: {
       load: id => api.groupMessages(id).then(list => (list || []).map(groupMessage)),
-      send: (id, html) => api.sendGroupMessage(id, me.name, html),
+      send: (id, html, image) => api.sendGroupMessage(id, html, image),
+      supportsImages: true,
       edit: (id, messageId, html) => api.editGroupMessage(id, messageId, html),
       remove: (id, messageId) => api.deleteGroupMessage(id, messageId),
       topic: id => `/topic/group/${id}`,
@@ -34,6 +37,7 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
   let pending = null; // 'send' or 'edit' while that request is in flight
   let early = []; // frames that arrived before the open conversation's history
   let unseenWhileHidden = false;
+  let pendingImage = null; // a data URL attached to the next message, or null
 
   const log = createMessageLog(elements.messages, { richText, me, onEdit: beginEdit, onDelete: deleteMessage });
   const composer = richText.createRichComposer({ placeholder: 'Type a message…', maxLength: 2000, onSubmit: submit });
@@ -65,11 +69,44 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
     elements.cancelEdit.hidden = !editing;
     elements.cancelEdit.disabled = pending === 'edit';
     setSendLabel(editing ? 'fa-save' : 'fa-paper-plane', editing ? 'Save' : 'Send');
+    // Attaching is offered only where the conversation can store an image, and not
+    // while editing, which rewrites the text of a message that is already sent.
+    if (elements.imageAttach) {
+      const canAttach = loaded && !editing && Boolean(kinds[current?.kind]?.supportsImages);
+      elements.imageAttach.classList.toggle('hidden', !canAttach);
+    }
+  }
+
+  // ── Attaching an image ───────────────────────────────────────────────────────
+  // Optional elements: a site running without the attach controls in its markup still
+  // works, it just cannot attach.
+  function clearImage() {
+    pendingImage = null;
+    if (elements.imageInput) elements.imageInput.value = '';
+    if (elements.imagePreview) elements.imagePreview.classList.add('hidden');
+    if (elements.imageThumb) elements.imageThumb.removeAttribute('src');
+  }
+
+  async function pickImage(file) {
+    if (!file) return;
+    try {
+      pendingImage = await readImageFile(file);
+    } catch (error) {
+      console.warn('Messages: could not read that image', error);
+      clearImage();
+      showFormMessage('Could not read that image. Try a different file.');
+      return;
+    }
+    if (elements.imageThumb) elements.imageThumb.src = pendingImage;
+    if (elements.imagePreview) elements.imagePreview.classList.remove('hidden');
+    showFormMessage('');
+    refreshComposer();
   }
 
   function resetEdit() {
     editing = null;
     composer.clear();
+    clearImage();
     showFormMessage('');
     refreshComposer();
   }
@@ -106,7 +143,11 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
   }
 
   async function submit() {
-    if (pending || !current?.loaded || composer.isEmpty() || composer.isOverLimit()) return;
+    // An image on its own is a message, so an empty composer is only a reason to stop
+    // when nothing is attached. Editing stays text-only.
+    const sendingImage = !editing && pendingImage;
+    if (pending || !current?.loaded || composer.isOverLimit()) return;
+    if (composer.isEmpty() && !sendingImage) return;
     const { kind, id } = current;
     const target = editing;
     const html = composer.getHTML();
@@ -116,7 +157,7 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
     refreshComposer();
     try {
       if (target) await kinds[kind].edit(id, target.id, html);
-      else await kinds[kind].send(id, html);
+      else await kinds[kind].send(id, html, sendingImage || null);
     } catch (error) {
       pending = null;
       console.warn('Messages: could not save the message', error);
@@ -136,6 +177,8 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
       if (hadFocus) composer.focus();
       return;
     }
+    // The attachment went with that message; the next one starts clean.
+    if (sendingImage) clearImage();
     // Keep anything typed while the message was sending.
     if (composer.getHTML() === html) composer.clear();
     refreshComposer();
@@ -162,6 +205,27 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
     }
   }
 
+  // The socket's file frame carries the bytes, but a conversation opened later only has
+  // the line in the log, so the file is fetched by name when it is clicked. The list
+  // endpoint is the only way to read one back -- there is no per-file URL.
+  async function downloadShared(groupId, filename, control) {
+    control.disabled = true;
+    try {
+      const files = await api.groupFiles(groupId);
+      const match = (files || []).find(file => file.filename === filename);
+      if (!match) {
+        showFormMessage(`${filename} is no longer shared with this group.`);
+        return;
+      }
+      saveFile(match);
+    } catch (error) {
+      console.warn('Messages: could not download the shared file', error);
+      showFormMessage(`Could not download ${filename}. Try again.`);
+    } finally {
+      control.disabled = false;
+    }
+  }
+
   function handleEvent(kind, id, event) {
     if (!isOpen(kind, id)) return;
     if (!current.loaded) {
@@ -172,9 +236,16 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
     switch (change.type) {
       case 'message':
         log.append(change.message, isMine(kind, change.message));
-        if (kind !== 'dm' || isMine(kind, change.message)) break;
-        if (document.visibilityState === 'visible') markRead(id);
-        else unseenWhileHidden = true;
+        if (isMine(kind, change.message)) break;
+        // Arriving in the conversation you are looking at means you have read it. A
+        // group advances its read marker the same way a DM does, or a message received
+        // while the group was open would still be counted as unread on the next load.
+        if (document.visibilityState !== 'visible') {
+          unseenWhileHidden = true;
+          break;
+        }
+        if (kind === 'dm') markRead(id);
+        else onGroupRead(id);
         break;
       case 'edit':
         log.updateBody(change.id, change.body);
@@ -186,7 +257,10 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
         if (kind === 'dm' && change.senderUid !== me.uid) window.dispatchEvent(new Event('dm:refresh-unread'));
         break;
       case 'file':
-        log.note(change.sender ? `${change.sender} shared ${change.filename}.` : `A file was shared: ${change.filename}.`);
+        log.note(
+          change.sender ? `${change.sender} shared a file:` : 'A file was shared:',
+          { label: change.filename, onClick: control => downloadShared(id, change.filename, control) },
+        );
         onFileShared(id);
         break;
       case 'error':
@@ -276,6 +350,7 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
     if (document.visibilityState !== 'visible' || !unseenWhileHidden) return;
     unseenWhileHidden = false;
     if (current?.kind === 'dm') markRead(current.id);
+    else if (current?.kind === 'group') onGroupRead(current.id);
   });
 
   elements.form.addEventListener('submit', event => {
@@ -283,6 +358,11 @@ export function createThread({ elements, api, socket, richText, me, onDmRead, on
     submit();
   });
   elements.cancelEdit.addEventListener('click', resetEdit);
+  elements.imageInput?.addEventListener('change', event => pickImage(event.target.files?.[0]));
+  elements.imageRemove?.addEventListener('click', () => {
+    clearImage();
+    refreshComposer();
+  });
   composer.element.addEventListener('keydown', event => {
     if (event.key === 'Escape' && editing && pending !== 'edit') {
       event.preventDefault();

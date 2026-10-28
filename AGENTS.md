@@ -105,7 +105,7 @@ while preserving all critical instructions. The agent must still communicate wit
 ### 后端边界
 
 * 后端服务位于 [node_backend/README.md](node_backend/README.md)，与站点构建流程分离；改动前先阅读该文档。
-* **人工评分优先：** 作业创建者和教师可在 Submissions 页面的“Assignments You Created”中直接改分（[creator-dashboard.js](assets/js/submissions/creator-dashboard.js)，调用 Spring `POST /api/submissions/grade/{id}`）。该接口设置 `gradedManually`；AI 评分只能通过 `applyAiGradeUnlessManuallyGraded` 条件 UPDATE 写入，不能 `save()` 过期实体，否则会覆盖评分途中的人工评分。内容变更会重置该标记。测试：`node --test tests/test_creator_dashboard.mjs`。
+* **评分生命周期：** 作业关闭前，教师和学生助教（作业创建者、指定评分者）在 Submissions 页面评分（全部提交表格、编辑弹窗、[creator-dashboard.js](assets/js/submissions/creator-dashboard.js) 的“Assignments You Created”）：保存的分数即人工覆盖，“AI re-grade”请 AI 重新评分，“Use AI grade”（`DELETE /api/submissions/grade/{id}`）移除覆盖。所有评分请求和结果文案都在 [grading.js](assets/js/submissions/grading.js)：Spring 返回类型化的 `outcome` 和 `grading` 状态（有效分、AI 分、人工分、`revision`、`closed`），页面按 outcome 显示文案；课程提交表单（Blogs `post.html`、Courses `course-document-player.html` 源文件）也使用其 `readGradingResponse`。务必发送屏幕上显示的 `revision`（否则 `STALE_REVISION`，409）。新内容即新版本：AI 重新评分，人工覆盖解除。教师在 Spring 的 tracker 中关闭作业后分数即为最终分（`grading.closed`，显示“Final”）：页面输入只读、隐藏编辑和评分操作；重新评分请求、相似性检查和申诉改由教师在 tracker 中审查。界面只用 OCS 语法（状态标签、`ocs__modal` 历史与 `ocs__tree` 时间线、`ocs__callout`、`ocs__links`），不用内联颜色。测试：`node --test tests/test_submission_grading.mjs tests/test_creator_dashboard.mjs`。
 
 ## 编码标准
 

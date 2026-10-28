@@ -447,6 +447,12 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
       let CURRENT_ASSIGNMENT_NAME_BLOG = FRONTMATTER_ASSIGNMENT_NAME_BLOG;
       let ASSIGNMENT_RESOLVE_PROMISE_BLOG = null;
 
+      // Text for a refused submission, e.g. one to a closed assignment.
+      async function submissionErrorBlog(response) {
+        const { readGradingResponse } = await import('{{ site.baseurl }}/assets/js/submissions/grading.js');
+        return (await readGradingResponse(response)).message;
+      }
+
       async function autoCreateAssignmentIfNeededBlog() {
         const hasAssignment = {{ page.assignment | default: false }};
         if (!hasAssignment) {
@@ -758,8 +764,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
               })
             });
             if (!res.ok) {
-              const e = await res.json().catch(() => ({}));
-              throw new Error(e.error || res.statusText);
+              throw new Error(await submissionErrorBlog(res));
             }
             // Dual-write to EshikaP1's grades system
             const assignmentName = currentAssignmentNameBlog();
@@ -839,8 +844,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
                 body: fd
               });
               if (!r.ok) {
-                const e = await r.json().catch(() => ({}));
-                throw new Error(`Upload failed for ${file.name}: ` + (e.error || r.statusText));
+                throw new Error(`Upload failed for ${file.name}: ` + await submissionErrorBlog(r));
               }
               // Dual-write to EshikaP1's grades system
               const assignmentNameForGrades = currentAssignmentNameBlog();
@@ -924,8 +928,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
               })
             });
             if (!res.ok) {
-              const e = await res.json().catch(() => ({}));
-              throw new Error(e.error || res.statusText);
+              throw new Error(await submissionErrorBlog(res));
             }
             const assignmentName = currentAssignmentNameBlog();
             const assignmentLabel = assignmentName ? assignmentName : String(assignmentId);
