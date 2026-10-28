@@ -1,11 +1,14 @@
 {
-  "fetchedAt": "2026-10-25T05:42:03.763785+00:00",
+  "fetchedAt": "2026-10-28T18:02:23.780930+00:00",
   "board": {
     "title": "Jarvis3000 KanBan",
     "url": "https://github.com/users/Arnav210/projects/3",
     "filterName": "Assignee",
     "groups": [
-      "SoniDhenuva"
+      "Arnav210",
+      "SoniDhenuva",
+      "XavierTho",
+      "shriya1401"
     ],
     "shared": [],
     "columns": [
@@ -53,17 +56,6 @@
         "people": []
       },
       {
-        "id": 282340199,
-        "title": "Funding Requests",
-        "url": "https://github.com/Arnav210/Jarvis3000/issues/23",
-        "number": 23,
-        "stage": "todo",
-        "status": "Ready",
-        "column": "Y3Vyc29yOnYyOpLOGcZDUaVSZWFkeQ==",
-        "group": "",
-        "people": []
-      },
-      {
         "id": 282342721,
         "title": "New Technology Usage",
         "url": "https://github.com/Arnav210/Jarvis3000/issues/24",
@@ -86,6 +78,19 @@
         "people": []
       },
       {
+        "id": 285080585,
+        "title": "Integrate Jarvis into OCS",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/29",
+        "number": 29,
+        "stage": "todo",
+        "status": "Ready",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUaVSZWFkeQ==",
+        "group": "Arnav210",
+        "people": [
+          "Arnav210"
+        ]
+      },
+      {
         "id": 282335436,
         "title": "Mentor Notes",
         "url": "https://github.com/Arnav210/Jarvis3000/issues/19",
@@ -97,6 +102,19 @@
         "people": []
       },
       {
+        "id": 282344257,
+        "title": "Finalize MVP for N@tM",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/25",
+        "number": 25,
+        "stage": "doing",
+        "status": "In progress",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUatJbiBwcm9ncmVzcw==",
+        "group": "XavierTho",
+        "people": [
+          "XavierTho"
+        ]
+      },
+      {
         "id": 282339539,
         "title": "File/Code Architecture Updates",
         "url": "https://github.com/Arnav210/Jarvis3000/issues/22",
@@ -104,14 +122,42 @@
         "stage": "doing",
         "status": "In progress",
         "column": "Y3Vyc29yOnYyOpLOGcZDUatJbiBwcm9ncmVzcw==",
-        "group": "",
-        "people": []
+        "group": "shriya1401",
+        "people": [
+          "shriya1401"
+        ]
       },
       {
-        "id": 282344257,
-        "title": "Finalize MVP for N@tM",
-        "url": "https://github.com/Arnav210/Jarvis3000/issues/25",
-        "number": 25,
+        "id": 283809969,
+        "title": "Documentation Updates",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/27",
+        "number": 27,
+        "stage": "doing",
+        "status": "In progress",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUatJbiBwcm9ncmVzcw==",
+        "group": "SoniDhenuva",
+        "people": [
+          "SoniDhenuva"
+        ]
+      },
+      {
+        "id": 283821804,
+        "title": "Speed / Reliability Updates",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/28",
+        "number": 28,
+        "stage": "doing",
+        "status": "In progress",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUatJbiBwcm9ncmVzcw==",
+        "group": "Arnav210",
+        "people": [
+          "Arnav210"
+        ]
+      },
+      {
+        "id": 285094457,
+        "title": "Depth Tracking / 3D Mapping",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/30",
+        "number": 30,
         "stage": "doing",
         "status": "In progress",
         "column": "Y3Vyc29yOnYyOpLOGcZDUatJbiBwcm9ncmVzcw==",
@@ -145,6 +191,17 @@
         "title": "compatability of servers",
         "url": "https://github.com/Arnav210/Jarvis3000/issues/18",
         "number": 18,
+        "stage": "review",
+        "status": "In review",
+        "column": "Y3Vyc29yOnYyOpLOGcZDUalJbiByZXZpZXc=",
+        "group": "",
+        "people": []
+      },
+      {
+        "id": 282340199,
+        "title": "Funding Requests",
+        "url": "https://github.com/Arnav210/Jarvis3000/issues/23",
+        "number": 23,
         "stage": "review",
         "status": "In review",
         "column": "Y3Vyc29yOnYyOpLOGcZDUalJbiByZXZpZXc=",
@@ -330,6 +387,6 @@
         "people": []
       }
     ],
-    "updated": "2026-10-25T05:33:41Z"
+    "updated": "2026-10-27T17:55:09Z"
   }
 }
