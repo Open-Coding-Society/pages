@@ -28,7 +28,7 @@ year: "2026-2027"
     <h2 id="team-kanban-board">Team Kanban Board</h2>
     <p>Follow our team's actual issues, assignments, and progress on GitHub.</p>
     {% if pnec_data.Board %}
-    {% include ocs_kanban_board.html url=pnec_data.Board.url filter=pnec_data.Board.filter title=pnec_data.Board.title %}
+    {% include ocs_kanban_board.html url=pnec_data.Board.url filter=pnec_data.Board.filter title=pnec_data.Board.title issue_metadata=pnec_data.Board.issue_metadata %}
     {% endif %}
     <div class="ocs__links">
       <a class="ocs__btn small pill" href="{{ pnec_data.Board.project_url | escape }}" target="_blank" rel="noopener noreferrer">Open personal GitHub Project ↗</a>
@@ -36,6 +36,13 @@ year: "2026-2027"
     </div>
     <p class="ocs__text">Cards load from our public repository issues. Stage labels determine columns first; otherwise, closed issues appear in Done, assigned open issues in In progress, and other open issues in To do. These columns are derived from issue data and may differ from our personal GitHub Project.</p>
     <p class="ocs__text">Filter by an issue's first assignee; each card lists all assignees. The shared board reuses cached data for 10 minutes and checks GitHub again on a later page load. Pull requests and issues closed as not planned are omitted. Issue closure alone does not establish stakeholder acceptance.</p>
+    <p class="ocs__text">When present, Priority and Estimate labels show our proposed team priority and Fibonacci-hour effort estimate, not logged hours or Product Owner approval. One assignee coordinates each issue; individual academic contributions remain each student's responsibility.</p>
+  </section>
+
+  <section class="ocs__card" aria-labelledby="about-pnec">
+    <h2 id="about-pnec">About PNEC</h2>
+    <p>Poway Neighborhood Emergency Corps (PNEC) helps Poway residents prepare for emergencies by sharing preparedness information, coordinating with the city and first-response agencies, organizing preparedness activities, and encouraging neighbors to help one another. Our capstone improves the existing PNEC website to make this preparedness information easier to find and use.</p>
+    <a href="https://powaynec.com/" target="_blank" rel="noopener noreferrer">Visit the official PNEC website ↗</a>
   </section>
 
   <section class="ocs__card" aria-labelledby="project-overview">
