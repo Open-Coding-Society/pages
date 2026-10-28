@@ -25,6 +25,19 @@ show_reading_time: false
                 <button type="submit" class="large primary submit-button">Login</button>
             </p>
             <p id="message" style="color: red;"></p>
+            <!-- Shown after login when a student's verification has lapsed -->
+            <div id="reverify" style="display: none; text-align: center;">
+                <h3>School Email Verification</h3>
+                <p>Your verification has lapsed. Sign in with your school Google account to continue.</p>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="filled_blue"
+                     data-text="signin_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left"></div>
+                <p id="reverify-status"></p>
+            </div>
             <p style="text-align: center;">
                 <a href="{{site.baseurl}}/support?topic=reset">Forgot your password?</a>
             </p>
@@ -66,7 +79,13 @@ show_reading_time: false
                 <select id="signupRole">
                     <option value="student" selected>I am a Student</option>
                     <option value="mentor">I am a Mentor</option>
+                    <option value="guest" id="guestOption" hidden disabled>I am a guest</option>
                 </select>
+                <p id="guest-note" hidden>
+                    A guest can view pages, comment on the microblog and react to posts. It needs no GitHub or school
+                    account, and it lasts only a few hours. Guest sign-up is open until <span id="guest-closes"></span>:
+                    log in with the same account during a later guest window to come back.
+                </p>
             </div>
             <div class="form-group">
                 <input type="text" id="name" placeholder="Name" required>
@@ -121,6 +140,7 @@ show_reading_time: false
 
 <script type="module">
     import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, springEnabled } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { reverifyNeeded, staffMustVerify, reverify } from '{{site.baseurl}}/assets/js/api/reverify.js';
     import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
 
     let signupFormData = {};
@@ -224,7 +244,7 @@ show_reading_time: false
         }
     }
 
-    function updateOverallStatus(springErrorMessage = '') {
+    function updateOverallStatus(springErrorMessage = '', flaskErrorMessage = '') {
         const flaskEl = document.getElementById('flaskStatus');
         const springEl = document.getElementById('springStatus');
         const overallEl = document.getElementById('overallStatus');
@@ -236,12 +256,12 @@ show_reading_time: false
 
         overallEl.classList.remove('hidden', 'success', 'partial', 'error');
 
-        // A Flask-only site (spring: false in _config.yml) creates the account in Flask alone.
-        if (!springEnabled) {
+        // A Flask-only site (spring: false in _config.yml), or a guest, creates the account in Flask alone.
+        if (!usesSpring()) {
             overallEl.classList.add(flaskSuccess ? 'success' : 'error');
             overallEl.textContent = flaskSuccess
                 ? '🎉 Account created! You can now login.'
-                : '💥 Signup failed. Please check your information and try again.';
+                : `❌ Signup failed: ${flaskErrorMessage || 'the account could not be created.'} Please check your details and try again.`;
             return;
         }
         if (flaskSuccess && springSuccess) {
@@ -257,22 +277,54 @@ show_reading_time: false
         } else if (flaskError && springSuccess) {
             overallEl.classList.add('partial');
             overallEl.textContent = '⚠️ Spring account created! Flask failed - please try again.';
-        } else if (flaskError && springError) {
+        } else if (flaskError) {
+            // Flask is tried first and Spring only after Flask succeeds, so Spring was not tried
             overallEl.classList.add('error');
-            overallEl.textContent = '💥 Both backends failed. Please check your information and try again.';
+            overallEl.textContent = `❌ Signup failed: ${flaskErrorMessage || 'the account could not be created.'}`
+                + ' Please check your details and try again.';
         }
+    }
+
+    // Spring is used when the site has it. A guest never gets a Spring account: it would be a full account.
+    function usesSpring() {
+        return springEnabled && signupFormData.accountType !== 'guest';
     }
 
     // A Flask-only site has no Spring account, so sign-up shows only Flask's status.
     if (!springEnabled) document.getElementById('springStatus').style.display = 'none';
 
-    // A mentor has no student ID or school, so those fields are hidden and not required.
+    // A guest can sign up only while a Teacher or Admin has the Guest Window open, so the option is
+    // offered only then. If Flask cannot be asked, it stays hidden.
+    async function offerGuestOption() {
+        try {
+            const response = await fetch(`${pythonURI}/api/guest/window`, fetchOptions);
+            const guestWindow = response.ok ? await response.json() : null;
+            if (!guestWindow || guestWindow.open !== true) return;
+            const option = document.getElementById('guestOption');
+            option.hidden = false;
+            option.disabled = false;
+            // Flask gives UTC with no zone mark: say so, so the time shown is the visitor's own
+            document.getElementById('guest-closes').textContent =
+                new Date(guestWindow.closes_at + 'Z').toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        } catch (_) {
+            // no Guest Window to offer
+        }
+    }
+    offerGuestOption();
+
+    // A mentor or a guest has no student ID or school, so those fields are hidden and not required.
+    // A guest is asked for an email only to keep one account, so it is optional for them.
     document.getElementById('signupRole').addEventListener('change', function () {
-        const isMentor = this.value === 'mentor';
+        const noSchool = this.value === 'mentor' || this.value === 'guest';
+        const email = document.getElementById('signupEmail');
+        email.required = this.value !== 'guest';
+        email.placeholder = this.value === 'guest' ? 'Email (optional, helps you keep one account)' : 'Personal (not school) Email';
+        document.getElementById('guest-note').hidden = this.value !== 'guest';
+        if (springEnabled) document.getElementById('springStatus').style.display = this.value === 'guest' ? 'none' : '';
         ['signupSid', 'signupSchool'].forEach(id => {
             const field = document.getElementById(id);
-            field.required = !isMentor;
-            field.closest('.form-group').style.display = isMentor ? 'none' : '';
+            field.required = !noSchool;
+            field.closest('.form-group').style.display = noSchool ? 'none' : '';
         });
     });
 
@@ -291,20 +343,26 @@ show_reading_time: false
             return;
         }
 
+        // A mentor or a guest has no student ID or school: do not send what was typed before the role changed.
+        const role = document.getElementById("signupRole").value;
+        const hasSchool = role !== 'mentor' && role !== 'guest';
+
         // Store form data
         signupFormData = {
             name: document.getElementById("name").value,
             uid: document.getElementById("signupUid").value,
-            sid: document.getElementById("signupSid").value,
-            school: document.getElementById("signupSchool").value,
+            sid: hasSchool ? document.getElementById("signupSid").value : '',
+            school: hasSchool ? document.getElementById("signupSchool").value : '',
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
             accountType: document.getElementById("signupRole").value,
         };
+        if (role === 'guest' && !signupFormData.email) delete signupFormData.email;  // optional for a guest
 
         // A mentor cannot use a school email, so they skip it and wait for a Teacher/Admin
-        // to verify the account. A student verifies with Google first.
-        if (signupFormData.accountType === 'mentor') {
+        // to verify the account. A guest needs no verification at all. A student verifies with
+        // Google first.
+        if (signupFormData.accountType === 'mentor' || signupFormData.accountType === 'guest') {
             signup();
         } else {
             showOAuthVerification();
@@ -312,6 +370,9 @@ show_reading_time: false
     }
 
     function showOAuthVerification() {
+        // Starting a signup drops any re-verification that was waiting on the same Google button
+        reverifying = false;
+        document.getElementById('reverify').style.display = 'none';
         document.getElementById('signupForm').style.display = 'none';
         document.getElementById('oauth-verification').style.display = 'block';
     }
@@ -331,7 +392,31 @@ show_reading_time: false
         statusDiv.innerHTML = `<div class="${isError ? 'oauth-error' : 'oauth-success'}">${message}</div>`;
     }
 
+    // After login, a student whose verification has lapsed signs in with Google once more.
+    // The same Google button callback serves signup and this, so it needs to know which.
+    let reverifying = false;
+    let afterReverify = null;
+
+    async function finishReverify(idToken) {
+        const status = document.getElementById('reverify-status');
+        status.className = '';
+        status.textContent = 'Checking with Google...';
+        const result = await reverify(pythonURI, fetchOptions, idToken);
+        if (!result.ok) {
+            status.className = 'oauth-error';
+            status.textContent = result.message;
+            return;
+        }
+        reverifying = false;
+        document.getElementById('reverify').style.display = 'none';
+        afterReverify();
+    }
+
     window.handleGoogleSignIn = function(response) {
+        if (reverifying) {
+            finishReverify(response.credential);
+            return;
+        }
         try {
             const userInfo = parseJwt(response.credential);
             const email = userInfo.email;
@@ -388,28 +473,57 @@ show_reading_time: false
 
     // Function to handle both Python and Java login simultaneously
     window.loginBoth = function () {
-        // A Flask-only site (spring: false in _config.yml) signs in to Flask alone.
-        if (!springEnabled) {
-            window.pythonLogin(() => { window.location.href = '{{site.baseurl}}/profile'; });
-            return;
-        }
-        // Wrap both logins in Promises and only redirect after both finish
-        let javaPromise = new Promise((resolve) => {
-            window.javaLogin(resolve);
-        });
+        // Wrap both logins in Promises and only redirect after both finish. A Flask-only site
+        // (spring: false in _config.yml) signs in to Flask alone, so Spring counts as logged in.
+        let javaPromise = springEnabled
+            ? new Promise((resolve) => { window.javaLogin(resolve); })
+            : Promise.resolve(true);
         let pythonPromise = new Promise((resolve) => {
             window.pythonLogin(resolve);
         });
         // pythonPromise only settles when Flask accepts the login; on a Flask failure
         // login() shows the error in #message and the page stays put.
-        Promise.all([javaPromise, pythonPromise]).then(([springLoggedIn]) => {
-            if (springLoggedIn) {
-                window.location.href = '{{site.baseurl}}/profile';
+        Promise.all([javaPromise, pythonPromise]).then(([springLoggedIn, flaskBody]) => {
+            const finish = () => {
+                // A limited account (a guest) has no Spring account and no profile: it goes to the home page.
+                if (flaskBody && flaskBody.user && flaskBody.user.limited) {
+                    window.location.href = '{{site.baseurl}}/';
+                    return;
+                }
+                if (springLoggedIn) {
+                    window.location.href = '{{site.baseurl}}/profile';
+                    return;
+                }
+                showSpringLoginWarning();
+            };
+            if (reverifyNeeded(flaskBody)) {
+                reverifying = true;
+                afterReverify = finish;
+                document.getElementById('reverify').style.display = 'block';
                 return;
             }
-            showSpringLoginWarning();
+            if (staffMustVerify(flaskBody)) {
+                showStaffVerifyNotice(finish);
+                return;
+            }
+            finish();
         });
     };
+    // A Mentor's verification has lapsed. Only a Teacher or Admin can verify it, and the
+    // account still works, so say so and let them carry on.
+    function showStaffVerifyNotice(finish) {
+        const messageEl = document.getElementById('message');
+        const carryOn = springLink('{{site.baseurl}}/profile', 'Continue');
+        carryOn.addEventListener('click', (event) => {
+            event.preventDefault();
+            finish();
+        });
+        messageEl.innerHTML = '';
+        messageEl.append(
+            'Your verification has lapsed. Ask your Teacher or Admin to verify your account. ',
+            carryOn,
+        );
+    }
     // Flask accepted the login but Spring did not. The navbar would still show the
     // user as signed in, while every Spring feature returns 401, so say so here.
     function showSpringLoginWarning() {
@@ -433,8 +547,8 @@ show_reading_time: false
     window.pythonLogin = function (done) {
         const options = {
             URL: `${pythonURI}/api/authenticate`,
-            callback: function() {
-                if (done) done();
+            callback: function(body) {
+                if (done) done(body);
             },
             message: "message",
             method: "POST",
@@ -497,7 +611,7 @@ show_reading_time: false
         signupButton.classList.add("disabled");
         // Reset status indicators
         updateBackendStatus('flask', 'pending');
-        if (springEnabled) updateBackendStatus('spring', 'pending');
+        if (usesSpring()) updateBackendStatus('spring', 'pending');
         document.getElementById('overallStatus').classList.add('hidden');
 
         const data = signupFormData && Object.keys(signupFormData).length > 0 ? signupFormData : {
@@ -532,16 +646,20 @@ show_reading_time: false
             try {
                 flaskData = flaskRaw ? JSON.parse(flaskRaw) : {};
             } catch (_) {
-                flaskData = { message: flaskRaw };
+                flaskData = null;
+            }
+            // Not a JSON object (an error page from a proxy, or "null"): a failure, and do not show its text
+            if (flaskData === null || typeof flaskData !== 'object') {
+                flaskData = { success: false };
             }
 
             if (!flaskResponse.ok || flaskData.success === false) {
-                const flaskMessage = flaskData.message || flaskRaw || `Flask signup failed (${flaskResponse.status})`;
+                const flaskMessage = flaskData.message || `Flask signup failed (${flaskResponse.status})`;
                 throw new Error(flaskMessage);
             }
 
             updateBackendStatus('flask', 'success');
-            if (!springEnabled) {
+            if (!usesSpring()) {
                 setTimeout(updateOverallStatus, 500);
                 return;
             }
@@ -568,12 +686,19 @@ show_reading_time: false
         } catch (error) {
             console.error("Flask signup error:", error);
             updateBackendStatus('flask', 'error');
-            if (springEnabled) updateBackendStatus('spring', 'error');
-            setTimeout(updateOverallStatus, 500);
+            setTimeout(() => updateOverallStatus('', flaskFailureMessage(error)), 500);
         } finally {
             signupButton.disabled = false;
             signupButton.classList.remove("disabled");
         }
+    }
+    // What to tell the user when Flask refused the signup. A TypeError means fetch() itself failed
+    // (offline, CORS, server down), so there is no reply from Flask to quote.
+    function flaskFailureMessage(error) {
+        if (error instanceof TypeError) {
+            return 'Could not reach the server. Check your connection and try again.';
+        }
+        return error.message;
     }
     // Spring's /api/person/create answers errors as {"error": "..."}, e.g. a uid conflict.
     function readSpringError(raw, status) {

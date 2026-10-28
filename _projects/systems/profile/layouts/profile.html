@@ -18,7 +18,7 @@ Gist card need Spring, so a Flask-only site (spring: false in _config.yml) leave
 {%- endfor -%}]
 </script>
 
-<div class="ocs__container">
+<div class="ocs__container ocs__container--fill">
 
     <!-- Who the student is, and what is left to set up -->
     <section class="ocs__card" aria-labelledby="profileName">
@@ -190,6 +190,7 @@ Gist card need Spring, so a Flask-only site (spring: false in _config.yml) leave
     <div id="github">
         {% include profile-gist-connection.html %}
     </div>
+    {% include profile-ai-connections.html %}
     {%- endif %}
 </div>
 

@@ -1,11 +1,10 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const source = await readFile(new URL("../assets/js/submissions/creator-dashboard.js", import.meta.url), "utf8");
-const { assignmentPageUrl, filterCreatorSubmissions, withFrontmatterCourses } = await import(
-  `data:text/javascript;charset=utf-8,${encodeURIComponent(source)}`
-);
+import {
+  assignmentPageUrl, filterCreatorSubmissions, withFrontmatterCourses,
+} from "../assets/js/submissions/creator-dashboard.js";
+import { gradeSourceLabel, parseGradeInput } from "../assets/js/submissions/grading.js";
 
 const submissions = [
   { assignmentId: 1, assignmentName: "Ground 0", submitterName: "Ana", submitterUid: "ana", submitterCourseCodes: ["CSA", "CSP"], status: "pending" },
@@ -53,4 +52,22 @@ test("frontmatter courses appear immediately without Spring synchronization", ()
   assert.deepEqual(withFrontmatterCourses(assignments, manifest).map((assignment) => assignment.courseCodes), [
     ["CSSE", "CSP", "CSA", "CSH"], ["CSA"],
   ]);
+});
+
+test("creator grades must be within the assignment's points", () => {
+  assert.deepEqual(parseGradeInput("3.5", 4), { grade: 3.5 });
+  assert.deepEqual(parseGradeInput("0", 4), { grade: 0 });
+  assert.ok(parseGradeInput("5", 4).error);
+  assert.ok(parseGradeInput("-1", 4).error);
+  assert.ok(parseGradeInput("", 4).error);
+  assert.ok(parseGradeInput("abc", null).error);
+  assert.deepEqual(parseGradeInput("12", null), { grade: 12 });
+});
+
+test("grade source comes from Spring's grading state, not from guessing at feedback", () => {
+  assert.equal(gradeSourceLabel({ grade: null, grading: { source: "NONE" } }), "");
+  assert.equal(gradeSourceLabel({ grade: 4, grading: { source: "MANUAL" } }), "Instructor grade");
+  assert.equal(gradeSourceLabel({ grade: 3, grading: { source: "AI" } }), "AI grade");
+  // Identical feedback and AI summary used to be read as "AI"; the state is now explicit.
+  assert.equal(gradeSourceLabel({ grade: 3, feedback: "x", aiSummary: "x" }), "");
 });

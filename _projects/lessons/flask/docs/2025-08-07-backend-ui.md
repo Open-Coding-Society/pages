@@ -3,7 +3,7 @@ toc: true
 layout: post
 data: flask
 title: Backend UI
-description: An overview of backend UI for Flask Jinja
+description: Build admin pages for a Flask app with Jinja2 templates and Bootstrap, starting from a shared base template and a table of users.
 categories:
 - Python
 - flask
