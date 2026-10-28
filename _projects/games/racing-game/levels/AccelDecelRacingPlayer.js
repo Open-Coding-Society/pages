@@ -36,6 +36,27 @@ export default class Player extends EnginePlayer {
     }
   }
 
+  updateVelocity() {
+    this.velocity.x = 0;
+    this.velocity.y = 0;
+    this.moved = false;
+
+    const keysPressed = this.keysPressed ?? this.pressedKeys;
+    const { up, down, left, right } = this.keypress;
+
+    if (keysPressed[right] || keysPressed[left]) {
+      this.moved = true;
+      if (keysPressed[right]) this.velocity.x += this.xVelocity;
+      else if (keysPressed[left]) this.velocity.x -= this.xVelocity;
+    }
+
+    if (keysPressed[up] || keysPressed[down]) {
+      this.moved = true;
+      if (keysPressed[up]) this.velocity.y -= this.yVelocity;
+      else if (keysPressed[down]) this.velocity.y += this.yVelocity;
+    }
+  }
+
   update() {
     super.update();
 
@@ -43,8 +64,12 @@ export default class Player extends EnginePlayer {
     if (this.maxSpeed !== undefined) {
       const upKey = this.keypress.up;
       const downKey = this.keypress.down;
+      const accelerating =
+        this.keysPressed[upKey]
+        || this.keysPressed[this.keypress.left]
+        || this.keysPressed[this.keypress.right];
 
-      if (this.keysPressed[upKey]) {
+      if (accelerating) {
         this.currentSpeed = Math.min(this.currentSpeed + this.acceleration, this.maxSpeed);
       } else if (this.keysPressed[downKey]) {
         this.currentSpeed = Math.max(this.currentSpeed - this.acceleration, this.reverseSpeed);

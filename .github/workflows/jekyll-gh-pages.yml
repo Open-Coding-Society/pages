@@ -29,7 +29,8 @@ env:
 jobs:
   # Build job
   build:
-    runs-on: ubuntu-latest
+    # Ruby 3.1 builds exist only up to Ubuntu 24.04, and ubuntu-latest moved past it.
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v5

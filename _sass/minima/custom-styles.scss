@@ -12,7 +12,6 @@
 // Capstone Infograph Styles (centralized)
 // All individual capstone infograph SCSS has been unified into one file to provide a consistent B/W theme.
 @import "capstone/infograph";
-@import "capstone/pnec";
 // Capstone document primitives override generic infograph suffix selectors.
 @import "open-coding/elements/capstone/main";
 @import "open-coding/elements/capstone/checklists";

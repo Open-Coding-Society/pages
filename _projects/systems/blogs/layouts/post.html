@@ -290,6 +290,9 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
         Submit Assignment
       </h3>
 
+      {% comment %}
+        Self-assessment is paused while it is reworked; the matching JS checks
+        below are commented out. Remove this comment block to bring it back.
       <div class="self-assessment" id="self-assessment-blog">
         <h4 class="self-assessment-title">
           <i class="fas fa-clipboard-check"></i>
@@ -354,6 +357,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
           <textarea id="self-assessment-reflection-blog" placeholder="In a few sentences, describe what you learned, struggled with, or accomplished on this assignment. Include one specific example."></textarea>
         </div>
       </div>
+      {% endcomment %}
 
       {% if submission_type == "link" or submission_type == "github_issue" %}
       {% if submission_type == "github_issue" %}
@@ -442,6 +446,12 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
       let CURRENT_ASSIGNMENT_ID_BLOG = FRONTMATTER_ASSIGNMENT_ID_BLOG;
       let CURRENT_ASSIGNMENT_NAME_BLOG = FRONTMATTER_ASSIGNMENT_NAME_BLOG;
       let ASSIGNMENT_RESOLVE_PROMISE_BLOG = null;
+
+      // Text for a refused submission, e.g. one to a closed assignment.
+      async function submissionErrorBlog(response) {
+        const { readGradingResponse } = await import('{{ site.baseurl }}/assets/js/submissions/grading.js');
+        return (await readGradingResponse(response)).message;
+      }
 
       async function autoCreateAssignmentIfNeededBlog() {
         const hasAssignment = {{ page.assignment | default: false }};
@@ -724,11 +734,12 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
             return;
           }
           const selfAssessment = getSelfAssessmentDataBlog();
-          const selfAssessmentError = validateSelfAssessmentBlog(selfAssessment);
-          if (selfAssessmentError) {
-            showStatusBlog('error', selfAssessmentError);
-            return;
-          }
+          // Self-assessment is paused, so its required-field check is off for now.
+          // const selfAssessmentError = validateSelfAssessmentBlog(selfAssessment);
+          // if (selfAssessmentError) {
+          //   showStatusBlog('error', selfAssessmentError);
+          //   return;
+          // }
           btn.disabled = true;
           showStatusBlog('loading', 'Submitting...');
           try {
@@ -753,8 +764,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
               })
             });
             if (!res.ok) {
-              const e = await res.json().catch(() => ({}));
-              throw new Error(e.error || res.statusText);
+              throw new Error(await submissionErrorBlog(res));
             }
             // Dual-write to EshikaP1's grades system
             const assignmentName = currentAssignmentNameBlog();
@@ -787,11 +797,12 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
           const notes = document.getElementById('file-notes-blog').value.trim();
           const btn = document.getElementById('file-submit-btn-blog');
           const selfAssessment = getSelfAssessmentDataBlog();
-          const selfAssessmentError = validateSelfAssessmentBlog(selfAssessment);
-          if (selfAssessmentError) {
-            showStatusBlog('error', selfAssessmentError);
-            return;
-          }
+          // Self-assessment is paused, so its required-field check is off for now.
+          // const selfAssessmentError = validateSelfAssessmentBlog(selfAssessment);
+          // if (selfAssessmentError) {
+          //   showStatusBlog('error', selfAssessmentError);
+          //   return;
+          // }
           btn.disabled = true;
           showStatusBlog('loading', 'Uploading...');
           try {
@@ -821,11 +832,10 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
               fd.append('username', uid);
               fd.append('file', file);
               if (notes) fd.append('notes', notes);
-              fd.append('technicalExcellence', String(selfAssessment.technicalExcellence));
-              fd.append('communication', String(selfAssessment.communication));
-              fd.append('workHabits', String(selfAssessment.workHabits));
-              fd.append('aiOrchestration', String(selfAssessment.aiOrchestration));
-              fd.append('selfAssessmentReflection', selfAssessment.selfAssessmentReflection);
+              // Skip unanswered fields: String(null) would send "null", which Spring cannot bind to an Integer.
+              for (const [field, value] of Object.entries(selfAssessment)) {
+                if (value !== null && value !== '') fd.append(field, String(value));
+              }
               const r = await fetch(`${javaURI}/api/assignment-submissions/upload`, {
                 method: 'POST',
                 mode: fetchOptions.mode,
@@ -834,8 +844,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
                 body: fd
               });
               if (!r.ok) {
-                const e = await r.json().catch(() => ({}));
-                throw new Error(`Upload failed for ${file.name}: ` + (e.error || r.statusText));
+                throw new Error(`Upload failed for ${file.name}: ` + await submissionErrorBlog(r));
               }
               // Dual-write to EshikaP1's grades system
               const assignmentNameForGrades = currentAssignmentNameBlog();
@@ -871,7 +880,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
           const notes = document.getElementById('code-notes-blog')?.value?.trim() || '';
           const btn = this.querySelector('button[type="submit"]');
           if (window.unsavedRunners().length > 0) {
-            showStatusBlog('error', 'Save your code with the 💾 button in each runner before submitting.');
+            showStatusBlog('error', 'Save each code runner with its 💾 button, and submit each reflection with its 📤 button, before submitting.');
             return;
           }
           const files = window.readRunners();
@@ -880,11 +889,12 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
             return;
           }
           const selfAssessment = getSelfAssessmentDataBlog();
-          const selfAssessmentError = validateSelfAssessmentBlog(selfAssessment);
-          if (selfAssessmentError) {
-            showStatusBlog('error', selfAssessmentError);
-            return;
-          }
+          // Self-assessment is paused, so its required-field check is off for now.
+          // const selfAssessmentError = validateSelfAssessmentBlog(selfAssessment);
+          // if (selfAssessmentError) {
+          //   showStatusBlog('error', selfAssessmentError);
+          //   return;
+          // }
           btn.disabled = true;
           showStatusBlog('loading', 'Checking login...');
           let uid, personId;
@@ -898,7 +908,8 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
           showStatusBlog('loading', 'Creating Gist and submitting...');
           try {
             const assignmentId = await ensureAssignmentIdBlog();
-            const gistUrl = await window.exportToGist(files, { type: 'submission', description: notes || 'Code submission' });
+            // kinds tells the grader which files are written reflections rather than code.
+            const gistUrl = await window.exportToGist(files, { type: 'submission', description: notes || 'Code submission', manifest: { kinds: window.readRunnerKinds() } });
             const content = { type: 'code', url: gistUrl, notes };
             const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
               ...fetchOptions,
@@ -918,8 +929,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
               })
             });
             if (!res.ok) {
-              const e = await res.json().catch(() => ({}));
-              throw new Error(e.error || res.statusText);
+              throw new Error(await submissionErrorBlog(res));
             }
             const assignmentName = currentAssignmentNameBlog();
             const assignmentLabel = assignmentName ? assignmentName : String(assignmentId);
@@ -972,7 +982,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
     import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
     import { appendGistSettingsLink } from '{{ site.baseurl }}/assets/js/gist-connection-errors.js';
-    import { listRunners, unsavedRunners, readRunners } from '{{ site.baseurl }}/assets/js/runner-io.js';
+    import { listRunners, unsavedRunners, readRunners, readRunnerKinds } from '{{ site.baseurl }}/assets/js/runner-io.js';
     window.pythonURI = pythonURI;
     window.javaURI = javaURI;
     window.fetchOptions = fetchOptions;
@@ -982,6 +992,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     window.listRunners = listRunners;
     window.unsavedRunners = unsavedRunners;
     window.readRunners = readRunners;
+    window.readRunnerKinds = readRunnerKinds;
   </script>
   <script src="{{ site.baseurl }}/assets/js/ocs-analytics-enhanced.js"></script>
   <script src="{{ site.baseurl }}/assets/js/code-runner-analytics.js"></script>

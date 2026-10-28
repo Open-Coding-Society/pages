@@ -1,5 +1,6 @@
 // The classes card on /profile: lists the student's classes and adds or removes one
-// in Flask right away, then keeps Spring's course groups in step (course calendars read them).
+// in Flask right away, then, on a site that runs Spring, keeps Spring's course groups in
+// step (course calendars read them).
 async function requestClasses({ pythonURI, fetchOptions }, method, body) {
     const response = await fetch(`${pythonURI}/api/user/class`, {
         ...fetchOptions,
@@ -12,7 +13,9 @@ async function requestClasses({ pythonURI, fetchOptions }, method, body) {
 }
 
 // Keep the four course-group memberships aligned with the saved profile classes.
-async function syncClassGroupMemberships({ javaURI, fetchOptions }, classes) {
+// A Flask-only site has no course groups, so there is nothing to sync.
+async function syncClassGroupMemberships({ javaURI, springEnabled, fetchOptions }, classes) {
+    if (!springEnabled) return null;
     const response = await fetch(`${javaURI}/api/groups/class-memberships`, {
         ...fetchOptions,
         method: 'PUT',

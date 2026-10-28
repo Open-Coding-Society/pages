@@ -1,0 +1,9 @@
+# Public repository issues rendered by the shared OCS Kanban component.
+# The team's actual project board (projects/8) is a personal board, which
+# GitHub only answers for signed-in requests, so the live embed reads the
+# repository's public issues instead; project_url links to the real board.
+Board:
+  url: "https://github.com/vanshikak210/shoreline.csp/issues"
+  title: "Shoreline Kanban Board"
+  filter: "Assignee"
+  project_url: "https://github.com/users/vanshikak210/projects/8"

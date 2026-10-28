@@ -26,7 +26,7 @@ active_tab: dashboard
         <div id="tab-content-container" class="relative min-h-[400px]">
             <!-- Admin Evaluation UI (hidden by default, shown only for admins) -->
             <div id="admin-only" style="display:none;">
-                <div id="tab-content-admin-evaluation" class="tab-content block px-6 py-4 text-neutral-200 max-w-5xl mx-auto">
+                <div id="tab-content-admin-evaluation" class="tab-content block py-4 text-neutral-200">
                     <h2 class="text-xl font-semibold mb-4">Admin: Search & Evaluate Users</h2>
                 <div id="admin-people-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     <p class="col-span-full text-neutral-400" id="admin-people-loading">Loading users...</p>
@@ -53,7 +53,7 @@ active_tab: dashboard
             </div>
 
             <!-- Preferences tab content -->
-            <div id="tab-content-preferences" class="tab-content block px-6 py-4 text-neutral-200 max-w-5xl mx-auto">
+            <div id="tab-content-preferences" class="tab-content block py-4 text-neutral-200">
                 <h2 class="text-xl font-semibold mb-2">Preferences</h2>
                 <p class="text-neutral-400 mb-6">Customize how the site looks. Changes apply across the site and are saved locally.</p>
 
@@ -269,31 +269,44 @@ active_tab: dashboard
                     </div>
                 </div>
 
-                <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700" id="ask-ai-panel">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-medium">Ask AI: Generate a Theme</h3>
-                        <div class="flex gap-2">
-                        <button id="ask-ai-toggle" type="button" class="px-3 py-1 text-sm rounded bg-indigo-600 hover:bg-indigo-700 text-white">Ask AI</button>
+                <!-- AI Theme: assets/js/pages/dashboard/ai-theme.js -->
+                <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700" id="ai-theme-panel">
+                    <h3 class="font-medium mb-1">AI Theme</h3>
+                    <p class="text-sm text-neutral-400 mb-1">Describe a look and the AI designs a theme: colors, font and an emoji wallpaper.</p>
+                    <p class="text-sm text-neutral-400 mb-3" id="ai-theme-key"></p>
+                    <form id="ai-theme-form" class="flex flex-col gap-2" novalidate>
+                        <label for="ai-theme-prompt" class="text-sm text-neutral-400">Describe your theme</label>
+                        <textarea id="ai-theme-prompt" maxlength="200" rows="2" class="w-full bg-neutral-700 text-white rounded px-3 py-2"
+                            placeholder="cozy rainy library, neon arcade, Halloween…"></textarea>
+                        <div id="ai-theme-chips" class="flex flex-wrap gap-2" role="group" aria-label="Suggestions"></div>
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <button type="submit" id="ai-theme-generate" class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white">Generate</button>
+                            <span id="ai-theme-status" class="text-sm text-neutral-400" role="status" aria-live="polite"></span>
                         </div>
-                    </div>
+                    </form>
 
-                    <div id="ask-ai-dropdown" class="hidden mt-3">
-                        <label class="text-sm text-neutral-400 block">Describe the style you want (e.g. "modern, playful, cool blues")</label>
-                        <textarea id="ask-ai-prompt" class="w-full mt-2 bg-neutral-700 text-white rounded px-3 py-2" rows="4"
-                        placeholder="Describe colors, tones, fonts, mood, and any words like 'modern', 'playful', 'professional', etc."></textarea>
-
-                        <div class="flex gap-2 mt-3">
-                        <button id="ask-ai-send" class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white">Get Suggestions</button>
-                        <button id="ask-ai-clear" class="px-4 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white">Clear</button>
+                    <div id="ai-theme-result" class="mt-4" hidden>
+                        <!-- Drawn in the theme's own colors and font by ai-theme.js -->
+                        <div id="ai-theme-preview" class="p-4 rounded-lg border-2 flex flex-col gap-2">
+                            <div class="flex flex-wrap justify-between items-center gap-2">
+                                <h4 id="ai-theme-title" class="text-lg font-semibold"></h4>
+                                <span id="ai-theme-emoji" class="text-2xl" aria-hidden="true"></span>
+                            </div>
+                            <p id="ai-theme-description" class="text-sm"></p>
+                            <p class="text-sm">Sample text: this is how lessons will read.</p>
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <span id="ai-theme-sample-btn" class="px-3 py-1 rounded text-sm font-medium">Sample button</span>
+                                <span id="ai-theme-swatches" class="flex gap-1"></span>
+                                <span id="ai-theme-badge" class="text-sm"></span>
+                            </div>
                         </div>
-
-                        <div id="ask-ai-status" class="text-sm text-neutral-400 mt-2"></div>
-
-                        <div id="ask-ai-response" class="mt-4 p-3 bg-neutral-900 border border-neutral-700 rounded text-sm text-neutral-200 whitespace-pre-wrap"></div>
-
-                        <div class="mt-3 flex gap-2 items-center">
-                        <button id="ask-ai-apply" class="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white">Apply to Form</button>
-                        <a id="ask-ai-open" href="#" target="_blank" class="text-sm text-blue-400 underline hidden ml-2">Open full response</a>
+                        <div class="flex flex-wrap gap-2 mt-3 items-center">
+                            <button type="button" id="ai-theme-try" class="px-3 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white">Try it</button>
+                            <button type="button" id="ai-theme-regenerate" class="px-3 py-1 rounded bg-neutral-700 hover:bg-neutral-600 text-white">Regenerate</button>
+                            <label class="text-sm text-neutral-400 flex items-center gap-1"><input type="checkbox" id="ai-theme-wallpaper" checked> Emoji wallpaper</label>
+                            <label for="ai-theme-name" class="sr-only">Custom theme name</label>
+                            <input id="ai-theme-name" maxlength="30" class="bg-neutral-700 text-white rounded px-2 py-1" />
+                            <button type="button" id="ai-theme-save" class="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white">Save as custom theme</button>
                         </div>
                     </div>
                 </div>
@@ -305,9 +318,11 @@ active_tab: dashboard
                 <script type="module">
                 import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
                 import { initializePreferences } from '{{ site.baseurl }}/assets/js/pages/dashboard/preferences.js';
+                import { initAiTheme } from '{{ site.baseurl }}/assets/js/pages/dashboard/ai-theme.js';
 
                 // Initialize the preferences module with API configuration
                 initializePreferences(javaURI, fetchOptions);
+                initAiTheme({ javaURI, fetchOptions, profileURL: '{{ site.baseurl }}/profile#ai-connections' });
                 </script>
 
         </div>
@@ -397,264 +412,6 @@ active_tab: dashboard
             console.error('Error loading preferences on DOMContentLoaded', e);
         }
     });
-</script>
-
-<script type="module">
-  import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
-  (function () {
-
-    // UI elements
-    const toggleBtn = document.getElementById('ask-ai-toggle');
-    const dropdown = document.getElementById('ask-ai-dropdown');
-    const sendBtn = document.getElementById('ask-ai-send');
-    const clearBtn = document.getElementById('ask-ai-clear');
-    const promptEl = document.getElementById('ask-ai-prompt');
-    const statusEl = document.getElementById('ask-ai-status');
-    const responseEl = document.getElementById('ask-ai-response');
-    const applyBtn = document.getElementById('ask-ai-apply');
-    const openLink = document.getElementById('ask-ai-open');
-
-    if (!toggleBtn || !dropdown) return;
-
-    function showStatus(msg, isError) {
-      statusEl.textContent = msg;
-      statusEl.style.color = isError ? '#f87171' : '';
-    }
-
-    toggleBtn.addEventListener('click', () => {
-      dropdown.classList.toggle('hidden');
-    });
-
-    clearBtn.addEventListener('click', () => {
-      promptEl.value = '';
-      responseEl.textContent = '';
-      openLink.classList.add('hidden');
-      showStatus('');
-    });
-
-    // Try to capture the current preference form values (read DOM inputs directly)
-    function readCurrentPrefs() {
-      try {
-        return {
-          bg: document.getElementById('pref-bg-color')?.value,
-          text: document.getElementById('pref-text-color')?.value,
-          accent: document.getElementById('pref-accent-color')?.value,
-          selectionColor: document.getElementById('pref-selection-color')?.value,
-          font: document.getElementById('pref-font-family')?.value,
-          size: Number(document.getElementById('pref-font-size')?.value || 14),
-          buttonStyle: document.getElementById('pref-button-style')?.value
-        };
-      } catch (e) {
-        return {};
-      }
-    }
-
-    // Map possible names to the font <select> values used in the form
-    const FONT_MAP = {
-      'inter': "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
-      'roboto': "Roboto, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial",
-      'open sans': "'Open Sans', Arial, sans-serif",
-      'lato': "Lato, Arial, sans-serif",
-      'montserrat': "Montserrat, Arial, sans-serif",
-      'georgia': "Georgia, 'Times New Roman', Times, serif",
-      'source code pro': "'Source Code Pro', monospace",
-      'sourcecodepro': "'Source Code Pro', monospace"
-    };
-
-    function tryParseResponsePayload(data) {
-      // Data may be JSON like { background: "#...", button: "#...", text: "#...", font: "Roboto" }
-      // Or it may be { response: "..." } or plain text.
-      const parsed = { raw: data };
-
-      if (!data) return parsed;
-
-      // If data is an object with fields, copy known fields.
-      if (typeof data === 'object') {
-        parsed.bg = data.background || data.bg || data.backgroundColor || data.background_color;
-        parsed.button = data.button || data.buttonColor || data.button_color;
-        parsed.selectionColor = data.selection || data.selectionColor || data.selection_color || data.selectionColorHex;
-        parsed.text = data.text || data.textColor || data.text_color;
-        parsed.font = data.font || data.fontFamily || data.font_family;
-        parsed.accent = data.accent || data.accentColor || data.accent_color;
-        return parsed;
-      }
-
-      // If it's a string, try to find hex color values and font names.
-      if (typeof data === 'string') {
-        const s = data;
-        const hexes = [...s.matchAll(/#([0-9a-f]{3,6})/ig)].map(m => '#' + m[1]);
-        if (hexes.length) {
-          parsed.bg = hexes[0];
-          if (hexes[1]) parsed.button = hexes[1];
-          if (hexes[2]) parsed.text = hexes[2];
-          if (hexes[3]) parsed.accent = hexes[3];
-        }
-        // look for font keywords
-        Object.keys(FONT_MAP).forEach(k => {
-          if (s.toLowerCase().includes(k)) parsed.font = FONT_MAP[k];
-        });
-        return parsed;
-      }
-
-      return parsed;
-    }
-
-    async function sendPromptToBackend(promptText) {
-
-      try {
-        showStatus('Sending to AI...', false);
-        sendBtn.disabled = true;
-
-        const res = await fetch(`${javaURI}/api/upai`, {
-          ...fetchOptions,
-          method: 'POST',
-          body: JSON.stringify({
-            prompt: promptText
-          })
-        });
-
-        if (!res.ok) {
-          const txt = await res.text().catch(() => '');
-          showStatus('Server error: ' + (res.status + ' ' + txt), true);
-          responseEl.textContent = txt || `Status: ${res.status}`;
-          openLink.classList.add('hidden');
-          return null;
-        }
-
-        // Try JSON first, then text
-        let json;
-        try { json = await res.json(); } catch (e) { json = null; }
-        let payload = json;
-        if (json && json.response) {
-          payload = json.response;
-        }
-        if (!payload) {
-          payload = await res.text();
-        }
-
-        showStatus('Response received', false);
-        return payload;
-
-      } catch (err) {
-        showStatus('Network error: ' + (err.message || err), true);
-        return null;
-      } finally {
-        sendBtn.disabled = false;
-      }
-    }
-
-        sendBtn.addEventListener('click', async () => {
-      const promptText = promptEl.value && promptEl.value.trim();
-      if (!promptText) { showStatus('Please write a description first', true); return; }
-
-      responseEl.textContent = '';
-      openLink.classList.add('hidden');
-
-      const payload = await sendPromptToBackend(promptText);
-      if (!payload) return;
-            // Normalize the response so frontend can apply values consistently.
-            // Use tryParseResponsePayload to extract common tokens from text or object
-            const parsedRaw = (typeof payload === 'object') ? tryParseResponsePayload(payload) : tryParseResponsePayload(String(payload));
-
-            const normalized = {
-                background: (payload && (payload.background || payload.bg || payload.backgroundColor || payload.background_color)) || parsedRaw.bg || parsedRaw.background,
-                button: (payload && (payload.button || payload.buttonColor || payload.button_color)) || parsedRaw.button,
-                selectionColor: (payload && (payload.selectionColor || payload.selection || payload.selection_color)) || parsedRaw.selectionColor || parsedRaw.selection,
-                textColor: (payload && (payload.textColor || payload.text || payload.text_color)) || parsedRaw.text,
-                fontFamily: (payload && (payload.fontFamily || payload.font || payload.font_family)) || parsedRaw.font,
-                suggestions: (payload && (payload.suggestions || payload.response)) || (typeof payload === 'string' ? payload : parsedRaw.raw)
-            };
-
-            // Display the human-friendly suggestion (if present) instead of raw JSON
-            responseEl.textContent = normalized.suggestions || JSON.stringify(payload, null, 2);
-
-            // Keep the normalized object on the element for Apply to read
-            try { responseEl.dataset.parsed = JSON.stringify(normalized); } catch (e) { /* ignore */ }
-
-            // Provide a quick link to view response in a new tab (use a data: URI)
-            const safeText = encodeURIComponent(responseEl.textContent);
-            openLink.href = `data:text/plain;charset=utf-8,${safeText}`;
-            openLink.classList.remove('hidden');
-
-            showStatus('AI suggestions ready — review below. Use "Apply to Form" to copy values', false);
-    });
-
-    applyBtn.addEventListener('click', () => {
-            const raw = responseEl.textContent;
-            if (!raw && !responseEl.dataset.parsed) { showStatus('No AI response to apply', true); return; }
-
-            let parsed = null;
-            if (responseEl.dataset.parsed) {
-                try { parsed = JSON.parse(responseEl.dataset.parsed); } catch (e) { parsed = null; }
-            }
-
-            if (!parsed) {
-                // Fallbacks: try JSON in the box, then try to parse free text
-                try { parsed = JSON.parse(raw); } catch (e) { parsed = tryParseResponsePayload(raw); }
-            }
-
-            if (!parsed) { showStatus('Could not parse AI response', true); return; }
-
-            // Set form fields if found (normalized keys: background, button, selectionColor, textColor, fontFamily)
-            try {
-                if (parsed.background) {
-                    const el = document.getElementById('pref-bg-color');
-                    if (el) el.value = parsed.background;
-                }
-                if (parsed.textColor) {
-                    const el = document.getElementById('pref-text-color');
-                    if (el) el.value = parsed.textColor;
-                }
-                const accent = parsed.button || parsed.accent || parsed.buttonColor;
-        if (accent) {
-          const el = document.getElementById('pref-accent-color');
-          if (el) el.value = accent;
-        }
-                const selection = parsed.selectionColor || parsed.selection || parsed.selection_color;
-        if (selection) {
-          const el = document.getElementById('pref-selection-color');
-          if (el) el.value = selection;
-        }
-                // Handle fontFamily mapping
-                const fontVal = (parsed.fontFamily || parsed.font || '').toString().toLowerCase();
-                if (fontVal) {
-                    let mapped = null;
-                    Object.keys(FONT_MAP).forEach(k => {
-                        if (fontVal.includes(k)) mapped = FONT_MAP[k];
-                    });
-                    const fontSelect = document.getElementById('pref-font-family');
-                    if (fontSelect) {
-                        if (mapped) {
-                            fontSelect.value = mapped;
-                        } else {
-                            for (const opt of fontSelect.options) {
-                                if ((opt.value || '').toLowerCase().includes(fontVal)) {
-                                    fontSelect.value = opt.value;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-        showStatus('Values applied to the form. Click "Save All" to persist.', false);
-
-        // Optionally trigger the Save All button so user doesn't need to click twice
-        const saveBtn = document.getElementById('save-preferences');
-        if (saveBtn) {
-          // give tiny delay so UI updates are visible
-          setTimeout(() => {
-            saveBtn.click();
-            showStatus('Preferences saved (via Save All)', false);
-          }, 300);
-        }
-
-      } catch (e) {
-        showStatus('Error applying values: ' + (e.message || e), true);
-      }
-    });
-
-  })();
 </script>
 
 <!-- ============================================================

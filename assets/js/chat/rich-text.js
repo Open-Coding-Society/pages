@@ -22,7 +22,23 @@
 
 const MAX_LENGTH_DEFAULT = 2000;
 
-const URL_RE = /https?:\/\/[^\s<>()]+/g;
+// Links a teacher pastes into an announcement: full URLs, "www." links, and
+// bare domains on common TLDs ("github.com/org/repo"). A bare word like
+// "main.py" is left alone because its TLD isn't on the list.
+const URL_RE = /(?:https?:\/\/|www\.)[^\s<>]+|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|org|net|edu|gov|io|dev|app|ai|co|us|me|info|ly|gl|gg)(?:[/?#][^\s<>]*)?(?![\w.-]*@)/gi;
+
+// Sentence punctuation after a link ("see https://x.com.") isn't part of it.
+const TRAILING_RE = /[.,;:!?'"*]+$/;
+
+// Drop trailing punctuation, and a closing ")" with no matching "(" inside the
+// link — so "(see github.com/x)" links github.com/x but keeps wiki URLs whole.
+function trimUrl(url) {
+  let out = url.replace(TRAILING_RE, '');
+  while (out.endsWith(')') && (out.match(/\(/g) || []).length < (out.match(/\)/g) || []).length) {
+    out = out.slice(0, -1).replace(TRAILING_RE, '');
+  }
+  return out;
+}
 
 // Zero-width space + BOM: some browsers seed an empty contenteditable with one
 // and paste can carry them in. They must never count as content or reach a
@@ -74,20 +90,24 @@ function linkifyText(text, insideAnchor) {
     frag.appendChild(document.createTextNode(value));
     return frag;
   }
-  const re = new RegExp(URL_RE.source, 'g');
+  const re = new RegExp(URL_RE.source, 'gi');
   let lastIndex = 0;
   let match;
   while ((match = re.exec(value)) !== null) {
+    const url = trimUrl(match[0]);
+    // Skip the domain half of an email address (name@school.edu).
+    if (!url || value[match.index - 1] === '@') continue;
     if (match.index > lastIndex) {
       frag.appendChild(document.createTextNode(value.slice(lastIndex, match.index)));
     }
     const a = document.createElement('a');
-    a.href = match[0];
-    a.textContent = match[0];
+    a.href = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    a.textContent = url;
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     frag.appendChild(a);
-    lastIndex = match.index + match[0].length;
+    lastIndex = match.index + url.length;
+    re.lastIndex = lastIndex;
   }
   if (lastIndex < value.length || !frag.childNodes.length) {
     frag.appendChild(document.createTextNode(value.slice(lastIndex)));
@@ -214,6 +234,12 @@ export function sanitizeRichText(raw) {
   const holder = document.createElement('div');
   holder.appendChild(sanitizeToFragment(raw));
   return holder.innerHTML;
+}
+
+// Plain text with its web addresses turned into links (new tab). Used where
+// text is never HTML, such as calendar event details.
+export function linkify(text) {
+  return linkifyText(text, false);
 }
 
 export function renderRichMessage(container, raw) {

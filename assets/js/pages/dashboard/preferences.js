@@ -41,7 +41,8 @@ export class PreferencesConfig {
         'Green': { bg: '#154734', text: '#e6f6ef', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#10b981' },
         'Sepia': { bg: '#f4ecd8', text: '#3b2f2f', font: "Georgia, 'Times New Roman', Times, serif", size: 14, accent: '#b45309' },
         'Cyberpunk': { bg: '#0a0a0f', text: '#f0f0f0', font: "'Source Code Pro', monospace", size: 14, accent: '#f72585' },
-        'Ocean': { bg: '#0c1929', text: '#e0f2fe', font: "'Open Sans', Arial, sans-serif", size: 15, accent: '#06b6d4' }
+        'Ocean': { bg: '#0c1929', text: '#e0f2fe', font: "'Open Sans', Arial, sans-serif", size: 15, accent: '#06b6d4' },
+        'Sunset': { bg: '#2a1433', text: '#fbe7d4', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#ff7f6b' }
     };
 
     static MAX_CUSTOM = 10;
@@ -404,7 +405,11 @@ export class ThemeRenderer {
 
             const btn = document.createElement('button');
             btn.className = 'flex-1 px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-sm text-left flex items-center gap-2';
-            btn.innerHTML = `<span class="w-3 h-3 rounded-full" style="background:${theme.accent || '#3b82f6'}"></span> ${name}`;
+            // Names can come from an AI theme, so they go in as text, never HTML.
+            const dot = document.createElement('span');
+            dot.className = 'w-3 h-3 rounded-full';
+            dot.style.background = theme.accent || '#3b82f6';
+            btn.append(dot, [theme.decor?.[0], name].filter(Boolean).join(' '));
             btn.addEventListener('click', async () => {
                 const currentLang = document.getElementById('pref-language')?.value || PreferencesStore.cachedPrefs?.language || '';
                 const currentTTS = {
@@ -413,6 +418,7 @@ export class ThemeRenderer {
                     ttsPitch: PreferencesStore.cachedPrefs?.ttsPitch || 1.0,
                     ttsVolume: PreferencesStore.cachedPrefs?.ttsVolume || 1.0
                 };
+                window.SitePreferences?.setThemeDecor?.(theme); // this theme's wallpaper (or none) wins after the reload
                 await PreferencesStore.set({
                     ...theme,
                     language: currentLang,
@@ -449,7 +455,9 @@ export class ThemeRenderer {
             StatusDisplay.set('Max themes reached');
             return;
         }
-        themes[name] = FormManager.get();
+        // Leave out the theme list itself: a theme that contains its own list can't be saved as JSON.
+        const { customThemes, ...theme } = FormManager.get();
+        themes[name] = theme;
         await PreferencesStore.setThemes(themes);
         ThemeRenderer.setCustom();
         StatusDisplay.set('Saved: ' + name);
@@ -1376,6 +1384,7 @@ export class PreferencesController {
 
         // Reset
         document.getElementById('restore-styles').addEventListener('click', async () => {
+            window.SitePreferences?.setThemeDecor?.(null);
             if (PreferencesAPI.isLoggedIn) {
                 const deleted = await PreferencesAPI.delete();
                 if (!deleted) {

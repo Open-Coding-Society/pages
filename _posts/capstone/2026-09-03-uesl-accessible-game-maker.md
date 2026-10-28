@@ -11,9 +11,12 @@ year: "2026-2027"
 
 > UESL Accessible Game Maker helps participants create and play games through a clear, accessible workflow. Our sprint focuses on making the existing editor easier to understand without replacing its game engine, accessibility tools, or save system.
 
+{% assign game_maker_board = site.data.uesl_game_maker.Board %}
+{% include ocs_kanban_board.html url=game_maker_board.url filter=game_maker_board.filter %}
+
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn alert-green fill large" href="https://github.com/RazorCrest00/uesl-accessible-game-maker/issues/1" target="_blank" rel="noopener noreferrer">Open Sprint Plan</a>
-    <a class="ocs__btn large" href="https://github.com/RazorCrest00/uesl-accessible-game-maker" target="_blank" rel="noopener noreferrer">Team Repository</a>
+    <a class="ocs__btn alert-green fill large" href="https://github.com/GameMaker-CSP/Frontend/issues/1" target="_blank" rel="noopener noreferrer">Open Sprint Plan</a>
+    <a class="ocs__btn large" href="https://github.com/GameMaker-CSP/Frontend" target="_blank" rel="noopener noreferrer">Team Repository</a>
     <a class="ocs__btn large" href="https://github.com/Malware-Madness/MalwareMadness" target="_blank" rel="noopener noreferrer">Original Project</a>
 </div>
 
@@ -100,7 +103,7 @@ year: "2026-2027"
             <li>Test keyboard order, Back behavior, mobile, and zoom.</li>
         </ul>
         <p><strong>Done when:</strong> the full path preserves choices and never relies on color alone.</p>
-        <a class="ocs__btn small" href="https://github.com/RazorCrest00/uesl-accessible-game-maker/issues/2" target="_blank" rel="noopener noreferrer">Rohan's Issue</a>
+        <a class="ocs__btn small" href="https://github.com/GameMaker-CSP/Frontend/issues/2" target="_blank" rel="noopener noreferrer">Rohan's Issue</a>
     </div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
@@ -112,7 +115,7 @@ year: "2026-2027"
             <li>Lead reviews, unblock dependencies, and record revisions.</li>
         </ul>
         <p><strong>Done when:</strong> three settings affect the preview and every sprint gate has evidence.</p>
-        <a class="ocs__btn small" href="https://github.com/RazorCrest00/uesl-accessible-game-maker/issues/3" target="_blank" rel="noopener noreferrer">Ishan's Issue</a>
+        <a class="ocs__btn small" href="https://github.com/GameMaker-CSP/Frontend/issues/3" target="_blank" rel="noopener noreferrer">Ishan's Issue</a>
     </div>
 
     <div class="ocs__grid-cell">
@@ -124,7 +127,7 @@ year: "2026-2027"
             <li>Test missing, conflicting, valid, and corrupted data.</li>
         </ul>
         <p><strong>Done when:</strong> valid input becomes a compatible preview configuration and drafts restore safely.</p>
-        <a class="ocs__btn small" href="https://github.com/RazorCrest00/uesl-accessible-game-maker/issues/4" target="_blank" rel="noopener noreferrer">Adhvay's Issue</a>
+        <a class="ocs__btn small" href="https://github.com/GameMaker-CSP/Frontend/issues/4" target="_blank" rel="noopener noreferrer">Adhvay's Issue</a>
     </div>
 </div>
 
@@ -159,7 +162,7 @@ year: "2026-2027"
 
     <div class="ocs__grid-cell">
         <strong>Kanban and reviews</strong>
-        <p>Backlog → In Progress → Code Complete → Deployed → Verified.</p>
+        <p>To do → In progress → In review → Done. Future work stays in Backlog.</p>
         <p>Each pull request links its issue, lists its tests, receives teammate review, and records the resulting revision.</p>
     </div>
 </div>
@@ -193,6 +196,6 @@ year: "2026-2027"
 <br>
 
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn alert-green fill" href="https://github.com/RazorCrest00/uesl-accessible-game-maker/issues/1" target="_blank" rel="noopener noreferrer">View Team Plan</a>
-    <a class="ocs__btn" href="https://github.com/RazorCrest00/uesl-accessible-game-maker" target="_blank" rel="noopener noreferrer">View Repository</a>
+    <a class="ocs__btn alert-green fill" href="https://github.com/GameMaker-CSP/Frontend/issues/1" target="_blank" rel="noopener noreferrer">View Team Plan</a>
+    <a class="ocs__btn" href="https://github.com/GameMaker-CSP/Frontend" target="_blank" rel="noopener noreferrer">View Repository</a>
 </div>

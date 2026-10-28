@@ -1,3 +1,4 @@
+import http.server
 import os
 import platform
 import re
@@ -7,16 +8,99 @@ import signal
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
-from linux_setup_agent import LiveFeedback, diagnose, feedback
+from linux_setup_agent import (LiveFeedback, diagnose, feedback, format_setup_report, is_wsl,
+                               run_setup_check, upload_report, write_report_file)
 
 SCRIPT = Path(__file__).with_name('linux_setup_agent.py')
+WINDOWS_SCRIPT = Path(__file__).with_name('windows_setup_agent.py')
 
 
 class LinuxSetupTests(unittest.TestCase):
+    def test_setup_report_has_stable_linux_markers_and_fixes(self):
+        report = format_setup_report([
+            {'id': 'git', 'label': 'Git', 'passed': True, 'fix': ''},
+            {'id': 'vscode', 'label': 'VS Code', 'passed': False, 'fix': 'Install VS Code.'},
+        ], 'linux')
+        self.assertIn('=== LINUX SETUP CHECK v1 ===', report)
+        self.assertIn('PASS git | Git', report)
+        self.assertIn('FAIL vscode | VS Code | Install VS Code.', report)
+        self.assertIn('Summary: 1 passed, 0 warned, 1 failed', report)
+        self.assertIn('Overall: FAIL', report)
+        self.assertTrue(report.endswith('=== END LINUX SETUP CHECK ==='))
+
+    def test_setup_report_shows_when_the_check_ran_and_how_long_it_took(self):
+        report = format_setup_report([
+            {'id': 'git', 'label': 'Git', 'passed': True, 'fix': ''},
+        ], 'linux', '2026-10-15 09:30:00 PDT', 1)
+        self.assertIn('Started: 2026-10-15 09:30:00 PDT', report)
+        self.assertIn('Duration: 1 second\n', report)
+        self.assertIn('Overall: PASS', report)
+
+    def test_check_report_is_saved_and_sent_to_the_upload_url(self):
+        received = []
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_POST(self):
+                received.append(self.rfile.read(int(self.headers['Content-Length'])).decode())
+                self.send_response(200)
+                self.end_headers()
+
+            def log_message(self, *args):
+                pass
+
+        server = http.server.HTTPServer(('127.0.0.1', 0), Handler)
+        threading.Thread(target=server.handle_request, daemon=True).start()
+        with tempfile.TemporaryDirectory() as project:
+            with mock.patch('linux_setup_agent.collect_setup_checks', return_value=[
+                {'id': 'git', 'label': 'Git', 'passed': True, 'fix': ''},
+            ]):
+                report, all_passed = run_setup_check(Path(project), True, 'LINUX')
+            write_report_file(report, Path(project))
+            self.assertTrue(upload_report(report, f'http://127.0.0.1:{server.server_port}/api/cs-pathway/setup-report/CODE'))
+            saved = (Path(project) / 'setup-report.md').read_text()
+        server.server_close()
+        self.assertTrue(all_passed)
+        self.assertRegex(report, r'(?m)^Started: \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}')
+        self.assertRegex(report, r'(?m)^Duration: \d+ seconds?$')
+        self.assertEqual(received, [report])
+        self.assertIn(report, saved)
+
+    def test_report_option_rejects_urls_that_are_not_upload_urls(self):
+        result = subprocess.run(
+            [sys.executable, str(SCRIPT), '--check', '--report', 'http://example.com/x'],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn('is not an upload URL', result.stderr)
+
+    def test_wsl_environment_is_detected_as_windows(self):
+        previous = os.environ.get('WSL_DISTRO_NAME')
+        os.environ['WSL_DISTRO_NAME'] = 'Ubuntu-24.04'
+        try:
+            self.assertTrue(is_wsl())
+        finally:
+            if previous is None:
+                os.environ.pop('WSL_DISTRO_NAME', None)
+            else:
+                os.environ['WSL_DISTRO_NAME'] = previous
+
+    @unittest.skipIf(is_wsl(), 'This guard is only expected outside WSL')
+    def test_windows_entry_point_requires_wsl(self):
+        result = subprocess.run(
+            [sys.executable, str(WINDOWS_SCRIPT), '--check'],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn('must run inside a WSL Ubuntu terminal', result.stdout)
+
     def test_unknown_is_not_success(self):
         self.assertEqual(diagnose('an unfamiliar failure', True), [])
 
@@ -55,13 +139,13 @@ class LinuxSetupTests(unittest.TestCase):
         self.assertIn('python -m pip', ' '.join(diagnose('bash: pip: command not found', True)))
 
     def test_bad_cd_returns_to_actual_checkout_and_quotes_spaces(self):
-        advice = ' '.join(diagnose('bash: cd: toolchian_trail: No such file or directory', True, Path('/tmp/student work/toolchain_trail')))
-        self.assertIn("cd -- '/tmp/student work/toolchain_trail'", advice)
+        advice = ' '.join(diagnose('bash: cd: bluepritns_pages: No such file or directory', True, Path('/tmp/student work/blueprints_pages')))
+        self.assertIn("cd -- '/tmp/student work/blueprints_pages'", advice)
 
     def test_wrong_directory_for_dependency_install(self):
         for error in ['Could not locate Gemfile', "Could not open requirements file: No such file or directory: 'requirements.txt'", 'fatal: not a git repository']:
             with self.subTest(error=error):
-                self.assertIn('cd -- /tmp/toolchain_trail', ' '.join(diagnose(error, True, Path('/tmp/toolchain_trail'))))
+                self.assertIn('cd -- /tmp/blueprints_pages', ' '.join(diagnose(error, True, Path('/tmp/blueprints_pages'))))
 
     def test_success_has_no_failure_message(self):
         self.assertEqual(feedback('git --version', 0, 'git version 2', True, Path('/tmp/project')), '')
@@ -120,7 +204,7 @@ class LinuxLiveTests(unittest.TestCase):
     def setUp(self):
         import pty
         self.temporary = tempfile.TemporaryDirectory(prefix='linux-agent-test-')
-        self.project = Path(self.temporary.name) / 'student work' / 'toolchain_trail'
+        self.project = Path(self.temporary.name) / 'student work' / 'blueprints_pages'
         (self.project / 'scripts').mkdir(parents=True)
         copied_script = self.project / 'scripts' / SCRIPT.name
         shutil.copyfile(SCRIPT, copied_script)
@@ -173,8 +257,8 @@ class LinuxLiveTests(unittest.TestCase):
     def test_project_cd_failure_and_recovery(self):
         result = self.command('pwd')
         self.assertIn(str(self.project), result)
-        result = self.command('cd toolchian_trail')
-        for expected in ['\033[33m', 'Command: cd toolchian_trail', 'No such file or directory', f"cd -- '{self.project}'"]:
+        result = self.command('cd bluepritns_pages')
+        for expected in ['\033[33m', 'Command: cd bluepritns_pages', 'No such file or directory', f"cd -- '{self.project}'"]:
             self.assertIn(expected, result)
         self.assertIn('STATUS=1', self.command('printf "STATUS=%s\\n" "$?"'))
         result = self.command('pwd')
