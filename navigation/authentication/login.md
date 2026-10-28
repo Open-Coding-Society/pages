@@ -298,6 +298,30 @@ show_reading_time: false
     // A Flask-only site has no Spring account, so sign-up shows only Flask's status.
     if (!springEnabled) document.getElementById('springStatus').style.display = 'none';
 
+    // The schools to choose from are Flask's data (GET /api/signup-options). The list in the markup stays
+    // as what is offered when Flask cannot be asked, such as a Flask that has not been updated yet.
+    async function offerSchools() {
+        try {
+            const response = await fetch(`${pythonURI}/api/signup-options`, fetchOptions);
+            const options = response.ok ? await response.json() : null;
+            if (!options || !Array.isArray(options.schools) || options.schools.length === 0) return;
+            const select = document.getElementById('signupSchool');
+            const chosen = select.value;
+            const placeholder = select.querySelector('option[value=""]');
+            select.replaceChildren(placeholder, ...options.schools.map(school => {
+                const option = document.createElement('option');
+                option.value = school.name;
+                option.textContent = school.label;  // text, never markup
+                return option;
+            }));
+            // a school picked before Flask answered stays picked, if Flask still offers it
+            select.value = options.schools.some(school => school.name === chosen) ? chosen : '';
+        } catch (_) {
+            // keep the markup's own list
+        }
+    }
+    offerSchools();
+
     // A guest can sign up only while a Teacher or Admin has the Guest Window open, so the option is
     // offered only then. If Flask cannot be asked, it stays hidden.
     async function offerGuestOption() {
