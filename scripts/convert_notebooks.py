@@ -103,6 +103,11 @@ GAME_RUNNER_PATTERN = r'^//\s*GAME_RUNNER:\s*(.+)$'
 # PSEUDOCODE_RUNNER pattern for Pseudocode examples (raw or code cells)
 PSEUDOCODE_RUNNER_PATTERN = r'^//\s*PSEUDOCODE_RUNNER:\s*(.+)$'
 
+# REFLECTION_RUNNER pattern: first line of a markdown cell, replaced by a written-answer box
+# (_includes/runners/reflection.html) whose answer is submitted with the code runners' Gist.
+#   <!-- REFLECTION_RUNNER: Why did you use a loop here? | id: loops-why -->
+REFLECTION_RUNNER_PATTERN = r'^<!--\s*REFLECTION_RUNNER:\s*(.+?)\s*-->$'
+
 
 #########################################
 ### Section for Core Helper Functions ###
@@ -1375,6 +1380,55 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     return '\n'.join(result)
 
 
+def split_marker_options(content: str) -> tuple[str, dict[str, str]]:
+    """Split "text | key: value, key: value" from a runner marker into text and options."""
+    if '|' not in content:
+        return content.strip(), {}
+    text, options_str = content.split('|', 1)
+    options = {}
+    for option in options_str.split(','):
+        if ':' in option:
+            key, value = option.split(':', 1)
+            options[key.strip()] = value.strip()
+    return text.strip(), options
+
+
+def reflection_runner_liquid(question: str, runner_id: str, number: int) -> str:
+    """The Liquid that embeds one reflection runner, mirroring the code runner's capture/include."""
+    return (
+        '{% capture reflection' + str(number) + ' %}' + question + '{% endcapture %}\n'
+        '{% include runners/reflection.html runner_id="' + runner_id + '" question=reflection'
+        + str(number) + ' reflection_number="' + str(number) + '" %}'
+    )
+
+
+def process_reflection_runner_cells(notebook, permalink):
+    """Replace <!-- REFLECTION_RUNNER: question | id: ... --> markdown cells with reflection runners."""
+    number = 0
+    seen_ids = set()
+    for cell in notebook.cells:
+        if cell.cell_type != 'markdown':
+            continue
+        lines = cell.source.strip().split('\n')
+        match = re.match(REFLECTION_RUNNER_PATTERN, lines[0].strip(), re.IGNORECASE)
+        if not match:
+            continue
+        question, options = split_marker_options(match.group(1))
+        if not question:
+            raise ValueError('A REFLECTION_RUNNER marker needs the question text: <!-- REFLECTION_RUNNER: question | id: name -->')
+        number += 1
+        # The id names the answer's file in the Gist, so it is kept to filename-safe characters.
+        runner_id = options.get('id') or generate_runner_id(permalink, f'reflection-{number}')
+        runner_id = re.sub(r'[^A-Za-z0-9_-]', '-', runner_id)
+        if runner_id in seen_ids:
+            raise ValueError(f'Duplicate REFLECTION_RUNNER id "{runner_id}" in one notebook.')
+        seen_ids.add(runner_id)
+        # Any text after the marker stays in the lesson, as context shown after the box.
+        rest = '\n'.join(lines[1:]).strip()
+        cell['source'] = reflection_runner_liquid(question, runner_id, number) + (f'\n\n{rest}' if rest else '')
+    return notebook
+
+
 def process_custom_cells(notebook, permalink):
     """Main custom-cell orchestration pipeline for ID assignment and runner extraction."""
     notebook = assign_custom_cell_ids(notebook, permalink)
@@ -1382,6 +1436,7 @@ def process_custom_cells(notebook, permalink):
     notebook = process_ui_runner_cells(notebook, permalink)
     notebook = process_game_runner_cells(notebook, permalink)
     notebook = process_pseudocode_runner_cells(notebook, permalink)
+    notebook = process_reflection_runner_cells(notebook, permalink)
     return notebook
 
 
