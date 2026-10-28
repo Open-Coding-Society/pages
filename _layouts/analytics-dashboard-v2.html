@@ -894,12 +894,10 @@ score += gists * 0.5
                 card.className = "flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-4";
 
                 card.innerHTML = `
-                    <h4 class="text-sm font-medium mb-1">${commit.repository || "Unknown Repo"}</h4>
+                    <h4 class="text-sm font-medium mb-1"></h4>
                     <p class="text-xs mb-1">
                         <strong>Message:</strong>
-                        <a href="${commit.url}" target="_blank" class="text-blue-400 hover:underline">
-                            ${commit.message || "No message"}
-                        </a>
+                        <a target="_blank" class="text-blue-400 hover:underline"></a>
                     </p>
                     <p class="text-xs mb-1"><strong>Date:</strong> ${new Date(commit.date).toLocaleString() || "Unknown"}</p>
                     <p class="text-xs mb-1">
@@ -908,6 +906,11 @@ score += gists * 0.5
                         <span class="text-red-400">-${commit.deletions || 0}</span>
                     </p>
                 `;
+                // Commit text is shown as text, so a message like "Use <details>" isn't parsed as HTML.
+                card.querySelector("h4").textContent = commit.repository || "Unknown Repo";
+                const link = card.querySelector("a");
+                link.href = commit.url || "#";
+                link.textContent = commit.message || "No message";
                 commitCardsContainer.appendChild(card);
             });
 
