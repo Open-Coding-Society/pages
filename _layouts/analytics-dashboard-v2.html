@@ -648,7 +648,6 @@ score += gists * 0.5
         );
     }
 
-    const profileLinksUrl = `${pythonURI}/api/analytics/github/user/profile_links`;
     const userProfileUrl = `${pythonURI}/api/analytics/github/user`;
     const commitsUrl = `${pythonURI}/api/analytics/github/user/commits`;
     const prsUrl = `${pythonURI}/api/analytics/github/user/prs`;
@@ -826,20 +825,26 @@ score += gists * 0.5
         });
     }
 
+    // Each card fills in as soon as its own request returns, so the slow commits read doesn't hold up the rest.
     async function fetchData() {
-        const results = await Promise.allSettled(
-            [profileLinksUrl, userProfileUrl, commitsUrl, prsUrl, issuesUrl].map(getJson)
-        );
-        results.filter((r) => r.status === "rejected")
-            .forEach((r) => console.error("Error fetching GitHub data:", r.reason));
-        const [profileLinks, userProfile, commitsData, prsData, issuesData] =
-            results.map((r) => (r.status === "fulfilled" ? r.value : null));
+        const load = (url) => getJson(url).catch((e) => {
+            console.error("Error fetching GitHub data:", e);
+            return null;
+        });
+        await Promise.all([
+            load(userProfileUrl).then(renderProfile),
+            load(issuesUrl).then(renderIssues),
+            load(prsUrl).then(renderPrs),
+            load(commitsUrl).then(renderCommits),
+        ]);
+    }
 
-        if (userProfile && profileLinks) {
+    function renderProfile(userProfile) {
+        if (userProfile) {
             const username = userProfile.login || "N/A";
             const avatarUrl = userProfile.avatar_url || "";
-            const profileUrl = profileLinks.profile_url || "#";
-            const reposUrl = profileLinks.repos_url || "#";
+            const profileUrl = userProfile.html_url || "#";
+            const reposUrl = userProfile.repos_url || "#";
 
             // Fill in profile info
             document.getElementById("avatar").src = avatarUrl;
@@ -853,21 +858,27 @@ score += gists * 0.5
         } else {
             markUnavailable(["username", "profile-url", "repos-url", "public-repos", "public-gists", "followers", "following"]);
         }
+    }
 
+    function renderIssues(issuesData) {
         if (issuesData) {
             document.getElementById("issues-count").textContent = (issuesData.issues || []).length;
             setupInfoModal("issues-info", issuesData);
         } else {
             markUnavailable(["issues-count"]);
         }
+    }
 
+    function renderPrs(prsData) {
         if (prsData) {
             document.getElementById("prs-count").textContent = (prsData.pull_requests || []).length;
             setupInfoModal("prs-info", prsData);
         } else {
             markUnavailable(["prs-count"]);
         }
+    }
 
+    async function renderCommits(commitsData) {
         if (!commitsData) {
             markUnavailable(["commits-count", "lines-changed"]);
             return;
@@ -1178,13 +1189,13 @@ score += gists * 0.5
         const activeTab = document.querySelector(".tab-btn.active");
         if (activeTab) setUnderline(activeTab);
 
-        await fetchData();
-        await loadStudentEvaluation();
-        
-        // Load OCS Analytics if it's the active tab
-        if (window.OCSAnalytics && window.OCSAnalytics.loadAnalyticsSummary) {
-            await window.OCSAnalytics.loadAnalyticsSummary();
+        // The sections don't depend on each other, so they load at the same time.
+        const loads = [fetchData(), loadStudentEvaluation()];
+        // OCS Analytics loads now only if it's the active tab; otherwise when its tab is opened.
+        if (activeTab?.id === "tab-ocs-analytics" && window.OCSAnalytics?.loadAnalyticsSummary) {
+            loads.push(window.OCSAnalytics.loadAnalyticsSummary());
         }
+        await Promise.all(loads);
     };
                 </script>
 
