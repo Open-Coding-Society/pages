@@ -1,0 +1,73 @@
+// The canvas page's chrome (/ui-builder/canvas/, inside the editor's iframe): selection and hover
+// outlines, hidden and broken parts, and the add buttons in empty cells. The page itself is
+// plain ocs__ grammar; these rules only mark it up for editing.
+
+// The whole frame is clickable: a click on empty space selects nothing (Page settings).
+.ocs__uibuilder-canvas {
+  min-height: 100vh;
+}
+
+.ocs__uibuilder-canvas [data-ui-node] {
+  position: relative;
+  cursor: pointer;
+}
+
+.ocs__uibuilder-canvas [data-ui-hover] {
+  outline: 1px dashed var(--pref-accent-color);
+  outline-offset: 3px;
+}
+
+.ocs__uibuilder-canvas [data-ui-selected] {
+  outline: 2px solid var(--pref-accent-color);
+  outline-offset: 3px;
+}
+
+// A section's outline sits further out, so a selected block and its section don't overlap.
+.ocs__uibuilder-canvas [data-ui-kind="section"][data-ui-hover],
+.ocs__uibuilder-canvas [data-ui-kind="section"][data-ui-selected] {
+  outline-offset: 8px;
+}
+
+// Hidden parts stay visible while editing, striped and labelled.
+.ocs__uibuilder-canvas [data-ui-hidden] {
+  opacity: 0.6;
+  background-image: repeating-linear-gradient(135deg, color-mix(in srgb, var(--pref-text-color) 7%, transparent) 0 6px, transparent 6px 12px);
+}
+
+.ocs__uibuilder-canvas [data-ui-hidden]::before {
+  content: attr(data-ui-hidden-label);
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  z-index: 1;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+// A block that failed to draw, or an unknown type: dashed so it reads as something to fix.
+.ocs__uibuilder-canvas [data-ui-error] {
+  outline: 2px dashed var(--pref-accent-color);
+  outline-offset: 3px;
+}
+
+// A block with nothing to show yet keeps a visible, selectable box.
+.ocs__uibuilder-canvas [data-ui-empty] {
+  padding: 0.75rem;
+  border: 1px dashed var(--ui-border);
+  border-radius: 0.5rem;
+  color: var(--text-muted);
+}
+
+// An empty column keeps its height and shows where its add button is.
+.ocs__uibuilder-canvas [data-ui-cell] {
+  min-height: 3rem;
+}
+
+.ocs__uibuilder-canvas [data-ui-add] {
+  align-self: flex-start;
+  border-style: dashed;
+}

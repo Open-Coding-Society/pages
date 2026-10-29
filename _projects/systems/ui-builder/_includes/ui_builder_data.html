@@ -4,6 +4,11 @@ reads: the generic registry (_data/ui_builder.yml), the school pack (_data/ui_bu
 course titles from each course's own data file (the way Profile reads them) and, on the editor
 page only (editor=true), the editor's strings (_data/ui_builder_editor.yml). Every "<" is written
 as \u003c so a string in the data can never close the script element.
+
+widgets=true (the viewer) also puts on the page what the live kanban and calendar blocks copy:
+each owner's data once (#ocs-kanban-defaults, #ocsSchoolCalendarData) and its empty card inside
+a <template>, for kanban-board.js createKanbanSection and calendar-card.js createCalendarCardSection.
+Their scripts are loaded by the viewer only when a page has such a block.
 {%- endcomment -%}
 <script type="application/json" id="ui-builder-registry">{{ site.data.ui_builder | jsonify | replace: "<", "\u003c" }}</script>
 <script type="application/json" id="ui-builder-school">{{ site.data.ui_builder_school | jsonify | replace: "<", "\u003c" }}</script>
@@ -14,4 +19,10 @@ as \u003c so a string in the data can never close the script element.
 {%- endfor -%}]</script>
 {%- if include.editor %}
 <script type="application/json" id="ui-builder-editor-text">{{ site.data.ui_builder_editor | jsonify | replace: "<", "\u003c" }}</script>
+{%- endif %}
+{%- if include.widgets %}
+{% include ocs_kanban_board_data.html %}
+{% include ocs_kanban_board.html template=true %}
+{% include ocs_calendar_card_data.html %}
+{% include ocs_calendar_card.html template=true %}
 {%- endif %}

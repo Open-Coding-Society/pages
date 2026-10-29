@@ -1,3 +1,37 @@
 // UI Builder editor and canvas chrome. Everything is scoped under .ocs__uibuilder (the editor
 // page) or .ocs__uibuilder-canvas (the canvas page), because project sass is imported site-wide.
-// Published pages use only the shared ocs__ grammar; nothing here styles them.
+// Published pages use only the shared ocs__ grammar; the one rule below for them undoes a
+// site-wide leak.
+//
+// The grammar draws every control, card, field, modal and pill the editor uses; these partials
+// only add what an editing app needs and a document page doesn't: the three-pane layout, the
+// scaled canvas frame, the flat outline tree, the menu and the canvas's selection outlines.
+// Each rule says why the grammar can't do it. Colours come from theme tokens only.
+// Ruby Sass 3.7: no min()/max() (Sass would try to compute them), no / division.
+
+$uib-wide: 1440px;
+$uib-phone: 767px;
+
+@import "shell";
+@import "outline";
+@import "inspector";
+@import "dialogs";
+@import "start";
+@import "canvas";
+
+// Two unscoped site rules reach every h1: the calendar system's sass hides it and the
+// documentation styles make it green and glowing. A builder page shows its own title in the
+// theme's text color, in the viewer, the editor's canvas and the template thumbnails alike.
+[data-ui-page] h1 {
+  display: block;
+  color: var(--pref-text-color);
+  text-shadow: none;
+}
+
+// Last on purpose: [hidden] (and the site's .hidden) must win over any rule above and over the
+// grammar's own display rules (ocs__btn, ocs__stack, ocs__modal-actions) inside the builder.
+.ocs__uibuilder [hidden],
+.ocs__uibuilder .hidden,
+.ocs__uibuilder-canvas [hidden] {
+  display: none !important;
+}

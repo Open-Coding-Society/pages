@@ -1,0 +1,93 @@
+// The outline: a flat ARIA tree (levels in aria-level), so the grammar's nested ocs__tree
+// indentation can't draw it; selection, drop targets and hidden rows need their own looks too.
+
+.ocs__uibuilder-tree {
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.ocs__uibuilder-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+  padding: 0.2rem 0.35rem;
+  border: 1px solid transparent;
+  border-radius: 0.45rem;
+  cursor: pointer;
+
+  &[aria-level="2"] { padding-left: 1.25rem; }
+  &[aria-level="3"] { padding-left: 2.25rem; }
+
+  &:hover {
+    background: color-mix(in srgb, var(--pref-text-color) 6%, var(--panel));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pref-accent-color);
+    outline-offset: 1px;
+  }
+
+  &[aria-selected="true"] {
+    border-color: var(--pref-accent-color);
+    background: color-mix(in srgb, var(--pref-accent-color) 14%, var(--panel));
+  }
+
+  // Hidden on the published page: still listed, quieter.
+  &[data-hidden] .ocs__uibuilder-row-main {
+    opacity: 0.6;
+  }
+
+  // Where a dragged row will land.
+  &[data-drop="before"] { box-shadow: inset 0 2px 0 var(--pref-accent-color); }
+  &[data-drop="after"] { box-shadow: inset 0 -2px 0 var(--pref-accent-color); }
+  &[data-drop="inside"] { outline: 2px dashed var(--pref-accent-color); }
+
+  // "Add block" rows read as an action, not as content.
+  &[data-kind="add"] .ocs__uibuilder-row-main {
+    color: var(--pref-accent-color);
+  }
+
+  // A cell row is a heading for its blocks.
+  &[data-kind="cell"] strong {
+    font-weight: 500;
+  }
+}
+
+// The label keeps at least 7rem beside its badges; the selected row's tools wrap under it
+// rather than squeeze it.
+.ocs__uibuilder-row-main {
+  flex: 1 1 7rem;
+
+  small {
+    color: var(--text-muted);
+  }
+}
+
+// Hidden and to-fix badges keep their full width beside the truncated label.
+.ocs__uibuilder-row-badges {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 0.2rem;
+}
+
+// Row tools show on the selected row only, so other rows keep their whole label and rows
+// don't jump while the mouse or the arrow keys move over them; a tap selects, then they show.
+.ocs__uibuilder-row-tools {
+  display: none;
+  flex: 0 0 auto;
+  gap: 0.15rem;
+  margin-left: auto;
+
+  .ocs__btn {
+    width: 1.9rem;
+    height: 1.9rem;
+    padding: 0;
+  }
+}
+
+.ocs__uibuilder-row[aria-selected="true"] .ocs__uibuilder-row-tools {
+  display: inline-flex;
+}

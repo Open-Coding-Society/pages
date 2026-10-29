@@ -209,6 +209,17 @@
   height: var(--dm-embed-log-height);
 }
 
+// A host's column can be a narrow sidebar, so the composer takes the column's whole width and
+// its Cancel and Send buttons wrap to the line below, at the end.
+.dm--embed .dm__composer {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.dm--embed .rt-composer {
+  flex-basis: 100%;
+}
+
 // The sign-in link shown to a visitor who isn't signed in, coloured like a link in a message.
 .dm--embed .dm__notice a {
   color: var(--dm-accent);

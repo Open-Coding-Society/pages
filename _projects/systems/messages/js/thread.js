@@ -203,9 +203,10 @@ export function createThread({
     pending = target ? 'edit' : 'send';
     showFormMessage('');
     refreshComposer();
+    let saved = null;
     try {
       if (target) await kinds[kind].edit(id, target.id, html);
-      else await kinds[kind].send(id, html, sendingImage || null);
+      else saved = await kinds[kind].send(id, html, sendingImage || null);
     } catch (error) {
       pending = null;
       console.warn('Messages: could not save the message', error);
@@ -232,8 +233,21 @@ export function createThread({
     // Keep anything typed while the message was sending.
     if (composer.getHTML() === html) composer.clear();
     refreshComposer();
-    // Your message comes back on the socket. Offline nothing comes back, so fetch it.
+    // Your message comes back on the socket, but a socket that subscribed a moment ago can miss
+    // it, so what the send answered goes on screen too (the log skips messages it has). Offline
+    // nothing comes back, so fetch it.
+    showSaved(kind, id, saved);
     if (!socket.isConnected()) loadNew(kind, id);
+  }
+
+  // A group send answers with the chat's messages, a DM send with the saved message's event.
+  function showSaved(kind, id, saved) {
+    if (kind === 'group' && Array.isArray(saved)) {
+      saved.map(groupMessage).forEach(message => log.append(message, isMine(kind, message)));
+    } else if (kind === 'dm' && saved && typeof saved === 'object') {
+      const change = classifyDmEvent(saved, id, key => log.has(key));
+      if (change.type === 'message') log.append(change.message, true);
+    }
   }
 
   async function deleteMessage(message, button) {

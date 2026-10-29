@@ -574,5 +574,150 @@ text:
     private_keys: "Your API sends {keys} to anyone who asks. Remove them from this route."
     loopback_hint: "If Chrome asks to let this page access apps on your device, choose Allow. School-managed Chromebooks may block this; take the saved copy on another computer."
     open_link: Open in new tab
-  view: {}
-  gallery: {}
+  # The viewer (/ui-builder/view/). ui_builder_school.yml rewords some of these for a school.
+  view:
+    loading: Loading the page…
+    noscript: Turn on JavaScript to see this page.
+    document_title: "{title}"
+    attribution: UI Builder page
+    made_by: "Made by {name}"
+    made_by_group: "Made by {name} ({group})"
+    edit: Edit
+    report: Report this page
+    report_subject: A UI Builder page to check
+    report_body: "This page may need someone to look at it: {url}"
+    draft_badge: Draft
+    draft_note: Only the page's editors and teachers can see this draft.
+    local_badge: In this browser
+    local_note: This page is saved in this browser only. Export the page file to put it on the site.
+    open_live: Open the live page
+    not_found: Not found, or only for signed-in OCS members.
+    draft_not_found: "This draft doesn't exist, or you can't edit it."
+    local_not_found: "This page isn't saved in this browser."
+    local_unreadable: "This browser can't open its saved pages (private browsing or blocked site data), or the saved page is damaged."
+    sign_in_to_see: Sign in to see this page.
+    load_failed: "The page couldn't load. Check your connection and try again."
+    broken: "This page is damaged and can't be shown."
+    retry: Try again
+    no_page: No page was named in this address.
+    open_gallery: See published pages
+    open_builder: Open the UI Builder
+    spring_off: "Published pages need the OCS Spring backend, which this site doesn't run. Pages made here are saved in your browser."
+    framed: "This page can't run inside another page."
+    open_directly: Open it in its own tab
+    guest_comms: This is for signed-in OCS members.
+    guest_members: Team names are for signed-in OCS members.
+    guest_message_me: Messages are for signed-in OCS members.
+    guest_announcements: Class announcements are for signed-in OCS members.
+  # The gallery (/ui-builder/gallery/).
+  gallery:
+    title: Page gallery
+    lead: Pages made with the UI Builder. Open one to see it live.
+    noscript: Turn on JavaScript to see the gallery.
+    make_page: Make a page
+    search_label: Search pages
+    search_placeholder: Title, team or topic
+    course_label: Course
+    course_all: All courses
+    loading: Loading pages…
+    count: "{count} pages"
+    count_one: "1 page"
+    results_label: Published pages
+    empty: No pages are published yet.
+    empty_filtered: No pages match. Try other words or another course.
+    by: "By {byline}"
+    members_only: OCS members only
+    signed_out: You see the pages approved for everyone.
+    load_failed: "The gallery couldn't load. Check your connection and try again."
+    retry: Try again
+    spring_off: "The gallery needs the OCS Spring backend, which this site doesn't run. Pages made here are saved in your browser."
+  # Live blocks on a published page, beyond text.blocks (blocks-live.js, blocks-project.js).
+  live:
+    offline: "This part of the page needs a connection. Reload the page when you're back online."
+    load_failed: "This part of the page couldn't load. Reload the page to try again."
+    api_open: Open
+    api_failed: "Couldn't load data from {host}."
+    api_unreachable: "This data comes from the team's own computer, and no saved copy was kept."
+    api_saved_copy: Saved copy
+    message_me_opening: Opening Messages…
+    message_me_failed: "Couldn't start a message. Try again."
+    message_me_unpublished: The button works once this page is published.
+    members_unpublished: Team members show once this page is published.
+    members_unavailable: "This group's members can't be shown."
+    members_empty: No one is in this group yet.
+    announcements_missing: "{course} has no announcement channel yet."
+    announcement_event: "Event: {title}, {date}"
+    announcement_event_untitled: Class event
+    feedback_unpublished: Feedback opens once this page is published.
+    feedback_label: Your feedback
+    feedback_help: "Up to {max} characters. Everyone who can see this page can read it."
+    feedback_send: Post feedback
+    feedback_sending: Posting…
+    feedback_sent: Thanks! Your feedback is posted.
+    feedback_check: "Write your feedback first, in {max} characters or fewer."
+    feedback_wait: Wait a few seconds before posting again.
+    feedback_failed: "Your feedback couldn't be posted. Try again."
+    feedback_load_failed: "Feedback couldn't load. Reload the page to try again."
+    feedback_none: No feedback yet. Be the first.
+    feedback_sign_in: Sign in to leave feedback.
+    feedback_someone: A visitor
+    feedback_time: "· {time}"
+  # What a page store's errors say (page-store.js storeErrorText picks the key).
+  store:
+    offline: "Can't reach OCS right now. Your changes are kept in this browser until it's back."
+    timeout: "OCS didn't answer in time. Your changes are kept in this browser; try again in a moment."
+    conflict: "{name} saved this page at {time}."
+    conflict_unknown: "This page was saved somewhere else at {time}, maybe in another tab."
+    not_found: "This page doesn't exist any more, or you can't open it."
+    slug_taken: That address is taken. Pick another one.
+    slug_locked: "A page's address can't change after it's published."
+    slug_required: Pick an address for the page before publishing it.
+    invalid_spec: "OCS didn't accept this page. Fix the problems marked on it, then try again."
+    origin_rejected: OCS only takes this from the OCS site. Reload the page and try again.
+    unauthorized: Sign in again to save to OCS.
+    forbidden: "You can't do that on this page."
+    too_large: This page is too big to save.
+    busy: OCS is busy. Try again in a moment.
+    not_published: Publish the page first.
+    own_page: This is your own page.
+    bad_request: "OCS couldn't use that request ({status})."
+    server: "OCS had a problem ({status}). Try again in a moment."
+    bad_response: "OCS sent an answer this page can't read."
+    storage_full: This browser is out of room for saved pages. Export or delete a page, then try again.
+    storage_blocked: "This browser doesn't let pages save (private browsing or blocked site data)."
+    corrupt: "This saved page is damaged and can't be opened."
+    unknown: Something went wrong. Try again.
+  # The group chat and class announcements, as Messages' conversation-embed.js texts (every key it has).
+  chat:
+    loading: Loading messages…
+    emptyTitle: No messages yet
+    emptyHint: Say hi to your group.
+    loadFailedTitle: Could not load these messages
+    loadFailedHint: Check your connection, then reload the page.
+    signIn: Sign in to see this chat.
+    unavailable: "This chat isn't available right now."
+    offline: Live updates are off. Reload the page to see new messages.
+    placeholder: Type a message…
+    send: Send
+    save: Save
+    cancel: Cancel
+    sendFailed: Could not send the message. Try again.
+    editFailed: Could not save your edit. Try again.
+    editOfDeleted: That message was deleted, so your edit was not saved.
+    deleteFailed: Could not delete the message. Try again.
+    waitForSave: Wait for your message to finish saving first.
+    you: You
+    edited: (edited)
+    deleted: This message was deleted.
+    editMessage: Edit message
+    deleteMessage: Delete message
+    imageFrom: "Image from {name}"
+    imageUnreadable: Could not read that image. Try a different file.
+    today: Today
+    yesterday: Yesterday
+    fileShared: "{sender} shared a file:"
+    fileSharedBySomeone: "A file was shared:"
+    fileGone: "{filename} is no longer shared with this group."
+    fileFailed: "Could not download {filename}. Try again."
+    idleTitle: Pick a conversation
+    idleHint: Or start a new chat, or find a group to join.

@@ -1,0 +1,85 @@
+// Dialogs and the block palette. The grammar's ocs__modal draws them; only the layering and the
+// palette's list are the builder's own.
+
+// Above the site's sticky header, as /dm does: the grammar's z-index of 50 sits under it.
+.ocs__uibuilder-dialog .ocs__modal {
+  z-index: 10000;
+}
+
+// Unscoped heading rules from other site styles (the documentation pages) turn every h2 green
+// and glowing; a dialog title follows the theme, as /dm's do.
+.ocs__uibuilder-dialog .ocs__modal-title {
+  color: var(--pref-text-color);
+  font-size: 1.25rem;
+  text-shadow: none;
+}
+
+.ocs__uibuilder-dialog .ocs__modal-card {
+  max-height: 85dvh;
+  overscroll-behavior: contain;
+}
+
+.ocs__uibuilder-palette-card {
+  max-width: 42rem;
+}
+
+// The choices scroll inside the card so the search box stays in view.
+.ocs__uibuilder-palette {
+  display: grid;
+  gap: 0.35rem;
+  max-height: 55dvh;
+  overflow: auto;
+}
+
+.ocs__uibuilder-palette-group {
+  margin: 0.6rem 0 0.15rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+// A choice is a full-width row with its icon, name and help, not an ocs__btn pill.
+.ocs__uibuilder-choice {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.55rem;
+  background: var(--panel);
+  color: var(--pref-text-color);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  small {
+    display: block;
+    margin-top: 0.15rem;
+    color: var(--text-muted);
+  }
+
+  i {
+    color: var(--pref-accent-color);
+  }
+
+  &:hover,
+  &:focus-visible,
+  &[aria-selected="true"] {
+    outline: none;
+    border-color: var(--pref-accent-color);
+    background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
+  }
+
+  &[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.ocs__uibuilder-revisions {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

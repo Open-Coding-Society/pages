@@ -157,6 +157,22 @@ test('a message sent from the pane goes to the open group over REST', async () =
   assert.deepEqual(api.calls.at(-1), ['sendGroupMessage', 7, 'hello team']);
 });
 
+test('your message shows from the send answer when the socket misses its echo', async () => {
+  const api = stubApi();
+  api.sendGroupMessage = async (id, html) => {
+    api.calls.push(['sendGroupMessage', id, html]);
+    return [{ id: 'm9', author: 'Ada Lovelace', message: html, date: '2026-10-28T19:00:00Z' }];
+  };
+  const { thread, elements, richText } = makeThread({ api });
+  thread.open('group', 7, { title: '', subtitle: '' });
+  await settle();
+  richText.composers[0].setHTML('first hello');
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  assert.match(elements.messages.textContent, /first hello/);
+  assert.equal(elements.messages.querySelectorAll('.chat-msg').length, 1);
+});
+
 test('destroy stops following, takes back the document listener and the composer, and drops a history still loading', async () => {
   let release;
   const api = stubApi();

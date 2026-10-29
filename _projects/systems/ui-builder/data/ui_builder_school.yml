@@ -157,6 +157,7 @@ text:
     made_by_group: "Made by {name} ({group})"
     report: Report this page
     report_body: "This student page may need a teacher's attention: {url}"
+    report_subject: A student page to check
     guest_comms: Team chat is for OCS members. Leave feedback below instead.
   teacher:
     class_pages: Class pages

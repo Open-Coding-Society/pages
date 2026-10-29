@@ -1,0 +1,113 @@
+// The inspector's fields. ocs__field lays each one out; these rules add what a form of
+// generated widgets needs: issue lines, required marks, repeatable rows and the API checks.
+
+.ocs__uibuilder-inspector .ocs__stack {
+  gap: 0.85rem;
+}
+
+// The title row of the selected part: its icon beside the name.
+.ocs__uibuilder-node-title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+// Inline problems, in a <strong> because preset themes recolor span, div and p.
+.ocs__uibuilder-issue {
+  display: block;
+  color: var(--pref-accent-color);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.ocs__uibuilder-required {
+  color: var(--pref-accent-color);
+  text-decoration: none;
+}
+
+// Code and tables are typed by column; a monospace face keeps the "|" lined up.
+.ocs__uibuilder-mono {
+  font-family: 'Source Code Pro', ui-monospace, monospace;
+  font-size: 0.85rem;
+}
+
+// Fieldsets group a list or the API settings; the browser default frame and padding don't fit.
+.ocs__uibuilder-list,
+.ocs__uibuilder-api {
+  min-width: 0;
+  margin: 0;
+  padding: 0.6rem 0.75rem 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.6rem;
+
+  > legend {
+    padding: 0 0.35rem;
+  }
+}
+
+.ocs__uibuilder-rows {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0 0 0.6rem;
+  padding: 0;
+  list-style: none;
+}
+
+// One repeatable row: its fields, then its move and remove buttons.
+.ocs__uibuilder-item {
+  display: grid;
+  gap: 0.4rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--ui-border);
+
+  &:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  > fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+}
+
+.ocs__uibuilder .ocs__uibuilder-item-tools {
+  gap: 0.25rem;
+}
+
+// The API doctor's lines: one finding each, with its icon.
+.ocs__uibuilder-checks {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+
+  i {
+    color: var(--pref-accent-color);
+  }
+}
+
+.ocs__uibuilder-checks:empty {
+  display: none;
+}
+
+// Image tips (GitHub raw links, Drive) beside the field they explain.
+.ocs__uibuilder-tip {
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--pref-accent-color);
+}
+
+// Delete sits apart from every other button, with room above it.
+.ocs__uibuilder-danger {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--ui-border);
+}
+
+// The rich-text composer fills the field like the inputs around it.
+.ocs__uibuilder-rich .rt-composer {
+  width: 100%;
+}
