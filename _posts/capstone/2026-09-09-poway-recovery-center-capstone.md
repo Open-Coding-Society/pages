@@ -2,7 +2,7 @@
 microblog: true
 toc: false
 layout: post
-title: "Poway Recovery Center: Community, Connection, and Recovery"
+title: "Poway Recovery Center"
 permalink: /capstone/poway-recovery-center/
 ---
 
