@@ -931,6 +931,18 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 
 
+   <!-- Unified Social Club (CSP, 2026-2027) -->
+   <div class="ocs__grid-cell CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-10-29-unified-social-club-capstone %}">
+           <img src="https://static.wixstatic.com/media/9e5be0_eb95862075164278a84294003b81a516~mv2.png" alt="Unified Social Club logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{% post_url 2026-10-29-unified-social-club-capstone %}">Unified Social Club</a></h3>
+           <p>Rebuilding the website for Poway's free social club for adults with special needs, so members, families, and volunteers can find a club date, register, and stay connected, with easy-read pages, hands-free Nod to select, club games, and safe messages with volunteers.</p>
+           <p>Team: Triple T (Chetan Tiduwar, Aaditya Prem, Kashyap Tubati)</p>
+       </div>
+   </div>
+
    <!-- San Diego Rescue Mission (2026-2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/sdrm/' | relative_url }}">
        <a href="{% post_url 2026-09-10-sdrm-capstone %}">

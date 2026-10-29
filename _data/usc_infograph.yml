@@ -1,0 +1,173 @@
+# Unified Social Club Capstone Infographic
+# Rendered by _includes/usc-infograph.html. All styling comes from the shared,
+# theme-aware capstone infograph SASS (_sass/capstone/infograph.scss), so there is no
+# page-specific CSS.
+Title: "Unified Social Club"
+Description: "Unified Social Club gives adults with special needs in Poway a free, safe place to make friends: board and card games, arts and crafts, karaoke, and sports, twice a month at the Mickey Cafagna Community Center. The club is warm and well supported, but its website makes families hunt for dates, times, and how to sign up. We are rebuilding it so members, families, and volunteers can find a club date, register, and stay connected, with accessibility built in from the start."
+
+Topics:
+  - title: "Club Dates and Registration"
+    phase: "Round 1"
+    link: "https://www.unifiedsocialclub.com/event-list"
+    linkLabel: "See Their Club Dates"
+    subtitle: "Find the next club date and sign up in one place"
+    keyPoints:
+      - "A calendar of club dates in order, with the year, start and end time, and pickup time"
+      - "Register for a date with spaces for an aide, a family member, or a service animal"
+      - "Shows when a date is full, and sends a reminder before each club night"
+      - "Volunteers and staff add or edit dates without touching code"
+    tech:
+      - "Events API"
+      - "RSVP with limits"
+      - "OCS calendar"
+      - "Email reminders"
+    description: "Today the dates show up out of order, without a year or a time, so families have to guess. A real events system fixes that, and the registration form keeps the details the club already asks for: aides, service animals, and photo consent."
+    impact:
+      - "Families know exactly when to drop off and pick up"
+      - "The club knows who is coming and when a date is full"
+    status: "Planned"
+    team:
+      - "Aaditya"
+      - "Chetan"
+      - "Kashyap"
+
+  - title: "Easy-Read, Accessible Site"
+    phase: "Round 2"
+    link: "https://www.unifiedsocialclub.com/blank-1"
+    linkLabel: "Read Their FAQ"
+    subtitle: "Plain words, big buttons, and more than one way to click"
+    keyPoints:
+      - "Short sentences and a picture next to every main link"
+      - "Text-size buttons that the site remembers between visits"
+      - "Nod to select: a head nod presses the highlighted button for members who can't use a mouse"
+      - "Real page names instead of /blank-1 to /blank-6, and the FAQ answers on the pages they belong to"
+    tech:
+      - "Easy-read design"
+      - "Text-size control"
+      - "Nod to select"
+      - "OCS template"
+    description: "Members, families, and aides all use the site, with very different needs. We are reusing the accessibility work from our Friends of Poway Seniors capstone, including hands-free Nod to select, and checking every page with real members."
+    impact:
+      - "Members can use the site on their own"
+      - "Families find answers without calling"
+    status: "Planned"
+    team:
+      - "Aaditya"
+      - "Chetan"
+      - "Kashyap"
+
+  - title: "Club Games Between Club Dates"
+    phase: "Round 3"
+    link: "https://www.unifiedsocialclub.com/"
+    linkLabel: "See What the Club Does"
+    subtitle: "Keep playing with friends at home"
+    keyPoints:
+      - "Large-print Bingo with a speaking caller, solo or in a room with friends using a 4-digit code"
+      - "Simple card and board games that match the ones played at club nights"
+      - "Every game works with Nod to select and big text"
+    tech:
+      - "Bingo rooms API"
+      - "Shared game rules"
+      - "Saved progress"
+    description: "Board and card games are the heart of club nights. We already built multiplayer Bingo with a server-checked caller for Friends of Poway Seniors, so we start from that and add games the members already love."
+    impact:
+      - "Friendships continue between club dates"
+      - "Members practice games before club night"
+    status: "Planned"
+    team:
+      - "Aaditya"
+      - "Chetan"
+      - "Kashyap"
+
+  - title: "Accounts, Profiles, and Messages"
+    phase: "Round 4"
+    link: "https://www.unifiedsocialclub.com/blank-4"
+    linkLabel: "Their Volunteer Page"
+    subtitle: "One account for members, families, and volunteers"
+    keyPoints:
+      - "Roles for members, family or aides, volunteers, and staff"
+      - "A tap-only interest survey that puts each member's favorite activities first"
+      - "Private messages with volunteers and staff only, never strangers"
+      - "Online volunteer sign-up and the liability waiver in the same flow"
+    tech:
+      - "OCS login and roles"
+      - "Interest survey API"
+      - "OCS direct messages"
+      - "OCS microblog"
+    description: "Volunteers register on one page and sign a waiver on another, and nothing ties a family to the dates they signed up for. The OCS login, roles, DMs, and microblog we connected for Friends of Poway Seniors give the club one account that covers all of it."
+    impact:
+      - "Volunteers get set up in one sitting"
+      - "Families can ask a volunteer a question privately"
+    status: "Planned"
+    team:
+      - "Aaditya"
+      - "Chetan"
+      - "Kashyap"
+
+  - title: "New Ideas We Want To Try"
+    phase: "Exploring"
+    link: "https://www.unifiedsocialclub.com/blank-6"
+    linkLabel: "Their Photo Gallery"
+    subtitle: "Rough versions first; we keep what works"
+    keyPoints:
+      - "Photo gallery that respects the club's photo-consent rules"
+      - "Sponsor wall for the supporters who keep the club free"
+      - "Karaoke song list members can add requests to before club night"
+    tech:
+      - "Gallery"
+      - "Sponsor page"
+    description: "Ideas we will prototype with the club before committing to them."
+    impact:
+      - "Members see themselves and their friends on the site"
+      - "Sponsors get visible thanks"
+    status: "Exploring"
+    team:
+      - "Aaditya"
+      - "Chetan"
+      - "Kashyap"
+
+Sections:
+  - title: "Strengths vs Problems"
+    subtitle: "What already works, and what gets in a family's way"
+    items:
+      - "Works: free for members, twice a month, with refreshments covered by community sponsors."
+      - "Works: strong community support, from the City of Poway and the Poway Sheriff's Department to sponsors like General Atomics and Unified ESports League."
+      - "Works: a clear FAQ that covers aides, service animals, age limits, and photo consent."
+      - "Problem: club dates are listed out of order, with no year and no start or pickup time."
+      - "Problem: no phone number or email anywhere on the site."
+      - "Problem: pages are named /blank-1 through /blank-6, and volunteering and the waiver are separate steps."
+
+  - title: "Ideas We Are Bringing From Our First Capstone"
+    subtitle: "What carries over from Friends of Poway Seniors, and what doesn't"
+    items:
+      - "Bringing: accessibility first, with big text, text-size buttons, and hands-free Nod to select."
+      - "Bringing: multiplayer Bingo rooms, saved progress, and the tap-only profile interest survey."
+      - "Bringing: OCS login and roles, direct messages with volunteers, the microblog, and the planned Events API with RSVPs."
+      - "Leaving behind: the scam-defense trainer, which was built for older adults."
+
+  - title: "The Direction"
+    subtitle: "Four goals behind every change"
+    items:
+      - "Findable: every club date has a date, a year, and a time."
+      - "Easy-read: plain words and pictures, usable without help."
+      - "Connected: members, families, and volunteers share one account."
+      - "Safe: messages only with volunteers and staff, and photo consent respected."
+
+Links:
+  title: "Following Along"
+  subtitle: "Where this work is tracked"
+  items:
+    - label: "Their Live Site"
+      url: "https://www.unifiedsocialclub.com/"
+    - label: "Club Dates and Register"
+      url: "https://www.unifiedsocialclub.com/event-list"
+    - label: "Their FAQ"
+      url: "https://www.unifiedsocialclub.com/blank-1"
+    - label: "Volunteer Registration"
+      url: "https://www.unifiedsocialclub.com/blank-4"
+    - label: "Our First Capstone: Friends of Poway Seniors"
+      url: "https://pages.opencodingsociety.com/capstone/fops-2026-2027/"
+    - label: "Frontend We Are Building From"
+      url: "https://github.com/rex0dex/fops-pages"
+    - label: "Backend We Are Building From"
+      url: "https://github.com/rex0dex/fops-flask"
