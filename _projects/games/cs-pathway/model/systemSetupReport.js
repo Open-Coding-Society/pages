@@ -1,6 +1,7 @@
-// Parses the Linux/Windows report printed by `linux_setup_agent.py --check`.
-// Windows students run the same agent inside WSL, where it identifies the host
-// as Windows. Reports are pasted by the student and are not proof of execution.
+// Parses the Linux/Windows report printed by `bash scripts/linux_setup_agent.sh --check`.
+// Like the Mac agent, the Linux and Windows agents are Bash scripts, so they run
+// before Python is installed. Windows students run windows_setup_agent.sh inside
+// WSL, where it identifies the host as Windows. Reports are pasted by the student and are not proof of execution.
 
 const SYSTEM_CONFIG = Object.freeze({
   linux: {
@@ -8,24 +9,24 @@ const SYSTEM_CONFIG = Object.freeze({
     label: 'Linux',
     icon: '🐧',
     terminalName: 'Terminal',
-    command: 'python3 scripts/linux_setup_agent.py --check',
-    reportCommand: 'python3 scripts/linux_setup_agent.py --check --report',
+    command: 'bash scripts/linux_setup_agent.sh --check',
+    reportCommand: 'bash scripts/linux_setup_agent.sh --check --report',
   },
   kasm: {
     reportSystem: 'LINUX',
     label: 'Kasm Linux',
     icon: '☁️',
     terminalName: 'Kasm Terminal',
-    command: 'python3 scripts/linux_setup_agent.py --check',
-    reportCommand: 'python3 scripts/linux_setup_agent.py --check --report',
+    command: 'bash scripts/linux_setup_agent.sh --check',
+    reportCommand: 'bash scripts/linux_setup_agent.sh --check --report',
   },
   windows: {
     reportSystem: 'WINDOWS',
     label: 'Windows/WSL',
     icon: '🪟',
     terminalName: 'WSL Ubuntu terminal',
-    command: 'python3 scripts/windows_setup_agent.py --check | tee /dev/tty | clip.exe',
-    reportCommand: 'python3 scripts/windows_setup_agent.py --check --report',
+    command: 'bash scripts/windows_setup_agent.sh --check | tee /dev/tty | clip.exe',
+    reportCommand: 'bash scripts/windows_setup_agent.sh --check --report',
   },
 });
 
