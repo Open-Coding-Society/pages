@@ -141,3 +141,14 @@ minima:
     - navigation/course.md
     - navigation/capstone.md
     - navigation/topics.md
+exclude:
+# Jekyll defaults
+  - vendor
+# Custom excludes
+  - Makefile
+  - _notebooks
+  - _docx
+  - _projects
+  - venv
+  - blueprints_capstone
+# Note: / auto-excluded by Jekyll (underscore prefix)
