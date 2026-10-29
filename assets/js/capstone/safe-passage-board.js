@@ -4,16 +4,6 @@
 
   const issueSearchUrl = "https://api.github.com/search/issues?q=project%3AYimingYin1213%2F7&per_page=100";
   const initialCardLimit = 5;
-  const highPriorityIssueNumbers = new Set([1, 5, 16]);
-  const issueAssignees = new Map([
-    [3, "Yiming Yin"],
-    [7, "Yiming Yin"],
-    [11, "Noor"],
-    [12, "Yiming Yin"],
-    [14, "Luke Sanders"],
-    [15, "Noor Mohammed Saif Bijapur, Luke Sanders, Yiming Yin"],
-    [16, "Luke Sanders"],
-  ]);
   const boardColumns = [
     { name: "Parking Lot", countLabel: "3/5", cards: [
       [10, "Support Simulation – Frontend Page"],
@@ -49,8 +39,6 @@
     number,
     title,
     status: column.name,
-    priority: highPriorityIssueNumbers.has(number) ? "high" : "medium",
-    assigneeDisplay: issueAssignees.get(number) || "all",
     repository_url: "https://api.github.com/repos/YimingYin1213/flaskandfurious",
     html_url: `https://github.com/YimingYin1213/flaskandfurious/issues/${number}`,
     labels: [],
@@ -74,9 +62,8 @@
   }
 
   function getPriority(issue) {
-    if (["low", "medium", "high"].includes(issue.priority)) return issue.priority;
     const label = matchingLabel(issue.labels || [], /^(?:priority\s*:?\s*)?(low|medium|high)$/i);
-    return label ? label.match(/low|medium|high/i)[0].toLowerCase() : "medium";
+    return label ? label.match(/low|medium|high/i)[0].toLowerCase() : "Not set";
   }
 
   function getTopic(issue) {
@@ -102,10 +89,9 @@
   }
 
   function displayAssignees(issue) {
-    if (issue.assigneeDisplay) return issue.assigneeDisplay;
     if (issue.assignees?.length) return issue.assignees.map((assignee) => assignee.name || assignee.login).join(", ");
     if (issue.assignee?.login) return issue.assignee.name || issue.assignee.login;
-    return "all";
+    return "Unassigned";
   }
 
   function createCard(issue) {
@@ -225,6 +211,7 @@
       if (!Array.isArray(result.items)) throw new Error("GitHub returned an unexpected issue list");
       const details = new Map(result.items.filter((issue) => !issue.pull_request).map((issue) => [issue.number, issue]));
       state.issues = snapshotCards.map((snapshot) => ({ ...snapshot, ...(details.get(snapshot.number) || {}), title: snapshot.title, status: snapshot.status }));
+      state.issues = await enrichAssigneeNames(state.issues);
       setLastEdit(state.issues);
       status.textContent = "Board columns and issue placement match the provided GitHub screenshots. Issue cards link to GitHub.";
       render();
@@ -234,6 +221,29 @@
       status.textContent = "Showing the board snapshot from the provided GitHub screenshots. Open GitHub for current issue details.";
       render();
     }
+  }
+
+  async function enrichAssigneeNames(issues) {
+    const logins = [...new Set(issues.flatMap((issue) => (issue.assignees || []).map((assignee) => assignee.login)
+      .concat(issue.assignee?.login ? [issue.assignee.login] : [])))];
+    const names = new Map();
+    await Promise.all(logins.map(async (login) => {
+      try {
+        const response = await fetch(`https://api.github.com/users/${encodeURIComponent(login)}`, {
+          headers: { Accept: "application/vnd.github+json" },
+        });
+        if (!response.ok) return;
+        const profile = await response.json();
+        if (profile.name) names.set(login, profile.name);
+      } catch {
+        // GitHub login remains a usable assignee label when profile lookup fails.
+      }
+    }));
+    return issues.map((issue) => ({
+      ...issue,
+      assignees: (issue.assignees || []).map((assignee) => ({ ...assignee, name: names.get(assignee.login) || assignee.login })),
+      assignee: issue.assignee ? { ...issue.assignee, name: names.get(issue.assignee.login) || issue.assignee.login } : null,
+    }));
   }
 
   board.querySelectorAll("[data-sph-area]").forEach((button) => {
