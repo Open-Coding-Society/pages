@@ -795,11 +795,11 @@ document.addEventListener('DOMContentLoaded', function(){
 
    <!-- Poway Recovery Center (CSP 26-27) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
-       <a href="{% post_url capstone/2026-09-09-poway-recovery-center-capstone %}">
-           <img src="/images/capstone/sentri.png" alt="Poway Recovery Center" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       <a href="{{ '/capstone/poway-recovery-center/' | relative_url }}">
+           <img src="{{ '/images/capstone/poway-recovery-center-logo.png' | relative_url }}" alt="Poway Recovery Center" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url capstone/2026-09-09-poway-recovery-center-capstone %}">Poway Recovery Center</a></h3>
+           <h3><a href="{{ '/capstone/poway-recovery-center/' | relative_url }}">Poway Recovery Center</a></h3>
            <p>Supporting Poway Recovery Center's mission by helping visitors find its recovery community, meetings, resources, and key contacts.</p>
            <p>Team: Adya Shipekar, Anika Seksaria, Jailene Tang</p>
        </div>
