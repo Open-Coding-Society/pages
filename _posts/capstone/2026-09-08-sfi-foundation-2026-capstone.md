@@ -1,5 +1,6 @@
 ---
 microblog: true
+sfi_correspondence_microblog: true
 toc: false
 layout: post
 title: SFI Foundation 2026–27
@@ -59,6 +60,13 @@ permalink: /capstone/sfi-foundation/
 
 ---
 
+## Client conversation history
+
+Use the **💬 Microblog** button on this page to view the five dated October 22–28, 2026 SFI partnership email summaries, including Jennifer Faye's interest in continuing the prototype, Katie Salo's follow-up, and the November 2 Electives Fair invitation. They are marked **archived** so they cannot be mistaken for newly submitted user posts. The existing client introduction, contacts, and technical project plan remain below.
+
+---
+
+## Core experience
 ## What SFI does
 
 > SFI does not race or sell parts. It sets the bar that safety equipment must clear and checks that products keep clearing it.
