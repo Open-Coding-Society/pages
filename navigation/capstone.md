@@ -1029,6 +1029,18 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
+   <!-- PowPAC - Poway Performing Arts Company (CSP, 2026/2027) -->
+   <div class="ocs__grid-cell CSP" data-year="2026-2027">
+       <a href="{% post_url capstone/2026-10-29-powpac-capstone %}">
+           <img src="/images/capstone/powpac-logo.png" alt="PowPAC logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{% post_url capstone/2026-10-29-powpac-capstone %}">PowPAC - Poway Performing Arts Company</a></h3>
+           <p>Helping PowPAC improve their website with cleaner organization, production galleries, search, and UI, so audiences can find shows, tickets, auditions, and ways to support Poway's community theatre.</p>
+           <p>Team: Samarth H, Rigved G, Rohan S</p>
+       </div>
+   </div>
+
    <!-- Shoreline Project Outreach (CSP, 2026/2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
        <a href="{% post_url 2026-09-11-shoreline-volunteer-capstone %}">
