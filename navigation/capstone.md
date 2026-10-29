@@ -1031,11 +1031,11 @@ document.addEventListener('DOMContentLoaded', function(){
 
    <!-- Shoreline Project Outreach (CSP, 2026/2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-11-shoreline-volunteer-capstone %}">
-           <img src="/images/capstone/shoreline.jpeg" alt="Shoreline Community Services logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       <a href="{{ '/capstone/shoreline-volunteer/' | relative_url }}">
+           <img src="{{ '/images/capstone/shoreline.jpeg' | relative_url }}" alt="Shoreline Community Services logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url 2026-09-11-shoreline-volunteer-capstone %}">Shoreline Community Services</a></h3>
+           <h3><a href="{{ '/capstone/shoreline-volunteer/' | relative_url }}">Shoreline Community Services</a></h3>
            <p>Extending Shoreline Community Services' outreach through smarter volunteer coordination and easier giving, this capstone project bridges technology and grassroots community care in San Diego.</p>
            <p>Team: Vanshika Keswani, Nitya Kasse, Hsu-Cheng Lin</p>
        </div>
