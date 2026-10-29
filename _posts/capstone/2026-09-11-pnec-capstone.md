@@ -7,6 +7,40 @@ description: CSP capstone continuing the PNEC project with proposed household pr
 permalink: /capstone/powaynec-2026-2027/
 year: "2026-2027"
 ---
+ {% assign pnec_data = site.data.pnec_capstone %}
+
+  <section class="ocs__card" aria-labelledby="pnec-story">
+    <p class="ocs__badge">Our Community · Emergency Preparedness</p>
+    <h2 id="pnec-story">The Story of PNEC</h2>
+    <p class="ocs__lead">Neighbors helping neighbors prepare for the unexpected.</p>
+
+    <p>Founded in 2011, Poway Neighborhood Emergency Corps (PNEC) is an all-volunteer nonprofit dedicated to helping Poway residents prepare for emergencies and support one another.</p>
+
+    <div class="ocs__grid ocs__grid--col2">
+      <div class="ocs__visual">
+        <h3>What PNEC Does</h3>
+        <ul>
+          <li>Educates residents about wildfires, earthquakes, and other hazards.</li>
+          <li>Shares emergency planning tips and preparedness resources.</li>
+          <li>Connects neighbors through community outreach.</li>
+        </ul>
+      </div>
+      <div class="ocs__visual">
+        <h3>Why It Matters</h3>
+        <ul>
+          <li>Helps families prepare before disasters happen.</li>
+          <li>Encourages neighbors to look out for one another.</li>
+          <li>Builds a more informed and resilient community.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p>PNEC's mission is simple: help Poway become a community where residents are prepared, informed, and ready to help their neighbors.</p>
+
+    <div class="ocs__links">
+      <a class="ocs__btn accent fill" href="https://powaynec.com/" target="_blank" rel="noopener noreferrer">Visit Official PNEC Website ↗</a>
+    </div>
+  </section>
 
 {% assign pnec_data = site.data.pnec_capstone %}
 
