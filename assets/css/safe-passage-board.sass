@@ -1,6 +1,46 @@
 ---
 ---
 
+.sph-about
+  --sph-about-surface: color-mix(in srgb, var(--pref-text-color) 4%, var(--pref-bg-color))
+  --sph-about-border: var(--ui-border)
+  margin: 1.25rem 0 2rem
+  padding: 1.25rem
+  color: var(--pref-text-color)
+  background: var(--sph-about-surface)
+  border: 1px solid var(--sph-about-border)
+  border-radius: 1rem
+
+  &__title
+    margin: 0
+
+  &__giving
+    margin-bottom: 0
+
+  &__logo
+    display: block
+    width: 100%
+    max-width: 18rem
+    max-height: 12rem
+    margin: 0 auto
+    object-fit: contain
+
+  .ocs__grid
+    margin: 0
+
+  .ocs__grid-cell
+    min-width: 0
+
+    p
+      margin-bottom: 0
+
+    strong
+      display: block
+      margin-bottom: .35rem
+
+  @media (max-width: 600px)
+    padding: .85rem
+
 .sph-board
   --sph-surface: color-mix(in srgb, var(--pref-text-color) 5%, var(--pref-bg-color))
   --sph-surface-raised: color-mix(in srgb, var(--pref-text-color) 9%, var(--pref-bg-color))

@@ -53,7 +53,7 @@ const nameKey = (name) => wordsOf(name).join(' ') || String(name ?? '').trim().t
 //   { status: 'Ground 0', stage: 'backlog' }   into that stage's column
 //   { status: 'Done', collapsed: true }        its column starts collapsed (false: open)
 //   { status: 'Notes', hidden: true }          left off the board
-export function boardConfig(defaults, columns) {
+export function boardConfig(defaults, columns, issueMetadata = false) {
   const data = defaults || {};
   const overrides = new Map();
   listOf(columns).forEach((column) => {
@@ -71,7 +71,8 @@ export function boardConfig(defaults, columns) {
     })),
     shared: listOf(data.shared).map(nameKey),
     fields: data.fields || {},
-    cardFields: listOf(data.card_fields),
+    cardFields: [...listOf(data.card_fields), ...(issueMetadata ? ['Estimate'] : [])],
+    issueMetadata,
     issues: data.issues || {},
     perColumn: Number(data.per_column) > 0 ? Number(data.per_column) : Infinity,
     text: data.text || {},
@@ -405,6 +406,12 @@ export function repoToProject(repo, issues, filterName, config) {
   const people = [...new Set(issues.flatMap((issue) => (issue.assignees || []).map((p) => p.login)))];
   const fields = [{ id: 1, name: String(config.fields.status ?? ''), data_type: 'single_select', options: config.stages.map((stage) => ({ name: stage.label })) }];
   if (filterName) fields.push({ id: 2, name: filterName, data_type: 'single_select', options: people.map((name) => ({ name })) });
+  // Issue metadata is opt-in; existing boards keep their original fields.
+  const details = config.issueMetadata ? [
+    { id: 3, name: 'Priority', pattern: /^Priority: (P0 Critical|P1 High|P2 Medium|P3 Low)$/ },
+    { id: 4, name: 'Estimate', pattern: /^Estimate: ((?:1|2|3|5|8|13|21) hours)$/ },
+  ] : [];
+  fields.push(...details.map(({ id, name }) => ({ id, name, data_type: 'single_select' })));
   const items = issues
     // Pull requests aren't work items, and issues closed as "not planned" were dropped.
     .filter((issue) => !issue.pull_request && issue.state_reason !== 'not_planned')
@@ -416,6 +423,12 @@ export function repoToProject(repo, issues, filterName, config) {
       fields: [
         { id: 1, value: { name: repoStatusOf(issue, config) } },
         ...(filterName && issue.assignees?.[0] ? [{ id: 2, value: { name: issue.assignees[0].login } }] : []),
+        ...details.flatMap((field) => {
+          const match = (issue.labels || []).map((label) => typeof label === 'string' ? label : label.name)
+            .map((name) => field.pattern.exec(name || '')).find(Boolean);
+          const value = match?.[1];
+          return value ? [{ id: field.id, value: { name: value } }] : [];
+        }),
       ],
     }));
   return { project: { title: textOf(config, 'issues_title', { repo }) }, fields, items };
@@ -715,7 +728,10 @@ function settingsOf(section) {
   const defaults = readJson(document.getElementById('ocs-kanban-defaults'));
   if (!defaults) return null;
   const columns = readJson(section.querySelector('script[data-hook="columns"]'));
-  return { config: boardConfig(defaults, columns), stamp: fingerprint(JSON.stringify([defaults, columns])) };
+  const issueMetadata = section.dataset.issueMetadata === 'true';
+  // Preserve existing cache keys for boards that have not opted in.
+  const settings = issueMetadata ? [defaults, columns, true] : [defaults, columns];
+  return { config: boardConfig(defaults, columns, issueMetadata), stamp: fingerprint(JSON.stringify(settings)) };
 }
 
 async function mountBoard(section) {
