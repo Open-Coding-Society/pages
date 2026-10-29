@@ -92,6 +92,7 @@ images/projects/
 /_includes/post_list_image_card.html
 /_includes/announcement_calendar_demo.html
 /_includes/ocs_calendar_card.html
+/_includes/ocs_calendar_card_data.html
 /_includes/sprint-card.html
 /_includes/sprint-item-card.html
 /_includes/sprint-modals.html
