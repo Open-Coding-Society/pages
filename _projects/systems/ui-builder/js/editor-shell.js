@@ -15,10 +15,10 @@ export function fitScale(available, deviceWidth) {
 
 export function buildShell({ doc = globalThis.document, registry, say, caps = {}, baseurl = '', win = doc.defaultView }) {
   const devices = (Array.isArray(registry.devices) ? registry.devices : []).filter((device) => device && typeof device.key === 'string');
-  const wrap = (child, hidden = true) => el(doc, 'span', { class: 'ocs__uibuilder-wrap', hidden }, child);
+  const wrap = (child, hidden = true) => el(doc, 'span', { class: 'ui-builder-wrap', hidden }, child);
   // Icon and words: ocs__btn--icon spaces them (a flex button drops a leading space).
   const back = el(doc, 'a', { class: 'ocs__btn ocs__btn--icon small', href: `${String(baseurl).replace(/\/+$/, '')}/ui-builder/` }, icon(doc, 'fa-arrow-left'), say('back'));
-  const title = el(doc, 'button', { type: 'button', class: 'ocs__btn small ocs__truncate ocs__uibuilder-title' }, '');
+  const title = el(doc, 'button', { type: 'button', class: 'ocs__btn small ocs__truncate ui-builder-title' }, '');
   const saveState = el(doc, 'strong', { class: 'ocs__status-pill ocs__status-pill--neutral' }, '');
   const publishState = el(doc, 'strong', { class: 'ocs__status-pill' }, '');
   const undo = iconButton(doc, { name: 'fa-rotate-left', label: say('undo') });
@@ -27,48 +27,48 @@ export function buildShell({ doc = globalThis.document, registry, say, caps = {}
     type: 'button', class: 'ocs__btn small', 'aria-pressed': 'false', title: say('device_label', { label: device.label }),
   }, device.label)]));
   const realInput = el(doc, 'input', { type: 'checkbox', class: 'ocs__toggle-input', id: 'ui-real-data', 'aria-describedby': 'ui-real-data-help' });
-  const realData = el(doc, 'div', { class: 'ocs__uibuilder-wrap', hidden: true },
+  const realData = el(doc, 'div', { class: 'ui-builder-wrap', hidden: true },
     el(doc, 'label', { class: 'ocs__toggle', title: say('real_data_help') }, realInput, el(doc, 'span', { class: 'ocs__toggle-track', 'aria-hidden': 'true' }), el(doc, 'span', { class: 'ocs__toggle-label' }, say('real_data'))),
-    el(doc, 'small', { id: 'ui-real-data-help', class: 'ocs__uibuilder-visually-hidden' }, say('real_data_help')));
-  const outlineToggle = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small ocs__uibuilder-pane-toggle', 'aria-expanded': 'false', 'aria-controls': 'ui-outline' }, icon(doc, 'fa-list'), say('outline_toggle'));
-  const inspectorToggle = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small ocs__uibuilder-pane-toggle', 'aria-expanded': 'false', 'aria-controls': 'ui-inspector' }, icon(doc, 'fa-sliders'), say('inspector_toggle'));
+    el(doc, 'small', { id: 'ui-real-data-help', class: 'ui-builder-visually-hidden' }, say('real_data_help')));
+  const outlineToggle = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small ui-builder-pane-toggle', 'aria-expanded': 'false', 'aria-controls': 'ui-outline' }, icon(doc, 'fa-list'), say('outline_toggle'));
+  const inspectorToggle = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small ui-builder-pane-toggle', 'aria-expanded': 'false', 'aria-controls': 'ui-inspector' }, icon(doc, 'fa-sliders'), say('inspector_toggle'));
   const preview = el(doc, 'a', { class: 'ocs__btn ocs__btn--icon small', href: '#', target: '_blank', rel: 'noopener' }, icon(doc, 'fa-eye'), say('preview_draft'));
   const live = el(doc, 'a', { class: 'ocs__btn ocs__btn--icon small', href: '#', target: '_blank', rel: 'noopener' }, icon(doc, 'fa-arrow-up-right-from-square'), say('open_live'));
   const publish = el(doc, 'button', { type: 'button', class: 'ocs__btn small accent fill' }, say('publish'));
   const more = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small', 'aria-haspopup': 'menu', 'aria-expanded': 'false', 'aria-controls': 'ui-more-menu' }, icon(doc, 'fa-ellipsis'), say('more'));
   const menuNames = ['export_page', 'export_json', 'show_html', ...(caps.revisions ? ['revisions'] : []), 'page_settings'];
-  const menuItems = new Map(menuNames.map((name) => [name, el(doc, 'button', { type: 'button', role: 'menuitem', tabindex: '-1', class: 'ocs__uibuilder-menu-item' }, say(name))]));
-  const menu = el(doc, 'div', { class: 'ocs__uibuilder-menu', id: 'ui-more-menu', role: 'menu', 'aria-label': say('more') }, [...menuItems.values()]);
-  const menuWrap = el(doc, 'div', { class: 'ocs__uibuilder-menu-wrap', hidden: true }, menu);
+  const menuItems = new Map(menuNames.map((name) => [name, el(doc, 'button', { type: 'button', role: 'menuitem', tabindex: '-1', class: 'ui-builder-menu-item' }, say(name))]));
+  const menu = el(doc, 'div', { class: 'ui-builder-menu', id: 'ui-more-menu', role: 'menu', 'aria-label': say('more') }, [...menuItems.values()]);
+  const menuWrap = el(doc, 'div', { class: 'ui-builder-menu-wrap', hidden: true }, menu);
   const previewWrap = wrap(preview, false);
   const liveWrap = wrap(live);
   const publishWrap = wrap(publish, !caps.publish);
 
-  const bar = el(doc, 'div', { class: 'ocs__uibuilder-bar', role: 'group', 'aria-label': say('toolbar_label') },
-    el(doc, 'div', { class: 'ocs__links ocs__uibuilder-bar-group' }, back, title, saveState, publishState),
-    el(doc, 'div', { class: 'ocs__links ocs__uibuilder-bar-group' }, undo, redo, el(doc, 'div', { class: 'ocs__links ocs__uibuilder-devices', role: 'group', 'aria-label': say('device_group') }, [...deviceButtons.values()]), realData),
-    el(doc, 'div', { class: 'ocs__links ocs__uibuilder-bar-group' }, outlineToggle, inspectorToggle, previewWrap, liveWrap, publishWrap,
-      el(doc, 'div', { class: 'ocs__uibuilder-more' }, more, menuWrap)));
+  const bar = el(doc, 'div', { class: 'ui-builder-bar', role: 'group', 'aria-label': say('toolbar_label') },
+    el(doc, 'div', { class: 'ocs__links ui-builder-bar-group' }, back, title, saveState, publishState),
+    el(doc, 'div', { class: 'ocs__links ui-builder-bar-group' }, undo, redo, el(doc, 'div', { class: 'ocs__links ui-builder-devices', role: 'group', 'aria-label': say('device_group') }, [...deviceButtons.values()]), realData),
+    el(doc, 'div', { class: 'ocs__links ui-builder-bar-group' }, outlineToggle, inspectorToggle, previewWrap, liveWrap, publishWrap,
+      el(doc, 'div', { class: 'ui-builder-more' }, more, menuWrap)));
 
-  const outlinePane = el(doc, 'section', { class: 'ocs__uibuilder-pane ocs__uibuilder-outline', id: 'ui-outline', 'aria-label': say('outline') });
-  const zoom = el(doc, 'output', { class: 'ocs__uibuilder-note' }, '');
-  const canvasStatus = el(doc, 'output', { class: 'ocs__uibuilder-note', 'aria-live': 'polite' }, say('canvas_loading'));
-  const iframe = el(doc, 'iframe', { class: 'ocs__uibuilder-frame', title: say('canvas_title') });
-  const viewport = el(doc, 'div', { class: 'ocs__uibuilder-viewport' }, iframe);
+  const outlinePane = el(doc, 'section', { class: 'ui-builder-pane ui-builder-outline', id: 'ui-outline', 'aria-label': say('outline') });
+  const zoom = el(doc, 'output', { class: 'ui-builder-note' }, '');
+  const canvasStatus = el(doc, 'output', { class: 'ui-builder-note', 'aria-live': 'polite' }, say('canvas_loading'));
+  const iframe = el(doc, 'iframe', { class: 'ui-builder-frame', title: say('canvas_title') });
+  const viewport = el(doc, 'div', { class: 'ui-builder-viewport' }, iframe);
   const reload = el(doc, 'button', { type: 'button', class: 'ocs__btn small accent' }, say('canvas_reload'));
-  const failed = el(doc, 'div', { class: 'ocs__uibuilder-wrap', hidden: true }, el(doc, 'div', { class: 'ocs__callout', role: 'alert' }, say('canvas_failed'), ' ', reload));
-  const stage = el(doc, 'section', { class: 'ocs__uibuilder-stage', 'aria-label': say('canvas_title') },
-    el(doc, 'div', { class: 'ocs__uibuilder-stagebar' }, zoom, canvasStatus), failed, viewport);
-  const inspectorPane = el(doc, 'section', { class: 'ocs__uibuilder-pane ocs__uibuilder-inspector', id: 'ui-inspector', 'aria-labelledby': 'ui-inspector-title', tabindex: '-1' });
-  const body = el(doc, 'div', { class: 'ocs__uibuilder-body' }, outlinePane, stage, inspectorPane);
-  const banners = el(doc, 'div', { class: 'ocs__stack ocs__uibuilder-banners' });
+  const failed = el(doc, 'div', { class: 'ui-builder-wrap', hidden: true }, el(doc, 'div', { class: 'ocs__callout', role: 'alert' }, say('canvas_failed'), ' ', reload));
+  const stage = el(doc, 'section', { class: 'ui-builder-stage', 'aria-label': say('canvas_title') },
+    el(doc, 'div', { class: 'ui-builder-stagebar' }, zoom, canvasStatus), failed, viewport);
+  const inspectorPane = el(doc, 'section', { class: 'ui-builder-pane ui-builder-inspector', id: 'ui-inspector', 'aria-labelledby': 'ui-inspector-title', tabindex: '-1' });
+  const body = el(doc, 'div', { class: 'ui-builder-body' }, outlinePane, stage, inspectorPane);
+  const banners = el(doc, 'div', { class: 'ocs__stack ui-builder-banners' });
   const feedbackText = el(doc, 'strong', null, '');
   const dismiss = iconButton(doc, { name: 'fa-xmark', label: say('dismiss') });
   const dismissWrap = wrap(dismiss);
-  const feedback = el(doc, 'div', { class: 'ocs__uibuilder-feedback', role: 'status', 'aria-live': 'polite' }, feedbackText, dismissWrap);
+  const feedback = el(doc, 'div', { class: 'ui-builder-feedback', role: 'status', 'aria-live': 'polite' }, feedbackText, dismissWrap);
   // The feedback line sits under the bar, so an answer such as Publish's list of problems stays
   // on screen: under the panes, which fill the window's height, it was below the bottom edge.
-  const element = el(doc, 'div', { class: 'ocs__uibuilder-shell' }, bar, banners, feedback, body);
+  const element = el(doc, 'div', { class: 'ui-builder-shell' }, bar, banners, feedback, body);
 
   // ---- devices and the canvas size
   // A phone-sized editor starts on the phone preview; anything wider on the desktop one.
@@ -153,7 +153,7 @@ export function buildShell({ doc = globalThis.document, registry, say, caps = {}
   // Capture phase: the menu closes and focus is back on More before the item opens a dialog,
   // so the dialog returns focus there and not to a hidden menu item.
   menu.addEventListener('click', (event) => { if (event.target.closest('[role="menuitem"]')) closeMenu(true); }, true);
-  const outside = (event) => { if (!menuWrap.hidden && !event.target.closest('.ocs__uibuilder-more')) closeMenu(false); };
+  const outside = (event) => { if (!menuWrap.hidden && !event.target.closest('.ui-builder-more')) closeMenu(false); };
   doc.addEventListener('click', outside, true);
 
   setDevice(device);

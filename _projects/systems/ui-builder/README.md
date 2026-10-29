@@ -43,7 +43,7 @@ the backend routes and the tests.
 | `layouts/ui-builder-canvas.html` | `_layouts/` | the canvas frame: the site's styles and theme, nothing else from the site head |
 | `_includes/ui_builder_data.html` | `_includes/projects/ui-builder/` | the registry and widget data as JSON scripts |
 | `js/*.js` | `assets/js/projects/ui-builder/` | the modules (the next table) |
-| `sass/` | `_sass/projects/ui-builder/` | the editor and canvas chrome, scoped under `.ocs__uibuilder` and `.ocs__uibuilder-canvas`, plus two rules for published pages and the gallery: one keeps their titles visible, one fits the grammar's badge into the viewer's bar |
+| `sass/` | `_sass/projects/ui-builder/` | the editor and canvas chrome, scoped under `.ui-builder` and `.ui-builder-canvas`, plus two rules for published pages and the gallery: one keeps their titles visible, one fits the grammar's badge into the viewer's bar |
 | `docs/ARCHITECTURE.md` | `/systems/ui-builder/architecture/` | how it works |
 
 The modules, by job:

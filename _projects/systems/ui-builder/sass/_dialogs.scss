@@ -3,36 +3,36 @@
 
 // Above the site's sticky header (navbar.scss gives it 999999999), so the backdrop dims it too:
 // the grammar's z-index of 50 sits under it.
-.ocs__uibuilder-dialog .ocs__modal {
+.ui-builder-dialog .ocs__modal {
   z-index: 1000000000;
 }
 
 // Unscoped heading rules from other site styles (the documentation pages) turn every h2 green
 // and glowing; a dialog title follows the theme, as /dm's do.
-.ocs__uibuilder-dialog .ocs__modal-title {
+.ui-builder-dialog .ocs__modal-title {
   color: var(--pref-text-color);
   font-size: 1.25rem;
   text-shadow: none;
 }
 
-.ocs__uibuilder-dialog .ocs__modal-card {
+.ui-builder-dialog .ocs__modal-card {
   max-height: 85dvh;
   overscroll-behavior: contain;
 }
 
-.ocs__uibuilder-palette-card {
+.ui-builder-palette-card {
   max-width: 42rem;
 }
 
 // The choices scroll inside the card so the search box stays in view.
-.ocs__uibuilder-palette {
+.ui-builder-palette {
   display: grid;
   gap: 0.35rem;
   max-height: 55dvh;
   overflow: auto;
 }
 
-.ocs__uibuilder-palette-group {
+.ui-builder-palette-group {
   margin: 0.6rem 0 0.15rem;
   color: var(--text-muted);
   font-size: 0.75rem;
@@ -43,7 +43,7 @@
 // A choice is a full-width row with its icon, name and help, not an ocs__btn pill. Two classes:
 // preset themes give every <button> an accent border (.user-theme-active button), which hid the
 // highlighted choice among 25 outlined ones.
-.ocs__uibuilder-palette .ocs__uibuilder-choice {
+.ui-builder-palette .ui-builder-choice {
   display: block;
   width: 100%;
   padding: 0.55rem 0.75rem;
@@ -80,7 +80,7 @@
   }
 }
 
-.ocs__uibuilder-revisions {
+.ui-builder-revisions {
   display: grid;
   gap: 0.5rem;
   margin: 0;

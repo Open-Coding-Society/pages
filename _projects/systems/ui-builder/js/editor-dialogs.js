@@ -103,7 +103,7 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
       el(doc, 'div', { class: 'ocs__modal-header' }, el(doc, 'h2', { class: 'ocs__modal-title', id: titleId }, title), close),
       body, actions);
     const backdrop = el(doc, 'div', { class: 'ocs__modal' }, card);
-    const host = el(doc, 'div', { class: 'ocs__uibuilder-dialog' }, backdrop);
+    const host = el(doc, 'div', { class: 'ui-builder-dialog' }, backdrop);
     const entry = {
       card, dismissible,
       finish(value) {
@@ -144,9 +144,9 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
 
   function textExport({ title, help = '', content, filename, mime = 'text/plain' }) {
     const id = `ui-dialog-text-${counter + 1}`;
-    const area = el(doc, 'textarea', { class: 'ocs__input ocs__uibuilder-mono', id, rows: 14, readonly: true, spellcheck: 'false' });
+    const area = el(doc, 'textarea', { class: 'ocs__input ui-builder-mono', id, rows: 14, readonly: true, spellcheck: 'false' });
     area.value = content;
-    const status = el(doc, 'output', { class: 'ocs__uibuilder-note', 'aria-live': 'polite' });
+    const status = el(doc, 'output', { class: 'ui-builder-note', 'aria-live': 'polite' });
     const buttons = [
       { label: say('copy'), onClick: async () => { status.textContent = (await copyText(doc, content, area)) ? say('copied') : say('copy_failed'); } },
       filename ? { label: say('download'), primary: true, onClick: () => downloadText(doc, filename, content, mime) } : null,
@@ -166,7 +166,7 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
     const input = el(doc, 'input', { class: 'ocs__input', id, type: 'text', autocomplete: 'off', spellcheck: 'false', 'aria-describedby': `${id}-help ${id}-status` });
     input.value = slug;
     const where = para('', bodyId('body'));
-    const status = el(doc, 'output', { class: 'ocs__uibuilder-note', id: `${id}-status`, 'aria-live': 'polite' });
+    const status = el(doc, 'output', { class: 'ui-builder-note', id: `${id}-status`, 'aria-live': 'polite' });
     let check = 0;
     let timer = null;
     let dialog = null;
@@ -236,8 +236,8 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
   // load() → [{revisionId, kind, savedByName, savedAt}]; restore(revision) → Promise. unsaved: the
   // newest changes couldn't be saved, so they are in no revision and a restore loses them.
   function revisions({ load, restore, readOnly = false, unsaved = false }) {
-    const list = el(doc, 'ul', { class: 'ocs__uibuilder-revisions' });
-    const status = el(doc, 'output', { class: 'ocs__uibuilder-note', 'aria-live': 'polite' }, say('revisions_loading'));
+    const list = el(doc, 'ul', { class: 'ui-builder-revisions' });
+    const status = el(doc, 'output', { class: 'ui-builder-note', 'aria-live': 'polite' }, say('revisions_loading'));
     const dialog = open({ title: say('revisions_title'), body: [status, list], buttons: [{ label: say('close'), value: null }] });
     Promise.resolve().then(load).then((rows) => {
       const items = Array.isArray(rows) ? rows : [];
@@ -267,7 +267,7 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
   function askUntil({ title = say('date_title') } = {}) {
     const id = `ui-dialog-date-${counter + 1}`;
     const input = el(doc, 'input', { class: 'ocs__input', id, type: 'date', 'aria-describedby': `${id}-help` });
-    const status = el(doc, 'output', { class: 'ocs__uibuilder-note', 'aria-live': 'polite' });
+    const status = el(doc, 'output', { class: 'ui-builder-note', 'aria-live': 'polite' });
     return open({
       title, focus: () => input,
       body: [el(doc, 'div', { class: 'ocs__field' }, el(doc, 'label', { class: 'ocs__label', for: id }, say('date_label')), input, el(doc, 'small', { id: `${id}-help` }, say('date_help')), status)],
@@ -293,7 +293,7 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
 export function createLeaseBanner(container, { doc = globalThis.document, say, onTakeOver }) {
   const message = el(doc, 'strong', null, '');
   const take = el(doc, 'button', { type: 'button', class: 'ocs__btn small accent', onclick: () => onTakeOver() }, say('lease_take'));
-  const box = el(doc, 'div', { class: 'ocs__uibuilder-banner', hidden: true }, el(doc, 'div', { class: 'ocs__callout' }, icon(doc, 'fa-user-lock'), ' ', message, ' ', take));
+  const box = el(doc, 'div', { class: 'ui-builder-banner', hidden: true }, el(doc, 'div', { class: 'ocs__callout' }, icon(doc, 'fa-user-lock'), ' ', message, ' ', take));
   container.appendChild(box);
   return {
     show(name) {

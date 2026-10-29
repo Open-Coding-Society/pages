@@ -1,21 +1,21 @@
 // The editing shell: top bar, three panes, the scaled canvas, banners, feedback and the menu.
 
 // An app surface: the grammar's document container stops at 900px and pads for reading.
-.ocs__uibuilder {
+.ui-builder {
   width: 100%;
   font-family: var(--pref-font-family);
   color: var(--pref-text-color);
 }
 
 // The shell is a column of bar, banners, panes and feedback with tighter gaps than ocs__stack.
-.ocs__uibuilder-shell {
+.ui-builder-shell {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
 // Groups pushed to both ends of one wrapping row; ocs__links wraps but can't spread groups apart.
-.ocs__uibuilder-bar {
+.ui-builder-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -28,31 +28,31 @@
 }
 
 // ocs__links' 0.75rem gap is roomy for a toolbar of small buttons.
-.ocs__uibuilder .ocs__uibuilder-bar-group {
+.ui-builder .ui-builder-bar-group {
   align-items: center;
   gap: 0.4rem;
 }
 
 // The publish group stays at the right end when the bar wraps onto a second line.
-.ocs__uibuilder .ocs__uibuilder-bar-group:last-child {
+.ui-builder .ui-builder-bar-group:last-child {
   margin-left: auto;
 }
 
 // A long page title must not push the toolbar onto three lines.
-.ocs__uibuilder .ocs__uibuilder-title {
+.ui-builder .ui-builder-title {
   display: inline-block;
   max-width: 16rem;
 }
 
 // Live regions and status words that are text, not controls. The text color, not the muted one:
 // some presets' muted text is under 4.5:1 on their panels.
-.ocs__uibuilder-note {
+.ui-builder-note {
   color: var(--pref-text-color);
   font-size: 0.8125rem;
 }
 
 // The grammar has no visually-hidden helper; this text is for screen readers only.
-.ocs__uibuilder-visually-hidden {
+.ui-builder-visually-hidden {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -63,7 +63,7 @@
 
 // Outline, canvas and inspector side by side from 1440px; below that the toggles open the
 // side panes beside the canvas, and on a phone everything stacks in reading order.
-.ocs__uibuilder-body {
+.ui-builder-body {
   display: grid;
   grid-template-columns: 17rem minmax(0, 1fr) 22rem;
   align-items: start;
@@ -71,7 +71,7 @@
 }
 
 // The panes scroll on their own so the canvas stays in view.
-.ocs__uibuilder-pane {
+.ui-builder-pane {
   min-width: 0;
   max-height: calc(100dvh - 9rem);
   overflow: auto;
@@ -88,63 +88,63 @@
 }
 
 // Only one way to show the pane toggles: below the width that fits all three panes.
-.ocs__uibuilder .ocs__uibuilder-pane-toggle {
+.ui-builder .ui-builder-pane-toggle {
   display: none;
 }
 
 @media (max-width: $uib-wide - 1px) {
-  .ocs__uibuilder .ocs__uibuilder-pane-toggle {
+  .ui-builder .ui-builder-pane-toggle {
     display: inline-flex;
   }
 
-  .ocs__uibuilder-body {
+  .ui-builder-body {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .ocs__uibuilder-body:not([data-outline-open]) .ocs__uibuilder-outline,
-  .ocs__uibuilder-body:not([data-inspector-open]) .ocs__uibuilder-inspector {
+  .ui-builder-body:not([data-outline-open]) .ui-builder-outline,
+  .ui-builder-body:not([data-inspector-open]) .ui-builder-inspector {
     display: none;
   }
 
-  .ocs__uibuilder-body[data-outline-open] {
+  .ui-builder-body[data-outline-open] {
     grid-template-columns: 16rem minmax(0, 1fr);
   }
 
-  .ocs__uibuilder-body[data-inspector-open] {
+  .ui-builder-body[data-inspector-open] {
     grid-template-columns: minmax(0, 1fr) 20rem;
   }
 
-  .ocs__uibuilder-body[data-outline-open][data-inspector-open] {
+  .ui-builder-body[data-outline-open][data-inspector-open] {
     grid-template-columns: 15rem minmax(0, 1fr) 19rem;
   }
 }
 
 @media (max-width: $uib-phone) {
-  .ocs__uibuilder-body,
-  .ocs__uibuilder-body[data-outline-open],
-  .ocs__uibuilder-body[data-inspector-open],
-  .ocs__uibuilder-body[data-outline-open][data-inspector-open] {
+  .ui-builder-body,
+  .ui-builder-body[data-outline-open],
+  .ui-builder-body[data-inspector-open],
+  .ui-builder-body[data-outline-open][data-inspector-open] {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .ocs__uibuilder-pane {
+  .ui-builder-pane {
     max-height: none;
   }
 
-  .ocs__uibuilder .ocs__uibuilder-title {
+  .ui-builder .ui-builder-title {
     max-width: 10rem;
   }
 }
 
 // The stage holds the zoom line and the frame; it is the canvas column of the grid.
-.ocs__uibuilder-stage {
+.ui-builder-stage {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
   min-width: 0;
 }
 
-.ocs__uibuilder-stagebar {
+.ui-builder-stagebar {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -155,7 +155,7 @@
 // A fixed-height window onto the device-width page: the iframe is laid out at the device's
 // width and scaled down to fit (editor-shell.js sets the variables), so media queries inside
 // the page see a real phone, tablet or desktop viewport.
-.ocs__uibuilder-viewport {
+.ui-builder-viewport {
   position: relative;
   // 14rem: the site header, the bar, the feedback line above the panes and the stage's own bar.
   height: clamp(26rem, calc(100dvh - 14rem), 64rem);
@@ -165,7 +165,7 @@
   background: color-mix(in srgb, var(--pref-text-color) 4%, var(--pref-bg-color));
 }
 
-.ocs__uibuilder-frame {
+.ui-builder-frame {
   position: absolute;
   top: 0;
   left: var(--ui-frame-left, 0);
@@ -178,18 +178,18 @@
 }
 
 @media (max-width: $uib-phone) {
-  .ocs__uibuilder-viewport {
+  .ui-builder-viewport {
     height: clamp(22rem, 70dvh, 40rem);
   }
 }
 
 // Banners (lease, recovery) take no room when there are none.
-.ocs__uibuilder .ocs__uibuilder-banners:empty {
+.ui-builder .ui-builder-banners:empty {
   display: none;
 }
 
 // The feedback line keeps its height so messages don't shift the panes.
-.ocs__uibuilder-feedback {
+.ui-builder-feedback {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -211,18 +211,18 @@
 }
 
 // The More menu: a popup under its button. The grammar's dropdown is a hover menu for links.
-.ocs__uibuilder-more {
+.ui-builder-more {
   position: relative;
 }
 
-.ocs__uibuilder-menu-wrap {
+.ui-builder-menu-wrap {
   position: absolute;
   top: calc(100% + 0.25rem);
   right: 0;
   z-index: 60;
 }
 
-.ocs__uibuilder-menu {
+.ui-builder-menu {
   display: grid;
   min-width: 13rem;
   padding: 0.35rem;
@@ -234,7 +234,7 @@
 
 // Menu items are full-width rows, not ocs__btn pills. Two classes: preset themes give every
 // <button> an accent border and the panel color (.user-theme-active button), which one would lose to.
-.ocs__uibuilder-menu .ocs__uibuilder-menu-item {
+.ui-builder-menu .ui-builder-menu-item {
   padding: 0.5rem 0.75rem;
   border: 0;
   border-radius: 0.4rem;
@@ -267,7 +267,7 @@
 }
 
 // A lease or recovery note sits inside a plain wrapper so [hidden] works on it.
-.ocs__uibuilder-banner .ocs__callout,
-.ocs__uibuilder-wrap .ocs__callout {
+.ui-builder-banner .ocs__callout,
+.ui-builder-wrap .ocs__callout {
   margin-top: 0;
 }

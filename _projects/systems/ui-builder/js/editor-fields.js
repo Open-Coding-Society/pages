@@ -80,9 +80,9 @@ function shell(ctx, field, control, { labelFor = true, labelText = field.label }
   const issueId = `${id}-issue`;
   const label = labelText ? el(doc, 'label', { class: 'ocs__label', for: labelFor ? id : null, id: `${id}-label` }, labelText,
     // The mark is for sight; the control says aria-required itself.
-    field.required ? [' ', el(doc, 'abbr', { class: 'ocs__uibuilder-required', title: ctx.say('required'), 'aria-hidden': 'true' }, '*')] : null) : null;
+    field.required ? [' ', el(doc, 'abbr', { class: 'ui-builder-required', title: ctx.say('required'), 'aria-hidden': 'true' }, '*')] : null) : null;
   const help = field.help ? el(doc, 'small', { id: helpId }, field.help) : null;
-  const issue = el(doc, 'strong', { class: 'ocs__uibuilder-issue', id: issueId, hidden: true });
+  const issue = el(doc, 'strong', { class: 'ui-builder-issue', id: issueId, hidden: true });
   const element = el(doc, 'div', { class: 'ocs__field', 'data-ui-field': field.id }, label, control, help, issue);
   const described = [help ? helpId : null, issueId].filter(Boolean).join(' ');
   return {
@@ -188,7 +188,7 @@ function richWidget(field, ctx) {
   let applying = false;
   let emit = () => {};
   entry.listener = () => { if (!applying) emit(); };
-  const holder = el(doc, 'div', { class: 'ocs__uibuilder-rich', id: ctx.nextId() }, composer.element);
+  const holder = el(doc, 'div', { class: 'ui-builder-rich', id: ctx.nextId() }, composer.element);
   const box = shell(ctx, field, holder, { labelFor: false });
   composer.editor.setAttribute('aria-labelledby', box.labelId);
   box.describe(composer.editor);
@@ -239,8 +239,8 @@ function imageWidget(field, ctx) {
   const { doc, say } = ctx;
   const base = inputWidget(field, ctx, { type: 'url', extra: { inputmode: 'url', autocomplete: 'off', spellcheck: 'false', placeholder: field.placeholder || 'https://' } });
   const control = base.element.querySelector('input');
-  const result = el(doc, 'output', { class: 'ocs__uibuilder-note', 'aria-live': 'polite' });
-  const tip = el(doc, 'div', { class: 'ocs__uibuilder-tip', hidden: true });
+  const result = el(doc, 'output', { class: 'ui-builder-note', 'aria-live': 'polite' });
+  const tip = el(doc, 'div', { class: 'ui-builder-tip', hidden: true });
   let run = 0;
   async function check() {
     const mine = ++run;
@@ -272,7 +272,7 @@ function imageWidget(field, ctx) {
 
 function rowTools(ctx, index, count, onMove, onRemove) {
   const { doc, say } = ctx;
-  return el(doc, 'div', { class: 'ocs__links ocs__uibuilder-item-tools' },
+  return el(doc, 'div', { class: 'ocs__links ui-builder-item-tools' },
     iconButton(doc, { name: 'fa-arrow-up', label: say('move_up'), disabled: ctx.readOnly || index === 0, onclick: () => onMove(index, -1) }),
     iconButton(doc, { name: 'fa-arrow-down', label: say('move_down'), disabled: ctx.readOnly || index === count - 1, onclick: () => onMove(index, 1) }),
     iconButton(doc, { name: 'fa-trash-can', label: say('remove'), disabled: ctx.readOnly, onclick: () => onRemove(index) }));
@@ -290,12 +290,12 @@ function listWidget(field, ctx) {
   let value = listOf(ctx.value).map((item) => (isObject(item) ? item : {}));
   let rows = [];
   let issues = [];
-  const list = el(doc, 'ol', { class: 'ocs__uibuilder-rows' });
+  const list = el(doc, 'ol', { class: 'ui-builder-rows' });
   const add = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small', onclick: () => {
     const blank = Object.fromEntries(subFields.map((sub) => [sub.id, sub.type === 'toggle' ? false : '']));
     commit([...value, blank], { focusRow: value.length });
   } }, icon(doc, 'fa-plus'), isLinks ? say('links_add') : say('items_add'));
-  const group = el(doc, 'fieldset', { class: 'ocs__uibuilder-list', id: ctx.nextId() }, el(doc, 'legend', { class: 'ocs__label' }, field.label), list, add);
+  const group = el(doc, 'fieldset', { class: 'ui-builder-list', id: ctx.nextId() }, el(doc, 'legend', { class: 'ocs__label' }, field.label), list, add);
   const box = shell(ctx, { ...field, label: '' }, group, { labelText: '' });
 
   function commit(next, { focusRow = null } = {}) {
@@ -323,7 +323,7 @@ function listWidget(field, ctx) {
         },
       }));
       const legend = say('item_n', { label: field.label, n: index + 1 });
-      const element = el(doc, 'li', { class: 'ocs__uibuilder-item' },
+      const element = el(doc, 'li', { class: 'ui-builder-item' },
         el(doc, 'fieldset', { class: 'ocs__stack' }, el(doc, 'legend', { class: 'ocs__label' }, legend), widgets.map((widget) => widget.element)),
         rowTools(ctx, index, value.length, move, remove));
       return { element, widgets };
@@ -366,7 +366,7 @@ function groupWidget(field, ctx) {
   const control = el(doc, 'select', { class: 'ocs__input', disabled: true }, el(doc, 'option', { value: '' }, say('group_loading')));
   const box = shell(ctx, field, control);
   box.describe();
-  const status = el(doc, 'small', { class: 'ocs__uibuilder-note' });
+  const status = el(doc, 'small', { class: 'ui-builder-note' });
   box.element.appendChild(status);
   let value = isObject(ctx.value) ? ctx.value : null;
   let known = [];
@@ -412,8 +412,8 @@ function groupWidget(field, ctx) {
 export function createFieldWidget(field, ctx) {
   switch (field.type) {
     case 'text': return inputWidget(field, ctx);
-    case 'textarea': return inputWidget(field, ctx, { tag: 'textarea', extra: { rows: field.id === 'code' ? 10 : 4, spellcheck: field.id === 'code' ? 'false' : null, class: field.id === 'code' ? 'ocs__input ocs__uibuilder-mono' : 'ocs__input' } });
-    case 'table': return inputWidget(field, ctx, { tag: 'textarea', extra: { rows: 6, spellcheck: 'false', class: 'ocs__input ocs__uibuilder-mono' } });
+    case 'textarea': return inputWidget(field, ctx, { tag: 'textarea', extra: { rows: field.id === 'code' ? 10 : 4, spellcheck: field.id === 'code' ? 'false' : null, class: field.id === 'code' ? 'ocs__input ui-builder-mono' : 'ocs__input' } });
+    case 'table': return inputWidget(field, ctx, { tag: 'textarea', extra: { rows: 6, spellcheck: 'false', class: 'ocs__input ui-builder-mono' } });
     case 'url': return inputWidget(field, ctx, { type: 'url', extra: { inputmode: 'url', autocomplete: 'off', spellcheck: 'false', placeholder: field.placeholder || 'https://' } });
     case 'number': return inputWidget(field, ctx, { type: 'number', extra: { min: field.min, max: field.max, step: 1, inputmode: 'numeric' } });
     case 'image': return imageWidget(field, ctx);

@@ -12,7 +12,7 @@ regenerate: true
 The UI Builder editor (DESIGN §10). js/editor-app.js builds everything inside #uiBuilder: the
 start screen (My pages, Class pages, Templates) or, for ?page= / ?local= / ?new=, the editing
 shell with the outline, the canvas iframe (/ui-builder/canvas/) and the inspector. Styles are
-the project's sass under .ocs__uibuilder; every visible string is in _data/ui_builder_editor.yml.
+the project's sass under .ui-builder; every visible string is in _data/ui_builder_editor.yml.
 
 The bootstrap below is the one place that knows whether this site runs Spring (`spring` in
 _config.yml, read by config.js): it picks the Spring store or this browser's store once, and
@@ -21,7 +21,7 @@ Messages' group rules, the kanban board's address check) are imported here and p
 {%- endcomment -%}
 <meta name="robots" content="noindex">
 {% include projects/ui-builder/ui_builder_data.html editor=true %}
-<div class="ocs__uibuilder" id="uiBuilder" data-start-failed="{{ site.data.ui_builder_editor.start_failed | escape }}">
+<div class="ui-builder" id="uiBuilder" data-start-failed="{{ site.data.ui_builder_editor.start_failed | escape }}">
   <noscript><div class="ocs__callout">{{ site.data.ui_builder_editor.needs_js | escape }}</div></noscript>
   <div class="ocs__loading"><div class="ocs__spinner"></div></div>
 </div>

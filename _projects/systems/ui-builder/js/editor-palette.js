@@ -42,7 +42,7 @@ export function createPalette({ doc = globalThis.document, registry, say, dialog
   function choiceButton(item, onPick) {
     const reason = item.disabled ? textOf(registry, item.reasonKey, { max: (registry.limits || {}).live_blocks }) : '';
     const button = el(doc, 'button', {
-      type: 'button', class: 'ocs__uibuilder-choice', role: 'option', 'aria-selected': 'false',
+      type: 'button', class: 'ui-builder-choice', role: 'option', 'aria-selected': 'false',
       'aria-disabled': item.disabled ? 'true' : null, 'data-choice': '',
       onclick: () => { if (!item.disabled) onPick(item); },
     }, icon(doc, item.icon), ' ', el(doc, 'strong', null, item.label), ' ',
@@ -84,8 +84,8 @@ export function createPalette({ doc = globalThis.document, registry, say, dialog
   function show({ title, groups, onPick, searchable }) {
     const listId = `ui-palette-${Date.now().toString(36)}`;
     const search = el(doc, 'input', { class: 'ocs__input', type: 'search', role: 'combobox', 'aria-expanded': 'true', 'aria-controls': listId, 'aria-autocomplete': 'list', 'aria-label': say('palette_search'), placeholder: say('palette_search'), hidden: !searchable });
-    const list = el(doc, 'div', { class: 'ocs__uibuilder-palette', id: listId, role: 'listbox', 'aria-label': title });
-    const count = el(doc, 'output', { class: 'ocs__uibuilder-note', 'aria-live': 'polite' });
+    const list = el(doc, 'div', { class: 'ui-builder-palette', id: listId, role: 'listbox', 'aria-label': title });
+    const count = el(doc, 'output', { class: 'ui-builder-note', 'aria-live': 'polite' });
     const items = new Map();
     let finished = false;
     const pick = (item) => {
@@ -97,7 +97,7 @@ export function createPalette({ doc = globalThis.document, registry, say, dialog
       items.clear();
       const shown = filterPalette(groups, search.value);
       list.replaceChildren(...shown.map((group) => el(doc, 'div', { role: 'group', 'aria-label': group.label },
-        group.label ? el(doc, 'h3', { class: 'ocs__uibuilder-palette-group' }, group.label) : null,
+        group.label ? el(doc, 'h3', { class: 'ui-builder-palette-group' }, group.label) : null,
         group.items.map((item) => {
           const button = choiceButton(item, pick);
           items.set(button, item);
@@ -119,7 +119,7 @@ export function createPalette({ doc = globalThis.document, registry, say, dialog
     });
     paint();
     dialog = dialogs.open({ title, body: [search, count, list], focus: () => (searchable ? search : list.querySelector('[data-choice]')) });
-    dialog.card.classList.add('ocs__uibuilder-palette-card');
+    dialog.card.classList.add('ui-builder-palette-card');
     return dialog.result.then((item) => (item ? onPick(item) : null));
   }
 

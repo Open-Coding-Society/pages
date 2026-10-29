@@ -1,5 +1,5 @@
-// UI Builder editor and canvas chrome. Everything is scoped under .ocs__uibuilder (the editor
-// page) or .ocs__uibuilder-canvas (the canvas page), because project sass is imported site-wide.
+// UI Builder editor and canvas chrome. Everything is scoped under .ui-builder (the editor
+// page) or .ui-builder-canvas (the canvas page), because project sass is imported site-wide.
 // Published pages and the gallery use only the shared ocs__ grammar; the two rules below for them
 // undo a site-wide leak and fit the grammar's badge into the viewer's one-line bar.
 //
@@ -38,8 +38,8 @@ $uib-phone: 767px;
 
 // Last on purpose: [hidden] (and the site's .hidden) must win over any rule above and over the
 // grammar's own display rules (ocs__btn, ocs__stack, ocs__modal-actions) inside the builder.
-.ocs__uibuilder [hidden],
-.ocs__uibuilder .hidden,
-.ocs__uibuilder-canvas [hidden] {
+.ui-builder [hidden],
+.ui-builder .hidden,
+.ui-builder-canvas [hidden] {
   display: none !important;
 }

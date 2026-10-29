@@ -263,7 +263,7 @@ blocks:
     fields: []
   chat:
     label: Group chat
-    help: Your group's live chat from Messages. Only members of the group see it.
+    help: Your group's live chat from Messages, shown on the page to the group's members.
     icon: fa-comments
     category: comms
     live: true

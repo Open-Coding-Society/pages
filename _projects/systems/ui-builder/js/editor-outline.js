@@ -87,7 +87,7 @@ export function createOutline({ root, doc = globalThis.document, registry, say, 
   let selectedKey = null;
   let readOnly = false;
   let drag = null;
-  const tree = el(doc, 'ul', { class: 'ocs__uibuilder-tree', role: 'tree', 'aria-label': say('outline_label') });
+  const tree = el(doc, 'ul', { class: 'ui-builder-tree', role: 'tree', 'aria-label': say('outline_label') });
   const empty = el(doc, 'p', { class: 'ocs__text', hidden: true }, say('outline_empty'));
   const addSection = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small', onclick: () => actions.addSection() }, icon(doc, 'fa-plus'), say('add_section'));
   root.replaceChildren(el(doc, 'h2', { class: 'ocs__section-title' }, say('outline')), empty, tree, el(doc, 'div', { class: 'ocs__links' }, addSection));
@@ -108,7 +108,7 @@ export function createOutline({ root, doc = globalThis.document, registry, say, 
       control.tabIndex = -1; // pointer shortcuts; keyboard users have the same actions as keys
       return control;
     };
-    return el(doc, 'span', { class: 'ocs__uibuilder-row-tools', role: 'group', 'aria-label': say('row_actions', { label: row.label }) },
+    return el(doc, 'span', { class: 'ui-builder-row-tools', role: 'group', 'aria-label': say('row_actions', { label: row.label }) },
       button('fa-arrow-up', say('move_up'), () => actions.move(row.id, -1)),
       button('fa-arrow-down', say('move_down'), () => actions.move(row.id, 1)),
       button('fa-clone', say('duplicate'), () => actions.duplicate(row.id)),
@@ -128,16 +128,16 @@ export function createOutline({ root, doc = globalThis.document, registry, say, 
       count ? el(doc, 'b', { class: 'ocs__status-pill ocs__status-pill--bad' }, say('issues_badge', { count })) : null,
     ].filter(Boolean);
     const item = el(doc, 'li', {
-      id: domId(row.key), class: 'ocs__uibuilder-row', role: 'treeitem', 'data-key': row.key, 'data-kind': row.kind,
+      id: domId(row.key), class: 'ui-builder-row', role: 'treeitem', 'data-key': row.key, 'data-kind': row.kind,
       'aria-level': row.depth + 1, 'aria-setsize': row.setSize, 'aria-posinset': row.position, 'aria-labelledby': badges.length ? `${labelId} ${badgesId}` : labelId,
       'aria-selected': row.kind === 'add' ? null : String(row.key === selectedKey), 'aria-expanded': row.hasChildren ? String(row.expanded) : null,
       'data-hidden': row.hidden || row.hiddenByParent ? '' : null, tabindex: row.key === activeKey ? '0' : '-1',
       draggable: !readOnly && (row.kind === 'block' || row.kind === 'section') ? 'true' : null,
     },
-    el(doc, 'span', { class: 'ocs__uibuilder-row-main ocs__truncate', id: labelId },
+    el(doc, 'span', { class: 'ui-builder-row-main ocs__truncate', id: labelId },
       icon(doc, iconName), ' ', el(doc, 'strong', null, labelOf(row)),
       row.preview ? [' ', el(doc, 'small', null, row.preview)] : null),
-    badges.length ? el(doc, 'span', { class: 'ocs__uibuilder-row-badges', id: badgesId }, badges) : null,
+    badges.length ? el(doc, 'span', { class: 'ui-builder-row-badges', id: badgesId }, badges) : null,
     tools(row));
     return item;
   }

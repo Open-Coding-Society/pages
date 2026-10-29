@@ -195,7 +195,7 @@ test('the revisions dialog words store errors and warns about unsaved changes', 
     restore: async () => { throw new ApiError({ status: 409, error: 'busy', message: 'UI Builder store: busy (HTTP 409)' }); },
   });
   await settle();
-  root.querySelector('.ocs__uibuilder-revisions button').click();
+  root.querySelector('.ui-builder-revisions button').click();
   await settle();
   const confirm = root.querySelectorAll('.ocs__modal-card')[1];
   assert.match(text(confirm), /couldn't be saved/, 'the confirm says the newest changes would be lost');

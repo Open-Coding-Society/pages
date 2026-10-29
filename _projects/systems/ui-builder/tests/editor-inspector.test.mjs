@@ -137,7 +137,7 @@ test('the team picker words a load failure through the store, never the error me
   const { root, inspector } = inspectorFor({ groups });
   inspector.update(pageOf([[]]), stateOf({ capabilities: { teams: true }, meta: { isOwner: true } }));
   await settle();
-  const note = text(root.querySelector('[data-ui-field="team"] .ocs__uibuilder-note'));
+  const note = text(root.querySelector('[data-ui-field="team"] .ui-builder-note'));
   assert.ok(note.includes(say('group_failed', { message: 'store-words:OfflineError' })), note);
   assert.ok(!note.includes('raw network text'), 'the error\'s own message never reaches a student');
 });
@@ -167,12 +167,12 @@ test('Page settings lists the page-wide problems that have no field of their own
   const { root, inspector } = inspectorFor();
   const issues = [{ nodeId: null, field: null, key: 'too_many_sections', message: 'A page can have at most 25 sections.' }];
   inspector.update(page, stateOf({ issues }));
-  const box = root.querySelector('.ocs__uibuilder-page-issues');
+  const box = root.querySelector('.ui-builder-page-issues');
   assert.ok(box && !box.hidden, 'the list is shown');
   assert.ok(text(box).includes('A page can have at most 25 sections.'));
   assert.ok(text(box).includes(say('page_issues_title')));
   inspector.update(page, stateOf({ issues: [] }));
-  assert.equal(root.querySelector('.ocs__uibuilder-page-issues').hidden, true, 'and hidden once the page is fixed');
+  assert.equal(root.querySelector('.ui-builder-page-issues').hidden, true, 'and hidden once the page is fixed');
 });
 
 test('Test connection fills in a list not picked yet, without touching mapped fields', needsRuby, async () => {
@@ -194,7 +194,7 @@ test('Test connection fills in a list not picked yet, without touching mapped fi
   const page = pageOf([[['api_data', { title: 'Users', view: 'list', source: { url: 'https://team.example/api/users', list_path: '', title_path: 'name', snapshot: { items: [], fetched_at: 0, from_loopback: false } } }]]]);
   const block = page.sections[0].cells[0].blocks[0];
   inspector.update(page, stateOf({ selectedId: block.id }));
-  const testButton = [...root.querySelectorAll('.ocs__uibuilder-api button')].find((button) => text(button) === say('api_test'));
+  const testButton = [...root.querySelectorAll('.ui-builder-api button')].find((button) => text(button) === say('api_test'));
   testButton.click();
   await settle();
   const last = patches[patches.length - 1];
@@ -221,16 +221,16 @@ function apiInspector(reply, source) {
   const empty = { url: 'https://team.example/api/team', list_path: '', title_path: '', text_path: '', image_path: '', link_path: '', value_path: '', label_path: '', snapshot: { items: [], fetched_at: 0, from_loopback: false } };
   const page = pageOf([[['api_data', { title: 'Team', view: 'list', source: { ...empty, ...source } }]]]);
   inspector.update(page, stateOf({ selectedId: page.sections[0].cells[0].blocks[0].id }));
-  const selects = () => root.querySelectorAll('.ocs__uibuilder-api select');
+  const selects = () => root.querySelectorAll('.ui-builder-api select');
   const press = async (key) => {
-    [...root.querySelectorAll('.ocs__uibuilder-api button')].find((button) => text(button) === say(key)).click();
+    [...root.querySelectorAll('.ui-builder-api button')].find((button) => text(button) === say(key)).click();
     await settle();
   };
   const pickList = (value) => {
     selects()[0].value = value;
     selects()[0].dispatchEvent(createEvent('change'));
   };
-  const report = () => root.querySelectorAll('.ocs__uibuilder-checks li').map((line) => [line.getAttribute('data-level'), text(line)]);
+  const report = () => root.querySelectorAll('.ui-builder-checks li').map((line) => [line.getAttribute('data-level'), text(line)]);
   return { patches, shown, listSelect: () => selects()[0], titleSelect: () => selects()[1], test: () => press('api_test'), press, pickList, report };
 }
 

@@ -1,13 +1,13 @@
 // The start screen: ocs__hub-grid holds the templates and ocs__grid--card the pages; a template
 // card shows its page drawn small, which the grammar has no element for.
 
-.ocs__uibuilder-start {
+.ui-builder-start {
   padding-top: 0.5rem;
 }
 
 // The calendar system's sass hides every h1 on the site (an unscoped h1 rule) and documentation
 // styles recolor them; the builder's own title is shown in the theme's colors.
-.ocs__uibuilder-start > h1 {
+.ui-builder-start > h1 {
   display: block;
   margin: 0;
   color: var(--pref-text-color);
@@ -20,7 +20,7 @@
 // the page color a real page gets, with or without a theme (--pref-bg-color keeps Midnight's
 // navy when there's none). The bottom fades, so the window's edge doesn't look like it cut the
 // page's buttons in half.
-.ocs__uibuilder-thumb {
+.ui-builder-thumb {
   position: relative;
   height: 11rem;
   overflow: hidden;
@@ -32,19 +32,19 @@
   mask-image: linear-gradient(to bottom, #000 70%, transparent);
 }
 
-.ocs__uibuilder-thumb-page {
+.ui-builder-thumb-page {
   width: 960px;
   transform: scale(var(--ui-thumb-scale, 0.3));
   transform-origin: 0 0;
 }
 
 // A whole template card is a pointer target; its button is the keyboard one.
-.ocs__uibuilder-templates .ocs__hub-card {
+.ui-builder-templates .ocs__hub-card {
   cursor: pointer;
 }
 
 // The class-page filters sit in one wrapping row.
-.ocs__uibuilder-filters {
+.ui-builder-filters {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;

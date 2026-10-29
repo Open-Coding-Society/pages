@@ -189,7 +189,7 @@ export const pageActions = {
       return;
     }
     const { doc, say } = this;
-    const box = el(doc, 'div', { class: 'ocs__uibuilder-wrap' });
+    const box = el(doc, 'div', { class: 'ui-builder-wrap' });
     const restore = el(doc, 'button', { type: 'button', class: 'ocs__btn small accent', onclick: () => {
       box.remove();
       if (draft.baseVersion !== undefined && draft.baseVersion !== null) this.session.setBase(draft.baseVersion);

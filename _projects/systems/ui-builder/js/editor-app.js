@@ -95,7 +95,7 @@ export class UiBuilderEditor {
       return board && !board.personal ? board.url : null;
     };
     this.hooks = createRichHooks({ richText: deps.richText, baseurl: this.baseurl, pageOrigin: this.pageOrigin, doc: this.doc });
-    this.view = el(this.doc, 'div', { class: 'ocs__uibuilder-view' });
+    this.view = el(this.doc, 'div', { class: 'ui-builder-view' });
     // The start screen's note, in a status region that lasts as long as the app: a region that
     // appears together with its words is often not read out, so it isn't redrawn with each screen.
     this.startNote = el(this.doc, 'div', { class: 'ocs__callout', hidden: true });

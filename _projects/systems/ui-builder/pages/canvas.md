@@ -15,7 +15,7 @@ shows a note. The editor strings are included because the canvas chrome (add but
 reads them from the registry too.
 {%- endcomment -%}
 {% include projects/ui-builder/ui_builder_data.html editor=true %}
-<div class="ocs__uibuilder-canvas" id="uiBuilderCanvas"></div>
+<div class="ui-builder-canvas" id="uiBuilderCanvas"></div>
 <script type="module">
   import { baseurl } from '{{ site.baseurl }}/assets/js/api/config.js';
   import * as richText from '{{ site.baseurl }}/assets/js/chat/rich-text.js';

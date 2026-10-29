@@ -58,18 +58,18 @@ function apiWidget(field, ctx) {
   let destroyed = false;
   const id = ctx.nextId();
   const url = el(doc, 'input', { class: 'ocs__input', type: 'url', id, inputmode: 'url', autocomplete: 'off', spellcheck: 'false', placeholder: 'https://', disabled: ctx.readOnly });
-  const issue = el(doc, 'strong', { class: 'ocs__uibuilder-issue', id: `${id}-issue`, hidden: true });
+  const issue = el(doc, 'strong', { class: 'ui-builder-issue', id: `${id}-issue`, hidden: true });
   url.setAttribute('aria-describedby', `${id}-issue`);
   const testButton = el(doc, 'button', { type: 'button', class: 'ocs__btn small accent', onclick: () => test() }, say('api_test'));
   const codeButton = el(doc, 'button', { type: 'button', class: 'ocs__btn small', onclick: () => showCode() }, say('show_code'));
-  const checks = el(doc, 'ul', { class: 'ocs__uibuilder-checks', 'aria-live': 'polite', 'aria-label': say('api_checks') });
+  const checks = el(doc, 'ul', { class: 'ui-builder-checks', 'aria-live': 'polite', 'aria-label': say('api_checks') });
   const listSelect = el(doc, 'select', { class: 'ocs__input', id: `${id}-list`, disabled: ctx.readOnly });
   const slotsBox = el(doc, 'div', { class: 'ocs__stack' });
-  const slotNote = el(doc, 'small', { class: 'ocs__uibuilder-note' });
-  const snapshotText = el(doc, 'small', { class: 'ocs__uibuilder-note' });
+  const slotNote = el(doc, 'small', { class: 'ui-builder-note' });
+  const snapshotText = el(doc, 'small', { class: 'ui-builder-note' });
   const saveCopy = el(doc, 'button', { type: 'button', class: 'ocs__btn small', onclick: () => saveSnapshot() }, say('api_snapshot_save'));
   const dropCopy = el(doc, 'button', { type: 'button', class: 'ocs__btn small', onclick: () => emit({ snapshot: { items: [], fetched_at: 0, from_loopback: false } }, 'snapshot') }, say('api_snapshot_remove'));
-  const element = el(doc, 'fieldset', { class: 'ocs__uibuilder-api ocs__stack', 'data-ui-field': field.id },
+  const element = el(doc, 'fieldset', { class: 'ui-builder-api ocs__stack', 'data-ui-field': field.id },
     el(doc, 'legend', { class: 'ocs__label' }, field.label),
     el(doc, 'div', { class: 'ocs__field' }, el(doc, 'label', { class: 'ocs__label', for: id }, say('api_url')), url, issue),
     el(doc, 'div', { class: 'ocs__links' }, testButton, codeButton),
@@ -261,7 +261,7 @@ export function createInspector({ root, doc = globalThis.document, registry, say
         ...ctx, value: values[field.id], settings: values,
         onChange: (value, meta) => onField(field, value, meta),
       });
-      const wrapper = el(doc, 'div', { class: 'ocs__uibuilder-slot', hidden: !visibleIn(field, values) }, widget.element);
+      const wrapper = el(doc, 'div', { class: 'ui-builder-slot', hidden: !visibleIn(field, values) }, widget.element);
       return { field, widget, wrapper };
     });
   }
@@ -279,7 +279,7 @@ export function createInspector({ root, doc = globalThis.document, registry, say
       return button;
     };
     const hidden = loc.node.hidden === true;
-    return el(doc, 'div', { class: 'ocs__links ocs__uibuilder-toolbar', role: 'toolbar', 'aria-label': say('block_toolbar', { label }) },
+    return el(doc, 'div', { class: 'ocs__links ui-builder-toolbar', role: 'toolbar', 'aria-label': say('block_toolbar', { label }) },
       tool('move_up', 'fa-arrow-up', say('move_up')),
       tool('move_down', 'fa-arrow-down', say('move_down')),
       tool('duplicate', 'fa-clone', say('duplicate')),
@@ -299,7 +299,7 @@ export function createInspector({ root, doc = globalThis.document, registry, say
     });
     // replaceChildren takes nodes, not arrays, and turns null into text: filter and spread.
     body.replaceChildren(...[
-      el(doc, 'h3', { class: 'ocs__uibuilder-node-title' }, icon(doc, def ? def.icon : 'fa-square'), ' ', def ? def.label : String(loc.node.type)),
+      el(doc, 'h3', { class: 'ui-builder-node-title' }, icon(doc, def ? def.icon : 'fa-square'), ' ', def ? def.label : String(loc.node.type)),
       def && def.help ? el(doc, 'p', { class: 'ocs__text' }, def.help) : null,
       toolbar(loc, def, state),
       ...(widgets.length ? widgets.map((item) => item.wrapper) : [el(doc, 'p', { class: 'ocs__text' }, say('no_fields'))]),
@@ -359,7 +359,7 @@ export function createInspector({ root, doc = globalThis.document, registry, say
       parts.push(el(doc, 'div', { class: 'ocs__links' }, actionButton(state, 'unpublish', 'ocs__btn small', () => actions.unpublish(), say('unpublish'))));
     }
     // Apart from every other button, behind a type-the-title confirm.
-    parts.push(el(doc, 'div', { class: 'ocs__uibuilder-danger' },
+    parts.push(el(doc, 'div', { class: 'ui-builder-danger' },
       actionButton(state, 'delete_page', 'ocs__btn ocs__btn--icon small', () => actions.deletePage(), icon(doc, 'fa-trash-can'), say('delete_page'))));
     return parts;
   }
@@ -371,9 +371,9 @@ export function createInspector({ root, doc = globalThis.document, registry, say
     });
     // Problems with the whole page (too big, too many sections or live blocks) have no outline row
     // and no field, so patch() lists them here, where they stay until they are fixed.
-    const pageIssues = el(doc, 'div', { class: 'ocs__uibuilder-page-issues', hidden: true });
+    const pageIssues = el(doc, 'div', { class: 'ui-builder-page-issues', hidden: true });
     body.replaceChildren(
-      el(doc, 'h3', { class: 'ocs__uibuilder-node-title' }, icon(doc, 'fa-sliders'), ' ', say('page_settings')),
+      el(doc, 'h3', { class: 'ui-builder-node-title' }, icon(doc, 'fa-sliders'), ' ', say('page_settings')),
       el(doc, 'p', { class: 'ocs__text' }, say('page_settings_help')),
       pageIssues,
       ...widgets.map((item) => item.wrapper),
@@ -391,7 +391,7 @@ export function createInspector({ root, doc = globalThis.document, registry, say
     }
     box.hidden = false;
     box.replaceChildren(el(doc, 'div', { class: 'ocs__callout' },
-      el(doc, 'strong', { class: 'ocs__uibuilder-issue' }, say('page_issues_title')),
+      el(doc, 'strong', { class: 'ui-builder-issue' }, say('page_issues_title')),
       el(doc, 'ul', null, own.map((item) => el(doc, 'li', null, item.message)))));
   }
 

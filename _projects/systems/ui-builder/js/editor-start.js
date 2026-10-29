@@ -40,7 +40,7 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
   tabs.push({ key: 'templates', label: say('tab_templates') });
   const panels = {};
   const tabButtons = {};
-  const tabList = el(doc, 'div', { class: 'ocs__links ocs__uibuilder-tabs', role: 'tablist', 'aria-label': say('tabs_label') });
+  const tabList = el(doc, 'div', { class: 'ocs__links ui-builder-tabs', role: 'tablist', 'aria-label': say('tabs_label') });
 
   function select(key, { focus = false } = {}) {
     for (const tab of tabs) {
@@ -69,7 +69,7 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
 
   // ---- My pages
   const mineList = el(doc, 'div', { class: 'ocs__grid ocs__grid--card' });
-  const mineStatus = el(doc, 'output', { class: 'ocs__uibuilder-note', 'aria-live': 'polite' });
+  const mineStatus = el(doc, 'output', { class: 'ui-builder-note', 'aria-live': 'polite' });
   const file = el(doc, 'input', { type: 'file', accept: 'application/json,.json', hidden: true });
   const notes = el(doc, 'div', { class: 'ocs__stack' });
   if (!caps.cloud) notes.appendChild(el(doc, 'div', { class: 'ocs__callout' }, icon(doc, 'fa-circle-info'), ' ', say('flask_only')));
@@ -155,12 +155,12 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
   const fitThumb = (frame) => frame.style.setProperty('--ui-thumb-scale', String(Math.max(0.05, frame.clientWidth / THUMB_WIDTH)));
   const thumbs = typeof view.ResizeObserver === 'function' ? new view.ResizeObserver((entries) => entries.forEach((entry) => fitThumb(entry.target))) : null;
   function thumbnail(template) {
-    const frame = el(doc, 'div', { class: 'ocs__uibuilder-thumb', 'aria-hidden': 'true' });
+    const frame = el(doc, 'div', { class: 'ui-builder-thumb', 'aria-hidden': 'true' });
     frame.inert = true;
     try {
       const page = createPage(registry, { template: template.key, ids: drawIds() });
       const tree = renderPage(page, { registry, mode: 'canvas', baseurl, pageOrigin, renderers: contentRenderers });
-      frame.appendChild(el(doc, 'div', { class: 'ocs__uibuilder-thumb-page' }, toDOM(tree, { doc, renderRich })));
+      frame.appendChild(el(doc, 'div', { class: 'ui-builder-thumb-page' }, toDOM(tree, { doc, renderRich })));
     } catch (error) {
       console.error('UI Builder: a template could not be drawn', template.key, error);
     }
@@ -170,7 +170,7 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
   // A card, not one big button: the drawn page inside isn't phrasing content. The whole card is a
   // pointer target; the button is the keyboard and screen reader one.
   panels.templates.append(el(doc, 'p', { class: 'ocs__text' }, say('templates_lead')),
-    el(doc, 'div', { class: 'ocs__hub-grid ocs__uibuilder-templates' }, listOf(registry.templates).map((template) => {
+    el(doc, 'div', { class: 'ocs__hub-grid ui-builder-templates' }, listOf(registry.templates).map((template) => {
       // The name starts with the words the button shows, so "click Use template" works by voice.
       const use = el(doc, 'button', { type: 'button', class: 'ocs__btn small accent fill', 'aria-label': say('template_use', { label: template.label }) }, say('template_start'));
       const card = el(doc, 'div', { class: 'ocs__hub-card ocs__stack', 'data-template': template.key },
@@ -182,7 +182,7 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
 
   // ---- Class pages (teachers)
   const classRows = el(doc, 'tbody');
-  const classStatus = el(doc, 'output', { class: 'ocs__uibuilder-note', 'aria-live': 'polite' });
+  const classStatus = el(doc, 'output', { class: 'ui-builder-note', 'aria-live': 'polite' });
   const course = el(doc, 'select', { class: 'ocs__input', id: 'ui-class-course' }, el(doc, 'option', { value: '' }, say('class_all_courses')),
     listOf(registry.courses).map((option) => el(doc, 'option', { value: option.value }, option.label)));
   const status = el(doc, 'select', { class: 'ocs__input', id: 'ui-class-status' }, el(doc, 'option', { value: '' }, say('class_status_all')),
@@ -249,7 +249,7 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
     for (const control of [status, changes, requested]) control.addEventListener('change', paintClass);
     paintBulk();
     panels.class.append(el(doc, 'p', { class: 'ocs__text' }, say('class_lead')),
-      el(doc, 'div', { class: 'ocs__uibuilder-filters' },
+      el(doc, 'div', { class: 'ui-builder-filters' },
         el(doc, 'div', { class: 'ocs__field' }, el(doc, 'label', { class: 'ocs__label', for: 'ui-class-course' }, say('class_course')), course),
         el(doc, 'div', { class: 'ocs__field' }, el(doc, 'label', { class: 'ocs__label', for: 'ui-class-status' }, say('class_status')), status),
         toggle(changes, say('class_changes')), toggle(requested, text('teacher.public_requested'))),
@@ -260,7 +260,7 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
 
   // tabindex -1: the app puts the keyboard here when it opens this screen from another one.
   const heading = el(doc, 'h1', { tabindex: '-1' }, say('title'));
-  root.replaceChildren(el(doc, 'div', { class: 'ocs__container ocs__container--fill ocs__stack ocs__uibuilder-start' },
+  root.replaceChildren(el(doc, 'div', { class: 'ocs__container ocs__container--fill ocs__stack ui-builder-start' },
     heading, el(doc, 'p', { class: 'ocs__text ocs__lead' }, say('start_lead')),
     tabList, Object.values(panels)));
   select('mine');
