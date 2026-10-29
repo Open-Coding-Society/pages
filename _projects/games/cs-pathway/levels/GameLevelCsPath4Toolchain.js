@@ -1018,6 +1018,7 @@ class GameLevelCsPath4Toolchain {
     // Chat helper: answers questions using the station the student is on right now.
     this.chatHelper = new ChatHelper({
       levelKey: 'toolchain-trail',
+      mountTo: hudMount,
       getProgress: () => {
         const stationId = this._getActiveStationId();
         const station = stationId ? this._stationById[stationId] : null;
