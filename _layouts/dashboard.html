@@ -335,37 +335,8 @@ active_tab: dashboard
 <script type="module">
     import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
-    // Tab switcher code with underline animation
-    const tabs = document.querySelectorAll(".tab-btn");
-    const tabContents = document.querySelectorAll(".tab-content");
-    const underline = document.getElementById("tab-underline");
-
-    function setUnderline(el) {
-        const rect = el.getBoundingClientRect();
-        const parentRect = el.parentElement.parentElement.getBoundingClientRect();
-        underline.style.width = `${rect.width}px`;
-        underline.style.left = `${rect.left - parentRect.left}px`;
-    }
-
-    tabs.forEach((tab) => {
-        tab.addEventListener("click", async (e) => {
-            e.preventDefault();
-            tabs.forEach(t => t.classList.remove("active", "text-blue-500", "border-blue-500"));
-            tabContents.forEach(c => c.classList.add("hidden"));
-            tabContents.forEach(c => c.classList.remove("block"));
-            const targetId = `tab-content-${tab.id.replace("tab-", "")}`;
-            document.getElementById(targetId).classList.remove("hidden");
-            document.getElementById(targetId).classList.add("block");
-            tab.classList.add("active", "text-blue-500", "border-blue-500");
-            setUnderline(tab);
-        });
-    });
-
     // Initialize dashboard on DOM ready
     document.addEventListener('DOMContentLoaded', async () => {
-        const activeTab = document.querySelector(".tab-btn.active");
-        if (activeTab) setUnderline(activeTab);
-
         // Check admin status and gate UI
         try {
             const userRes = await fetch(`${javaURI}/api/user/info`, fetchOptions);
