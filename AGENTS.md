@@ -105,6 +105,7 @@ while preserving all critical instructions. The agent must still communicate wit
 ### 后端边界
 
 * 后端服务位于 [node_backend/README.md](node_backend/README.md)，与站点构建流程分离；改动前先阅读该文档。
+* **评分生命周期：** 作业关闭前，教师和学生助教（作业创建者、指定评分者）在 Submissions 页面评分（全部提交表格、编辑弹窗、[creator-dashboard.js](assets/js/submissions/creator-dashboard.js) 的“Assignments You Created”）：保存的分数即人工覆盖，“AI re-grade”请 AI 重新评分，“Use AI grade”（`DELETE /api/submissions/grade/{id}`）移除覆盖。所有评分请求和结果文案都在 [grading.js](assets/js/submissions/grading.js)：Spring 返回类型化的 `outcome` 和 `grading` 状态（有效分、AI 分、人工分、`revision`、`closed`），页面按 outcome 显示文案；课程提交表单（Blogs `post.html`、Courses `course-document-player.html` 源文件）也使用其 `readGradingResponse`。务必发送屏幕上显示的 `revision`（否则 `STALE_REVISION`，409）。新内容即新版本：AI 重新评分，人工覆盖解除。教师在 Spring 的 tracker 中关闭作业后分数即为最终分（`grading.closed`，显示“Final”）：页面输入只读、隐藏编辑和评分操作；重新评分请求、相似性检查和申诉改由教师在 tracker 中审查。界面只用 OCS 语法（状态标签、`ocs__modal` 历史与 `ocs__tree` 时间线、`ocs__callout`、`ocs__links`），不用内联颜色。测试：`node --test tests/test_submission_grading.mjs tests/test_creator_dashboard.mjs`。
 
 ## 编码标准
 
@@ -167,6 +168,10 @@ while preserving all critical instructions. The agent must still communicate wit
 ### 自我更新与持续学习
 
 * **同步更新文档：** 随着你在迭代中犯错、学习新的系统模式或约束，主动用重要的注意事项更新 `AGENTS.md`，并确保同步更新 `AGENTS_MD_DOCUMENTATION.md`（英文说明版本），以便系统随时间不断改进。
+
+## 个人 AI 密钥
+
+* **个人 AI 密钥：** 规范源是 `_projects/systems/profile/_includes/profile-ai-connections.html` 与 `js/ai-connections.js`；使用共享 OCS 控件，无页面样式表。启动 include 注入 `javaURI`，不从模块用 `../` 导入配置。只在 `site.spring != false` 时渲染，独立于个人信息与 Gist 保存，不作为必填 Setup 步骤。不要记录、回显或在浏览器存储密钥；每次保存尝试后清空输入。评分失败不阻止保存提交，学校部署前检查供应商资格/隐私条件。测试：`node tests/test_ai_connections.mjs`、`bundle exec ruby tests/test_ai_profile_layout.rb`。
 
 ## 群组与实时聊天（Groups & realtime chat）
 

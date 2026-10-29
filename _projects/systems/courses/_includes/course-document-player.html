@@ -144,8 +144,9 @@
   import { pythonURI, fetchOptions, javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
   import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
   import { appendGistSettingsLink } from '{{ site.baseurl }}/assets/js/gist-connection-errors.js';
-  import { listRunners, unsavedRunners, readRunners } from '{{ site.baseurl }}/assets/js/runner-io.js';
+  import { listRunners, unsavedRunners, readRunners, readRunnerKinds } from '{{ site.baseurl }}/assets/js/runner-io.js';
   import { createNavigationState } from '{{ site.baseurl }}/assets/js/course-navigation-state.js';
+  import { readGradingResponse } from '{{ site.baseurl }}/assets/js/submissions/grading.js';
   import { rememberCourse } from '{{ site.baseurl }}/assets/js/course-entry.js';
 
   /**
@@ -661,8 +662,7 @@
       })
     });
     if (!res.ok) {
-      const e = await res.json().catch(() => ({}));
-      throw new Error(e.error || res.statusText);
+      throw new Error((await readGradingResponse(res)).message);
     }
     // Dual-write to EshikaP1's grades system
     const assignmentLabel = (typeof CURRENT_ASSIGNMENT_NAME === 'string' && CURRENT_ASSIGNMENT_NAME) ? CURRENT_ASSIGNMENT_NAME : String(assignmentId);
@@ -677,7 +677,8 @@
     const assignmentId = await ensureAssignmentId();
     // Resolve the user first so we don't burn a Gist creation on a request that will fail anyway.
     const { uid, personId } = await resolveCurrentUser();
-    const gistUrl = await exportToGist(files, { type: 'submission', description: description || 'Code submission' });
+    // kinds tells the grader which files are written reflections rather than code.
+    const gistUrl = await exportToGist(files, { type: 'submission', description: description || 'Code submission', manifest: { kinds: readRunnerKinds() } });
     const content = { type: 'code', url: gistUrl, notes: description };
     const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
       ...fetchOptions,
@@ -697,8 +698,7 @@
       })
     });
     if (!res.ok) {
-      const e = await res.json().catch(() => ({}));
-      throw new Error(e.error || res.statusText);
+      throw new Error((await readGradingResponse(res)).message);
     }
     const assignmentLabel = (typeof CURRENT_ASSIGNMENT_NAME === 'string' && CURRENT_ASSIGNMENT_NAME) ? CURRENT_ASSIGNMENT_NAME : String(assignmentId);
     await fetch(`${javaURI}/api/grades`, {
@@ -734,8 +734,7 @@
         body: fd
       });
       if (!r.ok) {
-        const e = await r.json().catch(() => ({}));
-        throw new Error(`Upload failed for ${file.name}: ` + (e.error || r.statusText));
+        throw new Error(`Upload failed for ${file.name}: ` + (await readGradingResponse(r)).message);
       }
       // Dual-write to EshikaP1's grades system
       const assignmentLabel = (typeof CURRENT_ASSIGNMENT_NAME === 'string' && CURRENT_ASSIGNMENT_NAME) ? CURRENT_ASSIGNMENT_NAME : String(assignmentId);
@@ -1031,7 +1030,7 @@
         const notes = document.getElementById('code-notes')?.value?.trim() || '';
         const submitBtn = codeForm.querySelector('button[type="submit"]');
         if (unsavedRunners().length > 0) {
-          showStatus('error', 'Save your code with the 💾 button in each runner before submitting.');
+          showStatus('error', 'Save each code runner with its 💾 button, and submit each reflection with its 📤 button, before submitting.');
           return;
         }
         const files = readRunners();

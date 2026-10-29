@@ -27,6 +27,53 @@
 }
 
 /* ── Header ── */
+.jv-kanban {
+  // Break out of the reading column while leaving room at both viewport edges.
+  width: unquote("min(1400px, calc(100vw - 3rem))");
+  max-width: none;
+  margin-left: 50%;
+  transform: translateX(-50%);
+
+  .ocs__kanban-board {
+    min-width: 0;
+  }
+
+  .jv-kanban-more > summary {
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--pref-accent-color);
+      outline-offset: 2px;
+    }
+  }
+
+  .jv-kanban-collapse,
+  .jv-kanban-more[open] .jv-kanban-expand {
+    display: none;
+  }
+
+  .jv-kanban-more[open] .jv-kanban-collapse {
+    display: inline;
+  }
+
+  .jv-kanban-extra {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  @media (max-width: 600px) {
+    width: 100%;
+    margin-left: 0;
+    transform: none;
+  }
+}
+
 .jv-header {
   text-align: center;
   margin-bottom: 2.75rem;

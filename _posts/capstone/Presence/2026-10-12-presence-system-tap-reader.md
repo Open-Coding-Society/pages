@@ -2,7 +2,7 @@
 toc: false
 layout: post
 title: Classroom Presence System, Tap Reader Build
-description: Our own tap reader, a Raspberry Pi 3 and an RC522 RFID board in a 3D-printed case, replacing the CrowPi.
+description: Our own tap reader, a Raspberry Pi 4 with a PN532 NFC HAT, replacing the CrowPi, and the circular enclosure it goes into.
 permalink: /capstone/presence-system/tap-reader/
 year: "2026-2027"
 rp_active: tapreader
@@ -13,10 +13,22 @@ rp_active: tapreader
   <div class="rfid-presence-header">
     <div class="ocs__badge">Tap Reader Build</div>
     <h1 class="rfid-presence-title">Building our own tap reader</h1>
-    <p class="ocs__description">A Raspberry Pi 3 and an RC522 RFID board in a 3D-printed case, replacing the CrowPi.</p>
+    <p class="ocs__description">Our own reader by the door: today a Raspberry Pi&nbsp;4 with a PN532 NFC HAT, going into a circular 3D-printed case. The RC522 plan below is kept for reference.</p>
   </div>
 
   {% include presence-system-nav.html %}
+
+<div class="ocs__card">
+    <h3 class="ocs__section-title">Current build (October 20)</h3>
+    <ul class="ocs__checklist">
+      <li class="done"><span class="ocs__checklist-box"></span><span><strong>Reader:</strong> a Raspberry Pi&nbsp;4 with a Waveshare PN532 NFC HAT, plugged straight onto the GPIO header (no loose wires), set to UART mode.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span><strong>Cards:</strong> S50 (MIFARE Classic 1K) cards, card-sized, read at 13.56&nbsp;MHz by a short tap.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span><strong>Software:</strong> the same <code>reader.py</code>, now with a PN532 mode (<code>READER=pn532</code>). It runs as a service that starts on boot and posts each tap to the OCS presence API.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span><strong>Tested end to end:</strong> tap a card, and the live dashboard shows Present in about 2 seconds.</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span><strong>Next:</strong> the circular enclosure below, then mounting at the door.</span></li>
+    </ul>
+    <p class="ocs__description">We switched from the RC522 board to a PN532 HAT: same 13.56&nbsp;MHz cards and the same code path, without wiring. The RC522 plan below is kept for reference.</p>
+  </div>
 
 <div class="ocs__card">
     <img class="ocs__image-frame" src="{{ site.baseurl }}/images/presence-system/tap-reader-hero.svg" alt="The finished reader, a Raspberry Pi 3 and RC522 board in a 3D-printed case, mounted on the wall by the classroom door. A student taps the tag on their laptop and the dashboard shows Vibha is present.">
@@ -97,6 +109,33 @@ rp_active: tapreader
       </div>
     </div>
     <p class="ocs__description">Why Option D, from our options doc: cheap, fast, and no code changes.</p>
+  </div>
+
+<div class="ocs__card">
+    <h3 class="ocs__section-title">Enclosure v2: circular, open only at the tap area</h3>
+    <div class="ocs__grid ocs__grid--standard cols-2">
+      <div class="ocs__grid-cell">
+        <h4>Requirements (mentor feedback, <a href="https://github.com/vibha1019/crowpi-attendance/issues/15" target="_blank" rel="noopener">issue #15</a>)</h4>
+        <ul class="ocs__checklist">
+          <li class="open"><span class="ocs__checklist-box"></span><span>The whole enclosure is circular, like the top of a speaker.</span></li>
+          <li class="open"><span class="ocs__checklist-box"></span><span>Closed everywhere except the area directly over the antenna (or thin enough there to read through).</span></li>
+          <li class="open"><span class="ocs__checklist-box"></span><span>Obvious where to tap: a raised tap area, or rings that guide the card to the center.</span></li>
+          <li class="open"><span class="ocs__checklist-box"></span><span>Power, cables, and ports still reachable with the case closed.</span></li>
+        </ul>
+      </div>
+      <div class="ocs__grid-cell">
+        <h4>Steps</h4>
+        <ul class="ocs__checklist">
+          <li class="open"><span class="ocs__checklist-box"></span><span>Measure the PN532 HAT's antenna area, the Pi&nbsp;4, its ports, cables, and mounting holes.</span></li>
+          <li class="open"><span class="ocs__checklist-box"></span><span>Test how far cards read through PLA at a few thicknesses: fully open top, or a thin closed top.</span></li>
+          <li class="open"><span class="ocs__checklist-box"></span><span>Sketch 2&ndash;3 options (raised tap area or guide rings) and pick one.</span></li>
+          <li class="open"><span class="ocs__checklist-box"></span><span>Model it in CAD with clearance on mating parts for printer shrinkage.</span></li>
+          <li class="open"><span class="ocs__checklist-box"></span><span>Print a quick low-infill test piece to check fit, adjust, then do the final print.</span></li>
+          <li class="open"><span class="ocs__checklist-box"></span><span>Reliability test with the case on: 10 taps per card, several cards, slightly off-center taps.</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="ocs__description">The next enclosure, due for N@TM: one circle, one obvious place to tap. Printed with Shay.</p>
   </div>
 
 

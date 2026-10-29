@@ -46,12 +46,112 @@ permalink: /capstone/poway-library-2026-27/
 
 ## FOPL Kanban
 
-Live sprint work from the team's planning issues, connected to the active FOPL frontend repository.
+Sprint work from the team's GitHub project, including planning and frontend issues across repositories.
 
 {% assign fopl_data = site.data.fopl_2026_27 %}
-{% if fopl_data.Board %}
-{% include ocs_kanban_board.html url=fopl_data.Board.url filter=fopl_data.Board.filter title=fopl_data.Board.title %}
-{% endif %}
+<section class="ocs__card ocs__keypoints" aria-label="FOPL Kanban">
+  <div class="ocs__links">
+    <strong>FOPL Kanban</strong>
+    <span class="ocs__text">16 cards</span>
+    <a class="ocs__btn small pill" href="https://github.com/users/nathantrieu360/projects/2/views/1" target="_blank" rel="noopener">Open live board on GitHub</a>
+  </div>
+  <p class="ocs__text">Board snapshot saved October 26, 2026. Open GitHub for current cards and statuses.</p>
+  <ul class="ocs__kanban-board">
+    <li class="ocs__kanban-column" data-stage="todo">
+      <div><strong>To do</strong> <span class="ocs__status-pill ocs__status-pill--neutral">9</span></div>
+      <a class="ocs__kanban-item" href="https://github.com/nathantrieu360/apcspteam/issues/8" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">nathantrieu360/apcspteam #8</div>
+        <div class="ocs__kanban-name">#2 — Build a Better Book and DVD Catalog Experience</div>
+        <div class="ocs__kanban-note">raadinansari-pixel</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/nathantrieu360/apcspteam/issues/9" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">nathantrieu360/apcspteam #9</div>
+        <div class="ocs__kanban-name">#3 — Design the FOPL Storyboard and Visual System</div>
+        <div class="ocs__kanban-note">nathantrieu360</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/nathantrieu360/apcspteam/issues/10" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">nathantrieu360/apcspteam #10</div>
+        <div class="ocs__kanban-name">#4 — Test and Demo the FOPL Frontend</div>
+        <div class="ocs__kanban-note">raadinansari-pixel</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/nathantrieu360/apcspteam/issues/11" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">nathantrieu360/apcspteam #11</div>
+        <div class="ocs__kanban-name">#5 — Enhance Volunteer, Contact, and Getting Involved Experience</div>
+        <div class="ocs__kanban-note">ArjunG1031</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/nathantrieu360/apcspteam/issues/12" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">nathantrieu360/apcspteam #12</div>
+        <div class="ocs__kanban-name">#6 — Build Events and Community Engagement Experience</div>
+        <div class="ocs__kanban-note">nathantrieu360</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/FOPL-Team-2026/bb-pages/issues/4" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">FOPL-Team-2026/bb-pages #4</div>
+        <div class="ocs__kanban-name">Merge portfolio upstream updates into bb-pages</div>
+        <div class="ocs__kanban-note">nathantrieu360</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/FOPL-Team-2026/bb-pages/issues/12" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">FOPL-Team-2026/bb-pages #12</div>
+        <div class="ocs__kanban-name">Connect catalog search and filters to the backend API</div>
+        <div class="ocs__kanban-note">raadinansari-pixel</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/FOPL-Team-2026/bb-pages/issues/10" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">FOPL-Team-2026/bb-pages #10</div>
+        <div class="ocs__kanban-name">Filter catalog items by category and format</div>
+        <div class="ocs__kanban-note">raadinansari-pixel</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/FOPL-Team-2026/bb-pages/issues/9" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">FOPL-Team-2026/bb-pages #9</div>
+        <div class="ocs__kanban-name">Search the catalog by title and author</div>
+        <div class="ocs__kanban-note">ArjunG1031</div>
+      </a>
+    </li>
+    <li class="ocs__kanban-column" data-stage="doing">
+      <div><strong>In progress</strong> <span class="ocs__status-pill ocs__status-pill--neutral">6</span></div>
+      <a class="ocs__kanban-item" href="https://github.com/nathantrieu360/apcspteam/issues/7" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">nathantrieu360/apcspteam #7</div>
+        <div class="ocs__kanban-name">#1 — Improve FOPL Homepage and Navigation</div>
+        <div class="ocs__kanban-note">ArjunG1031</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/FOPL-Team-2026/bb-pages/issues/8" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">FOPL-Team-2026/bb-pages #8</div>
+        <div class="ocs__kanban-name">Plan FOPL backend data and APIs</div>
+        <div class="ocs__kanban-note">nathantrieu360</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/FOPL-Team-2026/bb-pages/issues/11" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">FOPL-Team-2026/bb-pages #11</div>
+        <div class="ocs__kanban-name">Show clear loading, no-results, and error messages in the catalog</div>
+        <div class="ocs__kanban-note">raadinansari-pixel</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/FOPL-Team-2026/bb-pages/issues/7" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">FOPL-Team-2026/bb-pages #7</div>
+        <div class="ocs__kanban-name">Plan FOPL frontend changes</div>
+        <div class="ocs__kanban-note">nathantrieu360</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/FOPL-Team-2026/bb-pages/issues/6" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">FOPL-Team-2026/bb-pages #6</div>
+        <div class="ocs__kanban-name">Define FOPL users, needs, scope, and acceptance criteria</div>
+        <div class="ocs__kanban-note">ArjunG1031</div>
+      </a>
+      <a class="ocs__kanban-item" href="https://github.com/FOPL-Team-2026/bb-pages/issues/13" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">FOPL-Team-2026/bb-pages #13</div>
+        <div class="ocs__kanban-name">Test catalog searches and combined filters</div>
+        <div class="ocs__kanban-note">ArjunG1031</div>
+      </a>
+    </li>
+    <li class="ocs__kanban-column" data-stage="review">
+      <div><strong>In review</strong> <span class="ocs__status-pill ocs__status-pill--neutral">0</span></div>
+      <div class="ocs__text">Nothing here</div>
+    </li>
+    <li class="ocs__kanban-column" data-stage="done">
+      <div><strong>Done</strong> <span class="ocs__status-pill ocs__status-pill--neutral">1</span></div>
+      <a class="ocs__kanban-item" href="https://github.com/FOPL-Team-2026/bb-pages/issues/5" target="_blank" rel="noopener">
+        <div class="ocs__kanban-kicker">FOPL-Team-2026/bb-pages #5</div>
+        <div class="ocs__kanban-name">Merge Flask upstream updates into bb-flask</div>
+        <div class="ocs__kanban-note">ArjunG1031, nathantrieu360, raadinansari-pixel</div>
+      </a>
+    </li>
+  </ul>
+</section>
 
 <div class="ocs__links ocs__links--wide">
     <a class="ocs__btn iridescent" href="{{ fopl_data.Repository.url }}" target="_blank" rel="noreferrer noopener">Open FOPL Frontend on GitHub ↗</a>

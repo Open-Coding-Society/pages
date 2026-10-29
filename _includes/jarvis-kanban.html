@@ -1,0 +1,35 @@
+{% assign jarvis_board = site.data.jarvis_board.board %}
+<section class="ocs__card ocs__keypoints" data-jarvis-kanban aria-label="{{ data.Board.title | escape }}">
+  <div class="ocs__links">
+    <strong>{{ data.Board.title | escape }}</strong>
+    <span class="ocs__text">{{ jarvis_board.cards.size }} cards</span>
+    <a class="ocs__btn small pill" href="{{ data.Board.url | escape }}" target="_blank" rel="noopener noreferrer">Open on GitHub</a>
+  </div>
+  <p class="ocs__text">Project snapshot fetched {{ site.data.jarvis_board.fetchedAt | date: "%b %-d, %Y at %H:%M UTC" }}. Open on GitHub for the latest changes.</p>
+  <ul class="ocs__kanban-board">
+    {% for column in jarvis_board.columns %}
+    {% assign cards = jarvis_board.cards | where: "column", column.key %}
+    <li class="ocs__kanban-column"{% if column.stage %} data-stage="{{ column.stage | escape }}"{% endif %}>
+      <div><strong>{{ column.label | escape }}</strong> <span class="ocs__status-pill ocs__status-pill--neutral">{{ cards.size }}</span></div>
+      {% for card in cards limit: 5 %}
+      {% include jarvis-kanban-card.html card=card %}
+      {% else %}
+      <div class="ocs__text">Nothing here</div>
+      {% endfor %}
+      {% if cards.size > 5 %}
+      <details class="jv-kanban-more">
+        <summary class="ocs__status-pill ocs__status-pill--neutral">
+          <span class="jv-kanban-expand">+{{ cards.size | minus: 5 }} more</span>
+          <span class="jv-kanban-collapse">Show less</span>
+        </summary>
+        <div class="jv-kanban-extra">
+          {% for card in cards offset: 5 %}
+          {% include jarvis-kanban-card.html card=card %}
+          {% endfor %}
+        </div>
+      </details>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</section>
