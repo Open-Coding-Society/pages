@@ -476,6 +476,7 @@ document.addEventListener('DOMContentLoaded', function(){
        <h3><a href="{% post_url capstone/Presence/2026-09-12-presence-system-capstone %}">Classroom Presence System</a></h3>
        <p>A design-based research project asking whether classroom presence can be measured with zero teacher effort. Three low-effort inputs, RFID tap, QR scan, and face scan, are evaluated in parallel against a shared presence engine and the bell schedule to track instructional minutes and show who is missing in real time.</p>
        <p>Team: Vibha Mandayam (RFID), Ruta Sirdeshmukh (QR), Kush Shah (Camera)</p>
+       <p>Mentor: {{ site.data.presence_system_infograph.Mentor }}</p>
      </div>
    </div>
     <!-- Jarvis Classroom Object Detection -->
