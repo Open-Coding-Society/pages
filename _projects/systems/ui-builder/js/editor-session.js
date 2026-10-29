@@ -3,8 +3,10 @@
 // for Spring, 400 ms for this browser's store). Each response replaces the base version; a
 // conflict pauses saving until the editor picks Reload theirs or Keep mine. With Spring the
 // session also holds the edit lease: taken on open, renewed every 30 s and after saves, released
-// on pagehide. Offline saves retry with a growing delay and when the browser is back online.
+// on pagehide. Saves that got no answer, or a busy or failing server, retry with a growing delay
+// and when the browser is back online.
 import { createAutosave } from './autosave.js';
+import { storeErrorText } from './page-store.js';
 
 const DRAFT_DELAY_MS = 400;
 const LEASE_EVERY_MS = 30000;
@@ -18,13 +20,20 @@ export function fieldsOf(page) {
   return { title: text('title'), description: text('description'), byline: text('byline'), course: text('course'), image: text('image') };
 }
 
+// A failed save worth sending again without the student: no answer, or a server that is busy or
+// failing (5xx). Any other refusal stays until the student changes something.
+export function isRetryable(error) {
+  if (!error) return false;
+  return error.name === 'OfflineError' || error.error === 'busy' || (Number.isInteger(error.status) && error.status >= 500);
+}
+
 // What the save indicator says: {key, vars} for textOf(registry, 'editor.' + key).
 export function saveStateOf(status, { cloud = false, readOnly = false, created = true, formatTime = String } = {}) {
   if (readOnly) return { key: 'save_readonly', vars: {} };
   const state = status && status.state;
   if (state === 'saving') return { key: 'save_saving', vars: {} };
   if (state === 'conflict') return { key: 'save_conflict', vars: {} };
-  if (state === 'error') return { key: status.error && status.error.name === 'OfflineError' ? 'save_offline' : 'save_error', vars: {} };
+  if (state === 'error') return { key: isRetryable(status.error) ? 'save_retry' : 'save_error', vars: {} };
   if (!created) return { key: 'save_new', vars: {} };
   if (state === 'dirty') return { key: 'save_dirty', vars: {} };
   if (!cloud) return { key: 'save_local', vars: {} };
@@ -38,30 +47,35 @@ export function publishStateOf(meta, { publish = false, dirty = false } = {}) {
   return meta.hasUnpublishedChanges || dirty ? 'pub_changes' : 'pub_live';
 }
 
+// Whether everyone can see a page now (DESIGN D12): 'public', 'members' (never approved), or one
+// of the two states a teacher must approve again. Spring keeps visibility PUBLIC after the
+// approval's until date has passed ('ended': visitors get nothing) and after a newer publish
+// ('newer': visitors still get the approved copy). Spring's own publicExpired decides when it
+// sends it; an older answer without it falls back to the publicUntil date.
+export function publicStateOf(meta, now = Date.now()) {
+  if (!meta || meta.visibility !== 'PUBLIC') return 'members';
+  const expired = typeof meta.publicExpired === 'boolean'
+    ? meta.publicExpired
+    : Number.isFinite(meta.publicUntil) && meta.publicUntil <= now;
+  if (expired) return 'ended';
+  return meta.publicPending === true ? 'newer' : 'public';
+}
+
 // Publish is offered for a page never published, or one with changes the live page lacks.
 export function canPublish(meta, { publish = false, dirty = false, readOnly = false } = {}) {
   if (!publish || readOnly) return false;
   return !meta || meta.status !== 'PUBLISHED' || meta.hasUnpublishedChanges === true || dirty;
 }
 
-// A store error → {key, vars} for the feedback line.
+// A store error → {key, vars}: a registry path for textOf. page-store.js storeErrorText words
+// every store error; the editor adds its own words for a teacher's approval of a published copy
+// that a newer publish replaced (the teacher has to look at the new one first), or of a page that
+// was unpublished since (store.not_published, "Publish the page first", is advice for its owner).
+// Spring sends both only to a teacher's approval.
 export function errorKeyOf(error) {
-  const name = error && error.name;
-  const status = error && error.status;
-  const code = error && error.error;
-  if (name === 'OfflineError') return { key: 'err_offline', vars: {} };
-  // This browser's store: storage that is full, blocked, or a damaged record.
-  if (code === 'storage_full') return { key: 'err_storage_full', vars: {} };
-  if (code === 'storage_blocked') return { key: 'err_storage_blocked', vars: {} };
-  if (code === 'corrupt') return { key: 'err_corrupt', vars: {} };
-  if (name === 'NotFoundError' || status === 404) return { key: 'not_found', vars: {} };
-  if (status === 401) return { key: 'err_signed_out', vars: {} };
-  if (code === 'origin_rejected') return { key: 'err_origin', vars: {} };
-  if (status === 403) return { key: 'err_forbidden', vars: {} };
-  if (status === 413 || code === 'too_large') return { key: 'err_too_large', vars: {} };
-  if (code === 'busy') return { key: 'err_busy', vars: {} };
-  if (status === 400) return { key: 'err_invalid', vars: { message: code || '' } };
-  return { key: 'err_generic', vars: { message: (error && (error.message || code)) || String(error) } };
+  if (error && error.error === 'published_changed') return { key: 'editor.approve_changed', vars: {} };
+  if (error && error.error === 'not_published') return { key: 'editor.approve_unpublished', vars: {} };
+  return storeErrorText(error);
 }
 
 export function createSession({
@@ -79,6 +93,9 @@ export function createSession({
   let holding = false;
   let lastLeaseAt = 0;
   let disposed = false;
+  // Set by Keep mine: the save that puts this page over theirs asks Spring for a revision of its
+  // own, so theirs stays in Revisions. Cleared once a save carrying it succeeds.
+  let newRevision = false;
   const keyOf = () => draftStore.keyFor(currentRef);
 
   function writeDraft() {
@@ -97,20 +114,25 @@ export function createSession({
       const fields = getFields();
       if (!currentRef) {
         const created = await store.create(page, { fields });
-        draftStore.clear('new');
+        draftStore.clear(draftStore.keyFor(null));
         currentRef = created.ref;
         currentMeta = created.meta || null;
         onCreated(created);
         return { base: created.base, meta: currentMeta, fields };
       }
-      const result = await store.save(currentRef, page, { base: sendBase, fields });
+      const asNewRevision = newRevision;
+      const result = await store.save(currentRef, page, { base: sendBase, fields, newRevision: asNewRevision });
+      if (asNewRevision) newRevision = false;
       currentMeta = result.meta || currentMeta;
       return { base: result.base, meta: currentMeta, fields };
     },
     onState: (status) => onStatus(status),
     onSaved: ({ base: savedBase, savedAt, result }) => {
       retries = 0;
-      if (!autosave.status().pending) {
+      // A flush may already have sent newer changes: until they are saved too, the crash copy is
+      // the only one this browser has of them.
+      const status = autosave.status();
+      if (!status.pending && !status.saving) {
         clearTimeout(draftTimer);
         draftTimer = null;
         draftStore.clear(keyOf());
@@ -121,8 +143,9 @@ export function createSession({
     onConflict: (error) => onConflict(error),
     onError: (error) => {
       onError(error);
-      // Flaky networks: try again later on our own; a 4xx needs the student to act first.
-      if (error && error.name === 'OfflineError') {
+      // No answer, or a busy or failing server: try again later on our own. Any other refusal
+      // needs the student to act first.
+      if (isRetryable(error)) {
         clearTimeout(retryTimer);
         retryTimer = setTimeout(() => autosave.change(), RETRY_MS[Math.min(retries, RETRY_MS.length - 1)]);
         retries += 1;
@@ -166,12 +189,20 @@ export function createSession({
     flush: () => autosave.flush(),
     pause: () => autosave.pause(),
     resume: () => autosave.resume(),
-    // Keep mine: save over theirs with the version the conflict reported.
-    keepMine(currentBase) { autosave.resume({ base: currentBase }); },
+    // Keep mine: save the page on screen over theirs, with the version the conflict reported. It
+    // is sent even with nothing waiting (a conflict from Publish), so the next Publish publishes
+    // this page and not theirs.
+    keepMine(currentBase) {
+      if (disposed) return;
+      newRevision = true;
+      autosave.change(); // marks the page as waiting; resume() sends it at once
+      autosave.resume({ base: currentBase });
+    },
     // Reload theirs (or a restored revision): forget unsaved work and continue from base.
     reset({ base: nextBase, meta: nextMeta } = {}) {
       clearTimeout(draftTimer);
       draftTimer = null;
+      newRevision = false;
       draftStore.clear(keyOf());
       if (nextMeta) currentMeta = nextMeta;
       autosave.reset({ base: nextBase });

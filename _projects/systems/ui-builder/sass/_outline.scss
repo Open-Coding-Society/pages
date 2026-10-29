@@ -30,14 +30,17 @@
     outline-offset: 1px;
   }
 
+  // The tint goes over the page color, not the panel: every preset's text is readable on its page
+  // color, while on the panel tinted with the accent some (Sepia) fall under 4.5:1.
   &[aria-selected="true"] {
     border-color: var(--pref-accent-color);
-    background: color-mix(in srgb, var(--pref-accent-color) 14%, var(--panel));
+    background: color-mix(in srgb, var(--pref-accent-color) 14%, var(--pref-bg-color));
   }
 
-  // Hidden on the published page: still listed, quieter.
+  // Hidden on the published page: still listed, in italics (its own rows also have the Hidden
+  // badge). Not faded, which would take its text below 4.5:1 contrast.
   &[data-hidden] .ocs__uibuilder-row-main {
-    opacity: 0.6;
+    font-style: italic;
   }
 
   // Where a dragged row will land.
@@ -45,8 +48,9 @@
   &[data-drop="after"] { box-shadow: inset 0 -2px 0 var(--pref-accent-color); }
   &[data-drop="inside"] { outline: 2px dashed var(--pref-accent-color); }
 
-  // "Add block" rows read as an action, not as content.
-  &[data-kind="add"] .ocs__uibuilder-row-main {
+  // "Add block" rows read as an action, not as content, by their plus sign in the accent color.
+  // The words keep the text color: most presets' accent is under 4.5:1 on the panel.
+  &[data-kind="add"] .ocs__uibuilder-row-main i {
     color: var(--pref-accent-color);
   }
 

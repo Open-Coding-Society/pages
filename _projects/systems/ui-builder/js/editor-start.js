@@ -8,7 +8,7 @@ import { contentRenderers } from './blocks-content.js';
 import { toDOM } from './vnode.js';
 import { el, icon } from './editor-fields.js';
 import { formatWhen } from './editor-dialogs.js';
-import { errorKeyOf } from './editor-session.js';
+import { publicStateOf } from './editor-session.js';
 
 const listOf = (value) => (Array.isArray(value) ? value : []);
 
@@ -30,10 +30,10 @@ export function refOf(summary, cloud) {
   return summary && summary.id !== undefined ? { kind: cloud ? 'spring' : 'local', id: summary.id } : null;
 }
 
-// ids/validators feed importPageJSON. actions: open(ref), create(templateKey), importPage({page, errors}), resumeNew(draft),
-// openDraft(ref) → viewer URL, revisions(ref, summary), approve(ref, summary), unpublish(ref, summary),
-// bulkPublic(course), message(text, {error}).
-export function createStartScreen({ root, doc = globalThis.document, registry, say, text, store, draftStore, signedIn, baseurl, pageOrigin, renderRich, ids, validators, actions, editorUrl }) {
+// ids/validators feed importPageJSON; errorText(error) words a store error. actions: open(ref), create(templateKey),
+// importPage({page, errors}), resumeNew(draft), openDraft(ref) and openPublished(summary) → viewer URLs,
+// revisions(ref, summary), approve(ref, summary), unpublish(ref, summary), bulkPublic(course), message(text, {error}).
+export function createStartScreen({ root, doc = globalThis.document, registry, say, text, errorText = () => text('store.unknown'), store, draftStore, signedIn, baseurl, pageOrigin, renderRich, ids, validators, actions, editorUrl }) {
   const caps = store.capabilities || {};
   const tabs = [{ key: 'mine', label: say('tab_mine') }];
   if (caps.teacher) tabs.push({ key: 'class', label: text('teacher.class_pages') });
@@ -76,15 +76,15 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
   if (caps.cloud && !signedIn) {
     notes.appendChild(el(doc, 'div', { class: 'ocs__callout' }, say('sign_in'), ' ', el(doc, 'a', { class: 'ocs__btn small accent', href: `${baseurl}/login` }, say('sign_in_link'))));
   }
-  const unsaved = draftStore.read('new');
+  const unsaved = draftStore.read(draftStore.keyFor(null));
   if (unsaved && unsaved.page) {
     notes.appendChild(el(doc, 'div', { class: 'ocs__callout' }, say('resume_new', { time: formatWhen(unsaved.savedAt) }), ' ',
       el(doc, 'button', { type: 'button', class: 'ocs__btn small', onclick: () => actions.resumeNew(unsaved) }, say('resume_open'))));
   }
   panels.mine.append(notes,
     el(doc, 'div', { class: 'ocs__links' },
-      el(doc, 'button', { type: 'button', class: 'ocs__btn accent fill', onclick: () => select('templates', { focus: true }) }, icon(doc, 'fa-plus'), ` ${say('new_page')}`),
-      el(doc, 'button', { type: 'button', class: 'ocs__btn', onclick: () => file.click() }, icon(doc, 'fa-file-import'), ` ${say('import_json')}`), file),
+      el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon accent fill', onclick: () => select('templates', { focus: true }) }, icon(doc, 'fa-plus'), say('new_page')),
+      el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon', onclick: () => file.click() }, icon(doc, 'fa-file-import'), say('import_json')), file),
     mineStatus, mineList);
 
   file.addEventListener('change', async () => {
@@ -105,6 +105,15 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
     return el(doc, 'b', { class: `ocs__status-pill ocs__status-pill--${tone}` }, label);
   }
 
+  // Everyone sees the page only while its approval covers the live version (editor-session.js
+  // publicStateOf); an approval that ran out or a newer publish needs approving again.
+  function approvalPill(summary) {
+    const approval = publicStateOf(summary);
+    if (approval === 'public') return pill(say('public_pill'), 'good');
+    if (approval === 'ended') return pill(say('approval_ended'), 'warn');
+    return approval === 'newer' ? pill(say('approval_newer'), 'warn') : null;
+  }
+
   function pageCard(summary) {
     const ref = refOf(summary, caps.cloud);
     const href = ref ? editorUrl(ref) : null;
@@ -112,13 +121,15 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
     const status = typeof summary.status === 'string' ? summary.status : (caps.cloud ? 'DRAFT' : 'LOCAL');
     const lease = summary.lease && !summary.lease.mine && summary.lease.holderName ? summary.lease.holderName : '';
     const saved = summary.updatedByName ? say('saved_by', { time: formatWhen(summary.updatedAt), name: summary.updatedByName }) : say('saved_at', { time: formatWhen(summary.updatedAt) });
-    return el(doc, 'article', { class: 'ocs__card ocs__stack' },
+    // A div, as the template cards are: preset themes repaint every <article> in the page color
+    // (and the holiday wallpaper), which takes the card's panel away.
+    return el(doc, 'div', { class: 'ocs__card ocs__stack' },
       el(doc, 'h3', { class: 'ocs__section-title' }, href ? el(doc, 'a', { href }, title) : title),
       summary.description ? el(doc, 'p', { class: 'ocs__text' }, summary.description) : null,
       el(doc, 'div', { class: 'ocs__links' },
         pill(say(`status_${['DRAFT', 'PUBLISHED', 'LOCAL', 'DELETED'].includes(status) ? status : 'DRAFT'}`), status === 'PUBLISHED' ? 'good' : 'neutral'),
         summary.hasUnpublishedChanges ? pill(say('changes_pending'), 'warn') : null,
-        summary.visibility === 'PUBLIC' ? pill(say('public_pill'), 'good') : null,
+        approvalPill(summary),
         lease ? pill(say('editing_now', { name: lease }), 'warn') : null),
       summary.updatedAt ? el(doc, 'small', null, saved) : null,
       href ? el(doc, 'div', { class: 'ocs__links' }, el(doc, 'a', { class: 'ocs__btn small', href, onclick: (event) => { event.preventDefault(); actions.open(ref); } }, say('open'))) : null);
@@ -133,8 +144,7 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
       mineStatus.textContent = list.length ? '' : say('mine_empty');
       mineList.replaceChildren(...list.map(pageCard));
     }, (error) => {
-      const { key, vars } = errorKeyOf(error);
-      mineStatus.textContent = say('list_failed', { message: say(key, vars) });
+      mineStatus.textContent = say('list_failed', { message: errorText(error) });
       mineList.replaceChildren(el(doc, 'button', { type: 'button', class: 'ocs__btn small', onclick: () => { mineLoading = null; loadMine(); } }, say('retry')));
     }).finally(() => { mineLoading = null; });
   }
@@ -161,7 +171,8 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
   // pointer target; the button is the keyboard and screen reader one.
   panels.templates.append(el(doc, 'p', { class: 'ocs__text' }, say('templates_lead')),
     el(doc, 'div', { class: 'ocs__hub-grid ocs__uibuilder-templates' }, listOf(registry.templates).map((template) => {
-      const use = el(doc, 'button', { type: 'button', class: 'ocs__btn small accent fill', 'aria-label': say('template_use', { label: template.label }) }, say('open'));
+      // The name starts with the words the button shows, so "click Use template" works by voice.
+      const use = el(doc, 'button', { type: 'button', class: 'ocs__btn small accent fill', 'aria-label': say('template_use', { label: template.label }) }, say('template_start'));
       const card = el(doc, 'div', { class: 'ocs__hub-card ocs__stack', 'data-template': template.key },
         thumbnail(template), el(doc, 'strong', { class: 'ocs__hub-card-title' }, template.label), el(doc, 'p', null, template.help || ''),
         el(doc, 'div', { class: 'ocs__links' }, use));
@@ -188,26 +199,38 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
     const label = course.value ? (listOf(registry.courses).find((option) => option.value === course.value) || {}).label : '…';
     bulk.textContent = text('teacher.bulk_public', { course: label || course.value });
   }
+  const classTable = el(doc, 'table', { class: 'ocs__table', tabindex: '-1' });
   function paintClass() {
     const shown = filterClassPages(classPages, { status: status.value, changes: changes.checked, requested: requested.checked });
     classStatus.textContent = shown.length ? '' : say('class_empty');
     classRows.replaceChildren(...shown.map((summary) => {
       const ref = refOf(summary, true);
       const published = summary.status === 'PUBLISHED';
-      const run = (fn) => () => Promise.resolve(fn(ref, summary)).then(loadClass);
-      return el(doc, 'tr', null,
+      const run = (action, fn) => () => Promise.resolve(fn(ref, summary)).then(() => loadClass()).then(() => refocusRow(summary.id, action));
+      return el(doc, 'tr', { 'data-page-id': String(summary.id) },
         el(doc, 'td', null, el(doc, 'strong', null, summary.title || text('blocks.untitled')), summary.ownerName ? [el(doc, 'br'), say('class_owner', { name: summary.ownerName })] : null),
         el(doc, 'td', null, pill(say(`status_${published ? 'PUBLISHED' : 'DRAFT'}`), published ? 'good' : 'neutral'), ' ',
           summary.hasUnpublishedChanges ? pill(say('changes_pending'), 'warn') : null, ' ',
-          summary.publicRequested ? pill(text('teacher.public_requested'), 'warn') : null,
-          summary.visibility === 'PUBLIC' ? pill(say('public_pill'), 'good') : null),
+          summary.publicRequested ? pill(text('teacher.public_requested'), 'warn') : null, ' ',
+          approvalPill(summary)),
         el(doc, 'td', null, formatWhen(summary.updatedAt)),
         el(doc, 'td', null, el(doc, 'div', { class: 'ocs__links' },
           el(doc, 'a', { class: 'ocs__btn small', href: actions.openDraft(ref), target: '_blank', rel: 'noopener' }, say('class_open_draft')),
-          el(doc, 'button', { type: 'button', class: 'ocs__btn small', onclick: () => actions.revisions(ref, summary) }, say('revisions')),
-          published && summary.visibility !== 'PUBLIC' ? el(doc, 'button', { type: 'button', class: 'ocs__btn small accent', onclick: run(actions.approve) }, text('teacher.approve_public')) : null,
-          published ? el(doc, 'button', { type: 'button', class: 'ocs__btn small', onclick: run(actions.unpublish) }, say('unpublish')) : null)));
+          el(doc, 'button', { type: 'button', class: 'ocs__btn small', 'data-ui-action': 'revisions', onclick: () => actions.revisions(ref, summary) }, say('revisions')),
+          // The copy Approve shows to everyone, which can differ from the draft.
+          published && summary.slug ? el(doc, 'a', { class: 'ocs__btn small', href: actions.openPublished(summary), target: '_blank', rel: 'noopener' }, say('class_open_published')) : null,
+          published && publicStateOf(summary) !== 'public' ? el(doc, 'button', { type: 'button', class: 'ocs__btn small accent', 'data-ui-action': 'approve', onclick: run('approve', actions.approve) }, text('teacher.approve_public')) : null,
+          published ? el(doc, 'button', { type: 'button', class: 'ocs__btn small', 'data-ui-action': 'unpublish', onclick: run('unpublish', actions.unpublish) }, say('unpublish')) : null)));
     }));
+  }
+  // Repainting replaces the row whose button had the keyboard: it goes back to the same button of
+  // the same page, else that row's first control, else the table. A click elsewhere meanwhile wins.
+  function refocusRow(id, action) {
+    const active = doc.activeElement;
+    if (active && active !== doc.body && doc.contains(active)) return;
+    const row = [...classRows.children].find((item) => item.getAttribute('data-page-id') === String(id));
+    const controls = row ? [...row.querySelectorAll('a, button')] : [];
+    (controls.find((control) => control.getAttribute('data-ui-action') === action) || controls[0] || classTable).focus();
   }
   let classLoading = null;
   function loadClass() {
@@ -217,8 +240,7 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
       classPages = listOf(pages);
       paintClass();
     }, (error) => {
-      const { key, vars } = errorKeyOf(error);
-      classStatus.textContent = say('list_failed', { message: say(key, vars) });
+      classStatus.textContent = say('list_failed', { message: errorText(error) });
     }).finally(() => { classLoading = null; });
     return classLoading;
   }
@@ -232,14 +254,15 @@ export function createStartScreen({ root, doc = globalThis.document, registry, s
         el(doc, 'div', { class: 'ocs__field' }, el(doc, 'label', { class: 'ocs__label', for: 'ui-class-status' }, say('class_status')), status),
         toggle(changes, say('class_changes')), toggle(requested, text('teacher.public_requested'))),
       el(doc, 'div', { class: 'ocs__links' }, bulk), classStatus,
-      el(doc, 'div', { class: 'ocs__table-wrap' }, el(doc, 'table', { class: 'ocs__table' },
-        el(doc, 'thead', null, el(doc, 'tr', null, ['col_page', 'col_status', 'col_updated', 'col_actions'].map((key) => el(doc, 'th', { scope: 'col' }, say(key))))),
-        classRows)));
+      el(doc, 'div', { class: 'ocs__table-wrap' }, classTable));
+    classTable.append(el(doc, 'thead', null, el(doc, 'tr', null, ['col_page', 'col_status', 'col_updated', 'col_actions'].map((key) => el(doc, 'th', { scope: 'col' }, say(key))))), classRows);
   }
 
+  // tabindex -1: the app puts the keyboard here when it opens this screen from another one.
+  const heading = el(doc, 'h1', { tabindex: '-1' }, say('title'));
   root.replaceChildren(el(doc, 'div', { class: 'ocs__container ocs__container--fill ocs__stack ocs__uibuilder-start' },
-    el(doc, 'h1', null, say('title')), el(doc, 'p', { class: 'ocs__text ocs__lead' }, say('start_lead')),
+    heading, el(doc, 'p', { class: 'ocs__text ocs__lead' }, say('start_lead')),
     tabList, Object.values(panels)));
   select('mine');
-  return { select, reload: loadMine, destroy() { if (thumbs) thumbs.disconnect(); } };
+  return { select, reload: loadMine, heading, destroy() { if (thumbs) thumbs.disconnect(); } };
 }

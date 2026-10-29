@@ -216,7 +216,9 @@
   justify-content: flex-end;
 }
 
-.dm--embed .rt-composer {
+// .dm.dm--embed: _composer.scss's `.dm .rt-composer { flex: 1 }` comes later and would set the
+// basis back to 0, leaving the editor a narrow column beside Send.
+.dm.dm--embed .rt-composer {
   flex-basis: 100%;
 }
 

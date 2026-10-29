@@ -5,11 +5,13 @@
 import { apiUrlPolicy, hostOf, safeImage, safeLink } from './url-rules.js';
 
 export const SLOTS = Object.freeze(['title', 'text', 'image', 'link', 'value', 'label']);
+// list_path for "The whole reply". "" is a list not picked yet, which listIn guesses.
+export const WHOLE_REPLY = '.';
 const PATH = /^[A-Za-z0-9_.[\]-]{0,120}$/;
 const KEY = /^[A-Za-z0-9_-]{1,60}$/; // a key the path syntax can address
 const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 const PRIVATE = /^(uid|useruid|user_uid|email|sid|password|passwd|token|jwt|secret|grade.*|ap_exam|phone|address|birth.*|dob)$/i;
-const POLICY_TEXT = new Set(['policy_https', 'policy_loopback_view', 'policy_private_host']);
+const POLICY_TEXT = new Set(['policy_https', 'policy_loopback_form', 'policy_loopback_view', 'policy_private_host']);
 const FIELD_SAMPLE = 20;
 const MAX_FIELDS = 100;
 const SEARCH_NODES = 500;
@@ -73,6 +75,31 @@ export function findListPath(json) {
     }
   }
   return best ? best.path : null;
+}
+
+// The list a block with no list picked yet ("") shows: '' when the reply is a list, else the list
+// of objects findListPath finds, else null. A list inside the reply that is empty or holds plain
+// values is never guessed, so {"joke": …, "comments": []} stays one joke, as published pages have
+// shown it. Show code writes this rule out, findListPath's limits included (SNIPPET_FIND), so a
+// change here is a change there too.
+export function guessListPath(json) {
+  const found = findListPath(json);
+  if (found === null) return null;
+  const list = getPath(json, found);
+  return found === '' || (Array.isArray(list) && list.slice(0, FIELD_SAMPLE).some(isPlainObject)) ? found : null;
+}
+
+// The items in a reply, by the one rule the editor, its preview and the published page share: the
+// list at list_path (WHOLE_REPLY reads the reply itself); with no list_path picked yet, the list
+// guessListPath finds; else one object is a list of one ({"joke": …}), and anything else has no items.
+export function listIn(json, listPath) {
+  const path = typeof listPath === 'string' ? listPath : '';
+  const mapped = getPath(json, path);
+  if (Array.isArray(mapped)) return mapped;
+  const found = path ? null : guessListPath(json);
+  const guess = found === null ? undefined : getPath(json, found);
+  if (Array.isArray(guess)) return guess;
+  return isPlainObject(mapped) ? [mapped] : [];
 }
 
 // The fields of the first items as [{path, type}] (type first seen that isn't null). Nested
@@ -334,22 +361,30 @@ function originOf(pageOrigin) {
 }
 
 // Advice for a fetchJson result: [{level, key, vars}] with key under registry text.doctor.
-// level: ok, info, warning, error, or action (a button: open_link with vars.url).
-export function doctor(result, { url = '', pageOrigin = '', privateKeyList } = {}) {
+// level: ok, info, warning, error, or action (a button: open_link with vars.url). listPath is the
+// block's list_path: the count and the private-field warning are about the items the block shows.
+export function doctor(result, { url = '', pageOrigin = '', privateKeyList, listPath = '' } = {}) {
   if (!isPlainObject(result)) return [];
   const out = [];
   const add = (level, key, vars = {}) => out.push({ level, key, vars });
   const host = result.host || hostOf(url) || '';
   const link = result.url || url;
   if (result.ok) {
-    const listPath = findListPath(result.json);
-    const list = listPath === null ? undefined : getPath(result.json, listPath);
-    if (Array.isArray(list)) add('ok', 'ok', { ms: result.ms, count: list.length });
-    else {
+    const path = typeof listPath === 'string' ? listPath : '';
+    const items = listIn(result.json, path);
+    // No list picked and none to guess: the block shows the reply as one item, so a count would
+    // say little. Name the list the reply holds instead (empty for now, or of plain values, which
+    // is never guessed); a reply with no list at all has no list of items.
+    if (!path && guessListPath(result.json) === null) {
       add('ok', 'ok_object', { ms: result.ms });
-      add('warning', 'empty');
+      const found = findListPath(result.json);
+      const list = found === null ? undefined : getPath(result.json, found);
+      if (!Array.isArray(list)) add('warning', 'empty');
+      else add('info', list.length ? 'ok_list_plain' : 'ok_list_empty', { path: found });
+    } else {
+      add('ok', items.length === 1 ? 'ok_one' : 'ok', { ms: result.ms, count: items.length });
     }
-    const keys = Array.isArray(privateKeyList) ? privateKeyList : privateKeys(fieldsOf(Array.isArray(list) ? list : []));
+    const keys = Array.isArray(privateKeyList) ? privateKeyList : privateKeys(fieldsOf(items));
     if (keys.length) add('warning', 'private_keys', { keys: keys.join(', ') });
     // It works now, but visitors can't reach the student's computer.
     if (result.loopback) add('info', 'policy_loopback_view');
@@ -381,7 +416,8 @@ export function doctor(result, { url = '', pageOrigin = '', privateKeyList } = {
 // JSON is valid JavaScript; "<" is escaped so the snippet can't end a <script> it is pasted into.
 const literal = (value) => JSON.stringify(value).replace(/</g, `${BACKSLASH}u003c`);
 
-const SNIPPET_BODY = String.raw`
+// Show code's parts, which codeSnippet joins. Each starts on a new line and the last ends with one.
+const SNIPPET_READ = String.raw`
 // Reads a path like "data.items[0].name" from the reply. It never runs code from the reply.
 function getPath(value, path) {
   return String(path || '').replace(/\[(\w+)\]/g, '.$1').split('.').filter(Boolean).reduce(
@@ -393,18 +429,59 @@ function getPath(value, path) {
 function textAt(item, path) {
   const value = path ? getPath(item, path) : '';
   return value === null || value === undefined || typeof value === 'object' ? '' : String(value);
-}
+}`;
 
+// listIn's rule for a list not picked yet (guessListPath), written out for students. The code
+// must find the same items as the block, so it keeps findListPath's limits too.
+const SNIPPET_FIND = String.raw`
+// LIST_PATH "" means "Find the list for me", so this finds the items the way the UI Builder does.
+// A reply that is a list is the items. Otherwise the list of objects nearest the top of the reply
+// is (the longest one when two are as near). With no such list, a reply that is an object is one
+// item. Like the UI Builder, it looks at 500 objects and four names deep (like a.b.c.items) at
+// most. It only follows names made of letters, digits, _ and - (never JavaScript's own __proto__,
+// constructor or prototype) in a path of 120 characters at most, and checks the first 20 entries
+// of a list for objects.
+function findItems(reply) {
+  const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+  if (Array.isArray(reply)) return reply;
+  let best = null;
+  const queue = isObject(reply) ? [{ node: reply, path: '', depth: 0 }] : [];
+  for (let looked = 0; queue.length && looked < 500; looked += 1) {
+    const { node, path, depth } = queue.shift();
+    for (const [key, value] of Object.entries(node)) {
+      const at = path ? path + '.' + key : key;
+      if (!/^[\w-]{1,60}$/.test(key) || ['__proto__', 'constructor', 'prototype'].includes(key) || at.length > 120) continue;
+      if (Array.isArray(value) && value.slice(0, 20).some(isObject)) {
+        // The queue goes one level at a time, so a list found later is never nearer the top.
+        if (!best || (depth === best.depth && value.length > best.items.length)) best = { items: value, depth };
+      } else if (isObject(value) && depth < 3) {
+        queue.push({ node: value, path: at, depth: depth + 1 });
+      }
+    }
+  }
+  if (best) return best.items;
+  return isObject(reply) ? [reply] : [];
+}`;
+
+// loadItems reads the list at LIST_PATH, one object as one item. In the code for a list not picked
+// yet it first hands an empty LIST_PATH to findItems, and still reads a path a student types in.
+function snippetLoad(withFind) {
+  const find = withFind ? '\n  if (!LIST_PATH) return findItems(reply);' : '';
+  return String.raw`
 async function loadItems() {
   // No cookies, no referrer and no redirects: the rules the UI Builder uses for your API.
   const response = await fetch(API_URL, {
     credentials: 'omit', referrerPolicy: 'no-referrer', redirect: 'error', headers: { Accept: 'application/json' },
   });
   if (!response.ok) throw new Error('HTTP ' + response.status);
-  const list = getPath(await response.json(), LIST_PATH);
-  return Array.isArray(list) ? list : [];
+  const reply = await response.json();${find}
+  const list = getPath(reply, LIST_PATH);
+  if (Array.isArray(list)) return list;
+  return list !== null && typeof list === 'object' ? [list] : [];
+}`;
 }
 
+const SNIPPET_SHOW = String.raw`
 // textContent shows text and never runs HTML, so nothing in the reply can run on your page.
 function showItems(container, items) {
   container.replaceChildren();
@@ -440,19 +517,26 @@ loadItems()
   .catch((error) => console.error('Could not load the API', error));
 `;
 
-// "Show code": plain JavaScript that does what the block does, for students to learn from.
+// "Show code": plain JavaScript for students to learn from. It draws the items the block shows as
+// cards, reading them as listIn does: a picked list (source.list_path) is read as it is, one
+// object as one item. For a list not picked yet ("") the code also has findItems, so it finds the
+// list each time it runs, as the block does, with or without a Test in the editor.
 export function codeSnippet(source) {
   const src = isPlainObject(source) ? source : {};
   const text = (key) => (hasOwn(src, key) && typeof src[key] === 'string' ? src[key] : '');
   const pathOf = (key) => (pathTokens(text(key)) ? text(key) : '');
   const fields = {};
   for (const slot of SLOTS) fields[slot] = isPrivateField(pathOf(`${slot}_path`)) ? '' : pathOf(`${slot}_path`);
+  const listPath = pathOf('list_path');
   return [
     '// Generated by the OCS UI Builder. CPT rules: if you reuse this code, say that the OCS UI Builder generated it.',
     '// Put <div id="api-data"></div> where the items should appear.',
     `const API_URL = ${literal(text('url').trim())};`,
-    `const LIST_PATH = ${literal(pathOf('list_path'))};`,
+    `const LIST_PATH = ${literal(listPath)};`,
     `const FIELDS = ${literal(fields)};`,
-    SNIPPET_BODY,
+    SNIPPET_READ,
+    ...(listPath ? [] : [SNIPPET_FIND]),
+    snippetLoad(!listPath),
+    SNIPPET_SHOW,
   ].join('\n');
 }

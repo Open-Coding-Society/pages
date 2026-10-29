@@ -3,18 +3,17 @@
 // through the choices, Enter inserts; blocks this site or page can't take stay listed, disabled,
 // with the reason (no Spring or Flask, the live-block limit).
 import { framesOf, paletteOf, textOf } from './registry.js';
+import { foldText } from './url-rules.js';
 import { el, icon } from './editor-fields.js';
-
-const fold = (value) => String(value || '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
 
 // Groups whose label or help match every word of the query; empty groups are dropped.
 export function filterPalette(groups, query) {
-  const words = fold(query).split(/\s+/).filter(Boolean);
+  const words = foldText(query).split(/\s+/).filter(Boolean);
   if (!words.length) return groups;
   return groups.map((group) => ({
     ...group,
     items: group.items.filter((item) => {
-      const haystack = fold(`${item.label} ${item.help || ''} ${item.type}`);
+      const haystack = foldText(`${item.label} ${item.help || ''} ${item.type}`);
       return words.every((word) => haystack.includes(word));
     }),
   })).filter((group) => group.items.length);

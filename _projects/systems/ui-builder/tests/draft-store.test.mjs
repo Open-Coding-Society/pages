@@ -23,6 +23,26 @@ test('keyFor names one draft per page and refuses refs the editor could never ma
   }
 });
 
+test('the new-page draft is kept per signed-in person, and shared only when none is known', () => {
+  const storage = createStorage();
+  const drafts = new DraftStore({ storage, now: () => 1 });
+  assert.equal(drafts.keyFor(null), 'new', 'signed out or Flask-only: the shared slot');
+  drafts.setPerson(42);
+  assert.equal(drafts.keyFor(null), 'new:42');
+  assert.equal(drafts.write(drafts.keyFor(null), { page: page() }), true);
+  assert.ok(drafts.read('new:42'), 'stored under the person-scoped key');
+  // The next student on a shared computer is offered their own slot, never the first student's.
+  drafts.setPerson(43);
+  assert.equal(drafts.keyFor(null), 'new:43');
+  assert.equal(drafts.read(drafts.keyFor(null)), null);
+  // A ref still names its own key, and a bad or missing person id falls back to the shared slot.
+  assert.equal(drafts.keyFor({ kind: 'spring', id: 7 }), 'spring-7');
+  for (const bad of [0, -1, 1.5, '42', null]) {
+    drafts.setPerson(bad);
+    assert.equal(drafts.keyFor(null), 'new', String(bad));
+  }
+});
+
 test('a draft round-trips with the time it was written', () => {
   const storage = createStorage();
   const time = clock(5000);

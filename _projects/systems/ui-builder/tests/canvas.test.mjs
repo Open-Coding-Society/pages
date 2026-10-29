@@ -1,8 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { apiBlocksOf, apiItemsView, canvasAllowed, contextKey, listIn, nodeHashes, readNonce } from '../js/canvas.js';
-import { toHTML } from '../js/vnode.js';
+import { apiBlocksOf, canvasAllowed, contextKey, keyPartOf, nodeHashes, readNonce, realDataView } from '../js/canvas.js';
+import { codeSnippet, listIn } from '../js/api-data.js';
+import { contentRenderers } from '../js/blocks-content.js';
+import { mountApiData } from '../js/blocks-project.js';
+import { textOf } from '../js/registry.js';
+import { toDOM } from '../js/vnode.js';
 import { createPage, updateSettings, moveNode } from '../js/page-model.js';
+import { createDocument, text } from './fixtures/live/dom.mjs';
+import { ORIGIN, blocksOf, cardOf, drawPage, fetchRouter, json, mountOf, pageOf } from './fixtures/live/pages.mjs';
+import { runSnippet } from './fixtures/snippet.mjs';
 import { counterIds, loadRegistry, needsRuby } from './helpers.mjs';
 
 test('the canvas reads only a well-formed nonce from its address', () => {
@@ -52,28 +59,110 @@ test('hashes ignore repeated ids and hostile shapes instead of throwing', () => 
   assert.deepEqual(apiBlocksOf({ sections: [{ cells: [{ blocks: [{ id: 'b-1', type: 'api_data' }, { id: 7, type: 'api_data' }, { type: 'text', id: 'b-2' }] }] }] }).map((block) => block.id), ['b-1']);
 });
 
-test('listIn follows the mapped list, else finds the list itself', () => {
-  const reply = { data: { items: [{ a: 1 }, { a: 2 }] }, meta: { tags: ['x'] } };
-  assert.equal(listIn(reply, 'data.items').length, 2);
-  assert.equal(listIn(reply, '').length, 2, 'an empty path on an object reply falls back to the best list');
-  assert.equal(listIn([1, 2, 3], '').length, 3);
-  assert.deepEqual(listIn({ a: 1 }, ''), []);
-  assert.deepEqual(listIn(reply, 'data.items[0]'), [{ a: 1 }, { a: 2 }], 'a path to a non-list falls back too');
+test('a key from the canvas names the block or section that has the keyboard', () => {
+  const doc = createDocument();
+  const section = doc.createElement('section');
+  section.setAttribute('data-ui-node', 's-aaaaaa');
+  const block = doc.createElement('div');
+  block.setAttribute('data-ui-node', 'b-bbbbbb');
+  const link = doc.createElement('a');
+  const add = doc.createElement('button');
+  add.setAttribute('data-ui-add', '');
+  block.appendChild(link);
+  section.append(block, add);
+  doc.body.appendChild(section);
+  assert.equal(keyPartOf(link), 'b-bbbbbb', 'a link inside a block: that block');
+  assert.equal(keyPartOf(block), 'b-bbbbbb');
+  assert.equal(keyPartOf(add), '', 'an add button: no part to act on, not its section');
+  assert.equal(keyPartOf(doc.body), null, 'nothing in the page has focus');
+  assert.equal(keyPartOf(null), null);
 });
 
-test('API items draw as cards, a list, a table or numbers, as text only', () => {
-  const items = [{ title: '<b>Joke</b>', text: 'Why?', image: 'https://img.example/a.png', link: 'https://example.com/j/1', value: '3', label: 'votes' }];
-  const cards = toHTML(apiItemsView(items, 'cards', {}), { strict: true });
-  assert.match(cards, /^<div class="ocs__grid ocs__grid--card"><div class="ocs__grid-cell"><img class="ocs__image-frame" src="https:\/\/img.example\/a.png" alt="" loading="lazy" referrerpolicy="no-referrer">/);
-  assert.match(cards, /<h3>&lt;b&gt;Joke&lt;\/b&gt;<\/h3>/, 'API text is never markup');
-  assert.match(cards, /target="_blank" rel="noopener noreferrer nofollow"/);
-  assert.match(toHTML(apiItemsView(items, 'list', {}), { strict: true }), /^<ul class="ocs__entity-list"><li><strong>/);
-  assert.match(toHTML(apiItemsView(items, 'stats', {}), { strict: true }), /<strong class="ocs__stat-value">3<\/strong><span class="ocs__stat-label">votes<\/span>/);
-  const table = toHTML(apiItemsView(items, 'table', { source: { title_path: 'joke', value_path: 'haha' } }), { strict: true });
-  assert.match(table, /<th scope="col">joke<\/th><th scope="col">haha<\/th>/);
-  assert.match(table, /<td>&lt;b&gt;Joke&lt;\/b&gt;<\/td><td>3<\/td>/);
-  const ocs = toHTML(apiItemsView([{ image: 'https://team.opencodingsociety.com/x.png' }], 'cards', { cookieDomain: 'opencodingsociety.com' }), { strict: true });
-  assert.match(ocs, /crossorigin="anonymous"/, 'images on cookie hosts load without cookies');
-  const unsafe = toHTML(apiItemsView([{ title: 'x', image: 'javascript:alert(1)', link: 'javascript:alert(1)' }], 'cards', {}), { strict: true });
-  assert.equal(unsafe, '<div class="ocs__grid ocs__grid--card"><div class="ocs__grid-cell"><h3>x</h3></div></div>', 'unsafe links and images are dropped');
+// The review's case: the Flask API starter pointed at an API that answers an object holding a list,
+// with list_path still "". The editor's preview, the inspector's field list and the published page
+// must all show the same items.
+test('Real data while editing shows what the published page shows, in every view', needsRuby, async () => {
+  const registry = loadRegistry();
+  const url = 'https://team.example/api/users';
+  const reply = { users: [{ name: 'Ada', role: 'Lead' }, { name: 'Alan', role: '' }] };
+  assert.deepEqual(listIn(reply, '').map((user) => user.name), ['Ada', 'Alan'], 'what the inspector lists fields from');
+  const canvasCtx = { registry, mode: 'canvas', baseurl: '', pageOrigin: ORIGIN, renderers: contentRenderers };
+  for (const view of ['cards', 'list', 'table', 'stats']) {
+    const source = { url, list_path: '', title_path: 'name', text_path: 'role', image_path: '', link_path: '', value_path: '', label_path: '', snapshot: { items: [], fetched_at: 0, from_loopback: false } };
+    const page = pageOf([[['api_data', { title: 'Users', view, limit: 12, source }]]]);
+    const [block] = blocksOf(page);
+    const doc = createDocument();
+    const root = drawPage(doc, page, registry);
+    const router = fetchRouter({ [url]: json(reply) });
+    await mountApiData(cardOf(root, block.id), block, { registry, baseurl: '', pageOrigin: ORIGIN, pageProtocol: 'https:', fetchImpl: router.fetchImpl, storage: null });
+    const published = mountOf(root, block.id);
+    assert.ok(text(published).includes('Alan'), view);
+
+    const preview = realDataView({ ok: true, json: reply, url }, block, canvasCtx);
+    assert.equal(preview.status, '', view);
+    assert.equal(toDOM(preview.view, { doc }).outerHTML, published.innerHTML, `${view}: the preview is the published markup`);
+  }
+});
+
+// "The whole reply" (list_path ".") on a reply that also holds a list: the published page, the
+// preview and Show code's code show the reply as one item, where "" (not picked yet) shows the
+// list inside it. The code is made from the block alone, as before any Test in the editor.
+test('the whole reply shows as one item on the published page, in the preview and in Show code', needsRuby, async () => {
+  const registry = loadRegistry();
+  const url = 'https://team.example/api/team';
+  const reply = { team: 'Flood Watch', users: [{ team: 'Ada' }, { team: 'Alan' }] };
+  const canvasCtx = { registry, mode: 'canvas', baseurl: '', pageOrigin: ORIGIN, renderers: contentRenderers };
+  for (const [listPath, shown] of [['.', ['Flood Watch']], ['', ['Ada', 'Alan']]]) {
+    const source = { url, list_path: listPath, title_path: 'team', text_path: '', image_path: '', link_path: '', value_path: '', label_path: '', snapshot: { items: [], fetched_at: 0, from_loopback: false } };
+    const page = pageOf([[['api_data', { title: 'Team', view: 'list', limit: 12, source }]]]);
+    const [block] = blocksOf(page);
+    const doc = createDocument();
+    const root = drawPage(doc, page, registry);
+    await mountApiData(cardOf(root, block.id), block, { registry, baseurl: '', pageOrigin: ORIGIN, pageProtocol: 'https:', fetchImpl: fetchRouter({ [url]: json(reply) }).fetchImpl, storage: null });
+    const published = mountOf(root, block.id);
+    assert.deepEqual(published.querySelectorAll('li').map(text), shown, `list_path "${listPath}"`);
+    const preview = realDataView({ ok: true, json: reply, url }, block, canvasCtx);
+    assert.equal(toDOM(preview.view, { doc }).outerHTML, published.innerHTML, `list_path "${listPath}": the preview is the published markup`);
+    assert.deepEqual(await runSnippet(codeSnippet(source), reply), shown, `list_path "${listPath}": Show code draws the same items`);
+  }
+});
+
+// The Flask starter (joke and haha, no list picked) on a reply whose only list is empty or holds
+// plain values: one joke, as published pages showed it before lists were guessed, and the preview
+// agrees. A list of objects is guessed by both.
+test('a reply without a list of objects stays one item on the published page and in the preview', needsRuby, async () => {
+  const registry = loadRegistry();
+  const url = 'https://flask.example/api/joke';
+  const canvasCtx = { registry, mode: 'canvas', baseurl: '', pageOrigin: ORIGIN, renderers: contentRenderers };
+  const cases = [
+    [{ joke: 'Why?', haha: 3, comments: [] }, ['Why?|3']],
+    [{ joke: 'Why?', haha: 3, tags: ['pun'] }, ['Why?|3']],
+    [{ count: 2, results: [{ joke: 'A', haha: 1 }, { joke: 'B', haha: 2 }] }, ['A|1', 'B|2']],
+  ];
+  // A stat's label (the title when no label is mapped) and its number.
+  const statOf = (stat) => `${text(stat.querySelector('.ocs__stat-label'))}|${text(stat.querySelector('.ocs__stat-value'))}`;
+  for (const [reply, shown] of cases) {
+    const source = { url, list_path: '', title_path: 'joke', text_path: '', image_path: '', link_path: '', value_path: 'haha', label_path: '', snapshot: { items: [], fetched_at: 0, from_loopback: false } };
+    const page = pageOf([[['api_data', { title: 'Jokes', view: 'stats', limit: 12, source }]]]);
+    const [block] = blocksOf(page);
+    const doc = createDocument();
+    const root = drawPage(doc, page, registry);
+    await mountApiData(cardOf(root, block.id), block, { registry, baseurl: '', pageOrigin: ORIGIN, pageProtocol: 'https:', fetchImpl: fetchRouter({ [url]: json(reply) }).fetchImpl, storage: null });
+    const published = mountOf(root, block.id);
+    assert.deepEqual(published.querySelectorAll('.ocs__stat').map(statOf), shown, JSON.stringify(reply));
+    const preview = realDataView({ ok: true, json: reply, url }, block, canvasCtx);
+    assert.equal(toDOM(preview.view, { doc }).outerHTML, published.innerHTML, `${JSON.stringify(reply)}: the preview is the published markup`);
+  }
+});
+
+test('a failed read in the preview shows the saved copy and the doctor\'s advice', needsRuby, () => {
+  const registry = loadRegistry();
+  const canvasCtx = { registry, mode: 'canvas', baseurl: '', pageOrigin: ORIGIN, renderers: contentRenderers };
+  const snapshot = { items: [{ title: 'Saved joke', text: '', image: '', link: '', value: '', label: '' }], fetched_at: 1, from_loopback: false };
+  const block = { id: 'b-000002', type: 'api_data', settings: { view: 'list', limit: 5, source: { url: 'https://x.example/api', title_path: 'joke', snapshot } } };
+  const failed = realDataView({ ok: false, error: 'not_found', host: 'x.example', url: 'https://x.example/api' }, block, canvasCtx);
+  assert.equal(text(toDOM(failed.view, { doc: createDocument() })), 'Saved joke');
+  assert.equal(failed.status, textOf(registry, 'doctor.not_found', { host: 'x.example' }));
+  const empty = realDataView({ ok: true, json: { jokes: [] }, url: 'https://x.example/api' }, block, canvasCtx);
+  assert.deepEqual(empty, { view: null, status: textOf(registry, 'blocks.api_empty') });
 });

@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  apiUrlPolicy, embedPolicy, hostOf, isLoopbackHost, isOcsHost, normalizeHost, safeImage, safeLink, slugIssue,
-  suggestSlug, videoEmbedOf,
+  apiUrlPolicy, embedPolicy, foldText, hostOf, isLoopbackAddress, isLoopbackHost, isOcsHost, normalizeHost, safeImage, safeLink, slugIssue,
+  slugMatches, suggestSlug, videoEmbedOf,
 } from '../js/url-rules.js';
 
 const SITE = { baseurl: '', pageOrigin: 'https://pages.opencodingsociety.com' };
@@ -26,6 +26,26 @@ test('safeLink rejects every way a link can hide where it goes', () => {
     'file:///etc/passwd', 'ftp://example.com', 'example.com', 'mailto:<x>', '', null, undefined, 42, {},
   ];
   for (const value of bad) assert.equal(safeLink(value, SITE), null, JSON.stringify(value));
+});
+
+test('addresses are read as typed, the way Spring reads them, not as the browser would repair them', () => {
+  for (const value of ['https:/team.github.io/logo.png', 'https:team.github.io', 'https://@example.com/', 'https:///example.com', 'https://@/x']) {
+    assert.equal(safeLink(value, SITE), null, value);
+    assert.equal(safeImage(value, SITE), null, value);
+    assert.equal(embedPolicy(value, { pageOrigin: SITE.pageOrigin }).ok, false, value);
+  }
+  assert.equal(videoEmbedOf('https:/youtu.be/dQw4w9WgXcQ'), null);
+  assert.equal(safeLink('HTTPS://Example.com:443/a/@ada?x=@y#@z', SITE).href, 'https://example.com/a/@ada?x=@y#@z', 'an @ after the host is only part of the path');
+});
+
+test('site paths keep no dot segments, typed or encoded, so none can become a //host link', () => {
+  for (const value of ['/..//evil.com/x', '/.%2e//evil.com/x', '/%2E%2E//evil.com', '/a/../..//evil.com/x', '/.//evil.com', '/a/..', '/%2e/x']) {
+    assert.equal(safeLink(value, SITE), null, value);
+    assert.equal(safeImage(value, SITE), null, value);
+  }
+  for (const value of ['/search?q=/../x', '/csp/#../top', '/.well-known/x', '/files/v1.2/x', '/...']) {
+    assert.equal(safeLink(value, SITE).href, value, value);
+  }
 });
 
 test('safeImage allows https and site files and flags cookie-domain hosts', () => {
@@ -75,8 +95,19 @@ test('apiUrlPolicy: https always, the student computer only while editing', () =
   for (const value of ['https://10.0.0.1/api', 'https://[::1]/api', 'https://printer.local/api', 'https://localhost/api', 'https://db.internal/x']) {
     assert.equal(apiUrlPolicy(value, page).reason, 'policy_private_host', value);
   }
-  for (const value of ['ftp://x/y', 'javascript:1', 'https://u:p@example.com/api', 'not a url', '']) {
+  for (const value of ['ftp://x/y', 'javascript:1', 'https://u:p@example.com/api', 'not a url', '', 'https:team.github.io/api', 'https://@example.com/api']) {
     assert.equal(apiUrlPolicy(value, page).ok, false, value);
+  }
+});
+
+test('the student computer is named only as Spring takes it: http://localhost or http://127.0.0.1', () => {
+  const edit = { pageHost: 'pages.opencodingsociety.com', pageProtocol: 'https:', mode: 'edit' };
+  for (const value of ['http://localhost:8587/api/jokes', 'HTTP://LOCALHOST:8587', 'http://127.0.0.1', 'http://127.0.0.1:5000/api?x=1#y']) {
+    assert.equal(apiUrlPolicy(value, edit).ok, true, value);
+  }
+  // The browser would reach each of these, but Spring refuses them.
+  for (const value of ['http:/localhost:5000/api', 'http:localhost:5000/api', 'http://127.1:5000/api', 'http://0x7f.0.0.1/api', 'http://localhost./api']) {
+    assert.deepEqual([apiUrlPolicy(value, edit).ok, apiUrlPolicy(value, edit).reason], [false, 'policy_loopback_form'], value);
   }
 });
 
@@ -90,6 +121,48 @@ test('hosts are compared lowercased without a trailing dot', () => {
   assert.equal(hostOf('javascript:1'), null);
 });
 
+// The same verdicts as Spring's isLoopbackHost and its urlIssue in PUBLISH mode, which reads the host
+// as typed: if the two differed, a page would pass here and be refused at Publish.
+test('isLoopbackHost and isLoopbackAddress name the student\'s computer exactly as Spring does', () => {
+  for (const host of ['localhost', 'LOCALHOST', 'localhost.', 'team.localhost', 'a.b.localhost.', '.localhost', '127.0.0.1', '127.1.2.3',
+    '127.255.255.255', '127.000.000.001', '[::1]', '0.0.0.0', '0.0.0.0.', '[::]', '[::].', '[::ffff:127.0.0.1]', '[::FFFF:127.1.2.3]',
+    '[::ffff:7f00:1]', '[::ffff:7fff:ffff].']) {
+    assert.equal(isLoopbackHost(host), true, host);
+  }
+  for (const host of ['localhost..', 'localhost.example.com', 'mylocalhost', '127.1', '0177.0.0.1', '128.0.0.1', '10.0.0.1', '[0:0:0:0:0:0:0:1]',
+    '[::2]', '::1', '0.0.0.1', '127.0.0.1x', '', null, '[0:0:0:0:0:0:0:0]', '[::ffff:128.0.0.1]', '[::ffff:8000:1]', '[::ffff:0:0]', '[::127.0.0.1]',
+    '[0:0:0:0:0:ffff:7f00:1]', '[::ffff:7f00:00001]', '[::ffff:127.0.0]']) {
+    assert.equal(isLoopbackHost(host), false, String(host));
+  }
+  for (const value of ['https://localhost/', 'HTTPS://LocalHost:8443/x', 'https://localhost./x', 'https://team.localhost/', 'https://127.0.0.1:4100/team.png',
+    'https://127.000.000.001/', 'https://[::1]:8443/', 'https://0.0.0.0./x', 'http://localhost:4100/x', 'http://127.0.0.1/', ' https://localhost/ ',
+    'https://[::]/', 'https://[::ffff:127.0.0.1]:8443/', 'https://[::ffff:7f00:1]/']) {
+    assert.equal(isLoopbackAddress(value), true, value);
+  }
+  // A browser sends the first seven to this computer too, but Spring passes them, so the two change together.
+  for (const value of ['https://127.1/', 'https://0177.0.0.1/', 'https://2130706433/', 'https://0x7f.0.0.1/', 'https://[0:0:0:0:0:0:0:1]/',
+    'https://[0:0:0:0:0:ffff:7f00:1]/', 'https://%6Cocalhost/',
+    'https://localhost../x', 'https://localhost.example.com/', 'https://flood.example.com/', '/csp/', 'mailto:a@b.example', 'https://user@localhost/',
+    'http://localhost./', 'http://[::1]/', '', null, 42]) {
+    assert.equal(isLoopbackAddress(value), false, String(value));
+  }
+});
+
+// Spring trims an address as JavaScript's trim does (trimLikeJavaScript), so around an address only
+// tab, line breaks and space are dropped; U+001C to U+001F, which Java calls whitespace, and every
+// other control character stay and make the value no address on both sides.
+test('around an address, a control character is dropped only where JavaScript\'s trim drops it, as in Spring', () => {
+  const dropped = new Set([0x9, 0xa, 0xb, 0xc, 0xd, 0x20]);
+  const controls = [...Array(0x21).keys(), ...[...Array(0x21).keys()].map((n) => 0x7f + n)]; // U+0000-U+0020, U+007F-U+009F
+  for (const code of controls) {
+    const ch = String.fromCharCode(code);
+    for (const value of [`${ch}https://localhost/`, `https://localhost/${ch}`, `${ch}http://localhost:4000/`]) {
+      assert.equal(isLoopbackAddress(value), dropped.has(code), `${code.toString(16)} ${JSON.stringify(value)}`);
+    }
+    assert.equal(safeLink(`${ch}https://example.com/`, SITE) !== null, dropped.has(code), code.toString(16));
+  }
+});
+
 test('slugs follow the registry pattern and avoid reserved words', () => {
   const registry = { limits: { slug_pattern: '^[a-z0-9](?:[a-z0-9-]{1,62}[a-z0-9])$', reserved_slugs: ['admin', 'gallery'] } };
   assert.equal(slugIssue('flood-watch', registry), null);
@@ -100,4 +173,15 @@ test('slugs follow the registry pattern and avoid reserved words', () => {
   assert.equal(suggestSlug(''), 'my-page');
   assert.equal(suggestSlug('ab'), 'ab-page');
   assert.ok(suggestSlug('x'.repeat(200)).length <= 64);
+  assert.equal(foldText('Káñbán BOARD'), 'kanban board');
+});
+
+test('slugMatches follows the registry pattern, and reserved words still match it', () => {
+  const registry = { limits: { slug_pattern: '^[a-z0-9_-]{3,64}$', reserved_slugs: ['admin'] } };
+  assert.equal(slugMatches('team_3', registry), true, 'a widened pattern is used everywhere');
+  assert.equal(slugIssue('team_3', registry), null);
+  assert.equal(slugMatches('admin', registry), true, 'a page published before its word was reserved still opens');
+  assert.equal(slugIssue('admin', registry), 'slug_reserved');
+  assert.equal(slugMatches('team_3', { limits: {} }), false, 'without a pattern, the default one');
+  for (const value of ['ab', 'Team', '../x', null, 42]) assert.equal(slugMatches(value, registry), false, String(value));
 });

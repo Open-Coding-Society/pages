@@ -3,6 +3,7 @@ require "fileutils"
 require "jekyll"
 require "json"
 require "nokogiri"
+require "sass"
 require "tmpdir"
 require_relative "../../../../scripts/publish_project"
 
@@ -147,7 +148,8 @@ class UiBuilderPagesTest < Minitest::Test
     ["/preview", ""].each do |baseurl|
       build(spring: true, baseurl: baseurl) do |pages|
         { "view" => %w[api/config.js chat/rich-text.js projects/messages/messages-model.js projects/ui-builder/viewer.js
-                       projects/messages/conversation-embed.js kanban-board.js chat/calendar/calendar-card.js api/microblog.js],
+                       projects/messages/conversation-embed.js kanban-board.js chat/calendar/calendar-card.js
+                       chat/calendar/calendar-model.js api/microblog.js],
           "gallery" => %w[api/config.js projects/ui-builder/gallery.js] }.each do |name, expected|
           urls = module_urls(pages[name])
           expected.each { |path| assert_includes urls, "#{baseurl}/assets/js/#{path}", "#{name} uses #{path}" }
@@ -173,6 +175,19 @@ class UiBuilderPagesTest < Minitest::Test
       assert_equal permalink, front["permalink"]
       %w[full_width search_exclude hide regenerate].each { |key| assert_equal true, front[key], "#{name}: #{key}" }
     end
+  end
+
+  # The calendar system's sass hides every h1 on the site (an unscoped h1 rule). The builder shows
+  # its pages' titles again, and the gallery's: gallery.js draws it as an h1 under [data-ui-gallery].
+  def test_page_and_gallery_titles_show_despite_the_site_wide_h1_rule
+    sass = File.join(PROJECT, "sass")
+    css = Sass::Engine.new(File.read(File.join(sass, "main.scss")), syntax: :scss, load_paths: [sass]).render
+    %w[[data-ui-page] [data-ui-gallery]].each do |root|
+      rule = css.scan(/([^{}]+)\{([^{}]*)\}/).find { |selectors, _| selectors.split(",").map(&:strip).include?("#{root} h1") }
+      assert rule, "#{root} h1 has a rule"
+      assert_match(/display:\s*block/, rule[1], "#{root} h1 is shown")
+    end
+    build(spring: true) { |pages| assert Nokogiri::HTML(pages["gallery"]).at_css("#ui-builder-gallery[data-ui-gallery]") }
   end
 
   def test_the_loading_line_is_registry_text_escaped

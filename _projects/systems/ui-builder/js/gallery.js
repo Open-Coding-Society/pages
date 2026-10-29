@@ -6,15 +6,14 @@
 //
 //   startGallery(root, {registry, config, store}) → {ready, destroy()}
 import { textOf } from './registry.js';
-import { safeImage } from './url-rules.js';
-import { element } from './blocks-project.js';
+import { foldText, safeImage, slugMatches } from './url-rules.js';
+import { browserOffline, element } from './blocks-project.js';
+import { storeErrorText } from './page-store.js';
 import { h, toDOM } from './vnode.js';
 
 const QUERY_MAX = 100;
-const SLUG = /^[a-z0-9][a-z0-9-]{0,63}$/;
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
-const fold = (text) => String(text || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
 // The filters an address asks for: a known course code (else all) and a search of at most 100 characters.
 export function galleryRequest(search, registry) {
@@ -26,11 +25,11 @@ export function galleryRequest(search, registry) {
 
 // Pages whose title, description, byline or course name holds every word of the search.
 export function filterGallery(items, query, registry) {
-  const words = fold(query).split(/\s+/).filter(Boolean);
+  const words = foldText(query).split(/\s+/).filter(Boolean);
   if (!words.length) return items;
   const labels = new Map((registry.courses || []).map((option) => [option.value, option.label]));
   return items.filter((item) => {
-    const haystack = fold([item.title, item.description, item.byline, labels.get(item.course) || item.course].join(' '));
+    const haystack = foldText([item.title, item.description, item.byline, labels.get(item.course) || item.course].join(' '));
     return words.every((word) => haystack.includes(word));
   });
 }
@@ -49,7 +48,15 @@ export function startGallery(root, deps = {}) {
   const cookieDomain = isObject(registry.security) && typeof registry.security.cookie_domain === 'string' ? registry.security.cookie_domain : '';
   const draw = (vnode) => toDOM(vnode, { doc });
   const courseLabel = (code) => ((registry.courses || []).find((option) => option && option.value === code) || {}).label || '';
-  const state = { ...galleryRequest(location.search, registry), items: null, failed: false };
+  const state = { ...galleryRequest(location.search, registry), items: null, failed: false, error: null };
+
+  // Why the pages didn't load, worded like the viewer: "Check your connection" only when this
+  // browser knows it is offline; otherwise OCS didn't answer, or answered why (storeErrorText).
+  function loadProblem(error) {
+    if (error && error.name === 'OfflineError') return say(browserOffline() ? 'gallery.load_failed' : 'gallery.no_answer');
+    const { key, vars } = storeErrorText(error);
+    return say(key, vars);
+  }
   const loaded = new Map(); // course → its pages, so switching back costs no request
   let request = 0;
   let destroyed = false;
@@ -115,7 +122,8 @@ export function startGallery(root, deps = {}) {
       referrerpolicy: /^https:/i.test(picture.src) ? 'no-referrer' : undefined, crossorigin: picture.ocsHost ? 'anonymous' : undefined,
     }) : null;
     const kicker = courseLabel(item.course);
-    return h('a', { class: 'ocs__nav-card', href: `${baseurl}/ui-builder/view/?page=${item.slug}` },
+    // Encoded, so the link stays one address whatever the registry's slug pattern lets through.
+    return h('a', { class: 'ocs__nav-card', href: `${baseurl}/ui-builder/view/?page=${encodeURIComponent(item.slug)}` },
       image,
       kicker ? h('span', { class: 'ocs__nav-card-kicker' }, kicker) : null,
       h('span', { class: 'ocs__nav-card-title' }, item.title || say('blocks.untitled')),
@@ -128,7 +136,7 @@ export function startGallery(root, deps = {}) {
     if (state.failed) {
       count.textContent = '';
       const retry = draw(h('div', { class: 'ocs__stack' },
-        h('div', { class: 'ocs__callout' }, say('gallery.load_failed')),
+        h('div', { class: 'ocs__callout' }, loadProblem(state.error)),
         h('div', { class: 'ocs__links' }, h('button', { type: 'button', class: 'ocs__btn' }, say('gallery.retry')))));
       retry.querySelector('button').addEventListener('click', () => { load(); });
       results.replaceChildren(retry);
@@ -139,7 +147,7 @@ export function startGallery(root, deps = {}) {
       results.replaceChildren();
       return;
     }
-    const shown = filterGallery(state.items, state.q, registry).filter((item) => SLUG.test(item.slug));
+    const shown = filterGallery(state.items, state.q, registry).filter((item) => slugMatches(item.slug, registry));
     if (!shown.length) {
       count.textContent = say(state.items.length ? 'gallery.empty_filtered' : 'gallery.empty');
       results.replaceChildren();
@@ -154,6 +162,7 @@ export function startGallery(root, deps = {}) {
     const mine = request;
     const course = state.course;
     state.failed = false;
+    state.error = null;
     state.items = loaded.has(course) ? loaded.get(course) : null;
     render();
     if (state.items !== null) return;
@@ -166,6 +175,7 @@ export function startGallery(root, deps = {}) {
       if (destroyed || mine !== request) return;
       if (!error || error.name !== 'OfflineError') console.error('UI Builder gallery: the pages could not load', error);
       state.failed = true;
+      state.error = error;
     }
     render();
   }

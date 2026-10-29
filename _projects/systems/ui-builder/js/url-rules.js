@@ -6,9 +6,21 @@
 // other than what it looks like, so any of them rejects the whole value.
 const UNSAFE = /[\s\u0000-\u001f\u007f-\u009f\u00ad\u061c\u180e\u200b-\u200f\u202a-\u202e\u2028\u2029\u2060-\u2064\u2066-\u2069\ufeff\\]/;
 const IPV4 = /^\d{1,3}(?:\.\d{1,3}){3}$/;
+// 127.x.x.x mapped into IPv6, typed with its four numbers or in hex as the URL parser writes it
+// (https://[::ffff:127.0.0.1]/ becomes [::ffff:7f00:1]): Spring's MAPPED_LOOPBACK.
+const MAPPED_LOOPBACK = /^\[::ffff:(?:127(?:\.\d{1,3}){3}|7f[0-9a-f]{2}:[0-9a-f]{1,4})\]$/;
 // Spring accepts only these two loopback names in a draft's API link, so the editor does too.
-const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1']);
+const DRAFT_API_HOSTS = new Set(['localhost', '127.0.0.1']);
 const PRIVATE_SUFFIXES = ['.localhost', '.local', '.internal', '.lan', '.home', '.corp'];
+// Spring's urlIssue reads addresses as typed, so these do too: new URL would quietly repair
+// "https:/x", "https:x" or "https://@x" (and "http:/localhost" or "127.1") into addresses that
+// work here but that Spring refuses. HTTP_LOOPBACK is Spring's own pattern.
+const HTTPS_TYPED = /^https:\/\/[^/?#@]+(?:[/?#]|$)/i;
+const HTTP_LOOPBACK = /^http:\/\/(?:localhost|127\.0\.0\.1)(?::\d{1,5})?(?:[/?#].*)?$/i;
+// "." and ".." path segments, typed or percent-encoded: resolving them could turn "/..//evil.com"
+// into the protocol-relative "//evil.com". Checked on the path only: "?q=/../x" is fine.
+const DOT_SEGMENT = /(?:^|\/)(?:\.|%2e){1,2}(?=\/|$)/i;
+const SLUG_PATTERN = '^[a-z0-9](?:[a-z0-9-]{1,62}[a-z0-9])$';
 const YOUTUBE_HOSTS = new Set(['youtube.com', 'www.youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtu.be', 'youtube-nocookie.com', 'www.youtube-nocookie.com']);
 const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
 const DRIVE_ID = /^[A-Za-z0-9_-]{10,}$/;
@@ -35,8 +47,46 @@ export function normalizeHost(host) {
   return String(host || '').toLowerCase().replace(/\.+$/, '');
 }
 
+const isDraftApiHost = (host) => DRAFT_API_HOSTS.has(normalizeHost(host));
+
+// A name for the student's own computer, exactly as Spring's isLoopbackHost (UiBuilderSpecRules)
+// reads one: localhost or a *.localhost name, 127.x.x.x written as four numbers, 0.0.0.0, [::1],
+// [::] or 127.x.x.x mapped into IPv6, with at most one trailing dot. No visitor can reach these, so
+// Spring refuses them on publish. The mapped hex form is also what rich-content.js gets from the
+// URL parser for a typed [::ffff:127.0.0.1].
 export function isLoopbackHost(host) {
-  return LOOPBACK_HOSTS.has(normalizeHost(host));
+  const lower = String(host || '').toLowerCase();
+  const name = lower.endsWith('.') ? lower.slice(0, -1) : lower;
+  return name === 'localhost' || name.endsWith('.localhost') || name === '[::1]' || name === '[::]' || name === '0.0.0.0'
+    || (IPV4.test(name) && name.startsWith('127.')) || MAPPED_LOOPBACK.test(name);
+}
+
+// The host of an https:// address as typed, the way Spring's hostOf reads it: what comes before
+// the first "/", "?" or "#", without its port, lowercased; null when there is none or it names a user.
+function typedHttpsHost(raw) {
+  if (!/^https:\/\//i.test(raw)) return null;
+  const authority = raw.slice('https://'.length).split(/[/?#]/, 1)[0];
+  if (!authority || authority.includes('@')) return null;
+  let host;
+  if (authority.startsWith('[')) {
+    const close = authority.indexOf(']');
+    host = close < 0 ? '' : authority.slice(0, close + 1);
+  } else {
+    host = authority.split(':', 1)[0];
+  }
+  return host ? host.toLowerCase() : null;
+}
+
+// Whether a published page must refuse an address because it is on the student's own computer:
+// https:// on a loopback host, or http://localhost and http://127.0.0.1 (Spring's urlIssue in
+// PUBLISH mode, loopback_url there). The host is read as typed, as Spring reads it, so the two
+// agree; "https://127.1", which a browser also sends to this computer, passes both.
+export function isLoopbackAddress(value) {
+  const raw = clean(value);
+  if (!raw) return false;
+  if (HTTP_LOOPBACK.test(raw)) return true;
+  const host = typedHttpsHost(raw);
+  return host !== null && isLoopbackHost(host);
 }
 
 export function isOcsHost(host, { cookieDomain = '' } = {}) {
@@ -51,18 +101,20 @@ export function hostOf(value) {
   return url && url.hostname ? normalizeHost(url.hostname) : null;
 }
 
-// A site path: one leading slash (never "//" or "/\"), resolving to this site's own origin.
-// It is returned with the baseurl in front, the way {{ site.baseurl }} links are written.
+// A site path: one leading slash (never "//" or "/\"), no dot segments, resolving to this site's
+// own origin and to a path that doesn't start with "//" either. It is returned with the baseurl
+// in front, the way {{ site.baseurl }} links are written.
 function sitePath(raw, { baseurl = '', pageOrigin } = {}) {
-  if (!/^\/(?![/\\])/.test(raw)) return null;
+  if (!/^\/(?![/\\])/.test(raw) || DOT_SEGMENT.test(raw.split(/[?#]/, 1)[0])) return null;
   const origin = originOf(pageOrigin) || 'https://site.invalid';
   const url = parse(raw, origin);
-  if (!url || url.origin !== origin) return null;
+  if (!url || url.origin !== origin || /^\/[/\\]/.test(url.pathname)) return null;
   const base = String(baseurl || '').replace(/\/+$/, '');
   return `${base}${url.pathname}${url.search}${url.hash}`;
 }
 
 function httpsUrl(raw) {
+  if (!HTTPS_TYPED.test(raw)) return null;
   const url = parse(raw);
   if (!url || url.protocol !== 'https:' || url.username || url.password || !url.hostname) return null;
   return url;
@@ -162,32 +214,41 @@ export function apiUrlPolicy(value, { pageHost = '', pageProtocol = 'https:', mo
   const url = raw && parse(raw);
   if (!url || url.username || url.password) return { ok: false, loopback: false, reason: 'policy_https' };
   const host = normalizeHost(url.hostname);
-  if (url.protocol === 'http:' && isLoopbackHost(host)) {
-    if (mode === 'edit' || isLoopbackHost(pageHost)) return { ok: true, loopback: true, url: url.href, host };
+  if (url.protocol === 'http:' && isDraftApiHost(host)) {
+    if (!HTTP_LOOPBACK.test(raw)) return { ok: false, loopback: false, reason: 'policy_loopback_form', host };
+    if (mode === 'edit' || isDraftApiHost(pageHost)) return { ok: true, loopback: true, url: url.href, host };
     return { ok: false, loopback: true, reason: 'policy_loopback_view', host };
   }
   if (url.protocol === 'http:') {
     return { ok: false, loopback: false, reason: pageProtocol === 'https:' ? 'mixed_content' : 'policy_https', host };
   }
-  if (url.protocol !== 'https:') return { ok: false, loopback: false, reason: 'policy_https', host };
+  if (url.protocol !== 'https:' || !httpsUrl(raw)) return { ok: false, loopback: false, reason: 'policy_https', host };
   if (isPrivateHost(host)) return { ok: false, loopback: false, reason: 'policy_private_host', host };
   return { ok: true, loopback: false, url: url.href, host };
 }
 
-export function slugIssue(slug, registry) {
+// Whether a slug has the registry's shape (limits.slug_pattern, which Spring shares). Reserved
+// words still match: a page published before its word was reserved keeps its address.
+export function slugMatches(slug, registry) {
   const limits = (registry && registry.limits) || {};
-  const pattern = new RegExp(limits.slug_pattern || '^[a-z0-9](?:[a-z0-9-]{1,62}[a-z0-9])$');
-  if (typeof slug !== 'string' || !pattern.test(slug)) return 'slug_invalid';
+  return typeof slug === 'string' && new RegExp(limits.slug_pattern || SLUG_PATTERN).test(slug);
+}
+
+export function slugIssue(slug, registry) {
+  if (!slugMatches(slug, registry)) return 'slug_invalid';
+  const limits = (registry && registry.limits) || {};
   if ((limits.reserved_slugs || []).includes(slug)) return 'slug_reserved';
   return null;
 }
 
+// Lowercase text without accents ("Café" → "cafe"), for slugs and searches.
+export function foldText(text) {
+  return String(text || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
 // "Flood Watch: Team 3!" → "flood-watch-team-3".
 export function suggestSlug(title) {
-  const base = String(title || '')
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
+  const base = foldText(title)
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 64)

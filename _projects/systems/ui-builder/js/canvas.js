@@ -8,10 +8,10 @@
 import { readRegistry, textOf } from './registry.js';
 import { renderPage } from './render.js';
 import { contentRenderers } from './blocks-content.js';
-import { h, toDOM } from './vnode.js';
+import { renderApiItems } from './blocks-project.js';
+import { toDOM } from './vnode.js';
 import { createRichHooks } from './rich-content.js';
-import { doctor, fetchJson, findListPath, getPath, mapItems } from './api-data.js';
-import { safeImage, safeLink } from './url-rules.js';
+import { doctor, fetchJson, listIn, mapItems } from './api-data.js';
 import { isMacPlatform, isTypingTarget, keyEventOf, shortcutOf } from './editor-shortcuts.js';
 import { READY_EVENT } from './canvas-bridge.js';
 
@@ -73,47 +73,30 @@ export function apiBlocksOf(page) {
   return out;
 }
 
-// The list in an API reply: the mapped list_path when it points at a list, else the best guess.
-export function listIn(json, listPath) {
-  const mapped = getPath(json, typeof listPath === 'string' ? listPath : '');
-  if (Array.isArray(mapped)) return mapped;
-  const found = findListPath(json);
-  const guess = found === null ? undefined : getPath(json, found);
-  return Array.isArray(guess) ? guess : [];
-}
-
-// Mapped API items as the page's own grammar, text only. The live viewer draws the published
-// page; this is the editing preview of the same four views.
-export function apiItemsView(items, view, { cookieDomain = '', source = {} } = {}) {
-  const rows = listOf(items).filter(isObject);
-  const link = (item, label) => {
-    // Items were mapped through safeLink already; a hand-edited snapshot is checked again.
-    const target = item.link ? safeLink(item.link, {}) : null;
-    return target ? h('a', { class: 'ocs__btn', href: target.href, target: '_blank' }, label) : null;
+// What "Real data while editing" shows for one Data from your API block, from its fetchJson
+// result: the published page's own list rule (api-data.js listIn) and markup (blocks-project.js
+// renderApiItems), so the preview is what visitors will see. A failed read shows the saved copy,
+// if there is one, and the doctor's advice. ctx is the canvas render context.
+// → {view: vnode or null, status: text}
+export function realDataView(result, block, ctx) {
+  const { registry } = ctx;
+  const settings = isObject(own(block, 'settings')) ? block.settings : {};
+  const source = isObject(own(settings, 'source')) ? settings.source : {};
+  const limit = Number.isInteger(settings.limit) ? Math.min(Math.max(settings.limit, 1), 50) : 12;
+  if (result.ok) {
+    const cookieDomain = own(registry.security, 'cookie_domain');
+    const items = mapItems(listIn(result.json, source.list_path), source, {
+      limit, itemChars: (registry.limits || {}).api_item_chars || 500, baseurl: ctx.baseurl, pageOrigin: ctx.pageOrigin,
+      cookieDomain: typeof cookieDomain === 'string' ? cookieDomain : '', sourceUrl: result.url,
+    });
+    const view = renderApiItems(items, settings, ctx);
+    return { view, status: view ? '' : textOf(registry, 'blocks.api_empty') };
+  }
+  const problem = doctor(result, { url: source.url, pageOrigin: ctx.pageOrigin }).find((line) => line.level === 'error');
+  return {
+    view: renderApiItems(listOf(own(source.snapshot, 'items')).slice(0, limit), settings, ctx),
+    status: problem ? textOf(registry, `doctor.${problem.key}`, problem.vars) : '',
   };
-  const picture = (item) => {
-    const image = safeImage(item.image, { cookieDomain });
-    if (!image) return null;
-    return h('img', { class: 'ocs__image-frame', src: image.src, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer', crossorigin: image.ocsHost ? 'anonymous' : null });
-  };
-  if (view === 'stats') {
-    return h('div', { class: 'ocs__stats' }, rows.map((item) => h('div', { class: 'ocs__stat' },
-      h('strong', { class: 'ocs__stat-value' }, item.value), h('span', { class: 'ocs__stat-label' }, item.label || item.title))));
-  }
-  if (view === 'table') {
-    const slots = ['title', 'text', 'value', 'label'].filter((slot) => typeof own(source, `${slot}_path`) === 'string' && source[`${slot}_path`]);
-    const columns = slots.length ? slots : ['title'];
-    return h('div', { class: 'ocs__table-wrap' }, h('table', { class: 'ocs__table' },
-      h('thead', null, h('tr', null, columns.map((slot) => h('th', { scope: 'col' }, own(source, `${slot}_path`) || slot)))),
-      h('tbody', null, rows.map((item) => h('tr', null, columns.map((slot) => h('td', null, item[slot])))))));
-  }
-  if (view === 'list') {
-    return h('ul', { class: 'ocs__entity-list' }, rows.map((item) => h('li', null,
-      h('strong', null, item.title || item.value), item.text ? [h('br'), item.text] : null)));
-  }
-  return h('div', { class: 'ocs__grid ocs__grid--card' }, rows.map((item) => h('div', { class: 'ocs__grid-cell' },
-    picture(item), item.title ? h('h3', null, item.title) : null, item.text ? h('p', { class: 'ocs__text' }, item.text) : null,
-    link(item, item.title || item.link))));
 }
 
 function closestNode(target) {
@@ -122,6 +105,16 @@ function closestNode(target) {
     if (id) return node;
   }
   return null;
+}
+
+// The part of the page a key was pressed in, sent with the key so Delete or a move acts on what
+// has focus: the id of the block or section around the focused element, '' on an add button
+// (no part to act on) and null when nothing in the page has focus (the editor's selection then).
+export function keyPartOf(target) {
+  if (!target || target.nodeType !== 1) return null;
+  if (target.closest('[data-ui-add]')) return '';
+  const node = target.closest('[data-ui-node]');
+  return node ? node.getAttribute('data-ui-node') : null;
 }
 
 function notice(doc, root, text) {
@@ -145,7 +138,6 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
   }
   const pageOrigin = win.location.origin;
   const limits = registry.limits || {};
-  const cookieDomain = (registry.security && registry.security.cookie_domain) || '';
   const hooks = createRichHooks({ richText, baseurl, pageOrigin, doc });
   const ctx = { registry, mode: 'canvas', baseurl, pageOrigin, renderers: contentRenderers };
   const handlers = { select: null, hover: null, add: null, key: null };
@@ -174,14 +166,15 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
   function addButton(sectionId, cellIndex) {
     const button = doc.createElement('button');
     button.type = 'button';
-    button.className = 'ocs__btn small';
+    // ocs__btn--icon spaces the icon from the words (a flex button drops a leading space).
+    button.className = 'ocs__btn ocs__btn--icon small';
     button.setAttribute('data-ui-add', '');
     button.setAttribute('data-ui-add-section', sectionId);
     button.setAttribute('data-ui-add-cell', String(cellIndex));
     const icon = doc.createElement('i');
     icon.className = 'fa-solid fa-plus';
     icon.setAttribute('aria-hidden', 'true');
-    button.append(icon, doc.createTextNode(` ${say('canvas_add')}`));
+    button.append(icon, doc.createTextNode(say('canvas_add')));
     return button;
   }
 
@@ -212,23 +205,10 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
       status.textContent = say('canvas_real_loading');
       return;
     }
-    const view = typeof settings.view === 'string' ? settings.view : 'cards';
-    const limit = Number.isInteger(settings.limit) ? Math.min(Math.max(settings.limit, 1), 50) : 12;
-    const show = (items) => mount.replaceChildren(toDOM(apiItemsView(items, view, { cookieDomain, source }), { doc }));
-    const { result } = entry;
-    if (result.ok) {
-      const items = mapItems(listIn(result.json, source.list_path), source, {
-        limit, itemChars: limits.api_item_chars || 500, baseurl, pageOrigin, cookieDomain, sourceUrl: result.url,
-      });
-      show(items);
-      status.textContent = items.length ? '' : textOf(registry, 'blocks.api_empty');
-      return;
-    }
-    const problem = doctor(result, { url: source.url, pageOrigin }).find((line) => line.level === 'error');
-    const message = problem ? textOf(registry, `doctor.${problem.key}`, problem.vars) : '';
-    const saved = listOf(own(source.snapshot, 'items')).slice(0, limit);
-    if (saved.length) show(saved);
-    status.textContent = message;
+    // Once the API has answered, the sample gives way to what visitors would see, even nothing.
+    const { view, status: line } = realDataView(entry.result, block, ctx);
+    mount.replaceChildren(...(view ? [toDOM(view, { doc })] : []));
+    status.textContent = line;
   }
 
   function fetchSource(url) {
@@ -346,7 +326,7 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
     // The editor runs the shortcut; nothing in the canvas (or a site script) may act on it too.
     event.preventDefault();
     event.stopPropagation();
-    emit('key', keyEventOf(event));
+    emit('key', { ...keyEventOf(event), nodeId: keyPartOf(event.target) });
   }
 
   const stop = (event) => event.preventDefault();

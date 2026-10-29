@@ -2,8 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as messagesModel from '../../messages/js/messages-model.js';
 import { embedTexts } from '../../messages/js/conversation-embed.js';
+import * as calendarModel from '../../courses/js/announcement-calendar/calendar-model.js';
 import { textOf } from '../js/registry.js';
 import { announcementText, createLiveMounts, microblogPageKey, mountLiveBlocks } from '../js/blocks-live.js';
+import { escapeHTML } from '../js/vnode.js';
 import { createDocument, createEvent, settle, text } from './fixtures/live/dom.mjs';
 import {
   MODULE_URLS, ORIGIN, blocksOf, drawPage, fakeCalendarCard, fakeConversationEmbed, fakeKanban, fakeMicroblog, fetchRouter, json,
@@ -39,7 +41,7 @@ async function live(registry, blocks, options = {}) {
   const doc = createDocument();
   const root = drawPage(doc, page, registry);
   const fakes = {
-    conversationEmbed: fakeConversationEmbed(), kanban: fakeKanban(), calendarCard: fakeCalendarCard(), microblog: fakeMicroblog(), ...options.fakes,
+    conversationEmbed: fakeConversationEmbed(), kanban: fakeKanban(), calendarCard: fakeCalendarCard(), calendarModel, microblog: fakeMicroblog(), ...options.fakes,
   };
   const loader = moduleLoader(fakes);
   const router = fetchRouter(options.routes || {});
@@ -81,10 +83,10 @@ test('the registry words the chat with every key conversation-embed.js reads', n
 
 test('a Flask-only site shows a notice for Spring blocks and loads nothing', needsRuby, async () => {
   const registry = loadRegistry();
-  const run = await live(registry, [['chat', { group: GROUP }], ['members', { group: GROUP }], ['message_me', {}], ['announcements', { course: 'csp' }], ['calendar', {}]], {
-    config: { springEnabled: false }, view: null,
-  });
-  for (let index = 0; index < 5; index += 1) assert.equal(text(run.status(index)), say(registry, 'blocks.live_needs_spring'));
+  // Feedback too: its posts are filed under the published address, and only Spring publishes.
+  const blocks = [['chat', { group: GROUP }], ['members', { group: GROUP }], ['message_me', {}], ['announcements', { course: 'csp' }], ['calendar', {}], ['feedback', {}]];
+  const run = await live(registry, blocks, { config: { springEnabled: false }, view: null, slug: null });
+  for (let index = 0; index < blocks.length; index += 1) assert.equal(text(run.status(index)), say(registry, 'blocks.live_needs_spring'), blocks[index][0]);
   assert.deepEqual(run.loader.loaded, []);
   assert.deepEqual(run.router.calls, []);
   assert.deepEqual(run.store.calls, []);
@@ -116,6 +118,7 @@ test('group chat mounts for members, each block on its own; others get a notice 
   assert.equal(mounts[0].options.heading, '', 'the card header already shows the title');
   assert.equal(mounts[0].options.config.javaURI, JAVA);
   assert.equal(mounts[0].options.texts.signIn, say(registry, 'chat.signIn'));
+  assert.equal(mounts[0].options.texts.emptyHint, say(registry, 'chat.emptyHint'));
   assert.equal(run.status(0).hidden, true);
 
   const outsider = await live(registry, [['chat', { group: GROUP }]], { view: view({ groups: { 7: { name: 'Binary Beasts', viewerIsMember: false } } }) });
@@ -150,6 +153,12 @@ test('team members are names only, from the published members route', needsRuby,
   assert.equal(text(gone.status(0)), say(registry, 'live.members_unavailable'));
   const draft = await live(registry, [['members', { group: GROUP }]], { slug: null, view: null });
   assert.equal(text(draft.status(0)), say(registry, 'live.members_unpublished'));
+  // A slug is checked against the registry's pattern, so widening it there reaches the live blocks.
+  const widened = { ...registry, limits: { ...registry.limits, slug_pattern: '^[a-z0-9_-]{3,64}$' } };
+  const underscore = await live(widened, [['members', { group: GROUP }]], { slug: 'team_3', view: view({ slug: 'team_3' }) });
+  assert.deepEqual(underscore.store.calls, [['members', 'team_3', underscore.ids[0]]]);
+  const malformed = await live(registry, [['members', { group: GROUP }]], { slug: 'team_3', view: view({ slug: 'team_3' }) });
+  assert.equal(text(malformed.status(0)), say(registry, 'live.members_unpublished'));
 });
 
 test('Message us opens a DM with the owner; the owner sees what it is for instead', needsRuby, async () => {
@@ -199,11 +208,20 @@ test('announcements find the course channel by exact name and show it read-only,
   assert.equal(first.options.groupId, 4);
   assert.equal(first.options.readOnly, true);
   assert.equal(second.options.groupId, 4);
-  const body = 'Sprint review Friday<br>[[event:42|2026-10-30|P1|deadline|Sprint%20%3Cb%3Ereview|3,4|Bring%20demos]]';
+  // Markers as Courses writes them (calendar-model.js), so a change to their format shows up here.
+  const event = { id: '42', date: '2026-10-30', priority: 'P1', type: 'deadline', title: 'Sprint <b>review', periods: ['3', '4'], description: 'Bring demos' };
+  const body = calendarModel.appendEventMarkers('Sprint review Friday<br>', [event, { ...event, id: '43', title: '' }]);
   const shown = first.options.formatBody(body);
   assert.ok(!shown.includes('[[event'), 'the marker is not shown as data');
   assert.ok(shown.includes('Sprint &lt;b&gt;review'), 'what the marker carried is escaped');
-  assert.equal(shown, announcementText(body, (key, vars) => say(registry, key, vars)));
+  const date = new Date('2026-10-30T12:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  assert.equal(shown, `Sprint review Friday<br>${escapeHTML(say(registry, 'live.announcement_event', { title: event.title, date }))}`
+    + `<br>${escapeHTML(say(registry, 'live.announcement_event', { title: say(registry, 'live.announcement_event_untitled'), date }))}`, 'one line per event');
+  assert.equal(shown, announcementText(body, (key, vars) => say(registry, key, vars), calendarModel.extractEventMarkers));
+  // Only teachers post announcements: an empty channel doesn't ask visitors to say hi.
+  assert.equal(first.options.texts.emptyTitle, say(registry, 'live.announcements_empty_title'));
+  assert.equal(first.options.texts.emptyHint, say(registry, 'live.announcements_empty_hint'));
+  assert.equal(first.options.texts.signIn, say(registry, 'chat.signIn'), 'the rest is the chat wording');
 
   const missing = await live(registry, [['announcements', { course: 'csa' }]], { routes: { [`${JAVA}/api/groups/search?name=csa-announcements`]: json([]) } });
   assert.equal(text(missing.status(0)), say(registry, 'live.announcements_missing', { course: registry.courses.find((c) => c.value === 'csa').label }));
@@ -222,9 +240,14 @@ test('the class calendar uses the owner\'s card, with the block\'s course or the
   assert.deepEqual(cards.map((card) => card.options), [{ course: 'csp', title: 'When' }, { course: 'csa', title: '' }]);
   assert.deepEqual(cards[0].mountOptions, { springEnabled: true });
   assert.equal(cards[0].section.parentNode, run.mount(0));
+  // One card, one title: the owner's card carries the title, so the block's own steps aside.
+  const frame = run.root.querySelector(`[data-ui-node="${run.ids[0]}"] [data-ui-live]`);
+  assert.equal(frame.getAttribute('class'), null, 'the frame around the owner\'s card is not a card');
+  assert.equal(frame.querySelector('[data-ui-live-header]').hidden, true);
   run.mounts.destroy();
   assert.equal(cards[0].unmounted, true);
   assert.equal(cards[0].section.parentNode, null);
+  assert.equal(frame.querySelector('[data-ui-live-header]').hidden, false, 'the block\'s title is back once the card is gone');
 });
 
 test('a board waits for "Show our board" unless the viewer can edit the page', needsRuby, async () => {
@@ -232,6 +255,9 @@ test('a board waits for "Show our board" unless the viewer can edit the page', n
   const url = 'https://github.com/orgs/UGRC-CSA/projects/1';
   const run = await live(registry, [['kanban', { url, filter: 'Team', title: 'Our board' }]]);
   assert.deepEqual(run.loader.loaded, [], 'no GitHub request before the press');
+  const header = run.root.querySelector(`[data-ui-node="${run.ids[0]}"] [data-ui-live-header]`);
+  assert.equal(text(header), 'Our board', 'the button waits under the block\'s title');
+  assert.equal(header.hidden, false);
   const button = run.mount(0).querySelector('button');
   assert.equal(text(button), say(registry, 'blocks.live_show_board'));
   button.click();
@@ -241,6 +267,7 @@ test('a board waits for "Show our board" unless the viewer can edit the page', n
   assert.equal(board.refreshed, 1);
   assert.equal(board.section.parentNode, run.mount(0));
   assert.equal(run.doc.activeElement, run.mount(0));
+  assert.equal(header.hidden, true, 'the board\'s own card has the title now');
 
   const editor = await live(registry, [['kanban', { url }]], { viewer: { ...SIGNED_IN, canEdit: true } });
   assert.equal(editor.fakes.kanban.boards.length, 1, 'editors see it at once');
@@ -271,9 +298,15 @@ test('feedback reads the page\'s microblog topic and posts to it, first names on
   assert.equal(text(label), 'What next?');
   assert.equal(label.getAttribute('for'), box.getAttribute('id'));
   assert.equal(box.getAttribute('maxlength'), '280');
+  // The textarea points at the card's own status line (a role=status region that is always on the
+  // page), so a screen reader hears the validation message against this field.
+  const statusId = `ui-live-status-${run.ids[0]}`;
+  assert.equal(run.status(0).getAttribute('id'), statusId);
+  assert.ok((box.getAttribute('aria-describedby') || '').split(' ').includes(statusId), 'aria-describedby names the status line');
   form.dispatchEvent(createEvent('submit'));
   await settle();
   assert.equal(text(run.status(0)), say(registry, 'live.feedback_check', { max: 280 }));
+  assert.equal(box.getAttribute('aria-invalid'), 'true', 'an empty submit marks the field invalid');
   assert.deepEqual(run.fakes.microblog.posts, []);
 
   box.value = '  Add rain data  ';
@@ -282,6 +315,7 @@ test('feedback reads the page\'s microblog topic and posts to it, first names on
   await settle();
   assert.deepEqual(run.fakes.microblog.posts, [{ content: 'Add rain data', topicPath: '/ui-builder/view/?page=flood-watch' }]);
   assert.equal(box.value, '');
+  assert.equal(box.getAttribute('aria-invalid'), null, 'cleared once the feedback is accepted');
   assert.equal(text(run.status(0)), say(registry, 'live.feedback_sent'));
   assert.equal(run.mount(0).querySelectorAll('li').length, 2, 'the list reloads');
 

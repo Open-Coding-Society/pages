@@ -44,6 +44,7 @@ are asked not to index them.
       conversationEmbed: '{{ site.baseurl }}/assets/js/projects/messages/conversation-embed.js',
       kanban: '{{ site.baseurl }}/assets/js/kanban-board.js',
       calendarCard: '{{ site.baseurl }}/assets/js/chat/calendar/calendar-card.js',
+      calendarModel: '{{ site.baseurl }}/assets/js/chat/calendar/calendar-model.js',
       microblog: '{{ site.baseurl }}/assets/js/api/microblog.js',
     },
   });

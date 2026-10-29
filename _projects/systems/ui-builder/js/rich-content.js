@@ -2,7 +2,7 @@
 // HTML subset, then every element is checked again here. The page passes the rich-text module in
 // (it is never imported, so this file stays loadable in Node and the canvas uses its own copy).
 // secureRichTree works on any DOM-like tree, so Node tests cover it with a small fake.
-import { safeLink } from './url-rules.js';
+import { isLoopbackHost, safeLink } from './url-rules.js';
 import { NEW_TAB_REL } from './vnode.js';
 
 // What rich-text.js emits: inline formatting, lists, line breaks, its font/size spans and links.
@@ -32,10 +32,14 @@ function secureSpan(element) {
 }
 
 // Links must be https or mailto (rich-text.js also lets http through); the rest become their text.
+// So does a link to the reader's own computer (localhost, 127.x, [::1], [::] or 127.x mapped into
+// IPv6, in any spelling the URL parser turns into one, such as [::ffff:7f00:1]): it can only reach
+// the visitor's machine. Publish refuses such links, but rich-text.js also turns addresses typed as
+// plain text into links when it draws the page.
 function secureLink(element, { baseurl, pageOrigin }) {
   keepOnly(element, LINK_ATTRS);
   const link = safeLink(element.getAttribute('href'), { baseurl, pageOrigin });
-  if (!link || !/^(?:https:|mailto:)/i.test(link.href)) {
+  if (!link || !/^(?:https:|mailto:)/i.test(link.href) || (link.host && isLoopbackHost(link.host))) {
     unwrap(element);
     return;
   }

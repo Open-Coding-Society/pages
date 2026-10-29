@@ -34,7 +34,11 @@ function server(...answers) {
   return { calls, fetchImpl };
 }
 
-const storeWith = (fetchImpl, extra = {}) => new SpringPageStore({ javaURI: `${JAVA}/`, fetchOptions: FETCH_OPTIONS, fetchImpl, storage: createStorage(), ...extra });
+// The slug rule is the registry's (data/ui_builder.yml limits.slug_pattern), as the pages pass it.
+const SLUG_PATTERN = '^[a-z0-9](?:[a-z0-9-]{1,62}[a-z0-9])$';
+const REGISTRY = Object.freeze({ limits: { slug_pattern: SLUG_PATTERN }, text: {} });
+
+const storeWith = (fetchImpl, extra = {}) => new SpringPageStore({ javaURI: `${JAVA}/`, fetchOptions: FETCH_OPTIONS, fetchImpl, storage: createStorage(), registry: REGISTRY, ...extra });
 
 test('every request carries the site headers and cookies, unbound and uncached', async () => {
   const { calls, fetchImpl } = server(reply(200, [summary()]));
@@ -55,6 +59,17 @@ test('every request carries the site headers and cookies, unbound and uncached',
   assert.equal(pages[0].title, 'Flood Watch');
   assert.equal(pages[0].groupName, 'Beasts');
   assert.equal('spec' in pages[0], false);
+});
+
+test('a summary passes Spring\'s publicExpired and publicVersion through; older answers omit them', async () => {
+  const fresh = server(reply(200, [summary({ visibility: 'PUBLIC', publicUntil: 10, publicPending: true, publicExpired: true, publicVersion: 6 })]));
+  const [page] = await storeWith(fresh.fetchImpl).list();
+  assert.equal(page.publicExpired, true);
+  assert.equal(page.publicVersion, 6);
+  const older = server(reply(200, [summary({ visibility: 'PUBLIC', publicUntil: 10 })]));
+  const [old] = await storeWith(older.fetchImpl).list();
+  assert.equal(old.publicExpired, undefined, 'no publicExpired from an older server: the publicUntil fallback decides');
+  assert.equal(old.publicVersion, null);
 });
 
 test('the guard\'s two headers are always sent, never twice', async () => {
@@ -103,6 +118,33 @@ test('create and save send the page fields; groupId only when the editor names i
 
   await store.save(created.ref, SPEC, { base: 4, fields: { groupId: null } });
   assert.equal(JSON.parse(calls[2].init.body).groupId, null, 'groupId: null removes it');
+});
+
+test('page fields go to Spring whole: one too long for its column is refused there, not cut here', async () => {
+  const image = `https://lh3.googleusercontent.com/${'a'.repeat(600)}`;
+  const spec = { ...SPEC, page: { ...SPEC.page, image } };
+  const { calls, fetchImpl } = server(reply(201, detail()), reply(400, { error: 'invalid_spec', details: [{ nodeId: 'page', field: 'image', key: 'too_long' }] }));
+  const store = storeWith(fetchImpl);
+  await store.create(spec);
+  assert.equal(JSON.parse(calls[0].init.body).image, image);
+  await assert.rejects(store.save({ kind: 'spring', id: 12 }, spec, { base: 3 }), (error) => {
+    assert.deepEqual(error.details, [{ nodeId: 'page', field: 'image', key: 'too_long' }]);
+    return true;
+  });
+  assert.equal(JSON.parse(calls[1].init.body).image, image);
+});
+
+test('only the save that resolves a conflict asks for a revision of its own', async () => {
+  const { calls, fetchImpl } = server(reply(200, detail({ version: 10 })));
+  const store = storeWith(fetchImpl);
+  const ref = { kind: 'spring', id: 12 };
+  await store.save(ref, SPEC, { base: 9, newRevision: true });
+  await store.save(ref, SPEC, { base: 10 });
+  await store.save(ref, SPEC, { base: 10, newRevision: 'yes' });
+  const bodies = calls.map(({ init }) => JSON.parse(init.body));
+  assert.equal(bodies[0].newRevision, true);
+  assert.equal('newRevision' in bodies[1], false);
+  assert.equal('newRevision' in bodies[2], false, 'true only, never a truthy value');
 });
 
 test('open returns the draft and its version; local refs stay in this browser', async () => {
@@ -223,6 +265,42 @@ test('publishing, visibility, revisions and editors go to their routes', async (
   ]);
   await assert.rejects(store.revision(ref, 'x'), { name: 'NotFoundError' });
   await assert.rejects(store.publish({ kind: 'local', id: 'aaaaaa111111' }, { base: 1 }), TypeError);
+});
+
+test('a teacher approves the published version they looked at, and a newer one is refused', async () => {
+  const { calls, fetchImpl } = server(reply(200, detail({ status: 'PUBLISHED', visibility: 'PUBLIC', publishedVersion: 6 })),
+    reply(409, { error: 'published_changed', publishedVersion: 7 }), reply(200, detail({ status: 'PUBLISHED', publishedVersion: 7 })));
+  const store = storeWith(fetchImpl);
+  const ref = { kind: 'spring', id: 12 };
+  await store.setVisibility(ref, { visibility: 'PUBLIC', until: 99, publishedVersion: 6 });
+  assert.deepEqual(JSON.parse(calls[0].init.body), { visibility: 'PUBLIC', until: 99, publishedVersion: 6 });
+  await assert.rejects(store.setVisibility(ref, { visibility: 'PUBLIC', publishedVersion: 6 }), (error) => {
+    assert.equal(error.name, 'ApiError', 'not a draft version conflict: no Keep mine for an approval');
+    assert.equal(error.status, 409);
+    assert.equal(error.error, 'published_changed');
+    return true;
+  });
+  await store.setVisibility(ref, { visibility: 'SIGNED_IN', publishedVersion: null });
+  assert.deepEqual(JSON.parse(calls[2].init.body), { visibility: 'SIGNED_IN' }, 'no version unless it is a whole number');
+});
+
+test('slugs follow the registry rule, so a widened rule reaches every published route', async () => {
+  const { calls, fetchImpl } = server((url) => {
+    if (url.endsWith('/published')) return Promise.resolve(reply(200, [{ slug: 'team_3', title: 'Team 3' }, { slug: '..' }]));
+    if (url.endsWith('/message-owner')) return Promise.resolve(reply(200, { conversationId: 4 }));
+    if (url.includes('/members/')) return Promise.resolve(reply(200, []));
+    return Promise.resolve(reply(200, { slug: 'team_3', spec: SPEC }));
+  });
+  const wide = storeWith(fetchImpl, { registry: { limits: { slug_pattern: '^[a-z0-9._-]{2,64}$' }, text: {} } });
+  assert.equal((await wide.published('team_3')).slug, 'team_3');
+  await wide.messageOwner('team_3');
+  await wide.members('team_3', 'b-000004');
+  assert.deepEqual((await wide.gallery()).map((item) => item.slug), ['team_3'], 'a dot segment is never a slug');
+  await assert.rejects(wide.published('..'), { name: 'NotFoundError' });
+  const sent = calls.length;
+  await assert.rejects(storeWith(fetchImpl).published('team_3'), { name: 'NotFoundError' }, 'the default rule has no _');
+  await assert.rejects(storeWith(fetchImpl, { registry: null }).published('flood-watch'), { name: 'NotFoundError' }, 'no rule: nothing is sent');
+  assert.equal(calls.length, sent);
 });
 
 test('class pages, slugs, groups and the published routes', async () => {

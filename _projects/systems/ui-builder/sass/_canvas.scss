@@ -30,8 +30,14 @@
 
 // Hidden parts stay visible while editing, striped and labelled.
 .ocs__uibuilder-canvas [data-ui-hidden] {
-  opacity: 0.6;
   background-image: repeating-linear-gradient(135deg, color-mix(in srgb, var(--pref-text-color) 7%, transparent) 0 6px, transparent 6px 12px);
+}
+
+// Only the blocks' own content fades: faded, the "Hidden" label and the add buttons would fall
+// below 4.5:1 contrast. A block in a hidden section fades as well.
+.ocs__uibuilder-canvas [data-ui-hidden] [data-ui-kind="block"] > *,
+.ocs__uibuilder-canvas [data-ui-kind="block"][data-ui-hidden] > * {
+  opacity: 0.6;
 }
 
 .ocs__uibuilder-canvas [data-ui-hidden]::before {
@@ -44,7 +50,8 @@
   border: 1px solid var(--ui-border);
   border-radius: 999px;
   background: var(--panel);
-  color: var(--text-muted);
+  // The text color, not the muted one: some presets' muted text is under 4.5:1 on the panel.
+  color: var(--pref-text-color);
   font-size: 0.7rem;
 }
 

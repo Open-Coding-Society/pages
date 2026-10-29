@@ -16,15 +16,20 @@
 }
 
 // A window onto the template page laid out at 960px and scaled to the card's width
-// (editor-start.js sets --ui-thumb-scale); the grammar has no thumbnail element.
+// (editor-start.js sets --ui-thumb-scale); the grammar has no thumbnail element. --background is
+// the page color a real page gets, with or without a theme (--pref-bg-color keeps Midnight's
+// navy when there's none). The bottom fades, so the window's edge doesn't look like it cut the
+// page's buttons in half.
 .ocs__uibuilder-thumb {
   position: relative;
   height: 11rem;
   overflow: hidden;
   border: 1px solid var(--ui-border);
   border-radius: 0.6rem;
-  background: var(--pref-bg-color);
+  background: var(--background, var(--pref-bg-color));
   pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
 }
 
 .ocs__uibuilder-thumb-page {

@@ -102,7 +102,8 @@ test('the palette disables blocks this site cannot run and enforces the live lim
   const flaskOnly = paletteOf(registry, { capabilities: { spring: false, flask: true } });
   assert.equal(find(flaskOnly, 'chat').disabled, true);
   assert.equal(find(flaskOnly, 'chat').reasonKey, 'blocks.live_needs_spring');
-  assert.equal(find(flaskOnly, 'feedback').disabled, false);
+  // Feedback is filed under the published address, and a Flask-only site never publishes.
+  assert.deepEqual([find(flaskOnly, 'feedback').disabled, find(flaskOnly, 'feedback').reasonKey], [true, 'blocks.live_needs_spring']);
   assert.equal(find(flaskOnly, 'hero').disabled, false);
   const full = paletteOf(registry, { capabilities: { spring: true, flask: true }, liveCount: registry.limits.live_blocks });
   assert.equal(find(full, 'kanban').reasonKey, 'errors.too_many_live');

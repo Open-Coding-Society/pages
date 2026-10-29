@@ -89,7 +89,7 @@ export function createOutline({ root, doc = globalThis.document, registry, say, 
   let drag = null;
   const tree = el(doc, 'ul', { class: 'ocs__uibuilder-tree', role: 'tree', 'aria-label': say('outline_label') });
   const empty = el(doc, 'p', { class: 'ocs__text', hidden: true }, say('outline_empty'));
-  const addSection = el(doc, 'button', { type: 'button', class: 'ocs__btn small', onclick: () => actions.addSection() }, icon(doc, 'fa-plus'), ` ${say('add_section')}`);
+  const addSection = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small', onclick: () => actions.addSection() }, icon(doc, 'fa-plus'), say('add_section'));
   root.replaceChildren(el(doc, 'h2', { class: 'ocs__section-title' }, say('outline')), empty, tree, el(doc, 'div', { class: 'ocs__links' }, addSection));
 
   const rowOf = (key) => rows.find((row) => row.key === key) || null;

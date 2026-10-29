@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  ApiError, ConflictError, LocalPageStore, NotFoundError, OfflineError, SlugTakenError, storeErrorText,
+  ApiError, ConflictError, LocalPageStore, NotFoundError, OfflineError, SlugTakenError, pageFields, storeErrorText,
 } from '../js/page-store.js';
 import { textOf } from '../js/registry.js';
 import { createStorage } from './fixtures/live/dom.mjs';
@@ -133,6 +133,20 @@ test('storage failures become ApiErrors the editor can word', async () => {
   }
 });
 
+test('page fields are kept whole, never cut to a column size', async () => {
+  const image = `https://lh3.googleusercontent.com/${'a'.repeat(600)}`;
+  const title = 'T'.repeat(130);
+  const fields = pageFields(page(title, { image }));
+  assert.equal(fields.image, image);
+  assert.equal(fields.title, title);
+  assert.deepEqual(pageFields(page('Flood Watch', { byline: 7 })).byline, '', 'strings only');
+  const { store } = storeOf();
+  const { ref } = await store.create(page(title, { image }));
+  const saved = await store.save(ref, page(title, { image }), { base: 1 });
+  assert.equal(saved.meta.image, image);
+  assert.equal(saved.meta.title, title);
+});
+
 test('an untitled page lists with the registry word for untitled', needsRuby, async () => {
   const registry = loadRegistry();
   const { store } = storeOf({ registry });
@@ -155,16 +169,25 @@ test('every error has a name, and storeErrorText picks registry wording for each
     [new ApiError({ status: 400, error: 'invalid_group' }), 'errors.group_not_allowed'],
     [new ApiError({ status: 400, error: 'loopback_source' }), 'errors.loopback_url'],
     [new ApiError({ status: 403, error: 'origin_rejected' }), 'store.origin_rejected'],
+    [new ApiError({ status: 409, error: 'too_many_pages', body: { error: 'too_many_pages', max: 100 } }), 'store.too_many_pages'],
     [new ApiError({ error: 'storage_full' }), 'store.storage_full'],
     [new ApiError({ status: 503, error: 'something_new' }), 'store.server'],
     [new ApiError({ status: 422, error: 'something_new' }), 'store.bad_request'],
+    // Codes this page doesn't know (Spring Boot's own error bodies, a proxy) by their status.
+    [new ApiError({ status: 401, error: 'Unauthorized' }), 'store.unauthorized'],
+    [new ApiError({ status: 403, error: 'Forbidden' }), 'store.forbidden'],
+    [new ApiError({ status: 404, error: 'Not Found' }), 'store.not_found'],
+    [new ApiError({ status: 413, error: 'Payload Too Large' }), 'store.too_large'],
+    [new ApiError({ status: 409, error: 'conflict' }), 'store.bad_request'],
     [new Error('plain'), 'store.unknown'],
     [null, 'store.unknown'],
   ];
   for (const [error, key] of cases) {
     const said = storeErrorText(error);
     assert.equal(said.key, key, String(error && error.error));
-    assert.notEqual(textOf(registry, said.key, said.vars), said.key, `${said.key} has wording`);
+    const words = textOf(registry, said.key, said.vars);
+    assert.notEqual(words, said.key, `${said.key} has wording`);
+    assert.doesNotMatch(words, /\{\w+\}/, `${said.key} fills every placeholder`);
   }
   for (const [ErrorClass, name] of [[ApiError, 'ApiError'], [ConflictError, 'ConflictError'], [SlugTakenError, 'SlugTakenError'], [NotFoundError, 'NotFoundError'], [OfflineError, 'OfflineError']]) {
     assert.equal(new ErrorClass().name, name);

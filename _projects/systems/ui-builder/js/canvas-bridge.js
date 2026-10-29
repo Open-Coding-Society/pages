@@ -62,8 +62,8 @@ export function waitForCanvas(iframe, { nonce, timeoutMs = 10000, win = globalTh
 }
 
 // Owns the iframe: loads it, handshakes on every load and re-sends the last render. Callbacks:
-// onSelect(id|null), onHover(id|null), onAddRequest({sectionId, cellIndex}), onKey(keyEvent),
-// onStatus('loading'|'ready'|'failed', error?).
+// onSelect(id|null), onHover(id|null), onAddRequest({sectionId, cellIndex}), onKey(keyEvent:
+// the key fields plus nodeId, the part with focus), onStatus('loading'|'ready'|'failed', error?).
 export function createCanvasBridge({
   iframe, baseurl = '', win = globalThis.window, timeoutMs = 10000, nonceOf = makeNonce,
   onSelect = () => {}, onHover = () => {}, onAddRequest = () => {}, onKey = () => {}, onStatus = () => {},

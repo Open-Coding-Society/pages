@@ -116,22 +116,37 @@ test('an API on the team\'s computer is never fetched in view; its saved copy sh
   const router = fetchRouter({ 'http://localhost:8587': json([{ joke: 'live' }]) });
   const ctx = ctxOf(registry, { pageProtocol: 'http:', fetchImpl: router.fetchImpl, storage: null });
   const snapshot = { items: [{ title: 'From my laptop' }], fetched_at: Date.UTC(2026, 9, 2), from_loopback: true };
-  for (const settings of [{ source: source({ url: 'http://localhost:8587/api/jokes', snapshot }) }, { source: source({ snapshot }) }]) {
-    const view = apiPage(registry, settings);
-    await mountApiData(view.card, view.block, ctx);
-    assert.deepEqual(view.mount.querySelectorAll('li').map(text), ['From my laptop']);
-    assert.ok(text(view.status).startsWith(say(registry, 'blocks.api_saved_from_computer', { date: '' }).trim()));
-  }
+  const view = apiPage(registry, { source: source({ url: 'http://localhost:8587/api/jokes', snapshot }) });
+  await mountApiData(view.card, view.block, ctx);
+  assert.deepEqual(view.mount.querySelectorAll('li').map(text), ['From my laptop']);
+  assert.ok(text(view.status).startsWith(say(registry, 'blocks.api_saved_from_computer', { date: '' }).trim()));
   const bare = apiPage(registry, { source: source({ url: 'http://127.0.0.1:5000/api' }) });
   await mountApiData(bare.card, bare.block, ctx);
   assert.equal(text(bare.status), say(registry, 'live.api_unreachable'));
   assert.equal(router.calls.length, 0);
 });
 
-test('click-to-load cards become the grammar\'s iframes; edited addresses frame nothing', needsRuby, () => {
+// The review's case: a team saved a copy from localhost, then moved the block to its deployed API.
+test('a copy saved on the team\'s computer only stands in once the block reads a deployed API', needsRuby, async () => {
+  const registry = loadRegistry();
+  const snapshot = { items: [{ title: 'From my laptop' }], fetched_at: Date.UTC(2026, 9, 2), from_loopback: true };
+  const deployed = fetchRouter({ [JOKES]: json([{ joke: 'Live joke' }]) });
+  const live = apiPage(registry, { source: source({ snapshot }) });
+  await mountApiData(live.card, live.block, ctxOf(registry, { pageProtocol: 'https:', fetchImpl: deployed.fetchImpl, storage: null }));
+  assert.equal(deployed.calls.length, 1, 'the deployed API is read');
+  assert.deepEqual(live.mount.querySelectorAll('li').map(text), ['Live joke']);
+  assert.equal(live.status.hidden, true);
+
+  const down = apiPage(registry, { source: source({ snapshot }) });
+  await mountApiData(down.card, down.block, ctxOf(registry, { pageProtocol: 'https:', fetchImpl: fetchRouter({}).fetchImpl, storage: null }));
+  assert.deepEqual(down.mount.querySelectorAll('li').map(text), ['From my laptop'], 'when it does not answer, the old copy shows');
+  assert.ok(text(down.status).startsWith(say(registry, 'blocks.api_saved_from_computer', { date: '' }).trim()), 'still labelled as the laptop copy');
+});
+
+test('click-to-load cards open the grammar\'s iframes under their title; edited addresses frame nothing', needsRuby, () => {
   const registry = loadRegistry();
   const page = pageOf([[
-    ['video', { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: 'Demo', caption: '' }],
+    ['video', { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: 'Demo', caption: 'Two minutes, no sound' }],
     ['embed', { url: 'https://ada.github.io/flood/', title: 'Flood app', height: 'tall' }],
     ['embed', { url: 'https://ada.github.io/other/', title: 'Other', height: 'short' }],
     ['video', { url: 'https://youtu.be/dQw4w9WgXcQ', title: 'Second', caption: '' }],
@@ -149,7 +164,12 @@ test('click-to-load cards become the grammar\'s iframes; edited addresses frame 
   assert.equal(player.getAttribute('sandbox'), 'allow-scripts allow-same-origin allow-forms allow-popups');
   assert.equal(player.getAttribute('referrerpolicy'), 'strict-origin-when-cross-origin');
   assert.equal(player.getAttribute('title'), 'Demo');
-  assert.equal(root.querySelector(`[data-ui-node="${video.id}"] [data-ui-embed]`), null, 'the iframe replaces the card');
+  // Only the button row gives way: the title, host and caption the student wrote stay above it.
+  const card = root.querySelector(`[data-ui-node="${video.id}"] [data-ui-embed]`);
+  assert.equal(player.parentNode, card);
+  assert.equal(text(card.querySelector('h3')), 'Demo');
+  assert.equal(text(card.querySelector('p')), 'Two minutes, no sound');
+  assert.equal(card.querySelector('button'), null);
   assert.equal(doc.activeElement, player, 'focus moves to what was opened');
 
   root.querySelector(`[data-ui-node="${app.id}"] button`).click();
@@ -190,5 +210,30 @@ test('showStatus writes a sentence with an optional link or button, and hides wh
   assert.equal(pressed, 1);
   showStatus(status, '');
   assert.equal(status.hidden, true);
+  assert.equal(status.childNodes.length, 0);
+});
+
+// A live region shown with its words already in it is often not read out.
+test('a hidden status line is shown first and its words move in a moment later', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const doc = createDocument();
+  const status = doc.createElement('div');
+  status.setAttribute('role', 'status');
+  status.hidden = true;
+  showStatus(status, 'Posting…');
+  assert.equal(status.hidden, false, 'the region is on the page at once');
+  assert.equal(status.innerHTML, '<span hidden="">Posting…</span>', 'its words wait, hidden');
+  showStatus(status, 'Write your feedback first.', { button: { text: 'Try again', onClick() {} } });
+  assert.equal(text(status), 'Write your feedback first. Try again', 'newer words replace the waiting ones');
+  t.mock.timers.tick(100);
+  assert.equal(status.innerHTML, 'Write your feedback first. <button class="ocs__btn small" type="button">Try again</button>');
+  showStatus(status, 'Sent.');
+  assert.equal(status.innerHTML, 'Sent.', 'a line already showing changes at once');
+
+  showStatus(status, '');
+  showStatus(status, 'Opening Messages…');
+  showStatus(status, '');
+  t.mock.timers.tick(100);
+  assert.equal(status.hidden, true, 'emptied before its words came in: it stays hidden and empty');
   assert.equal(status.childNodes.length, 0);
 });

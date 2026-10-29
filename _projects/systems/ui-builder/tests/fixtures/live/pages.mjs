@@ -1,6 +1,7 @@
 // Pages and fakes for the runtime tests: a page builder with predictable ids, the viewer's
 // rendering (render.js + toDOM into the fake DOM), and stand-ins for the other systems' modules
 // (conversation-embed.js, kanban-board.js, calendar-card.js, microblog.js) that record calls.
+// Courses' calendar-model.js is pure, so tests hand out the real one.
 import { renderPage } from '../../../js/render.js';
 import { contentRenderers } from '../../../js/blocks-content.js';
 import { toDOM } from '../../../js/vnode.js';
@@ -115,6 +116,7 @@ export const MODULE_URLS = Object.freeze({
   conversationEmbed: '/assets/js/projects/messages/conversation-embed.js',
   kanban: '/assets/js/kanban-board.js',
   calendarCard: '/assets/js/chat/calendar/calendar-card.js',
+  calendarModel: '/assets/js/chat/calendar/calendar-model.js',
   microblog: '/assets/js/api/microblog.js',
 });
 

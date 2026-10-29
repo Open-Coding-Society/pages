@@ -6,15 +6,41 @@ import { findNode, normalizePage, validatePage } from './page-model.js';
 import { blockHTML, pageToMarkdown } from './export.js';
 import { slugIssue, suggestSlug } from './url-rules.js';
 import { formatWhen } from './editor-dialogs.js';
-import { errorKeyOf } from './editor-session.js';
 import { el } from './editor-fields.js';
 
 const STRUCTURE = new Set(['duplicate', 'move_up', 'move_down', 'remove']);
+// Keys that act on one part of the page: the part the keyboard is on, when it is on one.
+const ON_PART = new Set([...STRUCTURE, 'escape', 'palette']);
 const CLOSE_FLUSH_MS = 3000;
 const titleOf = (page) => (page && page.page && typeof page.page.title === 'string' ? page.page.title : '');
 
 export const pageActions = {
+  // The block or section a key acts on: the one whose outline row has the keyboard (or, from
+  // the canvas, whose content does), else the selection. null on an Add block or Column row or a
+  // canvas add button, where a structure key has no part to act on.
+  keyTarget(event, { fromCanvas } = {}) {
+    let focused;
+    if (fromCanvas) {
+      // canvas.js says '' for its add buttons and null when nothing in the page has focus.
+      focused = event && typeof event.nodeId === 'string' ? event.nodeId : undefined;
+    } else {
+      const row = event && event.target;
+      if (row && typeof row.getAttribute === 'function' && row.getAttribute('role') === 'treeitem' && this.shell.outlinePane.contains(row)) {
+        const kind = row.getAttribute('data-kind');
+        focused = kind === 'block' || kind === 'section' ? row.getAttribute('data-key') : '';
+      }
+    }
+    if (focused === undefined) return this.state.selectedId;
+    return focused && findNode(this.page, focused) ? focused : null;
+  },
+
   shortcut(action, { event, fromCanvas } = {}) {
+    // The part the keyboard is on becomes the selection first, so the inspector and the canvas
+    // show what the key changed (arrows in the outline move focus, not the selection).
+    if (ON_PART.has(action)) {
+      const target = this.keyTarget(event, { fromCanvas });
+      if (target && target !== this.state.selectedId) this.select(target);
+    }
     const id = this.state.selectedId;
     const run = {
       undo: () => this.undo(), redo: () => this.redo(), duplicate: () => this.duplicate(id), move_up: () => this.move(id, -1),
@@ -30,7 +56,10 @@ export const pageActions = {
     if (this.closed || this.app.dialogs.isOpen()) return true;
     if (action === 'regions') return false;
     if (this.state.readOnly && action !== 'escape') return true;
-    if ((STRUCTURE.has(action) || action === 'escape') && !this.state.selectedId) return true;
+    // "/" works only while the outline or the canvas has the keyboard, so a "/" that speech
+    // input types while a button has focus opens nothing (WCAG 2.1.4).
+    if (action === 'palette') return !fromCanvas && !this.shell.outlinePane.contains(event && event.target);
+    if (ON_PART.has(action) && !this.keyTarget(event, { fromCanvas })) return true;
     // Delete and Backspace change the page only from the outline, the canvas or no focus at all,
     // never from a button in the inspector or the top bar.
     if (action === 'remove' && !fromCanvas) {
@@ -75,6 +104,7 @@ export const pageActions = {
     this.history.reset(page, { selectedId: keep });
     this.session.reset({ base: opened.base, meta: opened.meta });
     this.state.selectedId = keep;
+    this.publishCheck = false; // another version: nobody asked to publish it yet
     this.refresh();
     this.bridge.select(keep);
   },
@@ -87,7 +117,9 @@ export const pageActions = {
       this.state.readOnly = true;
       this.session.pause();
       this.lease.show(holderName);
+      // The banner isn't a live region: the feedback line says why every field is locked.
       if (this.leaseHeld) this.notify(this.say('lease_lost', { name: holderName }), { error: true });
+      else this.notify(this.say('lease_banner', { name: holderName || this.say('someone') }));
       this.leaseHeld = false;
       this.refreshPanels();
       return;
@@ -112,22 +144,36 @@ export const pageActions = {
     return this.session.takeLease().catch((error) => this.failed(error));
   },
 
-  async conflict(error) {
-    if (this.conflictOpen) return;
+  // publishing: the conflict came from Publish (its POST, or the save it waits for first), so
+  // nothing was published, and after Keep mine saves, the student is told to publish again.
+  async conflict(error, { publishing = this.publishing === true } = {}) {
+    if (this.conflictOpen || this.closed) return;
     this.conflictOpen = true;
     const current = (error && error.current) || {};
+    let askAgain = false;
     try {
       const choice = await this.app.dialogs.conflict({ name: current.savedByName || '', time: formatWhen(current.savedAt), local: !this.caps.revisions });
-      if (choice === 'keep') this.session.keepMine(current.base);
-      else if (choice === 'reload') {
-        await this.reloadFromStore();
-        this.notify(this.say('conflict_reloaded'));
+      if (choice === 'keep') {
+        this.session.keepMine(current.base);
+        // A failed save reports itself (its own conflict dialog or error).
+        if (publishing) this.session.flush().then(() => this.notify(this.say('conflict_kept_publish')), () => {});
+      } else if (choice === 'reload') {
+        try {
+          await this.reloadFromStore();
+          this.notify(this.say('conflict_reloaded'));
+        } catch (failure) {
+          this.failed(failure);
+          // Their version didn't load and saving is still paused: ask again, or the editor would
+          // stay stuck with nothing able to reopen this choice.
+          askAgain = this.session.status().state === 'conflict';
+        }
       }
     } catch (failure) {
       this.failed(failure);
     } finally {
       this.conflictOpen = false;
     }
+    if (askAgain && !this.closed) this.conflict(error, { publishing });
   },
 
   // A crash copy in this browser that differs from what the store has: offer it back. Restoring
@@ -171,14 +217,19 @@ export const pageActions = {
       const issues = validatePage(this.page, this.registry, { validators: this.app.validators, baseurl: this.app.baseurl, pageOrigin: this.app.pageOrigin, publish: true });
       if (issues.length) {
         this.notify(say('publish_fix', { count: issues.length }), { error: true });
+        // Problems only a published page has (a link to the student's own computer) show in the
+        // inspector and the outline too from now on, until they are fixed (checkIssues).
+        this.publishCheck = true;
         const first = issues.find((issue) => issue.nodeId);
         this.select(first ? first.nodeId : null);
         return;
       }
       await this.publishWithAddress();
     } catch (failure) {
-      // A conflict already has its dialog; a paused autosave means read-only.
-      if (failure && failure.name !== 'ConflictError' && failure.code !== 'autosave_paused') this.failed(failure);
+      // A conflict gets its dialog (conflict() does nothing while one is open); a paused autosave
+      // means read-only.
+      if (failure && failure.name === 'ConflictError') this.conflict(failure, { publishing: true });
+      else if (failure && failure.code !== 'autosave_paused') this.failed(failure);
     } finally {
       this.publishing = false;
     }
@@ -209,10 +260,11 @@ export const pageActions = {
         const code = failure && failure.error;
         if ((failure && failure.name === 'SlugTakenError') || code === 'slug_taken') { error = say('slug_taken'); continue; }
         if (['slug_reserved', 'invalid_slug', 'slug_required'].includes(code)) { error = this.text(`errors.${code === 'slug_reserved' ? 'slug_reserved' : 'slug_invalid'}`); continue; }
-        if (failure && failure.name === 'ConflictError') { this.conflict(failure); return; }
-        if (code === 'loopback_source') { this.notify(this.text('errors.loopback_url'), { error: true }); return; }
-        const { key, vars } = errorKeyOf(failure);
-        this.notify(say('publish_failed', { message: say(key, vars) }), { error: true });
+        if (failure && failure.name === 'ConflictError') { this.conflict(failure, { publishing: true }); return; }
+        // A link to the student's computer that the check before publishing missed: Spring names the
+        // block and the field, so failed() selects the block and refusalText words the problem.
+        if (code === 'loopback_source') { this.failed(failure); return; }
+        this.notify(say('publish_failed', { message: this.app.errorText(failure) }), { error: true });
         return;
       }
     }
@@ -240,12 +292,22 @@ export const pageActions = {
 
   async revisions() {
     if (!this.ref || !this.caps.revisions) return;
-    await this.session.flush().catch(() => {}); // the newest draft becomes a revision first
+    // The newest draft becomes a revision first. Changes that can't be saved (a refused page, no
+    // connection) are in no revision, so the restore confirm says they will be lost.
+    const saved = await this.session.flush().then(() => true, () => false);
+    const status = this.session.status();
     await this.app.dialogs.revisions({
       readOnly: this.state.readOnly,
+      unsaved: !saved || status.pending || status.saving,
       load: () => this.store.revisions(this.ref),
       restore: async (revision) => {
-        await this.store.restore(this.ref, revision.revisionId, { base: this.session.base });
+        try {
+          await this.store.restore(this.ref, revision.revisionId, { base: this.session.base });
+        } catch (failure) {
+          // Saved somewhere else since: load that version, so Restore again replaces it.
+          if (failure && failure.name === 'ConflictError') await this.reloadFromStore();
+          throw failure;
+        }
         await this.reloadFromStore();
         this.notify(this.say('restored', { time: formatWhen(revision.savedAt) }));
       },
@@ -254,12 +316,35 @@ export const pageActions = {
 
   async setVisibility(value) {
     let until;
-    if (value === 'PUBLIC' && this.caps.teacher) {
-      const answer = await this.app.dialogs.askUntil();
-      if (!answer) return;
-      until = answer.until === null ? undefined : answer.until;
+    let publishedVersion;
+    if (value === 'PUBLIC') {
+      // Every PUBLIC request names the published copy the editor can see now (Open live page), so a
+      // teacher whose whoami failed still passes it. Spring ignores it for a student's request.
+      publishedVersion = (this.meta || {}).publishedVersion;
+      if (this.caps.teacher) {
+        const answer = await this.app.dialogs.askUntil();
+        if (!answer) return;
+        until = answer.until === null ? undefined : answer.until;
+      }
     }
-    await this.mutate(() => this.store.setVisibility(this.ref, { visibility: value, until }), this.say('visibility_done'));
+    await this.mutate(() => this.store.setVisibility(this.ref, { visibility: value, until, publishedVersion }).catch((failure) => {
+      // A newer publish replaced that copy, or the page was unpublished since: pick up what the
+      // page is now (the version for the next look and approval, or no published copy at all).
+      if (failure && (failure.error === 'published_changed' || failure.error === 'not_published')) this.reloadMeta();
+      throw failure;
+    }), this.say('visibility_done'));
+  },
+
+  // The page's summary (publish state, visibility) from the store again; the page and its
+  // unsaved changes stay as they are.
+  async reloadMeta() {
+    try {
+      const opened = await this.store.open(this.ref);
+      this.session.setMeta(opened.meta);
+      this.refreshPanels();
+    } catch (failure) {
+      this.failed(failure);
+    }
   },
 
   async unpublish() {

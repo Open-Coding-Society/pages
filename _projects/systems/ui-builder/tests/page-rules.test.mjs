@@ -55,10 +55,16 @@ const BROKEN = {
   'duplicate-id.json': 'duplicate_id', 'html-key.json': 'bad_key', 'javascript-link.json': 'bad_url',
   'loopback-url-on-publish.json': 'policy_loopback_view', 'on-key.json': 'bad_key', 'snapshot-extra-key.json': 'bad_snapshot',
   'too-many-sections.json': 'too_many_sections', 'userinfo-url.json': 'bad_url', 'wrong-kind.json': 'bad_page',
+  'dot-segment-link.json': 'bad_url', 'dot-segment-encoded-link.json': 'bad_url', 'https-typo-image.json': 'bad_image',
+  'userinfo-empty-host-link.json': 'bad_url', 'rich-text-quoted-gt.json': 'bad_body', 'long-gallery-image.json': 'too_long', 'blank-long-gallery-image.json': 'too_long',
+  'rich-text-tel-link.json': 'bad_body', 'rich-text-noscript.json': 'bad_body', 'rich-text-unknown-attribute.json': 'bad_body',
   'bad-api-path.json': 'bad_api_path', 'bad-envelope.json': 'bad_page', 'bad-type.json': 'unknown_type', 'data-image.json': 'bad_image',
   'handler-in-body.json': 'bad_body', 'http-link.json': 'bad_url', 'javascript-in-body.json': 'bad_body', 'long-title.json': 'too_long',
   'mailto-outside-links.json': 'bad_url', 'protocol-relative-link.json': 'bad_url', 'too-many-blocks.json': 'too_many_blocks',
   'too-many-cells.json': 'bad_cells', 'too-many-live.json': 'too_many_live',
+  'https-loopback-link-on-publish.json': 'loopback_link', 'https-loopback-image-on-publish.json': 'loopback_link',
+  'rich-text-loopback-link-on-publish.json': 'loopback_link', 'rich-text-padded-reference.json': 'bad_body',
+  'rich-text-padded-loopback-on-publish.json': 'loopback_link', 'ipv6-mapped-loopback-link-on-publish.json': 'loopback_link',
 };
 
 test('every invalid fixture fails for its own rule; *-on-publish files are valid drafts', needsRuby, () => {
@@ -104,14 +110,37 @@ test('rich text: visible text for required, and the script/frame/handler rule Sp
     '<a href="&#106;avascript:x">x</a>', '<a href="&#x6A;avascript&colon;x">x</a>', `<a href="java${String.fromCharCode(0x200b)}script:x">x</a>`,
     '<b onclick="x()">x</b>', '<img src=x onerror=alert(1)>', '<b/onmouseover=x>y</b>', "<b class='a'onclick=x>", '<b`onclick=x>',
     `<b${String.fromCharCode(0xa0)}onclick=x>`, '<p>unclosed <img src=x onerror=alert(1)',
+    // Tags end where the browser ends them: a ">" in a quoted value doesn't, a stray quote opens nothing.
+    '<a title=">" href="javascript:alert(1)" onclick="alert(1)">x</a>', "<a title='>' onclick=x>y</a>", '<a x"y=1 onclick=alert(1)>hi</a>',
+    '<a x=="><b title=">" onclick=alert(1)>x</b>', '< x="><b title=">" onclick=alert(1)>', '<!-- a="--><b title="x>" onclick=alert(1)>',
+    '<textarea><b title="</textarea><img src=x title=">" onerror=alert(1)>', '</b onclick=x>',
   ];
   for (const body of bad) assert.deepEqual(check('text', { body }), ['body:bad_body'], body);
   // Text outside tags is shown as text, as in Spring: students may write about JavaScript.
-  for (const body of ['Type javascript:void(0) in the console', 'Turn onlights= on', '&lt;script&gt; is escaped', '<a href="https://x.example/?q=javascript">x</a>']) {
+  for (const body of ['Type javascript:void(0) in the console', 'Turn onlights= on', '&lt;script&gt; is escaped', '<a href="https://x.example/?q=javascript">x</a>',
+    'a < b and c > d', '<a title="x > y" href="https://x.example">ok</a>', '<!-- a note --> javascript: is a link scheme']) {
     assert.deepEqual(check('text', { body }), [], body);
   }
   assert.deepEqual(check('text', { body: 'x'.repeat(4001) }), ['body:too_long']);
   assert.deepEqual(check('callout', { body: `<p>${'x'.repeat(1994)}</p>` }), ['body:too_long'], 'the callout max is 2000');
+});
+
+// Spring parses the body with jsoup too (UiBuilderSpecRules.unsafeElements); the client mirrors
+// that pass so a body it accepts is one Spring accepts. These are the cases the client used to let
+// through and Spring refused: addresses whose scheme isn't http/https/mailto, the elements jsoup
+// reads differently, and an attribute whose name starts with "on" even with no "=".
+test('rich text: the elements and attributes Spring\'s jsoup pass refuses', needsRuby, () => {
+  for (const body of ['<a href="tel:5551234">Call</a>', '<a href="sms:5551234">Text</a>', '<a href="ftp://x.example/f">File</a>',
+    '<a href="vbscript:x">x</a>', '<noscript>x</noscript>', '<template>x</template>', '<math><mi>x</mi></math>', '<svg></svg>',
+    '<b one>x</b>', '<a cite="urn:isbn:1">x</a>', '<img srcset="data:image/png;base64,AAAA">']) {
+    assert.deepEqual(check('text', { body }), ['body:bad_body'], body);
+  }
+  // Everything the rich-text composer writes still passes: formatting, lists, font/size spans, links.
+  for (const body of ['<b>b</b> <i>i</i> <u>u</u> <s>s</s><br><ul><li>a</li></ul><ol><li>b</li></ol>',
+    '<span class="rt-font-serif">x</span> <span class="rt-size-lg">y</span> <span class="rt-font-mono rt-size-sm">z</span>',
+    '<a href="https://x.example" target="_blank" rel="noopener noreferrer">x</a>', '<a href="mailto:a@b.example" target="_blank" rel="noopener noreferrer">y</a>']) {
+    assert.deepEqual(check('text', { body }), [], body);
+  }
 });
 
 test('url, image, choice, course, toggle and number fields', needsRuby, () => {
@@ -196,6 +225,7 @@ test('API sources: the link policy, mapping paths and the saved copy', needsRuby
   const item = { title: 'x', text: '', image: '', link: '', value: '', label: '' };
   const snapshot = (value) => api({ snapshot: value });
   assert.deepEqual(snapshot({ items: [item], fetched_at: 1, from_loopback: true }), []);
+  assert.deepEqual(snapshot({ items: [{ ...item, link: 'mailto:ada@example.com' }] }), [], 'a saved copy keeps the email links the live block shows');
   const bad = [
     { items: Array(registry.limits.api_snapshot_items + 1).fill(item) }, { items: [{ ...item, title: 'x'.repeat(501) }] },
     { items: [{ ...item, email: 'a@b.c' }] }, { items: [{ ...item, value: 3 }] }, { items: [{ ...item, link: 'javascript:x' }] },
@@ -203,6 +233,128 @@ test('API sources: the link policy, mapping paths and the saved copy', needsRuby
     { items: Array(50).fill({ ...item, text: 'x'.repeat(480), title: 'x'.repeat(480), label: 'x'.repeat(480) }) },
   ];
   for (const value of bad) assert.deepEqual(snapshot(value), ['source.snapshot:bad_snapshot'], JSON.stringify(value).slice(0, 80));
+  assert.deepEqual(api({ list_path: '.' }), [], '"The whole reply" is a path Spring accepts too');
+});
+
+// Spring's urlIssue refuses every url, src, image or link on the student's own computer once a page
+// is published (loopback_url), and its imageAllowed refuses the gallery picture there even in a draft.
+test('a published page refuses links and pictures on the student\'s own computer, as Spring does', needsRuby, () => {
+  const registry = loadRegistry();
+  const publish = { publish: true };
+  const home = 'https://localhost:8443/app/';
+  const both = (type, settings) => [check(type, settings), check(type, settings, publish)];
+  assert.deepEqual(both('buttons', { links: [{ label: 'Try it', url: home }] }), [[], ['links.0.url:loopback_link']]);
+  assert.deepEqual(both('hero', { title: 'Flood Watch', links: [{ label: 'Try it', url: 'https://team.localhost/' }] }), [[], ['links.0.url:loopback_link']]);
+  assert.deepEqual(both('image', { src: 'https://127.0.0.1:4100/team.png', alt: 'Our team' }), [[], ['src:loopback_link']]);
+  assert.deepEqual(both('embed', { url: 'https://[::1]:8443/', title: 'App' }), [[], ['url:loopback_link']]);
+  assert.deepEqual(both('kanban', { url: 'https://0.0.0.0/board' }), [[], ['url:loopback_link']]);
+  assert.deepEqual(both('link_cards', { items: [{ title: 'Docs', text: '', url: 'https://LOCALHOST./docs' }] }), [[], ['items.0.url:loopback_link']]);
+  assert.deepEqual(both('team', { items: [{ name: 'Ada', role: 'Lead', url: home }] }), [[], ['items.0.url:loopback_link']]);
+  assert.deepEqual(both('video', { url: home, title: 'Demo' }), [['url:video_bad_url'], ['url:loopback_link']], 'the address is the first problem');
+  const [issue] = validateSettings(defOf(registry, 'block', 'image'), { src: home, alt: 'x' }, registry, { ...SITE, publish: true });
+  assert.equal(issue.message, textOf(registry, 'errors.loopback_link', { field: 'Image link' }));
+  // Other addresses, site paths and email links stay as they were.
+  for (const url of ['https://flood.example.com/', 'https://localhost.example.com/', 'https://127.1/', '/csp/', 'mailto:team@example.com']) {
+    assert.deepEqual(check('buttons', { links: [{ label: 'Go', url }] }, publish), [], url);
+  }
+
+  // The saved copy of an API block is checked the same way; the API link keeps its own rule.
+  const item = { title: 'Ada', text: '', image: '', link: '', value: '', label: '' };
+  const api = (items) => both('api_data', { source: { url: 'https://flask.opencodingsociety.com/api/jokes', title_path: 'joke', snapshot: { items, fetched_at: 1, from_loopback: false } } });
+  assert.deepEqual(api([{ ...item, image: 'https://localhost/a.png' }]), [[], ['source.snapshot:loopback_snapshot']]);
+  assert.deepEqual(api([item, { ...item, link: 'https://127.0.0.1/x' }]), [[], ['source.snapshot:loopback_snapshot']]);
+  assert.deepEqual(api([{ ...item, link: 'https://flood.example.com/', image: '/images/a.png' }]), [[], []]);
+  assert.deepEqual(both('api_data', { source: { url: 'https://localhost/api/jokes', title_path: 'joke' } }), [['source:policy_private_host'], ['source:policy_private_host']]);
+
+  // The gallery picture: refused in a draft as well, with one problem either way.
+  const picture = (image, options) => keysOf(validatePage(pageOf([], { page: { image } }), registry, { ...SITE, ...options }));
+  assert.deepEqual(picture('https://localhost:4100/shot.png'), ['image:loopback_link']);
+  assert.deepEqual(picture('https://localhost:4100/shot.png', publish), ['image:loopback_link']);
+  assert.deepEqual(picture('https://flood.example.com/shot.png'), []);
+  const [gallery] = validatePage(pageOf([], { page: { image: 'https://127.0.0.1/shot.png' } }), registry, SITE);
+  assert.equal(gallery.message, textOf(registry, 'errors.loopback_link', { field: 'Gallery picture' }));
+});
+
+// Links and pictures inside rich text follow the same rule on publish (Spring's loopback_url for an
+// href or src in a body); a draft keeps them while the team tries its app.
+test('a published page refuses rich-text links to the student\'s own computer; a draft keeps them', needsRuby, () => {
+  const registry = loadRegistry();
+  const publish = { publish: true };
+  const both = (type, body) => [check(type, { body }), check(type, { body }, publish)];
+  for (const body of ['Try <a href="http://localhost:4000/">our app</a>.', '<a href="https://localhost:8443/demo">our app</a>',
+    '<a href="https://127.0.0.1:4100/x" target="_blank" rel="noopener noreferrer">x</a>', '<b><a href="https://team.localhost/">x</a></b>',
+    '<a href="HTTPS://LOCALHOST./">x</a>', '<a href=https://0.0.0.0/>x</a>', 'Our team <img src="https://[::1]:8443/team.png">',
+    // References decoded, as a browser and Spring's jsoup decode them; every run from < to > read too, as Spring does.
+    '<a href="https://local&#104;ost/">x</a>', '<a href="https://localhost:8443/?a=1&amp;b=2">x</a>', 'See <textarea><a href="https://localhost/">x</a></textarea>',
+    // Named references for the punctuation of an address, which Spring's jsoup decodes too.
+    '<a href="https:&sol;&sol;localhost/">x</a>', '<a href="https://127&period;0&period;0&period;1:4100/">x</a>']) {
+    assert.deepEqual(both('text', body), [[], ['body:loopback_link']], body);
+  }
+  const [issue] = validateSettings(defOf(registry, 'block', 'callout'), { body: 'See <a href="http://localhost:4000/">it</a>' }, registry, { ...SITE, ...publish });
+  assert.equal(issue.message, textOf(registry, 'errors.loopback_rich_text', { field: 'Note' }), 'the words say the link is in the text');
+  // Other addresses, a loopback address outside href and src or in a comment, and one read as typed
+  // with a hidden character (no address, so the page never shows it as a link) stay as they were.
+  for (const body of ['<a href="https://flood.example.com/">x</a>', '<a href="https://localhost.example.com/">x</a>',
+    '<a href="https://127.1/">x</a>', '<a href="mailto:team@example.com">x</a>', '<a href="/csp/">x</a>', '<a title="https://localhost/" href="https://flood.example.com/">x</a>',
+    '<!-- <a href="https://localhost/">old</a> --> Our app', `<a href="https://local${String.fromCharCode(0x200b)}host/">x</a>`]) {
+    assert.deepEqual(both('text', body), [[], []], body);
+  }
+  // One problem a field: unsafe markup and length come first.
+  assert.deepEqual(both('text', '<a href="https://localhost/" onclick="x()">x</a>'), [['body:bad_body'], ['body:bad_body']]);
+  assert.deepEqual(both('text', `<a href="https://localhost/">${'x'.repeat(4001)}</a>`), [['body:too_long'], ['body:too_long']]);
+});
+
+// Spring finds these with jsoup (UiBuilderSpecRules.linksToComputer); each was a body one side
+// refused and the other took. A published page must be refused by both or by neither.
+test('rich-text links are read as jsoup reads them, so publish agrees with Spring', needsRuby, () => {
+  const S = String.fromCharCode;
+  const both = (body) => [check('text', { body }), check('text', { body }, { publish: true })];
+  const refused = [[], ['body:loopback_link']];
+  for (const body of [
+    // Every digit of a reference; windows-1252 for 128 to 159 ("…" is no hidden character).
+    '<a href="https://&#00000000108;ocalhost/">x</a>', '<a href="https://&#x00000006c;ocalhost/">x</a>', '<a href="https://localhost/&#133;">x</a>',
+    // A name that starts with "=", one trimmed of a control character, and a NUL that goes on the name before it.
+    '<a = href="https://localhost/">x</a>', `<a ${S(1)}href="https://localhost/">x</a>`, `<a ${S(1)}href\n${S(0)}x="https://example.com/" href="https://localhost/">x</a>`,
+    // Table parts inside a table, tags a select keeps or that close it, and a complete tag in a select.
+    '<table><td href="https://localhost/">x</td></table>', '<table><tr><td><table></table><td src="https://localhost/x.png">x', '<select><b href="https://localhost/">x</b></select>',
+    'Pick <select><input title=">" src="https://localhost/x.png"></select>', '<select><option title=">" href="https://localhost/">x</option></select>',
+    // A textarea with no end tag: its text stops at the first tag. A run read like the body ("<<title"),
+    // 512 attributes, and a NUL, which jsoup reads as U+FFFD.
+    '<textarea><a title=">" href="https://localhost/">x</a>', '<!--<textarea><<title href="https://localhost/">x',
+    `<a${' x'.repeat(511)} href="https://localhost/">x</a>`, `<a href="https://localhost/${S(0)}">x</a>`,
+    // A form after a closed one, and a tag after a CDATA section (jsoup reads one up to "]]>"), after
+    // a title's text cut short at its first tag, and after a style's end tag.
+    '<form></form><form title=">" href="https://localhost/">x', '<![CDATA[x]]><a title=">" href="https://localhost/">x</a>',
+    '<title>x</b<a title=">" href="https://localhost/">x', '<style></x </style><a title=">" href="https://localhost/">x']) {
+    assert.deepEqual(both(body), refused, body);
+  }
+  for (const body of [
+    // Names exactly as written, with their ";"; codes past U+10FFFF; 0, spaces and U+001C, which make no address.
+    '<a href="https&Colon;//localhost/">x</a>', '<a href="https&COLON;//localhost/">x</a>', '<a href="https://localhost&Period;/">x</a>',
+    '<a href="http://localhost&QUEST;x">x</a>', '<a href="https:&sol&sol;localhost/">x</a>', '<a href="https://local&#x110000;host/">x</a>',
+    '<a href="https://localhost/&#0;">x</a>', '<a href="https://localhost/&nbsp;x">x</a>', '<a href="https://localhost/&nbsp/x">x</a>',
+    '<a href="https://localhost/&ThinSpace;x">x</a>', '<a href="&#x1c;https://localhost/">x</a>',
+    // The first of two hrefs, a tag the text cuts off, and tags jsoup leaves out.
+    '<a href="https://example.com/" href="https://localhost/">x</a>', 'end <a href="https://localhost/"', 'end <a href="https://localhost/>x',
+    `<a${S(1)}href="https://localhost/">x</a>`, '<html href="https://localhost/"><head src="https://localhost/"><body href="https://localhost/">x',
+    '<frameset><frame src="https://localhost/">x', '<td href="https://localhost/">x</td>', '<table></table><tr href="https://localhost/">x',
+    '<select><a title=">" href="https://localhost/">x</a></select>', `<a${' x'.repeat(512)} href="https://localhost/">x</a>`,
+    '<textarea><a title=">" href="https://localhost/">x</a></textarea>', '<form><form title=">" href="https://localhost/">x',
+    '<![CDATA[ > <a title=">" href="https://localhost/">x</a>',
+    // An end tag's name runs to a space, "/" or ">", so "</x</style>" ends no style and "</TEXTAREA<a" is text.
+    '<style></x</style><a title=">" href="https://localhost/">x', '<textarea></TEXTAREA<a title=">" href="https://localhost/">x']) {
+    assert.deepEqual(both(body), [[], []], body);
+  }
+});
+
+test('rich text: references in a tag are read loosely and as jsoup reads them, so Spring refuses no body the editor takes', needsRuby, () => {
+  const S = String.fromCharCode;
+  for (const body of ['<a href="java&#0000000115;cript:alert(1)">x</a>', '<a href="&#x000000006a;avascript:x">x</a>', '<b java&#0000000115;cript:x>x</b>',
+    '<b data-java&#x000000073;cript:x>x</b>', '<b title="java&Tabscript:x">x</b>',
+    '<b title="java&NewLinescript:x">x</b>', '<b title="java&nbsp;script:x">x</b>', '<a href="tel&nbsp;:1">x</a>', '<a href="&fjlig;x:1">x</a>',
+    '<a href="a&plus;b:x">x</a>', `<a ${S(1)}href="tel:1">x</a>`, `<b ${S(1)}onclick>x</b>`, '<textarea><a title=">" data-x="javascript:x">']) {
+    assert.deepEqual(check('text', { body }), ['body:bad_body'], body);
+  }
 });
 
 test('block rules: video and embed links, and injected validators such as kanban', needsRuby, () => {
@@ -226,6 +378,18 @@ test('page fields and page limits', needsRuby, () => {
   const registry = loadRegistry();
   const { limits } = registry;
   assert.deepEqual(keysOf(validatePage(pageOf([], { page: { title: '', course: 'nope', width: 'huge', image: 'data:x' } }), registry, SITE)), ['title:required', 'image:bad_image', 'width:bad_choice', 'course:bad_choice']);
+  // Spring strips page fields with Java's strip(), which also removes U+001C-U+001F; blank there is blank here.
+  for (const title of ['\x1c', ' \x1d ', '\x1e\x1f']) {
+    assert.deepEqual(keysOf(validatePage(pageOf([], { page: { title } }), registry, SITE)), ['title:required'], JSON.stringify(title));
+  }
+  // Length before blankness, as Spring checks: a gallery picture of 501 spaces is too long, not empty.
+  assert.deepEqual(keysOf(validatePage(pageOf([], { page: { image: ' '.repeat(501) } }), registry, SITE)), ['image:too_long']);
+  // Spring keeps the gallery picture in a 500-character column, so a longer link is refused, never cut.
+  const picture = (length) => `https://lh3.googleusercontent.com/d/${'x'.repeat(length - 36)}`;
+  assert.deepEqual(keysOf(validatePage(pageOf([], { page: { image: picture(500) } }), registry, SITE)), []);
+  const [tooLong] = validatePage(pageOf([], { page: { image: picture(501) } }), registry, SITE);
+  assert.deepEqual([tooLong.field, tooLong.key], ['image', 'too_long']);
+  assert.equal(tooLong.message, 'Gallery picture can be at most 500 characters.');
   const sections = (count) => Array.from({ length: count }, (_, i) => ({ id: `s-${String(i + 1).padStart(6, '0')}`, type: 'stack', settings: {}, hidden: false, cells: [{ blocks: [] }] }));
   assert.deepEqual(keysOf(validatePage(pageOf([], { sections: sections(limits.sections) }), registry)), []);
   assert.deepEqual(keysOf(validatePage(pageOf([], { sections: sections(limits.sections + 1) }), registry)), ['null:too_many_sections']);

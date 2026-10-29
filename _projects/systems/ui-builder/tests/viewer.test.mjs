@@ -73,11 +73,15 @@ test('the address names one page: ?page, then ?draft, then ?local', needsRuby, (
   assert.deepEqual(viewRequest('?draft=12&local=abcdef', registry), { mode: 'draft', id: 12 });
   assert.deepEqual(viewRequest('?local=abcdef123456', registry), { mode: 'local', id: 'abcdef123456' });
   assert.deepEqual(viewRequest('', registry), { mode: 'none' });
-  for (const [search, expected] of [['?page=Flood', { mode: 'page', slug: null }], ['?page=admin', { mode: 'page', slug: null }],
+  for (const [search, expected] of [['?page=Flood', { mode: 'page', slug: null }], ['?page=team_3', { mode: 'page', slug: null }],
     ['?page=../x', { mode: 'page', slug: null }], ['?draft=0', { mode: 'draft', id: null }], ['?draft=1e3', { mode: 'draft', id: null }],
     ['?draft=99999999999999999', { mode: 'draft', id: null }], ['?local=../x', { mode: 'local', id: null }]]) {
     assert.deepEqual(viewRequest(search, registry), expected, search);
   }
+  // The slug's shape comes from the registry; whether a page has it is Spring's call, reserved words too.
+  assert.deepEqual(viewRequest('?page=admin', registry), { mode: 'page', slug: 'admin' }, 'a page published before "admin" was reserved');
+  const widened = { ...registry, limits: { ...registry.limits, slug_pattern: '^[a-z0-9_-]{3,64}$' } };
+  assert.deepEqual(viewRequest('?page=team_3', widened), { mode: 'page', slug: 'team_3' });
 });
 
 test('a published page: attribution bar, the page, its title, and its live blocks', needsRuby, async () => {
@@ -138,12 +142,24 @@ test('not found, offline and broken pages each say so; offline offers a retry', 
       return viewOf();
     },
   });
-  const offline = await view(registry, { store: flaky });
-  assert.ok(text(offline.root).startsWith(say(registry, 'view.load_failed')));
-  offline.root.querySelector('[data-ui-viewer-retry]').click();
+  const noAnswer = await view(registry, { store: flaky });
+  assert.ok(text(noAnswer.root).startsWith(say(registry, 'view.no_answer')), 'this browser is online, so OCS is the one not answering');
+  noAnswer.root.querySelector('[data-ui-viewer-retry]').click();
   await settle();
   assert.equal(attempts, 2);
-  assert.ok(offline.root.querySelector('article[data-ui-page]'), 'the retry shows the page');
+  assert.ok(noAnswer.root.querySelector('article[data-ui-page]'), 'the retry shows the page');
+
+  // Only a browser that knows it is offline is told to check its connection.
+  Object.defineProperty(globalThis.navigator, 'onLine', { value: false, configurable: true });
+  try {
+    const offline = await view(registry, { store: fakeStore({ published: async () => { throw Object.assign(new Error('x'), { name: 'OfflineError' }); } }) });
+    assert.ok(text(offline.root).startsWith(say(registry, 'view.load_failed')));
+  } finally {
+    delete globalThis.navigator.onLine;
+  }
+  const failing = await view(registry, { store: fakeStore({ published: async () => { throw Object.assign(new Error('x'), { name: 'ApiError', status: 502, error: 'server' }); } }) });
+  assert.ok(text(failing.root).startsWith(say(registry, 'store.server', { status: 502 })), 'a failing server says so, not "check your connection"');
+  assert.ok(failing.root.querySelector('[data-ui-viewer-retry]'));
 
   const newer = await view(registry, { store: fakeStore({ published: async () => viewOf({ spec: { ...SPEC, schemaVersion: 2 } }) }) });
   assert.equal(text(newer.root), say(registry, 'errors.bad_schema_version'));

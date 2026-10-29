@@ -73,6 +73,16 @@ test('published pages show as nav cards that open the viewer', needsRuby, async 
   assert.equal(run.root.querySelector('h1').parentNode.localName, 'header');
 });
 
+test('cards follow the registry\'s slug pattern, and each slug is encoded into its link', needsRuby, async () => {
+  const registry = loadRegistry();
+  const pages = [...PAGES, { slug: 'team_3', title: 'Team 3', description: '', byline: '', course: 'csp', image: '', publishedAt: 0, visibility: 'PUBLIC' }];
+  const narrow = await open(registry, { store: fakeStore({ gallery: async () => pages }) });
+  assert.equal(narrow.cards().length, 2, 'the default pattern has no underscores');
+  const widened = { ...registry, limits: { ...registry.limits, slug_pattern: '^[a-z0-9_&=-]{3,64}$' } };
+  const run = await open(widened, { store: fakeStore({ gallery: async () => [...pages, { ...pages[3], slug: 'x&q=1' }] }) });
+  assert.deepEqual(run.cards().map((card) => card.getAttribute('href').replace('/preview/ui-builder/view/?page=', '')), ['flood-watch', 'rain-api', 'team_3', 'x%26q%3D1']);
+});
+
 test('search filters in the browser and course asks Spring, both kept in the address', needsRuby, async () => {
   const registry = loadRegistry();
   const run = await open(registry, { search: '?q=rain' });
@@ -108,15 +118,29 @@ test('empty, failing and signed-out galleries each say so', needsRuby, async (t)
   const empty = await open(registry, { store: fakeStore({ gallery: async () => [] }) });
   assert.equal(empty.count(), say(registry, 'gallery.empty'));
 
+  // This browser is online, so an OfflineError means OCS didn't answer, not "check your connection".
   let fail = true;
   const flaky = await open(registry, {
     store: fakeStore({ gallery: async () => { if (fail) throw Object.assign(new Error('x'), { name: 'OfflineError' }); return PAGES; } }),
   });
-  assert.ok(text(flaky.root).includes(say(registry, 'gallery.load_failed')));
+  assert.ok(text(flaky.root).includes(say(registry, 'gallery.no_answer')), 'OCS is the one not answering');
   fail = false;
   flaky.root.querySelector('.ocs__callout').parentNode.querySelector('button').click();
   await settle();
   assert.equal(flaky.cards().length, 2);
+
+  // A failing server says so (store wording), not "check your connection".
+  const server = await open(registry, { store: fakeStore({ gallery: async () => { throw Object.assign(new Error('x'), { name: 'ApiError', status: 502, error: 'server' }); } }) });
+  assert.ok(text(server.root).includes(say(registry, 'store.server', { status: 502 })));
+
+  // Only a browser that knows it is offline is told to check its connection.
+  Object.defineProperty(globalThis.navigator, 'onLine', { value: false, configurable: true });
+  try {
+    const offline = await open(registry, { store: fakeStore({ gallery: async () => { throw Object.assign(new Error('x'), { name: 'OfflineError' }); } }) });
+    assert.ok(text(offline.root).includes(say(registry, 'gallery.load_failed')));
+  } finally {
+    delete globalThis.navigator.onLine;
+  }
 
   const anonymous = await open(registry, { store: fakeStore({ whoami: async () => null }) });
   const note = anonymous.root.querySelector('a[href="/preview/login"]');

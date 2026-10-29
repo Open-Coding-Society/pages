@@ -9,8 +9,9 @@ import { textOf } from './registry.js';
 const PAGE_PREFIX = 'ocs:ui-builder:v1:page:';
 export const LOCAL_ID = /^[a-z0-9]{6,32}$/;
 const ID_LENGTH = 12;
-// DESIGN §9.6 field lengths, so a summary from a hand-edited record stays card-sized.
-const FIELD_MAX = { title: 120, description: 300, byline: 120, course: 16, image: 500 };
+// The page settings Spring also keeps as columns (DESIGN §9.6). They pass whole: a value too long
+// for its column is refused with too_long (and marked on its field), never cut to fit.
+const PAGE_FIELDS = ['title', 'description', 'byline', 'course', 'image'];
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const own = (value, key) => (isObject(value) && Object.prototype.hasOwnProperty.call(value, key) ? value[key] : undefined);
@@ -71,18 +72,22 @@ export class OfflineError extends Error {
 }
 
 // The registry text for a store error, as {key, vars}: textOf(registry, key, vars) words it.
-// Spring's refusal codes that already have wording elsewhere in the registry reuse it.
+// Spring's refusal codes that already have wording elsewhere in the registry reuse it; a code
+// this page doesn't know (a proxy's or Spring Boot's own error body) is worded by its status.
+// It never passes on the error's own message or code: those aren't written for students.
 const SHARED_TEXT = {
   invalid_slug: 'errors.slug_invalid',
   slug_reserved: 'errors.slug_reserved',
   invalid_group: 'errors.group_not_allowed',
   loopback_source: 'errors.loopback_url',
 };
+// 'conflict' is not here: only a ConflictError has the name and time its wording needs.
 const STORE_TEXT = new Set([
-  'offline', 'timeout', 'conflict', 'not_found', 'slug_taken', 'slug_locked', 'slug_required', 'invalid_spec',
+  'offline', 'timeout', 'not_found', 'slug_taken', 'slug_locked', 'slug_required', 'invalid_spec',
   'origin_rejected', 'unauthorized', 'forbidden', 'too_large', 'busy', 'not_published', 'own_page', 'bad_request',
   'server', 'bad_response', 'storage_full', 'storage_blocked', 'corrupt', 'unknown',
 ]);
+const STATUS_TEXT = { 401: 'unauthorized', 403: 'forbidden', 404: 'not_found', 413: 'too_large' };
 
 export function storeErrorText(error) {
   const name = error && error.name;
@@ -94,10 +99,17 @@ export function storeErrorText(error) {
     return { key: who ? 'store.conflict' : 'store.conflict_unknown', vars: { name: who || '', time: when ? when.toLocaleString() : '' } };
   }
   const code = error && typeof error.error === 'string' ? error.error : '';
+  // Spring's create refuses a page over the per-person limit with 409 {error, max}.
+  if (code === 'too_many_pages') {
+    const max = error && error.body && Number.isFinite(error.body.max) ? error.body.max : '';
+    return { key: 'store.too_many_pages', vars: { max } };
+  }
   if (Object.prototype.hasOwnProperty.call(SHARED_TEXT, code)) return { key: SHARED_TEXT[code], vars: {} };
   if (STORE_TEXT.has(code)) return { key: `store.${code}`, vars: { status: error.status || '' } };
-  if (error && error.status >= 500) return { key: 'store.server', vars: { status: error.status } };
-  if (error && error.status >= 400) return { key: 'store.bad_request', vars: { status: error.status } };
+  const status = error && Number.isInteger(error.status) ? error.status : 0;
+  if (Object.prototype.hasOwnProperty.call(STATUS_TEXT, status)) return { key: `store.${STATUS_TEXT[status]}`, vars: {} };
+  if (status >= 500) return { key: 'store.server', vars: { status } };
+  if (status >= 400) return { key: 'store.bad_request', vars: { status } };
   return { key: 'store.unknown', vars: {} };
 }
 
@@ -128,17 +140,13 @@ function randomId() {
   return Array.from(bytes, (byte) => (byte % 36).toString(36)).join('');
 }
 
-function textField(value, max) {
-  return typeof value === 'string' ? value.slice(0, max) : '';
-}
-
 // The page settings a summary shows, with explicit `fields` (the editor's) winning.
 export function pageFields(page, fields = {}) {
   const settings = isObject(own(page, 'page')) ? page.page : {};
   const out = {};
-  for (const key of Object.keys(FIELD_MAX)) {
+  for (const key of PAGE_FIELDS) {
     const value = own(fields, key) !== undefined ? own(fields, key) : own(settings, key);
-    out[key] = textField(value, FIELD_MAX[key]);
+    out[key] = typeof value === 'string' ? value : '';
   }
   return out;
 }

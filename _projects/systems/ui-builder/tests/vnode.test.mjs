@@ -171,6 +171,18 @@ test('secureRichTree keeps the rich-text subset and re-checks every link', () =>
   ].join(''));
 });
 
+test('secureRichTree turns a link to the reader\'s own computer into its text, in any spelling', () => {
+  const doc = createFakeDocument();
+  // The URL parser writes [::ffff:127.0.0.1] as [::ffff:7f00:1] and [0::0] as [::]: secureLink checks that host.
+  const loopback = ['https://localhost:8443/demo', 'https://LOCALHOST./x', 'https://app.localhost/', 'https://127.0.0.1:4100/',
+    'https://127.1/', 'https://2130706433/', 'https://0x7f.0.0.1/', 'https://[::1]/', 'https://[0:0:0:0:0:0:0:1]/', 'https://0.0.0.0/',
+    'https://[::ffff:127.0.0.1]:8443/', 'https://[0:0:0:0:0:ffff:7f00:1]/', 'https://[::]/', 'https://[0::0]/'];
+  const root = build(doc, ['div', {}, ...loopback.map((href, n) => ['a', { href }, `local${n}`]),
+    ['a', { href: 'https://localhost.example.com/' }, 'remote']]);
+  secureRichTree(root, { baseurl: '', pageOrigin: 'https://pages.opencodingsociety.com' });
+  assert.equal(root.innerHTML, `${loopback.map((_, n) => `local${n}`).join('')}<a href="https://localhost.example.com/" target="_blank" rel="${NEW_TAB_REL}">remote</a>`);
+});
+
 test('the rich hooks sanitize through rich-text.js and only touch the rich nodes', () => {
   const doc = createFakeDocument();
   const seen = [];

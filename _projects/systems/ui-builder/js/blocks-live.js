@@ -4,8 +4,9 @@
 // matches each to its block in the page by its wrapper's data-ui-node, and mounts it once into
 // its [data-ui-live-mount], reporting progress and refusals in its [data-ui-live-status]. A card
 // that fails says so in its own status and never stops the others. Other systems' modules
-// (Messages' conversation-embed.js, kanban-board.js, calendar-card.js, microblog.js) are loaded
-// by URL from ctx.services.modules, so nothing here imports across systems.
+// (Messages' conversation-embed.js, kanban-board.js, Courses' calendar-card.js and
+// calendar-model.js, microblog.js) are loaded by URL from ctx.services.modules, so nothing here
+// imports across systems.
 //
 // ctx: {registry, baseurl, pageOrigin, pageProtocol, slug, pageKey, doc, fetchImpl, storage, now,
 //   loadModule?(url), navigate?(url), services: {config, richText, messagesModel, modules, store,
@@ -14,27 +15,17 @@ import { findNode } from './page-model.js';
 import { defOf, liveTypes, textOf } from './registry.js';
 import { lineOf, ownValue } from './blocks-content.js';
 import { element, getJson, liveParts, mountApiData, showStatus, browserOffline } from './blocks-project.js';
+import { slugMatches } from './url-rules.js';
 import { escapeHTML, h, toDOM } from './vnode.js';
 
-const SLUG = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const FEEDBACK_MAX = 280; // the Flask microblog's limit
 const FEEDBACK_SHOWN = 20;
-// calendar-model.js extractEventMarkers' pattern: [[event:id|YYYY-MM-DD|P0-P3|type|title|periods|description]].
-const EVENT_MARKER = /\[\[event:([^|\]]+)\|(\d{4}-\d{2}-\d{2})\|(P[0-3])\|([^|\]]*)\|([^|\]]*)(?:\|([\d,]*))?(?:\|([^\]]*))?\]\]/g;
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
 function idOf(value) {
   const id = typeof value === 'string' && /^\d{1,16}$/.test(value) ? Number(value) : value;
   return Number.isSafeInteger(id) && id > 0 ? id : null;
-}
-
-function safeDecode(value) {
-  try {
-    return decodeURIComponent(value || '');
-  } catch (_) {
-    return value || '';
-  }
 }
 
 // "2026-10-30" is a calendar day: read at local noon so no time zone moves it.
@@ -62,7 +53,7 @@ function liveContext(ctx, page, isStopped) {
   const who = isObject(services.viewer) ? services.viewer : {};
   const modules = isObject(services.modules) ? services.modules : {};
   const baseurl = String(typeof ctx.baseurl === 'string' ? ctx.baseurl : config.baseurl || '').replace(/\/+$/, '');
-  const pick = (value) => (typeof value === 'string' && SLUG.test(value) ? value : null);
+  const pick = (value) => (slugMatches(value, ctx.registry) ? value : null);
   const loadModule = typeof ctx.loadModule === 'function' ? ctx.loadModule : (url) => import(url);
   const loaded = new Map();
   return {
@@ -239,12 +230,15 @@ async function mountMembers(card, block, c, { status, mount }) {
 
 /* ---------- class announcements and calendar ---------- */
 
-// Event markers are calendar data, not words: each becomes one short line. The result is HTML
-// for the chat's sanitizer, so everything from the marker is escaped.
-export function announcementText(body, say) {
-  return String(body ?? '').replace(EVENT_MARKER, (match, id, date, priority, type, title) => escapeHTML(say('live.announcement_event', {
-    title: safeDecode(title).trim() || say('live.announcement_event_untitled'), date: shortDay(date),
-  }))).replace(/(?:\s|<br>)+$/g, '').trim();
+// Event markers are calendar data, not words: Courses' own parser (calendar-model.js
+// extractEventMarkers) takes them out, and each event becomes one short line under the message.
+// The result is HTML for the chat's sanitizer, so everything a marker carried is escaped.
+export function announcementText(body, say, extractEventMarkers) {
+  const { html, events } = extractEventMarkers(String(body ?? ''));
+  const lines = events.map((event) => escapeHTML(say('live.announcement_event', {
+    title: String(event.title || '').trim() || say('live.announcement_event_untitled'), date: shortDay(event.date),
+  })));
+  return [html, ...lines].filter(Boolean).join('<br>');
 }
 
 // The course's announcement channel, by exact name, as the course pages find it. Never created.
@@ -269,14 +263,25 @@ async function mountAnnouncements(card, block, c, { status, mount }) {
   const groupId = await announcementGroup(c, course);
   if (c.stopped()) return nothing;
   if (!groupId) return refuse(status, { text: c.say('live.announcements_missing', { course: courseLabel(c, course) }) });
-  const embed = await c.load('conversationEmbed');
+  const [embed, calendarModel] = await Promise.all([c.load('conversationEmbed'), c.load('calendarModel')]);
   if (c.stopped()) return nothing;
+  const { extractEventMarkers } = calendarModel;
+  if (typeof extractEventMarkers !== 'function') throw new TypeError('UI Builder: calendar-model.js has no extractEventMarkers');
   const chat = await embed.mountGroupChat(mount, {
-    groupId, config: c.config, richText: c.richText, readOnly: true, heading: '', texts: c.chatTexts,
-    formatBody: (body) => announcementText(body, c.say),
+    groupId, config: c.config, richText: c.richText, readOnly: true, heading: '',
+    // Only teachers post here, so an empty channel doesn't invite visitors to say hi.
+    texts: { ...c.chatTexts, emptyTitle: c.say('live.announcements_empty_title'), emptyHint: c.say('live.announcements_empty_hint') },
+    formatBody: (body) => announcementText(body, c.say, extractEventMarkers),
   });
   showStatus(status, '');
   return { destroy() { chat.destroy(); } };
+}
+
+// The kanban and calendar cards bring their own title and Open link (blocks-content.js liveCard):
+// while one is in, the block's own title steps aside, so the page shows one card with one title.
+function showOwnTitle(card, shown) {
+  const header = card.querySelector('[data-ui-live-header]');
+  if (header) header.hidden = !shown;
 }
 
 // The calendar card shows the school week to visitors who aren't signed in, so it has no sign-in gate.
@@ -295,8 +300,9 @@ async function mountCalendar(card, block, c, { status, mount }) {
     section.remove();
     throw error;
   }
+  showOwnTitle(card, false);
   showStatus(status, '');
-  return { destroy() { mounted.unmount(); section.remove(); } };
+  return { destroy() { mounted.unmount(); section.remove(); showOwnTitle(card, true); } };
 }
 
 /* ---------- kanban board ---------- */
@@ -320,9 +326,10 @@ async function mountKanban(card, block, c, { status, mount }) {
     mount.replaceChildren(section);
     board = kanban.mountKanbanBoard(section);
     board.refresh();
+    showOwnTitle(card, false);
     showStatus(status, '');
   };
-  const handle = { destroy() { if (board) board.unmount(); if (section) section.remove(); mount.replaceChildren(); } };
+  const handle = { destroy() { if (board) board.unmount(); if (section) section.remove(); mount.replaceChildren(); showOwnTitle(card, true); } };
   if (c.viewer.canEdit) {
     await start();
     return handle;
@@ -373,13 +380,16 @@ function postView(post, c) {
     h('span', null, typeof post.content === 'string' ? post.content : ''));
 }
 
-function feedbackForm(c, block, { onSend }) {
+function feedbackForm(c, block, status, { onSend }) {
   const doc = c.doc;
   const id = `ui-feedback-${block.id}`;
   const form = element(doc, 'form', { className: 'ocs__stack', attrs: { novalidate: '' } });
   const field = element(doc, 'div', { className: 'ocs__field' });
   const label = element(doc, 'label', { className: 'ocs__label', text: lineOf(block.settings, 'prompt') || c.say('live.feedback_label'), attrs: { for: id } });
-  const input = element(doc, 'textarea', { className: 'ocs__input', attrs: { id, rows: '3', maxlength: String(FEEDBACK_MAX), 'aria-describedby': `${id}-help` } });
+  // The status line is the card's own role=status region (always on the page); point the textarea
+  // at it so a screen reader hears the "write your feedback first" message against this field.
+  const describedBy = [`${id}-help`, status && status.id].filter(Boolean).join(' ');
+  const input = element(doc, 'textarea', { className: 'ocs__input', attrs: { id, rows: '3', maxlength: String(FEEDBACK_MAX), 'aria-describedby': describedBy } });
   const help = element(doc, 'small', { text: c.say('live.feedback_help', { max: FEEDBACK_MAX }), attrs: { id: `${id}-help` } });
   const send = element(doc, 'button', { className: 'ocs__btn accent fill', text: c.say('live.feedback_send'), attrs: { type: 'submit' } });
   const row = element(doc, 'div', { className: 'ocs__links' });
@@ -391,10 +401,14 @@ function feedbackForm(c, block, { onSend }) {
     if (send.disabled) return;
     const content = input.value.trim();
     if (!content || content.length > FEEDBACK_MAX) {
-      input.focus();
+      // Say what's wrong in the status region (it is already on the page) before focus moves, and
+      // mark the field invalid; both are undone once the feedback is sent.
+      input.setAttribute('aria-invalid', 'true');
       onSend(null);
+      input.focus();
       return;
     }
+    input.removeAttribute('aria-invalid');
     send.disabled = true;
     onSend(content).then((sent) => {
       send.disabled = false;
@@ -405,6 +419,9 @@ function feedbackForm(c, block, { onSend }) {
 }
 
 async function mountFeedback(card, block, c, { status, mount }) {
+  // Posts are filed under the published address, and only Spring publishes.
+  const stop = gate(c, 'feedback', null);
+  if (stop) return refuse(status, stop);
   if (!c.slug) return refuse(status, { text: c.say('live.feedback_unpublished') });
   const topicPath = `/ui-builder/view/?page=${c.slug}`;
   const pythonURI = String(c.config.pythonURI || '').replace(/\/+$/, '');
@@ -444,7 +461,7 @@ async function mountFeedback(card, block, c, { status, mount }) {
     return true;
   };
 
-  if (c.viewer.flaskSignedIn) mount.replaceChildren(feedbackForm(c, block, { onSend: send }), list);
+  if (c.viewer.flaskSignedIn) mount.replaceChildren(feedbackForm(c, block, status, { onSend: send }), list);
   else {
     const line = element(c.doc, 'p', { className: 'ocs__text', text: `${c.say('live.feedback_sign_in')} ` });
     line.appendChild(element(c.doc, 'a', { text: c.say('blocks.live_sign_in_link'), attrs: { href: c.signInHref } }));

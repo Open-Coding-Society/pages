@@ -16,13 +16,17 @@ import { createOutline } from './editor-outline.js';
 import { createInspector } from './editor-inspector.js';
 import { createPalette } from './editor-palette.js';
 import { createLeaseBanner, formatWhen } from './editor-dialogs.js';
-import { canPublish, createSession, errorKeyOf, fieldsOf, publishStateOf, saveStateOf } from './editor-session.js';
+import { canPublish, createSession, fieldsOf, publishStateOf, saveStateOf } from './editor-session.js';
 import { el } from './editor-fields.js';
 import { pageActions } from './editor-actions.js';
 
 const FEEDBACK_MS = 4000;
 const CLOSE_FLUSH_MS = 3000;
+// The registry limit each page-wide refusal names as {max}.
+const REFUSAL_LIMITS = { too_many_sections: 'sections', too_many_blocks: 'blocks_per_section', too_many_live: 'live_blocks', too_big: 'spec_chars' };
 const own = (value, key) => (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, key) ? value[key] : undefined);
+const blockCount = (section) => section.cells.reduce((sum, cell) => sum + cell.blocks.length, 0);
+const issueId = (issue) => JSON.stringify([issue.nodeId, issue.field, issue.key]);
 
 // A node's registry label ("Card", "Columns"), or '' when it isn't on the page.
 export function nodeLabel(registry, page, id) {
@@ -36,13 +40,18 @@ export class EditSession {
     Object.assign(this, { app, shell, doc: app.doc, win: app.win, registry: app.registry, store: app.store, caps: app.caps, say: app.say, text: app.text });
     this.limits = this.registry.limits || {};
     this.state = { selectedId: null, issues: [], readOnly: false, pendingTeam: undefined, realData: false };
+    this.pageIssue = ''; // the page-wide problem the feedback line shows (showPageIssue)
+    this.publishCheck = false; // Publish found problems: check the page as Publish does (checkIssues)
     this.history = createHistory(page, { limit: this.limits.history_limit || 100 });
     this.session = createSession({
       store: this.store, draftStore: app.deps.draftStore, ref, base, meta, win: this.win,
       getPage: () => this.page, getFields: () => this.fields(),
       onStatus: () => this.updateBar(),
       onSaved: ({ fields }) => {
-        if (fields && own(fields, 'groupId') !== undefined) this.state.pendingTeam = undefined;
+        // Only the team this save carried is done: one picked while it was on its way goes next.
+        const sent = own(fields, 'groupId');
+        const picked = this.state.pendingTeam;
+        if (sent !== undefined && picked !== undefined && (picked ? picked.id : null) === sent) this.state.pendingTeam = undefined;
         this.refreshPanels();
       },
       onConflict: (error) => this.conflict(error),
@@ -76,7 +85,11 @@ export class EditSession {
     } });
     this.inspector = createInspector({
       root: shell.inspectorPane, doc, registry: this.registry, say, text: this.text, richText: this.app.deps.richText,
-      services: { groups: this.app.groups(), showCode: (code) => dialogs.textExport({ title: say('code_title'), content: code, filename: 'api-data.js', mime: 'text/javascript' }) },
+      services: {
+        groups: this.app.groups(), errorText: (error) => this.app.errorText(error),
+        showCode: (code) => dialogs.textExport({ title: say('code_title'), content: code, filename: 'api-data.js', mime: 'text/javascript' }),
+        openPublished: (slug) => this.app.viewerUrl({ slug }),
+      },
       apiOptions: { pageOrigin: this.app.pageOrigin, pageHost: this.win.location.hostname, pageProtocol: this.win.location.protocol, baseurl: this.app.baseurl, cookieDomain: (this.registry.security || {}).cookie_domain || '' },
       actions: {
         changeSettings: (id, patch, meta) => this.commit(updateSettings(this.page, this.registry, id, patch), meta),
@@ -179,11 +192,28 @@ export class EditSession {
 
   refreshPanels() {
     const { page } = this;
-    this.state.issues = validatePage(page, this.registry, { validators: this.app.validators, baseurl: this.app.baseurl, pageOrigin: this.app.pageOrigin });
+    this.state.issues = this.checkIssues(page);
     const state = { ...this.state, ref: this.ref, meta: this.meta || {}, capabilities: this.caps };
     this.outline.update(page, state);
     this.inspector.update(page, state);
     this.updateBar();
+    this.showPageIssue();
+  }
+
+  // The problems the outline and the inspector show. A draft may use the student's own computer
+  // (links, pictures, an API there), so those problems wait for Publish. Once Publish has found
+  // problems (publishCheck), every change is checked as Publish checks it, so they show where a
+  // draft's do. The first check that finds none of them left turns publishCheck off again, as
+  // loading another version of the page does (reloadFromStore).
+  checkIssues(page) {
+    const options = { validators: this.app.validators, baseurl: this.app.baseurl, pageOrigin: this.app.pageOrigin };
+    const draft = validatePage(page, this.registry, options);
+    if (!this.publishCheck) return draft;
+    const published = validatePage(page, this.registry, { ...options, publish: true });
+    const known = new Set(draft.map(issueId));
+    if (published.some((issue) => !known.has(issueId(issue)))) return published;
+    this.publishCheck = false;
+    return draft;
   }
 
   drawCanvas() {
@@ -206,7 +236,7 @@ export class EditSession {
     shell.title.setAttribute('aria-label', say('edit_title', { title }));
     const save = saveStateOf(status, { cloud: caps.cloud, readOnly: this.state.readOnly, created: Boolean(this.ref), formatTime: (ms) => formatWhen(ms) });
     shell.saveState.textContent = say(save.key, save.vars);
-    shell.saveState.className = `ocs__status-pill ocs__status-pill--${['save_conflict', 'save_error', 'save_offline'].includes(save.key) ? 'bad' : 'neutral'}`;
+    shell.saveState.className = `ocs__status-pill ocs__status-pill--${['save_conflict', 'save_error', 'save_retry'].includes(save.key) ? 'bad' : 'neutral'}`;
     const published = publishStateOf(meta, { publish: caps.publish, dirty });
     shell.publishState.hidden = !published;
     shell.publishState.textContent = published ? say(published) : '';
@@ -242,13 +272,53 @@ export class EditSession {
 
   failed(error) {
     const details = Array.isArray(error && error.details) ? error.details : [];
-    if (details.length && details[0].key) {
-      this.notify(this.text(`errors.${details[0].key}`, { field: details[0].field || '' }), { error: true });
-      if (details[0].nodeId) this.select(details[0].nodeId);
+    const first = details.find((detail) => detail && detail.key);
+    if (first) {
+      this.notify(this.refusalText(first), { error: true });
+      if (first.nodeId) this.select(first.nodeId);
       return;
     }
-    const { key, vars } = errorKeyOf(error);
-    this.notify(this.say(key, vars), { error: true });
+    this.notify(this.app.errorText(error), { error: true });
+  }
+
+  // Spring's refusal of one part of the page, in the words the editor has for the same problem:
+  // the matching local issue (already worded with its numbers), else the editor's own issue on that
+  // field, which says more when Spring names the problem differently (bad_image for a gallery
+  // picture on the student's computer, loopback_link here), else the registry text with the limit
+  // it names. Words that still miss a number, or no words at all, give the general refusal.
+  refusalText(detail) {
+    const nodeId = detail.nodeId === 'page' ? null : detail.nodeId || null;
+    const onNode = this.state.issues.filter((issue) => (issue.nodeId || null) === nodeId);
+    const local = onNode.filter((issue) => issue.key === detail.key);
+    // Spring names a settings key; the editor's issue can sit inside it ("links.0.url").
+    const field = typeof detail.field === 'string' ? detail.field : '';
+    const onField = field ? onNode.find((issue) => typeof issue.field === 'string' && (issue.field === field || issue.field.startsWith(`${field}.`))) : null;
+    const match = local.find((issue) => issue.field === detail.field) || local[0] || onField;
+    if (match) return match.message;
+    const path = `errors.${detail.key}`;
+    const message = this.text(path, { field: detail.field || '', ...this.limitVars(detail.key) });
+    return message === path || /\{\w+\}/.test(message) ? this.text('store.invalid_spec') : message;
+  }
+
+  limitVars(key) {
+    const vars = {};
+    const limit = own(REFUSAL_LIMITS, key);
+    if (limit && Number.isInteger(this.limits[limit])) vars.max = this.limits[limit];
+    if (key === 'too_big') vars.size = JSON.stringify(this.page).length;
+    return vars;
+  }
+
+  // Problems with the whole page (too big to save, too many sections or live blocks) have no row
+  // in the outline and no field in the inspector, so the feedback line shows the first one when it
+  // appears or changes, and clears it once it is fixed.
+  showPageIssue() {
+    const issue = this.state.issues.find((item) => !item.nodeId && !item.field);
+    const message = issue ? issue.message : '';
+    if (message === this.pageIssue) return;
+    const showing = Boolean(this.pageIssue) && this.shell.feedbackText.textContent === this.pageIssue;
+    this.pageIssue = message;
+    if (message) this.notify(message, { error: true });
+    else if (showing) this.notify('');
   }
 
   // ---- selection and changes
@@ -309,16 +379,37 @@ export class EditSession {
   move(id, delta) {
     const next = moveNode(this.page, id, delta);
     if (next === this.page) this.notify(this.say('moved_none', { label: this.labelOf(id) }));
+    else if (this.overBlockLimit(next, id, this.sectionIdOf(id))) this.tooManyBlocks();
     else this.commit(next, { selectedId: id, announce: this.describeMove(next, id) });
   }
 
   drop(id, target) {
     const next = moveNodeTo(this.page, id, target);
-    if (next !== this.page) this.commit(next, { selectedId: id, announce: this.describeMove(next, id) });
+    if (next === this.page) return;
+    if (this.overBlockLimit(next, id, this.sectionIdOf(id))) this.tooManyBlocks();
+    else this.commit(next, { selectedId: id, announce: this.describeMove(next, id) });
   }
 
   overLiveLimit(page) {
     return countLive(page, this.registry) > (this.limits.live_blocks || 8);
+  }
+
+  sectionIdOf(id) {
+    const loc = findNode(this.page, id);
+    return loc && loc.kind === 'block' ? loc.section.id : null;
+  }
+
+  // Whether block `id`, where it sits in `next`, leaves its section with more blocks than a section
+  // may hold (the canvas would leave the extra one out, and Spring refuses the page). A move
+  // within its own section (fromSectionId) adds nothing there.
+  overBlockLimit(next, id, fromSectionId = null) {
+    const loc = findNode(next, id);
+    if (!loc || loc.kind !== 'block' || loc.section.id === fromSectionId) return false;
+    return blockCount(loc.section) > this.limits.blocks_per_section;
+  }
+
+  tooManyBlocks() {
+    this.notify(this.text('errors.too_many_blocks', { max: this.limits.blocks_per_section }), { error: true });
   }
 
   duplicate(id) {
@@ -327,6 +418,7 @@ export class EditSession {
     const newId = this.app.ids(loc.kind === 'section' ? 's' : 'b');
     const next = duplicateNode(this.page, id, { ids: this.app.ids, newId });
     if (loc.kind === 'section' && this.page.sections.length >= this.limits.sections) { this.notify(this.text('errors.too_many_sections', { max: this.limits.sections }), { error: true }); return; }
+    if (loc.kind === 'block' && this.overBlockLimit(next, newId)) { this.tooManyBlocks(); return; }
     if (this.overLiveLimit(next)) { this.notify(this.say('live_limit', { max: this.limits.live_blocks }), { error: true }); return; }
     this.commit(next, { selectedId: newId, announce: this.say('duplicated', { label: this.labelOf(id) }) });
   }
@@ -377,8 +469,7 @@ export class EditSession {
       where = { sectionId, cellIndex: 0 };
     }
     const section = findNode(page, where.sectionId);
-    const count = section ? section.node.cells.reduce((sum, cell) => sum + cell.blocks.length, 0) : 0;
-    if (count >= this.limits.blocks_per_section) { this.notify(this.text('errors.too_many_blocks', { max: this.limits.blocks_per_section }), { error: true }); return; }
+    if (section && blockCount(section.node) >= this.limits.blocks_per_section) { this.tooManyBlocks(); return; }
     const newId = this.app.ids('b');
     const next = addBlock(page, this.registry, { type, sectionId: where.sectionId, cellIndex: where.cellIndex, index: where.index, ids: this.app.ids, newId });
     if (next === page) return;

@@ -1,12 +1,15 @@
 // Crash recovery for the editor (DESIGN §7.2, §10): the page being edited, written to this
 // browser on every change so a closed tab or a lost connection loses nothing. One draft per
-// page: 'spring-<id>', 'local-<id>', or 'new' for a page not saved anywhere yet. Every storage
-// failure (private mode, a full quota, blocked site data) is caught: write() and clear() say
-// whether they worked, read() returns null, and nothing here ever throws on storage.
+// page: 'spring-<id>', 'local-<id>', or the new-page draft for a page not saved anywhere yet.
+// That new-page draft is 'new:<personId>' once a signed-in person is known (setPerson), so a
+// shared school computer never offers one student's unsaved page to the next; a Flask-only or
+// signed-out editor keeps the plain 'new' key. Every storage failure (private mode, a full quota,
+// blocked site data) is caught: write() and clear() say whether they worked, read() returns null,
+// and nothing here ever throws on storage.
 import { LOCAL_ID, browserStorage, isPageDocument } from './page-store.js';
 
 const PREFIX = 'ocs:ui-builder:v1:draft:';
-const KEY = /^(?:spring-[1-9]\d{0,15}|local-[a-z0-9]{6,32}|new)$/;
+const KEY = /^(?:spring-[1-9]\d{0,15}|local-[a-z0-9]{6,32}|new(?::[1-9]\d{0,15})?)$/;
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const isBase = (value) => value === null || Number.isSafeInteger(value);
@@ -14,6 +17,7 @@ const isBase = (value) => value === null || Number.isSafeInteger(value);
 export class DraftStore {
   #storage;
   #now;
+  #personId = null;
 
   constructor({ storage, now = Date.now } = {}) {
     if (typeof now !== 'function') throw new TypeError('DraftStore: now must be a function');
@@ -21,10 +25,20 @@ export class DraftStore {
     this.#now = now;
   }
 
-  // The draft key for a page ref, or 'new' for null. A ref this editor could never have made is
-  // a bug in the caller, so it throws rather than sharing a key with another page.
+  // The signed-in person whose new-page draft to keep apart, or null for signed-out / Flask-only.
+  setPerson(personId) {
+    this.#personId = Number.isSafeInteger(personId) && personId > 0 ? personId : null;
+  }
+
+  // The new-page draft key: scoped to the person when one is known, else the shared 'new'.
+  #newKey() {
+    return this.#personId ? `new:${this.#personId}` : 'new';
+  }
+
+  // The draft key for a page ref, or the new-page key for null. A ref this editor could never have
+  // made is a bug in the caller, so it throws rather than sharing a key with another page.
   keyFor(ref) {
-    if (ref === null || ref === undefined) return 'new';
+    if (ref === null || ref === undefined) return this.#newKey();
     if (isObject(ref) && ref.kind === 'spring') {
       const id = typeof ref.id === 'string' && /^\d{1,16}$/.test(ref.id) ? Number(ref.id) : ref.id;
       if (Number.isSafeInteger(id) && id > 0) return `spring-${id}`;

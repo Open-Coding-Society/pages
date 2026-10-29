@@ -150,6 +150,21 @@ test('a page with every block, the templates and the shared fixture render in ev
   }
 });
 
+// Screen readers list a page by its headings, so no template skips a level (axe heading-order):
+// the header's h1, then a section heading (h2) before the cards' h3s.
+test('every template\'s headings go down one level at a time from its one h1', needsRuby, () => {
+  const registry = loadRegistry();
+  for (const template of registry.templates) {
+    const levels = [...pageHTML(template.page, registry, 'view').matchAll(/<h([1-6])[\s>]/g)].map((match) => Number(match[1]));
+    assert.equal(levels[0], 1, `${template.key} starts with its h1`);
+    assert.equal(levels.filter((level) => level === 1).length, 1, `${template.key} has one h1`);
+    levels.reduce((previous, level) => {
+      assert.ok(level <= previous + 1, `${template.key}: h${previous} then h${level}`);
+      return level;
+    });
+  }
+});
+
 const HOSTILE = [
   'javascript:alert(1)', ' JaVaScRiPt:alert(1)', 'data:text/html,<script>alert(1)</script>', 'vbscript:x',
   '<script>alert(1)</script>', '"><img src=x onerror=alert(1)>', "' onmouseover='alert(1)", '</textarea><svg onload=alert(1)>',
@@ -401,10 +416,17 @@ test('live blocks render the shared card; the canvas fills it with a sample', ne
   const { block } = builder();
   const one = (type, settings, mode) => htmlOf(renderBlock(block(type, settings), ctxFor(registry, mode, { pageSettings: { course: 'csp' } })));
   assert.match(one('chat', SAMPLES.chat, 'view'), new RegExp(`<section class="ocs__card" data-ui-live="chat"><div class="ocs__card-header"><h3 class="ocs__section-title">Team chat</h3></div>`
-    + `<div data-ui-live-status role="status">${say(registry, 'blocks.live_loading')}</div><div data-ui-live-mount></div></section>`));
+    + `<div data-ui-live-status role="status" id="ui-live-status-b-[a-z0-9]+">${say(registry, 'blocks.live_loading')}</div><div data-ui-live-mount></div></section>`));
   assert.ok(one('members', SAMPLES.members, 'view').includes(`<h3 class="ocs__section-title">${defOf(registry, 'block', 'members').label}</h3>`), 'an empty title falls back to the block name');
+  // The kanban and calendar owners draw a card of their own: no card around it, and the title in a
+  // plain wrapper that blocks-live.js hides once that card is in.
+  for (const type of ['kanban', 'calendar']) {
+    assert.match(one(type, SAMPLES[type], 'view'), new RegExp(`<section data-ui-live="${type}"><div data-ui-live-header><div class="ocs__card-header"><h3 class="ocs__section-title">${SAMPLES[type].title}</h3></div></div>`
+      + `<div data-ui-live-status role="status" id="ui-live-status-b-[a-z0-9]+">${say(registry, 'blocks.live_loading')}</div><div data-ui-live-mount></div></section>`), type);
+    assert.match(one(type, SAMPLES[type], 'canvas'), new RegExp(`<section class="ocs__card" data-ui-live="${type}"><div class="ocs__card-header">`), `${type}: the canvas sample keeps its card`);
+  }
   const sample = (type, settings) => one(type, settings, 'canvas');
-  assert.ok(sample('chat', SAMPLES.chat).includes(`<div data-ui-live-status role="status"></div><div data-ui-live-mount><p class="ocs__text">${say(registry, 'blocks.sample_chat', { group: 'Binary Beasts' })}</p></div>`));
+  assert.match(sample('chat', SAMPLES.chat), new RegExp(`<div data-ui-live-status role="status" id="ui-live-status-b-[a-z0-9]+"></div><div data-ui-live-mount><p class="ocs__text">${say(registry, 'blocks.sample_chat', { group: 'Binary Beasts' })}</p></div>`));
   assert.ok(sample('chat', { group: null }).includes(say(registry, 'blocks.sample_no_group')));
   assert.ok(sample('members', SAMPLES.members).includes(say(registry, 'blocks.sample_members', { group: 'Binary Beasts' })));
   assert.ok(sample('message_me', SAMPLES.message_me).includes('<button type="button" class="ocs__btn accent fill" tabindex="-1">Ask us</button>'));

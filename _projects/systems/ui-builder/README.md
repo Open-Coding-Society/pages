@@ -12,11 +12,13 @@ the backend routes and the tests.
 
 ## Flask only or Flask + Spring
 
-`spring` in `_config.yml` decides, as for Profile and login:
+`spring` in `_config.yml` decides, as for Profile and login. Each page reads it once, as
+`config.js` `springEnabled`, and picks where pages are kept:
 
 - `spring: false` (OCS for Business): pages save in the browser and are shared as a page file
-  or JSON. Blocks that need Spring (chat, members, message us, announcements, calendar) are
-  turned off in the block menu.
+  or JSON. Blocks that need Spring are turned off in the block menu: group chat, team members,
+  message us, class announcements, class calendar and visitor feedback. Feedback posts go to
+  Flask, but they are filed under the page's published address, and only Spring publishes.
 - `spring: true` (OCS for Education, this site): pages save to Spring's `mvc/uibuilder`, team
   members edit together, and published pages show at `/ui-builder/view/?page=<address>` and in
   `/ui-builder/gallery/`.
@@ -38,11 +40,24 @@ the backend routes and the tests.
 | `data/ui_builder_school.yml` | `_data/ui_builder_school.yml` | the school pack: courses, announcements and calendar blocks, CSP templates |
 | `data/ui_builder_editor.yml` | `_data/ui_builder_editor.yml` | the editor's strings |
 | `pages/*.md` | `navigation/ui-builder/` | the editor, canvas, viewer and gallery pages |
-| `layouts/ui-builder-canvas.html` | `_layouts/` | the canvas frame: the site head and theme, no navbar |
+| `layouts/ui-builder-canvas.html` | `_layouts/` | the canvas frame: the site's styles and theme, nothing else from the site head |
 | `_includes/ui_builder_data.html` | `_includes/projects/ui-builder/` | the registry and widget data as JSON scripts |
-| `js/*.js` | `assets/js/projects/ui-builder/` | the modules (pure ones are tested with Node) |
-| `sass/` | `_sass/projects/ui-builder/` | the editor and canvas chrome only, scoped under `.ocs__uibuilder` |
+| `js/*.js` | `assets/js/projects/ui-builder/` | the modules (the next table) |
+| `sass/` | `_sass/projects/ui-builder/` | the editor and canvas chrome, scoped under `.ocs__uibuilder` and `.ocs__uibuilder-canvas`, plus two rules for published pages and the gallery: one keeps their titles visible, one fits the grammar's badge into the viewer's bar |
 | `docs/ARCHITECTURE.md` | `/systems/ui-builder/architecture/` | how it works |
+
+The modules, by job:
+
+| Modules | Job |
+|---|---|
+| `editor-*.js` | the editor at `/ui-builder/`. `editor-app.js` starts it and opens the start screen or a page; the others are the start screen, the editing shell, the outline, the inspector and its fields, the block menu, the dialogs, the shortcuts and saving |
+| `canvas.js`, `canvas-bridge.js` | the preview inside the editor: the page drawn in its iframe, and the editor's side of the connection |
+| `page-store.js`, `spring-page-store.js`, `draft-store.js` | the stores: pages kept in this browser or in Spring, and the crash copy of the page being edited |
+| `render.js`, `vnode.js`, `rich-content.js` | turning a page into `ocs__` markup through an allowlist (a fixed list of allowed tags and attributes) |
+| `blocks-content.js`, `blocks-live.js`, `blocks-project.js` | each block's markup, the live blocks, and Data from your API with the click-to-load video and app cards |
+| `viewer.js` | one page at `/ui-builder/view/` |
+| `gallery.js` | the published pages at `/ui-builder/gallery/` |
+| the rest | pure helpers, tested with Node: the registry, the page model and its rules, reading rich text as Spring's jsoup does, the address rules, undo history, autosave, reading API data and the page-file export |
 
 Edit the sources here, never the published copies. The modules import each other only with
 `./`; each page imports `config.js`, `rich-text.js` and the other systems' modules with
@@ -52,9 +67,10 @@ Edit the sources here, never the published copies. The modules import each other
 
 | System | What the UI Builder calls |
 |---|---|
-| Messages | `conversation-embed.js` `mountGroupChat` / `mountConversation` |
-| Courses | `calendar-card.js` `createCalendarCardSection` / `mountCalendarCard`, `ocs_calendar_card.html template=true`, `ocs_calendar_card_data.html` |
+| Messages | `conversation-embed.js` `mountGroupChat` (group chat, and class announcements read-only); `messages-model.js` `isClassGroup` / `isCourseChannel` |
+| Courses | `calendar-card.js` `createCalendarCardSection` / `mountCalendarCard`, `ocs_calendar_card.html template=true`, `ocs_calendar_card_data.html`; `calendar-model.js` `extractEventMarkers` (events in announcements) |
 | Kanban (root) | `kanban-board.js` `createKanbanSection` / `mountKanbanBoard` / `parseBoardUrl`, `ocs_kanban_board.html template=true`, `ocs_kanban_board_data.html` |
+| Flask microblog | `microblog.js` `createPost` to post feedback; Flask's public `GET /api/microblog/page/<key>` to read it |
 | Chat rich text | `rich-text.js` `createRichComposer({enterKey: 'newline'})`, `renderRichMessage` |
 | Grammar | `ocs__split--aside-end` and `ocs__embed` (added for this system) |
 
@@ -62,12 +78,17 @@ Edit the sources here, never the published copies. The modules import each other
 
 A builder page shows a team's work. It is not their CPT program: the College Board doesn't
 count builder output as a student-developed procedure. "Show code" in "Data from your API"
-gives the equivalent `fetch` code with a comment saying the UI Builder generated it, so a
-student who reuses it can say so.
+gives `fetch` code that reads the same items the block reads, with a comment saying the UI
+Builder generated it, so a student who reuses it can say so. When no list is picked, the code
+finds the list the way the block does, so it works before Test connection too.
 
 ## Tests
 
 ```bash
 node --test _projects/systems/ui-builder/tests/*.test.mjs
 bundle exec ruby scripts/test_ui_builder.rb
+node --test tests/ui_builder.test.mjs
 ```
+
+The last one runs the same Node tests from the site's `tests/` folder. It imports the test
+files one by one, so a new test file is added there too.

@@ -1,9 +1,10 @@
 // Dialogs and the block palette. The grammar's ocs__modal draws them; only the layering and the
 // palette's list are the builder's own.
 
-// Above the site's sticky header, as /dm does: the grammar's z-index of 50 sits under it.
+// Above the site's sticky header (navbar.scss gives it 999999999), so the backdrop dims it too:
+// the grammar's z-index of 50 sits under it.
 .ocs__uibuilder-dialog .ocs__modal {
-  z-index: 10000;
+  z-index: 1000000000;
 }
 
 // Unscoped heading rules from other site styles (the documentation pages) turn every h2 green
@@ -39,8 +40,10 @@
   text-transform: uppercase;
 }
 
-// A choice is a full-width row with its icon, name and help, not an ocs__btn pill.
-.ocs__uibuilder-choice {
+// A choice is a full-width row with its icon, name and help, not an ocs__btn pill. Two classes:
+// preset themes give every <button> an accent border (.user-theme-active button), which hid the
+// highlighted choice among 25 outlined ones.
+.ocs__uibuilder-palette .ocs__uibuilder-choice {
   display: block;
   width: 100%;
   padding: 0.55rem 0.75rem;
@@ -62,12 +65,13 @@
     color: var(--pref-accent-color);
   }
 
+  // Tinted over the page color, as the outline's selected row is (_outline.scss).
   &:hover,
   &:focus-visible,
   &[aria-selected="true"] {
     outline: none;
     border-color: var(--pref-accent-color);
-    background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
+    background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--pref-bg-color));
   }
 
   &[aria-disabled="true"] {

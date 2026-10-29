@@ -2,7 +2,9 @@
 // data, and validation that mirrors Spring's UiBuilderSpecRules plus the registry's field rules.
 // Pure and DOM-free; page-model.js re-exports validatePage and validateSettings.
 import { cellCountOf, defOf, defaultValue, liveTypes, textOf } from './registry.js';
-import { apiUrlPolicy, embedPolicy, safeImage, safeLink, videoEmbedOf } from './url-rules.js';
+import { apiUrlPolicy, embedPolicy, isLoopbackAddress, safeImage, safeLink, videoEmbedOf } from './url-rules.js';
+// Rich text is checked as browsers and Spring's jsoup read it (rich-html.js).
+import { linksToComputer, unsafeRichText } from './rich-html.js';
 
 export const PAGE_KIND = 'ocs-ui-page';
 export const SCHEMA_VERSION = 1;
@@ -16,17 +18,6 @@ export const SNAPSHOT_KEYS = ['title', 'text', 'image', 'link', 'value', 'label'
 // a careless merge somewhere else change Object.prototype.
 const FORBIDDEN_KEY = /^(?:on|(?:html|script|__proto__|constructor|prototype)$)/i;
 const LINE_BREAK = new RegExp(`[\\n\\r\\v\\f${String.fromCharCode(0x85, 0x2028, 0x2029)}]`);
-// Spring's rich text rule (UiBuilderSpecRules.unsafeBody), so the editor and Spring agree: inside
-// each tag, after decoding character references, no script/iframe/object/embed tag or javascript:
-// once invisible characters are removed, and no on...= handler once they are spaces. Browsers
-// ignore those characters in "java&#9;script:" and "< script". Text outside tags is only text.
-const char = (code) => String.fromCharCode(code);
-const NOT_PRINTED = new RegExp(`[\\s${char(0)}-${char(0x1f)}${char(0x7f)}-${char(0x9f)}${char(0xa0)}${char(0xad)}`
-  + `${char(0x200b)}-${char(0x200f)}${char(0x2028)}-${char(0x202f)}${char(0x2060)}-${char(0x2064)}${char(0xfeff)}]+`, 'g');
-const TAG = /<[^>]*>?/g;
-const CHAR_REFERENCE = /&#(?:[xX]([0-9a-fA-F]{1,6})|([0-9]{1,7}));?/g;
-const FORBIDDEN_IN_TAG = ['<script', '<iframe', '<object', '<embed', 'javascript:'];
-const EVENT_HANDLER = /[\s/"'`]on\w+\s*=/i;
 const ELLIPSIS = String.fromCharCode(0x2026);
 const MAX_ISSUES = 1000;
 // Spring's UiBuilderSpecRules caps every string at 20 000 characters; DESIGN §6 caps link labels
@@ -57,22 +48,6 @@ export function tableRows(text) {
     .map((line) => line.split('|').map((cell) => cell.trim()));
 }
 
-function decodeReferences(text) {
-  return text.replace(CHAR_REFERENCE, (match, hex, decimal) => {
-    const code = hex ? parseInt(hex, 16) : Number(decimal);
-    return code <= 0x10ffff ? String.fromCodePoint(code) : '';
-  }).replace(/&colon;?/gi, ':').replace(/&tab;?/gi, '\t').replace(/&newline;?/gi, '\n');
-}
-
-function unsafeRichText(html) {
-  for (const raw of html.match(TAG) || []) {
-    const tag = decodeReferences(raw);
-    const squeezed = tag.replace(NOT_PRINTED, '').toLowerCase();
-    if (FORBIDDEN_IN_TAG.some((word) => squeezed.includes(word))) return true;
-    if (EVENT_HANDLER.test(tag.replace(NOT_PRINTED, ' '))) return true;
-  }
-  return false;
-}
 
 export function courseCodes(registry) {
   if (Array.isArray(registry.courses)) return registry.courses.map((course) => course && course.value);
@@ -99,7 +74,8 @@ function limitsOf(registry) {
 }
 
 // publish: check as Spring does before publishing, where an API on the student's own computer
-// (http://localhost) is no longer allowed; drafts may read it while editing.
+// (http://localhost) is no longer allowed, nor any link or picture there; drafts may use them
+// while editing.
 function contextOf(registry, { validators, baseurl = '', pageOrigin, publish = false } = {}) {
   let origin = null;
   try {
@@ -112,6 +88,7 @@ function contextOf(registry, { validators, baseurl = '', pageOrigin, publish = f
     limits: limitsOf(registry),
     validators: isObject(validators) ? validators : {},
     links: { baseurl, pageOrigin },
+    publish: publish === true,
     // Edit mode for drafts. Published pages are read by visitors, so the page's own host must not
     // unlock loopback APIs either (apiUrlPolicy allows them when the site runs on localhost).
     api: publish
@@ -140,27 +117,38 @@ const shownType = (type) => {
   return typeof type === 'number' || typeof type === 'boolean' ? String(type) : '';
 };
 
+// Spring checks page fields after Java's strip(), which also counts U+001C-U+001F as space while
+// JavaScript's trim keeps them, so those count as blank here too.
+const JAVA_ONLY_SPACE = /[\x1c-\x1f]/g;
+
 function checkString(value, field, max, oneLine, fail, visible = (text) => text) {
   if (typeof value !== 'string') return fail('bad_value');
-  if (field.required && !visible(value).trim()) return fail('required');
+  if (field.required && !visible(value).replace(JAVA_ONLY_SPACE, ' ').trim()) return fail('required');
   const limit = Number.isInteger(field.max) ? field.max : max;
   if (value.length > limit) return fail('too_long', { max: limit });
   if (oneLine && LINE_BREAK.test(value)) return fail('one_line');
   return false;
 }
 
+// A field's own max wins over Spring's cap on every string (the gallery picture's column holds 500).
 function checkLocation(value, field, ctx, fail, problemOf) {
   if (typeof value !== 'string') return fail('bad_value');
+  // Length before blankness, in Spring's order: 501 spaces in the gallery picture are too_long there.
+  const limit = Number.isInteger(field.max) ? field.max : ctx.limits.string_max;
+  if (value.length > limit) return fail('too_long', { max: limit });
   if (!value.trim()) return field.required ? fail('required') : false;
-  if (value.length > ctx.limits.string_max) return fail('too_long', { max: ctx.limits.string_max });
   const problem = problemOf(value);
   return problem ? fail(problem) : false;
 }
 
+// A published page can't point at the student's own computer, which no visitor can reach: Spring
+// refuses every such url, src, image or link on publish (loopback_url there).
+const onComputer = (raw, ctx) => (ctx.publish && isLoopbackAddress(raw) ? 'loopback_link' : null);
+
 // mailto: is only for buttons (links lists), the same rule Spring applies.
 const urlProblem = (ctx) => (raw) => {
   const link = safeLink(raw, ctx.links);
-  return link && !/^mailto:/i.test(link.href) ? null : 'bad_url';
+  return link && !/^mailto:/i.test(link.href) ? onComputer(raw, ctx) : 'bad_url';
 };
 
 function checkLinks(value, field, ctx, nodeId, path, fail) {
@@ -177,7 +165,7 @@ function checkLinks(value, field, ctx, nodeId, path, fail) {
       continue;
     }
     checkString(own(link, 'label') ?? '', { required: true, max: ctx.limits.link_label_max }, 0, true, failer(ctx, nodeId, `${at}.label`, label));
-    checkLocation(own(link, 'url') ?? '', { required: true }, ctx, failer(ctx, nodeId, `${at}.url`, label), (raw) => (safeLink(raw, ctx.links) ? null : 'bad_url'));
+    checkLocation(own(link, 'url') ?? '', { required: true }, ctx, failer(ctx, nodeId, `${at}.url`, label), (raw) => (safeLink(raw, ctx.links) ? onComputer(raw, ctx) : 'bad_url'));
   }
   return false;
 }
@@ -248,7 +236,13 @@ function checkApi(value, field, ctx, nodeId, path, fail) {
       report(ctx, nodeId, `${path}.${key}`, 'bad_api_path', { field: label });
     }
   }
-  if (!snapshotOk(own(value, 'snapshot'), ctx)) report(ctx, nodeId, `${path}.snapshot`, 'bad_snapshot', { field: label });
+  const snapshot = own(value, 'snapshot');
+  if (!snapshotOk(snapshot, ctx)) {
+    report(ctx, nodeId, `${path}.snapshot`, 'bad_snapshot', { field: label });
+  } else if (ctx.publish && listOf(own(snapshot, 'items')).some((item) => isLoopbackAddress(own(item, 'image')) || isLoopbackAddress(own(item, 'link')))) {
+    // Spring checks a saved copy's image and link like any other address (loopback_url).
+    report(ctx, nodeId, `${path}.snapshot`, 'loopback_snapshot', { field: label });
+  }
   return false;
 }
 
@@ -260,9 +254,13 @@ function checkField(field, value, ctx, nodeId, path) {
     case 'text': checkString(value, field, limits.text_max, true, fail); break;
     case 'textarea': checkString(value, field, limits.textarea_max, false, fail); break;
     case 'richtext':
-      // Unsafe markup is reported first, even in a body with no visible text.
+      // Unsafe markup is reported first, even in a body with no visible text. A link to the
+      // student's own computer is refused only on publish, as in link fields, in words that say
+      // the link is somewhere in the text.
       if (typeof value === 'string' && unsafeRichText(value)) fail('bad_body');
-      else checkString(value, field, limits.richtext_max, false, fail, plainText);
+      else if (!checkString(value, field, limits.richtext_max, false, fail, plainText) && ctx.publish && linksToComputer(value)) {
+        fail('loopback_link', {}, 'errors.loopback_rich_text');
+      }
       break;
     case 'table':
       if (!checkString(value, field, limits.string_max, false, fail)) {
@@ -273,7 +271,7 @@ function checkField(field, value, ctx, nodeId, path) {
       }
       break;
     case 'url': checkLocation(value, field, ctx, fail, urlProblem(ctx)); break;
-    case 'image': checkLocation(value, field, ctx, fail, (raw) => (safeImage(raw, ctx.links) ? null : 'bad_image')); break;
+    case 'image': checkLocation(value, field, ctx, fail, (raw) => (safeImage(raw, ctx.links) ? onComputer(raw, ctx) : 'bad_image')); break;
     case 'choice': if (!optionValues(field).includes(value)) fail('bad_choice'); break;
     case 'course':
       if (typeof value !== 'string' || (value && !courseCodes(ctx.registry).includes(value))) fail('bad_choice');
@@ -295,9 +293,13 @@ function checkField(field, value, ctx, nodeId, path) {
   return ctx.found > before;
 }
 
-// Block rules beyond the field type. The editor adds its own through `validators` (kanban's
-// parseBoardUrl); they run after these, only on non-empty values that passed the type check.
+// Rules beyond the field type, by block type ("page" for the page settings). The editor adds its
+// own through `validators` (kanban's parseBoardUrl); they run after these, only on non-empty
+// values that passed the type check.
 const BUILT_IN_RULES = {
+  // Spring checks the gallery picture as if the page were published on every save, drafts too
+  // (pageFieldIssues → imageAllowed): the gallery shows it to every visitor.
+  page: { image: (value) => (isLoopbackAddress(value) ? { key: 'loopback_link' } : null) },
   video: { url: (value) => (videoEmbedOf(value) ? null : { key: 'video_bad_url' }) },
   embed: { url: (value) => (embedPolicy(value).reason === 'embed_https' ? { key: 'embed_https' } : null) },
 };
@@ -457,7 +459,7 @@ export function validatePage(page, registry, options = {}) {
   }
   scanKeys(page, 1, null, ctx);
   const fields = own(page, 'page');
-  if (isObject(fields)) checkFields(listOf(registry.page_fields), fields, ctx, null, '', null);
+  if (isObject(fields)) checkFields(listOf(registry.page_fields), fields, ctx, null, '', 'page');
   else report(ctx, null, 'page', 'bad_page');
   const sections = own(page, 'sections');
   if (Array.isArray(sections)) {

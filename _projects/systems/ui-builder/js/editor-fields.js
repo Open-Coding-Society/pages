@@ -291,10 +291,10 @@ function listWidget(field, ctx) {
   let rows = [];
   let issues = [];
   const list = el(doc, 'ol', { class: 'ocs__uibuilder-rows' });
-  const add = el(doc, 'button', { type: 'button', class: 'ocs__btn small', onclick: () => {
+  const add = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small', onclick: () => {
     const blank = Object.fromEntries(subFields.map((sub) => [sub.id, sub.type === 'toggle' ? false : '']));
     commit([...value, blank], { focusRow: value.length });
-  } }, icon(doc, 'fa-plus'), ` ${isLinks ? say('links_add') : say('items_add')}`);
+  } }, icon(doc, 'fa-plus'), isLinks ? say('links_add') : say('items_add'));
   const group = el(doc, 'fieldset', { class: 'ocs__uibuilder-list', id: ctx.nextId() }, el(doc, 'legend', { class: 'ocs__label' }, field.label), list, add);
   const box = shell(ctx, { ...field, label: '' }, group, { labelText: '' });
 
@@ -389,7 +389,10 @@ function groupWidget(field, ctx) {
       fill();
     }, (error) => {
       fill();
-      status.replaceChildren(say('group_failed', { message: (error && error.message) || '' }), ' ',
+      // The store's words for the failure, never the error's own message (page-store.js wording).
+      const services = ctx.services || {};
+      const message = typeof services.errorText === 'function' ? services.errorText(error) : ((error && error.message) || '');
+      status.replaceChildren(say('group_failed', { message }), ' ',
         el(doc, 'button', { type: 'button', class: 'ocs__btn small', onclick: load }, say('group_retry')));
     });
   }

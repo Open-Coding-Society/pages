@@ -11,9 +11,9 @@ framed: The UI Builder doesn't run inside another page.
 framed_open: Open the UI Builder
 loading: Loading…
 load_failed: "Couldn't open this page: {message}"
-not_found: This page doesn't exist, or you can't edit it.
 back: My pages
 edit_title: "Page settings for {title}"
+editing: "Editing {title}."
 undo: Undo
 redo: Redo
 device_group: Preview size
@@ -53,7 +53,7 @@ save_saved: "Saved {time}"
 save_dirty: Unsaved changes
 save_local: Saved in this browser only
 save_conflict: Conflict
-save_offline: Offline · will retry
+save_retry: Not saved · will retry
 save_error: Couldn't save
 save_new: Not saved yet
 save_readonly: Read only
@@ -105,6 +105,7 @@ cancel: Cancel
 # ---- inspector
 inspector: Settings
 page_settings_help: Settings for the whole page. Select a block or section to change it instead.
+page_issues_title: "Fix these to save the whole page:"
 no_fields: This part has no settings.
 block_toolbar: "Actions for {label}"
 select_parent: Select its section
@@ -122,6 +123,9 @@ visibility_requested: A teacher has been asked to show this page to everyone.
 visibility_request: Ask to show it to everyone
 visibility_members: Only OCS members
 visibility_done: Visibility updated.
+approve_shows_published: Approving shows everyone the published copy, not this draft.
+approval_ended: Approval ended
+approval_newer: Newer version not approved
 unpublish: Unpublish
 unpublish_title: Unpublish this page
 unpublish_body: "Visitors to {address} see Not found until you publish again."
@@ -174,6 +178,7 @@ api_test: Test connection
 api_testing: Testing…
 api_checks: Connection check
 api_list: Which list
+api_list_auto: Find the list for me
 api_list_whole: The whole reply
 api_list_count: "{path} ({count} items)"
 api_slots: Fields to show
@@ -209,7 +214,7 @@ publish_confirm: Publish
 publish_changes_body: "Publishing replaces the live page at {address} with your draft."
 published: "Published. The live page is at {address}."
 publish_failed: "Couldn't publish: {message}"
-publish_fix: "Fix {count} problems before publishing."
+publish_fix: "{count} to fix before publishing."
 publish_wait: Saving your last changes first…
 publish_local: Pages on this site save in your browser. Export the page file to put it on the site.
 conflict_title: Someone else saved this page
@@ -220,7 +225,9 @@ conflict_keep: Keep mine
 conflict_keep_note: Keep mine saves your version over theirs. Theirs stays in Revisions.
 conflict_keep_note_local: Keep mine saves your version over the one from your other tab.
 conflict_reloaded: Reloaded the newest version.
+conflict_kept_publish: Your version is saved. Publish again to put it on the live page.
 lease_banner: "{name} is editing this page, so you can only look."
+someone: Someone
 lease_take: Take over
 lease_taken: You're editing now.
 lease_lost: "{name} took over editing. Your changes so far are saved."
@@ -235,6 +242,7 @@ rev_RESTORE: Restored
 revision_restore: Restore
 revision_restore_title: Restore this version
 revision_restore_body: "Restore the version from {time}? Your current draft stays in Revisions."
+revision_restore_body_unsaved: "Restore the version from {time}? Your newest changes couldn't be saved, so restoring throws them away. To keep a copy, cancel and use Export JSON in the More menu."
 restored: "Restored the version from {time}."
 recover_body: "This browser kept changes from {time} that weren't saved."
 recover_restore: Restore them
@@ -272,11 +280,15 @@ editing_now: "{name} is editing"
 changes_pending: Changes not published
 public_pill: Everyone
 templates_lead: Pick a starting point. You can change every part of it.
-template_use: "Start from {label}"
+template_start: Use template
+template_use: "Use template: {label}"
 creating: Making your page…
 create_failed: "Couldn't make the page: {message}"
 resume_new: "A page you started at {time} wasn't saved."
 resume_open: Open it
+replace_new_title: Start a new page?
+replace_new_body: "The page you started at {time} isn't saved anywhere yet. A new page throws it away. To keep it, cancel and choose Open it."
+replace_new_confirm: Start a new page
 class_lead: Every page in your classes. Open a draft, approve a page for everyone or unpublish it.
 class_course: Course
 class_all_courses: All courses
@@ -286,23 +298,14 @@ class_changes: Changes not published
 class_empty: No pages match.
 class_owner: "By {name}"
 class_open_draft: Open draft
+class_open_published: Open published copy
 class_bulk_pick: Pick a course first.
 class_bulk_done: "Pages approved for everyone: {count}."
 approve_done: "{title} is public now."
+approve_changed: This page was published again after you opened it. Open the published copy again, then approve it.
+approve_unpublished: This page was unpublished after you opened it, so it wasn't approved. You can approve it once it's published again.
 col_page: Page
 col_status: Status
 col_updated: Updated
 col_actions: Actions
-
-# ---- errors from the store
-err_offline: Spring isn't answering. Your changes are kept in this browser.
-err_storage_full: "This browser's storage is full. Export the pages you need, then delete old ones."
-err_storage_blocked: This browser blocks site data, so pages can't be saved here.
-err_corrupt: This saved page is damaged and can't be opened.
-err_signed_out: Your sign-in ended. Sign in again, then try again.
-err_forbidden: You can't do that on this page.
-err_too_large: This page is too big to save.
-err_busy: Spring is busy. Try again in a moment.
-err_origin: This site isn't allowed to save pages to Spring.
-err_invalid: "Spring refused the page: {message}"
-err_generic: "Something went wrong ({message})."
+# Store errors are worded by text.store in ui_builder.yml (page-store.js storeErrorText).

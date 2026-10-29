@@ -16,7 +16,8 @@ export function fitScale(available, deviceWidth) {
 export function buildShell({ doc = globalThis.document, registry, say, caps = {}, baseurl = '', win = doc.defaultView }) {
   const devices = (Array.isArray(registry.devices) ? registry.devices : []).filter((device) => device && typeof device.key === 'string');
   const wrap = (child, hidden = true) => el(doc, 'span', { class: 'ocs__uibuilder-wrap', hidden }, child);
-  const back = el(doc, 'a', { class: 'ocs__btn small', href: `${String(baseurl).replace(/\/+$/, '')}/ui-builder/` }, icon(doc, 'fa-arrow-left'), ` ${say('back')}`);
+  // Icon and words: ocs__btn--icon spaces them (a flex button drops a leading space).
+  const back = el(doc, 'a', { class: 'ocs__btn ocs__btn--icon small', href: `${String(baseurl).replace(/\/+$/, '')}/ui-builder/` }, icon(doc, 'fa-arrow-left'), say('back'));
   const title = el(doc, 'button', { type: 'button', class: 'ocs__btn small ocs__truncate ocs__uibuilder-title' }, '');
   const saveState = el(doc, 'strong', { class: 'ocs__status-pill ocs__status-pill--neutral' }, '');
   const publishState = el(doc, 'strong', { class: 'ocs__status-pill' }, '');
@@ -29,12 +30,12 @@ export function buildShell({ doc = globalThis.document, registry, say, caps = {}
   const realData = el(doc, 'div', { class: 'ocs__uibuilder-wrap', hidden: true },
     el(doc, 'label', { class: 'ocs__toggle', title: say('real_data_help') }, realInput, el(doc, 'span', { class: 'ocs__toggle-track', 'aria-hidden': 'true' }), el(doc, 'span', { class: 'ocs__toggle-label' }, say('real_data'))),
     el(doc, 'small', { id: 'ui-real-data-help', class: 'ocs__uibuilder-visually-hidden' }, say('real_data_help')));
-  const outlineToggle = el(doc, 'button', { type: 'button', class: 'ocs__btn small ocs__uibuilder-pane-toggle', 'aria-expanded': 'false', 'aria-controls': 'ui-outline' }, icon(doc, 'fa-list'), ` ${say('outline_toggle')}`);
-  const inspectorToggle = el(doc, 'button', { type: 'button', class: 'ocs__btn small ocs__uibuilder-pane-toggle', 'aria-expanded': 'false', 'aria-controls': 'ui-inspector' }, icon(doc, 'fa-sliders'), ` ${say('inspector_toggle')}`);
-  const preview = el(doc, 'a', { class: 'ocs__btn small', href: '#', target: '_blank', rel: 'noopener' }, icon(doc, 'fa-eye'), ` ${say('preview_draft')}`);
-  const live = el(doc, 'a', { class: 'ocs__btn small', href: '#', target: '_blank', rel: 'noopener' }, icon(doc, 'fa-arrow-up-right-from-square'), ` ${say('open_live')}`);
+  const outlineToggle = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small ocs__uibuilder-pane-toggle', 'aria-expanded': 'false', 'aria-controls': 'ui-outline' }, icon(doc, 'fa-list'), say('outline_toggle'));
+  const inspectorToggle = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small ocs__uibuilder-pane-toggle', 'aria-expanded': 'false', 'aria-controls': 'ui-inspector' }, icon(doc, 'fa-sliders'), say('inspector_toggle'));
+  const preview = el(doc, 'a', { class: 'ocs__btn ocs__btn--icon small', href: '#', target: '_blank', rel: 'noopener' }, icon(doc, 'fa-eye'), say('preview_draft'));
+  const live = el(doc, 'a', { class: 'ocs__btn ocs__btn--icon small', href: '#', target: '_blank', rel: 'noopener' }, icon(doc, 'fa-arrow-up-right-from-square'), say('open_live'));
   const publish = el(doc, 'button', { type: 'button', class: 'ocs__btn small accent fill' }, say('publish'));
-  const more = el(doc, 'button', { type: 'button', class: 'ocs__btn small', 'aria-haspopup': 'menu', 'aria-expanded': 'false', 'aria-controls': 'ui-more-menu' }, icon(doc, 'fa-ellipsis'), ` ${say('more')}`);
+  const more = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small', 'aria-haspopup': 'menu', 'aria-expanded': 'false', 'aria-controls': 'ui-more-menu' }, icon(doc, 'fa-ellipsis'), say('more'));
   const menuNames = ['export_page', 'export_json', 'show_html', ...(caps.revisions ? ['revisions'] : []), 'page_settings'];
   const menuItems = new Map(menuNames.map((name) => [name, el(doc, 'button', { type: 'button', role: 'menuitem', tabindex: '-1', class: 'ocs__uibuilder-menu-item' }, say(name))]));
   const menu = el(doc, 'div', { class: 'ocs__uibuilder-menu', id: 'ui-more-menu', role: 'menu', 'aria-label': say('more') }, [...menuItems.values()]);
@@ -65,7 +66,9 @@ export function buildShell({ doc = globalThis.document, registry, say, caps = {}
   const dismiss = iconButton(doc, { name: 'fa-xmark', label: say('dismiss') });
   const dismissWrap = wrap(dismiss);
   const feedback = el(doc, 'div', { class: 'ocs__uibuilder-feedback', role: 'status', 'aria-live': 'polite' }, feedbackText, dismissWrap);
-  const element = el(doc, 'div', { class: 'ocs__uibuilder-shell' }, bar, banners, body, feedback);
+  // The feedback line sits under the bar, so an answer such as Publish's list of problems stays
+  // on screen: under the panes, which fill the window's height, it was below the bottom edge.
+  const element = el(doc, 'div', { class: 'ocs__uibuilder-shell' }, bar, banners, feedback, body);
 
   // ---- devices and the canvas size
   // A phone-sized editor starts on the phone preview; anything wider on the desktop one.
@@ -105,6 +108,8 @@ export function buildShell({ doc = globalThis.document, registry, say, caps = {}
     if (open) body.setAttribute(`data-${name}-open`, '');
     else body.removeAttribute(`data-${name}-open`);
     toggle.setAttribute('aria-expanded', String(open));
+    // The grammar draws fill only with accent: both, as the device buttons do, show it open.
+    toggle.classList.toggle('accent', open);
     toggle.classList.toggle('fill', open);
     fit();
   }

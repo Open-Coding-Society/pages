@@ -2,8 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { textOf } from '../js/registry.js';
 import {
-  codeSnippet, doctor, fetchJson, fieldsOf, findListPath, getPath, guessMapping, mapItems, privateKeys,
+  WHOLE_REPLY, codeSnippet, doctor, fetchJson, fieldsOf, findListPath, getPath, guessListPath, guessMapping, listIn, mapItems, privateKeys,
 } from '../js/api-data.js';
+import { runSnippet, snippetItems } from './fixtures/snippet.mjs';
 import { loadRegistry, needsRuby } from './helpers.mjs';
 
 const PAGE = { mode: 'view', pageHost: 'pages.opencodingsociety.com', pageProtocol: 'https:' };
@@ -69,6 +70,109 @@ test('findListPath finds the list of items in a reply', () => {
   const cyclic = { a: {} };
   cyclic.a.self = cyclic;
   assert.equal(findListPath(cyclic), null, 'cycles end');
+});
+
+test('guessListPath guesses the reply itself or a list of objects, never an empty or plain list', () => {
+  assert.equal(guessListPath([{ a: 1 }]), '');
+  assert.equal(guessListPath([]), '', 'a reply that is a list is the items, even when empty');
+  assert.equal(guessListPath({ count: 2, results: [{ a: 1 }, { a: 2 }] }), 'results');
+  assert.equal(guessListPath({ tags: ['a'], data: { posts: [{ id: 1 }] } }), 'data.posts', 'a list of objects wherever it is');
+  for (const json of [{ joke: 'Why?', comments: [] }, { joke: 'Why?', tags: ['pun'] }, { data: { items: [] } }, { joke: 'Why?' }, null, 'x', 7]) {
+    assert.equal(guessListPath(json), null, JSON.stringify(json));
+  }
+});
+
+test('listIn: the mapped list, else the list in the reply, else one object as a list of one', () => {
+  const reply = { data: { items: [{ a: 1 }, { a: 2 }] }, meta: { tags: ['x'] } };
+  assert.equal(listIn(reply, 'data.items').length, 2);
+  assert.equal(listIn(reply, '').length, 2, 'no list_path: the list the reply holds');
+  assert.deepEqual(listIn({ users: [{ name: 'Ada' }] }, undefined), [{ name: 'Ada' }]);
+  assert.deepEqual(listIn([1, 2, 3], ''), [1, 2, 3]);
+  assert.deepEqual(listIn({ joke: 'Why?' }, ''), [{ joke: 'Why?' }], 'a reply with no list is one item');
+  assert.deepEqual(listIn(reply, 'data.items[0]'), [{ a: 1 }], 'a path to one object is a list of one');
+  for (const [json, path] of [[reply, 'missing'], [reply, 'meta.tags[0]'], ['text', ''], [null, ''], [reply, 'a b']]) {
+    assert.deepEqual(listIn(json, path), [], `${JSON.stringify(json)} at ${path}`);
+  }
+  // The Flask starter maps joke and haha with no list picked. A reply whose only list is empty or
+  // holds plain values stays one joke, as published pages showed it; a list of objects is guessed.
+  const starter = { title_path: 'joke', value_path: 'haha' };
+  const shown = (json) => mapItems(listIn(json, ''), starter, MAP).map((item) => `${item.title}|${item.value}`);
+  assert.deepEqual(shown({ joke: 'Why?', haha: 3, comments: [] }), ['Why?|3']);
+  assert.deepEqual(shown({ joke: 'Why?', haha: 3, tags: ['pun'] }), ['Why?|3']);
+  assert.deepEqual(shown({ count: 2, results: [{ joke: 'A', haha: 1 }, { joke: 'B', haha: 2 }] }), ['A|1', 'B|2']);
+});
+
+// "" is a list not picked yet, which is guessed; "The whole reply" is stored as "." and never is.
+test('listIn: the whole reply (".") is the reply itself, never the list inside it', () => {
+  assert.equal(WHOLE_REPLY, '.');
+  const reply = { team: 'Flood Watch', users: [{ name: 'Ada' }, { name: 'Alan' }] };
+  assert.equal(getPath(reply, WHOLE_REPLY), reply);
+  assert.deepEqual(listIn(reply, WHOLE_REPLY), [reply], 'one object is one item');
+  assert.deepEqual(listIn(reply, ''), reply.users, 'not picked yet: the list it holds');
+  assert.deepEqual(listIn([{ name: 'Ada' }], WHOLE_REPLY), [{ name: 'Ada' }], 'a reply that is a list is the items');
+  for (const json of ['text', 7, null]) assert.deepEqual(listIn(json, WHOLE_REPLY), [], String(json));
+});
+
+// Show code is run, not read: its own small getPath, findItems and loadItems must find the block's
+// items. A list not picked yet ("") is found when the code runs, so no Test is needed first.
+test('Show code draws the items the block shows: the whole reply as one item, a picked list as its items, a list not picked yet as the block finds it', async () => {
+  const team = { team: 'Flood Watch', users: [{ team: 'Ada' }, { team: 'Alan' }] };
+  const users = [{ name: 'Ada' }, { name: 'Alan' }];
+  const cases = [
+    [team, { list_path: WHOLE_REPLY, title_path: 'team' }, ['Flood Watch']],
+    [team, { list_path: 'users', title_path: 'team' }, ['Ada', 'Alan']],
+    [team, { list_path: 'users[1]', title_path: 'team' }, ['Alan']],
+    [team, { list_path: '', title_path: 'team' }, ['Ada', 'Alan']],
+    [{ count: 2, users }, { list_path: '', title_path: 'name' }, ['Ada', 'Alan']],
+    [{ count: 2, users }, { list_path: 'users', title_path: 'name' }, ['Ada', 'Alan']],
+    [[{ joke: 'Ha' }, { joke: 'Ho' }], { list_path: WHOLE_REPLY, title_path: 'joke' }, ['Ha', 'Ho']],
+    [[{ joke: 'Ha' }, { joke: 'Ho' }], { list_path: '', title_path: 'joke' }, ['Ha', 'Ho']],
+    [{ joke: 'Why?', comments: [] }, { list_path: '', title_path: 'joke' }, ['Why?']],
+    [{ joke: 'Why?', tags: ['pun'] }, { list_path: '', title_path: 'joke' }, ['Why?']],
+    ['text', { list_path: WHOLE_REPLY, title_path: 'joke' }, []],
+    ['text', { list_path: '', title_path: 'joke' }, []],
+  ];
+  for (const [reply, mapping, drawn] of cases) {
+    const source = { url: JOKES, ...mapping };
+    const label = `${JSON.stringify(reply).slice(0, 30)} at "${source.list_path}"`;
+    assert.deepEqual(mapItems(listIn(reply, source.list_path), source, MAP).map((item) => item.title), drawn, `the block: ${label}`);
+    assert.deepEqual(await runSnippet(codeSnippet(source), reply), drawn, `Show code: ${label}`);
+  }
+  // A path a student types into that code's LIST_PATH is read as it is, not found.
+  const typed = codeSnippet({ url: JOKES, list_path: '', title_path: 'name' }).replace('const LIST_PATH = "";', 'const LIST_PATH = "staff";');
+  assert.deepEqual(await runSnippet(typed, { users, staff: [{ name: 'Bo' }] }), ['Bo']);
+});
+
+// The code for a list not picked yet must find what listIn finds, limits included: the same list
+// (the reply's own values), or the reply as one item, for any reply an API could send.
+test('Show code finds a list not picked yet exactly as listIn does, down to the limits of the guess', async () => {
+  const one = [{ x: 1 }];
+  const two = [{ x: 1 }, { x: 2 }];
+  const numbers = (count) => Array.from({ length: count }, (_, index) => index);
+  const keyed = Object.fromEntries(Array.from({ length: 600 }, (_, index) => [`k${index}`, { n: index }]));
+  keyed.k10 = { list: one };
+  keyed.k550 = { list: two }; // longer, but past the 500 objects the guess looks at
+  const replies = [
+    [], [1, 2], two, 'text', 7, null, true,
+    { joke: 'Why?' }, { joke: 'Why?', comments: [] }, { joke: 'Why?', tags: ['pun'] }, { data: { items: [] } },
+    { count: 2, users: two }, { team: 'x', users: two }, { data: { items: two } }, { tags: ['a'], data: { posts: one } },
+    { short: one, long: two }, { first: [{ x: 1 }], second: [{ x: 2 }] }, { b: [{ x: 1 }], 1: [{ x: 2 }] }, // the longest, else the first
+    { a: { list: [{ x: 1 }, { x: 2 }, { x: 3 }] }, top: one }, // nearest the top wins over longer
+    { a: { b: { c: { list: one } } } }, { a: { b: { c: { d: { list: one } } } } }, // four names deep at most
+    { 'my list': two, ok: one }, { 'v1.users': two }, // names a path can't hold
+    JSON.parse('{"__proto__":[{"x":1},{"x":2}],"constructor":[{"x":1},{"x":2},{"x":3}],"items":[{"x":1}]}'),
+    { ['a'.repeat(60)]: { ['b'.repeat(60)]: two }, z: { y: one } }, // a path of 121 characters
+    { late: [...numbers(20), { x: 1 }, { x: 2 }], early: one }, { edge: [...numbers(19), { x: 1 }] }, // the first 20 entries
+    { grid: [[{ x: 1 }]], holes: [null, { x: 1 }] }, { a: [{ b: two }] },
+    keyed,
+  ];
+  for (const reply of replies) {
+    const label = String(JSON.stringify(reply)).slice(0, 60);
+    const items = await snippetItems(codeSnippet({ url: JOKES, list_path: '' }), reply);
+    const expected = listIn(reply, '');
+    assert.equal(items.length, expected.length, label);
+    assert.ok(items.every((item, index) => item === expected[index]), `the same items: ${label}`);
+  }
 });
 
 test('fieldsOf lists item fields with their types; privateKeys flags the ones a page must never show', () => {
@@ -146,6 +250,9 @@ test('fetchJson applies the API link policy before any request', async () => {
   assert.equal(calls.length, 0);
   const editing = await run(fetchOf(reply(200, '[]').response).fetchImpl, 'http://localhost:8587/api/jokes', { mode: 'edit' });
   assert.deepEqual([editing.ok, editing.loopback], [true, true]);
+  const typo = await run(fetchImpl, 'http:/localhost:8587/api/jokes', { mode: 'edit' });
+  assert.deepEqual([typo.error, typo.reason], ['policy', 'policy_loopback_form'], 'Spring would refuse it, so it is not read either');
+  assert.equal(calls.length, 0);
 });
 
 test('fetchJson names HTTP failures and drops their bodies unread', async () => {
@@ -207,11 +314,15 @@ test('doctor explains every result with registry text and the exact fix', needsR
   const options = { url: JOKES, pageOrigin: 'https://pages.opencodingsociety.com/ui-builder/' };
   const base = { ok: false, status: 0, ms: 12, host: 'flask.opencodingsociety.com', url: JOKES, loopback: false, timeoutMs: 8000, maxChars: 512000 };
   const cases = [
-    [{ ...base, ok: true, json: [{ joke: 'Ha', email: 'a@x' }] }, ['ok:ok', 'warning:private_keys']],
-    [{ ...base, ok: true, json: { data: { items: [] } } }, ['ok:ok']],
+    [{ ...base, ok: true, json: [{ joke: 'Ha', email: 'a@x' }, { joke: 'Ho' }] }, ['ok:ok', 'warning:private_keys']],
+    [{ ...base, ok: true, json: [{ joke: 'Ha' }] }, ['ok:ok_one']],
+    // Nothing picked and no list of objects to guess: the list the reply holds is named.
+    [{ ...base, ok: true, json: { data: { items: [] } } }, ['ok:ok_object', 'info:ok_list_empty']],
+    [{ ...base, ok: true, json: { tags: ['pun', 'dad'] } }, ['ok:ok_object', 'info:ok_list_plain']],
     [{ ...base, ok: true, json: { name: 'x' } }, ['ok:ok_object', 'warning:empty']],
     [{ ...base, ok: true, json: [], loopback: true }, ['ok:ok', 'info:policy_loopback_view']],
     [{ ...base, error: 'policy', reason: 'policy_https' }, ['error:policy_https']],
+    [{ ...base, error: 'policy', reason: 'policy_loopback_form' }, ['error:policy_loopback_form']],
     [{ ...base, error: 'policy', reason: 'odd' }, ['error:policy']],
     [{ ...base, error: 'mixed_content' }, ['error:mixed_content']],
     [{ ...base, error: 'timeout', loopback: true }, ['error:timeout', 'info:loopback_hint']],
@@ -237,9 +348,46 @@ test('doctor explains every result with registry text and the exact fix', needsR
   const [blocked] = doctor({ ...base, error: 'blocked_read' }, options);
   assert.equal(textOf(registry, 'doctor.blocked_read', blocked.vars).includes('add https://pages.opencodingsociety.com to allowed_origins'), true);
   assert.deepEqual(doctor({ ...base, error: 'timeout' }, options)[0].vars, { seconds: 8 });
-  assert.deepEqual(doctor({ ...base, ok: true, json: [{ email: 'x' }] }, { ...options, privateKeyList: [] }).map((a) => a.key), ['ok']);
+  // One item is not "1 items", and the list the reply holds is named by its path.
+  const said = (json) => doctor({ ...base, ok: true, json }, options).map(({ key, vars }) => textOf(registry, `doctor.${key}`, vars));
+  const [single] = said([{ joke: 'Ha' }]);
+  assert.match(single, /\b1 item\b/);
+  assert.doesNotMatch(single, /\b1 items\b/);
+  assert.match(said([{ joke: 'Ha' }, { joke: 'Ho' }])[0], /\b2 items\b/);
+  assert.match(said({ data: { items: [] } })[1], /\bdata\.items\b/);
+  assert.match(said({ joke: 'Ha', tags: ['pun'] })[1], /\btags\b/);
+  assert.deepEqual(doctor({ ...base, ok: true, json: [{ email: 'x' }] }, { ...options, privateKeyList: [] }).map((a) => a.key), ['ok_one']);
   assert.deepEqual(doctor({ ...base, ok: true, json: [{ a: 1 }] }, { ...options, privateKeyList: ['token', 'sid'] })[1].vars, { keys: 'token, sid' });
   assert.deepEqual(doctor(null), []);
+});
+
+// Test connection describes the items the block will show (listIn at the block's list_path), not
+// the list findListPath would pick: a different count there contradicts the preview.
+test('doctor counts the items the block shows at its list_path, and checks those for private fields', () => {
+  const base = { ok: true, status: 200, ms: 12, host: 'team.example', url: 'https://team.example/api', loopback: false };
+  const report = (json, listPath) => doctor({ ...base, json }, { listPath })
+    .map(({ key, vars }) => [key, vars.count ?? vars.keys ?? vars.path].filter((part) => part !== undefined).join(':'));
+  const team = { team: 'Flood Watch', users: [{ name: 'Ada' }, { name: 'Alan' }] };
+  assert.deepEqual(report(team, WHOLE_REPLY), ['ok_one:1'], 'the whole reply is one item, not the two users');
+  assert.deepEqual(report(team, ''), ['ok:2'], 'not picked yet: the list the block guesses');
+  assert.deepEqual(report({ a: [{ n: 1 }], b: [{ n: 1 }, { n: 2 }, { n: 3 }] }, 'a'), ['ok_one:1'], 'the picked list, not the longer one');
+  assert.deepEqual(report({ users: [] }, 'users'), ['ok:0'], 'a picked list that is empty for now');
+  assert.deepEqual(report(team, 'users[0]'), ['ok_one:1'], 'a path to one object is one item');
+  assert.deepEqual(report({ users: [{ name: 'Ada' }] }, 'jokes'), ['ok:0'], 'a picked list that is not in this reply');
+  // Nothing picked and no list of objects to guess: the block shows the reply as one item, and
+  // the report names the list the reply holds, which is right but empty for now or of plain values.
+  assert.deepEqual(report({ data: { items: [] } }, ''), ['ok_object', 'ok_list_empty:data.items'], 'the route is right; its list is empty for now');
+  assert.deepEqual(report({ joke: 'Why?', haha: 3, comments: [] }, ''), ['ok_object', 'ok_list_empty:comments']);
+  assert.deepEqual(report({ joke: 'Why?', tags: ['pun'] }, ''), ['ok_object', 'ok_list_plain:tags']);
+  assert.deepEqual(report({ names: ['Ada'], none: [] }, ''), ['ok_object', 'ok_list_plain:names'], 'the longer list of the two');
+  assert.deepEqual(report({ joke: 'Why?' }, ''), ['ok_object', 'empty'], 'a reply with no list at all');
+  assert.deepEqual(report({ data: { items: [] } }, 'data.items'), ['ok:0'], 'once picked, the list is counted');
+  // The longer list (staff) is the guess; the block may show users or the whole reply instead.
+  const mixed = { email: 'team@x.example', users: [{ name: 'Ada' }], staff: [{ name: 'Bo' }, { name: 'Cy', token: 't' }] };
+  assert.deepEqual(report(mixed, ''), ['ok:2', 'private_keys:token']);
+  assert.deepEqual(report(mixed, 'users'), ['ok_one:1'], 'nothing private in the list the block shows');
+  assert.deepEqual(report(mixed, WHOLE_REPLY), ['ok_one:1', 'private_keys:email']);
+  assert.deepEqual(report({ name: 'Ada', email: 'a@x.example' }, ''), ['ok_object', 'empty', 'private_keys:email'], 'one object is shown, so its fields count');
 });
 
 test('codeSnippet is plain JavaScript that starts with the CPT acknowledgment', () => {
@@ -251,6 +399,11 @@ test('codeSnippet is plain JavaScript that starts with the CPT acknowledgment', 
   assert.ok(code.includes('const FIELDS = {"title":"joke","text":"","image":"","link":"","value":"","label":""};'), 'private and invalid paths are left out');
   assert.ok(!code.includes('innerHTML') && code.includes("credentials: 'omit'") && code.includes("redirect: 'error'"));
   assert.doesNotThrow(() => new Function(code), 'it parses');
+  assert.ok(!code.includes('findItems'), 'a picked list is read as it is, with no finding of its own');
+  const finding = codeSnippet({ url: JOKES, list_path: '', title_path: 'joke' });
+  assert.ok(finding.includes('const LIST_PATH = "";') && finding.includes('function findItems(reply)'), 'a list not picked yet is found when the code runs');
+  assert.ok(!finding.includes('innerHTML'));
+  assert.doesNotThrow(() => new Function(finding), 'that parses too');
   assert.ok(codeSnippet(null).includes('const API_URL = "";'));
   assert.ok(codeSnippet(JSON.parse('{"__proto__":{"url":"https://evil.example"}}')).includes('const API_URL = "";'));
 });

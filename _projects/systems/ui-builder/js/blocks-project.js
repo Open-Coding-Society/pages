@@ -6,7 +6,7 @@
 // from a student's API is ever parsed as HTML. The live-card helpers at the end are shared with
 // blocks-live.js.
 import { apiUrlPolicy, hostOf, safeImage } from './url-rules.js';
-import { fetchJson, getPath, mapItems } from './api-data.js';
+import { fetchJson, listIn, mapItems } from './api-data.js';
 import { embedFrame, linkTo, lineOf, ownValue, textValue } from './blocks-content.js';
 import { browserStorage } from './page-store.js';
 import { textOf } from './registry.js';
@@ -43,8 +43,7 @@ export function element(doc, tag, { className = '', text = '', attrs = {} } = {}
 export function showStatus(status, text = '', { link = null, button = null } = {}) {
   if (!status) return null;
   const doc = status.ownerDocument;
-  status.replaceChildren();
-  if (text) status.appendChild(doc.createTextNode(text));
+  const parts = text ? [doc.createTextNode(text)] : [];
   let control = null;
   if (link && link.href) {
     control = element(doc, 'a', { text: link.text, attrs: { href: link.href } });
@@ -53,12 +52,39 @@ export function showStatus(status, text = '', { link = null, button = null } = {
     control = element(doc, 'button', { className: 'ocs__btn small', text: button.text, attrs: { type: 'button' } });
     control.addEventListener('click', button.onClick);
   }
-  if (control) {
-    if (text) status.appendChild(doc.createTextNode(' '));
-    status.appendChild(control);
-  }
-  status.hidden = !text && !control;
+  if (control) parts.push(...(text ? [doc.createTextNode(' ')] : []), control);
+  writeStatus(status, parts);
   return control;
+}
+
+// The status line is a live region (role=status), and one that is shown with its words already
+// in it is often not read out (NVDA and JAWS in Chrome). So a hidden line is shown first with its
+// words in a hidden holder, and they move in a moment later, once the line is on the page.
+const REVEAL_MS = 100;
+const revealing = new WeakMap(); // status line → {holder, timer} while its words wait
+
+function writeStatus(status, parts) {
+  const waiting = revealing.get(status);
+  if (!parts.length) {
+    if (waiting) clearTimeout(waiting.timer);
+    revealing.delete(status);
+    status.replaceChildren();
+    status.hidden = true;
+  } else if (waiting) {
+    waiting.holder.replaceChildren(...parts);
+  } else if (!status.hidden) {
+    status.replaceChildren(...parts);
+  } else {
+    const holder = element(status.ownerDocument, 'span', { attrs: { hidden: '' } });
+    holder.append(...parts);
+    status.replaceChildren(holder);
+    status.hidden = false;
+    const timer = setTimeout(() => {
+      revealing.delete(status);
+      status.replaceChildren(...holder.childNodes);
+    }, REVEAL_MS);
+    revealing.set(status, { holder, timer });
+  }
 }
 
 // Only the browser knows it has no network. A request that fails while it's online usually
@@ -102,8 +128,9 @@ export function formatDay(ms) {
 
 /* ---------- Video and Embed your app ---------- */
 
-// Turns a pressed click-to-load card into its iframe. embedFrame checks the address again,
-// so a card whose data-ui-embed-* attributes were edited in devtools frames nothing new.
+// Turns a pressed click-to-load card's button row into its iframe; the card's title, host and
+// caption stay above it. embedFrame checks the address again, so a card whose data-ui-embed-*
+// attributes were edited in devtools frames nothing new.
 export function wireEmbeds(root, ctx) {
   if (!root || typeof root.addEventListener !== 'function') throw new TypeError('UI Builder wireEmbeds: root must be an element');
   const doc = root.ownerDocument;
@@ -125,7 +152,8 @@ export function wireEmbeds(root, ctx) {
     }
     if (!frame) return;
     const iframe = toDOM(frame, { doc });
-    card.replaceWith(iframe);
+    const row = button.closest('.ocs__links');
+    (row && card.contains(row) ? row : card).replaceWith(iframe);
     if (typeof iframe.focus === 'function') iframe.focus();
   };
   root.addEventListener('click', onClick);
@@ -207,7 +235,7 @@ const hasContent = (item, view) => {
 };
 
 // API items → one vnode in the block's view (cards, list, table or stats), or null when there
-// is nothing to show. Pure, so the canvas can draw "Real data while editing" the same way.
+// is nothing to show. Pure: the canvas draws "Real data while editing" with it too.
 export function renderApiItems(items, settings, ctx) {
   if (!ctx || !isObject(ctx.registry)) throw new Error('UI Builder renderApiItems: ctx.registry is required');
   const view = VIEWS.has(ownValue(settings, 'view')) ? settings.view : 'cards';
@@ -233,13 +261,6 @@ function snapshotOf(source) {
     fetchedAt: Number.isFinite(fetchedAt) ? fetchedAt : 0,
     fromLoopback: ownValue(snapshot, 'from_loopback') === true,
   };
-}
-
-// The list in a reply: the mapped path, or the reply itself; one object is a list of one.
-function listIn(json, listPath) {
-  const found = getPath(json, typeof listPath === 'string' ? listPath : '');
-  if (Array.isArray(found)) return found;
-  return isObject(found) ? [found] : [];
 }
 
 function hashOf(text) {
@@ -275,7 +296,8 @@ function writeCache(storage, key, items, now) {
 
 // Mounts one Data from your API card: the saved copy for an API on the team's own computer
 // (visitors can never reach it), else one fetch per block per view (reused from sessionStorage
-// for five minutes), falling back to the saved copy when the API doesn't answer.
+// for five minutes), falling back to the saved copy when the API doesn't answer. The block's
+// address decides, not where its copy was saved: a team that moved to its deployed API is read live.
 // ctx: {registry, baseurl, pageOrigin, pageProtocol, pageKey, fetchImpl, storage, now}.
 export async function mountApiData(card, block, ctx) {
   const { status, mount } = liveParts(card);
@@ -309,13 +331,14 @@ export async function mountApiData(card, block, ctx) {
   }
   // View mode never reaches an API on the student's own computer, even on a localhost site.
   const policy = apiUrlPolicy(url, { pageHost: '', pageProtocol: ctx.pageProtocol || 'https:', mode: 'view' });
-  if (snapshot.fromLoopback || policy.loopback) {
+  if (policy.loopback) {
     if (!showSnapshot('blocks.api_saved_from_computer')) showStatus(status, say('live.api_unreachable'));
     return handle;
   }
   const host = policy.host || hostOf(url) || url;
   const failed = () => {
-    if (!showSnapshot('blocks.api_offline_copy')) showStatus(status, say('live.api_failed', { host }));
+    const label = snapshot.fromLoopback ? 'blocks.api_saved_from_computer' : 'blocks.api_offline_copy';
+    if (!showSnapshot(label)) showStatus(status, say('live.api_failed', { host }));
   };
   if (!policy.ok) {
     failed();

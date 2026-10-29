@@ -13,9 +13,9 @@ import { renderPage } from './render.js';
 import { contentRenderers } from './blocks-content.js';
 import { createRichHooks } from './rich-content.js';
 import { createLiveMounts } from './blocks-live.js';
-import { getJson, wireEmbeds } from './blocks-project.js';
-import { LOCAL_ID, isPageDocument } from './page-store.js';
-import { hostOf, slugIssue } from './url-rules.js';
+import { browserOffline, getJson, wireEmbeds } from './blocks-project.js';
+import { LOCAL_ID, isPageDocument, storeErrorText } from './page-store.js';
+import { hostOf, slugMatches } from './url-rules.js';
 import { h, toDOM } from './vnode.js';
 
 const SPRING_ID = /^[1-9]\d{0,15}$/;
@@ -29,7 +29,8 @@ export function viewRequest(search, registry) {
   const params = new URLSearchParams(search);
   if (params.has('page')) {
     const slug = params.get('page');
-    return slugIssue(slug, registry) === null ? { mode: 'page', slug } : { mode: 'page', slug: null };
+    // The registry's slug shape only: a page published before its word was reserved still opens.
+    return slugMatches(slug, registry) ? { mode: 'page', slug } : { mode: 'page', slug: null };
   }
   if (params.has('draft')) {
     const id = params.get('draft');
@@ -180,9 +181,17 @@ export function startViewer(root, deps = {}) {
       const draft = opened.mode === 'draft';
       items.push(h('strong', { class: 'ocs__badge' }, say(draft ? 'view.draft_badge' : 'view.local_badge')),
         h('span', { class: 'ocs__text' }, say(draft ? 'view.draft_note' : 'view.local_note')), edit,
-        opened.slug ? link(say('view.open_live'), `${baseurl}/ui-builder/view/?page=${opened.slug}`, { class: 'ocs__btn small' }) : null);
+        opened.slug ? link(say('view.open_live'), `${baseurl}/ui-builder/view/?page=${encodeURIComponent(opened.slug)}`, { class: 'ocs__btn small' }) : null);
     }
     return h('div', { class: 'ocs__container', 'data-ui-viewer-bar': '' }, h('div', { class: 'ocs__links' }, items));
+  }
+
+  // Why the page didn't load. "Check your connection" only when this browser knows it is offline;
+  // otherwise OCS didn't answer, or answered why (page-store.js storeErrorText words that).
+  function loadProblem(error) {
+    if (error && error.name === 'OfflineError') return say(browserOffline() ? 'view.load_failed' : 'view.no_answer');
+    const { key, vars } = storeErrorText(error);
+    return say(key, vars);
   }
 
   function showError(error) {
@@ -197,7 +206,7 @@ export function startViewer(root, deps = {}) {
       notice(say('view.local_unreadable'), { action: builderLink() });
     } else {
       if (name !== 'OfflineError') console.error('UI Builder viewer: the page could not load', error);
-      notice(say('view.load_failed'), { onRetry: () => { load(); } });
+      notice(loadProblem(error), { onRetry: () => { load(); } });
     }
   }
 

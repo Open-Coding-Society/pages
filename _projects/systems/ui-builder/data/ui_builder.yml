@@ -78,7 +78,8 @@ page_fields:
   - { id: title, type: text, label: Page title, required: true, max: 120 }
   - { id: description, type: text, label: One-line description, max: 300, help: Shown on gallery cards. }
   - { id: byline, type: text, label: Made by, max: 120, placeholder: Your team's name }
-  - { id: image, type: image, label: Gallery picture, help: Shown on the page's gallery card. }
+  # max: Spring keeps the picture in a 500-character column and refuses a longer one (too_long).
+  - { id: image, type: image, label: Gallery picture, max: 500, help: Shown on the page's gallery card. }
   - id: width
     type: choice
     label: Page width
@@ -306,7 +307,9 @@ blocks:
     icon: fa-comment-dots
     category: comms
     live: true
-    needs: flask
+    # Posts go to Flask's microblog (every site has it) under the page's published address, and
+    # only Spring publishes: without Spring the block could never work.
+    needs: spring
     fields:
       - { id: title, type: text, label: Title, max: 80, default: Feedback }
       - { id: prompt, type: text, label: Question for visitors, max: 120 }
@@ -346,7 +349,8 @@ blocks:
           - { value: medium, label: Medium }
           - { value: tall, label: Tall }
 
-# Starter pages. Sections and blocks get fresh ids when a page is created from one.
+# Starter pages. Sections and blocks get fresh ids when a page is created from one. A section
+# heading (h2) comes before the first card (h3), so screen readers find no skipped level.
 templates:
   - key: blank
     label: Blank page
@@ -382,6 +386,8 @@ templates:
                     links:
                       - { label: Try it, url: "https://example.com" }
                       - { label: Source code, url: "https://github.com" }
+                - type: heading
+                  settings: { text: What we built, level: "2", subtitle: "" }
                 - type: video
                   settings: { url: "", title: Demo video, caption: "" }
         - type: columns
@@ -416,6 +422,8 @@ templates:
                     badge: Flask API
                     title: Live data from a Flask API
                     lead: This page reads the OCS Jokes API. Change the link in Data from your API to your own backend.
+                - type: heading
+                  settings: { text: Live from the API, level: "2", subtitle: "" }
                 - type: api_data
                   settings:
                     title: Jokes
@@ -452,6 +460,8 @@ templates:
           settings: { layout: sidebar_right }
           cells:
             - blocks:
+                - type: heading
+                  settings: { text: My story, level: "2", subtitle: "" }
                 - type: text
                   settings: { body: "Write a few sentences about yourself. Use <b>bold</b> for the parts that matter." }
                 - type: link_cards
@@ -552,13 +562,22 @@ text:
     bad_type: "Unknown block type {type}."
     bad_path: "{field} paths can use letters, numbers, dots, dashes, underscores and [ ]."
     bad_course: Pick one of the courses.
-    loopback_url: "A link to your own computer can't be published. Save a copy of the data and use your deployed https:// address."
+    loopback_url: "This page links to your own computer (like localhost). Visitors can't reach it. Use your deployed https:// address."
+    # The editor's own words for Spring's loopback_url, by where the address is.
+    loopback_link: "{field} points to your own computer (like localhost), which visitors can't reach. Use your deployed https:// address."
+    loopback_snapshot: "{field} has a saved copy with links or pictures on your own computer, which visitors can't reach. Remove the saved copy before you publish."
+    loopback_rich_text: "{field} has a link to your own computer (like localhost), which visitors can't reach. Change it to your deployed https:// address."
     group_not_allowed: "Pick one of your own groups. Class groups and course channels can't be used."
   doctor:
     ok: "Connected in {ms} ms. Found {count} items."
+    ok_one: "Connected in {ms} ms. Found 1 item."
     ok_object: "Connected in {ms} ms."
+    # No list picked and no list of items with fields to find: the list the reply holds instead.
+    ok_list_empty: "Found the list {path}; it is empty right now."
+    ok_list_plain: "Found the list {path}, but it holds plain values, not items with fields. The block shows the whole reply as one item."
     policy: "{reason}"
     policy_https: "Use an https:// link. Published pages can only read https:// APIs."
+    policy_loopback_form: "Write a link to your own computer like http://localhost:8587/api/jokes, or with 127.0.0.1 in place of localhost."
     policy_loopback_view: "A link to your own computer only works while you're editing. Save a copy so visitors see the data."
     policy_private_host: "That address can't be used. Use your deployed backend's https:// address."
     mixed_content: "This page is https, so the browser blocks http:// APIs. Use your deployed https:// address."
@@ -597,6 +616,8 @@ text:
     local_unreadable: "This browser can't open its saved pages (private browsing or blocked site data), or the saved page is damaged."
     sign_in_to_see: Sign in to see this page.
     load_failed: "The page couldn't load. Check your connection and try again."
+    # This browser is online, but OCS didn't answer (it may be down or restarting).
+    no_answer: "OCS isn't answering right now, so the page couldn't load. Try again in a moment."
     broken: "This page is damaged and can't be shown."
     retry: Try again
     no_page: No page was named in this address.
@@ -629,6 +650,7 @@ text:
     members_only: OCS members only
     signed_out: You see the pages approved for everyone.
     load_failed: "The gallery couldn't load. Check your connection and try again."
+    no_answer: "OCS isn't answering right now, so the gallery couldn't load. Try again in a moment."
     retry: Try again
     spring_off: "The gallery needs the OCS Spring backend, which this site doesn't run. Pages made here are saved in your browser."
   # Live blocks on a published page, beyond text.blocks (blocks-live.js, blocks-project.js).
@@ -646,6 +668,8 @@ text:
     members_unavailable: "This group's members can't be shown."
     members_empty: No one is in this group yet.
     announcements_missing: "{course} has no announcement channel yet."
+    announcements_empty_title: No announcements yet
+    announcements_empty_hint: "Class news from teachers shows here."
     announcement_event: "Event: {title}, {date}"
     announcement_event_untitled: Class event
     feedback_unpublished: Feedback opens once this page is published.
@@ -674,12 +698,13 @@ text:
     slug_required: Pick an address for the page before publishing it.
     invalid_spec: "OCS didn't accept this page. Fix the problems marked on it, then try again."
     origin_rejected: OCS only takes this from the OCS site. Reload the page and try again.
-    unauthorized: Sign in again to save to OCS.
+    unauthorized: "You're signed out of OCS. Sign in, then try again."
     forbidden: "You can't do that on this page."
     too_large: This page is too big to save.
     busy: OCS is busy. Try again in a moment.
     not_published: Publish the page first.
     own_page: This is your own page.
+    too_many_pages: "You already have {max} pages. Delete one before you make another."
     bad_request: "OCS couldn't use that request ({status})."
     server: "OCS had a problem ({status}). Try again in a moment."
     bad_response: "OCS sent an answer this page can't read."
@@ -687,7 +712,8 @@ text:
     storage_blocked: "This browser doesn't let pages save (private browsing or blocked site data)."
     corrupt: "This saved page is damaged and can't be opened."
     unknown: Something went wrong. Try again.
-  # The group chat and class announcements, as Messages' conversation-embed.js texts (every key it has).
+  # The group chat, as Messages' conversation-embed.js texts (every key it has). Class announcements
+  # use them too, with their own empty state (live.announcements_empty_*): visitors can't post there.
   chat:
     loading: Loading messages…
     emptyTitle: No messages yet

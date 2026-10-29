@@ -11,7 +11,6 @@ import {
 import { textOf } from './registry.js';
 
 const API = '/api/ui-builder';
-const SLUG = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const BLOCK_ID = /^b-[a-z0-9]{6,12}$/;
 const MAX_DETAILS = 200;
 const TEACHER_ROLES = new Set(['ROLE_TEACHER', 'ROLE_ADMIN']);
@@ -52,6 +51,10 @@ function summaryOf(raw) {
     publicRequested: bool(raw.publicRequested),
     publicUntil: int(raw.publicUntil),
     publicPending: bool(raw.publicPending),
+    // Spring says outright whether the approval ran out and which version it approved; older
+    // answers have neither, so publicExpired stays undefined and the publicUntil fallback decides.
+    publicExpired: typeof raw.publicExpired === 'boolean' ? raw.publicExpired : undefined,
+    publicVersion: int(raw.publicVersion),
     groupId: idOf(raw.groupId),
     groupName: str(raw.groupName),
     ownerName: str(raw.ownerName),
@@ -183,6 +186,15 @@ export class SpringPageStore extends LocalPageStore {
     return out;
   }
 
+  // Slugs follow the registry's slug_pattern, which Spring's ui-builder.limits.slug-pattern
+  // mirrors, so changing the rule there reaches every published route here too. A slug goes into
+  // a request path, so without a rule nothing is sent, and a dot segment never is.
+  #isSlug(slug) {
+    const rule = own(own(this.registry, 'limits'), 'slug_pattern');
+    if (typeof slug !== 'string' || typeof rule !== 'string' || !rule || slug === '.' || slug === '..') return false;
+    return new RegExp(rule).test(slug);
+  }
+
   /* ---- the four methods both stores have ---- */
 
   async list({ scope = 'mine', course } = {}) {
@@ -210,9 +222,12 @@ export class SpringPageStore extends LocalPageStore {
     return { page: detail.page, base: detail.base, meta: detail.meta };
   }
 
-  async save(ref, page, { base, fields } = {}) {
+  // newRevision: the save that resolves a conflict (Keep mine). Spring then keeps it as a revision
+  // of its own instead of updating the newest one in place, so the copy it replaces stays there.
+  async save(ref, page, { base, fields, newRevision = false } = {}) {
     if (isObject(ref) && ref.kind === 'local') return super.save(ref, page, { base, fields });
     const body = { version: base === undefined ? null : base, spec: page, ...this.#fields(page, fields) };
+    if (newRevision === true) body.newRevision = true;
     return this.#detail(await this.#request('PUT', this.#pagePath(ref), { body, context: { ref, base } }));
   }
 
@@ -253,9 +268,12 @@ export class SpringPageStore extends LocalPageStore {
     return this.#detail(await this.#request('POST', this.#pagePath(ref, '/unpublish')));
   }
 
-  async setVisibility(ref, { visibility, until } = {}) {
+  // A teacher's PUBLIC approves one published copy: publishedVersion is the one they looked at.
+  // Spring answers 409 published_changed when a newer publish has replaced it since.
+  async setVisibility(ref, { visibility, until, publishedVersion } = {}) {
     const body = { visibility };
     if (until !== undefined && until !== null) body.until = until;
+    if (Number.isSafeInteger(publishedVersion)) body.publishedVersion = publishedVersion;
     return this.#detail(await this.#request('POST', this.#pagePath(ref, '/visibility'), { body }));
   }
 
@@ -328,7 +346,7 @@ export class SpringPageStore extends LocalPageStore {
 
   // PublishedView (§9.5): the copy this viewer may see. Malformed slugs are never sent.
   async published(slug) {
-    if (typeof slug !== 'string' || !SLUG.test(slug)) throw new NotFoundError({ status: 0 });
+    if (!this.#isSlug(slug)) throw new NotFoundError({ status: 0 });
     const json = await this.#request('GET', `${API}/published/${encodeURIComponent(slug)}`);
     if (!isObject(json) || !isObject(json.spec)) throw badResponse(200);
     const groups = {};
@@ -351,7 +369,7 @@ export class SpringPageStore extends LocalPageStore {
     const query = typeof course === 'string' && course ? `?course=${encodeURIComponent(course)}` : '';
     const json = await this.#request('GET', `${API}/published${query}`);
     if (!Array.isArray(json)) throw badResponse(200);
-    return json.filter((item) => isObject(item) && typeof item.slug === 'string' && SLUG.test(item.slug)).map((item) => ({
+    return json.filter((item) => isObject(item) && this.#isSlug(item.slug)).map((item) => ({
       slug: item.slug, title: str(item.title) || '', description: str(item.description) || '', byline: str(item.byline) || '',
       course: str(item.course) || '', image: str(item.image) || '', publishedAt: int(item.publishedAt),
       visibility: str(item.visibility) || 'SIGNED_IN',
@@ -366,7 +384,7 @@ export class SpringPageStore extends LocalPageStore {
   }
 
   async messageOwner(slug) {
-    if (typeof slug !== 'string' || !SLUG.test(slug)) throw new NotFoundError({ status: 0 });
+    if (!this.#isSlug(slug)) throw new NotFoundError({ status: 0 });
     const json = await this.#request('POST', `${API}/published/${encodeURIComponent(slug)}/message-owner`);
     const conversationId = idOf(own(json, 'conversationId'));
     if (conversationId === null) throw badResponse(200);
@@ -375,7 +393,7 @@ export class SpringPageStore extends LocalPageStore {
 
   // The names in a published members block's group: names only, nothing else is passed on.
   async members(slug, blockId) {
-    if (typeof slug !== 'string' || !SLUG.test(slug) || typeof blockId !== 'string' || !BLOCK_ID.test(blockId)) {
+    if (!this.#isSlug(slug) || typeof blockId !== 'string' || !BLOCK_ID.test(blockId)) {
       throw new NotFoundError({ status: 0 });
     }
     const json = await this.#request('GET', `${API}/published/${encodeURIComponent(slug)}/members/${blockId}`);

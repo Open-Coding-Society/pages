@@ -52,8 +52,10 @@ templates:
           settings: { layout: sidebar_right }
           cells:
             - blocks:
+                - type: heading
+                  settings: { text: Our plan, level: "2", subtitle: "" }
                 - type: text
-                  settings: { body: "<b>Our plan.</b> What we're building this sprint." }
+                  settings: { body: "What we're building this sprint." }
                 - type: kanban
                   settings: { url: "", filter: "", title: Our board }
             - blocks:
@@ -86,6 +88,8 @@ templates:
                     lead: One sentence a visitor can understand in five seconds.
                     links:
                       - { label: Try it, url: "https://example.com" }
+                - type: heading
+                  settings: { text: Our project, level: "2", subtitle: "" }
                 - type: video
                   settings: { url: "", title: Two-minute demo, caption: "" }
         - type: columns

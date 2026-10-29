@@ -14,6 +14,8 @@ const CHECK_MARK = String.fromCharCode(0x2713);
 const VIDEO_ALLOW = 'fullscreen; picture-in-picture; encrypted-media';
 const EMBED_HEIGHTS = new Set(['short', 'medium', 'tall']);
 export const LIVE_TYPES = Object.freeze(['chat', 'members', 'message_me', 'kanban', 'feedback', 'announcements', 'calendar', 'api_data']);
+// Live blocks whose owner module draws a whole card of its own (liveCard).
+const OWNER_CARDS = new Set(['kanban', 'calendar']);
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
@@ -416,12 +418,22 @@ export function designSample(type, settings, ctx) {
 
 // The frame every live block shares (DESIGN 6). viewer.js mounts the live content into
 // [data-ui-live-mount] and reports progress in [data-ui-live-status]; the canvas shows a sample.
-export function liveCard(type, settings, ctx) {
+// The kanban and calendar mount their owners' own cards, with a title and an Open link, so on a
+// live page their frame is no card: the block's title waits in [data-ui-live-header], a plain
+// wrapper that blocks-live.js hides once the owner's card is in. One card, one title.
+export function liveCard(type, settings, ctx, node) {
   const canvas = ctx.mode === 'canvas';
-  return h('section', { class: 'ocs__card', 'data-ui-live': type },
-    cardHeader(lineOf(settings, 'title') || labelOf(ctx, type), null),
-    h('div', { 'data-ui-live-status': '', role: 'status' }, canvas ? null : say(ctx, 'blocks.live_loading')),
-    h('div', { 'data-ui-live-mount': '' }, canvas ? designSample(type, settings, ctx) : null));
+  const header = cardHeader(lineOf(settings, 'title') || labelOf(ctx, type), null);
+  // A stable id so a block (the feedback form) can point a control's aria-describedby at its status.
+  const nodeId = node && typeof node.id === 'string' && /^[sb]-[a-z0-9]{6,12}$/.test(node.id) ? node.id : '';
+  const statusAttrs = { 'data-ui-live-status': '', role: 'status' };
+  if (nodeId) statusAttrs.id = `ui-live-status-${nodeId}`;
+  const status = h('div', statusAttrs, canvas ? null : say(ctx, 'blocks.live_loading'));
+  const mount = h('div', { 'data-ui-live-mount': '' }, canvas ? designSample(type, settings, ctx) : null);
+  if (!canvas && OWNER_CARDS.has(type)) {
+    return h('section', { 'data-ui-live': type }, h('div', { 'data-ui-live-header': '' }, header), status, mount);
+  }
+  return h('section', { class: 'ocs__card', 'data-ui-live': type }, header, status, mount);
 }
 
 export const contentRenderers = Object.freeze({
@@ -442,5 +454,5 @@ export const contentRenderers = Object.freeze({
   code,
   divider: () => h('hr'),
   embed,
-  ...Object.fromEntries(LIVE_TYPES.map((type) => [type, (settings, ctx) => liveCard(type, settings, ctx)])),
+  ...Object.fromEntries(LIVE_TYPES.map((type) => [type, (settings, ctx, node) => liveCard(type, settings, ctx, node)])),
 });

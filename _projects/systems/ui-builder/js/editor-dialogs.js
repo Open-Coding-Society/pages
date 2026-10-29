@@ -64,7 +64,8 @@ export async function copyText(doc, text, fallbackField = null) {
   }
 }
 
-export function createDialogs({ root, doc = globalThis.document, say, text, shell = null }) {
+// errorText(error) words a store error from the registry (a dialog never shows an error's own message).
+export function createDialogs({ root, doc = globalThis.document, say, text, shell = null, errorText = () => text('store.unknown') }) {
   const stack = [];
   let counter = 0;
 
@@ -88,7 +89,9 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
   doc.addEventListener('keydown', onKey, true);
 
   // The core: a titled card, a body, a row of buttons. finish(value) closes it and resolves.
-  function open({ title, body = [], buttons = [], dismissible = true, alert = false, focus = null }) {
+  // describedBy: ids of the body paragraphs read out with the title when the dialog opens, so a
+  // choice is never made without them (focus starts on a button or a field, past the words).
+  function open({ title, body = [], buttons = [], dismissible = true, alert = false, focus = null, describedBy = '' }) {
     counter += 1;
     const titleId = `ui-dialog-${counter}-title`;
     const opener = doc.activeElement;
@@ -96,7 +99,7 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
     const result = new Promise((done) => { resolve = done; });
     const close = el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small', 'aria-label': say('close'), title: say('close'), hidden: !dismissible }, icon(doc, 'fa-xmark'));
     const actions = el(doc, 'div', { class: 'ocs__modal-actions' });
-    const card = el(doc, 'div', { class: 'ocs__modal-card ocs__stack', role: alert ? 'alertdialog' : 'dialog', 'aria-modal': 'true', 'aria-labelledby': titleId },
+    const card = el(doc, 'div', { class: 'ocs__modal-card ocs__stack', role: alert ? 'alertdialog' : 'dialog', 'aria-modal': 'true', 'aria-labelledby': titleId, 'aria-describedby': describedBy || null },
       el(doc, 'div', { class: 'ocs__modal-header' }, el(doc, 'h2', { class: 'ocs__modal-title', id: titleId }, title), close),
       body, actions);
     const backdrop = el(doc, 'div', { class: 'ocs__modal' }, card);
@@ -129,10 +132,13 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
     return { result, finish: entry.finish, card, buttons: controls };
   }
 
-  const para = (message) => el(doc, 'p', { class: 'ocs__text' }, message);
+  const para = (message, id = null) => el(doc, 'p', { class: 'ocs__text', id }, message);
+  // An id for a paragraph of the dialog open() makes next.
+  const bodyId = (name) => `ui-dialog-${counter + 1}-${name}`;
 
   function confirm({ title, body, confirmLabel, cancelLabel = say('cancel') }) {
-    return open({ title, body: [para(body)], buttons: [{ label: cancelLabel, value: false }, { label: confirmLabel, value: true, primary: true }] })
+    const id = bodyId('body');
+    return open({ title, body: [para(body, id)], describedBy: id, buttons: [{ label: cancelLabel, value: false }, { label: confirmLabel, value: true, primary: true }] })
       .result.then((value) => value === true);
   }
 
@@ -153,12 +159,13 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
   // First publish: pick the address (checked as you type). Later publishes only confirm it.
   function publish({ address, slug = '', slugLocked = false, checkSlug = null, issueOf = () => null, error = '' }) {
     if (slugLocked) {
-      return open({ title: say('publish_title'), body: [para(say('publish_changes_body', { address: address(slug) }))], buttons: [{ label: say('cancel'), value: null }, { label: say('publish_confirm'), value: slug, primary: true }] }).result;
+      const what = bodyId('body');
+      return open({ title: say('publish_title'), body: [para(say('publish_changes_body', { address: address(slug) }), what)], describedBy: what, buttons: [{ label: say('cancel'), value: null }, { label: say('publish_confirm'), value: slug, primary: true }] }).result;
     }
     const id = `ui-dialog-slug-${counter + 1}`;
     const input = el(doc, 'input', { class: 'ocs__input', id, type: 'text', autocomplete: 'off', spellcheck: 'false', 'aria-describedby': `${id}-help ${id}-status` });
     input.value = slug;
-    const where = para('');
+    const where = para('', bodyId('body'));
     const status = el(doc, 'output', { class: 'ocs__uibuilder-note', id: `${id}-status`, 'aria-live': 'polite' });
     let check = 0;
     let timer = null;
@@ -192,7 +199,7 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
     const body = [where, el(doc, 'div', { class: 'ocs__field' }, el(doc, 'label', { class: 'ocs__label', for: id }, say('publish_slug')), input,
       el(doc, 'small', { id: `${id}-help` }, say('publish_slug_help')), status)];
     dialog = open({
-      title: say('publish_title'), body, focus: () => input,
+      title: say('publish_title'), body, focus: () => input, describedBy: where.id,
       buttons: [{ label: say('cancel'), value: null }, { label: say('publish_confirm'), primary: true, onClick: (finish) => { if (!issueOf(input.value.trim())) finish(input.value.trim()); } }],
     });
     refresh();
@@ -200,29 +207,35 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
     return dialog.result;
   }
 
+  // Focus starts on Reload theirs: who saved and what Keep mine does are read before either.
   function conflict({ name = '', time = '', local = false }) {
+    const what = bodyId('body');
+    const keep = bodyId('note');
     const body = [
-      para(name ? say('conflict_body', { name, time }) : say('conflict_body_unknown')),
-      para(say(local ? 'conflict_keep_note_local' : 'conflict_keep_note')),
+      para(name ? say('conflict_body', { name, time }) : say('conflict_body_unknown'), what),
+      para(say(local ? 'conflict_keep_note_local' : 'conflict_keep_note'), keep),
     ];
-    return open({ title: say('conflict_title'), body, dismissible: false, alert: true,
+    return open({ title: say('conflict_title'), body, dismissible: false, alert: true, describedBy: `${what} ${keep}`,
       buttons: [{ label: say('conflict_reload'), value: 'reload' }, { label: say('conflict_keep'), value: 'keep', primary: true }] }).result;
   }
 
+  // The field is described by the sentence with the title to type, since focus starts there.
   function deletePage({ title }) {
     const id = `ui-dialog-delete-${counter + 1}`;
-    const input = el(doc, 'input', { class: 'ocs__input', id, type: 'text', autocomplete: 'off', spellcheck: 'false' });
+    const what = bodyId('body');
+    const input = el(doc, 'input', { class: 'ocs__input', id, type: 'text', autocomplete: 'off', spellcheck: 'false', 'aria-describedby': what });
     const dialog = open({
-      title: say('delete_title'), focus: () => input,
-      body: [para(say('delete_body', { title })), el(doc, 'div', { class: 'ocs__field' }, el(doc, 'label', { class: 'ocs__label', for: id }, say('delete_label')), input)],
+      title: say('delete_title'), focus: () => input, describedBy: what,
+      body: [para(say('delete_body', { title }), what), el(doc, 'div', { class: 'ocs__field' }, el(doc, 'label', { class: 'ocs__label', for: id }, say('delete_label')), input)],
       buttons: [{ label: say('cancel'), value: false }, { label: say('delete_confirm'), disabled: true, onClick: (finish) => { if (confirmsTitle(input.value, title)) finish(true); } }],
     });
     input.addEventListener('input', () => { dialog.buttons[1].disabled = !confirmsTitle(input.value, title); });
     return dialog.result.then((value) => value === true);
   }
 
-  // load() → [{revisionId, kind, savedByName, savedAt}]; restore(revision) → Promise.
-  function revisions({ load, restore, readOnly = false }) {
+  // load() → [{revisionId, kind, savedByName, savedAt}]; restore(revision) → Promise. unsaved: the
+  // newest changes couldn't be saved, so they are in no revision and a restore loses them.
+  function revisions({ load, restore, readOnly = false, unsaved = false }) {
     const list = el(doc, 'ul', { class: 'ocs__uibuilder-revisions' });
     const status = el(doc, 'output', { class: 'ocs__uibuilder-note', 'aria-live': 'polite' }, say('revisions_loading'));
     const dialog = open({ title: say('revisions_title'), body: [status, list], buttons: [{ label: say('close'), value: null }] });
@@ -233,7 +246,8 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
         const time = formatWhen(revision.savedAt);
         const kind = say(`rev_${['SAVE', 'PUBLISH', 'RESTORE'].includes(revision.kind) ? revision.kind : 'SAVE'}`);
         const restoreButton = el(doc, 'button', { type: 'button', class: 'ocs__btn small', disabled: readOnly, onclick: async () => {
-          const sure = await confirm({ title: say('revision_restore_title'), body: say('revision_restore_body', { time }), confirmLabel: say('revision_restore') });
+          const body = unsaved ? say('revision_restore_body_unsaved', { time }) : say('revision_restore_body', { time });
+          const sure = await confirm({ title: say('revision_restore_title'), body, confirmLabel: say('revision_restore') });
           if (!sure) return;
           restoreButton.disabled = true;
           try {
@@ -241,12 +255,12 @@ export function createDialogs({ root, doc = globalThis.document, say, text, shel
             dialog.finish(revision);
           } catch (error) {
             restoreButton.disabled = false;
-            status.textContent = (error && error.message) || '';
+            status.textContent = errorText(error);
           }
         } }, say('revision_restore'));
         return el(doc, 'li', null, el(doc, 'strong', null, say('revision_row', { kind, name: revision.savedByName || '?', time })), ' ', restoreButton);
       }));
-    }, (error) => { status.textContent = say('revisions_failed', { message: (error && error.message) || '' }); });
+    }, (error) => { status.textContent = say('revisions_failed', { message: errorText(error) }); });
     return dialog.result;
   }
 
@@ -283,7 +297,7 @@ export function createLeaseBanner(container, { doc = globalThis.document, say, o
   container.appendChild(box);
   return {
     show(name) {
-      message.textContent = say('lease_banner', { name: name || '?' });
+      message.textContent = say('lease_banner', { name: name || say('someone') });
       box.hidden = false;
     },
     hide() { box.hidden = true; },

@@ -44,9 +44,10 @@
   max-width: 16rem;
 }
 
-// Live regions and status words that are text, not controls.
+// Live regions and status words that are text, not controls. The text color, not the muted one:
+// some presets' muted text is under 4.5:1 on their panels.
 .ocs__uibuilder-note {
-  color: var(--text-muted);
+  color: var(--pref-text-color);
   font-size: 0.8125rem;
 }
 
@@ -156,7 +157,8 @@
 // the page see a real phone, tablet or desktop viewport.
 .ocs__uibuilder-viewport {
   position: relative;
-  height: clamp(26rem, calc(100dvh - 12rem), 64rem);
+  // 14rem: the site header, the bar, the feedback line above the panes and the stage's own bar.
+  height: clamp(26rem, calc(100dvh - 14rem), 64rem);
   overflow: hidden;
   border: 1px solid var(--ui-border);
   border-radius: 0.75rem;
@@ -195,13 +197,16 @@
   padding: 0.25rem 0.75rem;
   border-left: 3px solid transparent;
 
+  // Tinted over the page color, as the outline's selected row is (_outline.scss).
   &[data-error] {
     border-left-color: var(--pref-accent-color);
-    background: color-mix(in srgb, var(--pref-accent-color) 10%, var(--panel));
+    background: color-mix(in srgb, var(--pref-accent-color) 10%, var(--pref-bg-color));
   }
 
+  // The text color, underlined: most presets' accent is under 4.5:1 on that tint.
   a {
-    color: var(--pref-accent-color);
+    color: var(--pref-text-color);
+    text-decoration: underline;
   }
 }
 
@@ -227,8 +232,9 @@
   box-shadow: 0 10px 24px color-mix(in srgb, var(--pref-text-color) 18%, transparent);
 }
 
-// Menu items are full-width rows, not ocs__btn pills.
-.ocs__uibuilder-menu-item {
+// Menu items are full-width rows, not ocs__btn pills. Two classes: preset themes give every
+// <button> an accent border and the panel color (.user-theme-active button), which one would lose to.
+.ocs__uibuilder-menu .ocs__uibuilder-menu-item {
   padding: 0.5rem 0.75rem;
   border: 0;
   border-radius: 0.4rem;
@@ -238,10 +244,20 @@
   text-align: left;
   cursor: pointer;
 
+  // Tinted over the page color, as the outline's selected row is (_outline.scss). The keyboard's
+  // item also gets an outline: a tint alone is under 1.2:1 from its neighbours in some presets.
   &:hover,
   &:focus-visible {
+    background: color-mix(in srgb, var(--pref-accent-color) 16%, var(--pref-bg-color));
+  }
+
+  &:hover {
     outline: none;
-    background: color-mix(in srgb, var(--pref-accent-color) 16%, var(--panel));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pref-accent-color);
+    outline-offset: -2px;
   }
 
   &:disabled {
