@@ -12,6 +12,17 @@ permalink: /capstone/oak/
 
 ---
 
+<div class="ocs__grid ocs__grid--standard cols-2">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Oncology and Kids · Company</div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>What do they aim to do?</strong>
+        <p>The Oncology and Kids nonprofit aims to help kids recover from the emotional turmoil of cancer diagnosis, as well as help them connect, learn, and achieve a sense of normalcy.</p>
+        <strong>Why we chose this nonprofit</strong>
+        <p><strong>Experience:</strong> We chose this specific nonprofit because the members of our group all have a strong interest in STEM and feel a lot of empathy for those going through difficult medical situations and would like to do what we can to help them if given the opportunity.</p>
+    </div>
+</div>
+
 {% assign oak_data = site.data.oak %}
 {% if oak_data.Board %}
 {% include ocs_kanban_board.html url=oak_data.Board.url %}
