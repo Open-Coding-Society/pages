@@ -18,8 +18,10 @@ for (const formId of ['microblog-form', 'reply-form']) {
         let fail = false;
         const alerts = [];
         let closed = 0;
-        const write = async () => {
+        const saved = [];
+        const write = async payload => {
             calls++;
+            saved.push(payload);
             if (fail) throw new Error('Please wait 30 seconds before saving another microblog post, edit, or reply.');
             await new Promise(resolve => { finish = resolve; });
         };
@@ -27,6 +29,8 @@ for (const formId of ['microblog-form', 'reply-form']) {
             document: { getElementById: id => elements[id] },
             pagePermalink: '/microblog',
             createPost: write, updatePost: write, createReply: write,
+            // A new post saves the open channel and the page's author uids with it
+            activeChannel: 'suggestions', pageAuthors: [],
             closeModal: () => closed++, closeReplyModal: () => closed++,
             renderMicroblogTable: () => {}, alert: message => alerts.push(message)
         });
@@ -37,6 +41,7 @@ for (const formId of ['microblog-form', 'reply-form']) {
         assert.equal(button.textContent, 'Saving...');
         await form.onsubmit(event);
         assert.equal(calls, 1);
+        if (formId === 'microblog-form') assert.equal(saved[0].data.channel, 'suggestions');
         finish();
         await saving;
         assert.equal(closed, 1);

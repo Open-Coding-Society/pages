@@ -1,13 +1,10 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const source = await readFile(new URL("../assets/js/submissions/creator-dashboard.js", import.meta.url), "utf8");
-const {
-  assignmentPageUrl, filterCreatorSubmissions, gradeSourceLabel, parseGradeInput, withFrontmatterCourses,
-} = await import(
-  `data:text/javascript;charset=utf-8,${encodeURIComponent(source)}`
-);
+import {
+  assignmentPageUrl, filterCreatorSubmissions, withFrontmatterCourses,
+} from "../assets/js/submissions/creator-dashboard.js";
+import { gradeSourceLabel, parseGradeInput } from "../assets/js/submissions/grading.js";
 
 const submissions = [
   { assignmentId: 1, assignmentName: "Ground 0", submitterName: "Ana", submitterUid: "ana", submitterCourseCodes: ["CSA", "CSP"], status: "pending" },
@@ -67,9 +64,10 @@ test("creator grades must be within the assignment's points", () => {
   assert.deepEqual(parseGradeInput("12", null), { grade: 12 });
 });
 
-test("grade source distinguishes instructor overrides from AI grades", () => {
-  assert.equal(gradeSourceLabel({ grade: null, gradedManually: true }), "");
-  assert.equal(gradeSourceLabel({ grade: 4, gradedManually: true, feedback: "x", aiSummary: "x" }), "Instructor grade");
-  assert.equal(gradeSourceLabel({ grade: 3, gradedManually: false, feedback: "Good.", aiSummary: "Good." }), "AI grade");
-  assert.equal(gradeSourceLabel({ grade: 3, gradedManually: null, feedback: "Teacher note", aiSummary: "Summary" }), "");
+test("grade source comes from Spring's grading state, not from guessing at feedback", () => {
+  assert.equal(gradeSourceLabel({ grade: null, grading: { source: "NONE" } }), "");
+  assert.equal(gradeSourceLabel({ grade: 4, grading: { source: "MANUAL" } }), "Instructor grade");
+  assert.equal(gradeSourceLabel({ grade: 3, grading: { source: "AI" } }), "AI grade");
+  // Identical feedback and AI summary used to be read as "AI"; the state is now explicit.
+  assert.equal(gradeSourceLabel({ grade: 3, feedback: "x", aiSummary: "x" }), "");
 });

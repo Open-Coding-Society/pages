@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function(){
     return currentQuery.split(/\s+/).every(word=>cardText.get(card).includes(word));
   }
   // Highlight each search word in the card's own text with <mark>, like the Topics page.
-  const markSkip = '.capstone-links-button, .capstone-popup, .capstone-card-placeholder';
+  const markSkip = '.capstone-links-button, .capstone-popup, .capstone-card-placeholder, .microblog-unread-badge';
   function clearMarks(card){
     card.querySelectorAll('mark[data-search-mark]').forEach(mark=>{
       const parent = mark.parentNode;
@@ -542,11 +542,11 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 
    <div class="ocs__grid-cell CSA" data-year="2026-2027">
-       <a href="{% post_url capstone/2026-08-28-toolchain-trail %}">
+       <a href="{{ '/capstone/toolchain-trail/' | relative_url }}">
          <img src="{{ '/images/' | append: site.data.toolchain-trail-capstone.Logo | relative_url }}" alt="{{ site.data.toolchain-trail-capstone.Title }} logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-         <h3><a href="{% post_url capstone/2026-08-28-toolchain-trail %}"></a>{{ site.data.toolchain-trail-capstone.Title }}</h3>
+         <h3><a href="{{ '/capstone/toolchain-trail/' | relative_url }}">{{ site.data.toolchain-trail-capstone.Title }}</a></h3>
          <p>{{ site.data.toolchain-trail-capstone.Overview }}</p>
        </div>
    </div>
@@ -995,14 +995,14 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 </div>
 
-   <!-- California Center For The Performing Arts Escondido (CSP, 2026/2027) -->
+   <!-- North County Special Needs Community Foundation (CSP, 2026/2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">
-           <img src="/images/capstone/ccae.jpeg" alt="Cal Center For Arts Escondido Logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       <a href="{% post_url 2026-09-08-ncsncf-capstone %}">
+           <img src="/images/capstone/ncsncf.jpg" alt="North County Special Needs Community Foundation" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">California Center For The Performing Arts Escondido</a></h3>
-           <p>This capstone project involves refurbishing the California Center For The Performing Arts Escondido website to be more streamlined, organized, and less busy. It will also overhaul the search feature to be more intelligent, introduce a dynamic and artistic design, and will replace generic walls of text with something more interactive.</p>
+           <h3><a href="{% post_url 2026-09-08-ncsncf-capstone %}">North County Special Needs Community Foundation</a></h3>
+           <p>This capstone project involves refurbishing the North County Special Needs Community Foundation website to be more streamlined, organized, and professional. It will also overhaul and add new features such as an events backend and will update the Event Calendar to include categories.</p>
            <p>Team: Mateo, Tristan, and Yue (Barbara)</p>
        </div>
    </div>
@@ -1478,5 +1478,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
 })();
 </script>
+
+<!-- A red count on each capstone with new microblog posts for its signed-in author -->
+<script type="module" src="{{ site.baseurl }}/assets/js/capstone-microblog-badges.js"></script>
 
   <!-- markdownlint-enable MD033 MD046 -->

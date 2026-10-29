@@ -1,3 +1,8 @@
+import {
+  applyGradingState, clearManualGrade, gradePills, hasManualOverride, isFinal, parseGradeInput, requestAiRegrade,
+  saveManualGrade, showGradingHistory,
+} from "./grading.js";
+
 const PAGE_SIZE = 25;
 const UNASSIGNED_COURSE = "__unassigned__";
 
@@ -46,30 +51,11 @@ export function filterCreatorSubmissions(submissions, filters, getFilterStatus) 
   });
 }
 
-export function parseGradeInput(rawValue, maxPoints) {
-  const trimmed = String(rawValue ?? "").trim();
-  const grade = Number(trimmed);
-  const hasMax = maxPoints != null && Number.isFinite(Number(maxPoints));
-  if (trimmed === "" || !Number.isFinite(grade) || grade < 0 || (hasMax && grade > Number(maxPoints))) {
-    return { error: `Enter a grade from 0 to ${hasMax ? maxPoints : "the assignment's points"}` };
-  }
-  return { grade };
-}
-
-// AI grading writes identical feedback and aiSummary; older manual grades predate the flag,
-// so a grade that matches neither rule gets no label instead of a guessed one.
-export function gradeSourceLabel(submission) {
-  if (submission?.grade == null) return "";
-  if (submission.gradedManually) return "Instructor grade";
-  if (submission.feedback && submission.feedback === submission.aiSummary) return "AI grade";
-  return "";
-}
-
 export function createCreatorDashboard(options) {
   const {
     managedAssignmentsUrl,
     managedSubmissionsUrl,
-    gradeSubmissionUrl,
+    javaURI,
     courseManifestUrl,
     fetchOptions,
     baseUrl,
@@ -185,23 +171,35 @@ export function createCreatorDashboard(options) {
         </tr></thead>
         <tbody>${rows.map((submission) => {
           const points = assignmentPoints(submission);
-          const source = gradeSourceLabel(submission);
+          // Grading actions only until the assignment closes.
+          const final = isFinal(submission);
+          const pills = gradePills(submission, escapeHtml);
           const grade = `
             <input class="ocs__input creator-grade-input" type="number" min="0" step="0.01"
               ${points != null ? `max="${text(points)}"` : ""}
               value="${text(submission.grade ?? "")}"
               placeholder="${points != null ? `0–${text(points)}` : "Points"}"
               aria-label="Grade for ${text(submission.submitterName, "this student")}"
+              ${final ? "readonly" : ""}
               data-grade-input>
-            ${source ? `<small class="creator-grade-source">${text(source)}</small>` : ""}`;
+            ${pills ? `<div>${pills}</div>` : ""}`;
+          const actions = final ? "" : `
+              <button type="button" class="ocs__btn small accent fill" data-save-grade="${text(submission.id)}">Save grade</button>
+              <button type="button" class="ocs__btn small" data-ai-regrade="${text(submission.id)}"
+                title="Ask the AI to grade this again">AI re-grade</button>
+              ${hasManualOverride(submission)
+                ? `<button type="button" class="ocs__btn small" data-clear-grade="${text(submission.id)}"
+                    title="Remove your grade so the AI grade applies">Use AI grade</button>`
+                : ""}`;
           const feedback = `
             <textarea class="ocs__input creator-feedback-input" rows="2" placeholder="Feedback"
               aria-label="Feedback for ${text(submission.submitterName, "this student")}"
+              ${final ? "readonly" : ""}
               data-feedback-input>${text(submission.feedback ?? "")}</textarea>
-            <div class="creator-grade-actions">
-              <button type="button" class="ocs__btn small accent fill" data-save-grade="${text(submission.id)}">Save grade</button>
-              <small class="creator-grade-status" role="status" data-grade-status></small>
-            </div>`;
+            <div class="ocs__links">${actions}
+              <button type="button" class="ocs__btn small" data-grading-history="${text(submission.id)}">History</button>
+            </div>
+            <small class="creator-grade-status" role="status" data-grade-status></small>`;
           return `<tr>
             <td><strong>${text(submission.submitterName, "Unknown")}</strong><span class="creator-student-uid">${text(submission.submitterUid)}</span></td>
             <td><span class="creator-course-list">${courseList(submission.submitterCourseCodes)}</span></td>
@@ -222,11 +220,14 @@ export function createCreatorDashboard(options) {
     return assignment?.points ?? null;
   }
 
-  // Saving marks the grade as manual on the server, so the AI will not replace it later.
+  function submissionFor(id) {
+    return submissions.find((current) => String(current.id) === String(id));
+  }
+
   async function saveGrade(button) {
     const row = button.closest("tr");
     const status = row.querySelector("[data-grade-status]");
-    const submission = submissions.find((current) => String(current.id) === button.dataset.saveGrade);
+    const submission = submissionFor(button.dataset.saveGrade);
     if (!submission) return;
 
     const { grade, error } = parseGradeInput(row.querySelector("[data-grade-input]").value, assignmentPoints(submission));
@@ -234,21 +235,51 @@ export function createCreatorDashboard(options) {
       status.textContent = error;
       return;
     }
-    const feedback = row.querySelector("[data-feedback-input]").value;
+    await runGradingAction(button, status, submission, () => saveManualGrade({
+      javaURI,
+      fetchOptions,
+      submissionId: submission.id,
+      grade,
+      feedback: row.querySelector("[data-feedback-input]").value,
+      revision: submission.grading?.revision,
+    }));
+  }
 
+  async function clearGrade(button) {
+    const status = button.closest("tr").querySelector("[data-grade-status]");
+    const submission = submissionFor(button.dataset.clearGrade);
+    if (!submission) return;
+    await runGradingAction(button, status, submission, () => clearManualGrade({
+      javaURI,
+      fetchOptions,
+      submissionId: submission.id,
+      revision: submission.grading?.revision,
+    }));
+  }
+
+  async function aiRegrade(button) {
+    const status = button.closest("tr").querySelector("[data-grade-status]");
+    const submission = submissionFor(button.dataset.aiRegrade);
+    if (!submission) return;
+    await runGradingAction(button, status, submission, () => requestAiRegrade({
+      javaURI,
+      fetchOptions,
+      submissionId: submission.id,
+    }));
+  }
+
+  async function runGradingAction(button, status, submission, action) {
     button.disabled = true;
-    status.textContent = "Saving…";
+    status.textContent = "Working…";
     try {
-      const query = new URLSearchParams({ grade: String(grade), feedback });
-      const response = await fetch(`${gradeSubmissionUrl}/${encodeURIComponent(submission.id)}?${query}`, {
-        ...fetchOptions,
-        method: "POST",
-      });
-      if (!response.ok) {
-        const body = await response.json().catch(() => ({}));
-        throw new Error(body.error || body.message || `HTTP ${response.status}`);
+      const result = await action();
+      if (!result.ok) {
+        // Keep the old revision so a stale save keeps failing until the page is reloaded.
+        status.textContent = result.message;
+        button.disabled = false;
+        return;
       }
-      Object.assign(submission, { grade, feedback, gradedManually: true });
+      applyGradingState(submission, result.grading);
       renderSubmissions();
     } catch (saveError) {
       status.textContent = `Could not save grade: ${saveError.message}`;
@@ -311,8 +342,22 @@ export function createCreatorDashboard(options) {
     });
 
     element("creator-submissions-container").addEventListener("click", (event) => {
-      const button = event.target.closest("[data-save-grade]");
-      if (button && !button.disabled) saveGrade(button);
+      const button = event.target.closest("[data-save-grade], [data-clear-grade], [data-ai-regrade], [data-grading-history]");
+      if (!button || button.disabled) return;
+      if (button.dataset.saveGrade) saveGrade(button);
+      else if (button.dataset.clearGrade) clearGrade(button);
+      else if (button.dataset.aiRegrade) aiRegrade(button);
+      else {
+        const submission = submissionFor(button.dataset.gradingHistory);
+        showGradingHistory({
+          javaURI,
+          fetchOptions,
+          submissionId: button.dataset.gradingHistory,
+          title: `${submission?.submitterName || "Submission"} · ${submission?.assignmentName || ""}`,
+          points: submission ? assignmentPoints(submission) : null,
+          escapeHtml,
+        });
+      }
     });
 
     element("creator-pagination").addEventListener("click", (event) => {

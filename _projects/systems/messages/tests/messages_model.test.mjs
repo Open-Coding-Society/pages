@@ -32,9 +32,13 @@ test('dmMessage names an unnamed sender by uid and keys a message without an id 
   assert.equal(message.key, 'ada|2026-10-20T10:00:00Z');
 });
 
-test('groupMessage reads a saved group chat message, whose only sender field is the display name', () => {
+// Spring's field is `author`. It was `name` once, and reading the old field silently
+// produced "Unknown" senders and made your own messages look like someone else's,
+// because senderKey came back empty and never matched selfKey.
+test('groupMessage reads a saved group chat message, whose sender field is author', () => {
   const message = groupMessage({
-    id: 'uuid-1', name: 'Ada Lovelace', message: 'hello team', date: '2026-10-20T10:00:00Z', image: null, edited: false,
+    id: 'uuid-1', author: 'Ada Lovelace', author_uid: 'ada', message: 'hello team',
+    date: '2026-10-20T10:00:00Z', image: null, edited: false,
   });
   assert.deepEqual(message, {
     id: 'uuid-1', key: 'uuid-1', senderKey: 'Ada Lovelace', senderName: 'Ada Lovelace', senderPfp: null,
@@ -42,8 +46,13 @@ test('groupMessage reads a saved group chat message, whose only sender field is 
   });
 });
 
+test('groupMessage does not read a sender out of the field Spring no longer sends', () => {
+  const message = groupMessage({ id: 'uuid-9', name: 'Ada Lovelace', message: 'hi', date: '2026-10-20T10:00:00Z' });
+  assert.equal(message.senderName, 'Unknown');
+});
+
 test('groupMessage keys an old message that has no id by sender, time and text', () => {
-  const message = groupMessage({ name: 'Ada', message: 'hi', date: '2026-01-01T00:00:00Z', image: 'abc' });
+  const message = groupMessage({ author: 'Ada', message: 'hi', date: '2026-01-01T00:00:00Z', image: 'abc' });
   assert.equal(message.id, '');
   assert.equal(message.key, 'Ada|2026-01-01T00:00:00Z|hi');
   assert.equal(message.image, 'abc');
