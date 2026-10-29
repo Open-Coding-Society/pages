@@ -793,14 +793,14 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
     </div>
 
-   <!-- Integra (CSP 26-27) -->
+   <!-- Poway Recovery Center (CSP 26-27) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-09-integra-capstone %}">
-           <img src="/images/capstone/sentri.png" alt="Sentri" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       <a href="{% post_url capstone/2026-09-09-poway-recovery-center-capstone %}">
+           <img src="/images/capstone/sentri.png" alt="Poway Recovery Center" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url 2026-09-09-integra-capstone %}">Integra</a></h3>
-           <p>An AI-driven recovery ecosystem for the Poway Recovery Center that provides users with access to specialized support programs and meeting schedules at the center while also tracking long-term sobriety milestones through a secure, high-fidelity user profile/dashboard.</p>
+           <h3><a href="{% post_url capstone/2026-09-09-poway-recovery-center-capstone %}">Poway Recovery Center</a></h3>
+           <p>Supporting Poway Recovery Center's mission by helping visitors find its recovery community, meetings, resources, and key contacts.</p>
            <p>Team: Adya Shipekar, Anika Seksaria, Jailene Tang</p>
        </div>
    </div>
