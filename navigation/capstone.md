@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function(){
     return currentQuery.split(/\s+/).every(word=>cardText.get(card).includes(word));
   }
   // Highlight each search word in the card's own text with <mark>, like the Topics page.
-  const markSkip = '.capstone-links-button, .capstone-popup, .capstone-card-placeholder';
+  const markSkip = '.capstone-links-button, .capstone-popup, .capstone-card-placeholder, .microblog-unread-badge';
   function clearMarks(card){
     card.querySelectorAll('mark[data-search-mark]').forEach(mark=>{
       const parent = mark.parentNode;
@@ -541,11 +541,11 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 
    <div class="ocs__grid-cell CSA" data-year="2026-2027">
-       <a href="{% post_url capstone/2026-08-28-toolchain-trail %}">
+       <a href="{{ '/capstone/toolchain-trail/' | relative_url }}">
          <img src="{{ '/images/' | append: site.data.toolchain-trail-capstone.Logo | relative_url }}" alt="{{ site.data.toolchain-trail-capstone.Title }} logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-         <h3><a href="{% post_url capstone/2026-08-28-toolchain-trail %}"></a>{{ site.data.toolchain-trail-capstone.Title }}</h3>
+         <h3><a href="{{ '/capstone/toolchain-trail/' | relative_url }}">{{ site.data.toolchain-trail-capstone.Title }}</a></h3>
          <p>{{ site.data.toolchain-trail-capstone.Overview }}</p>
        </div>
    </div>
@@ -1477,5 +1477,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
 })();
 </script>
+
+<!-- A red count on each capstone with new microblog posts for its signed-in author -->
+<script type="module" src="{{ site.baseurl }}/assets/js/capstone-microblog-badges.js"></script>
 
   <!-- markdownlint-enable MD033 MD046 -->
