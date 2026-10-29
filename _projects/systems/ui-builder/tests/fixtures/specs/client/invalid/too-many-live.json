@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": {
+    "title": "Bad page",
+    "description": "",
+    "byline": "",
+    "course": "",
+    "width": "contained",
+    "image": ""
+  },
+  "sections": [
+    {
+      "id": "s-aaaaaa",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-fbk001",
+              "type": "feedback",
+              "settings": {
+                "title": "Feedback",
+                "prompt": ""
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-fbk002",
+              "type": "feedback",
+              "settings": {
+                "title": "Feedback",
+                "prompt": ""
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-fbk003",
+              "type": "feedback",
+              "settings": {
+                "title": "Feedback",
+                "prompt": ""
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-fbk004",
+              "type": "feedback",
+              "settings": {
+                "title": "Feedback",
+                "prompt": ""
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-fbk005",
+              "type": "feedback",
+              "settings": {
+                "title": "Feedback",
+                "prompt": ""
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-fbk006",
+              "type": "feedback",
+              "settings": {
+                "title": "Feedback",
+                "prompt": ""
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-fbk007",
+              "type": "feedback",
+              "settings": {
+                "title": "Feedback",
+                "prompt": ""
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-fbk008",
+              "type": "feedback",
+              "settings": {
+                "title": "Feedback",
+                "prompt": ""
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-fbk009",
+              "type": "feedback",
+              "settings": {
+                "title": "Feedback",
+                "prompt": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

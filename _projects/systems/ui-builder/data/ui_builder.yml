@@ -1,0 +1,578 @@
+# UI Builder registry: every frame, block, field, limit and visible string.
+# Published to _data/ui_builder.yml; the school pack (ui_builder_school.yml) is merged over it.
+# Key convention that Spring's UiBuilderSpecRules checks: URL values live only under keys named
+# url, src, image or link; rich text only under body; API field mappings end in _path.
+schema_version: 1
+
+limits:
+  sections: 25
+  blocks_per_section: 50
+  live_blocks: 8
+  spec_chars: 200000
+  depth: 12
+  text_max: 200
+  textarea_max: 2000
+  richtext_max: 4000
+  list_max: 20
+  table_rows: 50
+  table_cols: 8
+  api_timeout_ms: 8000
+  api_max_chars: 512000
+  api_item_chars: 500
+  api_snapshot_items: 50
+  api_snapshot_chars: 64000
+  import_max_chars: 5000000
+  gallery_max: 200
+  history_limit: 100
+  string_max: 20000
+  link_label_max: 60
+  slug_pattern: "^[a-z0-9](?:[a-z0-9-]{1,62}[a-z0-9])$"
+  reserved_slugs: [admin, login, logout, help, teacher, teachers, staff, official, ocs, new, edit, view, gallery, canvas, api, draft]
+
+devices:
+  - { key: phone, label: Phone, width: 375 }
+  - { key: tablet, label: Tablet, width: 768 }
+  - { key: desktop, label: Desktop, width: 1280 }
+  - { key: full, label: Full width, width: 0 }
+
+# Hosts under this domain get the site's login cookies (they are domain-wide), so images from
+# them load without cookies and apps on them open in a new tab instead of inside the page.
+security:
+  cookie_domain: opencodingsociety.com
+
+categories:
+  - { key: layout, label: Layout }
+  - { key: content, label: Content }
+  - { key: comms, label: Talk and plan }
+  - { key: project, label: Your project }
+
+frames:
+  stack:
+    label: One column
+    help: Blocks stacked from top to bottom.
+    icon: fa-bars
+    fields: []
+  columns:
+    label: Columns
+    help: Two or three columns side by side. They stack on phones.
+    icon: fa-table-columns
+    fields:
+      - id: layout
+        type: choice
+        label: Column layout
+        default: halves
+        options:
+          - { value: halves, label: Two equal columns }
+          - { value: thirds, label: Three equal columns }
+          - { value: sidebar_left, label: Narrow column on the left }
+          - { value: sidebar_right, label: Narrow column on the right }
+
+# Each columns layout and the grammar classes that draw it (see _sass/open-coding/README.md).
+layouts:
+  halves: { class: ocs__split, cells: 2 }
+  thirds: { class: ocs__facts, cells: 3 }
+  sidebar_left: { class: ocs__split ocs__split--aside, cells: 2 }
+  sidebar_right: { class: ocs__split ocs__split--aside-end, cells: 2 }
+
+page_fields:
+  - { id: title, type: text, label: Page title, required: true, max: 120 }
+  - { id: description, type: text, label: One-line description, max: 300, help: Shown on gallery cards. }
+  - { id: byline, type: text, label: Made by, max: 120, placeholder: Your team's name }
+  - { id: image, type: image, label: Gallery picture, help: Shown on the page's gallery card. }
+  - id: width
+    type: choice
+    label: Page width
+    default: contained
+    options:
+      - { value: contained, label: Normal }
+      - { value: wide, label: Wide }
+
+blocks:
+  hero:
+    label: Page header
+    help: A title, a short intro and up to three buttons at the top of the page.
+    icon: fa-flag
+    category: content
+    fields:
+      - { id: badge, type: text, label: Small label, max: 40, placeholder: "CSP · Team project" }
+      - { id: title, type: text, label: Title, required: true, max: 120 }
+      - { id: lead, type: textarea, label: Intro, max: 400 }
+      - { id: links, type: links, label: Buttons, max_items: 3 }
+  heading:
+    label: Heading
+    help: A section title with an optional line under it.
+    icon: fa-heading
+    category: content
+    fields:
+      - { id: text, type: text, label: Heading, required: true, max: 120 }
+      - id: level
+        type: choice
+        label: Size
+        default: "2"
+        options:
+          - { value: "2", label: Section heading }
+          - { value: "3", label: Smaller heading }
+      - { id: subtitle, type: text, label: Line under the heading, max: 200 }
+  text:
+    label: Text
+    help: Paragraphs with bold, italic, lists and links.
+    icon: fa-align-left
+    category: content
+    fields:
+      - { id: body, type: richtext, label: Text, required: true, max: 4000 }
+  image:
+    label: Image
+    help: A picture from an https:// link or a file on this site.
+    icon: fa-image
+    category: content
+    fields:
+      - { id: src, type: image, label: Image link, required: true }
+      - { id: alt, type: text, label: Describe the image, required: true, max: 200, help: Screen readers read this aloud. }
+      - { id: caption, type: text, label: Caption, max: 200 }
+      - id: fit
+        type: choice
+        label: Fit
+        default: contain
+        options:
+          - { value: contain, label: Show the whole image }
+          - { value: cover, label: Fill the frame }
+  video:
+    label: Video
+    help: A YouTube or Google Drive video. It loads when a visitor presses Play.
+    icon: fa-circle-play
+    category: content
+    fields:
+      - { id: url, type: url, label: Video link, required: true, help: "Paste a YouTube or Google Drive link. Drive videos must be shared with Anyone with the link." }
+      - { id: title, type: text, label: Title, required: true, max: 80 }
+      - { id: caption, type: text, label: Caption, max: 200 }
+  buttons:
+    label: Buttons
+    help: A row of up to four link buttons.
+    icon: fa-hand-pointer
+    category: content
+    fields:
+      - { id: links, type: links, label: Buttons, required: true, max_items: 4 }
+      - { id: emphasize_first, type: toggle, label: Make the first button stand out, default: true }
+  card:
+    label: Card
+    help: A boxed title and text with an optional button.
+    icon: fa-square
+    category: content
+    fields:
+      - { id: title, type: text, label: Title, required: true, max: 120 }
+      - { id: body, type: richtext, label: Text, max: 2000 }
+      - { id: links, type: links, label: Button, max_items: 1 }
+  callout:
+    label: Callout
+    help: A highlighted note.
+    icon: fa-circle-info
+    category: content
+    fields:
+      - { id: body, type: richtext, label: Note, required: true, max: 2000 }
+  keypoints:
+    label: Key points
+    help: A short list of ideas, each with a title.
+    icon: fa-list-ul
+    category: content
+    fields:
+      - id: items
+        type: items
+        label: Points
+        max_items: 8
+        item_fields:
+          - { id: title, type: text, label: Title, required: true, max: 80 }
+          - { id: text, type: textarea, label: Text, max: 300 }
+  checklist:
+    label: Checklist
+    help: Tasks with done and to-do boxes.
+    icon: fa-square-check
+    category: content
+    fields:
+      - id: items
+        type: items
+        label: Tasks
+        max_items: 20
+        item_fields:
+          - { id: text, type: text, label: Task, required: true, max: 120 }
+          - { id: done, type: toggle, label: Done, default: false }
+  stats:
+    label: Numbers
+    help: Big numbers with a label, like users or tests passing.
+    icon: fa-chart-simple
+    category: content
+    fields:
+      - id: items
+        type: items
+        label: Numbers
+        max_items: 6
+        item_fields:
+          - { id: value, type: text, label: Number, required: true, max: 20 }
+          - { id: label, type: text, label: Label, required: true, max: 60 }
+  table:
+    label: Table
+    help: "Type one row per line and split cells with |. The first row is the header."
+    icon: fa-table
+    category: content
+    fields:
+      - { id: data, type: table, label: Table, required: true, placeholder: "Name | Role" }
+      - { id: caption, type: text, label: Caption, max: 120 }
+  link_cards:
+    label: Link cards
+    help: Clickable cards that link to your app, your repo or a lesson.
+    icon: fa-grip
+    category: content
+    fields:
+      - id: items
+        type: items
+        label: Cards
+        max_items: 8
+        item_fields:
+          - { id: kicker, type: text, label: Small label, max: 40 }
+          - { id: title, type: text, label: Title, required: true, max: 80 }
+          - { id: text, type: textarea, label: Text, max: 200 }
+          - { id: url, type: url, label: Link, required: true }
+  team:
+    label: Team
+    help: Who is on the team and what each person does.
+    icon: fa-people-group
+    category: content
+    fields:
+      - { id: title, type: text, label: Title, max: 80, default: Our team }
+      - id: items
+        type: items
+        label: People
+        max_items: 8
+        item_fields:
+          - { id: name, type: text, label: Name, required: true, max: 40, help: First names only on public pages. }
+          - { id: role, type: text, label: Role, max: 40 }
+          - { id: url, type: url, label: GitHub or portfolio link }
+  code:
+    label: Code
+    help: Shows code as text. It never runs.
+    icon: fa-code
+    category: content
+    fields:
+      - { id: language, type: text, label: Language, max: 20, placeholder: python }
+      - { id: code, type: textarea, label: Code, required: true, max: 6000 }
+  divider:
+    label: Divider
+    help: A line between parts of the page.
+    icon: fa-minus
+    category: content
+    fields: []
+  chat:
+    label: Group chat
+    help: Your group's live chat from Messages. Only members of the group see it.
+    icon: fa-comments
+    category: comms
+    live: true
+    needs: spring
+    fields:
+      - { id: group, type: group, label: Group, required: true }
+      - { id: title, type: text, label: Title, max: 80 }
+  members:
+    label: Team members
+    help: The names of everyone in a group.
+    icon: fa-users
+    category: comms
+    live: true
+    needs: spring
+    fields:
+      - { id: group, type: group, label: Group, required: true }
+      - { id: title, type: text, label: Title, max: 80 }
+  message_me:
+    label: Message us
+    help: A button that opens a direct message with you, the page owner.
+    icon: fa-envelope
+    category: comms
+    live: true
+    needs: spring
+    fields:
+      - { id: label, type: text, label: Button text, max: 40, default: Message us }
+      - { id: note, type: text, label: Note above the button, max: 120 }
+  kanban:
+    label: Kanban board
+    help: Your team's GitHub project board or issues, live.
+    icon: fa-clipboard-list
+    category: comms
+    live: true
+    fields:
+      - { id: url, type: url, label: Board link, required: true, help: "A GitHub organization Projects board, or a repository's Issues page such as https://github.com/owner/repo/issues. Personal boards can't be shown." }
+      - { id: filter, type: text, label: Group cards by, max: 40, placeholder: Team }
+      - { id: title, type: text, label: Title, max: 80 }
+  feedback:
+    label: Visitor feedback
+    help: Visitors leave comments on your page. Guests can use it on showcase night.
+    icon: fa-comment-dots
+    category: comms
+    live: true
+    needs: flask
+    fields:
+      - { id: title, type: text, label: Title, max: 80, default: Feedback }
+      - { id: prompt, type: text, label: Question for visitors, max: 120 }
+  api_data:
+    label: Data from your API
+    help: Show live data from your own backend as cards, a list, a table or numbers.
+    icon: fa-plug
+    category: project
+    live: true
+    fields:
+      - { id: source, type: api, label: Your API, required: true }
+      - { id: title, type: text, label: Title, max: 80 }
+      - id: view
+        type: choice
+        label: Show it as
+        default: cards
+        options:
+          - { value: cards, label: Cards }
+          - { value: list, label: List }
+          - { value: table, label: Table }
+          - { value: stats, label: Numbers }
+      - { id: limit, type: number, label: How many items, min: 1, max: 50, default: 12 }
+  embed:
+    label: Embed your app
+    help: Shows your deployed frontend inside the page. It loads when a visitor presses Open.
+    icon: fa-window-maximize
+    category: project
+    fields:
+      - { id: url, type: url, label: App link, required: true, help: Must start with https://. }
+      - { id: title, type: text, label: Title, required: true, max: 80 }
+      - id: height
+        type: choice
+        label: Height
+        default: medium
+        options:
+          - { value: short, label: Short }
+          - { value: medium, label: Medium }
+          - { value: tall, label: Tall }
+
+# Starter pages. Sections and blocks get fresh ids when a page is created from one.
+templates:
+  - key: blank
+    label: Blank page
+    help: A page header and nothing else.
+    page:
+      schemaVersion: 1
+      kind: ocs-ui-page
+      page: { title: Untitled page, description: "", byline: "", width: contained, image: "" }
+      sections:
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: hero
+                  settings: { title: Untitled page, lead: Say what this page is about in one or two sentences. }
+  - key: project_showcase
+    label: Project showcase
+    help: Show what you built, a demo video, features and links.
+    page:
+      schemaVersion: 1
+      kind: ocs-ui-page
+      page: { title: Our project, description: What we built and how to try it., byline: "", width: contained, image: "" }
+      sections:
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: hero
+                  settings:
+                    badge: Project
+                    title: Our project
+                    lead: One sentence about the problem it solves and who it helps.
+                    links:
+                      - { label: Try it, url: "https://example.com" }
+                      - { label: Source code, url: "https://github.com" }
+                - type: video
+                  settings: { url: "", title: Demo video, caption: "" }
+        - type: columns
+          settings: { layout: halves }
+          cells:
+            - blocks:
+                - type: keypoints
+                  settings:
+                    items:
+                      - { title: Feature one, text: What it does and why it matters. }
+                      - { title: Feature two, text: What it does and why it matters. }
+            - blocks:
+                - type: stats
+                  settings:
+                    items:
+                      - { value: "3", label: API endpoints }
+                      - { value: "12", label: Tests passing }
+  - key: flask_api_starter
+    label: Flask API starter
+    help: Live data from the OCS Jokes API in the first minute. Then swap in your own backend.
+    page:
+      schemaVersion: 1
+      kind: ocs-ui-page
+      page: { title: Live data from a Flask API, description: Data from a Flask backend shown with OCS components., byline: "", width: contained, image: "" }
+      sections:
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: hero
+                  settings:
+                    badge: Flask API
+                    title: Live data from a Flask API
+                    lead: This page reads the OCS Jokes API. Change the link in Data from your API to your own backend.
+                - type: api_data
+                  settings:
+                    title: Jokes
+                    view: list
+                    limit: 5
+                    source:
+                      url: "https://flask.opencodingsociety.com/api/jokes"
+                      list_path: ""
+                      title_path: joke
+                      text_path: ""
+                      image_path: ""
+                      link_path: ""
+                      value_path: haha
+                      label_path: ""
+                      snapshot: { items: [], fetched_at: 0, from_loopback: false }
+                - type: callout
+                  settings:
+                    body: "Your backend must allow this site in its CORS origins. Press <b>Test connection</b> to check it."
+  - key: about_me
+    label: About me
+    help: A personal page with your projects and links.
+    page:
+      schemaVersion: 1
+      kind: ocs-ui-page
+      page: { title: About me, description: Who I am and what I build., byline: "", width: contained, image: "" }
+      sections:
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: hero
+                  settings: { badge: About me, title: "Hi, I'm a student developer", lead: What I like to build and what I'm learning now. }
+        - type: columns
+          settings: { layout: sidebar_right }
+          cells:
+            - blocks:
+                - type: text
+                  settings: { body: "Write a few sentences about yourself. Use <b>bold</b> for the parts that matter." }
+                - type: link_cards
+                  settings:
+                    items:
+                      - { kicker: Project, title: My first app, text: What it does., url: "https://github.com" }
+            - blocks:
+                - type: card
+                  settings:
+                    title: Find me
+                    body: Links to my code and portfolio.
+                    links:
+                      - { label: GitHub, url: "https://github.com" }
+
+text:
+  blocks:
+    untitled: Untitled page
+    unknown_block: "This block type isn't available: {type}."
+    block_error: "This block couldn't be shown."
+    needs_live_viewer: "{label}: shown on the live page only."
+    external_host: "{host}"
+    checklist_done: Done
+    checklist_todo: To do
+    video_play: Play video
+    video_unsupported: Paste a YouTube or Google Drive link to show this video.
+    embed_open: Open app here
+    embed_new_tab: "Open {host} in a new tab"
+    embed_ocs_host: "Apps on {host} open in a new tab, because they would receive visitors' OCS sign-in cookies inside this page."
+    embed_blocked: "This link can't be shown inside the page. Use the button to open it."
+    code_label: "Code ({language})"
+    table_empty: This table is empty.
+    team_role_none: Team member
+    sample_chat: "Live chat for {group} shows here on the published page."
+    sample_members: "Names of everyone in {group} show here on the published page."
+    sample_message_me: "Visitors press this button to message you."
+    sample_kanban: "Your board from {host} shows here on the published page."
+    sample_feedback: "Visitor comments show here on the published page."
+    sample_api_data: "Data from {host} shows here. Turn on Real data while editing to see it now."
+    sample_no_group: No group picked yet.
+    sample_no_source: No API link yet.
+    live_loading: Loading…
+    live_error: "Couldn't load this block: {message}"
+    live_needs_spring: This needs the OCS Spring backend, which this site doesn't run.
+    live_needs_flask: This needs the OCS Flask backend.
+    live_sign_in: Sign in to see this.
+    live_sign_in_link: Sign in
+    live_not_member: "This chat is for members of {group}."
+    live_show_board: Show our board
+    api_offline_copy: "Saved copy · {date}"
+    api_saved_from_computer: "Saved from the team's computer · {date}"
+    api_empty: The API returned no items.
+  errors:
+    required: "{field} is required."
+    too_long: "{field} can be at most {max} characters."
+    one_line: "{field} must be one line."
+    bad_url: "{field} must be an https:// link or a path on this site, like /about."
+    bad_image: "{field} must be an https:// image link or a path on this site."
+    bad_choice: "Pick one of the options for {field}."
+    bad_number: "{field} must be a whole number from {min} to {max}."
+    bad_toggle: "{field} must be on or off."
+    too_many: "{field} can have at most {max} items."
+    bad_list: "{field} must be a list."
+    table_too_big: "{field} can have at most {rows} rows and {cols} cells per row."
+    bad_group: "Pick one of your groups for {field}."
+    bad_api: "{field} needs an API link."
+    bad_api_path: "{field} paths can use letters, numbers, dots, dashes, underscores and [ ]."
+    bad_snapshot: "{field} has a saved copy that is too big. Save it again with fewer items."
+    unknown_type: "Unknown block type {type}."
+    too_many_sections: "A page can have at most {max} sections."
+    too_many_blocks: "A section can hold at most {max} blocks."
+    too_many_live: "A page can have at most {max} live blocks (chat, boards, API data and similar)."
+    too_big: "This page is too big to save ({size} of {max} characters)."
+    too_deep: This page is nested too deeply to save.
+    bad_page: "This file isn't a UI Builder page."
+    bad_json: "This file isn't valid JSON."
+    import_too_big: This file is too big to import.
+    kanban_personal: "GitHub doesn't let other people's pages read personal boards. Use your repository's Issues page instead, like https://github.com/owner/repo/issues."
+    kanban_bad_url: "Use a GitHub organization Projects board or a repository's Issues page."
+    private_field: "Private: never show this on a page."
+    slug_invalid: "Use 3 to 64 lowercase letters, numbers and dashes, starting and ending with a letter or number."
+    slug_reserved: "That address is reserved. Pick another one."
+    video_bad_url: "Paste a YouTube or Google Drive video link."
+    embed_https: "The app link must start with https://."
+    bad_id: A section or block on this page has a broken id.
+    duplicate_id: Two parts of this page have the same id.
+    bad_cells: This section has the wrong number of columns for its layout.
+    bad_key: "This page has a setting named {field}, which isn't allowed."
+    bad_value: "{field} has a value of the wrong kind."
+    bad_body: "{field} has code that isn't allowed: scripts, frames or on… attributes."
+    bad_kind: "This isn't a UI Builder page."
+    bad_schema_version: This page was made by a newer UI Builder.
+    bad_sections: This page's sections are broken.
+    bad_section: A section on this page is broken.
+    bad_cell: A column on this page is broken.
+    bad_block: A block on this page is broken.
+    bad_settings: A block's settings are broken.
+    bad_hidden: A block's show or hide setting is broken.
+    bad_type: "Unknown block type {type}."
+    bad_path: "{field} paths can use letters, numbers, dots, dashes, underscores and [ ]."
+    bad_course: Pick one of the courses.
+    loopback_url: "A link to your own computer can't be published. Save a copy of the data and use your deployed https:// address."
+    group_not_allowed: "Pick one of your own groups. Class groups and course channels can't be used."
+  doctor:
+    ok: "Connected in {ms} ms. Found {count} items."
+    ok_object: "Connected in {ms} ms."
+    policy: "{reason}"
+    policy_https: "Use an https:// link. Published pages can only read https:// APIs."
+    policy_loopback_view: "A link to your own computer only works while you're editing. Save a copy so visitors see the data."
+    policy_private_host: "That address can't be used. Use your deployed backend's https:// address."
+    mixed_content: "This page is https, so the browser blocks http:// APIs. Use your deployed https:// address."
+    timeout: "No answer after {seconds} seconds. Is your backend running?"
+    network: "Couldn't reach {host}. Check the address, its DNS record (Route 53 CNAME) and its certificate (certbot)."
+    blocked_read: "{host} answered, but the browser hid the reply. Open the link in a new tab: an error page or 502 means your backend is down, so restart it. If it shows JSON, add {origin} to allowed_origins in __init__.py (the OCS template already allows https://*.opencodingsociety.com)."
+    auth: "This route needs sign-in. The builder never sends sign-in cookies, so your page can't use anyone's account. Use a public GET route like /api/jokes, or add a read-only route that returns only public fields."
+    not_found: "{host} says this route doesn't exist (404). Check the path."
+    http: "{host} answered with an error ({status})."
+    not_json: "{host} didn't send JSON. Check that the link is an API route, not a web page."
+    too_big: "The reply is bigger than {max} characters. Add a route that returns fewer items."
+    empty: The reply has no list of items. Pick a route that returns a list.
+    private_keys: "Your API sends {keys} to anyone who asks. Remove them from this route."
+    loopback_hint: "If Chrome asks to let this page access apps on your device, choose Allow. School-managed Chromebooks may block this; take the saved copy on another computer."
+    open_link: Open in new tab
+  view: {}
+  gallery: {}

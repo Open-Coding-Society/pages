@@ -1,0 +1,10 @@
+import '../_projects/systems/ui-builder/tests/registry.test.mjs';
+import '../_projects/systems/ui-builder/tests/url-rules.test.mjs';
+import '../_projects/systems/ui-builder/tests/page-model.test.mjs';
+import '../_projects/systems/ui-builder/tests/page-rules.test.mjs';
+import '../_projects/systems/ui-builder/tests/history.test.mjs';
+import '../_projects/systems/ui-builder/tests/autosave.test.mjs';
+import '../_projects/systems/ui-builder/tests/api-data.test.mjs';
+import '../_projects/systems/ui-builder/tests/vnode.test.mjs';
+import '../_projects/systems/ui-builder/tests/render.test.mjs';
+import '../_projects/systems/ui-builder/tests/export.test.mjs';

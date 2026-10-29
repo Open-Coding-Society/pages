@@ -81,6 +81,13 @@ images/projects/
 /navigation/topics.md
 /assets/js/topics/
 
+# UI Builder system distributions (authoritative sources in _projects/systems/ui-builder)
+/navigation/ui-builder/
+/_data/ui_builder.yml
+/_data/ui_builder_school.yml
+/_data/ui_builder_editor.yml
+/_layouts/ui-builder-canvas.html
+
 # Profile system distributions (authoritative sources in _projects/systems/profile)
 /navigation/authentication/profile.md
 /navigation/authentication/profile-v2.md
