@@ -158,33 +158,41 @@ Computer unlinked"]</pre>
     </ul>
     </div>
     <div class="ocs__card">
-        <h3 class="ocs__section-title">API Endpoints (built today)</h3>
+        <h3 class="ocs__section-title">API Endpoints (merged into OCS, PRs #96 and #97)</h3>
         <div class="ocs__table-wrap">
           <table class="ocs__table">
             <thead><tr><th>Method</th><th>Path</th><th>Auth</th><th>What it does</th></tr></thead>
             <tbody>
               <tr><td><code>POST</code></td><td><code>/api/presence/event</code></td><td>Device key</td><td>Record a tap (source rfid) or a camera result (source camera)</td></tr>
-              <tr><td><code>POST</code></td><td><code>/api/rfid/scan</code></td><td>Device key</td><td>Route the CrowPi uses today; forwards to /api/presence/event</td></tr>
-              <tr><td><code>GET</code></td><td><code>/api/presence/classrooms/{id}/taps/pending</code></td><td>Device key</td><td>Camera asks for taps from the last 15 seconds</td></tr>
-              <tr><td><code>GET</code></td><td><code>/api/presence/classrooms/{id}/status</code></td><td>Teacher / Admin</td><td>Each student's state now (the dashboard polls this every 2 s)</td></tr>
-              <tr><td><code>POST</code></td><td><code>/api/presence/periods/start</code></td><td>Teacher / Admin</td><td>Start a demo period (overrides the bell schedule)</td></tr>
-              <tr><td><code>POST</code></td><td><code>/api/rfid/register</code></td><td>Teacher / Admin</td><td>Link a tag to a student</td></tr>
-              <tr><td><code>GET</code></td><td><code>/api/rfid/classrooms/{id}/events</code></td><td>Logged in, same school</td><td>Latest 200 taps for a classroom</td></tr>
+              <tr><td><code>POST</code></td><td><code>/api/rfid/scan</code></td><td>Device key</td><td>Route the tap reader uses; forwards to /api/presence/event</td></tr>
+              <tr><td><code>GET</code></td><td><code>/api/presence/rooms/{id}/taps/pending</code></td><td>Device key</td><td>Camera asks for taps from the last 15 seconds</td></tr>
+              <tr><td><code>GET</code></td><td><code>/api/presence/rooms/{id}/status</code></td><td>Teacher / Admin</td><td>Each person's state now (the dashboard polls this every 2 s)</td></tr>
+              <tr><td><code>GET, POST</code></td><td><code>/api/presence/rooms</code></td><td>Teacher / Admin</td><td>List or create rooms: a class, a club meeting, or an event</td></tr>
+              <tr><td><code>GET, PUT, DELETE</code></td><td><code>/api/presence/rooms/{id}</code></td><td>Teacher / Admin</td><td>One room: name, schedule, members</td></tr>
+              <tr><td><code>POST, DELETE</code></td><td><code>/api/presence/rooms/{id}/members/{uid}</code></td><td>Teacher / Admin</td><td>Add or remove a room member</td></tr>
+              <tr><td><code>GET, POST</code></td><td><code>/api/presence/rooms/{id}/periods</code></td><td>Teacher / Admin</td><td>Current period; start a manual period (overrides the schedule)</td></tr>
+              <tr><td><code>GET, POST</code></td><td><code>/api/presence/schedules</code></td><td>Teacher / Admin</td><td>Schedules stored in the database, editable on demand</td></tr>
+              <tr><td><code>GET, PUT, DELETE</code></td><td><code>/api/presence/schedules/{id}</code></td><td>Teacher / Admin</td><td>One schedule and its blocks</td></tr>
+              <tr><td><code>GET, POST, DELETE</code></td><td><code>/api/presence/schedules/overrides</code></td><td>Teacher / Admin</td><td>Special days: another schedule, or no periods, on one date</td></tr>
+              <tr><td><code>GET, POST</code></td><td><code>/api/rfid/tags</code></td><td>Teacher / Admin</td><td>List cards; register a card to a person by uid</td></tr>
+              <tr><td><code>DELETE</code></td><td><code>/api/rfid/tags/{tag_uid}</code></td><td>Teacher / Admin</td><td>Remove a card</td></tr>
+              <tr><td><code>GET</code></td><td><code>/api/rfid/rooms/{id}/events</code></td><td>Teacher / Admin</td><td>Latest 200 taps in a room</td></tr>
+              <tr><td><code>GET, POST</code></td><td><code>/api/export/presence, /api/export/import/presence</code></td><td>Admin</td><td>Backup and restore of every presence table during OCS upgrades</td></tr>
               <tr><td><code>POST</code></td><td><code>/api/authenticate</code></td><td>Password</td><td>OCS login; sets the session cookie</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="rfid-presence-about">Device key = the <code>X-API-Key</code> header the CrowPi (and later the camera) sends. Teacher / Admin = a normal OCS login. Example tap, the request the CrowPi sends and what Flask returns:</p>
+        <p class="rfid-presence-about">Device key = the <code>X-API-Key</code> header the tap reader (and later the camera) sends (<code>RFID_API_KEY</code> on the server). Teacher / Admin = a normal OCS login. Example tap, the request the CrowPi sends and what Flask returns:</p>
         <pre>POST /api/presence/event
     X-API-Key: (device key)
 
     {
       "event_id": "3f2b8c1e-6a1d-4f7e-9b0a-2d5c7e9f1a44",
       "source": "rfid",
-      "classroom_id": 1,
+      "room_id": 1,
       "occurred_at": "2026-10-12T15:44:07.123Z",
       "tag_uid": "1234567890",
-      "device_id": "crowpi-room1"
+      "device_id": "reader-1"
     }
 
     200 OK (trimmed)
@@ -203,7 +211,7 @@ Computer unlinked"]</pre>
         <p class="rfid-presence-about">Errors: 401 bad or missing device key, 404 unregistered tag (<code>"status": "unregistered"</code>), 400 missing fields or a timestamp without a timezone. A resent <code>event_id</code> returns the original record with <code>"duplicate": true</code>.</p>
       </div>
     <div class="ocs__card">
-        <h3 class="ocs__section-title">Postman stands in for the CrowPi</h3>
+        <h3 class="ocs__section-title">Testing the API: api/presence.http</h3>
         <div class="ocs__table-wrap">
           <table class="ocs__table">
             <thead><tr><th>#</th><th>Method</th><th>Request</th><th>Dashboard shows</th></tr></thead>
@@ -218,15 +226,15 @@ Computer unlinked"]</pre>
             </tbody>
           </table>
         </div>
-        <p class="ocs__description">Same request, same server, and the dashboard updates live.</p>
+        <p class="ocs__description">The same sequence as our Postman collection, now as the REST Client file <code>api/presence.http</code> in the OCS backend, the new testing process for OCS. It runs against local or deployed OCS, and the dashboard updates live.</p>
       </div>
     <div class="ocs__card">
         <h3 class="ocs__section-title">Current Software Stack (RFID Track)</h3>
         <ul class="ocs__entity-list">
-          <li><strong>Reader board</strong>: CrowPi, single scan pad, 13.56MHz MIFARE Classic tags. Contact-tap, not the UHF doorway design above.</li>
-          <li><strong>Backend</strong>: Flask, integrated into OCS. Real authentication on admin routes and moving off the dev server are still open, tracked in <a href="https://github.com/vibha1019/crowpi-attendance/issues/6" target="_blank" rel="noopener">Issue #6</a>.</li>
-          <li><strong>Database</strong>: OCS's own database via the shared attendance API; the standalone prototype's separate SQLite database is being phased out.</li>
-          <li><strong>Frontend</strong>: a live dashboard, running locally on the team's own network.</li>
+          <li><strong>Reader</strong>: Raspberry Pi&nbsp;4 with a Waveshare PN532 NFC HAT (UART mode), reading S50 (MIFARE Classic 1K) cards at 13.56&nbsp;MHz. Contact tap, not the UHF doorway design above. The same <code>reader.py</code> also runs an RC522 board, and card numbers match between the two.</li>
+          <li><strong>Backend</strong>: the presence API is merged into the shared OCS Flask backend (PRs #96 and #97). Staff routes require an OCS Teacher or Admin login; readers use the device key. Deployment to the OCS server is pending.</li>
+          <li><strong>Database</strong>: OCS's own database (MySQL in production); the presence tables are included in OCS's export/import, so upgrades that rebuild the database keep every card, period, and tap.</li>
+          <li><strong>Frontend</strong>: the live dashboard works on our local OCS today and moves to OCS Pages after the deploy. Next: students register their own cards from a My card page (built, PR after deploy).</li>
         </ul>
         <div class="ocs__callout">
           The full RFID and camera architecture above is the <strong>target design</strong> for that pairing. The current running system implements only the leftmost slice of it: RFID read, log, dashboard, with no camera correlation yet, and that gap is intentionally not being closed until the research cycles justify it. See <a href="/capstone/presence-system/phases/">Roadmap</a> for what's paused and why.

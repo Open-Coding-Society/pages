@@ -43,6 +43,8 @@ The Apache license has its roots in Fastpages.  Thus, it carries that license fo
 
 - **Blog Contributions**:  Often students contribute articles and blogs to this project.  Their names are typically listed in the front matter of their contributing post.
 
+- **Mentorship**: The RFID-based Classroom Presence System has benefited from the mentorship of **Dr. Douglas Fenner, President of Fenner Consulting Group**, whose guidance has shaped its hardware design, integration with OCS, and research direction.
+
 ---
 
 ## GitHub Pages setup
