@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function(){
     return currentQuery.split(/\s+/).every(word=>cardText.get(card).includes(word));
   }
   // Highlight each search word in the card's own text with <mark>, like the Topics page.
-  const markSkip = '.capstone-links-button, .capstone-popup, .capstone-card-placeholder';
+  const markSkip = '.capstone-links-button, .capstone-popup, .capstone-card-placeholder, .microblog-unread-badge';
   function clearMarks(card){
     card.querySelectorAll('mark[data-search-mark]').forEach(mark=>{
       const parent = mark.parentNode;
@@ -1477,5 +1477,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
 })();
 </script>
+
+<!-- A red count on each capstone with new microblog posts for its signed-in author -->
+<script type="module" src="{{ site.baseurl }}/assets/js/capstone-microblog-badges.js"></script>
 
   <!-- markdownlint-enable MD033 MD046 -->

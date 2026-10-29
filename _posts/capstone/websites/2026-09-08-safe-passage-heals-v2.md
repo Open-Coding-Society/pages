@@ -10,6 +10,66 @@ categories: [Capstone]
 permalink: /capstone/safe-passage-heals-v2/
 ---
 
+<link rel="stylesheet" href="{{ '/assets/css/safe-passage-board.css' | relative_url }}">
+
+<section class="sph-about" aria-labelledby="sph-about-title">
+    <div class="ocs__grid ocs__grid--standard cols-2">
+        <div class="ocs__grid-cell ocs__grid-cell--header">
+            <h2 class="sph-about__title" id="sph-about-title">Safe Passage Heals</h2>
+        </div>
+        <div class="ocs__grid-cell">
+            <img class="sph-about__logo" src="{{ '/images/capstone/sph.png' | relative_url }}" alt="Safe Passage Heals logo">
+        </div>
+        <div class="ocs__grid-cell ocs__grid-cell--accent">
+            <strong>About the organization</strong>
+            <p>For 25 years, Safe Passage Heals has helped women and children leave abuse and rebuild their lives. Its work offers survivors and families practical support, caring guidance, and room to heal and begin again.</p>
+        </div>
+    </div>
+
+    <div class="ocs__grid ocs__grid--standard cols-4">
+        <div class="ocs__grid-cell ocs__grid-cell--header">How Safe Passage Heals creates change</div>
+        <div class="ocs__grid-cell ocs__grid-cell--accent">
+            <strong>Raise awareness</strong>
+            <p>Bring the community together to speak out against domestic violence and abuse, including at “Walk a Mile in Her Shoes.”</p>
+        </div>
+        <div class="ocs__grid-cell">
+            <strong>Promote peace</strong>
+            <p>Encourage respect and equality in relationships. Support groups help participants strengthen self-worth and find courage.</p>
+        </div>
+        <div class="ocs__grid-cell ocs__grid-cell--accent">
+            <strong>Speak kindness</strong>
+            <p>Help children of all ages stand up to bullying with kind words, including through the Luisa Diaz Foundation’s “Kindness Is Cool” initiative.</p>
+        </div>
+        <div class="ocs__grid-cell">
+            <strong>Educate to empower</strong>
+            <p>Life skills, financial literacy, career development, and mentorship help survivors build the tools and confidence to thrive.</p>
+        </div>
+    </div>
+
+    <div class="ocs__grid ocs__grid--standard cols-3">
+        <div class="ocs__grid-cell ocs__grid-cell--header">Support for healing and growth</div>
+        <div class="ocs__grid-cell">
+            <strong>Counseling</strong>
+            <p>A safe, supportive place to talk through stress, anxiety, trauma, and personal challenges with guidance along the way.</p>
+        </div>
+        <div class="ocs__grid-cell ocs__grid-cell--accent">
+            <strong>Emergency assistance</strong>
+            <p>Shelter support, basic necessities, and compassionate care help individuals and families regain stability and hope.</p>
+        </div>
+        <div class="ocs__grid-cell">
+            <strong>Mentorship for children</strong>
+            <p>Supportive relationships and activities help children grow confidence, leadership, and healthy life skills.</p>
+        </div>
+    </div>
+
+    <div class="ocs__grid ocs__grid--card">
+        <div class="ocs__grid-cell ocs__grid-cell--accent sph-about__giving">
+            <strong>Every gift helps someone begin again</strong>
+            <p>A donation can provide a bus pass, a warm meal, or a full healing program—each one helping someone move toward a fresh start.</p>
+        </div>
+    </div>
+</section>
+
 <div class="ocs__grid ocs__grid--standard cols-2">
     <div class="ocs__grid-cell ocs__grid-cell--header">Safe Passage Heals · 2026–2027</div>
     <div class="ocs__grid-cell ocs__grid-cell--accent">
@@ -18,7 +78,6 @@ permalink: /capstone/safe-passage-heals-v2/
         <p><strong>Experience:</strong> discover → explore → manage → learn → revisit</p>
     </div>
     <div class="ocs__grid-cell">
-        <img src="{{ '/images/capstone/sph.png' | relative_url }}" alt="Safe Passage Heals capstone project logo" loading="lazy">
         <p><strong>Project focus:</strong> media management, community events, recovery information, and an interactive recovery simulation.</p>
     </div>
     <div class="ocs__grid-cell">
@@ -27,7 +86,6 @@ permalink: /capstone/safe-passage-heals-v2/
     </div>
 </div>
 
-<link rel="stylesheet" href="{{ '/assets/css/safe-passage-board.css' | relative_url }}">
 <section class="sph-board" data-sph-board aria-labelledby="sph-board-title">
     <div class="sph-board__top">
         <div class="sph-board__meta">

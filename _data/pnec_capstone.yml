@@ -3,4 +3,5 @@ Board:
   url: "https://github.com/samanviy17-crypto/team-portfolio/issues"
   title: "PNEC Team Kanban"
   filter: "Assignee"
+  issue_metadata: true
   project_url: "https://github.com/users/samanviy17-crypto/projects/1/views/1"
