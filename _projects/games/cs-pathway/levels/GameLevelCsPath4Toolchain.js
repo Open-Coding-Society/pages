@@ -292,51 +292,59 @@ class GameLevelCsPath4Toolchain {
         name: 'Terminal Town Gate',
         icon: '🖥️',
         accentColor: '#38bdf8',
-        skill: 'Shell fundamentals and package management',
+        skill: 'Shell basics and cloning the class repo',
         zone: 1,
         position: { x: width * 0.16, y: height * 0.28 },
         narrativeHook: "The gate won't open until you prove you can pilot the shell.",
         instructions: [
-          'Open your terminal application.',
-          { text: "See where you currently are:", commands: ["pwd"] },
-          { text: "List the files here:", commands: ["ls"] },
-          { text: "Create the trail folder:", commands: ["mkdir toolchain-trail"] },
+          'Open a Terminal.',
+          { text: "Go to your home folder:", commands: ["cd ~"] },
+          { text: "Make the trail folder (the trail agent checks for it):", commands: ["mkdir -p ~/toolchain-trail"] },
+          { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
+          { text: "Clone the class repo into it:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
+          { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
         ],
         instructionsByOS: {
           windows: [
             'Open Windows Terminal (pin it to your taskbar).',
             { text: "Install WSL with Ubuntu, then set a username and password when prompted:", commands: ["wsl --install -d Ubuntu-24.04"] },
             { text: "Set it as your default:", commands: ["wsl --set-default Ubuntu-24.04"] },
-            { text: "Launch your Ubuntu shell, then create the trail folder:", commands: ["wsl", "mkdir toolchain-trail"] },
+            { text: "Open your Ubuntu shell and go to your Linux home folder:", commands: ["wsl", "cd ~"] },
+            { text: "Make the trail folder (the trail agent checks for it):", commands: ["mkdir -p ~/toolchain-trail"] },
+            { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
+            { text: "Clone the class repo into it:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
+            { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
           ],
           kasm: [
             'Open a Terminal in your Kasm Workspace.',
-            { text: "See where you currently are:", commands: ["pwd"] },
-            { text: "List the files here (cat shows a file's contents):", commands: ["ls"] },
-            { text: "Create the trail folder:", commands: ["mkdir toolchain-trail"] },
+            { text: "Go to your home folder:", commands: ["cd ~"] },
+            { text: "Make the trail folder (the trail agent checks for it):", commands: ["mkdir -p ~/toolchain-trail"] },
+            { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
+            { text: "Clone the class repo into it:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
+            { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
           ],
           macos: [
             'Open Terminal (keep it in the Dock for easy access).',
             { text: "Go to your home folder:", commands: ["cd ~"] },
-            { text: "Create the trail folder. This is safe to run if the folder already exists:", commands: ["mkdir -p toolchain-trail"] },
-            { text: "Show your current folder. You should see a path ending with your username:", commands: ["pwd"] },
-            { text: "Show the trail folder. You should see a line ending with toolchain-trail:", commands: ["ls -ld toolchain-trail"] },
+            { text: "Make the trail folder (the trail agent checks for it):", commands: ["mkdir -p ~/toolchain-trail"] },
+            { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
+            { text: "Clone the class repo into it. If a window asks to install the command line developer tools, click Install, then run this again:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
+            { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
           ],
           linux: [
             'Open a Terminal.',
-            { text: "See where you currently are:", commands: ["pwd"] },
-            { text: "List the files here (cat shows a file's contents):", commands: ["ls"] },
-            { text: "Create the trail folder:", commands: ["mkdir toolchain-trail"] },
+            { text: "Go to your home folder:", commands: ["cd ~"] },
+            { text: "Make the trail folder (the trail agent checks for it):", commands: ["mkdir -p ~/toolchain-trail"] },
+            { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
+            { text: "Clone the class repo into it. If git is missing, run sudo apt install git first:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
+            { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
           ],
         },
-        expectedCommandPattern: /^(mkdir\s+\S+|ls|dir|pwd|cd)/i,
+        expectedCommandPattern: /^(git\s+clone\s+\S+|mkdir\s+.*|cd(\s+.*)?|ls(\s+.*)?|pwd)/i,
         expectedCommandPatternByOS: {
-          windows: /^(wsl(\s+.*)?|mkdir\s+\S+|ls|pwd|cd)/i,
+          windows: /^(wsl(\s+.*)?|git\s+clone\s+\S+|mkdir\s+.*|cd(\s+.*)?|ls(\s+.*)?|pwd)/i,
         },
-        exampleCommand: 'mkdir toolchain-trail',
-        exampleCommandByOS: {
-          windows: 'wsl --install -d Ubuntu-24.04',
-        },
+        exampleCommand: 'git clone https://github.com/Open-Coding-Society/pages.git',
         funFact: "Fun fact: 'ls' has been a Unix command since 1971 — older than most operating systems still in use today.",
       },
       {
@@ -364,7 +372,7 @@ class GameLevelCsPath4Toolchain {
           ],
           macos: [
             'Open Terminal.',
-            { text: "Go into your cloned portfolio folder:", commands: ["cd ~/opencs/portfolio"] },
+            { text: "Go into your cloned pages folder:", commands: ["cd ~/opencs/pages"] },
             { text: "Check Python and pip. Each command should print a version number:", commands: ["python3 --version", "python3 -m pip --version"] },
             { text: "Check the Ruby tools. Each command should print a version number:", commands: ["ruby -v", "bundle -v", "gem --version"] },
             { text: "If a tool is missing, install Homebrew from brew.sh, then run the macOS setup script and reload your shell:", commands: ["bash scripts/activate_macos.sh", "source ~/.zshrc"] },
@@ -422,12 +430,12 @@ class GameLevelCsPath4Toolchain {
             'Download and install VS Code for Mac from code.visualstudio.com.',
             "In VS Code, press Cmd+Shift+P, search for Shell Command, and choose Install 'code' command in PATH.",
             { text: "Open a new Terminal and check the command. You should see a version number:", commands: ["code --version"] },
-            { text: "Go into your project folder and open it:", commands: ["cd ~/opencs/portfolio", "code ."] },
+            { text: "Go into your project folder and open it:", commands: ["cd ~/opencs/pages", "code ."] },
             'Install one recommended extension.',
           ],
           kasm: [
             'Open a new Terminal in your Kasm Workspace.',
-            { text: "Go into your project folder:", commands: ["cd opencs/student"] },
+            { text: "Go into your project folder:", commands: ["cd ~/opencs/pages"] },
             { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
             { text: "Open it in VS Code:", commands: ["code ."] },
           ],
@@ -465,7 +473,7 @@ class GameLevelCsPath4Toolchain {
           ],
           macos: [
             { text: "Confirm Git is installed. You should see a version number. If it is missing, install Homebrew from brew.sh, then run the second command:", commands: ["git --version", "brew install git"] },
-            { text: "Go into your cloned portfolio folder:", commands: ["cd ~/opencs/portfolio"] },
+            { text: "Go into your cloned pages folder:", commands: ["cd ~/opencs/pages"] },
             { text: "Set your Git name and email. Do not include your email in a screenshot:", commands: ["bash scripts/activate.sh"] },
             { text: "Check your name:", commands: ["git config --global --get user.name"] },
             { text: "Check your email. Before pasting into the Practice Check, you may replace the domain with [redacted]:", commands: ["git config --global --get user.email"] },
@@ -503,39 +511,12 @@ class GameLevelCsPath4Toolchain {
         narrativeHook: 'No signal passes the arch without an authenticated connection.',
         instructions: [
           'Confirm you have a GitHub account.',
-          { text: "Set up SSH key or token auth:", commands: ["ssh-keygen -t ed25519"] },
-          'Clone the class starter repo with git clone.',
+          { text: "Go into the pages repo you cloned at Terminal Town Gate:", commands: ["cd ~/opencs/pages"] },
+          { text: "Check where it came from. You should see github.com/Open-Coding-Society/pages.git:", commands: ["git remote -v"] },
+          { text: "Check that you can reach GitHub. You should see Already up to date:", commands: ["git pull"] },
         ],
-        instructionsByOS: {
-          windows: [
-            'Confirm you have a GitHub account.',
-            { text: "In your WSL Ubuntu terminal, make a workspace:", commands: ["mkdir opencs && cd opencs"] },
-            { text: "Clone the class repo:", commands: ["git clone https://github.com/Open-Coding-Society/portfolio.git"] },
-          ],
-          kasm: [
-            'Confirm you have a GitHub account.',
-            { text: "In your Kasm Terminal, make a workspace:", commands: ["mkdir opencs && cd opencs"] },
-            { text: "Clone the class repo:", commands: ["git clone https://github.com/Open-Coding-Society/student.git"] },
-          ],
-          macos: [
-            'Confirm you have a GitHub account.',
-            { text: "In Terminal, make a workspace:", commands: ["mkdir opencs && cd opencs"] },
-            { text: "Clone the class repo:", commands: ["git clone https://github.com/Open-Coding-Society/portfolio.git"] },
-          ],
-          linux: [
-            'Confirm you have a GitHub account.',
-            { text: "In Terminal, make a workspace:", commands: ["mkdir opencs && cd opencs"] },
-            { text: "Clone the class repo:", commands: ["git clone https://github.com/Open-Coding-Society/portfolio.git"] },
-          ],
-        },
-        expectedCommandPattern: /^git\s+clone\s+\S+/i,
-        exampleCommand: 'git clone <starter-repo-url>',
-        exampleCommandByOS: {
-          windows: 'git clone https://github.com/Open-Coding-Society/portfolio.git',
-          kasm: 'git clone https://github.com/Open-Coding-Society/student.git',
-          macos: 'git clone https://github.com/Open-Coding-Society/portfolio.git',
-          linux: 'git clone https://github.com/Open-Coding-Society/portfolio.git',
-        },
+        expectedCommandPattern: /^(cd\s+.*|git\s+(remote|pull|fetch|status)(\s+.*)?)/i,
+        exampleCommand: 'git remote -v',
         funFact: 'Fun fact: GitHub hosts over 100 million repositories — more code than any library in human history.',
       },
       {
@@ -553,25 +534,25 @@ class GameLevelCsPath4Toolchain {
         ],
         instructionsByOS: {
           windows: [
-            { text: "In your WSL Ubuntu terminal, go into the cloned folder:", commands: ["cd portfolio"] },
+            { text: "In your WSL Ubuntu terminal, go into the cloned folder:", commands: ["cd ~/opencs/pages"] },
             { text: "Install the Ubuntu tools (enter your WSL Ubuntu password when asked):", commands: ["./scripts/activate_ubuntu.sh"] },
             { text: "Set up Git (enter your Git username and email when asked):", commands: ["./scripts/activate.sh"] },
             { text: "Build the Python virtual environment:", commands: ["./scripts/venv.sh"] },
           ],
           kasm: [
-            { text: "In your Kasm Terminal, go into the cloned folder:", commands: ["cd student"] },
+            { text: "In your Kasm Terminal, go into the cloned folder:", commands: ["cd ~/opencs/pages"] },
             { text: "Set up Git (enter your Git UID and personal email when asked):", commands: ["./scripts/activate.sh"] },
             { text: "Build the Python virtual environment:", commands: ["./scripts/venv.sh"] },
             { text: "Open the project in VS Code:", commands: ["code ."] },
           ],
           macos: [
-            { text: "In Terminal, go into the cloned folder:", commands: ["cd portfolio"] },
+            { text: "In Terminal, go into the cloned folder:", commands: ["cd ~/opencs/pages"] },
             { text: "Install the macOS tools:", commands: ["./scripts/activate_macos.sh"] },
             { text: "Set up Git (enter your Git UID and personal email when asked):", commands: ["./scripts/activate.sh"] },
             { text: "Build the Python virtual environment:", commands: ["./scripts/venv.sh"] },
           ],
           linux: [
-            { text: "In Terminal, go into the cloned folder:", commands: ["cd portfolio"] },
+            { text: "In Terminal, go into the cloned folder:", commands: ["cd ~/opencs/pages"] },
             { text: "Install the Linux tools (every Linux can use the Ubuntu script):", commands: ["./scripts/activate_ubuntu.sh"] },
             { text: "Set up Git (enter your Git UID and personal email when asked):", commands: ["./scripts/activate.sh"] },
             { text: "Configure tools for the project:", commands: ["./scripts/venv.sh"] },
@@ -612,25 +593,25 @@ class GameLevelCsPath4Toolchain {
         ],
         instructionsByOS: {
           windows: [
-            { text: "From your WSL Ubuntu terminal, go back into your project:", commands: ["cd opencs/portfolio"] },
+            { text: "From your WSL Ubuntu terminal, go back into your project:", commands: ["cd ~/opencs/pages"] },
             { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
             { text: "Open it in your editor:", commands: ["code ."] },
             { text: "Make one commit and push it (change the message if you like):", commands: ["git add -A && git commit -m \"My first trail commit\"", "git push"] },
           ],
           kasm: [
-            { text: "From your Kasm Terminal, go back into your project:", commands: ["cd opencs/student"] },
+            { text: "From your Kasm Terminal, go back into your project:", commands: ["cd ~/opencs/pages"] },
             { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
             { text: "Open it in your editor:", commands: ["code ."] },
             { text: "Make one commit and push it (change the message if you like):", commands: ["git add -A && git commit -m \"My first trail commit\"", "git push"] },
           ],
           macos: [
-            { text: "From Terminal, go back into your project:", commands: ["cd opencs/portfolio"] },
+            { text: "From Terminal, go back into your project:", commands: ["cd ~/opencs/pages"] },
             { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
             { text: "Open it in your editor:", commands: ["code ."] },
             { text: "Make one commit and push it (change the message if you like):", commands: ["git add -A && git commit -m \"My first trail commit\"", "git push"] },
           ],
           linux: [
-            { text: "Open a new Terminal (close the old one) and go back into your project:", commands: ["cd opencs/portfolio"] },
+            { text: "Open a new Terminal (close the old one) and go back into your project:", commands: ["cd ~/opencs/pages"] },
             { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
             { text: "Open it in your editor:", commands: ["code ."] },
             { text: "Make one commit and push it (change the message if you like):", commands: ["git add -A && git commit -m \"My first trail commit\"", "git push"] },
@@ -1705,16 +1686,7 @@ class GameLevelCsPath4Toolchain {
     this._reportCheckBusy = true;
     try {
       const res = await fetch(`${javaURI}/api/cs-pathway/setup-report`, { ...fetchOptions, method: 'GET' });
-      if (this._reportBackoff) {
-        this._reportBackoff = false;
-        if (this._setupReportInterval) clearInterval(this._setupReportInterval);
-        this._setupReportInterval = setInterval(() => this._checkSetupReport(), SETUP_REPORT_POLL_MS);
-      }
       if (!res.ok) {
-        if (!this._reportStatusWarned) {
-          console.warn(`[Toolchain Trail] setup report request returned ${res.status}${res.status === 401 ? ' (not signed in)' : ''}`);
-          this._reportStatusWarned = true;
-        }
         this._reportCheckFailures = (this._reportCheckFailures || 0) + 1;
         if (this._reportCheckFailures >= 3) {
           this._reportCheckPausedUntil = Date.now() + 5 * 60 * 1000;
