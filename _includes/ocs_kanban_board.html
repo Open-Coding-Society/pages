@@ -15,6 +15,8 @@
     filter   a single-select field to filter cards by, e.g. Team    default: no filter
              (each option that has cards becomes a button; for a
              repository's issues, filter="Assignee" filters by person)
+    issue_metadata  opt in to Priority and Fibonacci-hour Estimate issue labels
+                    (default: off; use only for repository issue boards)
     title    the heading                                            default: the board's name
     columns  the capstone's own changes to its board's columns, a list from
              its page data (columns=data.Board.columns). Each entry names a
@@ -50,7 +52,7 @@
 {% if include.template %}{% assign ocs_kanban = nil %}{% else %}{% assign ocs_kanban = include %}{% endif -%}
 {% assign ocs_kanban_text = site.data.kanban.text %}
 {% assign ocs_kanban_title = ocs_kanban.title | default: ocs_kanban_text.title %}
-{% capture ocs_kanban_section %}<section class="ocs__card ocs__keypoints" data-ocs-kanban data-board-url="{{ ocs_kanban.url | escape }}" data-filter="{{ ocs_kanban.filter | escape }}"{% if ocs_kanban.title %} data-title-fixed{% endif %} aria-label="{{ ocs_kanban_title | escape }}">
+{% capture ocs_kanban_section %}<section class="ocs__card ocs__keypoints" data-ocs-kanban{% if ocs_kanban.issue_metadata == true %} data-issue-metadata="true"{% endif %} data-board-url="{{ ocs_kanban.url | escape }}" data-filter="{{ ocs_kanban.filter | escape }}"{% if ocs_kanban.title %} data-title-fixed{% endif %} aria-label="{{ ocs_kanban_title | escape }}">
   <div class="ocs__links">
     <strong data-hook="title">{{ ocs_kanban_title | escape }}</strong>
     <span class="ocs__text" data-hook="meta"></span>

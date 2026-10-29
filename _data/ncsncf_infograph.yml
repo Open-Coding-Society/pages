@@ -5,7 +5,7 @@ github: "https://github.com/NCSNCF-Redesign/NCSNCF-FE"
 
 summary:
   main_problems: "The website lacks visual cohesion across its pages, features an underutilized event calendar, and lacks modern, sophisticated features for community engagement, resource matching, and donor interactions."
-  original_url: "https://ncsncf.org/"
+  original_url: "https://www.ncspecialneedsfoundation.com/"
   project_direction: "This capstone project aims to modernize and streamline the NCSNCF web presence. We are creating a cohesive design system, activating and automating the event calendar, and integrating sophisticated interactive tools—such as a personalized resource navigator and dynamic community updates."
 
 board:

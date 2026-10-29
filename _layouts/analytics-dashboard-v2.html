@@ -811,34 +811,31 @@ score += gists * 0.5
         });
     });
 
+    // Each GitHub request fills its own cards. One that fails marks only those cards
+    // "Unavailable", instead of leaving the whole page on "Loading..." behind an alert.
+    async function getJson(url) {
+        const res = await fetch(url, fetchOptions);
+        if (!res.ok) throw new Error(`${url} returned ${res.status}`);
+        return res.json();
+    }
+
+    function markUnavailable(ids) {
+        ids.forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = "Unavailable";
+        });
+    }
+
     async function fetchData() {
-        try {
-            const [profileLinksRes, userProfileRes, commitsRes, prsRes, issuesRes] = await Promise.all([
-                fetch(profileLinksUrl, fetchOptions),
-                fetch(userProfileUrl, fetchOptions),
-                fetch(commitsUrl, fetchOptions),
-                fetch(prsUrl, fetchOptions),
-                fetch(issuesUrl, fetchOptions),
-            ]);
+        const results = await Promise.allSettled(
+            [profileLinksUrl, userProfileUrl, commitsUrl, prsUrl, issuesUrl].map(getJson)
+        );
+        results.filter((r) => r.status === "rejected")
+            .forEach((r) => console.error("Error fetching GitHub data:", r.reason));
+        const [profileLinks, userProfile, commitsData, prsData, issuesData] =
+            results.map((r) => (r.status === "fulfilled" ? r.value : null));
 
-            if (![profileLinksRes, userProfileRes, commitsRes, prsRes, issuesRes].every((res) => res.ok)) {
-                throw new Error("One or more fetch requests failed.");
-            }
-
-            const profileLinks = await profileLinksRes.json();
-            const userProfile = await userProfileRes.json();
-            const commitsData = await commitsRes.json();
-            const prsData = await prsRes.json();
-            const issuesData = await issuesRes.json();
-
-            const commitsArray = commitsData.details_of_commits || [];
-            const commitsCount = commitsData.total_commit_contributions || 0;
-            const totalAdditions = commitsData.total_lines_added || 0;
-            const totalDeletions = commitsData.total_lines_deleted || 0;
-
-            const prsArray = prsData.pull_requests || [];
-            const issuesArray = issuesData.issues || [];
-
+        if (userProfile && profileLinks) {
             const username = userProfile.login || "N/A";
             const avatarUrl = userProfile.avatar_url || "";
             const profileUrl = profileLinks.profile_url || "#";
@@ -853,12 +850,36 @@ score += gists * 0.5
             document.getElementById("public-gists").textContent = `Public Gists: ${userProfile.public_gists || 0}`;
             document.getElementById("followers").textContent = `Followers: ${userProfile.followers || 0}`;
             document.getElementById("following").textContent = `Following: ${userProfile.following || 0}`;
+        } else {
+            markUnavailable(["username", "profile-url", "repos-url", "public-repos", "public-gists", "followers", "following"]);
+        }
+
+        if (issuesData) {
+            document.getElementById("issues-count").textContent = (issuesData.issues || []).length;
+            setupInfoModal("issues-info", issuesData);
+        } else {
+            markUnavailable(["issues-count"]);
+        }
+
+        if (prsData) {
+            document.getElementById("prs-count").textContent = (prsData.pull_requests || []).length;
+            setupInfoModal("prs-info", prsData);
+        } else {
+            markUnavailable(["prs-count"]);
+        }
+
+        if (!commitsData) {
+            markUnavailable(["commits-count", "lines-changed"]);
+            return;
+        }
+        try {
+            const commitsArray = commitsData.details_of_commits || [];
+            const commitsCount = commitsData.total_commit_contributions || 0;
+            const totalAdditions = commitsData.total_lines_added || 0;
+            const totalDeletions = commitsData.total_lines_deleted || 0;
 
             document.getElementById("lines-changed").textContent = `+${totalAdditions} / -${totalDeletions}`;
-
             document.getElementById("commits-count").textContent = commitsCount;
-            document.getElementById("issues-count").textContent = issuesArray.length;
-            document.getElementById("prs-count").textContent = prsArray.length;
 
             // Commits over time chart (sprints computed from calendar breaks)
             await renderCommitsOverTimeChart(commitsArray);
@@ -873,12 +894,10 @@ score += gists * 0.5
                 card.className = "flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-4";
 
                 card.innerHTML = `
-                    <h4 class="text-sm font-medium mb-1">${commit.repository || "Unknown Repo"}</h4>
+                    <h4 class="text-sm font-medium mb-1"></h4>
                     <p class="text-xs mb-1">
                         <strong>Message:</strong>
-                        <a href="${commit.url}" target="_blank" class="text-blue-400 hover:underline">
-                            ${commit.message || "No message"}
-                        </a>
+                        <a target="_blank" class="text-blue-400 hover:underline"></a>
                     </p>
                     <p class="text-xs mb-1"><strong>Date:</strong> ${new Date(commit.date).toLocaleString() || "Unknown"}</p>
                     <p class="text-xs mb-1">
@@ -887,6 +906,11 @@ score += gists * 0.5
                         <span class="text-red-400">-${commit.deletions || 0}</span>
                     </p>
                 `;
+                // Commit text is shown as text, so a message like "Use <details>" isn't parsed as HTML.
+                card.querySelector("h4").textContent = commit.repository || "Unknown Repo";
+                const link = card.querySelector("a");
+                link.href = commit.url || "#";
+                link.textContent = commit.message || "No message";
                 commitCardsContainer.appendChild(card);
             });
 
@@ -900,14 +924,11 @@ score += gists * 0.5
                 };
             }
 
-            // Info links to show modal details
+            // Info link to show modal details
             setupInfoModal("commits-info", commitsData);
-            setupInfoModal("issues-info", issuesData);
-            setupInfoModal("prs-info", prsData);
 
         } catch (error) {
-            console.error("Error fetching GitHub data:", error);
-            alert("Error loading GitHub analytics data. Please check console for details.");
+            console.error("Error showing GitHub commits:", error);
         }
     }
 
