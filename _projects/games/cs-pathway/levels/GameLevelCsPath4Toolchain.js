@@ -299,7 +299,6 @@ class GameLevelCsPath4Toolchain {
         instructions: [
           'Open a Terminal.',
           { text: "Go to your home folder:", commands: ["cd ~"] },
-          { text: "Make the trail folder (the trail agent checks for it):", commands: ["mkdir -p ~/toolchain-trail"] },
           { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
           { text: "Clone the class repo into it:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
           { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
@@ -310,7 +309,6 @@ class GameLevelCsPath4Toolchain {
             { text: "Install WSL with Ubuntu, then set a username and password when prompted:", commands: ["wsl --install -d Ubuntu-24.04"] },
             { text: "Set it as your default:", commands: ["wsl --set-default Ubuntu-24.04"] },
             { text: "Open your Ubuntu shell and go to your Linux home folder:", commands: ["wsl", "cd ~"] },
-            { text: "Make the trail folder (the trail agent checks for it):", commands: ["mkdir -p ~/toolchain-trail"] },
             { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
             { text: "Clone the class repo into it:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
             { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
@@ -318,7 +316,6 @@ class GameLevelCsPath4Toolchain {
           kasm: [
             'Open a Terminal in your Kasm Workspace.',
             { text: "Go to your home folder:", commands: ["cd ~"] },
-            { text: "Make the trail folder (the trail agent checks for it):", commands: ["mkdir -p ~/toolchain-trail"] },
             { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
             { text: "Clone the class repo into it:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
             { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
@@ -326,7 +323,6 @@ class GameLevelCsPath4Toolchain {
           macos: [
             'Open Terminal (keep it in the Dock for easy access).',
             { text: "Go to your home folder:", commands: ["cd ~"] },
-            { text: "Make the trail folder (the trail agent checks for it):", commands: ["mkdir -p ~/toolchain-trail"] },
             { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
             { text: "Clone the class repo into it. If a window asks to install the command line developer tools, click Install, then run this again:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
             { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
@@ -334,7 +330,6 @@ class GameLevelCsPath4Toolchain {
           linux: [
             'Open a Terminal.',
             { text: "Go to your home folder:", commands: ["cd ~"] },
-            { text: "Make the trail folder (the trail agent checks for it):", commands: ["mkdir -p ~/toolchain-trail"] },
             { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
             { text: "Clone the class repo into it. If git is missing, run sudo apt install git first:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
             { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
