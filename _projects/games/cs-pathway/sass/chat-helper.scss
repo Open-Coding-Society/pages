@@ -1,7 +1,8 @@
-// Station Helper HUD panel (levels/ChatHelper.js), mounted in the game container.
-// "fixed" is relative to that container when the stage is fitted (it has a transform),
-// so the panel stays in the game box top-right and scales with the map. Looks like the
-// PLAYER PROFILE StatusPanel across from it (same z-index, colors and font).
+// Station Helper (levels/ChatHelper.js): a 💬 button in the bottom-right of the game
+// box, mounted in the game container. "fixed" is relative to that container when the
+// stage is fitted (it has a transform), so it stays inside the game and scales with the
+// map. right: 72px keeps it left of the red flag (40px wide at right: 20px) when the game
+// fills the window. The open panel looks like the PLAYER PROFILE StatusPanel.
 $chat-accent: var(--ocs-game-accent, #38bdf8);
 $chat-text: var(--ocs-game-text, #dbeafe);
 $chat-muted: var(--ocs-game-muted, #a5b4fc);
@@ -14,23 +15,46 @@ $chat-error: #f87171;
 
 .cs-pathway-chat {
   position: fixed;
-  top: 16px;
-  right: 16px;
+  right: 72px;
+  bottom: 24px;
   z-index: 10000;
   display: flex;
   flex-direction: column;
-  padding: 6px 10px;
-  border: 1px solid $chat-accent;
-  border-radius: 10px;
-  background: $chat-bg;
-  color: $chat-text;
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.18);
+  align-items: flex-end;
+  gap: 8px;
   font-family: "Courier New", monospace;
 
-  &--open {
+  &__button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 2px solid $chat-accent;
+    border-radius: 50%;
+    background: $chat-bg;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible,
+    &[aria-expanded="true"] {
+      background: rgba(56, 189, 248, 0.3);
+    }
+  }
+
+  &__panel {
     width: 300px;
     max-height: 480px;
+    display: flex;
+    flex-direction: column;
     padding: 12px 14px;
+    border: 1px solid $chat-accent;
+    border-radius: 10px;
+    background: $chat-bg;
+    color: $chat-text;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.18);
+
+    &[hidden] { display: none; }
   }
 
   &__header {
@@ -38,6 +62,7 @@ $chat-error: #f87171;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
+    margin-bottom: 8px;
   }
 
   &__title {
@@ -48,7 +73,7 @@ $chat-error: #f87171;
     color: $chat-accent;
   }
 
-  &__toggle {
+  &__close {
     padding: 0 2px;
     border: none;
     background: transparent;
@@ -58,15 +83,6 @@ $chat-error: #f87171;
     font-weight: bold;
     line-height: 1;
     cursor: pointer;
-  }
-
-  &__body {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    margin-top: 8px;
-
-    &[hidden] { display: none; }
   }
 
   &__log {

@@ -1,7 +1,6 @@
 // ChatHelper.js
-// Station Helper HUD panel inside the game box, top-right across from the player
-// profile: a student can ask for help at any station. It starts minimized to its
-// title bar so it doesn't cover the stations on the right of the map. Answers come
+// Station Helper: a 💬 button in the bottom-right of the game box that opens a chat
+// panel above it, so a student can ask for help at any station. Answers come
 // from Gemini through Spring (services/ChatApi.js), which is told where the student
 // is through getProgress() (see model/chatContext.js).
 import { askChatHelper } from '../services/ChatApi.js';
@@ -23,16 +22,14 @@ class ChatHelper {
     this.greetedStation = undefined;
     this.sending = false;
 
-    this.root = document.createElement('section');
+    this.root = document.createElement('div');
     this.root.className = 'cs-pathway-chat';
-    this.root.setAttribute('aria-label', 'Station helper');
     this.root.innerHTML = `
-      <header class="cs-pathway-chat__header">
-        <h2 class="cs-pathway-chat__title">STATION HELPER</h2>
-        <button type="button" class="cs-pathway-chat__toggle" aria-expanded="false"
-          aria-label="Open the station helper" title="Ask for help with this station">+</button>
-      </header>
-      <div class="cs-pathway-chat__body" hidden>
+      <section class="cs-pathway-chat__panel" aria-label="Station helper" hidden>
+        <header class="cs-pathway-chat__header">
+          <h2 class="cs-pathway-chat__title">STATION HELPER</h2>
+          <button type="button" class="cs-pathway-chat__close" aria-label="Close the station helper">−</button>
+        </header>
         <div class="cs-pathway-chat__log" role="log" aria-live="polite"></div>
         <form class="cs-pathway-chat__form">
           <input class="cs-pathway-chat__input" type="text" maxlength="${MAX_CHAT_QUESTION_LENGTH}"
@@ -40,16 +37,19 @@ class ChatHelper {
           <button type="submit" class="cs-pathway-chat__send">Send</button>
         </form>
         <p class="cs-pathway-chat__note">AI answers can be wrong. Never paste passwords or tokens.</p>
-      </div>`;
+      </section>
+      <button type="button" class="cs-pathway-chat__button" aria-label="Ask the station helper" aria-expanded="false"
+        title="Ask the station helper">💬</button>`;
     mountTo.appendChild(this.root);
 
-    this.body = this.root.querySelector('.cs-pathway-chat__body');
+    this.panel = this.root.querySelector('.cs-pathway-chat__panel');
     this.log = this.root.querySelector('.cs-pathway-chat__log');
     this.input = this.root.querySelector('.cs-pathway-chat__input');
     this.sendButton = this.root.querySelector('.cs-pathway-chat__send');
-    this.toggleButton = this.root.querySelector('.cs-pathway-chat__toggle');
+    this.toggleButton = this.root.querySelector('.cs-pathway-chat__button');
 
-    this.toggleButton.addEventListener('click', () => this.setOpen(this.body.hidden));
+    this.toggleButton.addEventListener('click', () => this.setOpen(this.panel.hidden));
+    this.root.querySelector('.cs-pathway-chat__close').addEventListener('click', () => this.setOpen(false));
     this.root.querySelector('.cs-pathway-chat__form').addEventListener('submit', (event) => {
       event.preventDefault();
       this.ask();
@@ -65,11 +65,8 @@ class ChatHelper {
   }
 
   setOpen(open) {
-    this.body.hidden = !open;
-    this.root.classList.toggle('cs-pathway-chat--open', open);
-    this.toggleButton.textContent = open ? '−' : '+';
+    this.panel.hidden = !open;
     this.toggleButton.setAttribute('aria-expanded', String(open));
-    this.toggleButton.setAttribute('aria-label', open ? 'Minimize the station helper' : 'Open the station helper');
     if (!open) {
       this.toggleButton.focus();
       return;
