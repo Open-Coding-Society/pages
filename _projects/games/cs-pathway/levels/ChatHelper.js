@@ -5,6 +5,9 @@
 // is through getProgress() (see model/chatContext.js).
 import { askChatHelper } from '../services/ChatApi.js';
 import { chatGreeting, recentHistory, MAX_CHAT_QUESTION_LENGTH } from '../model/chatContext.js';
+import { splitAnswerIntoParts } from '../model/chatAnswerParts.js';
+
+const COPIED_LABEL_MS = 1500;
 
 class ChatHelper {
   /**
@@ -113,13 +116,13 @@ class ChatHelper {
 
   describeFailure(error) {
     if (error.status === 401 || error.status === 403) {
-      return 'Sign in so the helper can answer. You can also use the red flag to ask your teacher.';
+      return 'Sign in so the helper can answer.';
     }
     // Spring's messages (busy, too soon, too long) are written for students.
     if (error.status && error.status !== 404 && error.message && !/HTTP \d+/.test(error.message)) {
       return error.message;
     }
-    return "The helper isn't available right now. Use the red flag to ask your teacher.";
+    return "The helper isn't available right now. Ask your teacher for help.";
   }
 
   setSending(sending) {
@@ -129,14 +132,55 @@ class ChatHelper {
 
   addTurn(turn) {
     this.turns.push(turn);
-    const bubble = document.createElement('p');
+    const bubble = document.createElement('div');
     bubble.className = `cs-pathway-chat__message cs-pathway-chat__message--${turn.role}`;
     if (turn.tone) bubble.dataset.tone = turn.tone;
-    bubble.textContent = turn.text; // answers are plain text; never parsed as HTML
+    if (turn.role === 'helper' && !turn.local) {
+      this.renderAnswer(bubble, turn.text);
+    } else {
+      bubble.textContent = turn.text;
+    }
     turn.element = bubble;
     this.log.appendChild(bubble);
     this.log.scrollTop = this.log.scrollHeight;
     return turn;
+  }
+
+  /** Answers are built from text nodes, never parsed as HTML; each piece of code gets a Copy button. */
+  renderAnswer(bubble, answer) {
+    splitAnswerIntoParts(answer).forEach((part) => {
+      if (part.type === 'text') {
+        bubble.append(part.text);
+        return;
+      }
+      const wrapper = document.createElement(part.type === 'block' ? 'div' : 'span');
+      wrapper.className = part.type === 'block' ? 'cs-pathway-chat__command' : 'cs-pathway-chat__inline';
+      const code = document.createElement('code');
+      code.className = 'cs-pathway-chat__code';
+      code.textContent = part.text;
+      wrapper.append(code, this.createCopyButton(part.text));
+      bubble.append(wrapper);
+    });
+  }
+
+  createCopyButton(text) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'cs-pathway-chat__copy';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-label', `Copy ${text}`);
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(text);
+        button.textContent = 'Copied!';
+      } catch (error) {
+        // Clipboard access needs https (or localhost) and permission; the code can still be selected.
+        console.warn('[ChatHelper] copy failed:', error);
+        button.textContent = 'Select it';
+      }
+      setTimeout(() => { button.textContent = 'Copy'; }, COPIED_LABEL_MS);
+    });
+    return button;
   }
 
   removeTurn(turn) {

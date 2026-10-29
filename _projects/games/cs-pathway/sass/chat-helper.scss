@@ -1,8 +1,8 @@
 // Station Helper (levels/ChatHelper.js): a 💬 button in the bottom-right of the game
 // box, mounted in the game container. "fixed" is relative to that container when the
 // stage is fitted (it has a transform), so it stays inside the game and scales with the
-// map. right: 72px keeps it left of the red flag (40px wide at right: 20px) when the game
-// fills the window. The open panel looks like the PLAYER PROFILE StatusPanel.
+// map. The open panel looks like the PLAYER PROFILE StatusPanel. Commands in answers
+// show as code with a Copy button (model/chatAnswerParts.js).
 $chat-accent: var(--ocs-game-accent, #38bdf8);
 $chat-text: var(--ocs-game-text, #dbeafe);
 $chat-muted: var(--ocs-game-muted, #a5b4fc);
@@ -15,7 +15,7 @@ $chat-error: #f87171;
 
 .cs-pathway-chat {
   position: fixed;
-  right: 72px;
+  right: 20px;
   bottom: 24px;
   z-index: 10000;
   display: flex;
@@ -118,6 +118,64 @@ $chat-error: #f87171;
     }
 
     &[data-tone="error"] { color: $chat-error; }
+  }
+
+  // A command on its own line: the code, then its Copy button.
+  &__command {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin: 6px 0;
+    padding: 6px 8px;
+    border: 1px solid $chat-accent;
+    border-radius: 6px;
+    background: $chat-input-bg;
+  }
+
+  &__code {
+    padding: 0;
+    border: none;
+    // The theme presets give every code element a background with !important, which
+    // draws a second box inside the command box.
+    background: none !important;
+    font-family: inherit;
+    font-size: inherit;
+    color: #67e8f9;
+    overflow-wrap: anywhere;
+
+    .cs-pathway-chat__command & {
+      flex: 1;
+      min-width: 0;
+      white-space: pre-wrap;
+    }
+  }
+
+  &__copy {
+    flex-shrink: 0;
+    padding: 1px 6px;
+    border: 1px solid $chat-accent;
+    border-radius: 4px;
+    background: transparent;
+    color: $chat-accent;
+    font-family: inherit;
+    font-size: 10.5px;
+    font-weight: bold;
+    vertical-align: baseline;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: $chat-accent;
+      color: $chat-button-text;
+    }
+  }
+
+  // Backticked text in a sentence: the code, then a small Copy button.
+  &__inline {
+    white-space: nowrap;
+
+    .cs-pathway-chat__code { white-space: normal; }
+    .cs-pathway-chat__copy { margin-left: 4px; }
   }
 
   &__form {
