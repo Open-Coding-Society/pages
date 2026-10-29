@@ -10,15 +10,64 @@ class TimeLapScreen extends GameObject {
     this.totalLaps = Number.isFinite(data.totalLaps) ? data.totalLaps : 3;
     this.currentLap = Number.isFinite(data.currentLap) ? data.currentLap : 1;
     this.startedAt = null;
+    this.finishedAt = null;
+    this.lapArmed = false;
+    this.previousPlayerPosition = null;
     this.player = gameEnv?.gameObjects?.find((object) => object instanceof NightCityPlayer);
     this.panel = { x: 18, y: 18, width: 240, height: 138 };
   }
 
   update() {
-    if (this.player?.selected && this.startedAt === null) {
-      this.startedAt = performance.now();
+    if (this.player?.selected) {
+      const now = performance.now();
+      if (this.startedAt === null) {
+        this.startedAt = now;
+      }
+      this.updateLapProgress(now);
     }
     this.draw();
+  }
+
+  updateLapProgress(now) {
+    if (this.finishedAt !== null || !this.player) {
+      return;
+    }
+
+    const center = this.player.getCenter();
+    const position = {
+      x: center.x / this.gameEnv.innerWidth,
+      y: center.y / this.gameEnv.innerHeight
+    };
+    const finishLineX = 0.5;
+    const finishLineYMin = 0.7;
+    const finishLineYMax = 0.85;
+
+    if (!this.lapArmed) {
+      if (Math.abs(position.x - finishLineX) >= 0.04) {
+        this.lapArmed = true;
+      }
+      this.previousPlayerPosition = position;
+      return;
+    }
+
+    const previousPosition = this.previousPlayerPosition;
+    const crossedFinishLine = previousPosition
+      && ((previousPosition.x < finishLineX && position.x >= finishLineX)
+        || (previousPosition.x > finishLineX && position.x <= finishLineX))
+      && previousPosition.y >= finishLineYMin
+      && previousPosition.y <= finishLineYMax
+      && position.y >= finishLineYMin
+      && position.y <= finishLineYMax;
+
+    if (crossedFinishLine) {
+      this.currentLap = Math.min(this.currentLap + 1, this.totalLaps);
+      this.lapArmed = false;
+      if (this.currentLap >= this.totalLaps) {
+        this.finishedAt = now;
+      }
+    }
+
+    this.previousPlayerPosition = position;
   }
 
   draw() {
@@ -27,9 +76,11 @@ class TimeLapScreen extends GameObject {
       return;
     }
 
-    const elapsedMs = this.startedAt === null ? 0 : performance.now() - this.startedAt;
+    const elapsedMs = this.startedAt === null
+      ? 0
+      : (this.finishedAt ?? performance.now()) - this.startedAt;
     const timeLabel = this.formatTime(elapsedMs);
-    const lapLabel = 'Lap ' + this.currentLap + '/' + this.totalLaps;
+    const lapLabel = this.finishedAt === null ? 'Lap ' + this.currentLap + '/' + this.totalLaps : 'FINISH!';
     const { x, y, width, height } = this.panel;
 
     ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
@@ -221,8 +272,8 @@ class NightCityPlayer extends Player {
     this.motionVelocity.x = forwardX * forwardSpeed + rightX * lateralSpeed;
     this.motionVelocity.y = forwardY * forwardSpeed + rightY * lateralSpeed;
     this.direction = this.getSpriteDirection();
-    this.velocity.x = this.motionVelocity.x * elapsedSeconds * 60;
-    this.velocity.y = this.motionVelocity.y * elapsedSeconds * 60;
+    this.velocity.x = this.motionVelocity.x * elapsedSeconds;
+    this.velocity.y = this.motionVelocity.y * elapsedSeconds;
   }
 
   getSpriteDirection() {

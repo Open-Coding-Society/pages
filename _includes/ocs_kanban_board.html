@@ -15,6 +15,8 @@
     filter   a single-select field to filter cards by, e.g. Team    default: no filter
              (each option that has cards becomes a button; for a
              repository's issues, filter="Assignee" filters by person)
+    issue_metadata  opt in to Priority and Fibonacci-hour Estimate issue labels
+                    (default: off; use only for repository issue boards)
     title    the heading                                            default: the board's name
     columns  the capstone's own changes to its board's columns, a list from
              its page data (columns=data.Board.columns). Each entry names a
@@ -38,7 +40,7 @@
 {% endcomment %}
 {% assign ocs_kanban_text = site.data.kanban.text %}
 {% assign ocs_kanban_title = include.title | default: ocs_kanban_text.title %}
-<section class="ocs__card ocs__keypoints" data-ocs-kanban data-board-url="{{ include.url | escape }}" data-filter="{{ include.filter | escape }}"{% if include.title %} data-title-fixed{% endif %} aria-label="{{ ocs_kanban_title | escape }}">
+<section class="ocs__card ocs__keypoints" data-ocs-kanban{% if include.issue_metadata == true %} data-issue-metadata="true"{% endif %} data-board-url="{{ include.url | escape }}" data-filter="{{ include.filter | escape }}"{% if include.title %} data-title-fixed{% endif %} aria-label="{{ ocs_kanban_title | escape }}">
   <div class="ocs__links">
     <strong data-hook="title">{{ ocs_kanban_title | escape }}</strong>
     <span class="ocs__text" data-hook="meta"></span>

@@ -78,7 +78,7 @@
         "coverage": "RPN calculators and queue/deque lessons cover stack and queue behavior and library implementation choices. Heap and priority-queue implementation layers are drafted.",
         "gap": "Finish student-built heap operations and priority ordering. Using a library PriorityQueue does not demonstrate implementing a heap.",
         "pbl": "Compare FIFO task handling with priority scheduling and explain the ordering invariant.",
-        "lessons": ["/csa/rpn-calculator-lesson", "/csa/rpn-lesson/", "/csa/rpn-lesson2", "/2025/03/17/calculatorlesson_IPYNB_2_.html", "/collectablesToolkitQueueDequeue", "/teamTeachCollectables/queue-dequeue", "/csa/cs113/drafts/heap-priority-queue/"]
+        "lessons": ["/csa/rpn-calculator-lesson", "/csa/rpn-lesson/", "/csa/rpn-lesson2", "/2025/03/17/calculatorlesson_IPYNB_2_.html", "/collectablesToolkitQueueDequeue", "/teamTeachCollectables/queue-dequeue", "/csa/cs113/drafts/heap-priority-queue/", "/csa/cs113/drafts/backend-work-queue/"]
       },
       {
         "id": "linked-lists-trees",
@@ -94,7 +94,7 @@
         "coverage": "RPN variants, tracking, and enactments show how stacks and queues participate in a complete expression-processing pipeline.",
         "gap": "Make the layers explicit: trace the existing example, use a collection API, then implement and test a selected structure from scratch.",
         "pbl": "Extend the calculator or a project work queue and document where a library structure was used versus implemented.",
-        "lessons": ["/2025/02/20/rpn_calculator_IPYNB_2_.html", "/csa/rpn-calculator/graph-variant/", "/2025/02/20/rpn_calculator-tracking_IPYNB_2_.html", "/csa/rpn-calculator-wayfinding", "/csa/rpn-lesson2", "/csa/rpn-calculator-lesson", "/csa/rpn-lesson/", "/csa/calculator-enactment", "/2025/03/17/calculatorlesson_IPYNB_2_.html"]
+        "lessons": ["/2025/02/20/rpn_calculator_IPYNB_2_.html", "/csa/rpn-calculator/graph-variant/", "/2025/02/20/rpn_calculator-tracking_IPYNB_2_.html", "/csa/rpn-calculator-wayfinding", "/csa/rpn-lesson2", "/csa/rpn-calculator-lesson", "/csa/rpn-lesson/", "/csa/calculator-enactment", "/2025/03/17/calculatorlesson_IPYNB_2_.html", "/csa/cs113/drafts/backend-collection-choice/"]
       }
     ]
   },
@@ -108,7 +108,7 @@
         "coverage": "Graph introductions, Java representations, BFS/DFS, and heuristic-search examples cover nodes, edges, adjacency structures, and path-finding strategies.",
         "gap": "Strengthen directed/weighted graph tests and the distinction between exact search and heuristic trade-offs.",
         "pbl": "Represent dependencies or routes as a graph and compare traversal and path-finding strategies.",
-        "lessons": ["/graphs/intro", "/graphs/java", "/graphs/searching", "/heuristics/intro", "/heuristics/searches", "/graph", "graphHeuristics"]
+        "lessons": ["/graphs/intro", "/graphs/java", "/graphs/searching", "/heuristics/intro", "/heuristics/searches", "/graph", "graphHeuristics", "/csa/cs113/drafts/service-dependency-graph/"]
       },
       {
         "id": "hash-collisions",
@@ -124,7 +124,7 @@
         "coverage": "Set lessons provide uniqueness and collection operations; Java graph and search examples support adjacency representations and traversals.",
         "gap": "Require students to justify representation choices and test equality, duplicate handling, missing keys, and disconnected graphs.",
         "pbl": "Use a set for deduplication, a map for keyed records, and a graph for relationships; explain each choice.",
-        "lessons": ["/teamTeachCollectables/sets", "/collectablesToolkitSets", "/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/graphs/java", "/graphs/searching", "/csa/cs113/drafts/hash-table-layers/"]
+        "lessons": ["/teamTeachCollectables/sets", "/collectablesToolkitSets", "/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/graphs/java", "/graphs/searching", "/csa/cs113/drafts/hash-table-layers/", "/csa/cs113/drafts/set-map-graph-api/"]
       }
     ]
   },

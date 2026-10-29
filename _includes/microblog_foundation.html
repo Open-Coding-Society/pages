@@ -27,6 +27,23 @@
   </div>
 
   <div class="microblog-panel-content">
+    <!-- Channels: Chat for conversation, Suggestions for ideas and issues -->
+    <div class="microblog-channel-tabs" role="tablist" aria-label="Microblog channels">
+      <button type="button" role="tab" class="microblog-channel-tab is-active" data-channel="chat" aria-selected="true">Chat</button>
+      <button type="button" role="tab" class="microblog-channel-tab" data-channel="suggestions" aria-selected="false">Suggestions</button>
+    </div>
+    <!-- View filter: Active (default) hides resolved posts, History shows only them -->
+    <div class="microblog-view-filter">
+      <label for="microblog-view-select">Show</label>
+      <select id="microblog-view-select" class="microblog-view-select">
+        <option value="all">All messages</option>
+        <option value="active" selected>Active</option>
+        <option value="mine">Mine</option>
+        <option value="history">History (resolved)</option>
+      </select>
+    </div>
+    <p id="microblog-status" class="microblog-status" aria-live="polite"></p>
+
     <!-- MicroBlog Container -->
     <div id="microblog-playground">
       <em>Loading microblog posts...</em>
@@ -201,15 +218,84 @@ window.handleGuestSignup = async function(event) {
 <!--JavaScript Logic for MicroBlog -->
 <script type="module">
 // Imports for APIs used on this page
-import { fetchPosts, createPost, updatePost, createReply, fetchReplies } from '/assets/js/api/microblog.js';
+import { fetchPosts, createPost, updatePost, deletePost, createReply, fetchReplies, fetchCurrentUser, setPostResolved, setReplyResolved, isStatusMarker, getResolution, getReplyResolution, normalizeAuthorUids, postChannel, matchesViewFilter } from '/assets/js/api/microblog.js';
+import { markMicroblogSeen } from '/assets/js/api/microblog-notifications.js';
 
 // Default Key for New MicroBlog Posts
 const pagePermalink = '{{page.permalink}}';
+const sfiArchivedPosts = {% if page.sfi_correspondence_microblog %}{{ site.data.sfi_partner_correspondence | jsonify }}{% else %}[]{% endif %};
+// Page author uids from front matter (`authors:`): they can resolve posts, and
+// get a notification badge for new activity on this page
+const pageAuthors = normalizeAuthorUids({{ page.authors | jsonify }});
+const currentUserPromise = fetchCurrentUser();
+
+// Opening the panel shows the page's posts, so its new activity counts as
+// seen: the Capstone tab's badge drops this page's share.
+document.getElementById('microblog-toggle-btn').addEventListener('click', () => markMicroblogSeen(pagePermalink));
+
+// Channel tab and view dropdown (see matchesViewFilter for the filter values)
+let activeChannel = 'chat';
+let viewFilter = 'active';
+// Posts from the last render, keyed by id, for the edit/reply/resolve buttons
+let postsById = new Map();
+
+// Resolve / Reopen icons, shared by posts and replies
+const resolveIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="14" height="14" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+const reopenIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="14" height="14" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M1 4v6h6M3.5 15a9 9 0 1 0 2.1-9.4L1 10" /></svg>`;
+
+function showStatus(text) {
+  document.getElementById('microblog-status').textContent = text;
+}
+
+// Posts save their page's authors when created; on this page, the current
+// front matter also counts so authors added later can still resolve.
+function authorsForPost(post) {
+  const saved = Array.isArray(post.pageAuthors) ? post.pageAuthors : [];
+  const current = post.topicPath === pagePermalink ? pageAuthors : [];
+  return [...new Set([...saved, ...current])];
+}
+
+// Matches the Flask API: only a post's writer or an Admin may edit or delete it
+function canModify(post, user) {
+  return Boolean(user) && (post.userId === user.id || user.role === 'Admin');
+}
+
+function canResolve(post, user) {
+  return Boolean(user) && (post.userId === user.id || authorsForPost(post).includes(user.uid));
+}
+
+// A reply's writer can resolve it too, along with everyone who can resolve its post
+function canResolveReply(post, reply, user) {
+  return Boolean(user) && (reply.userId === user.id || canResolve(post, user));
+}
+
+// Channel tabs
+document.querySelectorAll('.microblog-channel-tab').forEach(tab => {
+  tab.onclick = () => {
+    activeChannel = tab.dataset.channel;
+    document.querySelectorAll('.microblog-channel-tab').forEach(other => {
+      other.classList.toggle('is-active', other === tab);
+      other.setAttribute('aria-selected', String(other === tab));
+    });
+    showStatus('');
+    renderMicroblogTable();
+  };
+});
+
+// View filter dropdown
+document.getElementById('microblog-view-select').onchange = async function() {
+  viewFilter = this.value;
+  const signedOut = !(await currentUserPromise);
+  showStatus(viewFilter === 'mine' && signedOut ? 'Sign in to see your posts.' : '');
+  renderMicroblogTable();
+};
 
 // Create/Edit Modal Functions
 function openModal({ mode, post = {} }) {
   document.getElementById('microblog-modal').classList.remove('hidden');
-  document.getElementById('modal-title').textContent = mode === 'edit' ? 'Edit Microblog Post' : 'Create Microblog Post';
+  document.getElementById('modal-title').textContent = mode === 'edit'
+    ? 'Edit Microblog Post'
+    : `New ${activeChannel === 'suggestions' ? 'Suggestion' : 'Chat Post'}`;
   document.getElementById('post-id').value = post.id || '';
   document.getElementById('topic-id').value = post.topicPath || pagePermalink;
   document.getElementById('content').value = post.content || '';
@@ -266,7 +352,13 @@ document.getElementById('reply-form').onsubmit = async function(e) {
 async function loadRepliesForPost(postId) {
   try {
     const repliesData = await fetchReplies(postId);
-    const replies = repliesData.replies || repliesData || [];
+    const allReplies = repliesData.replies || repliesData || [];
+    // Resolve/reopen markers are status, not conversation
+    const replies = Array.isArray(allReplies) ? allReplies.filter(reply => !isStatusMarker(reply)) : [];
+    const user = await currentUserPromise;
+    // The freshly fetched replies (markers included) decide each reply's status
+    const listedPost = postsById.get(String(postId));
+    const post = listedPost ? { ...listedPost, replies: Array.isArray(allReplies) ? allReplies : [] } : null;
     if (replies.length > 0) {
       // Find the row for this post
       const postRow = document.querySelector(`#post-row-${postId}`);
@@ -284,10 +376,13 @@ async function loadRepliesForPost(postId) {
         // Format replies HTML
         const repliesHtml = replies.map(reply => {
           const replyDate = reply.timestamp ? new Date(reply.timestamp).toLocaleString() : '';
+          // Replies without an id (or a post) can't be told apart, so they get no status
+          const status = post && reply.id != null ? getReplyResolution(post, reply.id, authorsForPost(post)) : null;
           return `
-            <div class="reply-item ml-4 mt-2 p-2 rounded border-l-4 border-green-500">
-              <div class="text-sm text-gray-600">
-                ${reply.userName || 'Anonymous'} - ${replyDate}
+            <div class="reply-item microblog-reply${status && status.resolved ? ' is-resolved' : ''} ml-4 mt-2 p-2 rounded border-l-4 border-green-500">
+              <div class="microblog-reply-byline text-sm text-gray-600">
+                <span>${escapeHtml(reply.userName || 'Anonymous')} - ${replyDate}</span>
+                ${status ? replyStatusHtml(post, reply, status, user) : ''}
               </div>
               <div class="mt-1">${escapeHtml(reply.content || '')}</div>
             </div>
@@ -307,6 +402,21 @@ async function loadRepliesForPost(postId) {
   } catch (error) {
     console.error(`Error loading replies for post ${postId}:`, error);
   }
+}
+
+// A reply's Resolved badge and Resolve/Reopen button. While the post is
+// resolved its replies are too, so they get a badge but no button.
+function replyStatusHtml(post, reply, status, user) {
+  const badge = status.resolved
+    ? `<span class='microblog-resolved-badge'>${status.withPost ? 'Resolved with post' : 'Resolved'}</span>`
+    : '';
+  if (status.withPost || !canResolveReply(post, reply, user)) return badge;
+  const button =
+    `<button class='reply-resolve-btn microblog-resolve-btn microblog-resolve-btn--reply${status.resolved ? ' is-reopen' : ''}' ` +
+    `data-post-id='${post.id}' data-reply-id='${escapeHtml(String(reply.id))}' ` +
+    `title='${status.resolved ? 'Reopen this reply' : 'Mark this reply as resolved'}'>` +
+    `${status.resolved ? reopenIcon : resolveIcon}<span>${status.resolved ? 'Reopen' : 'Resolve'}</span></button>`;
+  return badge + button;
 }
 
 // Utility function to escape HTML
@@ -331,7 +441,10 @@ document.getElementById('microblog-form').onsubmit = async function(e) {
     if (id) {
       await updatePost({ id, content, topicPath });
     } else {
-      await createPost({ content, topicPath });
+      // Save the open channel, and the page's authors so they can resolve the
+      // post from any page
+      const data = pageAuthors.length ? { channel: activeChannel, pageAuthors } : { channel: activeChannel };
+      await createPost({ content, topicPath, data });
     }
     closeModal();
     renderMicroblogTable();
@@ -354,11 +467,35 @@ async function renderMicroblogTable() {
           pageArg = window.location ? window.location.pathname : 'default';
         }
         // API call to Read former Posts
-        const data = await fetchPosts(pageArg);
+        let data;
+        try {
+          data = await fetchPosts(pageArg);
+        } catch (error) {
+          if (!{{ page.sfi_correspondence_microblog | default: false | jsonify }}) throw error;
+          data = { microblogs: [] };
+        }
+        if ({{ page.sfi_correspondence_microblog | default: false | jsonify }} && pageArg !== undefined) {
+          const archived = sfiArchivedPosts.map((item, i) => ({
+            id: 'sfi-archived-' + i,
+            userName: item.author,
+            timestamp: item.date + 'T12:00:00',
+            characterCount: item.message.length,
+            topicPath: 'SFI partnership correspondence',
+            content: item.message,
+            archived: true
+          }));
+          data.microblogs = archived.concat(data.microblogs || []);
+        }
+        const user = await currentUserPromise;
+        const posts = (data.microblogs || []).map(post => ({ ...post, resolution: getResolution(post, authorsForPost(post)) }));
+        postsById = new Map(posts.map(post => [String(post.id), post]));
+        const visiblePosts = posts.filter(post =>
+          postChannel(post) === activeChannel && matchesViewFilter(post, viewFilter, user));
         // SVG icons for Create (+) and Edit (pencil)
         const createIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>`;
         const editIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-2.828 1.172H7v-2a4 4 0 011.172-2.828z" /></svg>`;
         const replyIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>`;
+        const deleteIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>`;
         // Single page icon (default)
         const pageIcon = `<span class="microblog-filter-icon microblog-filter-page" id="page-icon" title="Show this page only"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="6" y="4" width="12" height="16" rx="2" fill="white" stroke="white" stroke-width="1.5"/><rect x="8" y="6" width="8" height="12" rx="1" fill="#9333ea" stroke="white" stroke-width="1.5"/></svg></span>`;
         // Many pages icon (secondary option)
@@ -401,24 +538,39 @@ async function renderMicroblogTable() {
 
         // Table: rows; generated from microblog data
         let genBody = '';
-        (data.microblogs || []).forEach(post => {
+        visiblePosts.forEach(post => {
             const analyticsCell = analytics.map(f => {
               let value = post[f.key] ?? '';
               if (f.format) value = f.format(value);
               return `<div>${value}</div>`;
             }).join('');
-            // Edit and Reply buttons inline with Topic
+            // Resolve/Reopen shows only for the post's writer and the page authors
+            const isResolved = post.resolution.resolved;
+            const resolveBtn = canResolve(post, user)
+              ? `<button class='resolve-btn microblog-resolve-btn${isResolved ? ' is-reopen' : ''}' data-id='${post.id}' title='${isResolved ? 'Reopen this post' : 'Mark as resolved'}'>` +
+                `${isResolved ? reopenIcon : resolveIcon}<span>${isResolved ? 'Reopen' : 'Resolve'}</span></button>`
+              : '';
+            const resolvedBadge = isResolved ? `<span class='microblog-resolved-badge'>Resolved</span>` : '';
+            // Topic (+ Resolved badge), then content, then one row of post actions
             const messageCell = message.map(f => {
               let value = post[f.key] ?? '';
+              if (f.format) value = f.format(value);
               if (f.key === 'topicPath') {
-                value = (f.format ? f.format(value) : value) +
-                  ` <button class='edit-btn ml-2' data-id='${post.id}' title='Edit'>${editIcon}</button>` +
-                  ` <button class='reply-btn ml-2' data-id='${post.id}' title='Reply'>${replyIcon}</button>`;
-              } else if (f.format) {
-                value = f.format(value);
+                const archivedNote = post.archived ? '<small>(archived; read-only)</small>' : '';
+                return `<div class='microblog-post-topic'><span>${value}</span>${resolvedBadge}${archivedNote}</div>`;
               }
               return `<div>${value}</div>`;
-            }).join('');
+            }).join('') +
+              // Archived SFI emails are read-only: no reply, edit, delete or resolve
+              (post.archived ? '' :
+              `<div class='microblog-post-actions'>` +
+                `<button class='reply-btn microblog-icon-btn' data-id='${post.id}' title='Reply' aria-label='Reply to post'>${replyIcon}</button>` +
+                (canModify(post, user)
+                  ? `<button class='edit-btn microblog-icon-btn' data-id='${post.id}' title='Edit' aria-label='Edit post'>${editIcon}</button>` +
+                    `<button class='delete-btn microblog-icon-btn is-danger' data-id='${post.id}' title='Delete' aria-label='Delete post'>${deleteIcon}</button>`
+                  : '') +
+                resolveBtn +
+              `</div>`);
             genBody += `<tr id="post-row-${post.id}"><td class="text-left">${analyticsCell}</td><td class="text-left">${messageCell}</td></tr>`;
         });
 
@@ -511,7 +663,7 @@ async function renderMicroblogTable() {
             // Bind edit buttons using event delegation so it works on all pages
             $('#microblog-table').off('click', '.edit-btn').on('click', '.edit-btn', function() {
               const id = $(this).data('id');
-              const post = (data.microblogs || []).find(p => p.id == id);
+              const post = postsById.get(String(id));
               openModal({ mode: 'edit', post });
             });
             // Bind reply buttons
@@ -519,9 +671,56 @@ async function renderMicroblogTable() {
               const postId = $(this).data('id');
               openReplyModal(postId);
             });
-            
+            // Bind delete buttons (own posts, or any post for an Admin)
+            $('#microblog-table').off('click', '.delete-btn').on('click', '.delete-btn', async function() {
+              const post = postsById.get(String($(this).data('id')));
+              if (!post || !canModify(post, user)) return;
+              if (!confirm('Delete this post and its replies? This cannot be undone.')) return;
+              this.disabled = true;
+              try {
+                await deletePost(post.id);
+                showStatus('Post deleted.');
+                renderMicroblogTable();
+              } catch (err) {
+                this.disabled = false;
+                alert('Error deleting post: ' + err.message);
+              }
+            });
+            // Bind resolve/reopen buttons
+            $('#microblog-table').off('click', '.resolve-btn').on('click', '.resolve-btn', async function() {
+              const post = postsById.get(String($(this).data('id')));
+              if (!post || !canResolve(post, user)) return;
+              this.disabled = true;
+              try {
+                await setPostResolved(post.id, !post.resolution.resolved, user.uid);
+                showStatus(post.resolution.resolved ? 'Post reopened. It is back under Active.' : 'Post resolved. Find it under History.');
+                renderMicroblogTable();
+              } catch (err) {
+                this.disabled = false;
+                alert('Error updating post status: ' + err.message);
+              }
+            });
+            // Bind reply resolve/reopen buttons (each reply's own status)
+            $('#microblog-table').off('click', '.reply-resolve-btn').on('click', '.reply-resolve-btn', async function() {
+              const post = postsById.get(String(this.dataset.postId));
+              const replyId = this.dataset.replyId;
+              const reply = post && (post.replies || []).find(r => String(r.id) === replyId);
+              if (!post || !reply || !canResolveReply(post, reply, user)) return;
+              const resolved = !this.classList.contains('is-reopen');
+              this.disabled = true;
+              try {
+                await setReplyResolved(post.id, replyId, resolved, user.uid);
+                showStatus(resolved ? 'Reply resolved.' : 'Reply reopened.');
+                renderMicroblogTable();
+              } catch (err) {
+                this.disabled = false;
+                alert('Error updating reply status: ' + err.message);
+              }
+            });
+
             // Load and display replies for each post
-            for (const post of (data.microblogs || [])) {
+            for (const post of visiblePosts) {
+              if (post.archived) continue; // not stored in Flask, so no replies to fetch
               await loadRepliesForPost(post.id);
             }
         }
