@@ -263,9 +263,5 @@ Click any card to open our live project board on GitHub.
     </div>
 </div>
 
----
-
-{% include ocs_kanban_board.html url="https://github.com/users/vanshikak210/projects/8" title="Kanban Board (CPT)" %}
-
 </div>
 <!-- markdownlint-enable MD033 -->
