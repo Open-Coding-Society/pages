@@ -504,6 +504,73 @@ test('an issue goes to a column by its stage label, else closed, assigned or ope
     assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'bug' }], assignees: [] }, CONFIG), 'To do');
 });
 
+const repositoryIssue = (labels = []) => ({
+    id: 1, number: 1, title: 'Review access', state: 'open',
+    html_url: 'https://github.com/team/repo/issues/1',
+    assignees: [{ login: 'reviewer' }], body: '- [ ] Review\n- [x] Reproduce', labels,
+});
+const repositoryBoard = (issues, config) => normalizeBoard(repoToProject('team/repo', issues, 'Assignee', config), {
+    url: 'https://github.com/team/repo/issues', filterName: 'Assignee', config,
+});
+
+test('PNEC opt-in shows only valid priorities and Fibonacci-hour estimates, preserving owners and workflow', yaml, () => {
+    const config = boardConfig(DEFAULTS, undefined, true);
+    for (const priority of ['P0 Critical', 'P1 High', 'P2 Medium', 'P3 Low']) {
+        for (const hours of [1, 2, 3, 5, 8, 13, 21]) {
+            const issue = repositoryIssue([{ name: 'To do' }, { name: `Priority: ${priority}` }, `Estimate: ${hours} hours`, 'Topic: Chatbot']);
+            const board = repositoryBoard([issue], config);
+            assert.deepEqual(board.cards[0].details, [
+                { name: 'Priority', value: priority }, { name: 'Estimate', value: `${hours} hours` },
+            ]);
+            assert.deepEqual(board.cards[0].people, ['reviewer']);
+            assert.equal(board.cards[0].stage, 'todo');
+            assert.deepEqual(board.cards[0].checklist, { done: 1, total: 2 });
+            assert.equal(filterCards(board, 'reviewer').length, 1);
+            assert.equal(filterCards(board, 'other').length, 0);
+            assert.equal(issue.state, 'open');
+        }
+    }
+    for (const labels of [['Priority: ', 'Estimate: '], ['Priority: P0 Low', 'Estimate: 4 hours']]) {
+        assert.deepEqual(repositoryBoard([repositoryIssue(labels)], config).cards[0].details, []);
+    }
+});
+
+test('metadata-free and Topic-only issues keep their existing board behavior even with PNEC opt-in', yaml, () => {
+    const config = boardConfig(DEFAULTS, undefined, true);
+    for (const labels of [[], ['bug'], ['Topic: Chatbot'], ['In review'], ['backlog']]) {
+        for (const state of ['open', 'closed']) {
+            const issue = { ...repositoryIssue(labels), state };
+            assert.deepEqual(repositoryBoard([issue], config), repositoryBoard([issue], CONFIG));
+        }
+    }
+});
+
+test('other repository boards ignore Priority, Estimate and Topic labels without opt-in', yaml, () => {
+    const issue = repositoryIssue(['Priority: P0 Critical', 'Estimate: 8 hours', 'Topic: Chatbot']);
+    assert.deepEqual(repositoryBoard([issue], CONFIG), repositoryBoard([repositoryIssue()], CONFIG));
+    assert.deepEqual(CONFIG.cardFields, ['Priority', 'Topic']);
+});
+
+test('organization boards keep Priority and Topic fields but do not expose an existing Estimate field', yaml, () => {
+    const fields = [...FIELDS,
+        { id: 20, name: 'Priority', data_type: 'single_select' },
+        { id: 21, name: 'Topic', data_type: 'single_select' },
+        { id: 22, name: 'Estimate', data_type: 'single_select' },
+    ];
+    const values = [
+        { id: 20, value: { name: 'High' } }, { id: 21, value: { name: 'Chatbot' } },
+        { id: 22, value: { name: '8 hours' } },
+    ];
+    const board = normalizeBoard({ project: PROJECT, fields, items: [
+        { ...ISSUE, fields: [...ISSUE.fields, ...values] },
+    ] }, { url: BOARD_URL, config: CONFIG });
+    assert.deepEqual(board.cards[0].details, [
+        { name: 'Priority', value: 'High' }, { name: 'Topic', value: 'Chatbot' },
+    ]);
+    assert.equal(board.cards[0].stage, 'done');
+    assert.equal(pickFields(fields, '', CONFIG).details.some(field => field.name === 'Estimate'), false);
+});
+
 test('where a repository\'s issues go, and its board\'s title, come from the data too', yaml, () => {
     const config = boardConfig({
         ...DEFAULTS,

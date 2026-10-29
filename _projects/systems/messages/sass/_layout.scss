@@ -1,0 +1,190 @@
+// The page shell: masthead, then the two panes.
+
+.dm {
+  font-family: var(--dm-font);
+  color: var(--dm-ink);
+
+  // Minima's .wrapper caps content at 800px, which is too narrow for two panes, so the
+  // page widens itself out of it. calc(50% - 50vw) is exactly the distance from the
+  // wrapper's edge to the viewport's, and the clamp only ever makes that less negative:
+  // it stops at 320px of bleed on a wide monitor and at roughly nothing on a phone,
+  // where the wrapper's own padding already does the job.
+  //
+  // The +1rem matters: 50vw counts the vertical scrollbar, so bleeding the full
+  // distance overshoots the visible area by the scrollbar's width and puts a
+  // horizontal scrollbar on the page. The inset absorbs it and leaves a gutter.
+  margin-inline: clamp(-320px, calc(50% - 50vw + 1rem), 0px);
+  padding-inline: clamp(var(--dm-space-md), 3vw, var(--dm-space-xl));
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}
+
+.dm__masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--dm-space-md);
+  padding-bottom: var(--dm-space-md);
+  border-bottom: 1px solid var(--dm-rule);
+}
+
+.dm__title {
+  margin: 0;
+  font-family: var(--dm-font);
+  font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--dm-ink);
+}
+
+.dm__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: none;
+  font-family: var(--dm-font);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--dm-muted);
+}
+
+.dm__status-dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+// Connection state, the one bit of colour-as-signal on the page. messages-page.js
+// puts these on the pill: is-live when the socket is connected, is-error when Spring
+// is unreachable or the socket dropped, is-preview for a degraded state. The dot
+// inherits currentColor, so colouring the pill colours both.
+.dm__status.is-live {
+  color: var(--green);
+}
+
+.dm__status.is-error {
+  color: var(--red);
+}
+
+.dm__status.is-preview {
+  color: var(--warn);
+}
+
+.dm__notice {
+  margin: var(--dm-space-md) 0 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--dm-muted);
+
+  &:empty {
+    display: none;
+  }
+}
+
+// ── The two panes ──────────────────────────────────────────────────────────────
+.dm__shell {
+  display: grid;
+  grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
+  height: var(--dm-shell-height);
+  margin-top: var(--dm-space-lg);
+  border-top: 1px solid var(--dm-rule);
+}
+
+.dm__aside {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  border-right: 1px solid var(--dm-rule);
+}
+
+// The scroll container, so the pane's own edge stays put while the list moves.
+.dm__aside-scroll {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--dm-space-md) var(--dm-space-md) var(--dm-space-lg) 0;
+}
+
+.dm__thread {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  padding-left: var(--dm-space-lg);
+}
+
+.dm__back {
+  display: none; // shown only in the single-column layout
+}
+
+@include dm-below($breakpoint-mobile) {
+  .dm {
+    --dm-shell-height: calc(100dvh - 11rem);
+    // The wrapper's own 18px already keeps content off the screen edge here.
+    padding-inline: 0;
+  }
+
+  .dm__masthead {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .dm__shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dm__aside {
+    border-right: 0;
+  }
+
+  .dm__aside-scroll {
+    padding-right: 0;
+  }
+
+  .dm__thread {
+    padding-left: 0;
+  }
+
+  // One pane at a time. `data-dm-view` is set by the page's own inline script when a
+  // conversation opens and cleared by the back control.
+  .dm[data-dm-view='thread'] .dm__aside,
+  .dm:not([data-dm-view='thread']) .dm__thread {
+    display: none;
+  }
+
+  .dm__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    align-self: flex-start;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--dm-font);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dm-muted);
+    cursor: pointer;
+
+    &::before {
+      content: '\2190';
+    }
+
+    &:hover {
+      color: var(--dm-ink);
+    }
+
+    @include dm-focus-ring;
+  }
+}

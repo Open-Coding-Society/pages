@@ -41,7 +41,8 @@ export class PreferencesConfig {
         'Green': { bg: '#154734', text: '#e6f6ef', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#10b981' },
         'Sepia': { bg: '#f4ecd8', text: '#3b2f2f', font: "Georgia, 'Times New Roman', Times, serif", size: 14, accent: '#b45309' },
         'Cyberpunk': { bg: '#0a0a0f', text: '#f0f0f0', font: "'Source Code Pro', monospace", size: 14, accent: '#f72585' },
-        'Ocean': { bg: '#0c1929', text: '#e0f2fe', font: "'Open Sans', Arial, sans-serif", size: 15, accent: '#06b6d4' }
+        'Ocean': { bg: '#0c1929', text: '#e0f2fe', font: "'Open Sans', Arial, sans-serif", size: 15, accent: '#06b6d4' },
+        'Sunset': { bg: '#2a1433', text: '#fbe7d4', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#ff7f6b' }
     };
 
     static MAX_CUSTOM = 10;
@@ -360,6 +361,7 @@ export class ThemeRenderer {
 
         Object.keys(PreferencesConfig.PRESETS).forEach(name => {
             const p = PreferencesConfig.PRESETS[name];
+            if (container.dataset.mode === 'fill') { container.appendChild(ThemeRenderer.swatch(name, p)); return; }
             const btn = document.createElement('button');
             btn.className = 'px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-sm flex items-center gap-2';
             btn.innerHTML = `<span class="w-3 h-3 rounded-full" style="background:${p.accent}"></span> ${name}`;
@@ -393,18 +395,25 @@ export class ThemeRenderer {
         const themes = PreferencesStore.getThemes();
         const keys = Object.keys(themes);
         if (!keys.length) {
-            container.innerHTML = '<p class="text-neutral-500 text-sm">No custom themes yet</p>';
+            container.innerHTML = container.dataset.mode === 'fill'
+                ? '<p class="ocs__text ocs__dashboard-fineprint">No saved themes yet. Make one below or with AI.</p>'
+                : '<p class="text-neutral-500 text-sm">No custom themes yet</p>';
             return;
         }
 
         keys.forEach(name => {
             const theme = themes[name];
+            if (container.dataset.mode === 'fill') { container.appendChild(ThemeRenderer.mineRow(name, theme)); return; }
             const wrap = document.createElement('div');
             wrap.className = 'flex gap-2';
 
             const btn = document.createElement('button');
             btn.className = 'flex-1 px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-sm text-left flex items-center gap-2';
-            btn.innerHTML = `<span class="w-3 h-3 rounded-full" style="background:${theme.accent || '#3b82f6'}"></span> ${name}`;
+            // Names can come from an AI theme, so they go in as text, never HTML.
+            const dot = document.createElement('span');
+            dot.className = 'w-3 h-3 rounded-full';
+            dot.style.background = theme.accent || '#3b82f6';
+            btn.append(dot, [theme.decor?.[0], name].filter(Boolean).join(' '));
             btn.addEventListener('click', async () => {
                 const currentLang = document.getElementById('pref-language')?.value || PreferencesStore.cachedPrefs?.language || '';
                 const currentTTS = {
@@ -413,6 +422,7 @@ export class ThemeRenderer {
                     ttsPitch: PreferencesStore.cachedPrefs?.ttsPitch || 1.0,
                     ttsVolume: PreferencesStore.cachedPrefs?.ttsVolume || 1.0
                 };
+                window.SitePreferences?.setThemeDecor?.(theme); // this theme's wallpaper (or none) wins after the reload
                 await PreferencesStore.set({
                     ...theme,
                     language: currentLang,
@@ -441,6 +451,69 @@ export class ThemeRenderer {
         });
     }
 
+    /** Fill-mode (dashboard v2): put a theme into the form so the student can preview and
+     *  fine-tune it; nothing is saved until Save. preferences-layout.js listens for prefs:filled. */
+    static fill(name, theme) {
+        FormManager.set({ ...FormManager.get(), selectionColor: theme.accent, ...theme });
+        window.SitePreferences?.setThemeDecor?.(theme);
+        document.dispatchEvent(new CustomEvent('prefs:filled', { detail: { name } }));
+    }
+
+    /** Fill-mode preset card: a sample in the theme's colors, then its name */
+    static swatch(name, theme) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ocs__prefs-swatch';
+        btn.dataset.theme = name;
+        btn.setAttribute('aria-pressed', 'false');
+        const sample = document.createElement('span');
+        sample.className = 'ocs__prefs-swatch-sample';
+        sample.style.setProperty('background-color', theme.bg, 'important');
+        sample.style.setProperty('color', theme.text, 'important');
+        sample.style.setProperty('font-family', theme.font, 'important');
+        const bar = document.createElement('span');
+        bar.className = 'ocs__prefs-swatch-bar';
+        bar.style.setProperty('background-color', theme.accent, 'important');
+        sample.append('Aa', bar);
+        const label = document.createElement('span');
+        label.className = 'ocs__prefs-swatch-name';
+        label.textContent = name;
+        btn.append(sample, label);
+        btn.addEventListener('click', () => ThemeRenderer.fill(name, theme));
+        return btn;
+    }
+
+    /** Fill-mode saved theme row: swatch, name (as text), Use and Delete */
+    static mineRow(name, theme) {
+        const row = document.createElement('div');
+        row.className = 'ocs__prefs-mine-row';
+        const dot = document.createElement('span');
+        dot.className = 'ocs__prefs-mine-dot';
+        dot.style.setProperty('background', `linear-gradient(135deg, ${theme.bg} 60%, ${theme.accent || '#3b82f6'} 60%)`, 'important');
+        const label = document.createElement('span');
+        label.className = 'ocs__prefs-grow';
+        label.textContent = [theme.decor?.[0], name].filter(Boolean).join(' ');
+        const use = document.createElement('button');
+        use.type = 'button';
+        use.className = 'ocs__btn small';
+        use.textContent = 'Use';
+        use.addEventListener('click', () => ThemeRenderer.fill(name, theme));
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'ocs__btn small alert-red';
+        del.textContent = 'Delete';
+        del.setAttribute('aria-label', 'Delete ' + name);
+        del.addEventListener('click', async () => {
+            const t = PreferencesStore.getThemes();
+            if (t[name]) delete t[name];
+            await PreferencesStore.setThemes(t);
+            ThemeRenderer.setCustom();
+            StatusDisplay.set('Deleted: ' + name);
+        });
+        row.append(dot, label, use, del);
+        return row;
+    }
+
     /** Save current form values as a named custom theme */
     static async set(name) {
         if (!name) { StatusDisplay.set('Enter a theme name'); return; }
@@ -449,7 +522,9 @@ export class ThemeRenderer {
             StatusDisplay.set('Max themes reached');
             return;
         }
-        themes[name] = FormManager.get();
+        // Leave out the theme list itself: a theme that contains its own list can't be saved as JSON.
+        const { customThemes, ...theme } = FormManager.get();
+        themes[name] = theme;
         await PreferencesStore.setThemes(themes);
         ThemeRenderer.setCustom();
         StatusDisplay.set('Saved: ' + name);
@@ -1322,6 +1397,7 @@ export class PreferencesController {
 
         // Step 4: Set form values from saved prefs (or defaults)
         FormManager.set(saved || PreferencesConfig.SITE_DEFAULT);
+        document.dispatchEvent(new CustomEvent('prefs:loaded'));
 
         // Step 4.5: Initialise camera-driven head-tracking cursor controls
         NodCursorController.init();
@@ -1376,6 +1452,7 @@ export class PreferencesController {
 
         // Reset
         document.getElementById('restore-styles').addEventListener('click', async () => {
+            window.SitePreferences?.setThemeDecor?.(null);
             if (PreferencesAPI.isLoggedIn) {
                 const deleted = await PreferencesAPI.delete();
                 if (!deleted) {

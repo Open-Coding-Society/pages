@@ -1,0 +1,44 @@
+/* ---------- Theme emoji wallpaper ----------
+   assets/js/user-preferences.js sets <html data-theme-decor> and --theme-decor-pattern (an
+   SVG tile of faint emoji and dots) while the active theme has decor emoji: an AI theme from
+   the dashboard, a holiday suggestion, or a custom theme saved from one.
+   The tile is painted on the page and on the full-page containers that user-preferences.scss
+   (and its lesson-player list) gives the plain background color, fixed to the viewport so their copies line up into one
+   wallpaper. Cards keep their solid --panel color, so text on them stays readable. */
+
+html[data-theme-decor] {
+  &,
+  body,
+  .container,
+  .page-content,
+  .wrapper,
+  main,
+  article,
+  .post,
+  .content,
+  .opencs_root,
+  .lesson-player,
+  .lesson-main,
+  .main-content,
+  .content-wrapper,
+  .lesson-content {
+    background-image: var(--theme-decor-pattern);
+    background-attachment: fixed;
+    background-repeat: repeat;
+  }
+
+  // The site header and nav keep their plain color: .wrapper is reused inside them.
+  :is(header, nav, .site-header) :is(.container, .wrapper, .content) {
+    background-image: none;
+  }
+
+  // The header is see-through glass (.tintedGlass); make it solid so the wallpaper doesn't
+  // show through, in the page color its inner .wrapper already has, so the bar is one color.
+  .site-header {
+    background-color: var(--pref-bg-color);
+  }
+}
+
+@media print {
+  html[data-theme-decor] * { background-image: none !important; }
+}

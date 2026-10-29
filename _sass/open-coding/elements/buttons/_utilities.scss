@@ -89,6 +89,7 @@
 // Runner control grammar (shared across CODE/UI/GAME runners)
 // Usage examples:
 // - .ocs__btn.utility.run
+// - .ocs__btn.utility.submit (reflection runner)
 // - .ocs__btn.utility.pause
 // - .ocs__btn.utility.stop
 // - .ocs__btn.utility.fullscreen
@@ -121,6 +122,16 @@
 
     &::before {
         content: '▶';
+    }
+}
+
+.ocs__btn.utility.submit {
+    background: var(--pref-accent-color);
+    border-color: var(--pref-accent-color);
+    color: var(--pref-bg-color);
+
+    &::before {
+        content: '📤';
     }
 }
 

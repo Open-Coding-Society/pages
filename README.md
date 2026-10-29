@@ -543,3 +543,24 @@ UDL is not a method but a **design lens** to make learning **accessible and mean
 | **Access & Design** | UDL | Inclusive and flexible access to all learners |
 | **Workflow & Rhythm** | Agile + Design Thinking + Gagné | Iteration, planning, feedback, reflection ceremonies |
 
+Preferences page redesign (dashboard v2) - work in progress
+
+What it does
+- Preferences tab split into: Appearance | Language & voice | Head tracking
+- Step 1 "Pick a starting point": Presets, My themes and Create with AI in one card
+- Step 2 "Fine-tune": all four colors together, then font, size and button style
+- Live preview with readability checks, and one Save / Reset
+
+How to try it
+1. In the pages repo (branch themes-front), copy each file over the one at the same path.
+   preferences-layout.js is a new file.
+2. Rebuild the site and open /dashboard/v2
+
+Files
+- _layouts/dashboard-v2.html                         new layout for the Preferences tab
+- _sass/open-coding/dashboard-v2.scss                styles (bottom: "Preferences tab")
+- assets/js/pages/dashboard/preferences-layout.js    NEW: tabs, live preview, readability checks
+- assets/js/pages/dashboard/preferences.js           presets / saved themes fill step 2 instead of saving
+- assets/js/pages/dashboard/ai-theme.js              an AI theme fills step 2 too
+- changes.diff                                       the same edits as a patch, for review
+                                                     (the new file isn't in it; it's in the folder above)
