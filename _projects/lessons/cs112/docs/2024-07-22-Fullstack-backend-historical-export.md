@@ -9,7 +9,7 @@ comments: True
 author: Finn Carpenter
 lesson_group: "cs112"
 articulation: {"institution":"MiraCosta College","course":"CS112"}
-categories: []
+categories: [Java, Spring]
 ---
 
 ## How do API work?
