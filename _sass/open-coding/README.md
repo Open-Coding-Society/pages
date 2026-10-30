@@ -82,6 +82,15 @@ Do not add literal values such as `#2563eb`, `rgb(...)`, `rgba(...)`, `white`,
 or `black` to new reusable OCS or capstone styles. We do not design to one
 fixed color theme; the same page must remain readable when preferences change.
 
+Every preset in `assets/js/user-preferences.js` keeps its text and its accent at
+4.5:1 (the WCAG AA minimum) on the page and on `--panel`, and keeps page-colored
+text on an accent fill at 4.5:1. The engine derives `--text-muted` at 4.5:1 on
+every surface and field outlines at 3:1, and `tests/theme_contrast.test.mjs`
+checks every preset. So a reusable style reads in every theme when its text is
+`--pref-text-color`, `--text-muted`, or the accent on the page or a panel. Text on
+an accent tint stays in the text color: the accent on its own tint falls under
+4.5:1 in most themes, so the accent goes on the ring and the tint.
+
 ### Color composition
 
 Compose color in layers instead of assigning unrelated colors to every element:
@@ -107,7 +116,7 @@ Example:
 .example-card--active {
   background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
   border-color: var(--pref-accent-color);
-  color: var(--pref-accent-color);
+  color: var(--pref-text-color);
 }
 ```
 
@@ -146,10 +155,14 @@ Common button classes:
 - `ocs__links`, `ocs__links--wide`: button groups
 - `pill`: rounded pill shape
 - `accent`: preference accent color
-- `fill`: filled state
+- `fill`: filled state; `accent fill` is a solid accent with page-colored text
 - `alert-green`, `alert-yellow`, `alert-red`: semantic tones
 - `small`, `medium`, `large`: button-scoped sizes
 - `ocs__btn--icon`, `ocs__btn-icon`: icon buttons
+
+Keyboard focus shows a 2px accent ring on every `ocs__btn`; a mouse click
+doesn't. A student's button-shape preference reaches `ocs__btn` only when they
+pick square or pill; the default keeps the grammar's own shapes.
 
 See [`elements/buttons`](elements/buttons) and [`buttons.md`](../../_projects/lessons/sass/navigation/buttons.md).
 
@@ -375,7 +388,9 @@ and Profile's face scanner use the full header/actions shape.
 
 `ocs__card-header`: a title/action row inside a card (flex,
 space-between, aligned). An `ocs__section-title` in the row drops its bottom
-margin, so it sits level with the action. See [`elements/capstone`](elements/capstone).
+margin, so it sits level with the action. The row wraps when the title and the
+action don't fit, so on a phone the action drops under the title. See
+[`elements/capstone`](elements/capstone).
 
 ### Picker cards
 
@@ -420,6 +435,11 @@ These shared classes are used by the RFID and Jarvis capstone documents:
 - `ocs__pager`, `ocs__pager-link`
 - `ocs__checklist`, `ocs__checklist-box`
 - `ocs__status-pill`, `ocs__status-pill--good`, `--warn`, `--bad`, `--neutral`
+
+`ocs__badge`, `ocs__status` and the status pills keep their words in the text
+color; the ring and the tint show the state: the accent for `--good`, the
+theme's yellow (`--priority-p2`) for `--warn` and its red (`--priority-p0`) for
+`--bad`.
 
 See [`elements/capstone`](elements/capstone).
 
