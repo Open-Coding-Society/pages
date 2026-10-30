@@ -1,4 +1,3 @@
-@import "common.scss";
 @import "../../materials/main.scss";
 
 // OCS input grammar.
@@ -7,7 +6,7 @@ input.ocs__input:not(:where([type="checkbox"], [type="radio"], [type="range"], [
 textarea.ocs__input,
 select.ocs__input {
     box-sizing: border-box;
-    border: 1px solid color-mix(in srgb, var(--pref-text-color) 24%, transparent);
+    border: 1px solid color-mix(in srgb, var(--pref-text-color) 40%, transparent);
     border-radius: 0.5rem;
     background-color: color-mix(in srgb, var(--pref-bg-color) 88%, var(--pref-text-color) 12%);
     color: var(--pref-text-color);
