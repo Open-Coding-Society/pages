@@ -60,3 +60,10 @@ test('every pairing failure says what to do next', () => {
   assert.equal(stuckHelpFor(new TypeError('Failed to fetch'), { localBackend: true }), STUCK_HELP.localBackendDown);
   for (const help of Object.values(STUCK_HELP)) assert.ok(help.length >= 2, 'has a next step');
 });
+
+test('the Toolchain Trail page has a microblog that keeps typing out of the game', () => {
+  const page = readFileSync(new URL('../_projects/games/cs-pathway/navigation/toolchain-trail.md', import.meta.url), 'utf8');
+  assert.match(page, /^microblog: true$/m);
+  for (const element of ['microblog-panel', 'microblog-modal', 'reply-modal']) assert.ok(page.includes(`'${element}'`));
+  for (const key of ['keydown', 'keyup']) assert.ok(page.includes(`addEventListener('${key}', (event) => event.stopPropagation())`));
+});
