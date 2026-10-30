@@ -1,0 +1,190 @@
+// The composer. js/thread.js injects assets/js/chat/rich-text.js's .rt-composer into
+// the form ahead of the Cancel and Send buttons, so the rt-* classes are styled here.
+// .rt-emoji-panel is attached to <body>, not to the form, and is styled globally in
+// _projects/systems/courses/sass/main.scss -- it is deliberately left alone.
+
+.dm__composer {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--dm-space-sm);
+  flex: none;
+  padding: var(--dm-space-md) 0 var(--dm-space-lg);
+  border-top: 1px solid var(--dm-rule);
+}
+
+.dm .rt-composer {
+  min-width: 0;
+  flex: 1;
+  border: 1px solid var(--dm-rule-strong);
+  border-radius: var(--dm-radius);
+  background: var(--dm-wash);
+  transition: border-color $transition-base ease;
+
+  // The page's single soft shadow, and only while the composer has the cursor.
+  &:focus-within {
+    border-color: var(--dm-ink);
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.18);
+  }
+}
+
+.dm .rt-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex-wrap: wrap;
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid var(--dm-rule);
+}
+
+.dm .rt-btn {
+  display: grid;
+  width: 1.6rem;
+  height: 1.6rem;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--dm-radius-sm);
+  background: none;
+  font-size: 0.75rem;
+  color: var(--dm-faint);
+  cursor: pointer;
+  transition: color $transition-fast ease, background-color $transition-fast ease;
+
+  &:hover,
+  &.is-active {
+    background: var(--dm-wash);
+    color: var(--dm-ink);
+  }
+
+  @include dm-focus-ring(-1px);
+}
+
+.dm .rt-select {
+  max-width: 7.5rem;
+  padding: 0.15rem 0.2rem;
+  border: 0;
+  background: none;
+  font-family: var(--dm-font);
+  font-size: 0.6875rem;
+  color: var(--dm-muted);
+  cursor: pointer;
+
+  @include dm-focus-ring(-1px);
+}
+
+.dm .rt-sep {
+  width: 1px;
+  height: 1rem;
+  margin: 0 0.25rem;
+  background: var(--dm-rule);
+}
+
+.dm .rt-editor {
+  max-height: 11rem;
+  min-height: 3rem;
+  overflow-y: auto;
+  padding: 0.65rem 0.75rem;
+  font-family: var(--dm-font);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--dm-ink);
+
+  &:empty::before {
+    content: attr(data-placeholder);
+    color: var(--dm-faint);
+  }
+
+  &:focus {
+    outline: none; // the ring sits on .rt-composer via :focus-within
+  }
+}
+
+// Send, and the Cancel that appears while editing.
+.dm__send {
+  flex: none;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--dm-rule-strong);
+  border-radius: var(--dm-radius);
+  background: none;
+  font-family: var(--dm-font);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--dm-ink);
+  cursor: pointer;
+  transition: background-color $transition-fast ease, border-color $transition-fast ease,
+    opacity $transition-fast ease;
+
+  i {
+    margin-right: 0.35rem;
+    font-size: 0.75rem;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--dm-ink);
+    background: var(--dm-wash);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  @include dm-focus-ring;
+}
+
+// Cancel is a .dm__action, which now carries its own padding; the extra bottom padding
+// this used to need was propping up a borderless button that no longer exists.
+.dm .dm-cancel-edit {
+  flex: none;
+}
+
+// ── Attaching an image ─────────────────────────────────────────────────────────
+.dm__attach {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+
+// The real file input: present for the label and for assistive technology, but never
+// drawn. Not display:none, which would take it out of the accessibility tree.
+.dm__file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// Keyboard focus lands on the hidden input, so the ring has to be drawn on its label.
+.dm__file-input:focus-visible + label,
+.dm__attach label:hover {
+  color: var(--dm-ink);
+}
+
+.dm__file-input:focus-visible + label {
+  outline: 2px solid var(--dm-accent);
+  outline-offset: 1px;
+}
+
+.dm__attach-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--dm-space-sm);
+  margin-bottom: var(--dm-space-md);
+
+  img {
+    width: 3rem;
+    height: 3rem;
+    object-fit: cover;
+    border: 1px solid var(--dm-rule);
+    border-radius: var(--dm-radius-sm);
+  }
+}
+
+.dm__form-status {
+  margin: 0 0 var(--dm-space-md);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--dm-accent);
+}

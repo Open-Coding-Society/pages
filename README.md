@@ -43,6 +43,12 @@ The Apache license has its roots in Fastpages.  Thus, it carries that license fo
 
 - **Blog Contributions**:  Often students contribute articles and blogs to this project.  Their names are typically listed in the front matter of their contributing post.
 
+### Mentorship
+
+OCS's AI initiatives have also benefited from mentorship and technical discussions with **Eduardo Revollo, Founder/CEO of Prometheus**. OCS welcomes continued collaboration with industry practitioners as students explore open intelligence, AI infrastructure, and practical applications of emerging technology.
+
+The RFID-based Classroom Presence System has benefited from the mentorship of **Dr. Douglas Fenner, President of Fenner Consulting Group**, whose guidance has shaped its hardware design, integration with OCS, and research direction. OCS welcomes continued collaboration with mentors as students build connected classroom systems.
+
 ---
 
 ## GitHub Pages setup
@@ -119,14 +125,17 @@ git merge upstream/main --allow-unrelated-histories -X theirs # destructive reso
 #### Windows WSL and/or Ubuntu or Kali Users
 
 - Execute the script: `./scripts/activate_ubuntu.sh` or `./scripts/activate_kali.sh`
+- Then run `./scripts/verifyTools.sh` to confirm your setup.
 
 #### macOS Users
 
 - Execute the script: `./scripts/activate_macos.sh`
+- Then run `./scripts/verifyTools.sh` to confirm your setup.
 
 #### Setup connection to GitHub
 
 - Execute the script: `./scripts/activate.sh`
+- Then run `./scripts/verifyTools.sh` to confirm your setup.
 
 #### Prep project to serve on localhost
 
@@ -134,6 +143,60 @@ git merge upstream/main --allow-unrelated-histories -X theirs # destructive reso
 - Source the virtual environment: `source venv/bin/activate`
 - Build localhost server:  `make`
 - Look for and click on server line output, perhaps `Server address: http://localhost:4500/portfolio/`.  The Port and baseurl may change.```
+
+### Verify Your Environment
+
+Run this after cloning and before starting any sprint work:
+
+```bash
+./scripts/verifyTools.sh
+```
+
+It auto-detects your repo location, checks required tools (git, ruby, bundler,
+python, pip), validates `_config.yml` and `venv/` setup, and confirms Jekyll can
+run. Its Markdown report lists each check as `PASS`, `WARN` (non-blocking, e.g.
+optional tools like Jupyter/Java), or `FAIL` with a remediation hint. Exit code
+`0` means there are no failures; exit code `1` means at least one check failed.
+The full report is written to `verifyTools.md` in the repo root.
+
+To print every check and its remediation directly in the terminal without
+creating a Markdown report, run:
+
+```bash
+bash scripts/verifyToolsTerminal.sh
+```
+
+### macOS Terminal Setup Helper (optional)
+
+On macOS, you can opt into a live terminal companion that watches setup commands
+(`brew`, `xcode-select`, `java`, `git`, `python3`, `pip3`, `code`, ...) as you run them
+and prints an inline fix the moment one fails. It's local-only — no network calls, no
+browser/game integration, and it never runs for commands outside that list. Add one
+line to `~/.zshrc` to enable it:
+
+```bash
+source /absolute/path/to/pages/scripts/mac_setup_agent.zsh
+```
+
+Run `mac_agent_pause` / `mac_agent_resume` in a shell to temporarily turn it off/on.
+
+To check your whole Mac setup at once (Xcode tools, Homebrew, Git and its name/email, Python/pip/venv,
+Ruby/Bundler, Java, VS Code's `code` command, this repo and its venv), run from the repo folder:
+
+```bash
+python3 scripts/mac_setup_agent.py --check
+```
+
+It only reads versions and settings; nothing is installed or changed. It prints a report with a fix for
+each failed check and exits `0` (all passed), `1` (something to fix), or `2` (not a Mac).
+
+In the CS Pathway game, the **Set up & check my Mac** button in Toolchain Trail (shown when macOS is selected)
+walks students through these commands in their own Terminal: `source scripts/mac_setup_agent.zsh` (agent on),
+`bash scripts/activate_macos.sh` (install), `source ~/.zshrc`, then `bash scripts/verifyToolsTerminal.sh`
+(verify). They paste the verifier's output back and the page shows what passed and the next steps. The agent
+also watches the install script, so a failed install gets a fix tip. Scripts are run with `bash` because they
+are committed without the execute bit. Tests: `python3 -m unittest discover -s scripts -p 'test_mac_setup_agent.py'`
+and `node --test tests/test_verify_tools_report.mjs`.
 
 ### Jupyter Kernels
 
@@ -486,3 +549,24 @@ UDL is not a method but a **design lens** to make learning **accessible and mean
 | **Access & Design** | UDL | Inclusive and flexible access to all learners |
 | **Workflow & Rhythm** | Agile + Design Thinking + Gagné | Iteration, planning, feedback, reflection ceremonies |
 
+Preferences page redesign (dashboard v2) - work in progress
+
+What it does
+- Preferences tab split into: Appearance | Language & voice | Head tracking
+- Step 1 "Pick a starting point": Presets, My themes and Create with AI in one card
+- Step 2 "Fine-tune": all four colors together, then font, size and button style
+- Live preview with readability checks, and one Save / Reset
+
+How to try it
+1. In the pages repo (branch themes-front), copy each file over the one at the same path.
+   preferences-layout.js is a new file.
+2. Rebuild the site and open /dashboard/v2
+
+Files
+- _layouts/dashboard-v2.html                         new layout for the Preferences tab
+- _sass/open-coding/dashboard-v2.scss                styles (bottom: "Preferences tab")
+- assets/js/pages/dashboard/preferences-layout.js    NEW: tabs, live preview, readability checks
+- assets/js/pages/dashboard/preferences.js           presets / saved themes fill step 2 instead of saving
+- assets/js/pages/dashboard/ai-theme.js              an AI theme fills step 2 too
+- changes.diff                                       the same edits as a patch, for review
+                                                     (the new file isn't in it; it's in the folder above)

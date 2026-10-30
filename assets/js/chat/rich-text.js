@@ -8,6 +8,10 @@
  *       that replaces the old single-line <input class="chat-input">. It
  *       produces a small, fixed subset of HTML: <b> <i> <u> <s>, <ul>/<ol>/<li>,
  *       <br>, and <span class="rt-font-*|rt-size-*"> for font family / size.
+ *       opts.enterKey is 'send' (a chat: Enter sends, the default) or
+ *       'newline' (a form field: Enter starts a new line and never sends).
+ *       destroy() removes what it added outside its element, for a composer
+ *       taken off a page that stays open.
  *
  *   renderRichMessage(container, raw) -> parses a stored message, keeps only
  *       that same subset, turns bare URLs into links, and appends the result.
@@ -22,7 +26,23 @@
 
 const MAX_LENGTH_DEFAULT = 2000;
 
-const URL_RE = /https?:\/\/[^\s<>()]+/g;
+// Links a teacher pastes into an announcement: full URLs, "www." links, and
+// bare domains on common TLDs ("github.com/org/repo"). A bare word like
+// "main.py" is left alone because its TLD isn't on the list.
+const URL_RE = /(?:https?:\/\/|www\.)[^\s<>]+|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|org|net|edu|gov|io|dev|app|ai|co|us|me|info|ly|gl|gg)(?:[/?#][^\s<>]*)?(?![\w.-]*@)/gi;
+
+// Sentence punctuation after a link ("see https://x.com.") isn't part of it.
+const TRAILING_RE = /[.,;:!?'"*]+$/;
+
+// Drop trailing punctuation, and a closing ")" with no matching "(" inside the
+// link — so "(see github.com/x)" links github.com/x but keeps wiki URLs whole.
+function trimUrl(url) {
+  let out = url.replace(TRAILING_RE, '');
+  while (out.endsWith(')') && (out.match(/\(/g) || []).length < (out.match(/\)/g) || []).length) {
+    out = out.slice(0, -1).replace(TRAILING_RE, '');
+  }
+  return out;
+}
 
 // Zero-width space + BOM: some browsers seed an empty contenteditable with one
 // and paste can carry them in. They must never count as content or reach a
@@ -74,20 +94,24 @@ function linkifyText(text, insideAnchor) {
     frag.appendChild(document.createTextNode(value));
     return frag;
   }
-  const re = new RegExp(URL_RE.source, 'g');
+  const re = new RegExp(URL_RE.source, 'gi');
   let lastIndex = 0;
   let match;
   while ((match = re.exec(value)) !== null) {
+    const url = trimUrl(match[0]);
+    // Skip the domain half of an email address (name@school.edu).
+    if (!url || value[match.index - 1] === '@') continue;
     if (match.index > lastIndex) {
       frag.appendChild(document.createTextNode(value.slice(lastIndex, match.index)));
     }
     const a = document.createElement('a');
-    a.href = match[0];
-    a.textContent = match[0];
+    a.href = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    a.textContent = url;
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     frag.appendChild(a);
-    lastIndex = match.index + match[0].length;
+    lastIndex = match.index + url.length;
+    re.lastIndex = lastIndex;
   }
   if (lastIndex < value.length || !frag.childNodes.length) {
     frag.appendChild(document.createTextNode(value.slice(lastIndex)));
@@ -216,6 +240,12 @@ export function sanitizeRichText(raw) {
   return holder.innerHTML;
 }
 
+// Plain text with its web addresses turned into links (new tab). Used where
+// text is never HTML, such as calendar event details.
+export function linkify(text) {
+  return linkifyText(text, false);
+}
+
 export function renderRichMessage(container, raw) {
   container.appendChild(sanitizeToFragment(raw));
 }
@@ -241,13 +271,19 @@ function stripGroupSpans(root, prefix) {
   });
 }
 
+const ENTER_KEYS = ['send', 'newline'];
+
 export function createRichComposer(opts = {}) {
   const {
     placeholder = 'Write a message…',
     maxLength = MAX_LENGTH_DEFAULT,
     onSubmit = () => {},
     onInput = () => {},
+    enterKey = 'send',
   } = opts;
+  if (!ENTER_KEYS.includes(enterKey)) {
+    throw new TypeError(`createRichComposer: enterKey must be 'send' or 'newline', not ${JSON.stringify(enterKey)}`);
+  }
 
   const root = document.createElement('div');
   root.className = 'rt-composer';
@@ -279,15 +315,17 @@ export function createRichComposer(opts = {}) {
      a page with many collapsed week-card chats doesn't pay for them upfront. */
   let savedRange = null;
   let selectionTracked = false;
+  let destroyed = false; // after destroy() nothing is added outside root again
+  function rememberSelection() {
+    const sel = document.getSelection();
+    if (sel && sel.rangeCount && editor.contains(sel.anchorNode)) {
+      savedRange = sel.getRangeAt(0).cloneRange();
+    }
+  }
   function trackSelection() {
-    if (selectionTracked) return;
+    if (selectionTracked || destroyed) return;
     selectionTracked = true;
-    document.addEventListener('selectionchange', () => {
-      const sel = document.getSelection();
-      if (sel && sel.rangeCount && editor.contains(sel.anchorNode)) {
-        savedRange = sel.getRangeAt(0).cloneRange();
-      }
-    });
+    document.addEventListener('selectionchange', rememberSelection);
   }
   editor.addEventListener('focusin', trackSelection);
 
@@ -612,6 +650,17 @@ export function createRichComposer(opts = {}) {
   let emojiOpen = false;
   let emojiBuilt = false;
 
+  function closeOnOutsideClick(e) {
+    if (emojiOpen && !root.contains(e.target) && !emojiPanel.contains(e.target)) closeEmojiPanel();
+  }
+
+  // Capture-phase, so it also sees scrolls on the page behind the panel —
+  // but scrolling *inside* the tray (its own element is the scroll target)
+  // is how the user reaches the emoji further down, so that must not close it.
+  function closeOnScroll(e) {
+    if (e.target !== emojiPanel) closeEmojiPanel();
+  }
+
   function buildEmojiPanel() {
     if (emojiBuilt) return;
     emojiBuilt = true;
@@ -628,18 +677,12 @@ export function createRichComposer(opts = {}) {
       });
       emojiPanel.appendChild(b);
     });
-    document.addEventListener('click', (e) => {
-      if (emojiOpen && !root.contains(e.target) && !emojiPanel.contains(e.target)) closeEmojiPanel();
-    });
-    // Capture-phase, so it also sees scrolls on the page behind the panel —
-    // but scrolling *inside* the tray (its own element is the scroll target)
-    // is how the user reaches the emoji further down, so that must not close it.
-    window.addEventListener('scroll', (e) => {
-      if (e.target !== emojiPanel) closeEmojiPanel();
-    }, true);
+    document.addEventListener('click', closeOnOutsideClick);
+    window.addEventListener('scroll', closeOnScroll, true);
   }
 
   function toggleEmojiPanel() {
+    if (destroyed) return;
     if (emojiOpen) { closeEmojiPanel(); return; }
     buildEmojiPanel();
     const sel = document.getSelection();
@@ -718,17 +761,32 @@ export function createRichComposer(opts = {}) {
     return false;
   }
 
+  // The <br> Shift+Enter gives. False when the browser doesn't offer the command.
+  function insertLineBreak() {
+    try {
+      return document.execCommand('insertLineBreak', false, null);
+    } catch (_) {
+      return false;
+    }
+  }
+
   editor.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' || e.isComposing) return;
-    if (e.shiftKey) {
-      // Shift+Enter is a soft newline; inside a list that means the next item.
+    // Shift+Enter is a soft newline, and so is Enter in a form field ('newline');
+    // inside a list that means the next item.
+    if (e.shiftKey || enterKey === 'newline') {
       if (inListItem()) {
         e.preventDefault();
         document.execCommand('insertParagraph', false, null);
         syncToolbarState();
         handleChange();
+      } else if (!e.shiftKey && insertLineBreak()) {
+        // Plain Enter would wrap the new line in a <div>, which the sanitiser turns
+        // into an extra blank line; the <br> keeps what was typed.
+        e.preventDefault();
+        handleChange();
       }
-      return; // outside a list, let the browser drop in its <br>
+      return; // otherwise the browser adds the new line itself
     }
     e.preventDefault();
     onSubmit();
@@ -786,6 +844,16 @@ export function createRichComposer(opts = {}) {
     length: textLength,
     getHTML() {
       return sanitizeRichText(editor.innerHTML).replace(/(?:<br>|\s)+$/g, '').trim();
+    },
+    // Takes back what the composer added outside its own element: the document and
+    // window listeners, and the emoji panel if it is open. For a composer removed from
+    // a page that stays open (an embedded chat); the course chats never call it.
+    destroy() {
+      destroyed = true;
+      closeEmojiPanel();
+      document.removeEventListener('selectionchange', rememberSelection);
+      document.removeEventListener('click', closeOnOutsideClick);
+      window.removeEventListener('scroll', closeOnScroll, true);
     },
   };
 }

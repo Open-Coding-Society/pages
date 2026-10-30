@@ -1,0 +1,147 @@
+// The Groups and Direct messages lists. Rows are built by js/sidebar.js as
+// .ocs__nav-card links, so the grammar's class names are what gets styled here.
+
+.dm__group {
+  & + & {
+    margin-top: var(--dm-space-lg);
+  }
+}
+
+// Centre, not baseline: the action is a padded box now, so baseline alignment pushed
+// it out of line with the heading beside it.
+.dm__group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dm-space-sm);
+  padding-bottom: 0.4rem;
+}
+
+.dm__group-title {
+  margin: 0;
+  font-family: var(--dm-font);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dm-faint);
+}
+
+// A quiet text button. Used for the list headers and the thread's group actions.
+//
+// The horizontal padding is load-bearing. With none, the focus ring (and the border a
+// user theme paints onto every button) closed right up against the glyphs, which is
+// what made these read as cramped boxes rather than buttons. line-height does the same
+// job vertically: without it the ring sat on the ascenders.
+.dm__action {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: var(--dm-radius-sm);
+  background: none;
+  font-family: var(--dm-font);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--dm-muted);
+  cursor: pointer;
+  transition: color $transition-fast ease, border-color $transition-fast ease,
+    background-color $transition-fast ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--dm-rule);
+    background: var(--dm-wash);
+    color: var(--dm-ink);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  @include dm-focus-ring(1px);
+}
+
+// The full-width variant, used for "Form groups for a class" at the foot of the Find
+// or make dialog. It keeps the shared box rather than adding a border-top of its own,
+// which would have collided with the base border now that one exists.
+.dm__action--block {
+  display: block;
+  width: 100%;
+  margin-top: var(--dm-space-xs);
+  border-color: var(--dm-rule);
+  text-align: left;
+}
+
+.dm__list {
+  display: flex;
+  flex-direction: column;
+
+  // Empty-state line, rendered as a plain <p class="ocs__text"> by sidebar.js.
+  > .ocs__text {
+    margin: 0;
+    padding: 0.5rem 0;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--dm-faint);
+  }
+}
+
+.dm .ocs__nav-card {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.7rem 0.75rem 0.7rem 0.8rem;
+  border: 0;
+  border-bottom: 1px solid var(--dm-rule);
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  text-decoration: none;
+  color: var(--dm-muted);
+  transition: border-color $transition-fast ease, color $transition-fast ease,
+    background-color $transition-fast ease;
+
+  &:hover {
+    border-left-color: var(--dm-rule-strong);
+    background: var(--dm-wash);
+    color: var(--dm-ink);
+  }
+
+  &.is-active {
+    border-left-color: var(--dm-accent);
+    background: var(--dm-wash);
+    color: var(--dm-ink);
+  }
+
+  @include dm-focus-ring(-2px);
+}
+
+.dm .ocs__nav-card-title {
+  font-family: var(--dm-font);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--dm-ink);
+}
+
+// The row's secondary line (a group's class and period).
+.dm .ocs__nav-card > .ocs__text {
+  font-family: var(--dm-font);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--dm-faint);
+}
+
+// The unread count. The one place the accent earns its keep.
+.dm .ocs__nav-card-cta {
+  justify-self: start;
+  margin-top: 0.2rem;
+  font-family: var(--dm-font);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--dm-accent);
+}
+
+// An unread row reads a shade louder than a read one.
+.dm .ocs__nav-card:has(.ocs__nav-card-cta) .ocs__nav-card-title {
+  font-weight: 500;
+  color: var(--dm-ink);
+}

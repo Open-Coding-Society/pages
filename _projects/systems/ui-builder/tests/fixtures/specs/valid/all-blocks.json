@@ -1,0 +1,427 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": {
+    "title": "Flood Watch",
+    "description": "River levels near school, live from our Flask API.",
+    "byline": "Binary Beasts",
+    "course": "csp",
+    "width": "wide",
+    "image": "/images/ui-builder/flood-watch.png"
+  },
+  "sections": [
+    {
+      "id": "s-stack01",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-hero01",
+              "type": "hero",
+              "settings": {
+                "badge": "CSP · Team project",
+                "title": "Flood Watch",
+                "lead": "Flood Watch shows the creek level near school from our Flask API, so families know before the road floods.",
+                "links": [
+                  { "label": "Try it", "url": "https://binary-beasts.github.io/flood-watch/" },
+                  { "label": "Source code", "url": "https://github.com/binary-beasts/flood-watch" },
+                  { "label": "Our sprint", "url": "/csp/sprint-5/" }
+                ]
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-heading01",
+              "type": "heading",
+              "settings": {
+                "text": "How it works",
+                "level": "2",
+                "subtitle": "A sensor, a Flask API and this page."
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-text01",
+              "type": "text",
+              "settings": {
+                "body": "<b>Flood Watch</b> reads the creek sensor every hour. <i>Readings can be a few minutes late.</i><br>Read the <a href=\"https://github.com/binary-beasts/flood-watch\">source on GitHub</a>.<ul><li>Python Flask API</li><li>SQLite database</li><li>OCS UI Builder page</li></ul>"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-image01",
+              "type": "image",
+              "settings": {
+                "src": "https://raw.githubusercontent.com/binary-beasts/flood-watch/main/images/dashboard.png",
+                "alt": "The Flood Watch dashboard with a chart of the creek level over one week",
+                "caption": "Our dashboard during the October storm",
+                "fit": "cover"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-video01",
+              "type": "video",
+              "settings": {
+                "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+                "title": "Two-minute demo",
+                "caption": "Recorded at our sprint review"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-buttons01",
+              "type": "buttons",
+              "settings": {
+                "links": [
+                  { "label": "Live app", "url": "https://binary-beasts.github.io/flood-watch/" },
+                  { "label": "API docs", "url": "https://flood-watch.opencodingsociety.com/api/docs" },
+                  { "label": "Email us", "url": "mailto:binary.beasts@example.com" },
+                  { "label": "More student pages", "url": "/ui-builder/gallery/" }
+                ],
+                "emphasize_first": true
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-divider01",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-code01",
+              "type": "code",
+              "settings": {
+                "language": "python",
+                "code": "@app.route('/api/levels')\ndef levels():\n    return jsonify(read_levels())"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-halves01",
+      "type": "columns",
+      "settings": { "layout": "halves" },
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-card01",
+              "type": "card",
+              "settings": {
+                "title": "Our partner",
+                "body": "<b>River Watch Society</b> volunteers check the creek every week.",
+                "links": [
+                  { "label": "Visit them", "url": "https://example.org/river-watch" }
+                ]
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-callout01",
+              "type": "callout",
+              "settings": {
+                "body": "<b>Heads up:</b> during a storm, check the county alerts too."
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-keypoints01",
+              "type": "keypoints",
+              "settings": {
+                "items": [
+                  { "title": "Live readings", "text": "The page reads our API every time it opens." },
+                  { "title": "Saved copy", "text": "If the API is down, visitors see the last saved readings." },
+                  { "title": "Alerts", "text": "A level over two meters turns the card red." },
+                  { "title": "History", "text": "Seven days of readings are kept." },
+                  { "title": "Map", "text": "Each sensor shows where it is along the creek." },
+                  { "title": "Phone friendly", "text": "Every block stacks on a phone." },
+                  { "title": "Open source", "text": "Anyone can read and reuse the code." },
+                  { "title": "Tested", "text": "Twelve tests run before every deploy." }
+                ]
+              },
+              "hidden": false
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "id": "b-checklist01",
+              "type": "checklist",
+              "settings": {
+                "items": [
+                  { "text": "Pick a problem", "done": true },
+                  { "text": "Meet our partner", "done": true },
+                  { "text": "Draw the wireframe", "done": true },
+                  { "text": "Set up the Flask project", "done": true },
+                  { "text": "Model the readings table", "done": true },
+                  { "text": "Write the levels API", "done": true },
+                  { "text": "Add CORS for the OCS site", "done": true },
+                  { "text": "Deploy to AWS", "done": true },
+                  { "text": "Point the DNS record at it", "done": true },
+                  { "text": "Build this page", "done": true },
+                  { "text": "Add the sensor map", "done": false },
+                  { "text": "Add alerts", "done": false },
+                  { "text": "Write the tests", "done": false },
+                  { "text": "Load test the API", "done": false },
+                  { "text": "Record the demo", "done": false },
+                  { "text": "Practice the pitch", "done": false },
+                  { "text": "Ask the partner for feedback", "done": false },
+                  { "text": "Fix the feedback", "done": false },
+                  { "text": "Write the README", "done": false },
+                  { "text": "Present at Night at the Museum", "done": false }
+                ]
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-stats01",
+              "type": "stats",
+              "settings": {
+                "items": [
+                  { "value": "4", "label": "Sensors" },
+                  { "value": "3", "label": "API endpoints" },
+                  { "value": "12", "label": "Tests passing" },
+                  { "value": "7 days", "label": "History kept" },
+                  { "value": "60 min", "label": "Between readings" },
+                  { "value": "99%", "label": "Uptime this month" }
+                ]
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-thirds01",
+      "type": "columns",
+      "settings": { "layout": "thirds" },
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-table01",
+              "type": "table",
+              "settings": {
+                "data": "Sensor | Place | Status\nS1 | Main Street bridge | Online\nS2 | Park trail | Online\nS3 | School gate | Offline",
+                "caption": "Where our sensors are"
+              },
+              "hidden": false
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "id": "b-linkcards01",
+              "type": "link_cards",
+              "settings": {
+                "items": [
+                  { "kicker": "App", "title": "Flood Watch", "text": "The live app.", "url": "https://binary-beasts.github.io/flood-watch/" },
+                  { "kicker": "Code", "title": "Frontend repo", "text": "The pages and styles.", "url": "https://github.com/binary-beasts/flood-watch" },
+                  { "kicker": "Code", "title": "Backend repo", "text": "The Flask API.", "url": "https://github.com/binary-beasts/flood-watch-api" },
+                  { "kicker": "Lesson", "title": "Flask APIs", "text": "How we learned to build the API.", "url": "/python/flask/api" },
+                  { "kicker": "Lesson", "title": "REST Client", "text": "How we tested each route.", "url": "/python/flask/csp/" },
+                  { "kicker": "Plan", "title": "Our board", "text": "What we are working on.", "url": "https://github.com/binary-beasts/flood-watch/issues" },
+                  { "kicker": "Data", "title": "County gauges", "text": "Where the official readings come from.", "url": "https://example.org/county/gauges" },
+                  { "kicker": "Gallery", "title": "More student pages", "text": "See what other teams built.", "url": "/ui-builder/gallery/" }
+                ]
+              },
+              "hidden": false
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "id": "b-team01",
+              "type": "team",
+              "settings": {
+                "title": "Our team",
+                "items": [
+                  { "name": "Ada", "role": "Scrum Master", "url": "https://github.com/ada-binary" },
+                  { "name": "Grace", "role": "Integrator", "url": "https://github.com/grace-binary" },
+                  { "name": "Alan", "role": "Backend", "url": "https://github.com/alan-binary" },
+                  { "name": "Katherine", "role": "Frontend", "url": "https://github.com/katherine-binary" },
+                  { "name": "Linus", "role": "DevOps", "url": "https://github.com/linus-binary" },
+                  { "name": "Margaret", "role": "Tester", "url": "https://github.com/margaret-binary" },
+                  { "name": "Dennis", "role": "Data", "url": "https://github.com/dennis-binary" },
+                  { "name": "Barbara", "role": "Designer", "url": "https://binary-beasts.github.io/barbara/" }
+                ]
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-sideleft01",
+      "type": "columns",
+      "settings": { "layout": "sidebar_left" },
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-members01",
+              "type": "members",
+              "settings": {
+                "group": { "id": 42, "name": "Binary Beasts" },
+                "title": "Who we are"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-messageme01",
+              "type": "message_me",
+              "settings": {
+                "label": "Message us",
+                "note": "Questions about Flood Watch? Ask us."
+              },
+              "hidden": false
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "id": "b-chat01",
+              "type": "chat",
+              "settings": {
+                "group": { "id": 42, "name": "Binary Beasts" },
+                "title": "Team chat"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-kanban01",
+              "type": "kanban",
+              "settings": {
+                "url": "https://github.com/binary-beasts/flood-watch/issues",
+                "filter": "Team",
+                "title": "Our board"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-sideright01",
+      "type": "columns",
+      "settings": { "layout": "sidebar_right" },
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-apidata01",
+              "type": "api_data",
+              "settings": {
+                "source": {
+                  "url": "https://flood-watch.opencodingsociety.com/api/levels",
+                  "list_path": "data.levels",
+                  "title_path": "station",
+                  "text_path": "reading.note",
+                  "image_path": "photo_url",
+                  "link_path": "links[0]",
+                  "value_path": "reading.level",
+                  "label_path": "unit",
+                  "snapshot": {
+                    "items": [
+                      {
+                        "title": "Main Street bridge",
+                        "text": "Normal for October.",
+                        "image": "https://flood-watch.opencodingsociety.com/photos/s1.jpg",
+                        "link": "https://flood-watch.opencodingsociety.com/stations/s1",
+                        "value": "1.2",
+                        "label": "meters"
+                      },
+                      {
+                        "title": "Park trail",
+                        "text": "Rising after the rain.",
+                        "image": "https://flood-watch.opencodingsociety.com/photos/s2.jpg",
+                        "link": "https://flood-watch.opencodingsociety.com/stations/s2",
+                        "value": "1.9",
+                        "label": "meters"
+                      },
+                      {
+                        "title": "School gate",
+                        "text": "Sensor offline.",
+                        "image": "/images/ui-builder/sensor-offline.png",
+                        "link": "/ui-builder/gallery/",
+                        "value": "0",
+                        "label": "meters"
+                      }
+                    ],
+                    "fetched_at": 1793206800000,
+                    "from_loopback": false
+                  }
+                },
+                "title": "Creek levels now",
+                "view": "cards",
+                "limit": 12
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-embed01",
+              "type": "embed",
+              "settings": {
+                "url": "https://binary-beasts.github.io/flood-watch/",
+                "title": "Try Flood Watch",
+                "height": "tall"
+              },
+              "hidden": false
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "id": "b-feedback01",
+              "type": "feedback",
+              "settings": {
+                "title": "Feedback",
+                "prompt": "What should we build next?"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-announce01",
+              "type": "announcements",
+              "settings": {
+                "course": "csp",
+                "title": "CSP announcements",
+                "limit": 5
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-calendar01",
+              "type": "calendar",
+              "settings": {
+                "course": "csp",
+                "title": "Class calendar"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

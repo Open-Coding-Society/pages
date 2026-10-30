@@ -111,6 +111,20 @@
       font: "'Open Sans', Arial, sans-serif",
       size: 15, accent: '#06b6d4',
     },
+    Sunset: {
+      bg: '#2a1433', text: '#fbe7d4',
+      font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+      size: 14, accent: '#ff7f6b',
+    },
+  };
+
+  // Built-in holiday palettes. The dashboard's AI theme offers the holidays as suggestions
+  // and uses these when the AI can't answer, so a holiday theme always works.
+  const SEASONAL_THEMES = {
+    halloween: { label: 'Halloween', bg: '#1a0f1f', text: '#f5e6d3', accent: '#ff7518', decor: ['🎃', '🦇', '👻'] },
+    thanksgiving: { label: 'Thanksgiving', bg: '#2b1d0e', text: '#f3e3c3', accent: '#e07a2e', decor: ['🍂', '🦃', '🥧'] },
+    christmas: { label: 'Christmas', bg: '#0f2a1d', text: '#f8f8f8', accent: '#ff4d5e', decor: ['❄️', '🎄', '🎁'] },
+    valentines: { label: "Valentine's", bg: '#fff0f5', text: '#5a1030', accent: '#c2185b', decor: ['💕', '💘', '🌹'] },
   };
 
   // ============================================
@@ -329,7 +343,10 @@
      * Apply a preferences object to the document via CSS custom properties,
      * priority-color tokens, and the override stylesheet.
      */
-    static apply(prefs) {
+    static apply(prefs, applyLanguage = true) {
+      const decor = ThemeDecorStore.decorFor(prefs);
+      ThemeDecorLayer.render(decor && { decor, accent: prefs.accent || SITE_DEFAULT.accent });
+
       const base = SITE_DEFAULT;
       const bg = prefs?.bg || base.bg;
       const text = prefs?.text || base.text;
@@ -427,9 +444,8 @@
         selectionColor, buttonStyle,
       });
 
-      // Apply language translation if set
-      const lang = prefs?.language || '';
-      TranslationLanguageManager.apply(lang);
+      // Apply language translation if set (a preview leaves the language alone)
+      if (prefs && applyLanguage) TranslationLanguageManager.apply(prefs.language || '');
     }
 
     /** Remove all user-theme CSS custom properties and the override sheet */
@@ -451,6 +467,119 @@
         '--ocs-game-score-accent',
       ];
       props.forEach(name => root.style.removeProperty(name));
+      ThemeDecorLayer.render(null);
+    }
+  }
+
+  // ============================================
+  // RESPONSIBILITY: Which emoji wallpaper goes with the active colors
+  // ============================================
+  class ThemeDecorStore {
+    // The last theme kept or picked, as { bg, text, accent, decor } (decor [] = wallpaper off). Matched by color
+    // rather than stored in the prefs: Spring's preferences have no field for it, and picking
+    // any theme with other colors (a preset, Reset, Save) then drops the wallpaper by itself.
+    static KEY = 'siteThemeDecor';
+
+    static get() {
+      try {
+        return JSON.parse(window.localStorage.getItem(ThemeDecorStore.KEY)) || null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    /** Remember theme's wallpaper choice (prefs-shaped: bg, text, accent, decor; no decor = off); null forgets it */
+    static set(theme) {
+      try {
+        if (theme) {
+          const { bg, text, accent, decor = [] } = theme;
+          window.localStorage.setItem(ThemeDecorStore.KEY, JSON.stringify({ bg, text, accent, decor }));
+        } else {
+          window.localStorage.removeItem(ThemeDecorStore.KEY);
+        }
+      } catch (_) { /* storage blocked: the wallpaper still shows on this page */ }
+    }
+
+    /** The emoji for prefs: its own decor ([] = wallpaper turned off), the kept theme's, or a saved custom theme's with the same colors */
+    static decorFor(prefs) {
+      if (!prefs) return null;
+      if (Array.isArray(prefs.decor)) return prefs.decor.length ? prefs.decor : null;
+      const same = t => t && ['bg', 'text', 'accent'].every(k => String(t[k]).toLowerCase() === String(prefs[k]).toLowerCase());
+      // The theme the student kept or picked wins, even when they chose no wallpaper.
+      const kept = ThemeDecorStore.get();
+      if (same(kept)) return kept.decor?.length ? kept.decor : null;
+      const match = Object.values(prefs.customThemes || {}).find(t => t?.decor?.length && same(t));
+      return match ? match.decor : null;
+    }
+  }
+
+  // ============================================
+  // RESPONSIBILITY: Remember the page's theme before a preview, to undo it exactly
+  // (inline CSS variables, classes, wallpaper attribute and the override sheet)
+  // ============================================
+  class PreviewSnapshot {
+    static saved = null;
+
+    static take() {
+      if (PreviewSnapshot.saved) return;
+      const root = document.documentElement;
+      const sheet = document.getElementById(TailwindOverrideStyleSheetInjector.STYLE_ID);
+      PreviewSnapshot.saved = {
+        style: root.getAttribute('style'),
+        className: root.className,
+        decor: root.dataset.themeDecor,
+        sheet: sheet ? sheet.textContent : null,
+      };
+    }
+
+    static restore() {
+      const saved = PreviewSnapshot.saved;
+      if (!saved) return;
+      PreviewSnapshot.saved = null;
+      const root = document.documentElement;
+      if (saved.style == null) root.removeAttribute('style');
+      else root.setAttribute('style', saved.style);
+      root.className = saved.className;
+      if (saved.decor == null) delete root.dataset.themeDecor;
+      else root.dataset.themeDecor = saved.decor;
+      if (saved.sheet == null) TailwindOverrideStyleSheetInjector.remove();
+      else document.getElementById(TailwindOverrideStyleSheetInjector.STYLE_ID).textContent = saved.sheet;
+    }
+
+    static drop() {
+      PreviewSnapshot.saved = null;
+    }
+  }
+
+  // ============================================
+  // RESPONSIBILITY: Theme decorations (a scattered emoji wallpaper)
+  // ============================================
+  class ThemeDecorLayer {
+    // One 280px tile, repeated: [x, y, size, rotation] per emoji, then [x, y] per dot.
+    // Hand-placed so neighbouring tiles don't line up into rows.
+    static EMOJI_SPOTS = [[40, 50, 34, -18], [175, 30, 28, 14], [110, 125, 38, 8], [235, 145, 30, -10], [30, 210, 30, 20], [160, 240, 34, -6]];
+    static DOT_SPOTS = [[95, 40], [250, 85], [60, 140], [200, 195], [105, 265], [265, 260]];
+
+    /** Set the wallpaper for { decor, accent }, or clear it when null */
+    static render(theme) {
+      const root = document.documentElement;
+      if (!theme) {
+        delete root.dataset.themeDecor;
+        root.style.removeProperty('--theme-decor-pattern');
+        return;
+      }
+      root.dataset.themeDecor = '';
+      root.style.setProperty('--theme-decor-pattern', `url("data:image/svg+xml,${encodeURIComponent(ThemeDecorLayer.tile(theme))}")`);
+    }
+
+    /** The SVG tile: faint emoji plus small accent-colored dots */
+    static tile({ decor, accent }) {
+      // Escaped: decor can come from an AI answer or a synced custom theme.
+      const esc = v => String(v).replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
+      const emoji = ThemeDecorLayer.EMOJI_SPOTS.map(([x, y, size, turn], i) =>
+        `<text x="${x}" y="${y}" font-size="${size}" text-anchor="middle" dominant-baseline="central" transform="rotate(${turn} ${x} ${y})">${esc(decor[i % decor.length])}</text>`).join('');
+      const dots = ThemeDecorLayer.DOT_SPOTS.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3"/>`).join('');
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280"><g opacity="0.22">${emoji}</g><g fill="${esc(accent)}" opacity="0.35">${dots}</g></svg>`;
     }
   }
 
@@ -963,11 +1092,12 @@ class GlobalNodCursor {
 
     // (2) Honor the dashboard's explicit "Reset to site defaults" action.
     //     Set by the preferences panel; presence overrides any saved theme.
-    const wasReset = window.localStorage.getItem('preferencesReset');
-    if (wasReset === 'true') return;
+    const wasReset = window.localStorage.getItem('preferencesReset') === 'true';
 
     // (3) Restore the user's saved theme (background, text color, font, accent,
-    //     selection color, button shape, language, etc.). No-op for guests.
+    //     selection color, button shape, language, emoji wallpaper, etc.).
+    //     No-op for guests with none.
+    if (wasReset) return;
     const prefs = LocalStoragePreferencesStore.get();
     if (prefs) ThemePreferencesEngine.apply(prefs);
 
@@ -997,6 +1127,20 @@ class GlobalNodCursor {
     // ── Read-only constants exposed for the dashboard's preset/lang menus ──
     PRESETS,    // Built-in named themes (Site Default, Midnight, Light, ...)
     LANGUAGES,  // Supported translation language codes for the dropdown.
+
+    // ── Theme preview & emoji wallpaper (dashboard's AI theme) ─────────────
+    SEASONAL_THEMES, // Holiday palettes, the AI theme's fallback for its holiday suggestions.
+    /** Show prefs (colors, font, optional decor emoji) on this page only: no save, no reload. */
+    preview: prefs => {
+      PreviewSnapshot.take();
+      ThemePreferencesEngine.apply(prefs, false);
+    },
+    /** Undo preview(): put the page back exactly as it was before the first preview(). */
+    cancelPreview: () => PreviewSnapshot.restore(),
+    /** The previewed theme was kept, so the next preview() starts from it. */
+    keepPreview: () => PreviewSnapshot.drop(),
+    /** Keep theme's decor emoji as the wallpaper whenever its colors are the active ones. */
+    setThemeDecor: theme => ThemeDecorStore.set(theme),
 
     // ── Text-to-Speech ─────────────────────────────────────────────────────
     /** Speak arbitrary text using the user's saved TTS voice/rate/pitch. */

@@ -20,13 +20,21 @@ export function dmMessage(raw) {
     sentAt: raw.sentAt || null,
     edited: Boolean(raw.edited),
     deleted,
-    image: null,
+    image: raw.image || null,
   };
 }
 
+// Spring calls the sender `author` on a saved message. The socket frame calls the same
+// person `sender`, and classifyGroupEvent maps that onto `author` before calling this,
+// so both paths produce one shape.
+//
+// Still the display name rather than the uid, even though a saved message now also
+// carries author_uid: the socket frame has no uid at all, and Spring authorises a group
+// edit or delete by comparing display names. Keying off the uid here would leave live
+// messages unattributable and would disagree with what the server actually enforces.
 export function groupMessage(raw) {
   const id = asId(raw.id);
-  const name = raw.name || '';
+  const name = raw.author || '';
   return {
     id,
     key: id || `${name}|${raw.date}|${raw.message}`,
@@ -49,7 +57,7 @@ export function classifyGroupEvent(event) {
       return {
         type: 'message',
         message: groupMessage({
-          id: event.messageId, name: event.sender, message: event.message, date: event.date, image: event.image,
+          id: event.messageId, author: event.sender, message: event.message, date: event.date, image: event.image,
         }),
       };
     case 'editMessageServer':
@@ -117,6 +125,27 @@ export const isCourseChannel = group => /^(lessons|[a-z]+-announcements|[a-z]+-w
 const CLASS_GROUPS = ['CSSE', 'CSP', 'CSA', 'CSH'];
 
 export const isClassGroup = group => CLASS_GROUPS.includes(String(group.name || '').toUpperCase());
+
+// Only site admins delete groups, and never a class group, for the same reason it has no Leave.
+export const canDeleteGroup = (person, group) => isAdmin(person) && !isClassGroup(group);
+
+// A page shows a run of spaces as one, so a name typed as it looks still matches.
+const collapseSpaces = text => String(text ?? '').trim().replace(/\s+/g, ' ');
+
+// Delete waits for the group's name typed out, so one stray click can't delete a group.
+export function confirmsGroupName(typed, group) {
+  const name = collapseSpaces(group?.name);
+  return name !== '' && collapseSpaces(typed) === name;
+}
+
+// Spring deletes a group's grades with it, and the assignments it submitted cascade. Its
+// chat and files stay in S3 under its name, where this page can't open them, so members
+// lose them, but they aren't erased.
+export function deleteGroupWarning(group) {
+  const count = (group.members || []).length;
+  const who = count === 1 ? 'Its only member loses' : `All ${count} members lose`;
+  return `Deleting ${group.name} also deletes its grades and any assignments it submitted. ${who} the group, its chat and its files. This can’t be undone.`;
+}
 
 export function sortGroups(groups) {
   return [...groups].sort((a, b) => String(a.name).localeCompare(String(b.name), undefined, { numeric: true, sensitivity: 'base' }));

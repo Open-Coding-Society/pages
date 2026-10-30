@@ -1,0 +1,295 @@
+// The open conversation. The message tree is built by js/message-log.js with the
+// `chat-*` class names the course chats also use; those rules live inside
+// `.announcement-chat`, so nothing from them reaches this page.
+
+.dm__thread-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--dm-space-md);
+  flex-wrap: wrap;
+  padding: var(--dm-space-md) 0;
+  border-bottom: 1px solid var(--dm-rule);
+}
+
+.dm__thread-heading {
+  min-width: 0;
+}
+
+.dm__thread-title {
+  margin: 0;
+  font-family: var(--dm-font);
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--dm-ink);
+}
+
+.dm__thread-subtitle {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--dm-font);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--dm-faint);
+}
+
+.dm__thread-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--dm-space-xs);
+  flex-wrap: wrap;
+}
+
+// ── The log ────────────────────────────────────────────────────────────────────
+.dm__log {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--dm-space-lg) 0;
+
+  @include dm-focus-ring(-2px);
+}
+
+.dm .chat-day {
+  margin: var(--dm-space-lg) 0 var(--dm-space-md);
+  font-family: var(--dm-font);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dm-faint);
+  border-top: 1px solid var(--dm-rule);
+  padding-top: 0.6rem;
+
+  &:first-child {
+    margin-top: 0;
+    border-top: 0;
+    padding-top: 0;
+  }
+}
+
+// Every message sits on the same side, tucked in close to its avatar.
+.dm .chat-msg {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.55rem;
+  max-width: calc(var(--dm-measure) + 3rem);
+  padding: 0.45rem 0;
+  animation: dm-fade $transition-slow ease both;
+}
+
+// Yours is marked by the weight of your name, not by moving it across the column.
+.dm .chat-msg.is-self .chat-msg-sender {
+  font-weight: 600;
+}
+
+.dm .chat-avatar {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--dm-wash);
+  border: 1px solid var(--dm-rule);
+  font-family: var(--dm-font);
+  font-size: 0.625rem;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  color: var(--dm-muted);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.dm .chat-msg-main {
+  min-width: 0;
+}
+
+.dm .chat-msg-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.dm .chat-msg-sender {
+  font-family: var(--dm-font);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--dm-ink);
+}
+
+.dm .chat-msg-time,
+.dm .chat-msg-edited {
+  font-family: var(--dm-font);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  color: var(--dm-faint);
+}
+
+.dm .chat-msg-body {
+  display: block;
+  max-width: var(--dm-measure);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--dm-ink);
+  overflow-wrap: anywhere;
+
+  p {
+    margin: 0 0 0.6em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  a {
+    color: var(--dm-accent);
+    text-underline-offset: 2px;
+  }
+
+  &.is-deleted {
+    font-style: italic;
+    color: var(--dm-faint);
+  }
+}
+
+// An image in a message. Bounded on both axes so it never dominates the log and never
+// arrives as a postage stamp: it fills the measure when it is wide enough to, stops
+// short of it when it is not, and is capped in height so a tall portrait photo cannot
+// push the rest of the conversation off screen. width:auto with a min keeps a small
+// image legible without stretching it past its own resolution.
+.dm .chat-msg img.ocs__image-frame {
+  display: block;
+  width: auto;
+  min-width: min(12rem, 100%);
+  max-width: min(100%, var(--dm-measure));
+  height: auto;
+  max-height: 22rem;
+  object-fit: contain;
+  object-position: left top;
+  margin-top: 0.6rem;
+  border: 1px solid var(--dm-rule);
+  border-radius: var(--dm-radius);
+  background: var(--dm-wash);
+}
+
+// Edit and delete stay out of the way until the message is hovered or focused.
+.dm .chat-msg-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+  opacity: 0;
+  transition: opacity $transition-base ease;
+}
+
+.dm .chat-msg:hover .chat-msg-actions,
+.dm .chat-msg:focus-within .chat-msg-actions {
+  opacity: 1;
+}
+
+.dm .chat-msg-action {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 0.6875rem;
+  color: var(--dm-faint);
+  cursor: pointer;
+  transition: color $transition-fast ease;
+
+  &:hover {
+    color: var(--dm-ink);
+  }
+
+  @include dm-focus-ring;
+}
+
+// A line that is not a message, such as a shared file.
+.dm .chat-system {
+  margin: var(--dm-space-md) 0;
+  font-family: var(--dm-font);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--dm-faint);
+}
+
+// The filename in "<someone> shared a file:" -- a button that downloads it.
+.dm .chat-system-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--dm-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: var(--dm-ink);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  @include dm-focus-ring;
+}
+
+// ── Empty and loading states ───────────────────────────────────────────────────
+.dm .chat-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: var(--dm-space-xl) 0;
+  animation: dm-fade $transition-slow ease both;
+
+  // message-log.js prepends a Font Awesome glyph; the page says it in words instead.
+  > i {
+    display: none;
+  }
+}
+
+.dm .chat-empty-title {
+  margin: 0;
+  font-family: var(--dm-font);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--dm-muted);
+}
+
+.dm .chat-empty-hint {
+  max-width: 34ch;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--dm-faint);
+}
+
+@keyframes dm-fade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dm .chat-msg,
+  .dm .chat-empty {
+    animation: none;
+  }
+
+  .dm * {
+    transition-duration: 0.01ms;
+  }
+}

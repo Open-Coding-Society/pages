@@ -70,6 +70,7 @@ Use these classes for standardized controls in CODE_RUNNER, UI_RUNNER, and GAME_
 
 Examples:
 - `ocs__btn utility run`
+- `ocs__btn utility submit` (reflection runner)
 - `ocs__btn utility pause`
 - `ocs__btn utility stop`
 - `ocs__btn utility fullscreen`

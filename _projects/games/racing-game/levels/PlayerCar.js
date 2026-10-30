@@ -10,7 +10,7 @@ export default class Player extends EnginePlayer {
     this.acceleration = 0.20;
     this.braking = 0.2;
     this.coasting = 0.05;
-    this.turnRate = 0.04;
+    this.turnRate = 0.1 / speed;
     this.heading = 0; // Radians; 0 points upward.
     this.gravity = false;
     this.updateDirection();

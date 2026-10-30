@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "A text link to the team's own computer", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-rtloop01",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-rtloop01",
+              "type": "text",
+              "settings": {
+                "body": "Try <a href=\"https://localhost:8443/demo\">our app</a> before class."
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

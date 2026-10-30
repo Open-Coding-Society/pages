@@ -1,0 +1,136 @@
+# San Diego Lab Rats Capstone Infographic
+# Rendered by _includes/sdlabrats-infograph.html. All styling comes from the shared,
+# theme-aware capstone infograph SASS (_sass/capstone/infograph.scss), so there is no
+# page-specific CSS.
+Title: "San Diego Lab Rats"
+Description: "Lab Rats teaches hands-on science to grades K through 8 with real scientists in Carlsbad. Their programs are strong, but the site repeats itself and hides what parents need most. We are rebuilding its structure, navigation, and styling so programs, pricing, and support are easy to find."
+
+# The team's GitHub project board, shown live under the header (_includes/ocs_kanban_board.html)
+Board:
+  url: "https://github.com/orgs/SDLabRats-Team/projects/3"
+
+Topics:
+  - title: "Architecture and Navigation"
+    phase: "Round 1"
+    link: "https://github.com/pkdev0101/apcsp-portfolio/issues/8"
+    linkLabel: "Follow Issue #8"
+    subtitle: "One home for every piece of content, and a shorter menu"
+    keyPoints:
+      - "Each block of content gets one page; copies become links"
+      - "Top menu cut to five items, with Enroll kept the most visible"
+      - "Six main sections: Home, Programs, Schedule and Pricing, Support, About, Donate and Contact"
+    tech:
+      - "Site map"
+      - "Navigation bar"
+      - "Links instead of copies"
+    description: "The site grew instead of being planned, so the same content shows up in several places. Giving each piece one home stops the repeats and lets the menu shrink."
+    impact:
+      - "Parents see each fact once, in one place"
+      - "Enroll is easy to find"
+    status: "Planned"
+    team:
+      - "Aryan"
+      - "Raymond"
+      - "Pranay"
+
+  - title: "Style Layer and Program Pages"
+    phase: "Round 2"
+    link: "https://github.com/pkdev0101/apcsp-portfolio/issues/8"
+    linkLabel: "Follow Issue #8"
+    subtitle: "Write the styles once and build the program page once"
+    keyPoints:
+      - "One shared style layer with a real type scale and clean HTML"
+      - "One program page layout, reused for all four programs"
+      - "Pricing, schedule, scholarships, and charter funding shown up front"
+    tech:
+      - "Shared styles"
+      - "Program page template"
+      - "Semantic HTML"
+    description: "Every program gets the same layout so parents can compare them. Scholarships, which are barely mentioned today, get a clear spot next to pricing."
+    impact:
+      - "Every page looks like part of the same site"
+      - "Families can find scholarships and charter funding"
+    status: "Planned"
+    team:
+      - "Aryan"
+      - "Raymond"
+      - "Pranay"
+
+  - title: "Fluid Layout and Motion"
+    phase: "Round 3"
+    link: "https://github.com/pkdev0101/apcsp-portfolio/issues/8"
+    linkLabel: "Follow Issue #8"
+    subtitle: "Works at every screen size, with quiet motion"
+    keyPoints:
+      - "Layout adjusts smoothly from phone to laptop"
+      - "More space between sections"
+      - "Light motion that never slows down reading"
+    tech:
+      - "Responsive layout"
+      - "Subtle transitions"
+    description: "This round starts only after the first two hold up, so spacing and motion are added once and reach every page."
+    impact:
+      - "Reads well on any device"
+    status: "Planned"
+    team:
+      - "Aryan"
+      - "Raymond"
+      - "Pranay"
+
+  - title: "New Ideas We Want To Try"
+    phase: "Exploring"
+    link: "https://github.com/pkdev0101/apcsp-portfolio/issues/8"
+    linkLabel: "Follow Issue #8"
+    subtitle: "Rough versions first; we keep what works"
+    keyPoints:
+      - "Comparison Row: weigh two programs side by side"
+      - "This Month Strip: what is running right now"
+      - "Program Accents: a light color per program"
+      - "Three Step Path: from curious to enrolled"
+    tech:
+      - "Programs index"
+      - "Accent colors"
+    description: "Ideas we will prototype before committing to them."
+    impact:
+      - "Faster ways for parents to compare and decide"
+    status: "Exploring"
+    team:
+      - "Aryan"
+      - "Raymond"
+      - "Pranay"
+
+Sections:
+  - title: "Strengths vs Problems"
+    subtitle: "What already works, and what gets in a parent's way"
+    items:
+      - "Works: many programs under one organization, a published 2023–24 impact report, and charter funding accepted."
+      - "Problem: the address and philosophy section are repeated across pages."
+      - "Problem: press logos are shown but link to no articles."
+      - "Problem: scholarships are mentioned but never explained."
+
+  - title: "The Direction"
+    subtitle: "Four goals behind every change"
+    items:
+      - "Fluid: flexes at every width."
+      - "Better CSS and HTML: one style layer, clean markup."
+      - "Less cluttered navigation: five items, no repeats."
+      - "New architecture: one home for every piece of content."
+
+Links:
+  title: "Following Along"
+  subtitle: "Where this work is tracked"
+  items:
+    - label: "Live Site"
+      url: "https://www.sdlabrats.org/"
+    - label: "Their Programs"
+      url: "https://www.sdlabrats.org/courses-workshops/"
+    - label: "Impact Report 2023–24"
+      url: "https://www.sdlabrats.org/wp-content/uploads/2025/08/Impact-report-23-24.pdf"
+    - label: "GitHub Issues — issue #8"
+      url: "https://github.com/pkdev0101/apcsp-portfolio/issues/8"
+    - label: "Frontend Repo"
+      url: "https://github.com/pkdev0101/sdlabrats_frontend"
+    - label: "Backend Repo"
+      url: "https://github.com/pkdev0101/sdlabrats_backend"
+    - label: "Sprint Board"
+      url: "https://github.com/orgs/SDLabRats-Team/projects/3"
