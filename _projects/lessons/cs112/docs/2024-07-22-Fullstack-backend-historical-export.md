@@ -300,25 +300,25 @@ public class AnnouncementService {
 - Sometimes you want to create specific query methods for your 
 - Example of fetching by author and tags
 - The methods findByAuthor(), and findByTags() are made by the JPA not me
+- The controller reaches them through service methods with the same names
 
 <br>
 
 ```java
-@GetMapping("/author/{author}")
-    public ResponseEntity<Announcement> getAnnouncementByAuthor(@PathVariable String author) {
-        Announcement announcement = announcementRepo.findByAuthor(author);
+    @GetMapping("/author/{author}")
+    public ResponseEntity<AnnouncementRecord> getAnnouncementByAuthor(@PathVariable String author) {
+        AnnouncementEntity announcement = announcementService.findByAuthor(author);
         if (announcement != null) {
-            return new ResponseEntity<>(announcement, HttpStatus.OK);
+            return new ResponseEntity<>(AnnouncementRecord.of(announcement), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-@GetMapping("/tags/{tags}")
-public ResponseEntity<List<Announcement>> getAnnouncementsByTags(@PathVariable String tags) {
-    List<Announcement> announcements = announcementRepo.findByTags(tags);
-    return new ResponseEntity<>(announcements, HttpStatus.OK);
-}
+    @GetMapping("/tags/{tags}")
+    public ResponseEntity<List<AnnouncementRecord>> getAnnouncementsByTags(@PathVariable String tags) {
+        return new ResponseEntity<>(AnnouncementRecord.of(announcementService.findByTags(tags)), HttpStatus.OK);
+    }
 ```
 
 ## Further Questions
