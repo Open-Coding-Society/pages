@@ -392,6 +392,25 @@ public class AnnouncementService {
 - Put `baseUrl`, `adminUid` and `adminPassword` in the Git-ignored `.vscode/settings.json`, never in the `.http` file
 - Then copy it to `api/yourfeature.http` and change the routes to test your own API
 
+## Step 8
+> Popcorn Hack: show your API with UI Builder
+- Sign in, open [UI Builder](/ui-builder/), and start from the **Flask API starter** template
+- In **Data from your API**, press **Test connection** to see live jokes on your page
+- Change the link to `http://localhost:8585/api/announcements` and press **Test connection** again
+- It says the route needs sign-in: every announcement route does, and UI Builder never sends sign-in cookies
+- So your feature needs one read-only route that returns only public fields, for example `GET /api/yourfeature/public`
+- Add that route to your controller, then allow it in `SecurityConfig.java` above the `/api/**` rule
+
+```java
+.requestMatchers(HttpMethod.GET, "/api/yourfeature/public").permitAll()
+```
+
+- Point the block at your new route, press **Test connection**, and choose how to show it (cards, list, table or numbers)
+- Press **Code** to read the HTML and the `ocs__` classes behind your page
+- A link to your own computer only works while you edit, so use your deployed `https://` address before you **Publish**
+
+> The **Class announcements** block is a different feature: it shows a course's announcement channel from Messages, not this API
+
 ## Further Questions
 > Please use the comments below to suggest things to be added
 - Come to office hours if further help is needed
