@@ -34,10 +34,12 @@ const DEFAULT_GOAL_DAYS = 14; // matches GrowthGoalService.DEFAULT_DAYS
 export const GOAL_SKILLS = [
     ['attendance', 'Attendance', 'Being in class, on time, and ready to work.'],
     ['workHabits', 'Work Habits', 'Using class time productively and making steady progress.'],
+    ['behavior', 'Behavior', 'Respectful, focused conduct that supports the class and your team.'],
     ['timeliness', 'Timeliness', 'Pacing your work so it is finished and turned in by the deadline.'],
     ['techSense', 'Tech Sense', 'Understanding technical concepts and applying them correctly.'],
     ['techTalk', 'Tech Talk', 'Explaining technical ideas clearly, using the right vocabulary.'],
     ['techGrowth', 'Tech Growth', 'Building new technical skills over time and pushing past what you already know.'],
+    ['advocacy', 'Advocacy', 'Speaking up for what you need and helping others get what they need.'],
     ['communication', 'Communication', 'Keeping your team and teacher informed, clearly and on time.'],
     ['integrity', 'Integrity', 'Doing honest work: crediting sources and AI help, and owning your code and mistakes.'],
     ['organization', 'Organization', 'Keeping your tasks, files and code planned, tidy and easy to follow.'],
