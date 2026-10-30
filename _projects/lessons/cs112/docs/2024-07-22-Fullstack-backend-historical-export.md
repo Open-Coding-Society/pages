@@ -139,8 +139,9 @@ public class AnnouncementEntity {
 ```
 
 ## Step 3
-> JPA file
+> JPA Repository file
 - JPA stands for Java Persistence API
+- Name it your feature + JpaRepository.java
 - This file helps with specif query methods of your database
 - For example if you wanted to create method for getting posts only based on an author, this file creates them
 
@@ -155,21 +156,21 @@ public class AnnouncementEntity {
 <br>
 
 ```java
-package com.nighthawk.spring_portfolio.mvc.announcement;
+package com.open.spring.mvc.announcement;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List; 
 
 @Repository
-public interface AnnouncementJPA extends JpaRepository<Announcement, Long> {
-    Announcement findByAuthor(String author); // Method to find announcement by author
+public interface AnnouncementJpaRepository extends JpaRepository<AnnouncementEntity, Long> {
+    AnnouncementEntity findByAuthor(String author); // Method to find announcement by author
 
-    List<Announcement> findByTags(String tags); // Example method to find announcements by tags
+    List<AnnouncementEntity> findByTags(String tags); // Example method to find announcements by tags
 
-    Announcement findByTitle(String title); // Example method to find announcements by title
+    AnnouncementEntity findByTitle(String title); // Example method to find announcements by title
 
-    List<Announcement> findAllByOrderByTimestampDesc();
+    List<AnnouncementEntity> findAllByOrderByTimestampDesc();
 }
 
 ```
