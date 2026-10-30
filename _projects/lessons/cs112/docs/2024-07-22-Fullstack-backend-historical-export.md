@@ -13,10 +13,19 @@ categories: []
 ---
 
 ## How do API work?
-> Three main components
-1. Constructor.java (makes the data object), usually the name of feature + .java
-2. Controller file, how data in the table is received/changed through links 
-3. JPA (Java Persistence API) file, for the creation of certain methods for the controller file
+> Five standard parts
+- Every Spring feature in our backend has the same five parts, named after the feature
+- The announcement package (`src/main/java/com/open/spring/mvc/announcement`) is the smallest complete example, so this lesson copies it
+
+| Part | Announcement class | What it does |
+|---|---|---|
+| Entity | `AnnouncementEntity` | The data object; one object is one row in the table |
+| JPA repository | `AnnouncementJpaRepository` | Reads and writes the table; Spring writes the SQL from method names |
+| Service | `AnnouncementService` | The rules of your feature; the only class that uses the repository |
+| REST controller | `AnnouncementApiRestController` | Turns HTTP requests into service calls and results into responses |
+| Table initializer | `AnnouncementTableInitializer` | Creates the table if it is missing |
+
+- The full guide is [announcement-architecture.md](https://github.com/Open-Coding-Society/spring/blob/master/docs/announcement-architecture.md) in the Spring repo
 
 ### Why do we use API's
 > These are the two main reason behind why we use them in this class
