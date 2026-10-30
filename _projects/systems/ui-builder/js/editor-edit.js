@@ -15,6 +15,7 @@ import { createShortcuts, isMacPlatform } from './editor-shortcuts.js';
 import { createOutline } from './editor-outline.js';
 import { createInspector } from './editor-inspector.js';
 import { createPalette } from './editor-palette.js';
+import { createCodeView } from './editor-code.js';
 import { createLeaseBanner, formatWhen } from './editor-dialogs.js';
 import { canPublish, createSession, fieldsOf, publishStateOf, saveStateOf } from './editor-session.js';
 import { el } from './editor-fields.js';
@@ -103,6 +104,8 @@ export class EditSession {
       },
     });
     this.palette = createPalette({ doc, registry: this.registry, say, dialogs });
+    this.codeView = createCodeView({ doc, registry: this.registry, say, onSelect: (id) => this.select(id, { from: 'code' }) });
+    shell.codePane.append(this.codeView.element);
     this.lease = createLeaseBanner(shell.banners, { doc, say, onTakeOver: () => this.takeOver() });
     this.bridge = createCanvasBridge({
       iframe: shell.iframe, baseurl: this.app.baseurl, win: this.win,
@@ -142,6 +145,7 @@ export class EditSession {
   wireBar() {
     const { shell, say } = this;
     shell.title.addEventListener('click', () => { this.select(null); this.focusInspector(); });
+    for (const [name, button] of shell.viewButtons) button.addEventListener('click', () => this.setView(name));
     shell.undo.addEventListener('click', () => this.undo());
     shell.redo.addEventListener('click', () => this.redo());
     shell.realInput.addEventListener('change', () => { this.state.realData = shell.realInput.checked; this.drawCanvas(); });
@@ -198,6 +202,25 @@ export class EditSession {
     this.inspector.update(page, state);
     this.updateBar();
     this.showPageIssue();
+    this.drawCode();
+  }
+
+  // The code view is drawn only while it shows; switching to it draws it at once.
+  drawCode() {
+    if (this.closed || !this.codeView || this.shell.view !== 'code') return;
+    this.codeView.update(this.page, { ctx: this.app.exportContext(this.meta), selectedId: this.state.selectedId });
+  }
+
+  // Preview and Code show the same selection: the one that comes into view is scrolled to it.
+  setView(name) {
+    this.shell.setView(name);
+    const id = this.state.selectedId;
+    if (this.shell.view === 'code') {
+      this.drawCode();
+      if (id) this.codeView.reveal(id);
+    } else if (id) {
+      this.bridge.scrollTo(id);
+    }
   }
 
   // The problems the outline and the inspector show. A draft may use the student's own computer
@@ -328,8 +351,9 @@ export class EditSession {
     this.state.selectedId = loc ? id : null;
     this.bridge.select(this.state.selectedId);
     if (from !== 'canvas' && this.state.selectedId) this.bridge.scrollTo(this.state.selectedId);
-    if (from === 'canvas' && !this.shell.paneOpen('inspector')) this.shell.setPane('inspector', true);
+    if ((from === 'canvas' || from === 'code') && !this.shell.paneOpen('inspector')) this.shell.setPane('inspector', true);
     this.refreshPanels();
+    if (from !== 'code' && this.state.selectedId && this.shell.view === 'code') this.codeView.reveal(this.state.selectedId);
   }
 
   focusInspector() {

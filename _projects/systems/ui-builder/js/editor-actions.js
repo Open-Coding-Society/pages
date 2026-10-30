@@ -3,7 +3,7 @@
 // file / HTML exports, revisions, visibility, unpublish and delete, the edit lease (read-only
 // while someone else edits), the conflict choice, crash recovery and closing the page.
 import { findNode, normalizePage, validatePage } from './page-model.js';
-import { blockHTML, pageToMarkdown } from './export.js';
+import { pageToMarkdown } from './export.js';
 import { slugIssue, suggestSlug } from './url-rules.js';
 import { formatWhen } from './editor-dialogs.js';
 import { el } from './editor-fields.js';
@@ -279,15 +279,12 @@ export const pageActions = {
     }
   },
 
+  // Show HTML: the code view, at this block.
   showHtml(id) {
     const loc = findNode(this.page, id);
     if (!loc || loc.kind !== 'block') return;
-    try {
-      const content = blockHTML(loc.node, { ...this.app.exportContext(this.meta), pageSettings: this.page.page });
-      this.app.dialogs.textExport({ title: this.say('html_title', { label: this.labelOf(id) }), help: this.say('html_help'), content });
-    } catch (error) {
-      this.failed(error);
-    }
+    this.select(id);
+    this.setView('code');
   },
 
   async revisions() {

@@ -50,11 +50,13 @@ frames:
   stack:
     label: One column
     help: Blocks stacked from top to bottom.
+    code_note: "A section with ocs__stack: its blocks sit one under another, with even gaps and no margins."
     icon: fa-bars
     fields: []
   columns:
     label: Columns
     help: Two or three columns side by side. They stack on phones.
+    code_note: "A section that is a grid: ocs__split makes two columns (with --aside or --aside-end, one of them narrow) and ocs__facts makes three. Each column is a div with ocs__stack, and on a phone the columns stack in this order."
     icon: fa-table-columns
     fields:
       - id: layout
@@ -92,6 +94,7 @@ blocks:
   hero:
     label: Page header
     help: A title, a short intro and up to three buttons at the top of the page.
+    code_note: "A header (an ocs__stack) with the page's only h1, an ocs__badge label above it, a bigger first paragraph (ocs__lead) and a row of ocs__btn buttons."
     icon: fa-flag
     category: content
     fields:
@@ -102,6 +105,7 @@ blocks:
   heading:
     label: Heading
     help: A section title with an optional line under it.
+    code_note: "An h2 with ocs__section-title: the small heading that starts a part of the page."
     icon: fa-heading
     category: content
     fields:
@@ -117,6 +121,7 @@ blocks:
   text:
     label: Text
     help: Paragraphs with bold, italic, lists and links.
+    code_note: "Your text in a div with ocs__text, which sets its color and line spacing. Bold, lists and links stay HTML tags inside it."
     icon: fa-align-left
     category: content
     fields:
@@ -124,6 +129,7 @@ blocks:
   image:
     label: Image
     help: A picture from an https:// link or a file on this site.
+    code_note: "A figure: the picture is an img that ocs__image-frame frames, and the caption is a figcaption. Screen readers read the img's alt text."
     icon: fa-image
     category: content
     fields:
@@ -140,6 +146,7 @@ blocks:
   video:
     label: Video
     help: A YouTube or Google Drive video. It loads when a visitor presses Play.
+    code_note: "A card (ocs__card) with the video's title, its site and a button. On the live page, Play loads the player in an ocs__embed--video frame."
     icon: fa-circle-play
     category: content
     fields:
@@ -149,6 +156,7 @@ blocks:
   buttons:
     label: Buttons
     help: A row of up to four link buttons.
+    code_note: "A row (ocs__links) of links that look like buttons (ocs__btn). accent fill marks the main one."
     icon: fa-hand-pointer
     category: content
     fields:
@@ -157,6 +165,7 @@ blocks:
   card:
     label: Card
     help: A boxed title and text with an optional button.
+    code_note: "A section with ocs__card, the framed panel. ocs__card-header puts its title and its button on one row."
     icon: fa-square
     category: content
     fields:
@@ -166,6 +175,7 @@ blocks:
   callout:
     label: Callout
     help: A highlighted note.
+    code_note: "A div with ocs__callout: a boxed note in a softer color, for tips and warnings."
     icon: fa-circle-info
     category: content
     fields:
@@ -173,6 +183,7 @@ blocks:
   keypoints:
     label: Key points
     help: A short list of ideas, each with a title.
+    code_note: "A list of points (ocs__keypoints). Each ocs__keypoint row is a check mark (ocs__check), then its text."
     icon: fa-list-ul
     category: content
     fields:
@@ -186,6 +197,7 @@ blocks:
   checklist:
     label: Checklist
     help: Tasks with done and to-do boxes.
+    code_note: "A ul with ocs__checklist. Each item's ocs__checklist-box shows whether it's done, and the done class marks the finished ones."
     icon: fa-square-check
     category: content
     fields:
@@ -199,6 +211,7 @@ blocks:
   stats:
     label: Numbers
     help: Big numbers with a label, like users or tests passing.
+    code_note: "A grid of numbers (ocs__stats). Each ocs__stat box holds a big ocs__stat-value and a small ocs__stat-label."
     icon: fa-chart-simple
     category: content
     fields:
@@ -212,6 +225,7 @@ blocks:
   table:
     label: Table
     help: "Type one row per line and split cells with |. The first row is the header."
+    code_note: "A table with ocs__table for theme colors, inside ocs__table-wrap so it scrolls sideways on a phone."
     icon: fa-table
     category: content
     fields:
@@ -220,6 +234,7 @@ blocks:
   link_cards:
     label: Link cards
     help: Clickable cards that link to your app, your repo or a lesson.
+    code_note: "A nav with ocs__nav-grid. Each card is one big link (ocs__nav-card) with a small kicker, a title and a line of text."
     icon: fa-grip
     category: content
     fields:
@@ -235,6 +250,7 @@ blocks:
   team:
     label: Team
     help: Who is on the team and what each person does.
+    code_note: "A list of people (ocs__entity-list). Each person has an ocs__avatar with their initials, then their name and role."
     icon: fa-people-group
     category: content
     fields:
@@ -250,6 +266,7 @@ blocks:
   code:
     label: Code
     help: Shows code as text. It never runs.
+    code_note: "A figure with your code in pre and code tags, so its spaces and line breaks stay exactly as typed."
     icon: fa-code
     category: content
     fields:
@@ -258,12 +275,14 @@ blocks:
   divider:
     label: Divider
     help: A line between parts of the page.
+    code_note: "An hr: a plain line between two parts of the page."
     icon: fa-minus
     category: content
     fields: []
   chat:
     label: Group chat
     help: Your group's live chat from Messages, shown on the page to the group's members.
+    code_note: "Only a comment in the page file. On the live page, the viewer embeds your group's chat from Messages for its members."
     icon: fa-comments
     category: comms
     live: true
@@ -274,6 +293,7 @@ blocks:
   members:
     label: Team members
     help: The names of everyone in a group.
+    code_note: "Only a comment in the page file. On the live page, the viewer lists your group's members for signed-in visitors."
     icon: fa-users
     category: comms
     live: true
@@ -284,6 +304,7 @@ blocks:
   message_me:
     label: Message us
     help: A button that opens a direct message with you, the page owner.
+    code_note: "Only a comment in the page file. On the live page, the viewer adds a button that opens a direct message with the page's owner."
     icon: fa-envelope
     category: comms
     live: true
@@ -294,6 +315,7 @@ blocks:
   kanban:
     label: Kanban board
     help: Your team's GitHub project board or issues, live.
+    code_note: "An include of the site's kanban board (ocs_kanban_board.html) with your board's address. Jekyll fills it in when the site builds."
     icon: fa-clipboard-list
     category: comms
     live: true
@@ -304,6 +326,7 @@ blocks:
   feedback:
     label: Visitor feedback
     help: Visitors leave comments on your page. Guests can use it on showcase night.
+    code_note: "Only a comment in the page file. On the live page, the viewer reads and posts visitors' comments in Flask's microblog, under the page's address."
     icon: fa-comment-dots
     category: comms
     live: true
@@ -316,6 +339,7 @@ blocks:
   api_data:
     label: Data from your API
     help: Show live data from your own backend as cards, a list, a table or numbers.
+    code_note: "Only a comment in the page file. On the live page, the viewer asks your API for its data and draws each item as a card or a row."
     icon: fa-plug
     category: project
     live: true
@@ -335,6 +359,7 @@ blocks:
   embed:
     label: Embed your app
     help: Shows your deployed frontend inside the page. It loads when a visitor presses Open.
+    code_note: "A card (ocs__card) with your app's title and a button. On the live page, Open loads your app in an ocs__embed frame."
     icon: fa-window-maximize
     category: project
     fields:
@@ -477,6 +502,49 @@ templates:
                       - { label: GitHub, url: "https://github.com" }
 
 text:
+  # What each ocs__ grammar class the code view lists draws (see _sass/open-coding/README.md).
+  code_classes:
+    ocs__container: "the page's width limit"
+    ocs__container--fill: "drops that limit, for a wide page"
+    ocs__stack: "a column of children with even gaps between them"
+    ocs__split: "two equal columns"
+    ocs__split--aside: "makes the first column narrow"
+    ocs__split--aside-end: "makes the second column narrow: a sidebar on the right"
+    ocs__facts: "three equal columns"
+    ocs__badge: "a small rounded label in the accent color"
+    ocs__text: "text in the muted color, with comfortable line spacing"
+    ocs__lead: "a slightly bigger first paragraph under a title"
+    ocs__links: "a row that holds buttons and links"
+    ocs__btn: "a button look for a link or a button"
+    ocs__section-title: "a small heading for one part of the page"
+    ocs__card: "a framed panel"
+    ocs__card-header: "a card's title and its action on one row"
+    ocs__callout: "a boxed note in a softer color"
+    ocs__keypoints: "a list of key points"
+    ocs__keypoint: "one key point: its mark, then its text"
+    ocs__check: "the check mark, in the accent color"
+    ocs__checklist: "a checklist"
+    ocs__checklist-box: "the box that shows whether an item is done"
+    ocs__stats: "a grid of numbers that fits as many as the width allows"
+    ocs__stat: "one number's box"
+    ocs__stat-value: "the big number"
+    ocs__stat-label: "the small caption under a number"
+    ocs__table-wrap: "lets a wide table scroll sideways"
+    ocs__table: "theme colors for a table's headers, borders and rows"
+    ocs__nav-grid: "a grid of link cards"
+    ocs__nav-card: "a card that is one big link"
+    ocs__nav-card-kicker: "the small label above a link card's title"
+    ocs__nav-card-title: "a link card's title"
+    ocs__status: "a small outlined pill, here the site a link goes to"
+    ocs__entity-list: "a grid of people or things, each in its own box"
+    ocs__avatar: "a round badge with a person's initials"
+    ocs__image-frame: "a rounded frame for a picture"
+    ocs__image-frame--cover: "fills the frame, cropping the picture to fit"
+    ocs__embed: "a frame for another page, at the full width"
+    ocs__embed--video: "a 16:9 video player that scales with the width"
+    ocs__embed--short: "a frame 320 pixels tall"
+    ocs__embed--medium: "a frame 480 pixels tall"
+    ocs__embed--tall: "a frame 720 pixels tall"
   blocks:
     untitled: Untitled page
     unknown_block: "This block type isn't available: {type}."

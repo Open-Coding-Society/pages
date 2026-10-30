@@ -5,7 +5,8 @@
 //
 // The grammar draws every control, card, field, modal and pill the editor uses; these partials
 // only add what an editing app needs and a document page doesn't: the three-pane layout, the
-// scaled canvas frame, the flat outline tree, the menu and the canvas's selection outlines.
+// scaled canvas frame, the flat outline tree, the menu, the canvas's selection outlines and the
+// code view's scrolling pane.
 // Each rule says why the grammar can't do it. Colours come from theme tokens only.
 // Ruby Sass 3.7: no min()/max() (Sass would try to compute them), no / division.
 
@@ -18,6 +19,7 @@ $uib-phone: 767px;
 @import "dialogs";
 @import "start";
 @import "canvas";
+@import "code";
 
 // Two unscoped site rules reach every h1: the calendar system's sass hides it and the
 // documentation styles make it green and glowing. A builder page shows its own title in the

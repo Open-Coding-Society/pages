@@ -27,10 +27,13 @@ the backend routes and the tests.
 
 1. Run Spring (`./mvnw spring-boot:run`, ports 8585 and 8589) with the local cookie settings in
    its `.env` (`jwt.cookie.secure=false`, `jwt.cookie.same-site=Lax`).
-2. Build this site and open it on `http://localhost:4500` (or 4600): `localhost`, not
-   `127.0.0.1`, because the local login cookie is for the host name.
+2. Build this site with a full `make` and open it on `http://localhost:4500` (or 4600):
+   `localhost`, not `127.0.0.1`, because the local login cookie is for the host name. The
+   UI Builder is registered without `:dev` (it has many files), so `make dev` leaves it out.
 3. Sign in, open `/ui-builder/`, pick a template (try **Flask API starter**), press
    **Test connection** in "Data from your API", then **Publish**.
+4. Press **Code** in the editor's bar to see the page's HTML, block by block, and **Preview** to
+   go back.
 
 ## Files
 
@@ -52,6 +55,7 @@ The modules, by job:
 |---|---|
 | `editor-*.js` | the editor at `/ui-builder/`. `editor-app.js` starts it and opens the start screen or a page; the others are the start screen, the editing shell, the outline, the inspector and its fields, the block menu, the dialogs, the shortcuts and saving |
 | `canvas.js`, `canvas-bridge.js` | the preview inside the editor: the page drawn in its iframe, and the editor's side of the connection |
+| `editor-code.js`, `pretty-html.js` | the code view in the preview's place: the page-file HTML block by block, indented and colored like lesson code, with what each block's markup does and the `ocs__` classes it uses |
 | `page-store.js`, `spring-page-store.js`, `draft-store.js` | the stores: pages kept in this browser or in Spring, and the crash copy of the page being edited |
 | `render.js`, `vnode.js`, `rich-content.js` | turning a page into `ocs__` markup through an allowlist (a fixed list of allowed tags and attributes) |
 | `blocks-content.js`, `blocks-live.js`, `blocks-project.js` | each block's markup, the live blocks, and Data from your API with the click-to-load video and app cards |

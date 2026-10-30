@@ -1,7 +1,8 @@
 // The editing shell's markup (DESIGN §10): the top bar, the More menu, the outline, canvas and
 // inspector panes, the banner slot and the feedback line. It owns only presentation: the
-// device buttons and the canvas size (scaled to fit, with the zoom shown), the pane toggles
-// below 1440px and the menu's keyboard behaviour. editor-edit.js wires the actions.
+// Preview/Code switch, the device buttons and the canvas size (scaled to fit, with the zoom
+// shown), the pane toggles below 1440px and the menu's keyboard behaviour. editor-edit.js wires
+// the actions.
 import { el, icon, iconButton } from './editor-fields.js';
 
 const WIDE = '(min-width: 1440px)';
@@ -26,6 +27,12 @@ export function buildShell({ doc = globalThis.document, registry, say, caps = {}
   const deviceButtons = new Map(devices.map((device) => [device.key, el(doc, 'button', {
     type: 'button', class: 'ocs__btn small', 'aria-pressed': 'false', title: say('device_label', { label: device.label }),
   }, device.label)]));
+  // Preview draws the page; Code shows the HTML its page file holds (editor-code.js).
+  const viewButtons = new Map([
+    ['preview', el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small', 'aria-pressed': 'false' }, icon(doc, 'fa-eye'), say('view_preview'))],
+    ['code', el(doc, 'button', { type: 'button', class: 'ocs__btn ocs__btn--icon small', 'aria-pressed': 'false' }, icon(doc, 'fa-code'), say('view_code'))],
+  ]);
+  const devicesGroup = el(doc, 'div', { class: 'ocs__links ui-builder-devices', role: 'group', 'aria-label': say('device_group') }, [...deviceButtons.values()]);
   const realInput = el(doc, 'input', { type: 'checkbox', class: 'ocs__toggle-input', id: 'ui-real-data', 'aria-describedby': 'ui-real-data-help' });
   const realData = el(doc, 'div', { class: 'ui-builder-wrap', hidden: true },
     el(doc, 'label', { class: 'ocs__toggle', title: say('real_data_help') }, realInput, el(doc, 'span', { class: 'ocs__toggle-track', 'aria-hidden': 'true' }), el(doc, 'span', { class: 'ocs__toggle-label' }, say('real_data'))),
@@ -46,7 +53,8 @@ export function buildShell({ doc = globalThis.document, registry, say, caps = {}
 
   const bar = el(doc, 'div', { class: 'ui-builder-bar', role: 'group', 'aria-label': say('toolbar_label') },
     el(doc, 'div', { class: 'ocs__links ui-builder-bar-group' }, back, title, saveState, publishState),
-    el(doc, 'div', { class: 'ocs__links ui-builder-bar-group' }, undo, redo, el(doc, 'div', { class: 'ocs__links ui-builder-devices', role: 'group', 'aria-label': say('device_group') }, [...deviceButtons.values()]), realData),
+    el(doc, 'div', { class: 'ocs__links ui-builder-bar-group' }, undo, redo,
+      el(doc, 'div', { class: 'ocs__links ui-builder-views', role: 'group', 'aria-label': say('view_group') }, [...viewButtons.values()]), devicesGroup, realData),
     el(doc, 'div', { class: 'ocs__links ui-builder-bar-group' }, outlineToggle, inspectorToggle, previewWrap, liveWrap, publishWrap,
       el(doc, 'div', { class: 'ui-builder-more' }, more, menuWrap)));
 
@@ -57,8 +65,9 @@ export function buildShell({ doc = globalThis.document, registry, say, caps = {}
   const viewport = el(doc, 'div', { class: 'ui-builder-viewport' }, iframe);
   const reload = el(doc, 'button', { type: 'button', class: 'ocs__btn small accent' }, say('canvas_reload'));
   const failed = el(doc, 'div', { class: 'ui-builder-wrap', hidden: true }, el(doc, 'div', { class: 'ocs__callout', role: 'alert' }, say('canvas_failed'), ' ', reload));
-  const stage = el(doc, 'section', { class: 'ui-builder-stage', 'aria-label': say('canvas_title') },
-    el(doc, 'div', { class: 'ui-builder-stagebar' }, zoom, canvasStatus), failed, viewport);
+  const stagebar = el(doc, 'div', { class: 'ui-builder-stagebar' }, zoom, canvasStatus);
+  const codePane = el(doc, 'div', { class: 'ui-builder-code-pane', hidden: true });
+  const stage = el(doc, 'section', { class: 'ui-builder-stage', 'aria-label': say('canvas_title') }, stagebar, failed, viewport, codePane);
   const inspectorPane = el(doc, 'section', { class: 'ui-builder-pane ui-builder-inspector', id: 'ui-inspector', 'aria-labelledby': 'ui-inspector-title', tabindex: '-1' });
   const body = el(doc, 'div', { class: 'ui-builder-body' }, outlinePane, stage, inspectorPane);
   const banners = el(doc, 'div', { class: 'ocs__stack ui-builder-banners' });
@@ -97,6 +106,25 @@ export function buildShell({ doc = globalThis.document, registry, say, caps = {}
     fit();
   }
   for (const [key, button] of deviceButtons) button.addEventListener('click', () => setDevice(key));
+
+  // ---- the view: the preview, or the page's code in its place (the device sizes don't apply to it)
+  let view = 'preview';
+  function setView(name) {
+    if (!viewButtons.has(name)) return;
+    view = name;
+    for (const [key, button] of viewButtons) {
+      const on = key === name;
+      button.setAttribute('aria-pressed', String(on));
+      button.classList.toggle('accent', on);
+      button.classList.toggle('fill', on);
+    }
+    const code = name === 'code';
+    stagebar.hidden = code;
+    viewport.hidden = code;
+    devicesGroup.hidden = code;
+    codePane.hidden = !code;
+    if (!code) fit();
+  }
   const observer = typeof win.ResizeObserver === 'function' ? new win.ResizeObserver(() => fit()) : null;
   if (observer) observer.observe(viewport);
   else win.addEventListener('resize', fit);
@@ -157,12 +185,14 @@ export function buildShell({ doc = globalThis.document, registry, say, caps = {}
   doc.addEventListener('click', outside, true);
 
   setDevice(device);
+  setView('preview');
   return {
     element, title, saveState, publishState, undo, redo, realInput, realData, preview, previewWrap, live, liveWrap,
     publish, publishWrap, menuItems, outlinePane, inspectorPane, iframe, viewport, stage, canvasStatus, failed, reload,
-    banners, feedbackText, dismiss, dismissWrap, feedback, outlineToggle, inspectorToggle,
+    banners, feedbackText, dismiss, dismissWrap, feedback, outlineToggle, inspectorToggle, viewButtons, codePane,
     get device() { return device; },
-    setDevice, fit, setPane, paneOpen, closeMenu,
+    get view() { return view; },
+    setDevice, setView, fit, setPane, paneOpen, closeMenu,
     destroy() {
       if (observer) observer.disconnect();
       else win.removeEventListener('resize', fit);

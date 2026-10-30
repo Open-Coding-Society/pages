@@ -7,7 +7,7 @@
 // rich-content.js), validators.kanbanCanonicalUrl (the editor passes kanban-board.js
 // parseBoardUrl(url)?.url), slug (the published slug, if any) and strict (tests).
 import { defOf, liveTypes, textOf } from './registry.js';
-import { renderBlock, renderPage } from './render.js';
+import { renderBlock, renderPage, renderSection } from './render.js';
 import { contentRenderers, lineOf, ownValue } from './blocks-content.js';
 import { slugIssue, suggestSlug } from './url-rules.js';
 import { comment, h, liquid, toHTML } from './vnode.js';
@@ -150,8 +150,17 @@ export function pageToMarkdown(page, ctx) {
   return `${frontMatter.join('\n')}\n${serialize(renderPage(page, c), c)}\n`;
 }
 
-// One block's page-file markup, for the inspector's Show HTML (shown even while the block is hidden).
+// One block's page-file markup, for the code view (shown even while the block is hidden).
 export function blockHTML(block, ctx) {
   const c = exportContext(ctx);
   return serialize(renderBlock(isObject(block) ? { ...block, hidden: false } : block, c), c);
+}
+
+// A section's page-file markup with its blocks left out, for the code view: the section's own tag
+// and, for columns, one div per column.
+export function sectionHTML(section, ctx) {
+  if (!isObject(section)) return '';
+  const c = exportContext(ctx);
+  const cells = (Array.isArray(section.cells) ? section.cells : []).map((cell) => ({ ...(isObject(cell) ? cell : {}), blocks: [] }));
+  return serialize(renderSection({ ...section, hidden: false, cells }, c), c);
 }

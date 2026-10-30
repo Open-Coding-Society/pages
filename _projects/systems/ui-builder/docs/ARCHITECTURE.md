@@ -66,6 +66,17 @@ link to open the page on its own, and on a Flask-only site it opens only `?local
 draws the page under a bar that says who made it, then mounts the live blocks. When the visitor
 leaves, every live block stops; a page restored from the back/forward cache loads again.
 
+**The code view.** The bar's **Preview** and **Code** buttons switch the middle pane between the
+canvas and the page's code (`editor-code.js`). The code is the page file's HTML (`blockHTML`, and
+`sectionHTML` for a section's own tag with a comment where its blocks go), laid out by
+`pretty-html.js`. That module only adds line breaks and indentation and leaves out the builder's
+`data-ui-*` attributes. A test checks every template block's code against its markup. The tokens
+use Rouge's `.highlight` classes, so the code has the site's lesson-code colors and needs no new
+CSS. Each block says what its markup does (its `code_note` in the registry), then lists the
+`ocs__` classes it uses with what each draws (`text.code_classes`). Sections do the same with
+their frame's `code_note`. Picking a block in the code selects it in the editor, and switching
+views keeps the selection. Show HTML (inspector and More menu) opens the code at that block.
+
 **The canvas** is the preview in the middle of the editor: a same-origin iframe of
 `/ui-builder/canvas/`. The editor opens it with a **nonce** (a random code) in its address and
 talks only to a canvas that answers with that nonce, so it never talks to an old frame or to a
@@ -107,7 +118,7 @@ editor's strings. No module hard-codes a visible string; they all go through `te
 `tests/editor-strings.test.mjs` checks that every key the editor asks for is in
 `data/ui_builder_editor.yml` and that none is left unused.
 
-Adding a block: add its definition (label, help, icon, category, fields) to a registry file,
+Adding a block: add its definition (label, help, icon, category, fields, `code_note`) to a registry file,
 add a renderer to `blocks-content.js` (and a mount to `blocks-live.js` or `blocks-project.js`
 if it is live), follow the key convention, and add it to the shared fixture `all-blocks.json`
 in both repos.
@@ -116,7 +127,7 @@ in both repos.
 
 - `render.js` → a **vnode** tree (`vnode.js`). `toDOM` builds it with `createElement`,
   `setAttribute` and text nodes; `toHTML` writes the same tree as a string for the page-file
-  export and Show HTML.
+  export and the code view.
 - `vnode.js` allows a fixed list of tags and attributes with fixed values (`sandbox`, `allow`,
   `target`, `referrerpolicy`, `id`, class tokens). `href`/`src` are re-checked. `toHTML` escapes
   `{` and `}` everywhere except generated include tags, so Liquid never runs in an exported page.
@@ -421,5 +432,7 @@ such as `bad_url`). For example, Spring's `bad_path` is the editor's `bad_api_pa
   `api-data.js` too, which writes the same rule out.
 - A new field or block: the key convention, `all-blocks.json` in both repos, and a renderer test.
 - A new visible string: a registry file, never the code.
+- A new block or frame: its `code_note`. A renderer that uses a new `ocs__` class: its line in
+  `text.code_classes` (`tests/editor-code.test.mjs` checks both).
 - A new test file: add it to `tests/ui_builder.test.mjs` too.
 - AGENTS.md and AGENTS_MD_DOCUMENTATION.md together when these rules change.
