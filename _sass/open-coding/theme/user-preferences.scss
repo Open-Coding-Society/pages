@@ -165,6 +165,12 @@
     color: var(--pref-text-color) !important;
   }
 
+  /* The post layouts give category chips a fixed light background, and the links rule above
+     colors their words with the accent, so the chips take the card color: the accent reads on it. */
+  .category-tags-link {
+    background-color: var(--panel) !important;
+  }
+
   /* Selected capstone navigation uses the page background for contrast. */
   .jv-nav-link.active,
   .ocs__btn.accent.fill {
