@@ -284,18 +284,14 @@ public class AnnouncementService {
     //
 
     //Determines the Mapping POST GET PUT DELETE 
-    @PutMapping("/edit/{title}")
-    public ResponseEntity<Announcement> editAnnouncement(@PathVariable String title, @RequestBody String body)
-    //     Data Type Returned                             Parameters needed for the method
+    @PostMapping("/edit/{title}")
+    public ResponseEntity<AnnouncementRecord> editAnnouncement(@PathVariable String title, @RequestBody String body)
+    //     Data Type Returned                                   Parameters needed for the method
     {
-        // Getting the announcement from the database
-        Announcement announcement = announcementRepo.findByTitle(title);
-        //Setting the new information into the announcement
-        announcement.setBody(body);
-        //Saving into the database
-        announcementRepo.save(announcement);
-        // Returning the announcement, and the HTTP status, whether it worked or not
-        return new ResponseEntity<>(announcement, HttpStatus.OK);
+        // The service finds the announcement, sets the new body and saves it
+        AnnouncementEntity edited = announcementService.editBody(title, body);
+        // Returning the announcement as a record, and the HTTP status, whether it worked or not
+        return new ResponseEntity<>(AnnouncementRecord.of(edited), HttpStatus.OK);
     }
 ```
 
