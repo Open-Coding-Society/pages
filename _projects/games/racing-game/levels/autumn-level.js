@@ -79,6 +79,16 @@ class GameLevelAutumn {
       pixels: { height: 369, width: 676 },
       orientation: { rows: 1, columns: 1 },
     };
+        const ConeData = {
+      id: "cone-1",
+      src: path + '/images/projects/racing-game/ConeObstacle.png',
+      coordinateSpace: "normalized",
+      SCALE_FACTOR: 10,
+      INIT_POSITION: { x: 0.2985, y: 0.8404 },
+      hitbox: { widthPercentage: 0.5, heightPercentage: 0.5 },
+      pixels: { height: 369, width: 676 },
+      orientation: { rows: 1, columns: 1 },
+    };
 
 
     // Finish line on the painted start/finish line; HUD in the trees above the top-left corner.
@@ -95,6 +105,7 @@ class GameLevelAutumn {
       { class: SplineBarrier, data: barrierData1 },
       { class: SplineBarrier, data: barrierData2 },
       { class: Character, data: BoxData },
+      { class: Character, data: ConeData },
       { class: TimeLapScreen, data: lap_data }
     ];
   }
