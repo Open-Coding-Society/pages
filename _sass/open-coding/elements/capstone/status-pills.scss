@@ -6,23 +6,31 @@
   border: 1px solid var(--ui-border);
   border-radius: 9999px;
   color: var(--pref-text-color);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--pref-font-family);
   font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
   font-weight: 600;
   white-space: nowrap;
 }
 
+// The words stay in the text color, which reads on every tint; the ring and tint tell the
+// states apart: the accent for good, the theme's yellow and red for warn and bad.
 .ocs__status-pill--good {
   background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
   border-color: var(--pref-accent-color);
-  color: var(--pref-accent-color);
+  color: var(--pref-text-color);
 }
 
-.ocs__status-pill--warn,
+.ocs__status-pill--warn {
+  background: color-mix(in srgb, var(--priority-p2, var(--warn)) 12%, var(--panel));
+  border-color: var(--priority-p2, var(--warn));
+  color: var(--pref-text-color);
+}
+
 .ocs__status-pill--bad {
-  background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
-  border-color: var(--pref-accent-color);
-  color: var(--pref-accent-color);
+  background: color-mix(in srgb, var(--priority-p0, var(--red)) 12%, var(--panel));
+  border-color: var(--priority-p0, var(--red));
+  color: var(--pref-text-color);
 }
 
 .ocs__status-pill--neutral {
