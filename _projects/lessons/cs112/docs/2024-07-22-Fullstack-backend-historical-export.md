@@ -355,6 +355,13 @@ public class AnnouncementService {
 
 - Copy `seedIdCounterIfEmpty()` from the announcement file as it is; it adds the first row of the `_seq` table
 
+## Step 7
+> Popcorn Hack: test the API
+- The Spring repo has [api/announcement.http](https://github.com/Open-Coding-Society/spring/blob/master/api/announcement.http), which calls every announcement route in order
+- Install the **REST Client** extension in VS Code, open the file, and click **Send Request** above each request
+- Put `baseUrl`, `adminUid` and `adminPassword` in the Git-ignored `.vscode/settings.json`, never in the `.http` file
+- Then copy it to `api/yourfeature.http` and change the routes to test your own API
+
 ## Further Questions
 > Please use the comments below to suggest things to be added
 - Come to office hours if further help is needed
