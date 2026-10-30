@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "Rich text with a > inside a quoted value", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-quotegt1",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-quotegt1",
+              "type": "text",
+              "settings": {
+                "body": "<a title=\">\" href=\"javascript:alert(1)\" onclick=\"alert(1)\">x</a>"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
