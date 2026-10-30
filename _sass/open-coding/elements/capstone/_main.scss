@@ -153,6 +153,13 @@
   grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
 }
 
+// The narrow column on the right instead, for a sidebar beside the main content.
+// It comes second in the markup, so phones stack it under the main content.
+// Like --aside, it stays above the 768px rule.
+.ocs__split--aside-end {
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem);
+}
+
 .ocs__facts {
   grid-template-columns: repeat(3, 1fr);
 }

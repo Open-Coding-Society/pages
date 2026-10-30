@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "A button to the team's own computer through IPv6", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-v6loop01",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-v6loop01",
+              "type": "buttons",
+              "settings": {
+                "links": [ { "label": "Try our app", "url": "https://[::ffff:127.0.0.1]:8443/" } ],
+                "emphasize_first": true
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

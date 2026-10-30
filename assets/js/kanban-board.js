@@ -27,6 +27,12 @@
 // The filters, counts and toggle are existing OCS elements (ocs__links,
 // ocs__btn, ocs__status-pill, ocs__toggle); the columns and cards are the
 // ocs__kanban element (_sass/open-coding/elements/kanban/).
+//
+// A page that makes its boards from its own data (the UI Builder) puts the
+// include's empty board on the page with template=true and the defaults with
+// ocs_kanban_board_data.html, then calls createKanbanSection for each board
+// and mountKanbanBoard to start it. Those sections are marked manual, so the
+// boards this script starts by itself (mountAll) are only the include's.
 
 const API = 'https://api.github.com';
 const FRESH_MS = 10 * 60 * 1000;       // a saved board is reused this long
@@ -723,9 +729,9 @@ function fingerprint(text) {
 }
 
 // The include puts the site's defaults on the page once, and each board's
-// own columns list inside its section, both as JSON.
-function settingsOf(section) {
-  const defaults = readJson(document.getElementById('ocs-kanban-defaults'));
+// own columns list inside its section, both as JSON. A page that has the
+// defaults already can pass them instead.
+function settingsOf(section, defaults = readJson(document.getElementById('ocs-kanban-defaults'))) {
   if (!defaults) return null;
   const columns = readJson(section.querySelector('script[data-hook="columns"]'));
   const issueMetadata = section.dataset.issueMetadata === 'true';
@@ -734,10 +740,13 @@ function settingsOf(section) {
   return { config: boardConfig(defaults, columns, issueMetadata), stamp: fingerprint(JSON.stringify(settings)) };
 }
 
-async function mountBoard(section) {
-  const settings = settingsOf(section);
+// One look at a board: the saved copy at once, then GitHub's when that copy is
+// stale. `run` is its mount's: the view keeps what the reader chose across
+// refreshes, and once the signal is aborted (unmounted) nothing is drawn.
+async function loadBoard(section, run) {
+  const settings = settingsOf(section, run.defaults);
   if (!settings) {
-    console.error('Kanban board: the page has no #ocs-kanban-defaults; add the board with _includes/ocs_kanban_board.html.');
+    console.error('Kanban board: the page has no #ocs-kanban-defaults; add the board with _includes/ocs_kanban_board.html (or the defaults with _includes/ocs_kanban_board_data.html).');
     return;
   }
   const { config, stamp } = settings;
@@ -754,7 +763,8 @@ async function mountBoard(section) {
   }
   const filterName = section.dataset.filter || '';
   const key = `ocs-kanban:v5:${ref.apiPath}:${filterName}:${stamp}`;
-  const view = boardView(section, config);
+  run.view = run.view || boardView(section, config);
+  const { view } = run;
   let entry = readEntry(key);
   if (entry?.board) view.show(entry.board);
 
@@ -765,12 +775,16 @@ async function mountBoard(section) {
     return;
   }
   if (!entry?.board) setStatus(section, say('loading'));
+  // The mount's signal stops requests still out when the board is unmounted.
+  const fetchImpl = (url, init) => fetch(url, { ...init, signal: run.signal });
   try {
-    entry = await refreshBoard(ref, { filterName, config, meta: entry?.meta, metaAt: entry?.metaAt });
+    entry = await refreshBoard(ref, { filterName, config, meta: entry?.meta, metaAt: entry?.metaAt, fetchImpl });
+    if (run.signal.aborted) return;
     writeEntry(key, entry);
     view.show(entry.board);
     setStatus(section, '');
   } catch (err) {
+    if (run.signal.aborted) return;
     if (!(err instanceof BoardError)) console.error('Kanban board: could not draw the board', err);
     const error = err instanceof BoardError ? err : new BoardError('network', err.message);
     // Don't ask again before the limit resets (or for 10 minutes if GitHub didn't say).
@@ -779,26 +793,107 @@ async function mountBoard(section) {
   }
 }
 
-// Each board loads when it comes within 400px of the screen, so a board far
-// down a long page costs no requests until someone scrolls to it.
-function mountWhenNear(section) {
-  if (section.dataset.mounted) return;
+// Each section's mount, so mounting one twice is harmless.
+const mounts = new WeakMap();
+
+// Starts the board in a section and returns { refresh(), unmount() }. The
+// board loads when it comes within 400px of the screen, so a board far down a
+// long page costs no requests until someone scrolls to it; refresh() loads it
+// now (from the saved copy while that is fresh). unmount() stops watching the
+// screen and any request still out, and empties the board. `defaults` are
+// _data/kanban.yml's, for a page without #ocs-kanban-defaults.
+export function mountKanbanBoard(section, { defaults } = {}) {
+  if (mounts.has(section)) return mounts.get(section);
+  const before = section.getAttribute('data-mounted');
+  const controller = new AbortController();
+  const run = { defaults, signal: controller.signal, view: null };
+  let observer = null;
+  let loading = null;
+
+  const load = () => {
+    if (controller.signal.aborted) return Promise.resolve();
+    observer?.disconnect();
+    observer = null;
+    loading = loading || loadBoard(section, run)
+      .catch((err) => console.error('Kanban board: load failed', err))
+      .finally(() => { loading = null; });
+    return loading;
+  };
+
+  const handle = {
+    refresh: load,
+    unmount() {
+      if (controller.signal.aborted) return;
+      controller.abort();
+      observer?.disconnect();
+      mounts.delete(section);
+      const mount = section.querySelector('[data-hook="mount"]');
+      mount.replaceChildren();
+      mount.hidden = true;
+      section.querySelector('[data-hook="meta"]').textContent = '';
+      setStatus(section, '');
+      if (before === null) section.removeAttribute('data-mounted');
+      else section.setAttribute('data-mounted', before);
+    },
+  };
+  mounts.set(section, handle);
   section.dataset.mounted = 'true';
-  const start = () => mountBoard(section).catch((err) => console.error('Kanban board: load failed', err));
-  if (!('IntersectionObserver' in window)) {
-    start();
-    return;
+
+  if ('IntersectionObserver' in globalThis) {
+    observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) load();
+    }, { rootMargin: '400px 0px' });
+    observer.observe(section);
+  } else {
+    load();
   }
-  const observer = new IntersectionObserver((entries) => {
-    if (!entries.some((entry) => entry.isIntersecting)) return;
-    observer.disconnect();
-    start();
-  }, { rootMargin: '400px 0px' });
-  observer.observe(section);
+  return handle;
+}
+
+// The include's boards: every section in `root` that isn't mounted yet.
+// Sections from createKanbanSection are marked manual and wait for their
+// page's own mountKanbanBoard.
+export function mountAll(root = document) {
+  return [...root.querySelectorAll('[data-ocs-kanban]:not([data-mounted])')].map((section) => mountKanbanBoard(section));
+}
+
+// A board for a page that makes its own: a copy of the include's empty
+// section (template=true) with this board's values, marked manual. The page
+// adds it, then calls mountKanbanBoard(section). columns is a capstone's
+// columns list, as the include's columns option takes it.
+export function createKanbanSection({ url = '', filter = '', title = '', columns = null } = {}, doc = document) {
+  const empty = doc.querySelector('template[data-ocs-template="kanban"]')?.content.querySelector('[data-ocs-kanban]');
+  if (!empty) {
+    throw new Error('Kanban board: the page has no board template; add {% include ocs_kanban_board.html template=true %}.');
+  }
+  const section = doc.importNode(empty, true);
+  const address = String(url ?? '').trim();
+  section.dataset.boardUrl = address;
+  section.dataset.filter = String(filter ?? '').trim();
+  // Only a board's own address on GitHub gets the Open on GitHub link.
+  const link = section.querySelector('a.ocs__btn');
+  if (parseBoardUrl(address)) link.href = address;
+  else link.remove();
+  const name = String(title ?? '').trim();
+  if (name) {
+    section.querySelector('[data-hook="title"]').textContent = name;
+    section.setAttribute('aria-label', name);
+    section.setAttribute('data-title-fixed', '');
+  }
+  if (Array.isArray(columns) && columns.length) {
+    const list = doc.createElement('script');
+    list.type = 'application/json';
+    list.dataset.hook = 'columns';
+    // Escaped like the include's, so the list can't end its script element.
+    list.textContent = JSON.stringify(columns).replace(/</g, '\\u003c');
+    section.querySelector('[data-hook="mount"]').after(list);
+  }
+  section.dataset.mounted = 'manual';
+  return section;
 }
 
 if (typeof document !== 'undefined') {
-  const mountAll = () => document.querySelectorAll('[data-ocs-kanban]').forEach(mountWhenNear);
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountAll);
-  else mountAll();
+  const start = () => mountAll();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
 }

@@ -20,7 +20,7 @@ const holidayFor = prompt => {
 const capName = name => [...name].slice(0, NAME_MAX).join('').trim();
 
 /** WCAG contrast ratio of two #rrggbb colors */
-function contrast(a, b) {
+export function contrast(a, b) {
     const lum = hex => {
         const [r, g, bl] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
             .map(c => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
@@ -73,7 +73,7 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
     $('ai-theme-chips').replaceChildren(...SUGGESTIONS.map(text => {
         const chip = document.createElement('button');
         chip.type = 'button';
-        chip.className = 'px-3 py-1 rounded-full bg-neutral-700 hover:bg-neutral-600 text-white text-sm';
+        chip.className = form.closest('.ocs__prefs') ? 'ocs__btn small' : 'px-3 py-1 rounded-full bg-neutral-700 hover:bg-neutral-600 text-white text-sm';
         chip.textContent = text;
         chip.addEventListener('click', () => { promptEl.value = text; promptEl.focus(); });
         return chip;
@@ -114,6 +114,8 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
         $('ai-theme-badge').textContent = `${ratio >= 4.5 ? 'Readable ✓' : 'Hard to read'} ${ratio.toFixed(1)}:1`;
         nameInput.value = capName(theme.name);
         result.hidden = false;
+        // Dashboard v2 (preferences-layout.js) also puts the theme into the form and live preview.
+        document.dispatchEvent(new CustomEvent('ai-theme:shown', { detail: { name: theme.name, prefs: prefsFor(theme) } }));
     }
 
     async function generate(prompt) {

@@ -1,124 +1,53 @@
 # Introduction
 
-Founded and maintained by John Mortensen, Open Coding Society (OCS) is an open educational and software ecosystem built around student learning, collaboration, and community impact.
+Founded and maintained by John Mortensen.
 
-OCS `Pages` began as a project to support students studying computer science. It provides team-taught lessons, coding challenges and runners ("hacks"), and educational blogs ("tech talks"). As the work expanded into community outreach and projects with nonprofits, local communities, and businesses, a new need emerged: making the software, resources, and teaching practices reusable by other educators and organizations. That need led to **OCS-in-a-Kit**.
+Open Coding Society `Pages` is a project designed to support students in their Computer Science education. It offers a wide range of resources including tech talks, code examples, and educational blogs.
 
-Educators and students can customize this GitHub Pages repository to support computer science learning through pathways using JavaScript, Python/Flask, and Java/Spring. It supports coursework in Computer Science and Software Engineering (CSSE), AP Computer Science Principles (APCSP or CSP), AP Computer Science A (APCSA or CSA), and Computer Science Honors (CSH).
+This GitHub Pages repository can be customized by the blogger to support computer science learning as the student works through the pathways of using Javascript, Python/Flask, Java/Spring. It is intended to support course work for Computer Science and Software Engineering (CSSE), AP Computer Science Principles (APCSP or CSP), AP Computer Science 'A' (APCSA or CSA), and Computer Science Honors (CSH).
 
-## Educational Model
+"Open Coding Society's instructional model is grounded in **Connectivism**, recognizing that learning happens through diverse networks of people, platforms, and AI. OCS is refining `pages` using **Merrill's structure**, deepening learning through **Fink**, ensuring access via **UDL**, and supporting our classroom through **Agile and Design Thinking ceremonies**, with a touch of **Gagné** to focus each classroom day. OCS wants to create projects that support learning for today's digital, open, and connected world."
 
-OCS's instructional model is grounded in **connectivism**: learning happens through networks of people, platforms, and AI. The project continues to refine its instructional practices by drawing on **Merrill's instructional principles**, **Fink's approach to significant learning**, and **Universal Design for Learning (UDL)**.
+## Student Requirements
 
-Agile and design-thinking ceremonies provide structure for classroom collaboration, while **Gagné's instructional events** help organize individual class sessions. Together, these approaches support a learning environment in which students build, explain, review, and improve authentic work.
+HS students will have the opportunity to create their personal GitHub Pages repository as they progress through their coursework.
+In general, students and instructors are expected to use GitHub Pages to build lessons, complete classroom hacks/challenges and perform exploratory work.
+Exchange of information from this repository to you personal GitHub Pages can be done in many ways...
 
-## OCS-in-a-Kit: Education and Community
-
-OCS-in-a-Kit is an emerging initiative to make OCS's software, educational resources, and teaching practices accessible to other schools, educators, nonprofits, and community organizations.
-
-The goal is not simply to distribute a curriculum. It is to provide a foundation others can adopt, customize, and extend to serve their own learners and communities.
-
-This work spans two connected areas:
-
-- **OCS Education:** Learning pathways, lessons, coding challenges, instructional practices, student collaboration, and assessment.
-- **OCS Business:** Community-facing projects, technical solutions, and opportunities to connect education with nonprofits, businesses, and other organizations.
-
-Community partners can contribute technical expertise, mentorship, documentation, adoption opportunities, and authentic project needs. Students remain central to the educational mission: they learn by creating work that can be useful beyond the classroom.
-
-OCS welcomes these contributions without requiring exclusive partnerships or transferring control of the project to any single organization.
-
-## Student Requirements and Participation
-
-High school students have opportunities to create and maintain personal GitHub Pages repositories as they progress through their coursework.
-
-Students and instructors generally use OCS `Pages` to build lessons, complete classroom hacks and challenges, and explore technical concepts. Work can move between OCS and personal or team repositories in several ways:
-
-1. **Share individual files.** Copy or download a file, such as a Jupyter Notebook, from its raw GitHub URL.
-2. **Create a template.** Use this repository as a starting point for an independent project.
-3. **Fork the repository.** Create a separate copy for individual or team development, with the option to contribute improvements back to OCS `Pages` through pull requests.
-
-This model becomes even more powerful as students use OCS to build community projects. Projects can share ideas, reusable components, lessons, and improvements while maintaining their own goals and direction.
-
-A common architecture and contribution workflow make it easier to share useful ideas across projects without requiring every project to be identical. This creates a continuing cycle of learning, building, reuse, and contribution.
-
-The goal is a **win-win model**: students develop transferable skills, community organizations gain useful work, and future learners benefit from what earlier contributors have created.
+1. sharing a file, ie: `wget "raw-link.ipynb"`
+2. creating a template from this repository to break off into custom projects
+3. creating a fork to be shared by you and team members to contribute back to OCS `pages`
 
 ---
 
 ## History
 
-This project is in its fifth major revision, known as version 5.0.
+This project is in its 4th revision (aka 4.0).
 
-OCS `Pages` was initially inspired by Fastpages. Over time, the project evolved into an independent system as its educational goals and technical requirements diverged from the original foundation. The deprecation of Fastpages by its original authors also contributed to the decision to move forward independently.
+The project was initially based on a project called Fastpages. But this project has diverged from those roots into an independent entity, in fact most things (like the build system), are completely different.  The decision to separate from Fastpages was influenced by it's deprecation by the original authors.  It is believed by our community that the authors of Fastpages turned toward the support of Quatro.  After that change of direction Fastpages did not align with the OCS `pages` goals. Thus, `pages` has more of a raw development and classroom blogging purpose. But, as we parted we were grateful to Fastpages for their inspiration.  Also, this project originations were focused around the GitHub Pages Minima theme and still uses it as a remote.
 
-The current implementation has substantially different architecture and build tooling, reflecting years of teacher and student development. Although the project began with GitHub Pages and the Minima theme, its presentation layer has evolved toward a custom Sass implementation using a grammar-based UI system. The long-term direction is to remove the remaining Minima dependencies.
+### License
 
-We remain grateful to Fastpages for its early inspiration. OCS continues to build on that starting point while developing its own approach to open educational software, classroom collaboration, and community participation.
+The Apache license has its roots in Fastpages.  Thus, it carries that license forward.  However, most of the code is likely unrecognizable from those original roots.
 
-### License and Attribution
+### Key Features
 
-Years of teacher and student work have gone into OCS `Pages`. The current code, lessons, tools, and instructional practices have evolved substantially from their original foundations through contributions from educators, students, and AI-assisted development.
+- **Code Examples**: Provides practical coding examples in JavaScript, including a platformer game, and frontend code for user databases using Python and Java backends.
+- **Educational Blogs**: Offers instructional content on various topics such as developer tools setup, deployment on AWS, SQL databases, machine learning, and data structures. It utilizes Jupyter Notebooks for interactive lessons and coding challenges, often referred to as `hacks`.
+- **Tools and Integrations**: Features GitHub actions for blog publishing, Utterances for blog commenting, local development support via Makefile and scripts, and styling with the Minima Theme and SASS. It also includes an Agile Toolkit to assist in Student Teaching, Assignment Tracking, Live Reviews, and more.
+- **Keyboard Shortcuts**: Pages supports keyboard shortcuts using `Alt+Shift+key` (e.g. `Alt+Shift+C` for calendar, `Alt+Shift+H` for home, `Alt+Shift+S` for student toolkit). Press `Alt+Shift+?` to see all shortcuts. These use a non-conflicting modifier so browser defaults (copy, save, print, etc.) are unaffected.
 
-OCS recognizes that open projects grow through the work of many people. Attribution should reflect actual contributions, including original student work, software development, educational resources, documentation, mentorship, and community adoption.
+### Contributions
 
-Reuse and redistribution are governed by the applicable licenses and copyright terms of each repository and its materials. Contributors and adopters should consult the relevant license and preserve required notices.
+- **Notable Contributions**: Highlights significant contributions to the project, including theme development, search and tagging functionality, GitHub API integration, and the incorporation of GitHub Projects into GitHub pages. Contributors such as Tirth Thakker, Mirza Beg, and Toby Ledder have played crucial roles in these developments.
 
-OCS welcomes contributions from individuals and organizations without requiring exclusivity. Acknowledgment recognizes contributions; it does not, by itself, confer ownership or control over OCS or prevent others from contributing.
+- **Blog Contributions**:  Often students contribute articles and blogs to this project.  Their names are typically listed in the front matter of their contributing post.
 
-## Open Collaboration and Acknowledgment
-
-Open Coding Society is designed to be reused, adapted, and extended by students, educators, nonprofits, businesses, and other contributors.
-
-- **Open participation:** Individuals and organizations are welcome to contribute without becoming exclusive partners or acquiring ownership of OCS.
-- **Student recognition:** Student authors should receive appropriate credit for their original work and contributions, consistent with applicable ownership and licensing terms.
-- **Contributor acknowledgment:** Meaningful contributions may be recognized in project documentation, presentations, release notes, and other relevant materials.
-- **Accurate and nonexclusive credit:** Acknowledgments should reflect contributions actually made. Recognizing one contributor does not prevent OCS from recognizing others or collaborating with other organizations.
-- **Open-ended collaboration:** OCS may evolve through new contributors, partnerships, and adoption opportunities. Recognition should support this growth rather than create an exclusive or permanent claim over the project's identity.
-
-OCS aims to make its work useful beyond any single classroom, institution, or partnership. Its long-term value comes from open participation, transparent contributions, and the ability of others to build upon what already exists.
-
----
-
-## Emerging Technology and Applied Computer Science
-
-OCS provides a foundation for students to explore emerging technologies by building real applications, integrating systems, testing ideas, and working with users beyond the classroom. Projects connect foundational computer science to current developments in AI, connected devices, software infrastructure, accessibility, and community technology.
-
-### AI and Open Intelligence
-
-Students explore large language models (LLMs), AI-assisted development and assessment, intelligent search, chatbots, and AI-enabled applications. OCS Intelligence investigates hosting open-weight language models on locally available GPU hardware, making AI coding assistance more accessible without requiring every student to purchase a separate subscription.
+### Mentorship
 
 OCS's AI initiatives have also benefited from mentorship and technical discussions with **Eduardo Revollo, Founder/CEO of Prometheus**. OCS welcomes continued collaboration with industry practitioners as students explore open intelligence, AI infrastructure, and practical applications of emerging technology.
 
-### Connected Classrooms and Intelligent Systems
-
-Projects explore how software can connect physical devices, classroom environments, and digital services. Examples include RFID-based classroom presence prototypes, QR-based workflows, computer vision, object detection, and systems that combine sensor events with application data and dashboards.
-
-### Full-Stack Engineering and Infrastructure
-
-Students build beyond isolated programs and frontend demonstrations. Their work includes JavaScript interfaces, Python/Flask services, Java/Spring applications, SQL databases, APIs, authentication, deployment, monitoring, and security. They also develop the administrative, communication, assessment, and analytics systems needed to operate a shared educational platform.
-
-### Interactive Experiences and Accessibility
-
-Game engines, multiplayer experiences, interactive learning modules, accessible game creation, and alternative input methods give students opportunities to explore user interaction, software design, and inclusive technology. Projects connect programming concepts with the experience of the people who will use the resulting systems.
-
-### Community Technology and Applied Research
-
-Through capstone projects, students work with nonprofits, community organizations, and real-world problem statements. Projects include community websites and service platforms, volunteer coordination, educational tools, emergency preparedness, and other applications intended to make information and services more useful to their audiences.
-
-OCS encourages students to treat these projects as engineering work: define a problem, investigate possible solutions, build a prototype, test assumptions, evaluate results, document decisions, and improve the system.
-
-## The OCS Development Ecosystem
-
-OCS `Pages` supports the instructional and development workflows that make this work possible:
-
-- **Lessons and coding challenges:** Interactive lessons, Jupyter Notebooks, code examples, and hands-on `hacks`.
-- **Collaborative development:** GitHub repositories, forks, templates, team projects, pull requests, and reusable resources.
-- **Teaching and assessment:** Student Teaching, assignment tracking, live reviews, AI-assisted grading, and feedback workflows.
-- **Communication and analytics:** Tools for discussion, announcements, collaboration, progress tracking, and educational reflection.
-- **Local development and deployment:** Makefiles, development scripts, GitHub Actions, and integration with web services and databases.
-- **OCS-in-a-Kit:** An evolving effort to package software, resources, and teaching practices so other educators and organizations can adopt and adapt the ecosystem.
-
-The project portfolio is available at [OCS Capstone](https://pages.opencodingsociety.com/capstone/). It provides examples of student teams, technical investigations, and community-facing projects as the ecosystem evolves.
+The RFID-based Classroom Presence System has benefited from the mentorship of **Dr. Douglas Fenner, President of Fenner Consulting Group**, whose guidance has shaped its hardware design, integration with OCS, and research direction. OCS welcomes continued collaboration with mentors as students build connected classroom systems.
 
 ---
 
@@ -619,3 +548,25 @@ UDL is not a method but a **design lens** to make learning **accessible and mean
 | **Depth & Growth** | Fink | Human, affective, reflective development |
 | **Access & Design** | UDL | Inclusive and flexible access to all learners |
 | **Workflow & Rhythm** | Agile + Design Thinking + Gagné | Iteration, planning, feedback, reflection ceremonies |
+
+Preferences page redesign (dashboard v2) - work in progress
+
+What it does
+- Preferences tab split into: Appearance | Language & voice | Head tracking
+- Step 1 "Pick a starting point": Presets, My themes and Create with AI in one card
+- Step 2 "Fine-tune": all four colors together, then font, size and button style
+- Live preview with readability checks, and one Save / Reset
+
+How to try it
+1. In the pages repo (branch themes-front), copy each file over the one at the same path.
+   preferences-layout.js is a new file.
+2. Rebuild the site and open /dashboard/v2
+
+Files
+- _layouts/dashboard-v2.html                         new layout for the Preferences tab
+- _sass/open-coding/dashboard-v2.scss                styles (bottom: "Preferences tab")
+- assets/js/pages/dashboard/preferences-layout.js    NEW: tabs, live preview, readability checks
+- assets/js/pages/dashboard/preferences.js           presets / saved themes fill step 2 instead of saving
+- assets/js/pages/dashboard/ai-theme.js              an AI theme fills step 2 too
+- changes.diff                                       the same edits as a patch, for review
+                                                     (the new file isn't in it; it's in the folder above)
