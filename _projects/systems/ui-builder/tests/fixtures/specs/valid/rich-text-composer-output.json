@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "Everything the composer writes", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-compose1",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-compose1",
+              "type": "text",
+              "settings": {
+                "body": "<b>Bold</b> <i>Italic</i> <u>Underline</u> <s>Strike</s><br><ul><li>First point</li><li>Second point</li></ul><ol><li>Step one</li><li>Step two</li></ol><span class=\"rt-font-serif\">Serif</span> <span class=\"rt-font-mono\">Monospace</span> <span class=\"rt-size-sm\">Small</span> <span class=\"rt-size-lg\">Large</span> <span class=\"rt-size-xl\">Huge</span> 🚀✅ <a href=\"https://github.com/open-coding-society\" target=\"_blank\" rel=\"noopener noreferrer\">Our repo</a> <a href=\"mailto:team@example.com\" target=\"_blank\" rel=\"noopener noreferrer\">Email us</a>"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

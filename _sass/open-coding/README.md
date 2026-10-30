@@ -180,11 +180,38 @@ Common layout classes:
   need no margins; `ocs__stack--wide` uses the 1.5rem gap between cards.
   Children stretch to the full width, so put buttons in an `ocs__links` row.
 - `ocs__split`: two equal columns; `ocs__split ocs__split--aside` makes the first
-  a narrow list (14 to 18rem) beside a wide pane. Both become one column at 768px
-  and below. Messages (`/dm`) puts its conversation list beside the open chat this way.
+  a narrow list (14 to 18rem) beside a wide pane, and `ocs__split ocs__split--aside-end`
+  makes the second one narrow instead, a sidebar on the right. Each becomes one
+  column at 768px and below, in markup order, so a right-hand sidebar moves under
+  the main content. Write that sidebar as a `div`, not an `<aside>`: a saved
+  preference theme paints every `aside` with the page background. Messages (`/dm`)
+  puts its conversation list beside the open chat with `--aside`; the UI Builder's
+  "Narrow column on the right" layout uses `--aside-end`.
 
 See [`elements/containers`](elements/containers), [`elements/grids`](elements/grids),
 and [`grids.md`](../../_projects/lessons/sass/navigation/grids.md).
+
+### Embeds
+
+```html
+<iframe class="ocs__embed ocs__embed--tall" src="https://example.github.io/app/"
+        title="Flood Watch app" loading="lazy"></iframe>
+<iframe class="ocs__embed ocs__embed--video" src="https://www.youtube-nocookie.com/embed/VIDEO_ID"
+        title="Flood Watch demo video" allow="fullscreen; picture-in-picture; encrypted-media"></iframe>
+```
+
+- `ocs__embed`: a frame for another page, on the `<iframe>` itself. It fills its
+  container's width at a fixed height, 480px unless a size says otherwise, with
+  the theme border and a soft panel background that shows while the page loads.
+- `ocs__embed--short`, `--medium`, `--tall`: 320, 480 or 720px tall, so the page
+  around the frame keeps its place while it loads and the embedded app knows how
+  much room it has.
+- `ocs__embed--video`: a 16:9 player that scales with the width, for YouTube or a
+  Google Drive video. It wins over a size class set beside it.
+
+Give each iframe a `title` that says what it shows: screen readers announce it.
+See [`elements/embeds`](elements/embeds). The UI Builder's Embed your app and
+Video blocks load their pages in this frame.
 
 ### Form fields
 

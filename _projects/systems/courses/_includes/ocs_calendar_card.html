@@ -7,6 +7,12 @@
     course   csa | csp | csse | csh, or "all"   default: the page's course, else all
     title    card heading                       default: "CSA calendar" / "Class calendar"
     sample   true shows example events          for prototypes; nothing is saved
+    template true puts only an empty card on the page, inside
+             <template data-ocs-template="calendar-card">, whatever the other
+             options say, and no data or script. It is for a page that makes
+             its cards from its own data (the UI Builder): createCalendarCardSection
+             in calendar-card.js copies it, and the page adds the school
+             calendar with ocs_calendar_card_data.html.
 
   There is no period option. A period typed into a page would be the same for
   every reader, so the card shows every period its course meets. Events tagged
@@ -16,6 +22,12 @@
   from existing OCS elements (ocs__card, ocs__links, ocs__btn, ocs__table,
   ocs__callout, ocs__text) and has no CSS of its own. The parts the script shows
   and hides are plain wrappers, because ocs__ elements that set display beat [hidden].
+  The school calendar goes on the page once (ocs_calendar_card_data.html, which
+  keeps its own once-flag), and so does the script.
+
+  The tags are laid out so a card renders byte for byte as it did before
+  template=true (scripts/test_calendar_card.rb): the "-" in a tag drops the
+  line break after it.
 {% endcomment %}
 {% assign ocs_cal_course = include.course | default: page.course | default: "all" %}
 {% if ocs_cal_course == "all" %}
@@ -24,37 +36,20 @@
   {% assign ocs_cal_default_title = ocs_cal_course | upcase | append: " calendar" %}
 {% endif %}
 {% assign ocs_cal_title = include.title | default: ocs_cal_default_title %}
-<section class="ocs__card ocs__keypoints" data-ocs-calendar data-course="{{ ocs_cal_course }}" data-sample="{{ include.sample | default: false }}" data-calendar-url="{{ site.baseurl }}/student/calendar" aria-label="{{ ocs_cal_title }}">
+{% assign ocs_cal_sample = include.sample | default: false -%}
+{% if include.template %}{% assign ocs_cal_course = "" %}{% assign ocs_cal_title = "" %}{% assign ocs_cal_sample = false %}{% endif -%}
+{% capture ocs_cal_section %}<section class="ocs__card ocs__keypoints" data-ocs-calendar data-course="{{ ocs_cal_course | escape }}" data-sample="{{ ocs_cal_sample }}" data-calendar-url="{{ site.baseurl }}/student/calendar" aria-label="{{ ocs_cal_title | escape }}">
   <div class="ocs__links">
-    <strong><i class="fas fa-calendar-alt" aria-hidden="true"></i> {{ ocs_cal_title }}</strong>
+    <strong><i class="fas fa-calendar-alt" aria-hidden="true"></i> {{ ocs_cal_title | escape }}</strong>
     <a class="ocs__btn small pill" href="{{ site.baseurl }}/student/calendar">Open calendar</a>
   </div>
   <div class="ocs__text" data-hook="status" role="status" hidden></div>
   <div data-hook="mount"></div>
   <div data-hook="detail" hidden></div>
   <noscript><div class="ocs__text">Turn on JavaScript to see the class calendar.</div></noscript>
-</section>
+</section>{% endcapture %}{% if include.template %}<template data-ocs-template="calendar-card">{{ ocs_cal_section }}</template>{% else %}{{ ocs_cal_section }}
 
-{% unless ocs_calendar_card_assets %}
-{% assign ocs_calendar_card_assets = true %}
-{% assign ocs_cal_school = site.data.school_calendar %}
-<script id="ocsSchoolCalendarData" type="application/json">
-{
-  "schoolYear": {{ ocs_cal_school.school_year | jsonify }},
-  "weeks": {
-    {% for week in ocs_cal_school.weeks %}
-    "{{ week[0] }}": {
-      "monday": {{ week[1].monday | jsonify }},
-      "friday": {{ week[1].friday | jsonify }},
-      "holidays": {{ week[1].holidays | default: nil | jsonify }},
-      "holidayAdjustment": {{ week[1].holiday_adjustment | default: nil | jsonify }},
-      "skipWeek": {{ week[1].skip_week | default: false | jsonify }},
-      "theme": {{ week[1].theme | default: nil | jsonify }},
-      "notes": {{ week[1].notes | default: nil | jsonify }}
-    }{% unless forloop.last %},{% endunless %}
-    {% endfor %}
-  }
-}
-</script>
+{% include ocs_calendar_card_data.html %}{% unless ocs_calendar_card_script %}{% assign ocs_calendar_card_script = true %}
 <script type="module" src="{{ site.baseurl }}/assets/js/chat/calendar/calendar-card.js"></script>
 {% endunless %}
+{% endif -%}
