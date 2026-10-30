@@ -411,6 +411,38 @@ public class AnnouncementService {
 
 > The **Class announcements** block is a different feature: it shows a course's announcement channel from Messages, not this API
 
+## Study This With AI
+> Paste your own code into your AI tool, then check what it says against the code
+- Never paste passwords, tokens or your `.env` file
+
+**Draw it**
+
+```text
+Draw a Mermaid sequence diagram of one GET request moving through my controller,
+service, repository and database, and back to the browser. Use my class names.
+```
+
+**Explain it**
+
+```text
+Explain why my controller calls a service instead of the repository. Use my
+feature as the example, in under 100 words.
+```
+
+**Quiz me**
+
+```text
+Ask me 5 questions, one at a time, on the five standard parts of a Spring feature.
+Wait for each answer and tell me what I missed.
+```
+
+**Break it**
+
+```text
+List 3 requests that would fail on my API and the status code each one returns.
+I will test them in my .http file and tell you where you were wrong.
+```
+
 ## Further Questions
 > Please use the comments below to suggest things to be added
 - Come to office hours if further help is needed
