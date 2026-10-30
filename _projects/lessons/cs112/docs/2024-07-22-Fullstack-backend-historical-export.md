@@ -9,6 +9,7 @@ comments: True
 author: Finn Carpenter
 lesson_group: "cs112"
 articulation: {"institution":"MiraCosta College","course":"CS112"}
+courses: {'csa': {'week': 5}}
 categories: [Java, Spring]
 ---
 
