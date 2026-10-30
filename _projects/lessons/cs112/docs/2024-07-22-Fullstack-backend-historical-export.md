@@ -57,6 +57,24 @@ categories: [Java, Spring]
 
 
 
+## How This Connects
+> Where this feature sits in OCS and in CS112
+
+### In OCS
+- **Spring** holds the data and the rules, which is what this lesson builds
+- **Pages** is the frontend students see, built from `ocs__` classes
+- **UI Builder** lets you put your API on a Pages page without writing HTML, which is Step 8
+- Your feature follows the same path: copy the five parts, rename them, then connect a page
+
+### In CS112
+> These come from the [CS112 outline report](/csa/cs112/)
+
+| CS112 topic | What you do in this lesson |
+|---|---|
+| V.B Java applets or Web | Connect a browser page to a Spring endpoint and retrieve project data (Steps 5 and 8) |
+| III.D Fault-tolerance through exception and error handling | Read the status code each route returns and test the error cases (Step 7) |
+| III.B.1 Text and binary files | Save data to a table with JPA; this is related but does not replace writing files yourself |
+
 ## Step 1
 > File Management
 - Create your features folder name in `src/main/java/com/open/spring/mvc` (for me it is announcement)
