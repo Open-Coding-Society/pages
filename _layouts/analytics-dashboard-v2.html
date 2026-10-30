@@ -251,14 +251,16 @@ score += gists * 0.5
                             Smart Predict Grade
                         </button>
                         <p id="userGrade" class="ocs__analytics-result-text ocs__analytics-card-spaced-sm"></p>
+                        <p id="forecastSaved" class="ocs__analytics-fineprint" hidden>
+                            Forecast saved. See how your guesses compare over time in your
+                            <a href="{{ site.baseurl }}/retrospective#forecast">Retrospective</a>.
+                        </p>
                     </div>
                 </div>
 
                 <!-- Grade Calculator, rendered by assets/js/analytics/grade-calculator.js -->
                 <div id="grade-calculator-root" style="margin-top: 2rem;"></div>
 
-                <!-- Forecast Retrospective, rendered by assets/js/analytics/forecast-retrospective.js -->
-                <div id="forecast-retrospective-root" style="margin-top: 2rem;"></div>
 
                 <!-- Help content -->
                 <div class="ocs__analytics-card-spaced">
@@ -393,18 +395,17 @@ score += gists * 0.5
                 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
     import { initOCSAnalyticsDashboard } from '{{ site.baseurl }}/assets/js/ocs-analytics-dashboard.js';
-    import { initForecastRetrospective, recordForecast, refreshForecastRetrospective } from '{{ site.baseurl }}/assets/js/analytics/forecast-retrospective.js';
+    import { recordForecast } from '{{ site.baseurl }}/assets/js/analytics/forecast-retrospective.js';
     import { initGradeCalculator } from '{{ site.baseurl }}/assets/js/analytics/grade-calculator.js';
 
     // Under the predictor: the student's own Grade Calculator (scores copied from their gradebook, plus
-    // what-ifs) and the Forecast Retrospective, which checks each logged Smart Predict against that grade.
-    let forecastPanelStarted = false;
+    // what-ifs). Each Smart Predict is logged for the Forecast Retrospective on the Retrospective page.
+    let gradeCalculatorStarted = false;
 
-    async function showForecastRetrospective() {
-        if (forecastPanelStarted) return refreshForecastRetrospective();
-        forecastPanelStarted = true;
-        await initGradeCalculator(document.getElementById("grade-calculator-root"), { onSaved: refreshForecastRetrospective });
-        return initForecastRetrospective(document.getElementById("forecast-retrospective-root"));
+    async function showGradeCalculator() {
+        if (gradeCalculatorStarted) return;
+        gradeCalculatorStarted = true;
+        await initGradeCalculator(document.getElementById("grade-calculator-root"));
     }
 
     async function logForecast(sliderValues, modelGrade) {
@@ -413,7 +414,7 @@ score += gists * 0.5
         const saved = await recordForecast(sliderValues, Math.min(100, Math.max(0, modelGrade)), guess);
         if (saved) {
             if (guessInput) guessInput.value = "";
-            await showForecastRetrospective();
+            document.getElementById("forecastSaved").hidden = false;
         }
     }
 
@@ -1216,7 +1217,7 @@ score += gists * 0.5
                 }
             }
             if (targetId === "tab-content-grade") {
-                await showForecastRetrospective();
+                await showGradeCalculator();
             }
             if (targetId === "tab-content-skill-passport") {
                 await loadSkillPassport();

@@ -1,6 +1,7 @@
-// Forecast Retrospective for the Grade Predictor tab of the analytics dashboards.
+// Forecast Retrospective on the Retrospective page (/retrospective).
 //
-// Every Smart Predict is logged to Spring (/api/grade-forecasts). This panel turns those
+// Every Smart Predict on the analytics dashboard's Grade Predictor tab is logged to Spring
+// (/api/grade-forecasts) by recordForecast. This panel turns those
 // forecasts into a growth loop a student can act on:
 //   1. Growth goal: pick one skill and one small action, then check in on a date and see what
 //      changed in your rating, your teacher's rating and your records (/api/grade-forecasts/goals).
@@ -8,7 +9,7 @@
 //      questions to ask your teacher where your ratings disagree.
 //   3. How well you judge yourself: whether your grade guesses are getting closer to your real
 //      grade (from your Grade Calculator; the official gradebook has no API).
-import { javaURI, fetchOptions } from '../api/config.js';
+import { javaURI, fetchOptions, baseurl } from '../api/config.js';
 
 // Grade Predictor slider name -> Spring field name and label, in dashboard order.
 export const SKILLS = [
@@ -28,6 +29,7 @@ const LABEL = Object.fromEntries(SKILLS.map(([, field, label]) => [field, label]
 const SLIDER = Object.fromEntries(SKILLS.map(([slider, field]) => [field, slider]));
 const NOTABLE_GAP = 1; // matches GradeForecastService.NOTABLE_GAP
 const DEFAULT_GOAL_DAYS = 14; // matches GrowthGoalService.DEFAULT_DAYS
+const PREDICTOR_LINK = `<a href="${baseurl}/analytics-dashboard" class="fr-link">Grade Predictor tab of the Analytics Dashboard</a>`;
 
 // Skills a growth goal can target, with a short definition shown when one is picked. AI
 // Orchestration is not rated by the predictor, so its goals have no ratings to compare.
@@ -73,7 +75,7 @@ export async function initForecastRetrospective(root) {
 
           <div class="fr-card">
             <div class="fr-step"><span class="fr-step-num">2</span><h3 class="fr-h3">Where to focus</h3></div>
-            <div data-fr="focus-empty" class="fr-muted fr-small" hidden>Run Smart Predict on the sliders above to see how your ratings compare with your teacher's and your records.</div>
+            <div data-fr="focus-empty" class="fr-muted fr-small" hidden>Run Smart Predict on the ${PREDICTOR_LINK} to see how your ratings compare with your teacher's and your records.</div>
             <div data-fr="focus-body">
               <div class="fr-focus" data-fr="focus" hidden></div>
               <div class="fr-levers">
@@ -603,6 +605,7 @@ function injectStyles() {
       .fr-title { font-size: 1.25rem; font-weight: 600; margin: 0 0 .25rem; }
       .fr-h3 { font-size: 1rem; font-weight: 600; margin: 0; }
       .fr-summary { cursor: pointer; font-weight: 600; }
+      .fr-link { color: #60a5fa; text-decoration: underline; }
       .fr-muted { opacity: .7; margin: 0; }
       .fr-small { font-size: .8rem; }
       .fr-label { display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; opacity: .65; }
