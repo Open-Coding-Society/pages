@@ -1,4 +1,5 @@
 import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import LapTracker from './LapTracker.js';
 import LosingScreen from './Losing-Screen.js';
 import RestartPrompt from './RestartPrompt.js';
@@ -68,16 +69,16 @@ class TimeLapScreen extends GameObject {
   }
 
   getPlayers() {
-    return this.gameEnv.gameObjects.filter((object) => object?.constructor?.name === 'Player');
+    return this.gameEnv.gameObjects.filter((object) => object instanceof Player);
   }
 
   // "P1 Red Car WASD" so players can tell which row is theirs.
   getPlayerLabel(player, index) {
     const name = player.spriteData?.name || 'Car';
-    const keys = player.keypress
+    const keys = player.controlLabel || (player.keypress
       ? [player.keypress.up, player.keypress.left, player.keypress.down, player.keypress.right]
         .map((code) => String.fromCharCode(code)).join('')
-      : '';
+      : '');
     return `P${index + 1} ${name}${keys ? ` ${keys}` : ''}`;
   }
 
@@ -141,6 +142,7 @@ class TimeLapScreen extends GameObject {
     if (this.drawsFinishLine) {
       this.drawFinishLine(ctx);
     }
+    this.drawBoostBars(ctx);
     this.drawPanel(ctx);
     if (this.winnerLabel) {
       this.drawBanner(
@@ -191,6 +193,37 @@ class TimeLapScreen extends GameObject {
       ctx.textAlign = 'right';
       ctx.fillStyle = '#bbf7d0';
       ctx.fillText(`${this.lapTracker.getLapsCompleted(player)}/${this.totalLaps}${halfway}`, x + width - 8, rowY);
+    });
+  }
+
+  drawBoostBars(ctx) {
+    const players = this.getPlayers().filter((player) => typeof player.getBoostCharge === 'function');
+    const barWidth = 14;
+    const barHeight = Math.min(100, Math.round(this.gameEnv.innerHeight * 0.28));
+    const sideInset = Math.max(6, Math.round(this.gameEnv.innerWidth * 0.025));
+    const y = Math.round((this.gameEnv.innerHeight - barHeight) / 2);
+
+    players.forEach((player, index) => {
+      const x = index === 0
+        ? sideInset
+        : this.gameEnv.innerWidth - sideInset - barWidth;
+      const color = PLAYER_COLORS[index] || '#f8fafc';
+      const charge = Math.max(0, Math.min(1, player.getBoostCharge()));
+      const innerHeight = barHeight - 4;
+      const filledHeight = innerHeight * charge;
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+      ctx.fillRect(x, y, barWidth, barHeight);
+      ctx.fillStyle = color;
+      ctx.fillRect(x + 2, y + barHeight - 2 - filledHeight, barWidth - 4, filledHeight);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, barWidth, barHeight);
+
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillStyle = color;
+      ctx.textAlign = index === 0 ? 'left' : 'right';
+      ctx.fillText(player.boostLabel, index === 0 ? x : x + barWidth, y - 6);
     });
   }
 

@@ -17,6 +17,19 @@ editing: "Editing {title}."
 undo: Undo
 redo: Redo
 device_group: Preview size
+view_group: "Preview or code"
+view_preview: "Preview"
+view_code: "Code"
+code_view_title: "Your page's code"
+code_lead: "This is the HTML your page file holds, section by section and block by block. Each part says what its markup does and which OCS classes style it. Pick a block to select it, then switch back to Preview to see it drawn."
+code_section: "{n}. {label}"
+code_column: "Column {n}"
+code_column_here: "column {n}: its blocks are below"
+code_blocks_here: "its blocks are below"
+code_classes: "OCS classes in this code"
+code_hidden: "Hidden: this isn't on the published page."
+code_nothing: "Nothing yet: fill in this block's settings and its code shows here."
+code_empty: "Add a block and its code shows here."
 device_label: "Show the page at {label} width"
 real_data: Real data while editing
 real_data_help: Reads your API in the preview. Links to your own computer work only after Test connection.
@@ -142,8 +155,6 @@ copy: Copy
 copied: Copied.
 copy_failed: Couldn't copy. Select the text and copy it yourself.
 download: Download
-html_title: "HTML for {label}"
-html_help: This is the markup the page file uses for this block.
 export_title: Export page file
 export_help: "Add this file to your fork of the Pages repository (for example in navigation/), then open a pull request. Live blocks that need the UI Builder's viewer are written as comments."
 export_permalink_note: Check that no other page uses this address before you open a pull request.
