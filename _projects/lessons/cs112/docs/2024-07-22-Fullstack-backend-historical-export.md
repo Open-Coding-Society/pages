@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Backend Fullstack Development
-description: Guide to the backend development of you're feature
+description: Guide to the backend development of your feature
 permalink: /fullstack/java/backend
 menu: nav/fullstack_java.html
 toc: True
@@ -151,7 +151,7 @@ public class AnnouncementEntity {
 - Replace the names with your project and data type names
 - Super simple just use the same method name formatting 
 - The compiler will make the methods for you
-- This code segment is you're whole file
+- This code segment is your whole file
 
 <br>
 
