@@ -13,6 +13,17 @@ courses: {'csa': {'week': 5}}
 categories: [Java, Spring]
 ---
 
+## Before You Start
+> Look back at these lessons from week 4
+- This lesson puts them together into one working feature, so skim any that feel unfamiliar
+
+| Lesson | Idea | Where it shows up here |
+|---|---|---|
+| [Spring intro](/java/spring/intro/) | How a Spring project fits together | The whole lesson |
+| [POJO](/java/spring/pojo/) | A Java class that becomes a table | Step 2, the entity |
+| [JPA](/java/spring/jpa/) | Reading and writing without SQL | Step 3, the repository |
+| [API Controller](/java/spring/api/) | Turning HTTP into method calls | Step 5, the controller |
+
 ## How do API work?
 > Five standard parts
 - Every Spring feature in our backend has the same five parts, named after the feature
