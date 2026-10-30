@@ -321,6 +321,40 @@ public class AnnouncementService {
     }
 ```
 
+## Step 6
+> Table Initializer File
+- Name it your feature + TableInitializer.java
+- Our backend runs with `ddl-auto=none`, so Spring does not create tables for new entities by itself
+- This file creates your table when the backend starts, only if it is missing, and never changes a table that exists
+- Use one column per variable from Step 2.1
+- Because the id uses `GenerationType.AUTO`, Spring also needs a `_seq` table that holds the next id
+
+<br>
+
+```java
+    @Bean
+    public ApplicationRunner migrateAnnouncement() {
+        return args -> {
+            try {
+                jdbcTemplate.execute(
+                    "CREATE TABLE IF NOT EXISTS announcement ("
+                        + "id bigint NOT NULL PRIMARY KEY, "
+                        + "author varchar(255), "
+                        + "body varchar(255), "
+                        + "tags varchar(255), "
+                        + "timestamp varchar(255), "
+                        + "title varchar(255))");
+                jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS announcement_seq (next_val bigint)");
+                seedIdCounterIfEmpty();
+            } catch (DataAccessException e) {
+                logger.warn("Could not create the announcement tables: {}", e.getMessage());
+            }
+        };
+    }
+```
+
+- Copy `seedIdCounterIfEmpty()` from the announcement file as it is; it adds the first row of the `_seq` table
+
 ## Further Questions
 > Please use the comments below to suggest things to be added
 - Come to office hours if further help is needed
