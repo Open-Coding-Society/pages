@@ -10,7 +10,7 @@ export default class Player extends EnginePlayer {
     this.acceleration = 0.20;
     this.braking = 0.2;
     this.coasting = 0.05;
-    this.turnRate = 0.1 / speed;
+    this.turnRate = 0.1;
     this.heading = 0; // Radians; 0 points upward.
     this.gravity = false;
     this.updateDirection();
@@ -77,6 +77,7 @@ export default class Player extends EnginePlayer {
     } else {
       this.speed = Math.min(this.speed + this.coasting, 0);
     }
+    this.turnRate = 0.1 / Math.abs(this.speed) || 0.1;
 
     const steering =
       (this.pressedKeys[right] ? 1 : 0) -
