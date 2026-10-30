@@ -6,7 +6,7 @@ permalink: /fullstack/java/backend
 menu: nav/fullstack_java.html
 toc: True
 comments: True
-author: Finn Carpenter
+author: Finn Carpenter, Akshaj Gurugubelli
 lesson_group: "cs112"
 articulation: {"institution":"MiraCosta College","course":"CS112"}
 courses: {'csa': {'week': 5}}
