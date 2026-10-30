@@ -178,6 +178,40 @@ public interface AnnouncementJpaRepository extends JpaRepository<AnnouncementEnt
 
 
 ## Step 4
+> Service File
+- Name it your feature + Service.java
+- The service holds the rules of your feature: what happens when someone creates, reads, edits or deletes
+- It is the only class that uses the repository, so the controller never talks to the database directly
+- `@Service` lets Spring hand it the repository through the constructor
+
+<br>
+
+```java
+@Service
+public class AnnouncementService {
+
+    private final AnnouncementJpaRepository repository;
+
+    public AnnouncementService(AnnouncementJpaRepository repository) {
+        this.repository = repository;
+    }
+
+    // Saves a new announcement stamped with the current time
+    public AnnouncementEntity create(String author, String title, String body, String tags) {
+        return repository.save(new AnnouncementEntity(author, title, body, tags));
+    }
+
+    // Replaces the body of the announcement with this title
+    public AnnouncementEntity editBody(String title, String body) {
+        AnnouncementEntity announcement = repository.findByTitle(title);
+        announcement.setBody(body);
+        repository.save(announcement);
+        return announcement;
+    }
+}
+```
+
+## Step 5
 > Controller File
 - Use the announcement controller file, copy and rename all parts to your API's name similar to the first step
 - This file is how you will manipulate your data from outside the local system
@@ -192,7 +226,7 @@ public interface AnnouncementJpaRepository extends JpaRepository<AnnouncementEnt
 @RequestMapping("/api/announcements")
 ```
 
-### Step 4.1
+### Step 5.1
 > Basic Methods (do not copy use as example)
 - All we are doing is just assigning certain methods to URLs, that will do CRUD processes
 - CRUD stands for Create Read Update Delete, and you want each kind 
@@ -267,7 +301,7 @@ public interface AnnouncementJpaRepository extends JpaRepository<AnnouncementEnt
     }
 ```
 
-### Step 4.2
+### Step 5.2
 > Custom methods using JPA
 - Sometimes you want to create specific query methods for your 
 - Example of fetching by author and tags
