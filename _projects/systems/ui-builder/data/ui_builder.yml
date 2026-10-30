@@ -1,0 +1,817 @@
+# UI Builder registry: every frame, block, field, limit and visible string.
+# Published to _data/ui_builder.yml; the school pack (ui_builder_school.yml) is merged over it.
+# Key convention that Spring's UiBuilderSpecRules checks: URL values live only under keys named
+# url, src, image or link; rich text only under body; API field mappings end in _path.
+schema_version: 1
+
+limits:
+  sections: 25
+  blocks_per_section: 50
+  live_blocks: 8
+  spec_chars: 200000
+  depth: 12
+  text_max: 200
+  textarea_max: 2000
+  richtext_max: 4000
+  list_max: 20
+  table_rows: 50
+  table_cols: 8
+  api_timeout_ms: 8000
+  api_max_chars: 512000
+  api_item_chars: 500
+  api_snapshot_items: 50
+  api_snapshot_chars: 64000
+  import_max_chars: 5000000
+  gallery_max: 200
+  history_limit: 100
+  string_max: 20000
+  link_label_max: 60
+  slug_pattern: "^[a-z0-9](?:[a-z0-9-]{1,62}[a-z0-9])$"
+  reserved_slugs: [admin, login, logout, help, teacher, teachers, staff, official, ocs, new, edit, view, gallery, canvas, api, draft]
+
+devices:
+  - { key: phone, label: Phone, width: 375 }
+  - { key: tablet, label: Tablet, width: 768 }
+  - { key: desktop, label: Desktop, width: 1280 }
+  - { key: full, label: Full width, width: 0 }
+
+# Hosts under this domain get the site's login cookies (they are domain-wide), so images from
+# them load without cookies and apps on them open in a new tab instead of inside the page.
+security:
+  cookie_domain: opencodingsociety.com
+
+categories:
+  - { key: layout, label: Layout }
+  - { key: content, label: Content }
+  - { key: comms, label: Talk and plan }
+  - { key: project, label: Your project }
+
+frames:
+  stack:
+    label: One column
+    help: Blocks stacked from top to bottom.
+    code_note: "A section with ocs__stack: its blocks sit one under another, with even gaps and no margins."
+    icon: fa-bars
+    fields: []
+  columns:
+    label: Columns
+    help: Two or three columns side by side. They stack on phones.
+    code_note: "A section that is a grid: ocs__split makes two columns (with --aside or --aside-end, one of them narrow) and ocs__facts makes three. Each column is a div with ocs__stack, and on a phone the columns stack in this order."
+    icon: fa-table-columns
+    fields:
+      - id: layout
+        type: choice
+        label: Column layout
+        default: halves
+        options:
+          - { value: halves, label: Two equal columns }
+          - { value: thirds, label: Three equal columns }
+          - { value: sidebar_left, label: Narrow column on the left }
+          - { value: sidebar_right, label: Narrow column on the right }
+
+# Each columns layout and the grammar classes that draw it (see _sass/open-coding/README.md).
+layouts:
+  halves: { class: ocs__split, cells: 2 }
+  thirds: { class: ocs__facts, cells: 3 }
+  sidebar_left: { class: ocs__split ocs__split--aside, cells: 2 }
+  sidebar_right: { class: ocs__split ocs__split--aside-end, cells: 2 }
+
+page_fields:
+  - { id: title, type: text, label: Page title, required: true, max: 120 }
+  - { id: description, type: text, label: One-line description, max: 300, help: Shown on gallery cards. }
+  - { id: byline, type: text, label: Made by, max: 120, placeholder: Your team's name }
+  # max: Spring keeps the picture in a 500-character column and refuses a longer one (too_long).
+  - { id: image, type: image, label: Gallery picture, max: 500, help: Shown on the page's gallery card. }
+  - id: width
+    type: choice
+    label: Page width
+    default: contained
+    options:
+      - { value: contained, label: Normal }
+      - { value: wide, label: Wide }
+
+blocks:
+  hero:
+    label: Page header
+    help: A title, a short intro and up to three buttons at the top of the page.
+    code_note: "A header (an ocs__stack) with the page's only h1, an ocs__badge label above it, a bigger first paragraph (ocs__lead) and a row of ocs__btn buttons."
+    icon: fa-flag
+    category: content
+    fields:
+      - { id: badge, type: text, label: Small label, max: 40, placeholder: "CSP · Team project" }
+      - { id: title, type: text, label: Title, required: true, max: 120 }
+      - { id: lead, type: textarea, label: Intro, max: 400 }
+      - { id: links, type: links, label: Buttons, max_items: 3 }
+  heading:
+    label: Heading
+    help: A section title with an optional line under it.
+    code_note: "An h2 with ocs__section-title: the small heading that starts a part of the page."
+    icon: fa-heading
+    category: content
+    fields:
+      - { id: text, type: text, label: Heading, required: true, max: 120 }
+      - id: level
+        type: choice
+        label: Size
+        default: "2"
+        options:
+          - { value: "2", label: Section heading }
+          - { value: "3", label: Smaller heading }
+      - { id: subtitle, type: text, label: Line under the heading, max: 200 }
+  text:
+    label: Text
+    help: Paragraphs with bold, italic, lists and links.
+    code_note: "Your text in a div with ocs__text, which sets its color and line spacing. Bold, lists and links stay HTML tags inside it."
+    icon: fa-align-left
+    category: content
+    fields:
+      - { id: body, type: richtext, label: Text, required: true, max: 4000 }
+  image:
+    label: Image
+    help: A picture from an https:// link or a file on this site.
+    code_note: "A figure: the picture is an img that ocs__image-frame frames, and the caption is a figcaption. Screen readers read the img's alt text."
+    icon: fa-image
+    category: content
+    fields:
+      - { id: src, type: image, label: Image link, required: true }
+      - { id: alt, type: text, label: Describe the image, required: true, max: 200, help: Screen readers read this aloud. }
+      - { id: caption, type: text, label: Caption, max: 200 }
+      - id: fit
+        type: choice
+        label: Fit
+        default: contain
+        options:
+          - { value: contain, label: Show the whole image }
+          - { value: cover, label: Fill the frame }
+  video:
+    label: Video
+    help: A YouTube or Google Drive video. It loads when a visitor presses Play.
+    code_note: "A card (ocs__card) with the video's title, its site and a button. On the live page, Play loads the player in an ocs__embed--video frame."
+    icon: fa-circle-play
+    category: content
+    fields:
+      - { id: url, type: url, label: Video link, required: true, help: "Paste a YouTube or Google Drive link. Drive videos must be shared with Anyone with the link." }
+      - { id: title, type: text, label: Title, required: true, max: 80 }
+      - { id: caption, type: text, label: Caption, max: 200 }
+  buttons:
+    label: Buttons
+    help: A row of up to four link buttons.
+    code_note: "A row (ocs__links) of links that look like buttons (ocs__btn). accent fill marks the main one."
+    icon: fa-hand-pointer
+    category: content
+    fields:
+      - { id: links, type: links, label: Buttons, required: true, max_items: 4 }
+      - { id: emphasize_first, type: toggle, label: Make the first button stand out, default: true }
+  card:
+    label: Card
+    help: A boxed title and text with an optional button.
+    code_note: "A section with ocs__card, the framed panel. ocs__card-header puts its title and its button on one row."
+    icon: fa-square
+    category: content
+    fields:
+      - { id: title, type: text, label: Title, required: true, max: 120 }
+      - { id: body, type: richtext, label: Text, max: 2000 }
+      - { id: links, type: links, label: Button, max_items: 1 }
+  callout:
+    label: Callout
+    help: A highlighted note.
+    code_note: "A div with ocs__callout: a boxed note in a softer color, for tips and warnings."
+    icon: fa-circle-info
+    category: content
+    fields:
+      - { id: body, type: richtext, label: Note, required: true, max: 2000 }
+  keypoints:
+    label: Key points
+    help: A short list of ideas, each with a title.
+    code_note: "A list of points (ocs__keypoints). Each ocs__keypoint row is a check mark (ocs__check), then its text."
+    icon: fa-list-ul
+    category: content
+    fields:
+      - id: items
+        type: items
+        label: Points
+        max_items: 8
+        item_fields:
+          - { id: title, type: text, label: Title, required: true, max: 80 }
+          - { id: text, type: textarea, label: Text, max: 300 }
+  checklist:
+    label: Checklist
+    help: Tasks with done and to-do boxes.
+    code_note: "A ul with ocs__checklist. Each item's ocs__checklist-box shows whether it's done, and the done class marks the finished ones."
+    icon: fa-square-check
+    category: content
+    fields:
+      - id: items
+        type: items
+        label: Tasks
+        max_items: 20
+        item_fields:
+          - { id: text, type: text, label: Task, required: true, max: 120 }
+          - { id: done, type: toggle, label: Done, default: false }
+  stats:
+    label: Numbers
+    help: Big numbers with a label, like users or tests passing.
+    code_note: "A grid of numbers (ocs__stats). Each ocs__stat box holds a big ocs__stat-value and a small ocs__stat-label."
+    icon: fa-chart-simple
+    category: content
+    fields:
+      - id: items
+        type: items
+        label: Numbers
+        max_items: 6
+        item_fields:
+          - { id: value, type: text, label: Number, required: true, max: 20 }
+          - { id: label, type: text, label: Label, required: true, max: 60 }
+  table:
+    label: Table
+    help: "Type one row per line and split cells with |. The first row is the header."
+    code_note: "A table with ocs__table for theme colors, inside ocs__table-wrap so it scrolls sideways on a phone."
+    icon: fa-table
+    category: content
+    fields:
+      - { id: data, type: table, label: Table, required: true, placeholder: "Name | Role" }
+      - { id: caption, type: text, label: Caption, max: 120 }
+  link_cards:
+    label: Link cards
+    help: Clickable cards that link to your app, your repo or a lesson.
+    code_note: "A nav with ocs__nav-grid. Each card is one big link (ocs__nav-card) with a small kicker, a title and a line of text."
+    icon: fa-grip
+    category: content
+    fields:
+      - id: items
+        type: items
+        label: Cards
+        max_items: 8
+        item_fields:
+          - { id: kicker, type: text, label: Small label, max: 40 }
+          - { id: title, type: text, label: Title, required: true, max: 80 }
+          - { id: text, type: textarea, label: Text, max: 200 }
+          - { id: url, type: url, label: Link, required: true }
+  team:
+    label: Team
+    help: Who is on the team and what each person does.
+    code_note: "A list of people (ocs__entity-list). Each person has an ocs__avatar with their initials, then their name and role."
+    icon: fa-people-group
+    category: content
+    fields:
+      - { id: title, type: text, label: Title, max: 80, default: Our team }
+      - id: items
+        type: items
+        label: People
+        max_items: 8
+        item_fields:
+          - { id: name, type: text, label: Name, required: true, max: 40, help: First names only on public pages. }
+          - { id: role, type: text, label: Role, max: 40 }
+          - { id: url, type: url, label: GitHub or portfolio link }
+  code:
+    label: Code
+    help: Shows code as text. It never runs.
+    code_note: "A figure with your code in pre and code tags, so its spaces and line breaks stay exactly as typed."
+    icon: fa-code
+    category: content
+    fields:
+      - { id: language, type: text, label: Language, max: 20, placeholder: python }
+      - { id: code, type: textarea, label: Code, required: true, max: 6000 }
+  divider:
+    label: Divider
+    help: A line between parts of the page.
+    code_note: "An hr: a plain line between two parts of the page."
+    icon: fa-minus
+    category: content
+    fields: []
+  chat:
+    label: Group chat
+    help: Your group's live chat from Messages, shown on the page to the group's members.
+    code_note: "Only a comment in the page file. On the live page, the viewer embeds your group's chat from Messages for its members."
+    icon: fa-comments
+    category: comms
+    live: true
+    needs: spring
+    fields:
+      - { id: group, type: group, label: Group, required: true }
+      - { id: title, type: text, label: Title, max: 80 }
+  members:
+    label: Team members
+    help: The names of everyone in a group.
+    code_note: "Only a comment in the page file. On the live page, the viewer lists your group's members for signed-in visitors."
+    icon: fa-users
+    category: comms
+    live: true
+    needs: spring
+    fields:
+      - { id: group, type: group, label: Group, required: true }
+      - { id: title, type: text, label: Title, max: 80 }
+  message_me:
+    label: Message us
+    help: A button that opens a direct message with you, the page owner.
+    code_note: "Only a comment in the page file. On the live page, the viewer adds a button that opens a direct message with the page's owner."
+    icon: fa-envelope
+    category: comms
+    live: true
+    needs: spring
+    fields:
+      - { id: label, type: text, label: Button text, max: 40, default: Message us }
+      - { id: note, type: text, label: Note above the button, max: 120 }
+  kanban:
+    label: Kanban board
+    help: Your team's GitHub project board or issues, live.
+    code_note: "An include of the site's kanban board (ocs_kanban_board.html) with your board's address. Jekyll fills it in when the site builds."
+    icon: fa-clipboard-list
+    category: comms
+    live: true
+    fields:
+      - { id: url, type: url, label: Board link, required: true, help: "A GitHub organization Projects board, or a repository's Issues page such as https://github.com/owner/repo/issues. Personal boards can't be shown." }
+      - { id: filter, type: text, label: Group cards by, max: 40, placeholder: Team }
+      - { id: title, type: text, label: Title, max: 80 }
+  feedback:
+    label: Visitor feedback
+    help: Visitors leave comments on your page. Guests can use it on showcase night.
+    code_note: "Only a comment in the page file. On the live page, the viewer reads and posts visitors' comments in Flask's microblog, under the page's address."
+    icon: fa-comment-dots
+    category: comms
+    live: true
+    # Posts go to Flask's microblog (every site has it) under the page's published address, and
+    # only Spring publishes: without Spring the block could never work.
+    needs: spring
+    fields:
+      - { id: title, type: text, label: Title, max: 80, default: Feedback }
+      - { id: prompt, type: text, label: Question for visitors, max: 120 }
+  api_data:
+    label: Data from your API
+    help: Show live data from your own backend as cards, a list, a table or numbers.
+    code_note: "Only a comment in the page file. On the live page, the viewer asks your API for its data and draws each item as a card or a row."
+    icon: fa-plug
+    category: project
+    live: true
+    fields:
+      - { id: source, type: api, label: Your API, required: true }
+      - { id: title, type: text, label: Title, max: 80 }
+      - id: view
+        type: choice
+        label: Show it as
+        default: cards
+        options:
+          - { value: cards, label: Cards }
+          - { value: list, label: List }
+          - { value: table, label: Table }
+          - { value: stats, label: Numbers }
+      - { id: limit, type: number, label: How many items, min: 1, max: 50, default: 12 }
+  embed:
+    label: Embed your app
+    help: Shows your deployed frontend inside the page. It loads when a visitor presses Open.
+    code_note: "A card (ocs__card) with your app's title and a button. On the live page, Open loads your app in an ocs__embed frame."
+    icon: fa-window-maximize
+    category: project
+    fields:
+      - { id: url, type: url, label: App link, required: true, help: Must start with https://. }
+      - { id: title, type: text, label: Title, required: true, max: 80 }
+      - id: height
+        type: choice
+        label: Height
+        default: medium
+        options:
+          - { value: short, label: Short }
+          - { value: medium, label: Medium }
+          - { value: tall, label: Tall }
+
+# Starter pages. Sections and blocks get fresh ids when a page is created from one. A section
+# heading (h2) comes before the first card (h3), so screen readers find no skipped level.
+templates:
+  - key: blank
+    label: Blank page
+    help: A page header and nothing else.
+    page:
+      schemaVersion: 1
+      kind: ocs-ui-page
+      page: { title: Untitled page, description: "", byline: "", width: contained, image: "" }
+      sections:
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: hero
+                  settings: { title: Untitled page, lead: Say what this page is about in one or two sentences. }
+  - key: project_showcase
+    label: Project showcase
+    help: Show what you built, a demo video, features and links.
+    page:
+      schemaVersion: 1
+      kind: ocs-ui-page
+      page: { title: Our project, description: What we built and how to try it., byline: "", width: contained, image: "" }
+      sections:
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: hero
+                  settings:
+                    badge: Project
+                    title: Our project
+                    lead: One sentence about the problem it solves and who it helps.
+                    links:
+                      - { label: Try it, url: "https://example.com" }
+                      - { label: Source code, url: "https://github.com" }
+                - type: heading
+                  settings: { text: What we built, level: "2", subtitle: "" }
+                - type: video
+                  settings: { url: "", title: Demo video, caption: "" }
+        - type: columns
+          settings: { layout: halves }
+          cells:
+            - blocks:
+                - type: keypoints
+                  settings:
+                    items:
+                      - { title: Feature one, text: What it does and why it matters. }
+                      - { title: Feature two, text: What it does and why it matters. }
+            - blocks:
+                - type: stats
+                  settings:
+                    items:
+                      - { value: "3", label: API endpoints }
+                      - { value: "12", label: Tests passing }
+  - key: flask_api_starter
+    label: Flask API starter
+    help: Live data from the OCS Jokes API in the first minute. Then swap in your own backend.
+    page:
+      schemaVersion: 1
+      kind: ocs-ui-page
+      page: { title: Live data from a Flask API, description: Data from a Flask backend shown with OCS components., byline: "", width: contained, image: "" }
+      sections:
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: hero
+                  settings:
+                    badge: Flask API
+                    title: Live data from a Flask API
+                    lead: This page reads the OCS Jokes API. Change the link in Data from your API to your own backend.
+                - type: heading
+                  settings: { text: Live from the API, level: "2", subtitle: "" }
+                - type: api_data
+                  settings:
+                    title: Jokes
+                    view: list
+                    limit: 5
+                    source:
+                      url: "https://flask.opencodingsociety.com/api/jokes"
+                      list_path: ""
+                      title_path: joke
+                      text_path: ""
+                      image_path: ""
+                      link_path: ""
+                      value_path: haha
+                      label_path: ""
+                      snapshot: { items: [], fetched_at: 0, from_loopback: false }
+                - type: callout
+                  settings:
+                    body: "Your backend must allow this site in its CORS origins. Press <b>Test connection</b> to check it."
+  - key: about_me
+    label: About me
+    help: A personal page with your projects and links.
+    page:
+      schemaVersion: 1
+      kind: ocs-ui-page
+      page: { title: About me, description: Who I am and what I build., byline: "", width: contained, image: "" }
+      sections:
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: hero
+                  settings: { badge: About me, title: "Hi, I'm a student developer", lead: What I like to build and what I'm learning now. }
+        - type: columns
+          settings: { layout: sidebar_right }
+          cells:
+            - blocks:
+                - type: heading
+                  settings: { text: My story, level: "2", subtitle: "" }
+                - type: text
+                  settings: { body: "Write a few sentences about yourself. Use <b>bold</b> for the parts that matter." }
+                - type: link_cards
+                  settings:
+                    items:
+                      - { kicker: Project, title: My first app, text: What it does., url: "https://github.com" }
+            - blocks:
+                - type: card
+                  settings:
+                    title: Find me
+                    body: Links to my code and portfolio.
+                    links:
+                      - { label: GitHub, url: "https://github.com" }
+
+text:
+  # What each ocs__ grammar class the code view lists draws (see _sass/open-coding/README.md).
+  code_classes:
+    ocs__container: "the page's width limit"
+    ocs__container--fill: "drops that limit, for a wide page"
+    ocs__stack: "a column of children with even gaps between them"
+    ocs__split: "two equal columns"
+    ocs__split--aside: "makes the first column narrow"
+    ocs__split--aside-end: "makes the second column narrow: a sidebar on the right"
+    ocs__facts: "three equal columns"
+    ocs__badge: "a small rounded label in the accent color"
+    ocs__text: "text in the muted color, with comfortable line spacing"
+    ocs__lead: "a slightly bigger first paragraph under a title"
+    ocs__links: "a row that holds buttons and links"
+    ocs__btn: "a button look for a link or a button"
+    ocs__section-title: "a small heading for one part of the page"
+    ocs__card: "a framed panel"
+    ocs__card-header: "a card's title and its action on one row"
+    ocs__callout: "a boxed note in a softer color"
+    ocs__keypoints: "a list of key points"
+    ocs__keypoint: "one key point: its mark, then its text"
+    ocs__check: "the check mark, in the accent color"
+    ocs__checklist: "a checklist"
+    ocs__checklist-box: "the box that shows whether an item is done"
+    ocs__stats: "a grid of numbers that fits as many as the width allows"
+    ocs__stat: "one number's box"
+    ocs__stat-value: "the big number"
+    ocs__stat-label: "the small caption under a number"
+    ocs__table-wrap: "lets a wide table scroll sideways"
+    ocs__table: "theme colors for a table's headers, borders and rows"
+    ocs__nav-grid: "a grid of link cards"
+    ocs__nav-card: "a card that is one big link"
+    ocs__nav-card-kicker: "the small label above a link card's title"
+    ocs__nav-card-title: "a link card's title"
+    ocs__status: "a small outlined pill, here the site a link goes to"
+    ocs__entity-list: "a grid of people or things, each in its own box"
+    ocs__avatar: "a round badge with a person's initials"
+    ocs__image-frame: "a rounded frame for a picture"
+    ocs__image-frame--cover: "fills the frame, cropping the picture to fit"
+    ocs__embed: "a frame for another page, at the full width"
+    ocs__embed--video: "a 16:9 video player that scales with the width"
+    ocs__embed--short: "a frame 320 pixels tall"
+    ocs__embed--medium: "a frame 480 pixels tall"
+    ocs__embed--tall: "a frame 720 pixels tall"
+  blocks:
+    untitled: Untitled page
+    unknown_block: "This block type isn't available: {type}."
+    block_error: "This block couldn't be shown."
+    needs_live_viewer: "{label}: shown on the live page only."
+    external_host: "{host}"
+    checklist_done: Done
+    checklist_todo: To do
+    video_play: Play video
+    video_unsupported: Paste a YouTube or Google Drive link to show this video.
+    embed_open: Open app here
+    embed_new_tab: "Open {host} in a new tab"
+    embed_ocs_host: "Apps on {host} open in a new tab, because they would receive visitors' OCS sign-in cookies inside this page."
+    embed_blocked: "This link can't be shown inside the page. Use the button to open it."
+    code_label: "Code ({language})"
+    table_empty: This table is empty.
+    team_role_none: Team member
+    sample_chat: "Live chat for {group} shows here on the published page."
+    sample_members: "Names of everyone in {group} show here on the published page."
+    sample_message_me: "Visitors press this button to message you."
+    sample_kanban: "Your board from {host} shows here on the published page."
+    sample_feedback: "Visitor comments show here on the published page."
+    sample_api_data: "Data from {host} shows here. Turn on Real data while editing to see it now."
+    sample_no_group: No group picked yet.
+    sample_no_source: No API link yet.
+    live_loading: Loading…
+    live_error: "Couldn't load this block: {message}"
+    live_needs_spring: This needs the OCS Spring backend, which this site doesn't run.
+    live_needs_flask: This needs the OCS Flask backend.
+    live_sign_in: Sign in to see this.
+    live_sign_in_link: Sign in
+    live_not_member: "This chat is for members of {group}."
+    live_show_board: Show our board
+    api_offline_copy: "Saved copy · {date}"
+    api_saved_from_computer: "Saved from the team's computer · {date}"
+    api_empty: The API returned no items.
+  errors:
+    required: "{field} is required."
+    too_long: "{field} can be at most {max} characters."
+    one_line: "{field} must be one line."
+    bad_url: "{field} must be an https:// link or a path on this site, like /about."
+    bad_image: "{field} must be an https:// image link or a path on this site."
+    bad_choice: "Pick one of the options for {field}."
+    bad_number: "{field} must be a whole number from {min} to {max}."
+    bad_toggle: "{field} must be on or off."
+    too_many: "{field} can have at most {max} items."
+    bad_list: "{field} must be a list."
+    table_too_big: "{field} can have at most {rows} rows and {cols} cells per row."
+    bad_group: "Pick one of your groups for {field}."
+    bad_api: "{field} needs an API link."
+    bad_api_path: "{field} paths can use letters, numbers, dots, dashes, underscores and [ ]."
+    bad_snapshot: "{field} has a saved copy that is too big. Save it again with fewer items."
+    unknown_type: "Unknown block type {type}."
+    too_many_sections: "A page can have at most {max} sections."
+    too_many_blocks: "A section can hold at most {max} blocks."
+    too_many_live: "A page can have at most {max} live blocks (chat, boards, API data and similar)."
+    too_big: "This page is too big to save ({size} of {max} characters)."
+    too_deep: This page is nested too deeply to save.
+    bad_page: "This file isn't a UI Builder page."
+    bad_json: "This file isn't valid JSON."
+    import_too_big: This file is too big to import.
+    kanban_personal: "GitHub doesn't let other people's pages read personal boards. Use your repository's Issues page instead, like https://github.com/owner/repo/issues."
+    kanban_bad_url: "Use a GitHub organization Projects board or a repository's Issues page."
+    private_field: "Private: never show this on a page."
+    slug_invalid: "Use 3 to 64 lowercase letters, numbers and dashes, starting and ending with a letter or number."
+    slug_reserved: "That address is reserved. Pick another one."
+    video_bad_url: "Paste a YouTube or Google Drive video link."
+    embed_https: "The app link must start with https://."
+    bad_id: A section or block on this page has a broken id.
+    duplicate_id: Two parts of this page have the same id.
+    bad_cells: This section has the wrong number of columns for its layout.
+    bad_key: "This page has a setting named {field}, which isn't allowed."
+    bad_value: "{field} has a value of the wrong kind."
+    bad_body: "{field} has code that isn't allowed: scripts, frames or on… attributes."
+    bad_kind: "This isn't a UI Builder page."
+    bad_schema_version: This page was made by a newer UI Builder.
+    bad_sections: This page's sections are broken.
+    bad_section: A section on this page is broken.
+    bad_cell: A column on this page is broken.
+    bad_block: A block on this page is broken.
+    bad_settings: A block's settings are broken.
+    bad_hidden: A block's show or hide setting is broken.
+    bad_type: "Unknown block type {type}."
+    bad_path: "{field} paths can use letters, numbers, dots, dashes, underscores and [ ]."
+    bad_course: Pick one of the courses.
+    loopback_url: "This page links to your own computer (like localhost). Visitors can't reach it. Use your deployed https:// address."
+    # The editor's own words for Spring's loopback_url, by where the address is.
+    loopback_link: "{field} points to your own computer (like localhost), which visitors can't reach. Use your deployed https:// address."
+    loopback_snapshot: "{field} has a saved copy with links or pictures on your own computer, which visitors can't reach. Remove the saved copy before you publish."
+    loopback_rich_text: "{field} has a link to your own computer (like localhost), which visitors can't reach. Change it to your deployed https:// address."
+    group_not_allowed: "Pick one of your own groups. Class groups and course channels can't be used."
+  doctor:
+    ok: "Connected in {ms} ms. Found {count} items."
+    ok_one: "Connected in {ms} ms. Found 1 item."
+    ok_object: "Connected in {ms} ms."
+    # No list picked and no list of items with fields to find: the list the reply holds instead.
+    ok_list_empty: "Found the list {path}; it is empty right now."
+    ok_list_plain: "Found the list {path}, but it holds plain values, not items with fields. The block shows the whole reply as one item."
+    policy: "{reason}"
+    policy_https: "Use an https:// link. Published pages can only read https:// APIs."
+    policy_loopback_form: "Write a link to your own computer like http://localhost:8587/api/jokes, or with 127.0.0.1 in place of localhost."
+    policy_loopback_view: "A link to your own computer only works while you're editing. Save a copy so visitors see the data."
+    policy_private_host: "That address can't be used. Use your deployed backend's https:// address."
+    mixed_content: "This page is https, so the browser blocks http:// APIs. Use your deployed https:// address."
+    timeout: "No answer after {seconds} seconds. Is your backend running?"
+    network: "Couldn't reach {host}. Check the address, its DNS record (Route 53 CNAME) and its certificate (certbot)."
+    blocked_read: "{host} answered, but the browser hid the reply. Open the link in a new tab: an error page or 502 means your backend is down, so restart it. If it shows JSON, add {origin} to allowed_origins in __init__.py (the OCS template already allows https://*.opencodingsociety.com)."
+    auth: "This route needs sign-in. The builder never sends sign-in cookies, so your page can't use anyone's account. Use a public GET route like /api/jokes, or add a read-only route that returns only public fields."
+    not_found: "{host} says this route doesn't exist (404). Check the path."
+    http: "{host} answered with an error ({status})."
+    not_json: "{host} didn't send JSON. Check that the link is an API route, not a web page."
+    too_big: "The reply is bigger than {max} characters. Add a route that returns fewer items."
+    empty: The reply has no list of items. Pick a route that returns a list.
+    private_keys: "Your API sends {keys} to anyone who asks. Remove them from this route."
+    loopback_hint: "If Chrome asks to let this page access apps on your device, choose Allow. School-managed Chromebooks may block this; take the saved copy on another computer."
+    open_link: Open in new tab
+  # The viewer (/ui-builder/view/). ui_builder_school.yml rewords some of these for a school.
+  view:
+    loading: Loading the page…
+    noscript: Turn on JavaScript to see this page.
+    document_title: "{title}"
+    attribution: UI Builder page
+    made_by: "Made by {name}"
+    made_by_group: "Made by {name} ({group})"
+    edit: Edit
+    report: Report this page
+    report_subject: A UI Builder page to check
+    report_body: "This page may need someone to look at it: {url}"
+    draft_badge: Draft
+    draft_note: Only the page's editors and teachers can see this draft.
+    local_badge: In this browser
+    local_note: This page is saved in this browser only. Export the page file to put it on the site.
+    open_live: Open the live page
+    not_found: Not found, or only for signed-in OCS members.
+    draft_not_found: "This draft doesn't exist, or you can't edit it."
+    local_not_found: "This page isn't saved in this browser."
+    local_unreadable: "This browser can't open its saved pages (private browsing or blocked site data), or the saved page is damaged."
+    sign_in_to_see: Sign in to see this page.
+    load_failed: "The page couldn't load. Check your connection and try again."
+    # This browser is online, but OCS didn't answer (it may be down or restarting).
+    no_answer: "OCS isn't answering right now, so the page couldn't load. Try again in a moment."
+    broken: "This page is damaged and can't be shown."
+    retry: Try again
+    no_page: No page was named in this address.
+    open_gallery: See published pages
+    open_builder: Open the UI Builder
+    spring_off: "Published pages need the OCS Spring backend, which this site doesn't run. Pages made here are saved in your browser."
+    framed: "This page can't run inside another page."
+    open_directly: Open it in its own tab
+    guest_comms: This is for signed-in OCS members.
+    guest_members: Team names are for signed-in OCS members.
+    guest_message_me: Messages are for signed-in OCS members.
+    guest_announcements: Class announcements are for signed-in OCS members.
+  # The gallery (/ui-builder/gallery/).
+  gallery:
+    title: Page gallery
+    lead: Pages made with the UI Builder. Open one to see it live.
+    noscript: Turn on JavaScript to see the gallery.
+    make_page: Make a page
+    search_label: Search pages
+    search_placeholder: Title, team or topic
+    course_label: Course
+    course_all: All courses
+    loading: Loading pages…
+    count: "{count} pages"
+    count_one: "1 page"
+    results_label: Published pages
+    empty: No pages are published yet.
+    empty_filtered: No pages match. Try other words or another course.
+    by: "By {byline}"
+    members_only: OCS members only
+    signed_out: You see the pages approved for everyone.
+    load_failed: "The gallery couldn't load. Check your connection and try again."
+    no_answer: "OCS isn't answering right now, so the gallery couldn't load. Try again in a moment."
+    retry: Try again
+    spring_off: "The gallery needs the OCS Spring backend, which this site doesn't run. Pages made here are saved in your browser."
+  # Live blocks on a published page, beyond text.blocks (blocks-live.js, blocks-project.js).
+  live:
+    offline: "This part of the page needs a connection. Reload the page when you're back online."
+    load_failed: "This part of the page couldn't load. Reload the page to try again."
+    api_open: Open
+    api_failed: "Couldn't load data from {host}."
+    api_unreachable: "This data comes from the team's own computer, and no saved copy was kept."
+    api_saved_copy: Saved copy
+    message_me_opening: Opening Messages…
+    message_me_failed: "Couldn't start a message. Try again."
+    message_me_unpublished: The button works once this page is published.
+    members_unpublished: Team members show once this page is published.
+    members_unavailable: "This group's members can't be shown."
+    members_empty: No one is in this group yet.
+    announcements_missing: "{course} has no announcement channel yet."
+    announcements_empty_title: No announcements yet
+    announcements_empty_hint: "Class news from teachers shows here."
+    announcement_event: "Event: {title}, {date}"
+    announcement_event_untitled: Class event
+    feedback_unpublished: Feedback opens once this page is published.
+    feedback_label: Your feedback
+    feedback_help: "Up to {max} characters. Everyone who can see this page can read it."
+    feedback_send: Post feedback
+    feedback_sending: Posting…
+    feedback_sent: Thanks! Your feedback is posted.
+    feedback_check: "Write your feedback first, in {max} characters or fewer."
+    feedback_wait: Wait a few seconds before posting again.
+    feedback_failed: "Your feedback couldn't be posted. Try again."
+    feedback_load_failed: "Feedback couldn't load. Reload the page to try again."
+    feedback_none: No feedback yet. Be the first.
+    feedback_sign_in: Sign in to leave feedback.
+    feedback_someone: A visitor
+    feedback_time: "· {time}"
+  # What a page store's errors say (page-store.js storeErrorText picks the key).
+  store:
+    offline: "Can't reach OCS right now. Your changes are kept in this browser until it's back."
+    timeout: "OCS didn't answer in time. Your changes are kept in this browser; try again in a moment."
+    conflict: "{name} saved this page at {time}."
+    conflict_unknown: "This page was saved somewhere else at {time}, maybe in another tab."
+    not_found: "This page doesn't exist any more, or you can't open it."
+    slug_taken: That address is taken. Pick another one.
+    slug_locked: "A page's address can't change after it's published."
+    slug_required: Pick an address for the page before publishing it.
+    invalid_spec: "OCS didn't accept this page. Fix the problems marked on it, then try again."
+    origin_rejected: OCS only takes this from the OCS site. Reload the page and try again.
+    unauthorized: "You're signed out of OCS. Sign in, then try again."
+    forbidden: "You can't do that on this page."
+    too_large: This page is too big to save.
+    busy: OCS is busy. Try again in a moment.
+    not_published: Publish the page first.
+    own_page: This is your own page.
+    too_many_pages: "You already have {max} pages. Delete one before you make another."
+    bad_request: "OCS couldn't use that request ({status})."
+    server: "OCS had a problem ({status}). Try again in a moment."
+    bad_response: "OCS sent an answer this page can't read."
+    storage_full: This browser is out of room for saved pages. Export or delete a page, then try again.
+    storage_blocked: "This browser doesn't let pages save (private browsing or blocked site data)."
+    corrupt: "This saved page is damaged and can't be opened."
+    unknown: Something went wrong. Try again.
+  # The group chat, as Messages' conversation-embed.js texts (every key it has). Class announcements
+  # use them too, with their own empty state (live.announcements_empty_*): visitors can't post there.
+  chat:
+    loading: Loading messages…
+    emptyTitle: No messages yet
+    emptyHint: Say hi to your group.
+    loadFailedTitle: Could not load these messages
+    loadFailedHint: Check your connection, then reload the page.
+    signIn: Sign in to see this chat.
+    unavailable: "This chat isn't available right now."
+    offline: Live updates are off. Reload the page to see new messages.
+    placeholder: Type a message…
+    send: Send
+    save: Save
+    cancel: Cancel
+    sendFailed: Could not send the message. Try again.
+    editFailed: Could not save your edit. Try again.
+    editOfDeleted: That message was deleted, so your edit was not saved.
+    deleteFailed: Could not delete the message. Try again.
+    waitForSave: Wait for your message to finish saving first.
+    you: You
+    edited: (edited)
+    deleted: This message was deleted.
+    editMessage: Edit message
+    deleteMessage: Delete message
+    imageFrom: "Image from {name}"
+    imageUnreadable: Could not read that image. Try a different file.
+    today: Today
+    yesterday: Yesterday
+    fileShared: "{sender} shared a file:"
+    fileSharedBySomeone: "A file was shared:"
+    fileGone: "{filename} is no longer shared with this group."
+    fileFailed: "Could not download {filename}. Try again."
+    idleTitle: Pick a conversation
+    idleHint: Or start a new chat, or find a group to join.

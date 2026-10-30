@@ -3,8 +3,8 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
-  GRADING_MESSAGES, applyGradingState, clearManualGrade, gradePills, gradingMessage, hasManualOverride, isFinal,
-  readGradingResponse, renderGradingHistory, requestAiRegrade, saveManualGrade,
+  GRADING_MESSAGES, applyGradingState, canPetition, clearManualGrade, filePetition, gradePills, gradingMessage,
+  hasManualOverride, isFinal, readGradingResponse, renderGradingHistory, requestAiRegrade, saveManualGrade,
 } from "../assets/js/submissions/grading.js";
 
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (ch) => (
@@ -190,6 +190,52 @@ test("history shows the close and teacher review decisions", () => {
   assert.match(html, /ocs__status-pill--warn">Teacher review: grade corrected<\/span> by niko · 0.9\/1/);
   assert.match(html, /<div class="ocs__tree">/);
   assert.match(html, /<div class="ocs__callout">/);
+});
+
+test("a student can petition an instructor grade, or any grade after close", () => {
+  assert.equal(canPetition({ grading: OVERRIDDEN }), true);
+  assert.equal(canPetition({ grading: { ...OVERRIDDEN, manualOverride: false, source: "AI", closed: true } }), true);
+  assert.equal(canPetition({ grading: { ...OVERRIDDEN, manualOverride: false, source: "AI" } }), false);
+  assert.equal(canPetition({}), false);
+});
+
+test("a petition posts the student's message as JSON", async () => {
+  const calls = recordingFetch(jsonResponse(201, { outcome: "REVIEW_OPENED", grading: OVERRIDDEN }));
+
+  const result = await filePetition({
+    javaURI: "https://spring.test", fetchOptions: { credentials: "include" }, submissionId: 7,
+    message: "Revision 3 fixes part 2",
+  });
+
+  assert.equal(calls[0].url, "https://spring.test/api/grade-reviews/submission/7/petition");
+  assert.equal(calls[0].options.method, "POST");
+  assert.equal(calls[0].options.credentials, "include");
+  assert.equal(calls[0].options.headers["Content-Type"], "application/json");
+  assert.deepEqual(JSON.parse(calls[0].options.body), { message: "Revision 3 fixes part 2" });
+  assert.equal(result.ok, true);
+  assert.equal(result.message, GRADING_MESSAGES.REVIEW_OPENED);
+});
+
+test("a petition without an instructor grade before close is refused with a reason", async () => {
+  recordingFetch(jsonResponse(409, { outcome: "NO_MANUAL_OVERRIDE", grading: { ...OVERRIDDEN, manualOverride: false } }));
+
+  const result = await filePetition({ javaURI: "https://spring.test", fetchOptions: {}, submissionId: 7, message: "x" });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.message, GRADING_MESSAGES.NO_MANUAL_OVERRIDE);
+});
+
+test("history shows an instructor grade carried over to a new revision", () => {
+  const html = renderGradingHistory({
+    current: { ...OVERRIDDEN, revision: 2 },
+    events: [
+      { id: 1, revision: 2, type: "REVISED", actorName: "hop", createdAt: "2026-10-27T09:00:00" },
+      { id: 2, revision: 2, type: "MANUAL_OVERRIDE_KEPT_BY_REVISION", grade: 0.9, effective: true,
+        createdAt: "2026-10-27T09:00:00" },
+    ],
+  }, { escapeHtml, points: 1 });
+
+  assert.match(html, /Instructor grade kept for the new revision<\/span> · 0.9\/1/);
 });
 
 test("the grading UI uses OCS grammar with no literal colors", async () => {

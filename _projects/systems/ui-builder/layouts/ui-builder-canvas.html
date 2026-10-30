@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: 'en' }}">
+<head>
+  {%- comment -%}
+  The UI Builder canvas (DESIGN §7.4): a bare page the editor loads in a same-origin iframe. It
+  has the site's stylesheet, fonts, icons and user-preferences.js, so a page looks the way the
+  viewer's theme preset makes it look, and nothing else from the site head: no navbar, no
+  sign-in check, no DM bell, no analytics and no keyboard-shortcuts.js (the canvas forwards its
+  shortcut keys to the editor instead). The font list matches _includes/head-custom.html.
+  {%- endcomment -%}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>{{ page.title | default: site.title | escape }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&family=Montserrat:wght@400;600&family=Noto+Sans:wght@400;700&family=Merriweather:wght@400;700&family=Source+Code+Pro:wght@400;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <script src="{{ site.baseurl }}/assets/js/user-preferences.js"></script>
+</head>
+<body class="ui-builder-canvas-page">
+{{ content }}
+</body>
+</html>

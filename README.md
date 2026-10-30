@@ -43,7 +43,11 @@ The Apache license has its roots in Fastpages.  Thus, it carries that license fo
 
 - **Blog Contributions**:  Often students contribute articles and blogs to this project.  Their names are typically listed in the front matter of their contributing post.
 
-- **Mentorship**: The RFID-based Classroom Presence System has benefited from the mentorship of **Dr. Douglas Fenner, President of Fenner Consulting Group**, whose guidance has shaped its hardware design, integration with OCS, and research direction.
+### Mentorship
+
+OCS's AI initiatives have also benefited from mentorship and technical discussions with **Eduardo Revollo, Founder/CEO of Prometheus**. OCS welcomes continued collaboration with industry practitioners as students explore open intelligence, AI infrastructure, and practical applications of emerging technology.
+
+The RFID-based Classroom Presence System has benefited from the mentorship of **Dr. Douglas Fenner, President of Fenner Consulting Group**, whose guidance has shaped its hardware design, integration with OCS, and research direction. OCS welcomes continued collaboration with mentors as students build connected classroom systems.
 
 ---
 

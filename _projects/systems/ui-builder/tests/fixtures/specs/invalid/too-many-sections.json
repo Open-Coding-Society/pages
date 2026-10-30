@@ -1,0 +1,586 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": {
+    "title": "Twenty-six sections",
+    "description": "",
+    "byline": "",
+    "course": "csp",
+    "width": "contained",
+    "image": ""
+  },
+  "sections": [
+    {
+      "id": "s-many001",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many001",
+              "type": "heading",
+              "settings": {
+                "text": "Section 1",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many002",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many002",
+              "type": "heading",
+              "settings": {
+                "text": "Section 2",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many003",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many003",
+              "type": "heading",
+              "settings": {
+                "text": "Section 3",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many004",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many004",
+              "type": "heading",
+              "settings": {
+                "text": "Section 4",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many005",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many005",
+              "type": "heading",
+              "settings": {
+                "text": "Section 5",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many006",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many006",
+              "type": "heading",
+              "settings": {
+                "text": "Section 6",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many007",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many007",
+              "type": "heading",
+              "settings": {
+                "text": "Section 7",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many008",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many008",
+              "type": "heading",
+              "settings": {
+                "text": "Section 8",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many009",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many009",
+              "type": "heading",
+              "settings": {
+                "text": "Section 9",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many010",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many010",
+              "type": "heading",
+              "settings": {
+                "text": "Section 10",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many011",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many011",
+              "type": "heading",
+              "settings": {
+                "text": "Section 11",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many012",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many012",
+              "type": "heading",
+              "settings": {
+                "text": "Section 12",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many013",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many013",
+              "type": "heading",
+              "settings": {
+                "text": "Section 13",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many014",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many014",
+              "type": "heading",
+              "settings": {
+                "text": "Section 14",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many015",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many015",
+              "type": "heading",
+              "settings": {
+                "text": "Section 15",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many016",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many016",
+              "type": "heading",
+              "settings": {
+                "text": "Section 16",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many017",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many017",
+              "type": "heading",
+              "settings": {
+                "text": "Section 17",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many018",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many018",
+              "type": "heading",
+              "settings": {
+                "text": "Section 18",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many019",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many019",
+              "type": "heading",
+              "settings": {
+                "text": "Section 19",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many020",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many020",
+              "type": "heading",
+              "settings": {
+                "text": "Section 20",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many021",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many021",
+              "type": "heading",
+              "settings": {
+                "text": "Section 21",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many022",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many022",
+              "type": "heading",
+              "settings": {
+                "text": "Section 22",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many023",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many023",
+              "type": "heading",
+              "settings": {
+                "text": "Section 23",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many024",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many024",
+              "type": "heading",
+              "settings": {
+                "text": "Section 24",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many025",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many025",
+              "type": "heading",
+              "settings": {
+                "text": "Section 25",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-many026",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-many026",
+              "type": "heading",
+              "settings": {
+                "text": "Section 26",
+                "level": "2",
+                "subtitle": ""
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

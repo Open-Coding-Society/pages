@@ -20,15 +20,40 @@ permalink: /capstone/shoreline-volunteer/
 
 <div class="shoreline-capstone-card" markdown="1">
 
-> Shoreline Community Services has strong programs and a clear mission, but the volunteer page undersells them. There is opportunity to guide volunteers with real scheduling, real forms, and a clearer picture of where help is needed most.
+<div class="ocs__grid ocs__grid--card cols-3">
+    <div class="ocs__grid-cell ocs__grid-cell--header">About Shoreline Community Services</div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Mission</strong>
+        <p>Shoreline Community Services works toward "an interdependent community aligned with a common goal — a thriving, safe and welcoming neighborhood for everyone," addressing the unmet needs of unsheltered individuals and families in San Diego's Central Beach Area.</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Programs</strong>
+        <p>The Compass Station (a drop-in resource center), Volunteer Community Outreach, the Medical Respite Hotel Program, and the Community Care Crew transitional employment program.</p>
+    </div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Main People</strong>
+        <p>Caryn Blanton, Executive Director<br>Angie Veliz, Assistant Director</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Contact</strong>
+        <p>(858) 900-7024<br><a href="mailto:info@shorelinecs.org">info@shorelinecs.org</a><br>1004 Chalcedony St, San Diego, CA 92109</p>
+        <p style="font-size: 0.72rem; opacity: 0.7;">Individual staff contacts are not publicly listed; this is the organization's official line.</p>
+    </div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Current Gap</strong>
+        <p>Strong programs and a clear mission, but the volunteer page undersells them — there is opportunity to guide volunteers with real scheduling, real forms, and a clearer picture of where help is needed most.</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Source</strong>
+        <p><a href="https://shorelinecs.org/" target="_blank" rel="noopener">shorelinecs.org</a> / <a href="https://shorelinecs.org/leadership" target="_blank" rel="noopener">Leadership page</a></p>
+    </div>
+</div>
 
 ## Shoreline Community Services, Volunteer Page 2026-27
 
 <a class="ocs__btn large" href="https://github.com/vanshikak210/shorelineproject.git">
     Github Repository
 </a>
-
----
 
 <div class="ocs__grid ocs__grid--card cols-3">
     <div class="ocs__grid-cell ocs__grid-cell--header">How We Are Going to Change the Website</div>

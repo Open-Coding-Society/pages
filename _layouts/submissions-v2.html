@@ -185,8 +185,8 @@ active_tab: submissions
     import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
     import { createCreatorDashboard } from '{{ site.baseurl }}/assets/js/submissions/creator-dashboard.js';
     import {
-        applyGradingState, clearManualGrade, gradePills, hasManualOverride, isFinal, parseGradeInput,
-        readGradingResponse, requestAiRegrade, saveManualGrade, showGradingHistory
+        applyGradingState, canPetition, clearManualGrade, filePetition, gradePills, hasManualOverride, isFinal,
+        parseGradeInput, readGradingResponse, requestAiRegrade, saveManualGrade, showGradingHistory
     } from '{{ site.baseurl }}/assets/js/submissions/grading.js';
 
     const apiUrl = `${javaURI}/api/assignment-submission-view/list`;
@@ -695,6 +695,7 @@ active_tab: submissions
                                             <div class="submission-actions ocs__links">
                                                 ${isFinal(submission) ? '' : `<button type="button" class="ocs__btn small accent fill" onclick="openEditModal(${submission.id})">Edit</button>`}
                                                 <button type="button" class="ocs__btn small" onclick="showSubmissionHistory(${submission.id})">History</button>
+                                                ${canPetition(submission) ? `<button type="button" class="ocs__btn small" title="Ask your teacher to reconsider this grade" onclick="petitionGrade(${submission.id})">Petition</button>` : ''}
                                             </div>
                                         </td>
                                     </tr>
@@ -1055,6 +1056,19 @@ active_tab: submissions
             fetchOptions,
             submissionId
         }));
+    };
+
+    window.petitionGrade = async function(submissionId) {
+        const message = window.prompt('Why should your teacher reconsider this grade?');
+        if (message == null) {
+            return;
+        }
+        try {
+            const result = await filePetition({ javaURI, fetchOptions, submissionId, message });
+            alert(result.message);
+        } catch (e) {
+            alert('Network error');
+        }
     };
 
     window.showSubmissionHistory = function(submissionId) {

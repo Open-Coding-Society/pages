@@ -1,0 +1,322 @@
+# UI Builder editor strings, published to _data/ui_builder_editor.yml and written only on the
+# editor and canvas pages (ui_builder_data.html editor=true). readRegistry() merges this map into
+# text.editor, so the modules read them as textOf(registry, 'editor.<key>', vars).
+# {name} placeholders are filled by textOf; quote every value that has one.
+
+# ---- page and shell
+title: UI Builder
+needs_js: The UI Builder needs JavaScript.
+start_failed: "The UI Builder couldn't start: {message}"
+framed: The UI Builder doesn't run inside another page.
+framed_open: Open the UI Builder
+loading: Loading…
+load_failed: "Couldn't open this page: {message}"
+back: My pages
+edit_title: "Page settings for {title}"
+editing: "Editing {title}."
+undo: Undo
+redo: Redo
+device_group: Preview size
+view_group: "Preview or code"
+view_preview: "Preview"
+view_code: "Code"
+code_view_title: "Your page's code"
+code_lead: "This is the HTML your page file holds, section by section and block by block. Each part says what its markup does and which OCS classes style it. Pick a block to select it, then switch back to Preview to see it drawn."
+code_section: "{n}. {label}"
+code_column: "Column {n}"
+code_column_here: "column {n}: its blocks are below"
+code_blocks_here: "its blocks are below"
+code_classes: "OCS classes in this code"
+code_hidden: "Hidden: this isn't on the published page."
+code_nothing: "Nothing yet: fill in this block's settings and its code shows here."
+code_empty: "Add a block and its code shows here."
+device_label: "Show the page at {label} width"
+real_data: Real data while editing
+real_data_help: Reads your API in the preview. Links to your own computer work only after Test connection.
+preview_draft: Preview draft
+open_live: Open live page
+publish: Publish
+publish_changes: Publish changes
+publish_none: Nothing new to publish
+more: More
+export_page: Export page file
+export_json: Export JSON
+show_html: Show HTML
+revisions: Revisions
+page_settings: Page settings
+outline_toggle: Outline
+inspector_toggle: Settings
+toolbar_label: Page tools
+zoom: "Zoom {percent}%"
+canvas_title: Page preview
+canvas_loading: Loading the preview…
+canvas_failed: The canvas did not load.
+canvas_reload: Reload canvas
+canvas_only: This page is the UI Builder's preview. Open the UI Builder to edit a page.
+canvas_bad_page: "This page can't be shown: {message}"
+canvas_add: Add block
+canvas_hidden: Hidden
+canvas_real_loading: Reading your API…
+leave_warning: Some changes aren't saved yet.
+dismiss: Dismiss
+
+# ---- save and publish state
+save_saving: Saving…
+save_saved: "Saved {time}"
+save_dirty: Unsaved changes
+save_local: Saved in this browser only
+save_conflict: Conflict
+save_retry: Not saved · will retry
+save_error: Couldn't save
+save_new: Not saved yet
+save_readonly: Read only
+pub_none: Not published
+pub_live: Live
+pub_changes: Live · changes not published
+
+# ---- outline
+outline: Outline
+outline_label: Page outline
+outline_column: "Column {n}"
+outline_empty: This page has no sections yet. Add one to start.
+add_block: Add block
+add_section: Add section
+move_up: Move up
+move_down: Move down
+duplicate: Duplicate
+hide: Hide
+show: Show
+remove: Remove
+hidden_badge: Hidden
+issues_badge: "{count} to fix"
+row_actions: "Actions for {label}"
+moved: "Moved {label} to position {position} of {total}."
+moved_cell: "Moved {label} to {column}, position {position} of {total}."
+moved_none: "{label} can't move any further."
+added: "Added {label}."
+removed: "Removed {label}. Undo brings it back."
+duplicated: "Duplicated {label}."
+hidden_done: "{label} is hidden on the published page."
+shown_done: "{label} shows on the published page again."
+undone: Undone.
+redone: Redone.
+nothing_to_undo: Nothing to undo.
+nothing_to_redo: Nothing to redo.
+live_limit: "A page can have at most {max} live blocks."
+
+# ---- block and section pickers
+palette_title: Add a block
+palette_search: Search blocks
+palette_empty: "No blocks match {query}."
+palette_reason: "Not available: {reason}"
+palette_count: "{count} blocks"
+sections_title: Add a section
+section_columns: "Columns: {layout}"
+close: Close
+cancel: Cancel
+
+# ---- inspector
+inspector: Settings
+page_settings_help: Settings for the whole page. Select a block or section to change it instead.
+page_issues_title: "Fix these to save the whole page:"
+no_fields: This part has no settings.
+block_toolbar: "Actions for {label}"
+select_parent: Select its section
+required: required
+team_group: Team (editors)
+team_group_help: Everyone in this group can edit the page. Only the owner or a teacher can change it.
+team_refresh: Update editors from the group
+team_refreshed: The editors now match the group's members.
+team_saving: The team changes when the page saves.
+visibility: Who can see it
+visibility_signed_in: OCS members who are signed in can see the published page.
+visibility_public: "Everyone can see the approved version, including guests."
+visibility_public_until: "Everyone can see the approved version until {date}."
+visibility_requested: A teacher has been asked to show this page to everyone.
+visibility_request: Ask to show it to everyone
+visibility_members: Only OCS members
+visibility_done: Visibility updated.
+approve_shows_published: Approving shows everyone the published copy, not this draft.
+approval_ended: Approval ended
+approval_newer: Newer version not approved
+unpublish: Unpublish
+unpublish_title: Unpublish this page
+unpublish_body: "Visitors to {address} see Not found until you publish again."
+unpublished: The page is no longer published.
+delete_page: Delete page…
+delete_title: Delete this page
+delete_body: "Type the page's title, {title}, to delete it. This can't be undone."
+delete_label: Page title
+delete_confirm: Delete page
+deleted: "Deleted {title}."
+show_code: Show code
+code_title: Code for your API data
+copy: Copy
+copied: Copied.
+copy_failed: Couldn't copy. Select the text and copy it yourself.
+download: Download
+export_title: Export page file
+export_help: "Add this file to your fork of the Pages repository (for example in navigation/), then open a pull request. Live blocks that need the UI Builder's viewer are written as comments."
+export_permalink_note: Check that no other page uses this address before you open a pull request.
+json_title: Export JSON
+json_help: Keep this file to copy the page to another site, or import it again later.
+
+# ---- fields
+item_n: "{label} {n}"
+items_add: Add another
+links_add: Add a button
+links_label: Button text
+links_url: Link
+group_none: No group
+group_loading: Loading your groups…
+group_failed: "Couldn't load your groups: {message}"
+group_retry: Try again
+group_needs_spring: Groups need the OCS Spring backend.
+group_not_yours: "{name} (not one of your groups)"
+course_none: Pick a course
+course_page: The page's course
+image_check: Check image
+image_checking: Checking…
+image_ok: "The image loads ({width} × {height})."
+image_failed: "The image didn't load. Open the link: it must show the picture itself, not a page around it."
+image_github: That's GitHub's page for the file, not the picture itself.
+image_use_raw: Use the raw link
+image_drive: "Google Drive share links open a Drive page, not the picture. Put the image in your repository and use its path, like /images/team.png."
+
+# ---- API field
+api_url: API link
+api_test: Test connection
+api_testing: Testing…
+api_checks: Connection check
+api_list: Which list
+api_list_auto: Find the list for me
+api_list_whole: The whole reply
+api_list_count: "{path} ({count} items)"
+api_slots: Fields to show
+api_slot_none: Nothing
+api_private_option: "{path} (private)"
+slot_title: Title
+slot_text: Text
+slot_image: Image
+slot_link: Link
+slot_value: Number
+slot_label: Label
+slot_column: "Column {n}"
+api_snapshot: Saved copy (shown when your API is offline)
+api_snapshot_save: Save a copy for visitors
+api_snapshot_saved: "Saved copy: {count} items · {date}"
+api_snapshot_loopback: "Saved copy from your computer: {count} items · {date}"
+api_snapshot_none: No saved copy yet.
+api_snapshot_remove: Remove the saved copy
+api_snapshot_needs_test: Test the connection first, then save a copy.
+api_snapshot_trimmed: "The copy keeps the first {count} items so it fits."
+api_fields_need_test: Test the connection to pick the fields from your API's reply.
+
+# ---- dialogs
+publish_title: Publish this page
+publish_body: "The page will be at {address}."
+publish_slug: Page address
+publish_slug_help: Lowercase letters, numbers and dashes. You can't change it after the first publish.
+slug_checking: Checking…
+slug_free: That address is free.
+slug_taken: That address is taken. Try another one.
+slug_unknown: "Couldn't check the address now; publishing checks it again."
+publish_confirm: Publish
+publish_changes_body: "Publishing replaces the live page at {address} with your draft."
+published: "Published. The live page is at {address}."
+publish_failed: "Couldn't publish: {message}"
+publish_fix: "{count} to fix before publishing."
+publish_wait: Saving your last changes first…
+publish_local: Pages on this site save in your browser. Export the page file to put it on the site.
+conflict_title: Someone else saved this page
+conflict_body: "{name} saved a newer version at {time}."
+conflict_body_unknown: A newer version of this page was saved somewhere else.
+conflict_reload: Reload theirs
+conflict_keep: Keep mine
+conflict_keep_note: Keep mine saves your version over theirs. Theirs stays in Revisions.
+conflict_keep_note_local: Keep mine saves your version over the one from your other tab.
+conflict_reloaded: Reloaded the newest version.
+conflict_kept_publish: Your version is saved. Publish again to put it on the live page.
+lease_banner: "{name} is editing this page, so you can only look."
+someone: Someone
+lease_take: Take over
+lease_taken: You're editing now.
+lease_lost: "{name} took over editing. Your changes so far are saved."
+revisions_title: Revisions
+revisions_empty: No revisions yet.
+revisions_loading: Loading revisions…
+revisions_failed: "Couldn't load the revisions: {message}"
+revision_row: "{kind} by {name} · {time}"
+rev_SAVE: Saved
+rev_PUBLISH: Published
+rev_RESTORE: Restored
+revision_restore: Restore
+revision_restore_title: Restore this version
+revision_restore_body: "Restore the version from {time}? Your current draft stays in Revisions."
+revision_restore_body_unsaved: "Restore the version from {time}? Your newest changes couldn't be saved, so restoring throws them away. To keep a copy, cancel and use Export JSON in the More menu."
+restored: "Restored the version from {time}."
+recover_body: "This browser kept changes from {time} that weren't saved."
+recover_restore: Restore them
+recover_discard: Discard
+date_title: Show to everyone
+date_label: Until (optional)
+date_help: Leave it empty to keep the page public until a teacher changes it.
+date_confirm: Approve
+bad_date: Pick a date after today.
+
+# ---- start screen
+start_lead: "Build a page for your project from blocks: headers, cards, your team's board and chat, and live data from your own API."
+tabs_label: Pages
+tab_mine: My pages
+tab_templates: Templates
+new_page: New page
+import_json: Import JSON
+import_failed: "Couldn't import that file: {message}"
+import_dropped: "Some blocks aren't available on this site and were left out: {types}."
+import_issues: "The imported page has {count} things to fix. They're marked in the outline."
+flask_only: Pages save in this browser. Export the page file to put it on the site.
+sign_in: Sign in to make and save pages.
+sign_in_link: Sign in
+mine_empty: You have no pages yet. Start from a template.
+list_failed: "Couldn't load the pages: {message}"
+retry: Try again
+open: Open
+status_DRAFT: Draft
+status_PUBLISHED: Published
+status_LOCAL: In this browser
+status_DELETED: Deleted
+saved_by: "Saved {time} by {name}"
+saved_at: "Saved {time}"
+editing_now: "{name} is editing"
+changes_pending: Changes not published
+public_pill: Everyone
+templates_lead: Pick a starting point. You can change every part of it.
+template_start: Use template
+template_use: "Use template: {label}"
+creating: Making your page…
+create_failed: "Couldn't make the page: {message}"
+resume_new: "A page you started at {time} wasn't saved."
+resume_open: Open it
+replace_new_title: Start a new page?
+replace_new_body: "The page you started at {time} isn't saved anywhere yet. A new page throws it away. To keep it, cancel and choose Open it."
+replace_new_confirm: Start a new page
+class_lead: Every page in your classes. Open a draft, approve a page for everyone or unpublish it.
+class_course: Course
+class_all_courses: All courses
+class_status: Status
+class_status_all: Any status
+class_changes: Changes not published
+class_empty: No pages match.
+class_owner: "By {name}"
+class_open_draft: Open draft
+class_open_published: Open published copy
+class_bulk_pick: Pick a course first.
+class_bulk_done: "Pages approved for everyone: {count}."
+approve_done: "{title} is public now."
+approve_changed: This page was published again after you opened it. Open the published copy again, then approve it.
+approve_unpublished: This page was unpublished after you opened it, so it wasn't approved. You can approve it once it's published again.
+col_page: Page
+col_status: Status
+col_updated: Updated
+col_actions: Actions
+# Store errors are worded by text.store in ui_builder.yml (page-store.js storeErrorText).

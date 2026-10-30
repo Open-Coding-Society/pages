@@ -1,0 +1,97 @@
+// The outline: a flat ARIA tree (levels in aria-level), so the grammar's nested ocs__tree
+// indentation can't draw it; selection, drop targets and hidden rows need their own looks too.
+
+.ui-builder-tree {
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.ui-builder-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+  padding: 0.2rem 0.35rem;
+  border: 1px solid transparent;
+  border-radius: 0.45rem;
+  cursor: pointer;
+
+  &[aria-level="2"] { padding-left: 1.25rem; }
+  &[aria-level="3"] { padding-left: 2.25rem; }
+
+  &:hover {
+    background: color-mix(in srgb, var(--pref-text-color) 6%, var(--panel));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pref-accent-color);
+    outline-offset: 1px;
+  }
+
+  // The tint goes over the page color, not the panel: every preset's text is readable on its page
+  // color, while on the panel tinted with the accent some (Sepia) fall under 4.5:1.
+  &[aria-selected="true"] {
+    border-color: var(--pref-accent-color);
+    background: color-mix(in srgb, var(--pref-accent-color) 14%, var(--pref-bg-color));
+  }
+
+  // Hidden on the published page: still listed, in italics (its own rows also have the Hidden
+  // badge). Not faded, which would take its text below 4.5:1 contrast.
+  &[data-hidden] .ui-builder-row-main {
+    font-style: italic;
+  }
+
+  // Where a dragged row will land.
+  &[data-drop="before"] { box-shadow: inset 0 2px 0 var(--pref-accent-color); }
+  &[data-drop="after"] { box-shadow: inset 0 -2px 0 var(--pref-accent-color); }
+  &[data-drop="inside"] { outline: 2px dashed var(--pref-accent-color); }
+
+  // "Add block" rows read as an action, not as content, by their plus sign in the accent color.
+  // The words keep the text color: most presets' accent is under 4.5:1 on the panel.
+  &[data-kind="add"] .ui-builder-row-main i {
+    color: var(--pref-accent-color);
+  }
+
+  // A cell row is a heading for its blocks.
+  &[data-kind="cell"] strong {
+    font-weight: 500;
+  }
+}
+
+// The label keeps at least 7rem beside its badges; the selected row's tools wrap under it
+// rather than squeeze it.
+.ui-builder-row-main {
+  flex: 1 1 7rem;
+
+  small {
+    color: var(--text-muted);
+  }
+}
+
+// Hidden and to-fix badges keep their full width beside the truncated label.
+.ui-builder-row-badges {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 0.2rem;
+}
+
+// Row tools show on the selected row only, so other rows keep their whole label and rows
+// don't jump while the mouse or the arrow keys move over them; a tap selects, then they show.
+.ui-builder-row-tools {
+  display: none;
+  flex: 0 0 auto;
+  gap: 0.15rem;
+  margin-left: auto;
+
+  .ocs__btn {
+    width: 1.9rem;
+    height: 1.9rem;
+    padding: 0;
+  }
+}
+
+.ui-builder-row[aria-selected="true"] .ui-builder-row-tools {
+  display: inline-flex;
+}
