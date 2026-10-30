@@ -81,6 +81,13 @@ images/projects/
 /navigation/topics.md
 /assets/js/topics/
 
+# UI Builder system distributions (authoritative sources in _projects/systems/ui-builder)
+/navigation/ui-builder/
+/_data/ui_builder.yml
+/_data/ui_builder_school.yml
+/_data/ui_builder_editor.yml
+/_layouts/ui-builder-canvas.html
+
 # Profile system distributions (authoritative sources in _projects/systems/profile)
 /navigation/authentication/profile.md
 /navigation/authentication/profile-v2.md
@@ -92,6 +99,7 @@ images/projects/
 /_includes/post_list_image_card.html
 /_includes/announcement_calendar_demo.html
 /_includes/ocs_calendar_card.html
+/_includes/ocs_calendar_card_data.html
 /_includes/sprint-card.html
 /_includes/sprint-item-card.html
 /_includes/sprint-modals.html

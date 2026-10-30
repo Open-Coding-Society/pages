@@ -1,6 +1,6 @@
 // Shared setup-agent button and report panel for every supported operating system:
 // MacSetupCheck.js (macOS: step-by-step Terminal flow) and SystemSetupCheck.js
-// (Linux/Kasm/Windows). Buttons sit above the game canvas but below station
+// (Linux/Windows). Buttons sit above the game canvas but below station
 // panels (1200+); panels match the OS picker (z-index 100060) to cover dialogues.
 $setup-check-accent: #38bdf8;
 $setup-check-pass: #4ecca3;

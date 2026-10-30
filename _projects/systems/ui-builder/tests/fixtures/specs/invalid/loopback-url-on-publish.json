@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "An API on the team's own computer", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-loop0001",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-loop0001",
+              "type": "api_data",
+              "settings": {
+                "source": {
+                  "url": "http://localhost:8587/api/jokes",
+                  "list_path": "",
+                  "title_path": "joke",
+                  "text_path": "",
+                  "image_path": "",
+                  "link_path": "",
+                  "value_path": "haha",
+                  "label_path": "",
+                  "snapshot": {
+                    "items": [
+                      { "title": "Why do programmers prefer dark mode?", "text": "", "image": "", "link": "", "value": "12", "label": "" }
+                    ],
+                    "fetched_at": 1793206800000,
+                    "from_loopback": true
+                  }
+                },
+                "title": "Jokes from our laptop",
+                "view": "list",
+                "limit": 5
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

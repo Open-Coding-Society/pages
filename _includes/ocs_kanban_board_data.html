@@ -1,0 +1,17 @@
+{% comment %}
+  The kanban board's defaults (_data/kanban.yml) on the page, once, as
+  #ocs-kanban-defaults: the JSON assets/js/kanban-board.js reads for every
+  board.
+
+  {% raw %}{% include ocs_kanban_board_data.html %}{% endraw %}
+
+  ocs_kanban_board.html adds it for its boards. A page that makes its boards
+  in script instead (from {% raw %}{% include ocs_kanban_board.html template=true %}{% endraw %},
+  with createKanbanSection) adds it itself. Both share the once-flag, so a
+  page with both gets the defaults once. Every "<" is escaped so no value can
+  end the script element early.
+{% endcomment -%}
+{% unless ocs_kanban_board_assets %}
+{% assign ocs_kanban_board_assets = true %}
+<script type="application/json" id="ocs-kanban-defaults">{{ site.data.kanban | jsonify | replace: "<", "\u003c" }}</script>
+{%- endunless -%}

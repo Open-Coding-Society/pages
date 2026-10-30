@@ -378,4 +378,275 @@
   min-height: 1.2rem;
 }
 
+/* Channel tabs: Chat / Suggestions. Underlined like page tabs, so they read
+   as separate places rather than another filter. */
+.microblog-channel-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.microblog-channel-tab {
+  flex: 1;
+  margin-bottom: -1px;
+  padding: 0.5rem 0.75rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #d1d5db;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  &.is-active {
+    border-bottom-color: #3b82f6;
+    color: #fff;
+  }
+}
+
+/* View filter: All / Active / Mine / History */
+.microblog-view-filter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+
+  label {
+    color: #d1d5db;
+    font-weight: 600;
+  }
+}
+
+.microblog-view-select {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.375rem;
+  background: #1f2937;
+  color: #f9fafb;
+  font-size: 0.85rem;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 1px;
+  }
+}
+
+.microblog-status {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: #e5e7eb;
+
+  &:empty {
+    display: none;
+  }
+}
+
+/* Post layout: topic line (+ Resolved badge), content, then one row of actions */
+.microblog-post-topic {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+/* Never wraps: four 1.75rem buttons plus Resolve fit the narrowest panel, and
+   Resolve drops its label on small screens (see the media query below) */
+.microblog-post-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+}
+
+/* Edit / Reply: matching square icon buttons */
+.microblog-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0.375rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* Delete: same square, turns red on hover */
+  &.is-danger:hover:not(:disabled) {
+    background: #dc2626;
+    border-color: #dc2626;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* Resolve / Reopen: same height as the icon buttons, with a label, at the row's right end */
+.microblog-resolve-btn {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 0.3rem;
+  margin-left: auto;
+  height: 1.75rem;
+  padding: 0 0.65rem;
+  border: 1px solid #10b981;
+  border-radius: 0.375rem;
+  background: #10b981;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #059669;
+    border-color: #059669;
+  }
+
+  &:disabled {
+    background: #94a3b8;
+    border-color: #94a3b8;
+    cursor: not-allowed;
+  }
+}
+
+/* Replies: name and date, then the reply's status badge and its own
+   Resolve / Reopen, pushed to the right (margin-left: auto above) */
+.microblog-reply-byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+}
+
+.microblog-resolve-btn.microblog-resolve-btn--reply {
+  height: 1.5rem;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+}
+
+// Resolved replies stay readable but step back from open ones
+.microblog-reply.is-resolved {
+  opacity: 0.7;
+}
+
+/* Reopen is the secondary action on a resolved post, so it's outlined */
+.microblog-resolve-btn.is-reopen {
+  background: transparent;
+  color: #6ee7b7;
+
+  &:hover:not(:disabled) {
+    background: rgba(16, 185, 129, 0.2);
+    color: #fff;
+  }
+}
+
+/* Phones: Resolve / Reopen become icon squares (the title still says which) */
+@media (max-width: 480px) {
+  .microblog-resolve-btn {
+    justify-content: center;
+    width: 1.75rem;
+    padding: 0;
+
+    span {
+      display: none;
+    }
+  }
+
+  .microblog-resolve-btn.microblog-resolve-btn--reply {
+    width: 1.5rem;
+    padding: 0;
+  }
+}
+
+.microblog-resolved-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.25);
+  color: #6ee7b7;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Microblog notification badges (assets/js/api/microblog-notifications.js):
+   the DM bell's red count (%notification-badge in dm-bell.scss), on the
+   Capstone tab and on each capstone card with new posts on its microblog. */
+
+// On the tab it sits just after the name instead of over an icon.
+.microblog-unread-badge {
+  @extend %notification-badge;
+  position: relative;
+  top: -0.55em;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+// On a card, in its top-right corner (assets/js/capstone-microblog-badges.js).
+[data-microblog-unread-card] {
+  position: relative;
+}
+
+// Two classes, so its size beats the shared pill's, which dm-bell.scss writes later.
+.microblog-unread-badge.microblog-unread-badge--card {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  font-size: 12px;
+  line-height: 22px;
+}
+
+// Phones keep the tabs behind the menu icon: a dot on it says there is news.
+@media screen and (max-width: 599px) {
+  .site-nav.has-microblog-unread .menu-icon {
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: -3px;
+      right: -5px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: darken($red, 8%);
+    }
+  }
+}
+
 /* Add more microblog-specific styles as needed */
