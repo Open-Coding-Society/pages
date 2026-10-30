@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "An image link missing a slash", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-typo0001",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-typo0001",
+              "type": "image",
+              "settings": { "src": "https:/team.github.io/logo.png", "alt": "Our logo", "caption": "", "fit": "contain" },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

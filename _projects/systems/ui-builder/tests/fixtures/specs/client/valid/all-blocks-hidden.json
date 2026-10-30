@@ -1,0 +1,471 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": {
+    "title": "Flood Watch",
+    "description": "Live river levels for our town.",
+    "byline": "Binary Beasts",
+    "course": "csp",
+    "width": "wide",
+    "image": "https://raw.githubusercontent.com/open-coding-society/pages/main/images/logo.png"
+  },
+  "sections": [
+    {
+      "id": "s-intro01",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-hero0001",
+              "type": "hero",
+              "settings": {
+                "badge": "CSP team project",
+                "title": "Flood Watch",
+                "lead": "River levels every hour, with alerts before the water rises.",
+                "links": [
+                  {
+                    "label": "Try it",
+                    "url": "https://ada.github.io/flood-watch/"
+                  },
+                  {
+                    "label": "Our lesson",
+                    "url": "/csp/sprint-3/"
+                  },
+                  {
+                    "label": "Email us",
+                    "url": "mailto:team@example.com"
+                  }
+                ]
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-head0001",
+              "type": "heading",
+              "settings": {
+                "text": "How it works",
+                "level": "3",
+                "subtitle": "Sensors, a Flask API and this page."
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-text0001",
+              "type": "text",
+              "settings": {
+                "body": "<p>We measure <b>river levels</b> every hour.</p><ul><li>Sensors</li><li>Alerts</li></ul><p><a href=\"https://github.com/open-coding-society\">Our code</a></p>"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-text0002",
+              "type": "text",
+              "settings": {
+                "body": "<p>Draft notes, hidden until we finish them.</p>"
+              },
+              "hidden": true
+            },
+            {
+              "id": "b-image001",
+              "type": "image",
+              "settings": {
+                "src": "https://raw.githubusercontent.com/open-coding-society/pages/main/images/river.png",
+                "alt": "The river gauge at the bridge",
+                "caption": "Our first sensor",
+                "fit": "cover"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-video001",
+              "type": "video",
+              "settings": {
+                "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "title": "Two-minute demo",
+                "caption": "Recorded at the bridge."
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-btns0001",
+              "type": "buttons",
+              "settings": {
+                "links": [
+                  {
+                    "label": "Live app",
+                    "url": "https://ada.github.io/flood-watch/"
+                  },
+                  {
+                    "label": "Backend",
+                    "url": "https://flask.opencodingsociety.com/api/jokes"
+                  },
+                  {
+                    "label": "Lesson",
+                    "url": "/csp/"
+                  },
+                  {
+                    "label": "Contact",
+                    "url": "mailto:team@example.com"
+                  }
+                ],
+                "emphasize_first": false
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-card0001",
+              "type": "card",
+              "settings": {
+                "title": "Our partner",
+                "body": "<p>The town council uses our alerts.</p>",
+                "links": [
+                  {
+                    "label": "Read more",
+                    "url": "https://example.com/partner"
+                  }
+                ]
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-call0001",
+              "type": "callout",
+              "settings": {
+                "body": "<p><b>Safety first:</b> never go near the river during a flood.</p>"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-halves1",
+      "type": "columns",
+      "settings": {
+        "layout": "halves"
+      },
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-keyp0001",
+              "type": "keypoints",
+              "settings": {
+                "items": [
+                  {
+                    "title": "Hourly data",
+                    "text": "Every sensor reports once an hour."
+                  },
+                  {
+                    "title": "Alerts",
+                    "text": "Texts go out when water rises fast."
+                  }
+                ]
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-check001",
+              "type": "checklist",
+              "settings": {
+                "items": [
+                  {
+                    "text": "Install the sensor",
+                    "done": true
+                  },
+                  {
+                    "text": "Write the alert route",
+                    "done": false
+                  }
+                ]
+              },
+              "hidden": false
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "id": "b-stats001",
+              "type": "stats",
+              "settings": {
+                "items": [
+                  {
+                    "value": "3",
+                    "label": "API endpoints"
+                  },
+                  {
+                    "value": "12",
+                    "label": "Tests passing"
+                  }
+                ]
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-table001",
+              "type": "table",
+              "settings": {
+                "data": "Name | Role\nAda | Scrum Master\nGrace | Integrator",
+                "caption": "Who does what"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-thirds1",
+      "type": "columns",
+      "settings": {
+        "layout": "thirds"
+      },
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-links001",
+              "type": "link_cards",
+              "settings": {
+                "items": [
+                  {
+                    "kicker": "Prototype",
+                    "title": "Try our app",
+                    "text": "Start with the map.",
+                    "url": "https://ada.github.io/flood-watch/"
+                  },
+                  {
+                    "kicker": "Lesson",
+                    "title": "Sprint 3",
+                    "text": "What we learned.",
+                    "url": "/csp/sprint-3/"
+                  }
+                ]
+              },
+              "hidden": false
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "id": "b-team0001",
+              "type": "team",
+              "settings": {
+                "title": "Our team",
+                "items": [
+                  {
+                    "name": "Ada",
+                    "role": "Scrum Master",
+                    "url": "https://github.com/ada"
+                  },
+                  {
+                    "name": "Grace",
+                    "role": "Integrator",
+                    "url": "https://github.com/grace"
+                  }
+                ]
+              },
+              "hidden": false
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "id": "b-code0001",
+              "type": "code",
+              "settings": {
+                "language": "python",
+                "code": "@app.route('/api/levels')\ndef levels():\n    return jsonify(read_levels())"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-line0001",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-asidel1",
+      "type": "columns",
+      "settings": {
+        "layout": "sidebar_left"
+      },
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-chat0001",
+              "type": "chat",
+              "settings": {
+                "group": {
+                  "id": 42,
+                  "name": "Binary Beasts"
+                },
+                "title": "Team chat"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-memb0001",
+              "type": "members",
+              "settings": {
+                "group": {
+                  "id": 42,
+                  "name": "Binary Beasts"
+                },
+                "title": "Who we are"
+              },
+              "hidden": false
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "id": "b-mesg0001",
+              "type": "message_me",
+              "settings": {
+                "label": "Message us",
+                "note": "Questions about our project?"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-kanb0001",
+              "type": "kanban",
+              "settings": {
+                "url": "https://github.com/open-coding-society/pages/issues",
+                "filter": "Team",
+                "title": "Our board"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-asider1",
+      "type": "columns",
+      "settings": {
+        "layout": "sidebar_right"
+      },
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-feed0001",
+              "type": "feedback",
+              "settings": {
+                "title": "Leave us feedback",
+                "prompt": "What should we build next?"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-apid0001",
+              "type": "api_data",
+              "settings": {
+                "source": {
+                  "url": "https://flask.opencodingsociety.com/api/jokes",
+                  "list_path": "data.items",
+                  "title_path": "joke",
+                  "text_path": "detail.text",
+                  "image_path": "image",
+                  "link_path": "link",
+                  "value_path": "haha",
+                  "label_path": "tags[0]",
+                  "snapshot": {
+                    "items": [
+                      {
+                        "title": "Why did the river cross the road?",
+                        "text": "It was flooding.",
+                        "image": "https://raw.githubusercontent.com/open-coding-society/pages/main/images/river.png",
+                        "link": "https://example.com/jokes/1",
+                        "value": "3",
+                        "label": "river"
+                      }
+                    ],
+                    "fetched_at": 1767225600000,
+                    "from_loopback": false
+                  }
+                },
+                "title": "Live from our backend",
+                "view": "stats",
+                "limit": 5
+              },
+              "hidden": false
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "id": "b-embd0001",
+              "type": "embed",
+              "settings": {
+                "url": "https://ada.github.io/flood-watch/",
+                "title": "Flood Watch app",
+                "height": "tall"
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-anno0001",
+              "type": "announcements",
+              "settings": {
+                "course": "csp",
+                "title": "Class news",
+                "limit": 5
+              },
+              "hidden": false
+            },
+            {
+              "id": "b-cale0001",
+              "type": "calendar",
+              "settings": {
+                "course": "csa",
+                "title": "Class calendar"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s-hidden1",
+      "type": "stack",
+      "settings": {},
+      "hidden": true,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-line0002",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
