@@ -213,8 +213,9 @@ public class AnnouncementService {
 
 ## Step 5
 > Controller File
-- Use the announcement controller file, copy and rename all parts to your API's name similar to the first step
+- Use AnnouncementApiRestController.java, copy and rename all parts to your API's name similar to the first step
 - This file is how you will manipulate your data from outside the local system
+- It only translates HTTP: each method calls the service and turns the result into a response
 - This is done through [fetching](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) different URLs with data embedded in the HTTP request
 - Each controller file should have a base path that is different from the rest of the other API's
 - Looking above the class you should see this 
@@ -230,43 +231,40 @@ public class AnnouncementService {
 > Basic Methods (do not copy use as example)
 - All we are doing is just assigning certain methods to URLs, that will do CRUD processes
 - CRUD stands for Create Read Update Delete, and you want each kind 
-- Create -> POST, Read -> GET, Update -> PUT, Delete -> DELETE
+- Create -> POST, Read -> GET, Update -> PUT, Delete -> DELETE is the usual mapping
+- The announcement API uses POST for edit and delete (`/edit/{title}`, `/delete/{title}`), because clients already call those routes
+- Methods return an `AnnouncementRecord`, a small record nested in the controller, instead of the entity, so the JSON stays the same even if the table changes
 - Use CHATGPT to help with creation
 
 <br>
 
 ```java
     // Create Example
-    @PostMapping("/create") 
-    public ResponseEntity<Announcement> createAnnouncement( @RequestParam String author, @RequestParam String title, @RequestParam String body, @RequestParam String tags) {
-        
-        Announcement newAnnouncement = new Announcement(author, title, body, tags);
-        Announcement savedAnnouncement = announcementRepo.save(newAnnouncement);
-        
-        return new ResponseEntity<>(savedAnnouncement, HttpStatus.CREATED);
+    @PostMapping("/create")
+    public ResponseEntity<AnnouncementRecord> createAnnouncement(@RequestParam String author, @RequestParam String title,
+            @RequestParam String body, @RequestParam String tags) {
+        AnnouncementEntity saved = announcementService.create(author, title, body, tags);
+        return new ResponseEntity<>(AnnouncementRecord.of(saved), HttpStatus.CREATED);
     }
 
     // Read Example
-    @GetMapping 
-    public ResponseEntity<List<Announcement>> getAllAnnouncements() {
-        List<Announcement> announcements = announcementRepo.findAll();
-        return new ResponseEntity<>(announcements, HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<List<AnnouncementRecord>> getAllAnnouncements() {
+        return new ResponseEntity<>(AnnouncementRecord.of(announcementService.findAll()), HttpStatus.OK);
     }
 
     // Update Example
-    @PutMapping("/edit/{title}")
-    public ResponseEntity<Announcement> editAnnouncement(@PathVariable String title, @RequestBody String body) {
-        Announcement announcement = announcementRepo.findByTitle(title);
-        announcement.setBody(body);
-        announcementRepo.save(announcement);
-        return new ResponseEntity<>(announcement, HttpStatus.OK);
+    @PostMapping("/edit/{title}")
+    public ResponseEntity<AnnouncementRecord> editAnnouncement(@PathVariable String title, @RequestBody String body) {
+        AnnouncementEntity edited = announcementService.editBody(title, body);
+        return new ResponseEntity<>(AnnouncementRecord.of(edited), HttpStatus.OK);
     }
 
     // Delete Example
-    @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteAnnouncement(@PathVariable Long id) {
+    @PostMapping("/delete/{title}")
+    public ResponseEntity<HttpStatus> deleteAnnouncement(@PathVariable String title) {
         try {
-            announcementRepo.deleteById(id);
+            announcementService.deleteByTitle(title);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
