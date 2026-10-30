@@ -938,7 +938,7 @@ document.addEventListener('DOMContentLoaded', function(){
        </a>
        <div>
            <h3><a href="{% post_url 2026-10-29-unified-social-club-capstone %}">Unified Social Club</a></h3>
-           <p>Rebuilding the website for Poway's free social club for adults with special needs, so members, families, and volunteers can find a club date, register, and stay connected, with easy-read pages, hands-free Nod to select, club games, and safe messages with volunteers.</p>
+           <p>Club games for Poway's free social club for adults with special needs: Club Bingo, Club Trivia Live (like Kahoot), and Club Jeopardy, played together at club night or at home, with big print and hands-free Nod to select.</p>
            <p>Team: Triple T (Chetan Tiduwar, Aaditya Prem, Kashyap Tubati)</p>
        </div>
    </div>
