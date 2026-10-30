@@ -157,6 +157,14 @@
     fill: currentColor !important;
   }
 
+  /* Grammar labels written as links keep their words in the text color, as the grammar draws
+     them: the accent is their ring, and accent text on the accent's own tint is under 4.5:1. */
+  a.ocs__status-pill,
+  a.ocs__status,
+  a.ocs__badge {
+    color: var(--pref-text-color) !important;
+  }
+
   /* Selected capstone navigation uses the page background for contrast. */
   .jv-nav-link.active,
   .ocs__btn.accent.fill {
