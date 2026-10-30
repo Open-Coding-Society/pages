@@ -1,5 +1,5 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import TutorialPlayer from './TutorialPlayer.js';
+import Player from './PlayerCar.js';
 import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
 import TimeLapScreen from './TimeLapScreen.js';
 
@@ -91,8 +91,8 @@ class GameLevelTutorial {
 
     this.classes = [
       { class: GameEnvBackground, data: background_data },
-      { class: TutorialPlayer, data: player_data },
-      { class: TutorialPlayer, data: other_data },
+      { class: Player, data: player_data },
+      { class: Player, data: other_data },
       { class: SplineBarrier, data: barrierData1 },
       { class: SplineBarrier, data: barrierData2 },
       { class: TimeLapScreen, data: lap_data }

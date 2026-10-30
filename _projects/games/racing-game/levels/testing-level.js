@@ -8,9 +8,9 @@ class GameLevelTesting {
   constructor(gameEnv) {
     const path = gameEnv.path;
     const background_data = {
-name: "Autumn Course",
+      name: "Autumn Course",
       greeting: "Welcome to the Autumn Level!",
-      src: path + '/images/projects/racing-game/Autumn_Track.jpeg',
+      src: path + '/images/projects/racing-game/Autumn_Mud_track.jpeg',
       pixels: { height: 360, width: 643 }
     };
     const player_data = {
@@ -88,17 +88,17 @@ name: "Autumn Course",
       orientation: { rows: 1, columns: 1 },
     };
 
-    // Creeper sprite info with movement, animation logic, and scaled down size
+    // Creeper sprite info with interactive knockback/blast mechanics
     const sprite_src_creeper = `${path}/images/projects/gamify/creepa.png`;
     const sprite_greet_creeper = "KABOOM!!";
     const sprite_data_creeper = {
       id: 'Creeper',
       greeting: sprite_greet_creeper,
       src: sprite_src_creeper,
-      SCALE_FACTOR: 16, // Increased scale factor to make the Creeper much smaller
+      SCALE_FACTOR: 16,
       ANIMATION_RATE: 25,
       pixels: { height: 1200, width: 1600 },
-      INIT_POSITION: { x: 60, y: 100 }, // Positioning the creeper in the middle of the track
+      INIT_POSITION: { x: 60, y: 100 },
       orientation: { rows: 1, columns: 2 },
       down: { row: 0, start: 0, columns: 2 },
       right: { row: 0, start: 0, columns: 2 },
@@ -107,7 +107,6 @@ name: "Autumn Course",
       hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
 
       collisionEvents: [],
-      hasExploded: false,
       isColliding: false,
       lastCollisionCheck: 0,
       
@@ -124,86 +123,65 @@ name: "Autumn Course",
 
       sound: new Audio(`${path}/assets/audio/creeper.mp3`),
 
-      explode() {
-        if (this.hasExploded) return;
-        this.hasExploded = true;
+      explode(player) {
+        if (this.sound) {
+          this.sound.currentTime = 0;
+          this.sound.play().catch(() => {});
+        }
 
-        console.log("CREEPER EXPLODING - CALLING Creeper.js EXPLOSION!"); 
+        this.blastPlayerBack(player);
+        this.showBlastEffect();
+      },
 
-        this.speed = 0;
+      blastPlayerBack(player) {
+        if (!player) return;
 
-        const creeperObject = gameEnv?.gameObjects?.find(obj => obj.spriteData?.id === 'Creeper');
-        if (creeperObject) {
-          creeperObject.hasExploded = true;
-          creeperObject.isExploding = true;
-          
-          creeperObject.velocity.x = 0;
-          creeperObject.velocity.y = 0;
-          
-          creeperObject.startSequentialExplosion();
-        } else {
-          console.warn("Could not find Creeper object - falling back to local explosion");
-          this.showExplosionMessageAndRestart();
+        // Knock back car on impact by reversing speed and pushing velocity away
+        if (typeof player.currentSpeed === 'number') {
+          player.currentSpeed = -Math.abs(player.maxSpeed || 12) * 1.5;
+        }
+
+        if (player.velocity) {
+          const creeperWidth = this.pixels.width / this.SCALE_FACTOR;
+          const creeperHeight = this.pixels.height / this.SCALE_FACTOR;
+          const creeperCenterX = this.INIT_POSITION.x + creeperWidth / 2;
+          const creeperCenterY = this.INIT_POSITION.y + creeperHeight / 2;
+
+          const playerPos = player.position || player.INIT_POSITION || { x: 0, y: 0 };
+          const dx = (playerPos.x || 0) - creeperCenterX;
+          const dy = (playerPos.y || 0) - creeperCenterY;
+          const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+          const knockbackStrength = 25;
+
+          player.velocity.x = (dx / distance) * knockbackStrength;
+          player.velocity.y = (dy / distance) * knockbackStrength;
         }
       },
 
-      showExplosionMessageAndRestart() {
-        console.log("Showing explosion message and preparing restart");
-        
-        const explosionMessage = document.createElement('div');
-        explosionMessage.innerHTML = 'BOOM! Game Over!<br>Restarting...';
-        explosionMessage.id = 'creeperExplosionMessage';
-        Object.assign(explosionMessage.style, {
+      showBlastEffect() {
+        const blastFlash = document.createElement('div');
+        blastFlash.id = 'creeperBlastFlash';
+        Object.assign(blastFlash.style, {
           position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'rgba(255, 0, 0, 0.9)',
-          color: 'white',
-          padding: '20px',
-          fontSize: '24px',
-          fontWeight: 'bold',
-          textAlign: 'center',
-          borderRadius: '10px',
-          zIndex: '10000',
-          fontFamily: 'Arial, sans-serif',
-          animation: 'fadeInExplosion 0.5s ease-in'
+          top: '0',
+          left: '0',
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(255, 165, 0, 0.35)',
+          pointerEvents: 'none',
+          zIndex: '9999',
+          transition: 'opacity 0.25s ease-out'
         });
-        
-        const style = document.createElement('style');
-        style.textContent = `
-          @keyframes fadeInExplosion {
-            from { 
-              opacity: 0; 
-              transform: translate(-50%, -50%) scale(0.5); 
-            }
-            to { 
-              opacity: 1; 
-              transform: translate(-50%, -50%) scale(1); 
-            }
-          }
-        `;
-        document.head.appendChild(style);
-        
-        const existingMessage = document.getElementById('creeperExplosionMessage');
-        if (existingMessage) {
-          existingMessage.remove();
-        }
-        
-        document.body.appendChild(explosionMessage);
-        
+        document.body.appendChild(blastFlash);
         setTimeout(() => {
-          console.log("Restarting game...");
-          window.location.reload();
-        }, 2000);
+          blastFlash.style.opacity = '0';
+          setTimeout(() => blastFlash.remove(), 250);
+        }, 100);
       },
 
       checkPlayerCollision(player) {
-        if (this.hasExploded) return false;
-
         const now = Date.now();
-        if (now - this.lastCollisionCheck < 100) return false;
-        this.lastCollisionCheck = now;
+        if (now - this.lastCollisionCheck < 250) return false;
 
         let playerPos = null;
         let playerWidth = 0;
@@ -221,18 +199,20 @@ name: "Autumn Course",
           };
           playerWidth = rect.width;
           playerHeight = rect.height;
-        } else {
+        } else if (player) {
           playerPos = player.position || player.INIT_POSITION || { x: 0, y: 0 };
           const playerPixels = player.pixels || { width: 600, height: 1500 };
           const playerScale = player.SCALE_FACTOR || 5;
           playerWidth = playerPixels.width / playerScale;
           playerHeight = playerPixels.height / playerScale;
+        } else {
+          return false;
         }
 
         const creeperWidth = this.pixels.width / this.SCALE_FACTOR;
         const creeperHeight = this.pixels.height / this.SCALE_FACTOR;
         
-        const collisionMargin = 40;
+        const collisionMargin = 30;
         const creeperLeft = this.INIT_POSITION.x + collisionMargin;
         const creeperRight = this.INIT_POSITION.x + creeperWidth - collisionMargin;
         const creeperTop = this.INIT_POSITION.y + collisionMargin;
@@ -251,14 +231,12 @@ name: "Autumn Course",
         );
         
         if (isOverlapping && !this.isColliding) {
-          console.log("NEW COLLISION DETECTED - STARTING SEQUENTIAL EXPLOSION!");
-          
+          this.lastCollisionCheck = now;
           this.isColliding = true;
-          this.explode();
+          this.explode(player);
           return true;
         } 
         else if (!isOverlapping && this.isColliding) {
-          console.log("Player moved away from creeper");
           this.isColliding = false;
         }
         
@@ -280,7 +258,7 @@ name: "Autumn Course",
       { class: SplineBarrier, data: barrierData1 },
       { class: SplineBarrier, data: barrierData2 },
       { class: Character, data: BoxData },
-      { class: Character, data: sprite_data_creeper }, // Added Creeper into the level game objects
+      { class: Character, data: sprite_data_creeper },
       { class: TimeLapScreen, data: lap_data }
     ];
   }
