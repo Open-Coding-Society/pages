@@ -32,8 +32,11 @@ export const FIXES = Object.freeze({
   'working-folder': {
     all: [{ text: 'Start the agent from a terminal inside your project folder, then use Pair a new agent:', commands: ['cd {project}', '{agent}'] }],
   },
-  'trail-folder': {
-    all: [{ text: 'Create the folder in your home folder, then click Check again:', commands: ['mkdir -p ~/toolchain-trail'] }],
+  'pages-clone': {
+    all: [
+      { text: 'Clone the class repo into your opencs folder (skip the clone if pages is already there):', commands: ['mkdir -p ~/opencs', 'cd ~/opencs', 'git clone https://github.com/Open-Coding-Society/pages.git'] },
+      { text: 'Start the agent from inside it, then use Pair a new agent:', commands: ['cd {project}', '{agent}'] },
+    ],
   },
   python: {
     macos: [{ text: 'Install Python with Homebrew (get Homebrew from brew.sh first if brew is missing):', commands: ['brew install python'] }],
@@ -86,16 +89,6 @@ export const FIXES = Object.freeze({
   },
   'bundle-check': {
     all: [{ text: "Install the project's gems and Python packages, then click Check again:", commands: ['cd {project}', './scripts/venv.sh'] }],
-  },
-  'recent-commit': {
-    all: [{ text: 'Make a commit in your project (change the message if you like):', commands: ['cd {project}', 'git add -A && git commit -m "My first trail commit"'] }],
-  },
-  'push-dry-run': {
-    all: [
-      { text: 'See what blocks your push:', commands: ['cd {project}', 'git push --dry-run'] },
-      { text: 'If it says there is no upstream branch, push once with:', commands: ['git push -u origin HEAD'] },
-      'If it asks you to sign in or says permission denied, sign in to GitHub (Windows: Git Credential Manager), then click Check again.',
-    ],
   },
 });
 

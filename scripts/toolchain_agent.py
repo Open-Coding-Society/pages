@@ -28,7 +28,7 @@ Usage (run it from inside your cloned pages repository):
     Stop the agent:       python3 scripts/toolchain_agent.py --stop
     Keep it in this window instead of the background: add --foreground
 
-The check ids below must match ToolchainStations.java in blueprint-spring.
+The check ids below must match ToolchainStationRules.java in blueprint-spring.
 """
 
 import argparse
@@ -124,15 +124,10 @@ def redact_email(output: str) -> str:
     return f"{local[:1]}***@{domain}"
 
 
-def find_trail_folder(cwd: Path, home: Path) -> Optional[Path]:
-    for base in (cwd, home, cwd.parent):
-        candidate = base / "toolchain-trail"
-        if candidate.is_dir():
-            return candidate
-    return None
-
-
 Runner = Callable[[List[str], Optional[Path]], CommandResult]
+
+# Stations the boss station runs again; must match FINAL_CHECK_STATIONS in ToolchainStationRules.java.
+FINAL_CHECK_STATIONS = ("terminal-town-gate", "compiler-canyon-forge", "editor-isle-tower", "git-village-hall")
 
 
 def collect_evidence(station_id: str, repo: Path, runner: Optional[Runner] = None) -> List[Dict]:
@@ -142,11 +137,9 @@ def collect_evidence(station_id: str, repo: Path, runner: Optional[Runner] = Non
     checks: List[Tuple[str, CommandResult]] = []
 
     if station_id == "terminal-town-gate":
-        cwd = Path.cwd()
-        folder = find_trail_folder(cwd, Path.home())
         checks = [
-            ("working-folder", (0, str(cwd))),
-            ("trail-folder", (0, str(folder)) if folder else (1, "toolchain-trail folder not found")),
+            ("working-folder", (0, str(Path.cwd()))),
+            ("pages-clone", runner(["git", "rev-parse", "--show-toplevel"], repo)),  # the backend checks it is opencs/pages
         ]
     elif station_id == "compiler-canyon-forge":
         checks = [
@@ -173,10 +166,8 @@ def collect_evidence(station_id: str, repo: Path, runner: Optional[Runner] = Non
     elif station_id == "build-bridge":
         checks = [("bundle-check", runner(["bundle", "check"], repo))]
     elif station_id == "integration-summit":
-        checks = [
-            ("recent-commit", runner(["git", "log", "-1", "--oneline"], repo)),
-            ("push-dry-run", runner(["git", "push", "--dry-run"], repo)),
-        ]
+        # The finish line re-checks the pages clone and every tool; it never commits or pushes.
+        return [item for station in FINAL_CHECK_STATIONS for item in collect_evidence(station, repo, runner)]
     else:
         raise ValueError(f"This agent does not know the station '{station_id}'. Update your pages repository.")
 
