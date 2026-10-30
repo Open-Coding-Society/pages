@@ -1,0 +1,30 @@
+// The code view (editor-code.js): the page's HTML in the preview's place, at the preview's height.
+// The code itself takes the site's lesson-code colors from Rouge's .highlight classes.
+.ui-builder-code-pane {
+  height: clamp(26rem, calc(100dvh - 14rem), 64rem);
+  overflow: auto;
+  padding: 0.25rem;
+}
+
+@media (max-width: $uib-phone) {
+  .ui-builder-code-pane {
+    height: clamp(22rem, 70dvh, 40rem);
+  }
+}
+
+// The selected block, as the outline and the preview mark it: the grammar's card has no selected state.
+.ui-builder-code-block[aria-current="true"] {
+  outline: 2px solid var(--pref-accent-color);
+  outline-offset: 2px;
+}
+
+// A long line scrolls inside its block instead of widening the pane.
+.ui-builder-code pre {
+  margin: 0;
+  overflow-x: auto;
+}
+
+.ui-builder-code-classes {
+  margin: 0;
+  padding-left: 1.25rem;
+}

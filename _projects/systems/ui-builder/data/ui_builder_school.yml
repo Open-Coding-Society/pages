@@ -11,6 +11,7 @@ blocks:
   announcements:
     label: Class announcements
     help: The latest announcements from a course's announcement channel.
+    code_note: "Only a comment in the page file. On the live page, the viewer shows your course's announcements chat from Messages."
     icon: fa-bullhorn
     category: comms
     live: true
@@ -22,6 +23,7 @@ blocks:
   calendar:
     label: Class calendar
     help: The class calendar for a course. Visitors who aren't signed in see the school week.
+    code_note: "An include of the course calendar card (ocs_calendar_card.html) for one course. Jekyll fills it in when the site builds."
     icon: fa-calendar-days
     category: comms
     live: true

@@ -412,6 +412,51 @@ test('every editor button with an icon and words uses the grammar\'s icon spacin
   assertIconSpacing(links.element, 'links field');
 });
 
+test('Code takes the preview\'s place and Preview brings it back, and Show HTML opens the code at its block', needsRuby, async () => {
+  const { doc, win } = shellDocument();
+  const root = doc.createElement('div');
+  doc.body.appendChild(root);
+  const store = emptyStore({ save: async (ref, page, { base }) => ({ base: base + 1, meta: null }) });
+  const app = new UiBuilderEditor(root, {
+    win, doc, registry: editorRegistry(), store, draftStore: fakeDrafts(), config: { baseurl: '' }, ids: counterIds(),
+    richText: { renderRichMessage(holder, raw) { holder.textContent = raw; } },
+  });
+  app.showStart();
+  const page = createPage(editorRegistry(), { template: 'about_me', ids: counterIds() });
+  // The About me template's text block needs the rich-text composer, which this test leaves out.
+  const blocks = page.sections.flatMap((section) => section.cells.flatMap((cell) => cell.blocks));
+  assert.ok(!['text'].includes(blocks[1].type) && !['text'].includes(blocks[3].type));
+  app.openEditor({ ref: { kind: 'local', id: 'abcdef123456' }, page, base: 0, meta: null });
+  const { shell } = app.edit;
+  assert.equal(shell.view, 'preview');
+  assert.equal(shell.codePane.hidden, true);
+  assert.equal(shell.viewButtons.get('preview').getAttribute('aria-pressed'), 'true');
+
+  shell.viewButtons.get('code').click();
+  assert.equal(shell.view, 'code');
+  assert.equal(shell.viewport.hidden, true, 'the code shows in the preview\'s place');
+  assert.equal(shell.codePane.hidden, false);
+  assert.equal(shell.viewButtons.get('code').getAttribute('aria-pressed'), 'true');
+  const cards = shell.codePane.querySelectorAll('.ui-builder-code-block');
+  assert.deepEqual(cards.map((card) => card.getAttribute('data-ui-code-node')), blocks.map((block) => block.id));
+
+  cards[1].querySelector('button').click();
+  assert.equal(app.edit.state.selectedId, blocks[1].id, 'picking a block in the code selects it in the editor');
+  assert.equal(shell.codePane.querySelector(`[data-ui-code-node="${blocks[1].id}"]`).getAttribute('aria-current'), 'true');
+
+  shell.viewButtons.get('preview').click();
+  assert.equal(shell.view, 'preview');
+  assert.equal(shell.viewport.hidden, false);
+  assert.equal(shell.codePane.hidden, true);
+  assert.equal(app.edit.state.selectedId, blocks[1].id, 'back in Preview, the same block is selected');
+
+  app.edit.nodeAction('show_html', blocks[3].id);
+  assert.equal(shell.view, 'code', 'Show HTML opens the code view');
+  assert.equal(app.edit.state.selectedId, blocks[3].id);
+  assert.equal(shell.codePane.querySelector(`[data-ui-code-node="${blocks[3].id}"]`).getAttribute('aria-current'), 'true');
+  await app.leave();
+});
+
 test('the feedback line sits above the panes, and an open pane\'s toggle looks pressed', needsRuby, () => {
   const { doc } = shellDocument();
   const shell = buildShell({ doc, registry: editorRegistry(), say, caps: { publish: true, revisions: true } });
