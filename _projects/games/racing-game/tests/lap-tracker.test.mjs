@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import LapTracker, { getCrossingDirection } from '../levels/LapTracker.js';
+import SpeedBoost from '../levels/SpeedBoost.js';
 
 const finishLine = { x: 0.5, top: 0.7, bottom: 0.9 };
 
@@ -74,4 +75,39 @@ test('rejects a level with a missing finish line or bad lap count', () => {
   assert.throws(() => new LapTracker({ totalLaps: 3 }), /finishLine/);
   assert.throws(() => new LapTracker({ finishLine: { x: 0.5, top: 0.9, bottom: 0.7 }, totalLaps: 3 }), /finishLine/);
   assert.throws(() => new LapTracker({ finishLine, totalLaps: 0 }), /totalLaps/);
+});
+
+test('boost runs for three seconds and cannot be triggered again while active', () => {
+  const boost = new SpeedBoost();
+  assert.equal(boost.activate(), true);
+  assert.equal(boost.isActive, true);
+  assert.equal(boost.chargeFraction, 0);
+  assert.equal(boost.activate(), false);
+
+  boost.update(2999);
+  assert.equal(boost.isActive, true);
+  boost.update(1);
+  assert.equal(boost.isActive, false);
+  assert.equal(boost.chargeFraction, 0);
+});
+
+test('recharge starts after the boost and completes after five seconds', () => {
+  const boost = new SpeedBoost();
+  boost.activate();
+  boost.update(3000);
+  assert.equal(boost.activate(), false);
+
+  boost.update(2500);
+  assert.equal(boost.chargeFraction, 0.5);
+  boost.update(2499);
+  assert.equal(boost.activate(), false);
+  boost.update(1);
+  assert.equal(boost.chargeFraction, 1);
+  assert.equal(boost.activate(), true);
+});
+
+test('elapsed time must be a non-negative finite number', () => {
+  const boost = new SpeedBoost();
+  assert.throws(() => boost.update(-1), /non-negative finite number/);
+  assert.throws(() => boost.update(Infinity), /non-negative finite number/);
 });
