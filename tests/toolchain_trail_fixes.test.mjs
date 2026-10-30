@@ -8,7 +8,7 @@ import { FIXES, STUCK_HELP, fixStepsFor, stuckHelpFor } from '../_projects/games
 const agent = readFileSync(new URL('../scripts/toolchain_agent.py', import.meta.url), 'utf8');
 const evidence = agent.slice(agent.indexOf('def collect_evidence'), agent.indexOf('class AgentError'));
 const CHECK_IDS = [...new Set([...evidence.matchAll(/\("([a-z][a-z-]*)", /g)].map((match) => match[1]))];
-const GAME_OSES = ['windows', 'macos', 'linux', 'kasm'];
+const GAME_OSES = ['windows', 'macos', 'linux'];
 
 test('the agent check list was found', () => {
   assert.ok(CHECK_IDS.length >= 14, `only found ${CHECK_IDS.join(', ')}`);
@@ -27,9 +27,9 @@ test('fix steps have no unknown check ids', () => {
 });
 
 test('placeholders are filled with the OS project folder and the agent command', () => {
-  const kasm = JSON.stringify(fixStepsFor('working-folder', 'kasm', 'python3 scripts/toolchain_agent.py'));
-  assert.match(kasm, /cd ~\/opencs\/student/);
-  assert.match(kasm, /python3 scripts\/toolchain_agent\.py/);
+  const linux = JSON.stringify(fixStepsFor('working-folder', 'linux', 'python3 scripts/toolchain_agent.py'));
+  assert.match(linux, /cd ~\/opencs\/pages/);
+  assert.match(linux, /python3 scripts\/toolchain_agent\.py/);
   for (const id of CHECK_IDS) {
     assert.doesNotMatch(JSON.stringify(fixStepsFor(id, 'macos', 'AGENT')), /\{project\}|\{agent\}/, id);
   }

@@ -177,7 +177,6 @@ function detectTerminalFailure(output) {
  */
 const OS_OPTIONS = Object.freeze([
   { id: 'windows', label: 'Windows' },
-  { id: 'kasm', label: 'Kasm (Cloud Linux Desktop)' },
   { id: 'macos', label: 'macOS' },
   { id: 'linux', label: 'Linux' },
 ]);
@@ -238,7 +237,10 @@ class GameLevelCsPath4Toolchain {
      */
     this.selectedOS = null;
     try {
-      this.selectedOS = localStorage.getItem(OS_STORAGE_KEY) || null;
+      const storedOS = localStorage.getItem(OS_STORAGE_KEY);
+      // A saved choice the trail no longer offers (such as Kasm) asks the student to pick again.
+      const isOfferedOS = OS_OPTIONS.some((option) => option.id === storedOS);
+      this.selectedOS = isOfferedOS ? storedOS : null;
     } catch (err) {
       this.selectedOS = null;
     }
@@ -313,13 +315,6 @@ class GameLevelCsPath4Toolchain {
             { text: "Clone the class repo into it:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
             { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
           ],
-          kasm: [
-            'Open a Terminal in your Kasm Workspace.',
-            { text: "Go to your home folder:", commands: ["cd ~"] },
-            { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
-            { text: "Clone the class repo into it:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
-            { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
-          ],
           macos: [
             'Open Terminal (keep it in the Dock for easy access).',
             { text: "Go to your home folder:", commands: ["cd ~"] },
@@ -372,12 +367,6 @@ class GameLevelCsPath4Toolchain {
             { text: "Check the Ruby tools. Each command should print a version number:", commands: ["ruby -v", "bundle -v", "gem --version"] },
             { text: "If a tool is missing, install Homebrew from brew.sh, then run the macOS setup script and reload your shell:", commands: ["bash scripts/activate_macos.sh", "source ~/.zshrc"] },
           ],
-          kasm: [
-            'Open a Terminal in your Kasm Workspace.',
-            { text: "Confirm Python is installed:", commands: ["python --version", "pip --version"] },
-            { text: "Confirm the Ruby tools too (the class stack uses them):", commands: ["ruby -v", "bundle -v", "gem --version"] },
-            { text: "If anything is missing, install it from your project folder:", commands: ["./scripts/activate.sh"] },
-          ],
           linux: [
             'Open a Terminal.',
             { text: "Confirm Python is installed:", commands: ["python --version", "pip --version"] },
@@ -389,14 +378,12 @@ class GameLevelCsPath4Toolchain {
         expectedCommandPatternByOS: {
           windows: /^(python3?\s+.*|pip\s+.*|ruby\s+.*|bundle\s+.*|gem\s+.*)/i,
           macos: /^(python3?\s+.*|pip\s+.*|ruby\s+.*|bundle\s+.*|gem\s+.*)/i,
-          kasm: /^(python3?\s+.*|pip\s+.*|ruby\s+.*|bundle\s+.*|gem\s+.*)/i,
           linux: /^(python3?\s+.*|pip\s+.*|ruby\s+.*|bundle\s+.*|gem\s+.*)/i,
         },
         exampleCommand: 'java -version',
         exampleCommandByOS: {
           windows: 'python --version',
           macos: 'python --version',
-          kasm: 'python --version',
           linux: 'python --version',
         },
         funFact: "Fun fact: Java was originally called 'Oak', named after a tree outside its creator's office.",
@@ -427,12 +414,6 @@ class GameLevelCsPath4Toolchain {
             { text: "Open a new Terminal and check the command. You should see a version number:", commands: ["code --version"] },
             { text: "Go into your project folder and open it:", commands: ["cd ~/opencs/pages", "code ."] },
             'Install one recommended extension.',
-          ],
-          kasm: [
-            'Open a new Terminal in your Kasm Workspace.',
-            { text: "Go into your project folder:", commands: ["cd ~/opencs/pages"] },
-            { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
-            { text: "Open it in VS Code:", commands: ["code ."] },
           ],
           linux: [
             'Install VS Code from code.visualstudio.com (choose the Debian/Ubuntu package and default options).',
@@ -473,12 +454,6 @@ class GameLevelCsPath4Toolchain {
             { text: "Check your name:", commands: ["git config --global --get user.name"] },
             { text: "Check your email. Before pasting into the Practice Check, you may replace the domain with [redacted]:", commands: ["git config --global --get user.email"] },
           ],
-          kasm: [
-            'Open a Terminal in your Kasm Workspace.',
-            { text: "Confirm git is installed (Kasm images ship with it):", commands: ["git --version"] },
-            { text: "Set your Git UID and personal email (it asks for them):", commands: ["./scripts/activate.sh"] },
-            { text: "Confirm it worked:", commands: ["git config --global --list"] },
-          ],
           linux: [
             { text: "Install git:", commands: ["sudo apt update", "sudo apt install git"] },
             { text: "Set your Git UID and personal email (it asks for them):", commands: ["./scripts/activate.sh"] },
@@ -490,7 +465,6 @@ class GameLevelCsPath4Toolchain {
         exampleCommandByOS: {
           windows: 'git config --global credential.helper "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe"',
           macos: 'git config --global --list',
-          kasm: 'git config --global --list',
           linux: 'git config --global --list',
         },
         funFact: 'Fun fact: Linus Torvalds wrote Git in 2005 — in about a weekend — to manage Linux kernel development.',
@@ -534,12 +508,6 @@ class GameLevelCsPath4Toolchain {
             { text: "Set up Git (enter your Git username and email when asked):", commands: ["./scripts/activate.sh"] },
             { text: "Build the Python virtual environment:", commands: ["./scripts/venv.sh"] },
           ],
-          kasm: [
-            { text: "In your Kasm Terminal, go into the cloned folder:", commands: ["cd ~/opencs/pages"] },
-            { text: "Set up Git (enter your Git UID and personal email when asked):", commands: ["./scripts/activate.sh"] },
-            { text: "Build the Python virtual environment:", commands: ["./scripts/venv.sh"] },
-            { text: "Open the project in VS Code:", commands: ["code ."] },
-          ],
           macos: [
             { text: "In Terminal, go into the cloned folder:", commands: ["cd ~/opencs/pages"] },
             { text: "Install the macOS tools:", commands: ["./scripts/activate_macos.sh"] },
@@ -556,13 +524,11 @@ class GameLevelCsPath4Toolchain {
         expectedCommandPattern: /^(mvn|gradle|\.\/gradlew|make)\s+\S+/i,
         expectedCommandPatternByOS: {
           windows: /^\.\/scripts\/\S+/i,
-          kasm: /^\.\/scripts\/\S+/i,
           macos: /^\.\/scripts\/\S+/i,
           linux: /^\.\/scripts\/\S+/i,
         },
         exampleCommandByOS: {
           windows: './scripts/venv.sh',
-          kasm: './scripts/venv.sh',
           macos: './scripts/venv.sh',
           linux: './scripts/venv.sh',
         },
@@ -587,12 +553,6 @@ class GameLevelCsPath4Toolchain {
         instructionsByOS: {
           windows: [
             { text: "From your WSL Ubuntu terminal, go back into your project:", commands: ["cd ~/opencs/pages"] },
-            { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
-            { text: "Open it in your editor:", commands: ["code ."] },
-            'Keep your agent running. This station checks that pages is cloned and every tool is installed. You do not commit or push anything.',
-          ],
-          kasm: [
-            { text: "From your Kasm Terminal, go back into your project:", commands: ["cd ~/opencs/pages"] },
             { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
             { text: "Open it in your editor:", commands: ["code ."] },
             'Keep your agent running. This station checks that pages is cloned and every tool is installed. You do not commit or push anything.',
@@ -966,7 +926,7 @@ class GameLevelCsPath4Toolchain {
     // Mac setup agent trigger: only offered when macOS is the selected OS.
     this.macSetupCheck = new MacSetupCheck();
     this.macSetupCheck.setVisible(this.selectedOS === 'macos');
-    // Linux, Kasm, and Windows/WSL use their own setup-agent panel. The
+    // Linux and Windows/WSL use their own setup-agent panel. The
     // existing macOS component above remains separate and unchanged.
     this.systemSetupCheck = new SystemSetupCheck();
     this.systemSetupCheck.setOS(this.selectedOS);
