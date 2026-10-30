@@ -69,7 +69,7 @@ function applied(theme) {
   return {
     bg: t('--pref-bg-color'), text: t('--pref-text-color'), accent: t('--pref-accent-color'),
     panel: t('--panel'), panelMid: t('--panel-mid'), uiBg: t('--ui-bg'), muted: t('--text-muted'),
-    sheet: engine.sheet(),
+    fieldBorder: t('--field-border'), sheet: engine.sheet(),
   };
 }
 
@@ -99,6 +99,7 @@ for (const [name, theme] of Object.entries(THEMES)) {
     const c = applied(theme);
     const frame = /textarea \{[^}]*border-color: (#[0-9a-f]{6}) !important;/.exec(c.sheet);
     assert.ok(frame, 'the theme sheet sets a field frame');
+    assert.equal(c.fieldBorder, frame[1], '--field-border, which the theme Sass uses for question fields, is the same frame');
     atLeast(contrast(frame[1], c.panel), 3, 'field frame on --panel');
     atLeast(contrast(frame[1], c.bg), 3, 'field frame on the page');
   });

@@ -480,6 +480,7 @@
       // A field's frame: the text faded toward the panel, as far as it keeps 3:1 (WCAG non-text
       // contrast) on the panel and on the page, so an empty field shows on both.
       const fieldBorder = ColorUtils.fadeWithin(text, panel, [panel, bg], 3, 0.8);
+      set('--field-border', fieldBorder);
 
       // Priority / semantic colours
       if (lightBg) {
@@ -545,7 +546,7 @@
         '--pref-cursor-style', '--background',
         '--bg-0', '--bg-1', '--bg-2', '--bg-3',
         '--text', '--text-strong', '--text-muted', '--white1',
-        '--panel', '--panel-mid', '--ui-bg', '--ui-border',
+        '--panel', '--panel-mid', '--ui-bg', '--ui-border', '--field-border',
         '--ocs-game-panel-bg', '--ocs-game-accent', '--ocs-game-text',
         '--ocs-game-muted', '--ocs-game-surface-alt', '--ocs-game-surface-contrast',
         '--ocs-game-overlay', '--ocs-game-panel-selected-bg', '--ocs-game-selected-border',

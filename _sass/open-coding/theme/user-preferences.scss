@@ -128,7 +128,7 @@
   textarea.question-input {
     background-color: var(--pref-bg-color) !important;
     color: var(--pref-text-color) !important;
-    border: 1px solid rgba(0,0,0,0.18) !important;
+    border: 1px solid var(--field-border) !important;
     padding: 0.5rem !important;
   }
 

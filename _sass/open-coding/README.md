@@ -85,11 +85,12 @@ fixed color theme; the same page must remain readable when preferences change.
 Every preset in `assets/js/user-preferences.js` keeps its text and its accent at
 4.5:1 (the WCAG AA minimum) on the page and on `--panel`, and keeps page-colored
 text on an accent fill at 4.5:1. The engine derives `--text-muted` at 4.5:1 on
-every surface and field outlines at 3:1, and `tests/theme_contrast.test.mjs`
-checks every preset. So a reusable style reads in every theme when its text is
-`--pref-text-color`, `--text-muted`, or the accent on the page or a panel. Text on
-an accent tint stays in the text color: the accent on its own tint falls under
-4.5:1 in most themes, so the accent goes on the ring and the tint.
+every surface and field outlines (`--field-border`) at 3:1, and
+`tests/theme_contrast.test.mjs` checks every preset. So a reusable style reads
+in every theme when its text is `--pref-text-color`, `--text-muted`, or the
+accent on the page or a panel. Text on an accent tint stays in the text color:
+the accent on its own tint falls under 4.5:1 in most themes, so the accent goes
+on the ring and the tint.
 
 ### Color composition
 
