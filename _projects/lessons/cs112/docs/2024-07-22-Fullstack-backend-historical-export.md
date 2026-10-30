@@ -53,9 +53,21 @@ categories: []
 - Make sure to match the class name with the file name, change any other appearances of the former files name
 
 ## Step 2
-> Constructor File
-- Change Announcement.java to your features name
+> Entity File
+- Change AnnouncementEntity.java to your features name + Entity.java
 - Rename each instance of the word **Announcement** to your feature's name use ctrl+f
+- The annotations above the class tell Spring this object is a row in a table, and name the table
+
+<br>
+
+```java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity(name = "Announcement")
+@Table(name = "announcement")
+public class AnnouncementEntity {
+```
 
 ### Step 2.1
 > Column Variables
@@ -88,11 +100,12 @@ categories: []
 
 ```java
     // Constructor with necessary fields
-    public Announcement(String author, String title, String body, String tags) {
+    public AnnouncementEntity(String author, String title, String body, String tags) {
         this.author = author;
         this.title = title;
         this.body = body;
         this.tags = tags;
+        this.timestamp = LocalDateTime.now().format(formatter);
     }
 ```
 
@@ -110,17 +123,17 @@ categories: []
 
 ```java
     // Static method to create initial data
-    public static List<Announcement> createInitialData() {
-        List<Announcement> announcements = new ArrayList<>();
+    public static List<AnnouncementEntity> createInitialData() {
+        List<AnnouncementEntity> announcements = new ArrayList<>();
 
         // Create announcements with formatted timestamp
-        announcements.add(new Announcement("Finn", "Test of innit", "Don't mind this message", "welcome"));
+        announcements.add(new AnnouncementEntity("Finn", "Test of innit", "Don't mind this message", "welcome"));
 
         return announcements;
     }
 
     // Static method to initialize the data
-    public static List<Announcement> init() {
+    public static List<AnnouncementEntity> init() {
         return createInitialData();
     }
 ```
