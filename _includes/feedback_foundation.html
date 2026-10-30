@@ -256,7 +256,11 @@
     }
     
     console.log("Payload:", payload);
-    
+
+    // Flask opens a GitHub issue per POST and takes seconds to answer, so a
+    // second click while waiting would open a duplicate issue.
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending...";
     try {
       const res = await fetch(`${pythonURI}/api/feedback/`, {
         method: "POST",
@@ -279,6 +283,9 @@
     } catch (err) {
       successMsg.style.display = "none";
       errorMsg.style.display = "block";
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit";
     }
   };
 </script>
