@@ -5,6 +5,11 @@
 Title: "Unified Social Club"
 Description: "Unified Social Club gives adults with special needs in Poway a free, safe place to make friends: board and card games, arts and crafts, karaoke, and sports, twice a month at the Mickey Cafagna Community Center. Games are the heart of every club night, so we are building three club games members can play together, on the big screen at club night and on their own phones: Club Bingo, Club Trivia Live, and Club Jeopardy. Every game is easy-read, big-print, and playable hands-free with Nod to select."
 
+Board:
+  url: "https://github.com/users/rex0dex/projects/4"
+  title: "Team Triple T Kanban"
+  filter: "Workstream"
+
 Topics:
   - title: "Club Bingo"
     phase: "Round 1"
@@ -153,6 +158,8 @@ Links:
   title: "Following Along"
   subtitle: "Where this work is tracked"
   items:
+    - label: "Our Kanban Board"
+      url: "https://github.com/users/rex0dex/projects/4"
     - label: "Their Live Site"
       url: "https://www.unifiedsocialclub.com/"
     - label: "Club Dates and Register"
