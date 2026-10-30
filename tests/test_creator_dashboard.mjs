@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
-  assignmentPageUrl, filterCreatorSubmissions, withFrontmatterCourses,
+  aiRegradeCandidates, assignmentPageUrl, assignmentsWithTopic, filterCreatorSubmissions, withFrontmatterCourses,
 } from "../assets/js/submissions/creator-dashboard.js";
 import { gradeSourceLabel, parseGradeInput } from "../assets/js/submissions/grading.js";
 
@@ -52,6 +52,42 @@ test("frontmatter courses appear immediately without Spring synchronization", ()
   assert.deepEqual(withFrontmatterCourses(assignments, manifest).map((assignment) => assignment.courseCodes), [
     ["CSSE", "CSP", "CSA", "CSH"], ["CSA"],
   ]);
+});
+
+test("frontmatter categories become topics, from an array or a page's string", () => {
+  const assignments = [
+    { contentUrl: "csa/arrays", courseCodes: ["CSA"] },
+    { contentUrl: "csp/loops", courseCodes: [] },
+    { contentUrl: "unlisted", courseCodes: [] },
+  ];
+  const manifest = [
+    { contentUrl: "/csa/arrays", courseCodes: ["csa"], topics: ["Java", "Arrays", "Java"] },
+    { contentUrl: "csp/loops/", courseCodes: [], topics: "Python Loops" },
+  ];
+  assert.deepEqual(withFrontmatterCourses(assignments, manifest).map((assignment) => assignment.topics), [
+    ["Java", "Arrays"], ["Python", "Loops"], [],
+  ]);
+});
+
+test("the topic filter narrows lessons and their submissions", () => {
+  const lessons = [{ id: 1, topics: ["Java"] }, { id: 2, topics: ["Python"] }];
+  assert.deepEqual(assignmentsWithTopic(lessons, "Java").map((lesson) => lesson.id), [1]);
+  assert.equal(assignmentsWithTopic(lessons, "").length, 2);
+  const topicAssignmentIds = new Set(assignmentsWithTopic(lessons, "Python").map((lesson) => String(lesson.id)));
+  assert.deepEqual(
+    filterCreatorSubmissions(submissions, { topicAssignmentIds }, statusOf).map((row) => row.submitterUid),
+    ["casey"],
+  );
+});
+
+test("bulk AI re-grade skips closed assignments and instructor grades", () => {
+  const rows = [
+    { id: 1, grading: { closed: false, manualOverride: false } },
+    { id: 2, grading: { closed: true, manualOverride: false } },
+    { id: 3, grading: { closed: false, manualOverride: true } },
+    { id: 4 },
+  ];
+  assert.deepEqual(aiRegradeCandidates(rows).map((row) => row.id), [1, 4]);
 });
 
 test("creator grades must be within the assignment's points", () => {

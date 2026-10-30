@@ -15,25 +15,47 @@ export function assignmentPageUrl(baseUrl, contentUrl) {
   return `${normalizedBase}/${normalizedPath}${normalizedPath.endsWith(".html") || !hasTrailingSlash ? "" : "/"}`;
 }
 
+function normalizedContentUrl(contentUrl) {
+  return String(contentUrl || "").replace(/^\/+|\/+$/g, "");
+}
+
+// Jekyll gives posts a categories array; a page may set a single string.
+function topicList(topics) {
+  const values = Array.isArray(topics) ? topics : String(topics || "").split(/[\s,]+/);
+  return [...new Set(values.map((topic) => String(topic).trim()).filter(Boolean))];
+}
+
 export function withFrontmatterCourses(assignments, manifest) {
-  const coursesByUrl = new Map();
+  const entriesByUrl = new Map();
   for (const entry of Array.isArray(manifest) ? manifest : []) {
-    const url = String(entry?.contentUrl || "").replace(/^\/+|\/+$/g, "");
-    if (!url || !Array.isArray(entry?.courseCodes)) continue;
-    const codes = [...new Set(entry.courseCodes.map((code) => String(code).trim().toUpperCase()))]
-      .filter(Boolean);
-    if (codes.length) coursesByUrl.set(url, codes);
+    const url = normalizedContentUrl(entry?.contentUrl);
+    if (url) entriesByUrl.set(url, entry);
   }
-  return assignments.map((assignment) => ({
-    ...assignment,
-    // Frontmatter is authoritative for the visible label; Spring remains authoritative for access.
-    courseCodes: coursesByUrl.get(String(assignment.contentUrl || "").replace(/^\/+|\/+$/g, ""))
-      || assignment.courseCodes,
-  }));
+  return assignments.map((assignment) => {
+    const entry = entriesByUrl.get(normalizedContentUrl(assignment.contentUrl));
+    const codes = [...new Set((Array.isArray(entry?.courseCodes) ? entry.courseCodes : [])
+      .map((code) => String(code).trim().toUpperCase()))].filter(Boolean);
+    return {
+      ...assignment,
+      // Frontmatter is authoritative for the visible label; Spring remains authoritative for access.
+      courseCodes: codes.length ? codes : assignment.courseCodes,
+      // Topics are the lesson's frontmatter categories, the same field the Topics page filters on.
+      topics: topicList(entry?.topics),
+    };
+  });
+}
+
+export function assignmentsWithTopic(assignments, topic) {
+  return topic ? assignments.filter((assignment) => (assignment.topics || []).includes(topic)) : assignments;
+}
+
+/** Submissions the AI may re-grade: not closed, and not held by an instructor grade. */
+export function aiRegradeCandidates(submissions) {
+  return submissions.filter((submission) => !isFinal(submission) && !hasManualOverride(submission));
 }
 
 export function filterCreatorSubmissions(submissions, filters, getFilterStatus) {
-  const { course = "", assignmentId = "", student = "", status = "" } = filters;
+  const { course = "", assignmentId = "", student = "", status = "", topicAssignmentIds = null } = filters;
   const studentQuery = student.trim().toLowerCase();
 
   return submissions.filter((submission) => {
@@ -41,10 +63,11 @@ export function filterCreatorSubmissions(submissions, filters, getFilterStatus) 
     const courseMatches = !course
       || (course === UNASSIGNED_COURSE ? memberships.length === 0 : memberships.includes(course));
     const assignmentMatches = !assignmentId || String(submission.assignmentId) === assignmentId;
+    const topicMatches = !topicAssignmentIds || topicAssignmentIds.has(String(submission.assignmentId));
     const studentText = `${submission.submitterName || ""} ${submission.submitterUid || ""}`.toLowerCase();
     const studentMatches = !studentQuery || studentText.includes(studentQuery);
     const statusMatches = !status || getFilterStatus(submission) === status;
-    return courseMatches && assignmentMatches && studentMatches && statusMatches;
+    return courseMatches && assignmentMatches && topicMatches && studentMatches && statusMatches;
   }).sort((left, right) => {
     const assignmentOrder = String(left.assignmentName || "").localeCompare(String(right.assignmentName || ""));
     return assignmentOrder || String(left.submitterName || "").localeCompare(String(right.submitterName || ""));
@@ -71,6 +94,7 @@ export function createCreatorDashboard(options) {
   let assignments = [];
   let submissions = [];
   let currentPage = 1;
+  let teacherView = false;
 
   const element = (id) => document.getElementById(id);
   const text = (value, fallback = "") => escapeHtml(String(value ?? fallback));
@@ -93,24 +117,40 @@ export function createCreatorDashboard(options) {
       : '<span class="creator-muted">Unassigned</span>';
   }
 
+  function topicList(topics) {
+    return Array.isArray(topics) && topics.length
+      ? text(topics.join(" · "))
+      : '<span class="creator-muted">None</span>';
+  }
+
+  function visibleAssignments() {
+    return assignmentsWithTopic(assignments, element("creator-filter-topic").value);
+  }
+
   function renderAssignments() {
     const container = element("created-assignments-container");
-    if (!assignments.length) {
-      container.innerHTML = '<div class="creator-workspace__empty">You are not listed as the creator of any assignments yet.</div>';
+    const rows = visibleAssignments();
+    if (!rows.length) {
+      container.innerHTML = assignments.length
+        ? '<div class="creator-workspace__empty">No lessons match this topic.</div>'
+        : `<div class="creator-workspace__empty">${teacherView
+          ? "No assignments exist yet."
+          : "You are not listed as the creator of any assignments yet."}</div>`;
       return;
     }
 
     container.innerHTML = `
       <table class="submissions-table ocs__table">
         <thead><tr>
-          <th>Assignment</th><th>Courses</th><th>Due date</th><th>Points</th><th>Submissions</th><th>Creators</th>
+          <th>Assignment</th><th>Courses</th><th>Topics</th><th>Due date</th><th>Points</th><th>Submissions</th><th>Creators</th>
         </tr></thead>
-        <tbody>${assignments.map((assignment) => {
+        <tbody>${rows.map((assignment) => {
           const count = submissions.filter((submission) =>
             String(submission.assignmentId) === String(assignment.id)).length;
           return `<tr>
             <td>${assignmentLink(assignment)}</td>
             <td><span class="creator-course-list">${courseList(assignment.courseCodes)}</span></td>
+            <td><span class="creator-course-list">${topicList(assignment.topics)}</span></td>
             <td>${text(assignment.dueDate, "Not set")}</td>
             <td>${text(assignment.points, "Not set")}</td>
             <td><button type="button" class="creator-assignment-count" data-assignment-id="${text(assignment.id)}" aria-label="Show ${count} submissions for ${text(assignment.name, "this assignment")}">${count}</button></td>
@@ -120,14 +160,25 @@ export function createCreatorDashboard(options) {
       </table>`;
   }
 
-  function populateFilters() {
+  // The assignment list follows the topic, so it never offers a lesson the topic hides.
+  function populateAssignmentFilter() {
     const assignmentFilter = element("creator-filter-assignment");
-    const courseFilter = element("creator-filter-course");
-
+    const selected = assignmentFilter.value;
+    const rows = visibleAssignments();
     assignmentFilter.innerHTML = '<option value="">All assignments</option>'
-      + assignments.map((assignment) =>
+      + rows.map((assignment) =>
         `<option value="${text(assignment.id)}">${text(assignment.name, "Untitled assignment")}</option>`)
         .join("");
+    assignmentFilter.value = rows.some((assignment) => String(assignment.id) === selected) ? selected : "";
+  }
+
+  function populateFilters() {
+    const courseFilter = element("creator-filter-course");
+    const topics = [...new Set(assignments.flatMap((assignment) => assignment.topics || []))]
+      .sort((left, right) => left.localeCompare(right));
+    element("creator-filter-topic").innerHTML = '<option value="">All topics</option>'
+      + topics.map((topic) => `<option value="${text(topic)}">${text(topic)}</option>`).join("");
+    populateAssignmentFilter();
 
     const courses = new Set();
     let hasUnassigned = false;
@@ -149,10 +200,13 @@ export function createCreatorDashboard(options) {
     const assignmentId = element("creator-filter-assignment").value;
     const student = element("creator-filter-student").value.trim().toLowerCase();
     const status = element("creator-filter-status").value;
+    const topicAssignmentIds = element("creator-filter-topic").value
+      ? new Set(visibleAssignments().map((assignment) => String(assignment.id)))
+      : null;
 
     return filterCreatorSubmissions(
       submissions,
-      { course, assignmentId, student, status },
+      { course, assignmentId, student, status, topicAssignmentIds },
       getFilterStatus,
     );
   }
@@ -287,6 +341,42 @@ export function createCreatorDashboard(options) {
     }
   }
 
+  // One request at a time: the AI grader is metered and rate limited per minute.
+  async function rerunAiGrading(button) {
+    const status = element("creator-bulk-ai-status");
+    const candidates = aiRegradeCandidates(filteredSubmissions());
+    if (!candidates.length) {
+      status.textContent = "Nothing to re-grade: every filtered submission is final or has an instructor grade.";
+      return;
+    }
+    const noun = `submission${candidates.length === 1 ? "" : "s"}`;
+    if (!window.confirm(`Re-run AI grading on ${candidates.length} filtered ${noun}? `
+      + "Instructor grades and closed assignments are skipped.")) return;
+
+    button.disabled = true;
+    let graded = 0;
+    const failures = [];
+    for (const [index, submission] of candidates.entries()) {
+      status.textContent = `Re-grading ${index + 1} of ${candidates.length}…`;
+      try {
+        const result = await requestAiRegrade({ javaURI, fetchOptions, submissionId: submission.id });
+        if (result.ok) {
+          applyGradingState(submission, result.grading);
+          graded += 1;
+        } else {
+          failures.push(`${submission.submitterName || submission.id}: ${result.message}`);
+        }
+      } catch (regradeError) {
+        failures.push(`${submission.submitterName || submission.id}: ${regradeError.message}`);
+      }
+    }
+    renderSubmissions();
+    status.textContent = `AI re-graded ${graded} of ${candidates.length} ${noun}.`
+      + (failures.length ? ` ${failures.length} failed: ${failures.slice(0, 3).join("; ")}`
+        + (failures.length > 3 ? "…" : "") : "");
+    button.disabled = false;
+  }
+
   function renderPagination(totalRows, totalPages) {
     const pagination = element("creator-pagination");
     if (totalPages <= 1) {
@@ -317,6 +407,11 @@ export function createCreatorDashboard(options) {
 
   function bindInteractions() {
     element("creator-submission-filters").addEventListener("submit", (event) => event.preventDefault());
+    element("creator-filter-topic").addEventListener("input", () => {
+      populateAssignmentFilter();
+      renderAssignments();
+    });
+    element("creator-bulk-ai-regrade").addEventListener("click", (event) => rerunAiGrading(event.currentTarget));
     ["creator-filter-course", "creator-filter-assignment", "creator-filter-student", "creator-filter-status"]
       .forEach((id) => element(id).addEventListener("input", () => {
         currentPage = 1;
@@ -325,6 +420,8 @@ export function createCreatorDashboard(options) {
 
     element("creator-clear-filters").addEventListener("click", () => {
       element("creator-submission-filters").reset();
+      populateAssignmentFilter();
+      renderAssignments();
       currentPage = 1;
       renderSubmissions();
     });
@@ -372,7 +469,24 @@ export function createCreatorDashboard(options) {
     });
   }
 
-  async function load(currentUsername) {
+  // Teachers manage every lesson, so the tab becomes a teacher dashboard rather than "yours".
+  function showTeacherLabels() {
+    element("tab-created-assignments").textContent = "Teacher Dashboard";
+    element("creator-workspace-eyebrow").textContent = "Teacher dashboard";
+    element("creator-workspace-title").textContent = "All lessons";
+    element("creator-workspace-description").textContent =
+      "Review every assignment and the submissions received from students.";
+    element("creator-assignment-list-title").textContent = "Lessons";
+  }
+
+  /**
+   * @param {string} currentUsername
+   * @param {{ isTeacher?: boolean }} options teachers and admins see every assignment,
+   *        matching what Spring's /managed endpoints return for them
+   */
+  async function load(currentUsername, { isTeacher = false } = {}) {
+    teacherView = isTeacher;
+    if (teacherView) showTeacherLabels();
     try {
       const [assignmentsResponse, submissionsResponse, manifestResponse] = await Promise.all([
         fetch(managedAssignmentsUrl, fetchOptions),
@@ -390,16 +504,17 @@ export function createCreatorDashboard(options) {
       const submissionData = await submissionsResponse.json();
       const manifest = manifestResponse?.ok ? await manifestResponse.json().catch(() => []) : [];
       assignments = withFrontmatterCourses(Array.isArray(assignmentData) ? assignmentData : [], manifest)
-        .filter((assignment) =>
-        currentUsername
-        && Array.isArray(assignment.creatorUids)
-        && assignment.creatorUids.includes(currentUsername));
+        .filter((assignment) => teacherView || (
+          currentUsername
+          && Array.isArray(assignment.creatorUids)
+          && assignment.creatorUids.includes(currentUsername)))
+        .sort((left, right) => String(left.name || "").localeCompare(String(right.name || "")));
       const ownedIds = new Set(assignments.map((assignment) => String(assignment.id)));
       submissions = (Array.isArray(submissionData) ? submissionData : []).filter((submission) =>
         ownedIds.has(String(submission.assignmentId)));
 
       element("creator-dashboard-summary").textContent =
-        `${assignments.length} owned · ${submissions.length} submission${submissions.length === 1 ? "" : "s"}`;
+        `${assignments.length} ${teacherView ? "lessons" : "owned"} · ${submissions.length} submission${submissions.length === 1 ? "" : "s"}`;
       renderAssignments();
       populateFilters();
       renderSubmissions();
