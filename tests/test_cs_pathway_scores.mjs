@@ -90,16 +90,16 @@ test("score updates notify the dashboard", async () => {
 });
 
 test("levels link forward in play order and the last level has no next level", () => {
-  assert.equal(getNextLevel("identity-forge").pagePath, "/cs-pathway/wayfinding");
+  assert.equal(getNextLevel("identity-forge").pagePath, "/cs-pathway/toolchain-trail");
+  assert.equal(getNextLevel("toolchain-trail").pagePath, "/cs-pathway/wayfinding");
   assert.equal(getNextLevel("wayfinding-world").key, "mission-tools");
   assert.equal(getNextLevel("mission-tools").key, "assessment-observatory");
-  assert.equal(getNextLevel("assessment-observatory").pagePath, "/cs-pathway/toolchain-trail");
-  assert.equal(getNextLevel("toolchain-trail"), null);
+  assert.equal(getNextLevel("assessment-observatory"), null);
   assert.throws(() => getNextLevel("not-a-level"), /Unknown CS Pathway level/);
 });
 
 test("every level has a short name for the scores bar", () => {
-  for (const key of ["identity-forge", "wayfinding-world", "mission-tools", "assessment-observatory"]) {
+  for (const key of ["identity-forge", "toolchain-trail", "wayfinding-world", "mission-tools"]) {
     assert.ok(getNextLevel(key).shortName, key);
   }
 });
