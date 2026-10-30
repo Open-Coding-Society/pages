@@ -6,9 +6,9 @@ Title: "Unified Social Club"
 Description: "Unified Social Club gives adults with special needs in Poway a free, safe place to make friends: board and card games, arts and crafts, karaoke, and sports, twice a month at the Mickey Cafagna Community Center. Games are the heart of every club night, so we are building three club games members can play together, on the big screen at club night and on their own phones: Club Bingo, Club Trivia Live, and Club Jeopardy. Every game is easy-read, big-print, and playable hands-free with Nod to select."
 
 Board:
-  url: "https://github.com/users/rex0dex/projects/4"
+  url: "https://github.com/orgs/Unified-Social-Club-CSP/projects/1"
   title: "Team Triple T Kanban"
-  filter: "Workstream"
+  filter: "Owner"
 
 Topics:
   - title: "Club Bingo"
@@ -154,12 +154,30 @@ Sections:
       - "Connected: members, families, and volunteers share one account."
       - "Safe: messages only with volunteers and staff, and photo consent respected."
 
+  - title: "Team Roles"
+    subtitle: "Sprint 3 roles; each person also owns one game"
+    items:
+      - "Kashyap: Scrum Master and frontend Deployment Admin. Owns Club Bingo."
+      - "Chetan: backend Deployment Admin and Data Modeler. Owns Club Trivia Live."
+      - "Aaditya: Integrator and Visual Design owner. Owns Club Jeopardy."
+      - "Everyone: shared features, reviews each other's pull requests, and tests with real users."
+
+  - title: "Sprint 3 Plan"
+    subtitle: "Ideate, define, prototype, then test at Night at the Museum"
+    items:
+      - "Ideate and Define: empathy notes, problem statements, and how-might-we questions for each game."
+      - "Prototype: Home, Login, and the interest Survey live on our site, plus playable Bingo, Trivia practice, and Jeopardy."
+      - "Night at the Museum (Nov 2–6): a test-driven Google Form and a usability test plan for all three games."
+      - "Done when: every game works on the live site, with Nod to select and big print, and each owner can explain their CPT procedure."
+
 Links:
   title: "Following Along"
   subtitle: "Where this work is tracked"
   items:
     - label: "Our Kanban Board"
-      url: "https://github.com/users/rex0dex/projects/4"
+      url: "https://github.com/orgs/Unified-Social-Club-CSP/projects/1"
+    - label: "Our Live Site"
+      url: "https://unified-social-club-csp.github.io/usc-pages/"
     - label: "Their Live Site"
       url: "https://www.unifiedsocialclub.com/"
     - label: "Club Dates and Register"
@@ -171,6 +189,6 @@ Links:
     - label: "Our First Capstone: Friends of Poway Seniors"
       url: "https://pages.opencodingsociety.com/capstone/fops-2026-2027/"
     - label: "Our Frontend (usc-pages)"
-      url: "https://github.com/rex0dex/usc-pages"
+      url: "https://github.com/Unified-Social-Club-CSP/usc-pages"
     - label: "Our Backend (usc-flask)"
-      url: "https://github.com/rex0dex/usc-flask"
+      url: "https://github.com/Unified-Social-Club-CSP/usc-flask"
