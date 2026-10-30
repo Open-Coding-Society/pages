@@ -36,8 +36,9 @@ export default class StationVerificationTrial {
    * @param {string} opts.station.name - in-world display name (e.g. "Terminal Town Gate")
    * @param {string} opts.station.skill - real-world skill label (e.g. "Shell fundamentals and package management")
    * @param {string} opts.station.narrativeHook - 1-2 sentence flavor text shown before the terminal
-   * @param {Array<string|{text: string, commands: string[]}>} opts.station.instructions - ordered real-world
-   *   steps; a step with commands shows each one with its own Copy button
+   * @param {Array<string|{text: string, commands: string[]}|{bold: string, text: string}>} opts.station.instructions - ordered real-world
+   *   steps; a step with commands shows each one with its own Copy button, and a step with bold
+   *   shows that text in extra-bold white (e.g. how to open the terminal)
    * @param {RegExp} opts.station.expectedCommandPattern - pattern the mock terminal checks input against
    * @param {string} opts.station.exampleCommand - a valid example command (shown as a hint)
    * @param {string} opts.station.funFact - fun fact shown by the NPC popup on success (level owns the popup, not this trial)
@@ -172,6 +173,13 @@ export default class StationVerificationTrial {
           font-size: 12.5px;
           line-height: 1.7;
           color: #dbeafe;
+        }
+
+        /* A bold step (like how to open the terminal): extra-bold and bright white. */
+        .svt-bold-step {
+          color: #ffffff;
+          font-weight: 900;
+          font-size: 1.2em;
         }
 
         .svt-terminal {
@@ -821,8 +829,12 @@ export default class StationVerificationTrial {
     this._close(false);
   }
 
-  /** A step is plain text, or { text, commands } with a Copy button per command. */
+  /**
+   * A step is plain text, { text, commands } with a Copy button per command, or
+   * { bold } shown extra-bold in bright white (e.g. how to open the terminal).
+   */
   _renderStep(step) {
+    if (step?.bold) return `<strong class="svt-bold-step">${this._escape(step.bold)}</strong>`;
     if (typeof step === 'string') return this._escape(step);
     return this._escape(step.text) + (step.commands || []).map((command) => this._commandRow(command)).join('');
   }
