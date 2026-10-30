@@ -1,12 +1,13 @@
 ---
 microblog: true
+sfi_correspondence_microblog: true
 toc: false
 layout: post
 title: SFI Foundation 2026–27
 description: >
-  CSP 2026–27 capstone continuing the SFI Foundation prototype with searchable
-  motorsports safety standards, ML-assisted discovery, equipment detection,
-  personal gear tracking, and staff tools.
+  The SFI Foundation writes and administers safety specifications for racing
+  equipment. This CSP 2026–27 capstone makes those standards easier to search,
+  understand, and track.
 categories: [Capstone]
 permalink: /capstone/sfi-foundation/
 ---
@@ -14,17 +15,17 @@ permalink: /capstone/sfi-foundation/
 > **Student capstone · In development.** This project explores a clearer way to discover and organize motorsports safety information. It is not an official SFI Foundation product and does not replace official SFI standards, labels, or PDF documents.
 
 <div class="ocs__grid ocs__grid--standard cols-2">
-    <div class="ocs__grid-cell ocs__grid-cell--header">SFI Foundation · 2026–2027</div>
+    <div class="ocs__grid-cell ocs__grid-cell--header">About the SFI Foundation</div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Making safety information easier to use</strong>
-        <p>A continuation of our motorsports safety modernization prototype, focused on helping people search standards, understand likely matches, organize equipment, and revisit important certification information.</p>
-        <p><strong>Experience:</strong> discover → understand → inspect → save → revisit</p>
+        <strong>Safety standards for motorsports equipment</strong>
+        <p>SFI Foundation, Inc. is a nonprofit that writes and administers quality-assurance specifications for racing and performance equipment, from driver suits and harnesses to roll cages and drivetrain parts. It began in 1978, when the Specialty Equipment Market Association (SEMA) spun off its service bureau. SFI now runs independently and is based in Poway, California.</p>
+        <p><strong>Its goal:</strong> give racers, manufacturers, and race organizers one shared, tested standard for safety gear.</p>
     </div>
 
     <div class="ocs__grid-cell">
         <img src="{{ '/images/capstone/sfi-foundation-2026-27.png' | relative_url }}" alt="SFI Foundation capstone project logo" loading="lazy">
-        <p><strong>Project focus:</strong> searchable standards, assisted discovery, equipment recognition, personal gear tracking, and staff-oriented workflows.</p>
+        <p><strong>By the numbers:</strong> SFI maintains more than 100 specifications, and hundreds of sanctioning bodies around the world use them.</p>
     </div>
 </div>
 
@@ -59,29 +60,36 @@ permalink: /capstone/sfi-foundation/
 
 ---
 
-## Core experience
+## Client conversation history
 
-> Four connected parts of the user journey, from finding a standard to returning to saved gear later.
+Use the **💬 Microblog** button on this page to view the five dated October 22–28, 2026 SFI partnership email summaries, including Jennifer Faye's interest in continuing the prototype, Katie Salo's follow-up, and the November 2 Electives Fair invitation. They are marked **archived** so they cannot be mistaken for newly submitted user posts. The existing client introduction, contacts, and technical project plan remain below.
+
+---
+
+## Core experience
+## What SFI does
+
+> SFI does not race or sell parts. It sets the bar that safety equipment must clear and checks that products keep clearing it.
 
 <div class="ocs__grid ocs__grid--card">
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>01 · Search standards</strong>
-        <p>Browse categories or search specification records in plain language instead of relying only on exact specification numbers.</p>
+        <strong>Writes specifications</strong>
+        <p>SFI works with manufacturers, engineers, and sanctioning bodies to define the minimum performance and test procedure for each type of equipment.</p>
     </div>
 
     <div class="ocs__grid-cell">
-        <strong>02 · Describe a part</strong>
-        <p>A TF-IDF + LinearSVC classifier suggests likely specification matches from a free-text equipment description.</p>
+        <strong>Certifies products</strong>
+        <p>Manufacturers test their products against a specification. Products that pass can carry an official SFI label showing which spec they meet.</p>
     </div>
 
     <div class="ocs__grid-cell">
-        <strong>03 · Inspect equipment</strong>
-        <p>Browser-side TensorFlow.js models explore image and camera-based equipment recognition as an assistive discovery tool.</p>
+        <strong>Runs follow-up testing</strong>
+        <p>SFI buys labeled products from retailers and retests them. It also retests when a manufacturer changes production or suppliers, so certified gear stays at the standard.</p>
     </div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>04 · Track and revisit</strong>
-        <p>Users organize personal gear, revisit certification information, and ask the site chatbot questions about the available specification data.</p>
+        <strong>Operates a test lab</strong>
+        <p>SFI runs its own laboratory in San Diego County and works with outside test facilities, such as one for head and neck restraints.</p>
     </div>
 </div>
 
@@ -89,89 +97,62 @@ permalink: /capstone/sfi-foundation/
 
 ---
 
-## From problem to product direction
+## How a standard reaches the track
 
-<div class="ocs__grid ocs__grid--standard cols-2">
-    <div class="ocs__grid-cell ocs__grid-cell--header">Why we are building it</div>
-
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Current challenge</strong>
-        <p>Users can face dense lists, unfamiliar specification numbers, and multiple documents when determining which safety standard applies to a piece of equipment.</p>
-    </div>
-
-    <div class="ocs__grid-cell">
-        <strong>Project direction</strong>
-        <p>Bring structured specification data, plain-language search, ML suggestions, gear tracking, and guided tools into one consistent frontend backed by a Flask API.</p>
-    </div>
-</div>
-
-<br>
-
----
-
-## System flow
-
-> A simple view of how the browser, API, data layer, and assisted-discovery tools work together.
+> SFI writes the standard, and race organizers decide when their rules require it.
 
 <div class="ocs__grid ocs__grid--standard cols-4">
-    <div class="ocs__grid-cell ocs__grid-cell--header">One connected full-stack workflow</div>
+    <div class="ocs__grid-cell ocs__grid-cell--header">From specification to tech inspection</div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>1 · Browser</strong>
-        <p>Jekyll and JavaScript provide search, equipment detection, My Gear, authentication views, and chatbot interactions.</p>
+        <strong>1 · Specification</strong>
+        <p>An SFI committee publishes a numbered spec with its test requirements.</p>
     </div>
 
     <div class="ocs__grid-cell">
-        <strong>2 · Flask API</strong>
-        <p>Backend routes handle authentication, SFI specification endpoints, classifier requests, chatbot requests, and gear operations.</p>
+        <strong>2 · Certification</strong>
+        <p>A manufacturer tests the product, meets the spec, and labels it.</p>
     </div>
 
     <div class="ocs__grid-cell">
-        <strong>3 · Data layer</strong>
-        <p>SQLAlchemy and SQLite organize structured specification records and user-linked prototype data during development.</p>
+        <strong>3 · Rulebooks</strong>
+        <p>Sanctioning bodies such as NHRA, NASCAR, IndyCar, SCCA, and USAC list SFI specs their competitors must meet.</p>
     </div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>4 · Assisted discovery</strong>
-        <p>LinearSVC matching, TensorFlow.js detection, and Gemini-assisted questions help users narrow down relevant information.</p>
+        <strong>4 · Tech inspection</strong>
+        <p>At the event, inspectors check each car and driver for current SFI labels.</p>
     </div>
 </div>
 
-> The goal is a single workflow where the browser experience and backend services can evolve together instead of feeling like separate demos.
+> Labels often carry a date. Some gear, such as restraint harnesses, has to be replaced or recertified a set time after it was made. Gear damaged in a crash or fire should be replaced right away.
 
 <br>
 
 ---
 
-## Technical foundation
+## Specifications racers see every day
 
 <div class="ocs__grid ocs__grid--card">
-    <div class="ocs__grid-cell">
-        <strong>Frontend</strong>
-        <p>Jekyll + JavaScript for static content and interactive client-side features.</p>
-    </div>
-
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Backend</strong>
-        <p>Python Flask APIs for authentication, specifications, chatbot requests, and gear operations.</p>
+        <strong>SFI 3.2A · Driver suits</strong>
+        <p>Fire-resistant suits rated by thermal protection, from /1 up to /20. A higher number means more protection from heat.</p>
     </div>
 
     <div class="ocs__grid-cell">
-        <strong>Machine learning</strong>
-        <p>TF-IDF + LinearSVC text classification and TensorFlow.js experiments for assisted equipment discovery.</p>
+        <strong>SFI 16.1 · Restraint harnesses</strong>
+        <p>Seat belt and harness assemblies that hold the driver in place during a crash.</p>
+    </div>
+
+    <div class="ocs__grid-cell">
+        <strong>SFI 38.1 · Head and neck restraints</strong>
+        <p>Devices that limit head movement in a sudden stop to reduce neck and skull injuries.</p>
     </div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Data + assistant</strong>
-        <p>SQLAlchemy persistence with SQLite in development, plus a Gemini-backed chatbot using compact specification context from the backend.</p>
+        <strong>And 100+ more</strong>
+        <p>Specs also cover parts such as fuel cells, clutches, flywheels, transmission shields, and roll cage padding.</p>
     </div>
-</div>
-
-<br>
-
-<div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn alert-green iridescent" href="https://github.com/SFI-Foundation/Frontend" target="_blank" rel="noreferrer noopener">Explore Frontend ↗</a>
-    <a class="ocs__btn alert-yellow iridescent" href="https://github.com/SFI-Foundation/Backend" target="_blank" rel="noreferrer noopener">Explore Backend ↗</a>
 </div>
 
 <br>
@@ -188,16 +169,43 @@ For technical questions, specification information, or product certification inq
 
 This is SFI Foundation's public contact information. For feedback on this student capstone, use the [project's GitHub organization](https://github.com/SFI-Foundation).
 
+<br>
+
+---
+
+## How our capstone supports SFI's mission
+
+> SFI's information is detailed and spread across many specification numbers and documents. Our prototype helps people find the spec that applies to their gear and keep track of it.
+
+<div class="ocs__grid ocs__grid--card">
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Search standards</strong>
+        <p>Search in plain language instead of needing the exact spec number.</p>
+    </div>
+
+    <div class="ocs__grid-cell">
+        <strong>Describe a part</strong>
+        <p>A text classifier suggests specs that likely match a description of a part.</p>
+    </div>
+
+    <div class="ocs__grid-cell">
+        <strong>Inspect equipment</strong>
+        <p>Image recognition that runs in the browser helps identify equipment from a photo or camera.</p>
+    </div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Track gear</strong>
+        <p>Save your gear, check its certification details again later, and ask the chatbot about the specification data.</p>
+    </div>
+</div>
+
+<br>
+
 ---
 
 ## Team
 
-> Two Scrum Masters guide project coordination while four technologists/developers build and refine the product experience.
-
-### Scrum Masters
-
-<div class="ocs__grid ocs__grid--standard cols-2">
-    <div class="ocs__grid-cell ocs__grid-cell--header">Project Leadership</div>
+<div class="ocs__grid ocs__grid--card">
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Ruhaan Bansal</strong>
         <p>Scrum Master</p>
@@ -206,13 +214,6 @@ This is SFI Foundation's public contact information. For feedback on this studen
         <strong>Ishan Jha</strong>
         <p>Scrum Master</p>
     </div>
-</div>
-
-<br>
-
-### Technologists / Developers
-
-<div class="ocs__grid ocs__grid--card">
     <div class="ocs__grid-cell">
         <strong>Arya Taghavi Zargar</strong>
         <p>Technologist / Developer</p>
@@ -229,11 +230,4 @@ This is SFI Foundation's public contact information. For feedback on this studen
         <strong>Vayun Shekhar</strong>
         <p>Technologist / Developer</p>
     </div>
-</div>
-
-<br>
-
-<div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn large iridescent" href="https://github.com/SFI-Foundation/Frontend" target="_blank" rel="noreferrer noopener">View Frontend Repository</a>
-    <a class="ocs__btn large iridescent" href="https://github.com/SFI-Foundation/Backend" target="_blank" rel="noreferrer noopener">View Backend Repository</a>
 </div>

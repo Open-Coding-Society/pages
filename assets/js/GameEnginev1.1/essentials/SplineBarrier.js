@@ -94,7 +94,9 @@ class SplineBarrier extends GameObject {
 
     resolvePlayerCollision() {
         // Every Player is blocked, so multiplayer levels cannot drive through the barrier.
-        const players = this.gameEnv.gameObjects.filter((object) => object?.constructor?.name === 'Player');
+        const players = this.gameEnv.gameObjects.filter(
+            (object) => object?.isPlayer === true || object?.constructor?.name === 'Player'
+        );
         if (players.length === 0) return;
 
         const curvePoints = SplineBarrier.getCurvePoints(this.getCanvasPoints());

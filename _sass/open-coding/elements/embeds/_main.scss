@@ -1,0 +1,38 @@
+// A frame for an embedded page or video player: an iframe at the full width of
+// its container and a fixed height, so the page around it keeps its place while
+// it loads. Put the class on the <iframe> itself, and give the iframe a title.
+
+.ocs__embed {
+  display: block;
+  // Keeps the border inside the full width outside an ocs__container too.
+  box-sizing: border-box;
+  width: 100%;
+  height: 480px;
+  border: 1px solid var(--ui-border);
+  border-radius: $radius-md;
+  // Shows until the embedded page paints, and behind a page with no background.
+  background: color-mix(in srgb, var(--pref-text-color) 5%, var(--panel));
+}
+
+// Fixed heights, so an embedded app knows how much room it has. Medium is the
+// default, named so that each size choice has a class.
+.ocs__embed--short {
+  height: 320px;
+}
+
+.ocs__embed--medium {
+  height: 480px;
+}
+
+.ocs__embed--tall {
+  height: 720px;
+}
+
+// A 16:9 player that scales with the width, for YouTube or a Drive video.
+// Declared after the sizes, so it wins over one set beside it.
+.ocs__embed--video {
+  height: auto;
+  aspect-ratio: 16 / 9;
+  // ocs__split stretches its items to the row's height; this keeps the player 16:9.
+  align-self: start;
+}

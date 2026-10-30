@@ -1,0 +1,12 @@
+{
+  "files": [
+    { "source": "data/ui_builder.yml", "destination": "_data/ui_builder.yml" },
+    { "source": "data/ui_builder_school.yml", "destination": "_data/ui_builder_school.yml" },
+    { "source": "data/ui_builder_editor.yml", "destination": "_data/ui_builder_editor.yml" },
+    { "source": "pages", "destination": "navigation/ui-builder" },
+    { "source": "layouts", "destination": "_layouts" },
+    { "source": "_includes", "destination": "_includes/projects/ui-builder" },
+    { "source": "js", "destination": "assets/js/projects/ui-builder" },
+    { "source": "sass", "destination": "_sass/projects/ui-builder" }
+  ]
+}

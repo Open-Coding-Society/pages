@@ -7,21 +7,6 @@ active_tab: dashboard
 <!-- Preline and ApexCharts CSS are loaded in <head> via aesthetihawk.html for dashboard pages -->
 <div class="w-full">
     <div class="space-y-4 sm:space-y-6">
-        <div class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700 relative">
-            <ul class="flex flex-wrap -mb-px relative" id="tab-bar">
-                <li class="me-2">
-                    <a href="#" id="tab-admin-evaluation"
-                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300 active text-blue-500 border-blue-500" aria-current="page">
-                        Preferences
-                    </a>
-                </li>
-            </ul>
-            <!-- sliding underline indicator -->
-            <div id="tab-underline"
-                style="position:absolute;bottom:0;left:0;height:2px;width:0;background:#2563eb;transition:all 0.3s cubic-bezier(.4,0,.2,1);border-radius:2px;">
-            </div>
-        </div>
-
         <!-- tab content container -->
         <div id="tab-content-container" class="relative min-h-[400px]">
             <!-- Admin Evaluation UI (hidden by default, shown only for admins) -->
@@ -350,37 +335,8 @@ active_tab: dashboard
 <script type="module">
     import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
-    // Tab switcher code with underline animation
-    const tabs = document.querySelectorAll(".tab-btn");
-    const tabContents = document.querySelectorAll(".tab-content");
-    const underline = document.getElementById("tab-underline");
-
-    function setUnderline(el) {
-        const rect = el.getBoundingClientRect();
-        const parentRect = el.parentElement.parentElement.getBoundingClientRect();
-        underline.style.width = `${rect.width}px`;
-        underline.style.left = `${rect.left - parentRect.left}px`;
-    }
-
-    tabs.forEach((tab) => {
-        tab.addEventListener("click", async (e) => {
-            e.preventDefault();
-            tabs.forEach(t => t.classList.remove("active", "text-blue-500", "border-blue-500"));
-            tabContents.forEach(c => c.classList.add("hidden"));
-            tabContents.forEach(c => c.classList.remove("block"));
-            const targetId = `tab-content-${tab.id.replace("tab-", "")}`;
-            document.getElementById(targetId).classList.remove("hidden");
-            document.getElementById(targetId).classList.add("block");
-            tab.classList.add("active", "text-blue-500", "border-blue-500");
-            setUnderline(tab);
-        });
-    });
-
     // Initialize dashboard on DOM ready
     document.addEventListener('DOMContentLoaded', async () => {
-        const activeTab = document.querySelector(".tab-btn.active");
-        if (activeTab) setUnderline(activeTab);
-
         // Check admin status and gate UI
         try {
             const userRes = await fetch(`${javaURI}/api/user/info`, fetchOptions);

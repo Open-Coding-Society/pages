@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "kind": "ocs-ui-page",
+  "page": {
+    "title": "Bad page",
+    "description": "",
+    "byline": "",
+    "course": "",
+    "width": "contained",
+    "image": ""
+  },
+  "sections": [
+    {
+      "id": "s-aaaaaa",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": []
+        }
+      ]
+    }
+  ]
+}
