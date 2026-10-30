@@ -57,9 +57,15 @@
   });
   formEl.insertBefore(composer.element, sendBtn);
 
-  function submitMessage() {
-    if (composer.isEmpty() || composer.isOverLimit()) return;
-    if (sendMessage(composer.getHTML())) composer.clear();
+  let sending = false;
+  async function submitMessage() {
+    if (sending || composer.isEmpty() || composer.isOverLimit()) return;
+    sending = true;
+    try {
+      if (await sendMessage(composer.getHTML())) composer.clear();
+    } finally {
+      sending = false;
+    }
   }
 
   function setStatus(text) {
@@ -174,13 +180,14 @@
         return;
       }
       const messages = await res.json();
+      // Spring calls a saved message's sender `author`; the socket frame calls it `sender`.
       (messages || []).forEach((msg) => {
         const stripped = matchesLesson(msg.message);
         if (stripped === null) return;
-        const key = eventKey({ sender: msg.name, date: msg.date, message: msg.message });
+        const key = eventKey({ sender: msg.author, date: msg.date, message: msg.message });
         if (state.seenKeys.has(key)) return;
         state.seenKeys.add(key);
-        appendMessage({ sender: msg.name, message: stripped, date: msg.date });
+        appendMessage({ sender: msg.author, message: stripped, date: msg.date });
       });
     } catch (err) {
       console.warn('Lesson chat: history load failed', err);
@@ -235,18 +242,19 @@
     });
   }
 
-  function sendMessage(text) {
-    if (!state.connected || !state.stompClient || !state.backboneGroupId) return false;
-    const payload = {
-      context: 'sendMessage',
-      groupId: state.backboneGroupId,
-      sender: state.currentUserDisplayName || 'anonymous',
-      message: `${LESSON_MARKER} ${text}`,
-      image: null,
-      date: new Date().toISOString(),
-    };
+  // Posted over HTTP, like the Messages page: Spring takes the sender from the
+  // login cookie, which the socket's sendMessage can't read. The saved message
+  // comes back to every reader, this one included, on the group topic.
+  async function sendMessage(text) {
+    if (!state.backboneGroupId) return false;
     try {
-      state.stompClient.send('/app/groups.chat', {}, JSON.stringify(payload));
+      const res = await fetch(`${javaURI}/api/groups/chat/${state.backboneGroupId}/messages`, {
+        ...fetchOptions, method: 'POST', body: JSON.stringify({ message: `${LESSON_MARKER} ${text}`, image: null }),
+      });
+      if (!res.ok) {
+        console.warn('Lesson chat: send HTTP', res.status);
+        return false;
+      }
       return true;
     } catch (err) {
       console.error('Lesson chat: send failed', err);
