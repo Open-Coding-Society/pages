@@ -12,14 +12,6 @@ const SYSTEM_CONFIG = Object.freeze({
     command: 'bash scripts/linux_setup_agent.sh --check',
     reportCommand: 'bash scripts/linux_setup_agent.sh --check --report',
   },
-  kasm: {
-    reportSystem: 'LINUX',
-    label: 'Kasm Linux',
-    icon: '☁️',
-    terminalName: 'Kasm Terminal',
-    command: 'bash scripts/linux_setup_agent.sh --check',
-    reportCommand: 'bash scripts/linux_setup_agent.sh --check --report',
-  },
   windows: {
     reportSystem: 'WINDOWS',
     label: 'Windows/WSL',
@@ -48,7 +40,7 @@ export function getReportUploadCommand(os, uploadUrl) {
 // startedAt and durationSeconds are null for reports from older copies of the agent.
 export function parseSystemSetupReport(pasted, os) {
   const config = getSystemSetupConfig(os);
-  if (!config) return failure('Choose Linux, Windows, or Kasm before checking your setup.');
+  if (!config) return failure('Choose Linux or Windows before checking your setup.');
 
   const text = String(pasted || '').slice(0, MAX_PASTE_LENGTH).replace(/\x1b\[[0-9;]*m/g, '');
   const lines = text.split(/\r?\n/).map((line) => line.trim());

@@ -3,7 +3,7 @@
  *
  * FIXES is keyed by the check ids the backend returns (ToolchainStations.java in
  * blueprint-spring). Each entry has steps per OS; an OS without its own steps uses
- * OS_FALLBACK (WSL and Kasm are Ubuntu), then `all`. A step is plain text or
+ * OS_FALLBACK (WSL is Ubuntu), then `all`. A step is plain text or
  * { text, commands }, and every command gets a Copy button.
  *
  * {project} is replaced with the student's project folder for their OS and
@@ -14,10 +14,9 @@ export const PROJECT_FOLDER = Object.freeze({
   windows: '~/opencs/pages',
   macos: '~/opencs/pages',
   linux: '~/opencs/pages',
-  kasm: '~/opencs/pages',
 });
 
-const OS_FALLBACK = Object.freeze({ windows: 'linux', kasm: 'linux', wsl: 'linux' });
+const OS_FALLBACK = Object.freeze({ windows: 'linux', wsl: 'linux' });
 
 const UBUNTU_TOOLS = [
   { text: 'Install Python, Ruby and the class gems from your project folder (enter your password when asked):', commands: ['cd {project}', './scripts/activate_ubuntu.sh'] },
@@ -59,7 +58,6 @@ export const FIXES = Object.freeze({
       'Install VS Code for Windows from code.visualstudio.com and keep "Add to PATH" checked.',
       { text: 'Close and reopen your Ubuntu (WSL) terminal, check it works, then click Check again:', commands: ['code --version'] },
     ],
-    kasm: [{ text: 'VS Code comes with Kasm. Check it works, then click Check again:', commands: ['code --version'] }],
     linux: [
       { text: 'Install VS Code (enter your password when asked):', commands: ['sudo snap install code --classic'] },
       { text: 'Check it works, then click Check again:', commands: ['code --version'] },

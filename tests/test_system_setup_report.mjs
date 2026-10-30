@@ -50,8 +50,9 @@ test('builds the upload command for each system', () => {
   assert.equal(getReportUploadCommand('macos', url), null);
 });
 
-test('accepts Linux reports for Kasm', () => {
-  assert.equal(parseSystemSetupReport(linuxReport, 'kasm').totalCount, 2);
+test('Kasm is no longer a setup choice', () => {
+  assert.equal(getSystemSetupConfig('kasm'), null);
+  assert.match(parseSystemSetupReport(linuxReport, 'kasm').error, /Choose Linux or Windows/);
 });
 
 test('accepts a Windows report only for the Windows selection', () => {

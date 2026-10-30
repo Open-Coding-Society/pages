@@ -1,4 +1,4 @@
-// Linux, Kasm, and Windows/WSL setup-check panel for Toolchain Trail.
+// Linux and Windows/WSL setup-check panel for Toolchain Trail.
 // macOS keeps using MacSetupCheck.js and its existing implementation.
 // Like the Mac panel, a signed-in student gets a check command that sends the
 // report to Spring, and the panel shows it when it arrives; otherwise (or if
