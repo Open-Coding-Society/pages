@@ -447,8 +447,14 @@ export default class StationVerificationTrial {
           <div class="svt-panel" id="svt-agent-panel">
             <h4>VERIFY WITH THE TOOLCHAIN AGENT</h4>
             <div id="svt-agent-start" class="svt-hidden">
-              <div class="svt-prompt">Get a one-time pairing code and paste it into the agent. You only do this once for the whole trail.</div>
-              <button class="svt-btn primary" id="svt-get-code">Get pairing code</button>
+              <div id="svt-briefing-gate">
+                <div class="svt-prompt">Finish every Mission Briefing step first. The agent runs from inside the pages folder you cloned, so start it only once your terminal is there.</div>
+                <button class="svt-btn primary" id="svt-briefing-done">I finished the Mission Briefing</button>
+              </div>
+              <div id="svt-get-code-step" class="svt-hidden">
+                <div class="svt-prompt">Get a one-time pairing code and paste it into the agent. You only do this once for the whole trail.</div>
+                <button class="svt-btn primary" id="svt-get-code">Get pairing code</button>
+              </div>
             </div>
             <div id="svt-agent-pairing" class="svt-hidden">
               <ol class="svt-agent-steps">
@@ -514,6 +520,7 @@ export default class StationVerificationTrial {
     this.agentChecksEl = this.overlay.querySelector('#svt-agent-checks');
     this.getCodeBtn = this.overlay.querySelector('#svt-get-code');
     this.getCodeBtn.onclick = () => this._startAgentSession();
+    this.overlay.querySelector('#svt-briefing-done').onclick = () => this._showGetCodeStep(true);
     this.overlay.querySelector('#svt-copy-code').onclick = () => this._copyCode();
     // Every command's Copy button copies the command shown right next to it.
     this.overlay.addEventListener('click', (event) => {
@@ -540,16 +547,23 @@ export default class StationVerificationTrial {
     this.overlay?.querySelector(selector)?.classList.toggle('svt-hidden', !visible);
   }
 
+  /** A first pairing waits until the student says the briefing is done; a re-pair (message) skips that. */
   _showPairingStart(message) {
     this._stopPolling();
     this.session = null;
     this._show('#svt-agent-start', true);
+    this._showGetCodeStep(Boolean(message));
     this._show('#svt-agent-pairing', false);
     this._show('#svt-check-again', false);
     this._show('#svt-new-agent', false);
     this.getCodeBtn.disabled = false;
     this._renderChecks([], this.agentChecksEl);
     this._setAgentStatus(message ? 'err' : '', message || '');
+  }
+
+  _showGetCodeStep(visible) {
+    this._show('#svt-briefing-gate', !visible);
+    this._show('#svt-get-code-step', visible);
   }
 
   /** Points the already-paired agent at this station, then waits for its results. */
@@ -580,6 +594,7 @@ export default class StationVerificationTrial {
   async _startAgentSession() {
     this._stopPolling();
     this._show('#svt-agent-start', true);
+    this._showGetCodeStep(true);
     this._show('#svt-check-again', false);
     this._show('#svt-new-agent', false);
     this.getCodeBtn.disabled = true;
