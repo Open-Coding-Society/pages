@@ -6,8 +6,8 @@
 <!-- exist yet, so no manual DB seeding is required. -->
 <!-- -->
 <!-- Signed-out visitors still get the full UI: the chat drops into a local -->
-<!-- "preview" mode backed by localStorage, matching _includes/week_chat.html, -->
-<!-- so the feature is visible and testable without a login. -->
+<!-- "preview" mode backed by localStorage, so the feature is visible and -->
+<!-- testable without a login. -->
 <!-- -->
 <!-- Calendar: a strip of this school week sits above the messages, anyone -->
 <!-- signed in adds events with the /event slash command, and announcements -->
@@ -19,7 +19,7 @@
       <a class="chat-badge" href="{{ '/student/calendar' | relative_url }}" aria-label="Open OCS calendar" title="Open OCS calendar"><i class="fas fa-calendar" aria-hidden="true"></i></a>
       <div class="chat-heading-text">
         <h2 class="chat-title" id="announcementChatTitle">{{ page.course | upcase }} Announcements</h2>
-        <p class="chat-subtitle">Class-wide chat for this course — announcements, questions, anything that isn't week-specific.</p>
+        <p class="chat-subtitle">Class-wide chat for this course — announcements and questions.</p>
       </div>
     </div>
     <span class="chat-status-pill" id="announcementChatStatusPill">
@@ -85,7 +85,7 @@
   const SOCKJS_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js';
   const STOMP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js';
 
-  // Shared with the per-week chats: load the chat libraries once per page,
+  // Shared with the calendar and Messages: load the chat libraries once per page,
   // and only when a chat actually needs a live connection.
   function loadScriptOnce(src) {
     window.__ocsChatScripts = window.__ocsChatScripts || {};

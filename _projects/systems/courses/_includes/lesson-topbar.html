@@ -3,7 +3,7 @@
   Shows breadcrumbs, current page info, completion toggle, and progress bar
   Expects: current_course, current_week, page, site
 
-  A player page (a sprint or week intro, a week's chat, or Blogs) is not a
+  A player page (a sprint or week intro, or Blogs) is not a
   lesson, so there is nothing to burn down. Sprint/week introductions retain
   the same Previous/Next navigation as lessons.
 {% endcomment %}
@@ -47,7 +47,7 @@
         </script>
         {%- endif %}
         {%- comment -%}
-          A week intro sits in its sprint. A lesson or chat sits in its week, and
+          A week intro sits in its sprint. A lesson sits in its week, and
           the crumb opens the week's intro; currentWeekUrl is set by
           lesson-sidebar-nav.html, which is included first.
         {%- endcomment -%}
