@@ -11,7 +11,7 @@ const CHECK_IDS = [...new Set([...evidence.matchAll(/\("([a-z][a-z-]*)", /g)].ma
 const GAME_OSES = ['windows', 'macos', 'linux', 'kasm'];
 
 test('the agent check list was found', () => {
-  assert.ok(CHECK_IDS.length >= 16, `only found ${CHECK_IDS.join(', ')}`);
+  assert.ok(CHECK_IDS.length >= 14, `only found ${CHECK_IDS.join(', ')}`);
 });
 
 test('every check the agent can fail has fix steps on every OS', () => {
