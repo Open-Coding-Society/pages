@@ -47,9 +47,10 @@ categories: []
 
 ## Step 1
 > File Management
-- Create your features folder name in `src/main/java/com/nighthawk/spring_portfolio/mvc` (for me it is announcement)
+- Create your features folder name in `src/main/java/com/open/spring/mvc` (for me it is announcement)
 - Locate the announcement folder, copy and rename to what your feature name is
-- Copy and rename file to your feature, make sure to match the class name with the file name, change any other appearances of the former files name
+- Copy all five files and rename each one to your feature, keeping the ending: `AnnouncementEntity.java` becomes `YourFeatureEntity.java`, and the same for `JpaRepository`, `Service`, `ApiRestController` and `TableInitializer`
+- Make sure to match the class name with the file name, change any other appearances of the former files name
 
 ## Step 2
 > Constructor File
