@@ -11,6 +11,9 @@ source "https://rubygems.org"
 gem "csv"
 gem "bigdecimal"
 gem "base64"
+gem "erb"
+gem "ostruct"
+gem "mutex_m"
 
 # ============================================================================
 # Jekyll Core & Plugins

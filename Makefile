@@ -8,6 +8,20 @@ CONVERT_FLAGS ?=
 SHELL = /bin/bash -c
 .SHELLFLAGS = -e
 
+# Ensure ruby user gems are in PATH and GEM_HOME, and locale is UTF-8
+ifeq ($(GEM_HOME),)
+  ifneq ($(wildcard $(HOME)/.local/gems),)
+    export GEM_HOME := $(HOME)/.local/gems
+  else
+    export GEM_HOME := $(shell ruby -e 'puts Gem.user_dir' 2>/dev/null)
+  endif
+endif
+ifneq ($(GEM_HOME),)
+  export PATH := $(GEM_HOME)/bin:$(PATH)
+endif
+export LC_ALL ?= C.utf8
+
+
 DESTINATION_DIRECTORY = _posts
 
 ###########################################

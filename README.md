@@ -196,6 +196,7 @@ git merge upstream/main --allow-unrelated-histories -X theirs # destructive reso
 #### Windows WSL and/or Ubuntu or Kali Users
 
 - Execute the script: `./scripts/activate_ubuntu.sh` or `./scripts/activate_kali.sh`
+- Run as your normal user; the script requests `sudo` only for APT. Ruby gems are installed privately in `$HOME/.local/gems`.
 - Then run `./scripts/verifyTools.sh` to confirm your setup.
 
 #### macOS Users
