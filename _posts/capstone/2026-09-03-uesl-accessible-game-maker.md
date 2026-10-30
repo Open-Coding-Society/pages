@@ -3,7 +3,7 @@ microblog: true
 toc: false
 layout: post
 title: UESL Accessible Game Maker 2.0
-description: An accessible game-building prototype for UESL, with a two-minute demo, frontend/backend architecture, community contact, and live team Kanban.
+description: An accessible game-building prototype for UESL, with a visual project overview, frontend/backend architecture, community contact, and live team Kanban.
 permalink: /capstone/uesl-game-maker/
 sticky_rank: 1
 year: "2026-2027"
@@ -12,7 +12,7 @@ year: "2026-2027"
 > We are Adhvay, Rohan, and Ishan. We are building an accessible space where UESL participants can create and play their own games, learn through experimentation, and eventually share those experiences with others.
 
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn alert-green fill large" href="#two-minute-demo">Two-minute walkthrough</a>
+    <a class="ocs__btn alert-green fill large" href="#two-minute-demo">Explore the project</a>
     <a class="ocs__btn large" href="#team-kanban">Team Kanban</a>
     <a class="ocs__btn large" href="https://www.unifiedesl.com/" target="_blank" rel="noopener noreferrer">Visit UESL</a>
 </div>
@@ -38,9 +38,9 @@ year: "2026-2027"
     </div>
 </div>
 
-<h2 id="two-minute-demo">Our project in two minutes</h2>
+<h2 id="two-minute-demo">How GameMaker works</h2>
 
-**Create → play → keep improving.** This is the structure of our local GameMaker prototype. This OCS page is our project and feedback hub; the game runs in the separate GameMaker app.
+**Create → play → keep improving.** Choose a builder, try an idea, and see it come to life. Our goal is to make game creation an approachable way for UESL participants to experiment and learn.
 
 <div class="ocs__grid ocs__grid--col2" markdown="1">
 <div class="ocs__grid-cell" markdown="1">
@@ -63,34 +63,23 @@ flowchart TB
     models <--> db
 ```
 
-**Read the diagram:** the frontend handles controls and gameplay. JavaScript exchanges JSON with Flask using the login cookie; Flask checks the request, then the models read or update SQLite. Play saves stay in the browser. The newer editor has a separate game-save API, but connecting the inherited builders to account saves is still planned.
+The **frontend** runs the builder and gameplay. **Flask** handles login and profile requests, and **SQLAlchemy models** read and update the **SQLite database**. Game workspaces currently stay in browser storage; connecting them to accounts is planned.
 
 </div>
 <div class="ocs__grid-cell">
-<strong>0:00–0:40 · Rohan · The idea</strong>
-<p><strong>Say:</strong> “We want UESL participants to move from playing games to creating them. Our prototype brings three builders into one workspace. Participants can make a small change, see its result, and learn by experimenting. We want UESL's feedback to shape the next version.”</p>
-<p><strong>Show:</strong> Open Play, point out the three builder tabs, then choose OpenCS Workbench and change the player or background.</p>
+<strong>01 · Create a game</strong>
+<p>Choose OpenCS Workbench, Open World, or Racing. Customize characters, environments, and settings in one workspace.</p>
 <hr>
-<strong>0:40–1:20 · Ishan · The experience</strong>
-<p><strong>Say:</strong> “The setup controls, game preview, and code sit together. Push turns our choices into code, and Run lets us try the result. We can stop, adjust, and try again. Saving a workspace gives us a return point on this browser.”</p>
-<p><strong>Show:</strong> Select Push →, Run, then Stop. Select Save Workspace, change one choice, and use Load Saved Workspace to restore it.</p>
+<strong>02 · Play and improve</strong>
+<p>In OpenCS Workbench, turn your choices into code and run the game alongside it. Stop, adjust a choice, and try again to see what changes.</p>
 <hr>
-<strong>1:20–2:00 · Adhvay · The structure</strong>
-<p><strong>Say:</strong> “The browser runs the game. Our Flask backend handles login and profile data, which stays in SQLite. Connecting builder saves to accounts is next. Multiplayer and chat are future ideas, and UESL's feedback will help us choose what to build first.”</p>
-<p><strong>Show:</strong> Point to the diagram, then save a display-name change in Profile and reload. End with: “What would make this useful for your participants?”</p>
+<strong>03 · Save and return</strong>
+<p>Keep a workspace in the current browser and return to it later. Login and profile updates are stored separately through the backend.</p>
+<hr>
+<strong>Next · Build together</strong>
+<p>Guided controls, account-connected game saves, multiplayer, and chat are planned. Feedback from UESL participants will help shape what comes next.</p>
 </div>
 </div>
-
-<details markdown="1">
-<summary>Presenter setup and demo checkpoints</summary>
-
-- Start `bash run_backend.sh` in `GameMaker-CSP/Backend` and `bash run_frontend.sh` in `GameMaker-CSP/Frontend`.
-- On the presenter's laptop, open `http://localhost:4700/play/` and `http://localhost:4700/profile` in separate tabs. Sign in beforehand using your local demo account; prepare a workspace you are comfortable replacing.
-- Run `python3 scripts/check_localhost.py` from the frontend folder. This checks page availability, backend health, and signed-out authentication; rehearse the interactive steps separately.
-- Check that Run responds, Load Saved Workspace restores the saved choice, and Profile shows its saved confirmation before reloading. Restore the original display name after the demo.
-- **Keep the claims clear:** login/profile and local builder saves are the demo. Guided mode, connecting inherited builder saves to accounts, multiplayer, and chat remain planned work. The existing `/api/game/*` API uses a different format from the inherited `/api/gamebuilder` requests.
-
-</details>
 
 <h2 id="team-kanban">Team Kanban</h2>
 
