@@ -25,7 +25,7 @@ import {
 } from '../services/ToolchainApi.js';
 import { TOOLCHAIN_TRAIL_SETTINGS } from '../data/toolchainTrailSettings.js';
 import { copyToClipboard } from '../services/clipboard.js';
-import { fixStepsFor, STUCK_HELP } from '../data/toolchainTrailFixes.js';
+import { fixStepsFor, stuckHelpFor } from '../data/toolchainTrailFixes.js';
 
 const { pollIntervalMs: POLL_INTERVAL_MS, silentAgentHintMs: SILENT_AGENT_HINT_MS } = TOOLCHAIN_TRAIL_SETTINGS;
 export default class StationVerificationTrial {
@@ -592,7 +592,7 @@ export default class StationVerificationTrial {
       if (!this.overlay) return;
       console.warn('[StationVerificationTrial] could not start an agent session:', error);
       this.getCodeBtn.disabled = false;
-      this._showStuckHelp(this._startFailureHelp(error), error.message);
+      this._showStuckHelp(stuckHelpFor(error, { localBackend: usesLocalBackend() }));
       this._showPasteFallback();
       return;
     }
@@ -702,8 +702,12 @@ export default class StationVerificationTrial {
   }
 
   _showPasteFallback() {
-    this.overlay?.querySelector('#svt-paste-panel').classList.remove('svt-hidden');
+    const pastePanel = this.overlay?.querySelector('#svt-paste-panel');
+    if (!pastePanel) return;
+    pastePanel.classList.remove('svt-hidden');
     this.runBtn?.classList.remove('svt-hidden');
+    // The panel opens below the fold on small windows; bring it into view so the next step is visible.
+    pastePanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   _setAgentStatus(kind, text) {
@@ -769,19 +773,8 @@ export default class StationVerificationTrial {
     return `<ol class="svt-fix">${steps.map((step) => `<li>${this._renderStep(step)}</li>`).join('')}</ol>`;
   }
 
-  /** Which help to show when no pairing code could be made. */
-  _startFailureHelp(error) {
-    if (error?.status === 401) return STUCK_HELP.notSignedIn;
-    const unreachable = error instanceof TypeError; // fetch got no answer at all
-    if (unreachable) return usesLocalBackend() ? STUCK_HELP.localBackendDown : STUCK_HELP.serverUnreachable;
-    return null; // a server error: its own message is the best help
-  }
-
-  _showStuckHelp(help, fallbackMessage) {
-    if (!help) {
-      this._setAgentStatus('err', `${fallbackMessage}. Try again, or use the practice check below.`);
-      return;
-    }
+  /** Shows what to do next when no pairing code could be made (see STUCK_HELP). */
+  _showStuckHelp(help) {
     const [summary, ...steps] = help;
     this._setAgentStatus('err', summary);
     this.agentChecksEl.innerHTML = `<ol class="svt-fix">${steps.map((step) => `<li>${this._renderStep(step)}</li>`).join('')}</ol>`;

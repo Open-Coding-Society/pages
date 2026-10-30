@@ -188,3 +188,52 @@
     @include dm-focus-ring;
   }
 }
+
+// ── Embedded in another page ───────────────────────────────────────────────────
+// js/conversation-embed.js shows one conversation in a host's column, such as a UI
+// Builder page's group chat. It stays inside the column rather than bleeding out of the
+// wrapper like /dm, and with no shell to fill, the log scrolls inside a fixed height.
+.dm.dm--embed {
+  --dm-embed-log-height: clamp(14rem, 45dvh, 28rem);
+
+  margin-inline: 0;
+  padding-inline: 0;
+}
+
+.dm--embed .dm__thread {
+  padding-left: 0;
+}
+
+.dm--embed .dm__log {
+  flex: none;
+  height: var(--dm-embed-log-height);
+}
+
+// A host's column can be a narrow sidebar, so the composer takes the column's whole width and
+// its Cancel and Send buttons wrap to the line below, at the end.
+.dm--embed .dm__composer {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+// .dm.dm--embed: _composer.scss's `.dm .rt-composer { flex: 1 }` comes later and would set the
+// basis back to 0, leaving the editor a narrow column beside Send.
+.dm.dm--embed .rt-composer {
+  flex-basis: 100%;
+}
+
+// The sign-in link shown to a visitor who isn't signed in, coloured like a link in a message.
+.dm--embed .dm__notice a {
+  color: var(--dm-accent);
+  text-underline-offset: 2px;
+
+  @include dm-focus-ring;
+}
+
+@include dm-below($breakpoint-mobile) {
+  // The one-pane rule above hides the thread until a conversation is picked from the
+  // lists. An embed has no lists, only the thread. Same specificity, so it comes after.
+  .dm.dm--embed .dm__thread {
+    display: flex;
+  }
+}

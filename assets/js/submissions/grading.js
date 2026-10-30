@@ -5,10 +5,10 @@
 export const GRADING_MESSAGES = {
   MANUAL_GRADE_APPLIED: "Grade saved. It replaces the AI grade.",
   MANUAL_OVERRIDE_CLEARED: "Instructor grade removed; the AI grade applies again.",
-  NO_MANUAL_OVERRIDE: "There is no instructor grade to remove.",
+  NO_MANUAL_OVERRIDE: "There is no instructor grade to remove or petition.",
   AI_GRADE_APPLIED: "AI graded the submission.",
   MANUAL_OVERRIDE_KEPT: "AI grade saved for reference; the instructor grade still applies.",
-  REVISION_CREATED: "Saved as a new revision. The AI will grade it, and any instructor grade was released.",
+  REVISION_CREATED: "Saved as a new revision. The AI will grade it; an instructor grade stays until your teacher changes it.",
   CONTENT_UNCHANGED: "Saved.",
   STALE_REVISION: "The student changed this submission since you loaded it. Reload and review the new version.",
   INVALID_GRADE: "Enter a grade from 0 to the assignment's points.",
@@ -20,11 +20,11 @@ export const GRADING_MESSAGES = {
   ASSIGNMENT_CLOSED: "This assignment is closed, so grades are final. Ask your teacher if something needs another look.",
   ASSIGNMENT_FINALIZED: "Assignment closed. Grades are final and copied to the gradebook.",
   REVIEW_REQUIRES_CLOSE: "Reviews are for closed assignments. Before close, grade or re-grade directly.",
-  REVIEW_OPENED: "Review opened.",
+  REVIEW_OPENED: "Review opened. Your teacher will decide it.",
   REVIEW_ALREADY_OPEN: "This submission already has an open review.",
   EVIDENCE_RECORDED: "Evidence saved.",
   REVIEW_NOT_OPEN: "This review is already decided.",
-  REASON_REQUIRED: "Choose a reason for the review.",
+  REASON_REQUIRED: "Give a reason for the review.",
   DECISION_REQUIRED: "Choose a decision.",
   RATIONALE_REQUIRED: "Write a rationale for the decision.",
   REVIEW_NO_CHANGE: "Decision recorded. The grade is unchanged.",
@@ -38,6 +38,7 @@ const HISTORY_LABELS = {
   AI_GRADED: "AI graded",
   MANUAL_OVERRIDE_SET: "Instructor grade",
   MANUAL_OVERRIDE_CLEARED: "Instructor grade removed",
+  MANUAL_OVERRIDE_KEPT_BY_REVISION: "Instructor grade kept for the new revision",
   MANUAL_OVERRIDE_RELEASED_BY_REVISION: "Instructor grade released by a new revision",
   FINALIZED: "Finalized at close",
   REVIEW_NO_CHANGE: "Teacher review: no change",
@@ -83,6 +84,11 @@ export function hasManualOverride(submission) {
 /** True once the assignment is closed and the grade is final. */
 export function isFinal(submission) {
   return submission?.grading?.closed === true;
+}
+
+/** A student can petition an instructor grade, or any grade once the assignment is closed. */
+export function canPetition(submission) {
+  return hasManualOverride(submission) || isFinal(submission);
 }
 
 /** Status pills for the grade's source, plus "Final" once the assignment is closed. */
@@ -152,6 +158,17 @@ export async function requestAiRegrade({ javaURI, fetchOptions, submissionId }) 
   const response = await fetch(`${javaURI}/api/submissions/ai-grade/${encodeURIComponent(submissionId)}`, {
     ...fetchOptions,
     method: "POST",
+  });
+  return readGradingResponse(response);
+}
+
+/** Asks the teacher to reconsider the grade; they decide it as a review. */
+export async function filePetition({ javaURI, fetchOptions, submissionId, message }) {
+  const response = await fetch(`${javaURI}/api/grade-reviews/submission/${encodeURIComponent(submissionId)}/petition`, {
+    ...fetchOptions,
+    method: "POST",
+    headers: { ...(fetchOptions?.headers || {}), "Content-Type": "application/json" },
+    body: JSON.stringify({ message }),
   });
   return readGradingResponse(response);
 }

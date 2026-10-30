@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "A site path with a dot segment", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-dotseg01",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-dotseg01",
+              "type": "buttons",
+              "settings": {
+                "links": [ { "label": "Sign in", "url": "/..//evil.com/x" } ],
+                "emphasize_first": true
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
