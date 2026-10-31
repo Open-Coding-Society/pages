@@ -1,6 +1,6 @@
 // Room setup panel on the Presence dashboard: create a room, manage its members, register cards.
 // Only teachers and admins see it; the backend rejects these calls from anyone else anyway.
-import { apiErrorText, cardEnding, hasUnknownMember, memberRows, normalizeCardNumber } from "./presence-room-model.js";
+import { apiErrorText, cardEnding, hasUnknownMember, memberRows, normalizeCardNumber, roomMembers } from "./presence-room-model.js";
 
 const el = (id) => document.getElementById(id);
 
@@ -73,8 +73,9 @@ export function createRoomSetup({ request, onRoomCreated, onMembersChanged }) {
       el("pd-member-status").textContent = apiErrorText(roomRes);
       return;
     }
-    await loadUsers(roomRes.data.member_uids);
-    const rows = memberRows(roomRes.data.member_uids, users, tagsRes.ok ? tagsRes.data : []);
+    const members = roomMembers(roomRes.data);
+    await loadUsers(members.map((member) => member.uid));
+    const rows = memberRows(members, users, tagsRes.ok ? tagsRes.data : []);
     renderMembers(rows);
     renderCards(rows);
   }
