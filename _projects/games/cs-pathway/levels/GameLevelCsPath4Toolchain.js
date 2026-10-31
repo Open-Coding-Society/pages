@@ -348,7 +348,7 @@ class GameLevelCsPath4Toolchain {
         name: 'Compiler Canyon Forge',
         icon: '☕',
         accentColor: '#f97316',
-        skill: 'Java or Python runtime',
+        skill: 'Python and Ruby runtimes with pip and Bundler',
         zone: 2,
         position: { x: width * 0.45, y: height * 0.18 },
         narrativeHook: 'The forge only ignites for a verified runtime.',
@@ -1080,14 +1080,10 @@ class GameLevelCsPath4Toolchain {
 
       const status = this.getStationStatus(stationId);
 
-      if (status === STATION_STATUS.LOCKED) {
-        await this.showDialogue(`${station.icon} ${station.name}`, [
-          station.isBoss
-            ? 'Integration Summit is sealed until every other station is verified.'
-            : 'This station is still sealed. Complete the earlier stations first.',
-        ]);
-        return;
-      }
+      // Locked stations still show their instructions, flagged as preview-only,
+      // so the whole trail can be walked through. Nothing done here counts.
+      const previewOnly = status === STATION_STATUS.LOCKED;
+      const previewNote = previewOnly ? this._previewNote(station) : null;
 
       if (status === STATION_STATUS.COMPLETE) {
         await this.showDialogue(`${station.icon} ${station.name}`, [
@@ -1109,8 +1105,16 @@ class GameLevelCsPath4Toolchain {
         os: this.selectedOS || 'linux',
         // If StationVerificationTrial supports it, it can call this with the
         // pasted output before onComplete and skip completion when it returns true.
-        onOutputSubmitted: (output) => this._handleTerminalOutput(station.id, output),
+        onOutputSubmitted: (output) => (previewOnly ? true : this._handleTerminalOutput(station.id, output)),
         onComplete: async ({ stationId: completedId, output }) => {
+          if (previewOnly) {
+            this._stationTrialOpen = false;
+            this._openTrialStationId = null;
+            this._previewStationId = null;
+            this._hidePreviewBanner();
+            this.showToast('Preview only. Finish the earlier stations to verify this one.');
+            return;
+          }
           this._stationTrialOpen = false;
           this._openTrialStationId = null;
           this._hidePanelFailureAlert();
@@ -1136,12 +1140,16 @@ class GameLevelCsPath4Toolchain {
           }
         },
         onClose: () => {
+          this._previewStationId = null;
+          this._hidePreviewBanner();
           this._stationTrialOpen = false;
           this._openTrialStationId = null;
           this._hidePanelFailureAlert();
         },
       });
+      this._previewStationId = previewOnly ? station.id : null;
       trial.start();
+      if (previewNote) this._showPreviewBanner(previewNote);
       // Reopening the failing station: show the in-panel alert right away.
       if (this.failureState) this._showPanelFailureAlert();
     };
@@ -1153,9 +1161,13 @@ class GameLevelCsPath4Toolchain {
      */
     this._localizeStation = function (station) {
       const os = this.selectedOS || 'linux';
+      const steps = station.instructionsByOS?.[os] || station.instructions;
+      const instructions = steps.map((step, i) => (
+        i === 0 && typeof step === 'string' ? { bold: step, text: step } : step
+      ));
       return {
         ...station,
-        instructions: station.instructionsByOS?.[os] || station.instructions,
+        instructions,
         exampleCommand: station.exampleCommandByOS?.[os] || station.exampleCommand,
         expectedCommandPattern: station.expectedCommandPatternByOS?.[os] || station.expectedCommandPattern,
       };
@@ -1334,6 +1346,7 @@ class GameLevelCsPath4Toolchain {
     const checkText = (text, path) => {
       if (!text) return;
       if (path.some((n) => n?.id === PROFILE_PANEL_ID)) return;
+      if (this._previewStationId) return; // preview panels never charge a failure
       if (this._stationTrialOpen) this._lastPastedOutput = text;
       if (this.failureState) return; // already locked; clears on a clean verify
       const stationId = this._openTrialStationId || this._getActiveStationId();
@@ -1800,6 +1813,40 @@ class GameLevelCsPath4Toolchain {
     el.style.left = `${rect.left + cx * scale}px`;
     el.style.top = `${rect.top + cy * scale}px`;
     el.style.width = `${Math.max(220, Math.min(320, innerW * scale))}px`;
+  }
+
+  /** Text for the preview banner: which station must be finished first. */
+  _previewNote(station) {
+    const firstId = this._nonBossOrder.find((id) => !this.completedStations.has(id));
+    const first = this._stationById[firstId];
+    const needed = first && first.id !== station.id
+      ? `${first.icon} ${first.name}`
+      : 'the earlier stations';
+    return `🔒 PREVIEW ONLY: finish ${needed} first. Nothing you do here counts.`;
+  }
+
+  _showPreviewBanner(message) {
+    this._hidePreviewBanner();
+    const el = document.createElement('div');
+    el.setAttribute('role', 'status');
+    el.textContent = message;
+    el.style.cssText = `
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      z-index: 2147483000; pointer-events: none;
+      width: min(460px, calc(100vw - 32px)); box-sizing: border-box;
+      background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+      border: 2px solid #fef3c7; border-radius: 8px;
+      color: #1f1300; font-family: "Courier New", monospace;
+      font-size: 13px; font-weight: 900; line-height: 1.4; text-align: center;
+      padding: 10px 16px;
+    `;
+    document.body.appendChild(el);
+    this._previewBannerEl = el;
+  }
+
+  _hidePreviewBanner() {
+    this._previewBannerEl?.remove();
+    this._previewBannerEl = null;
   }
 
   _hideFailureBanner() {
