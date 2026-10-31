@@ -1,7 +1,7 @@
 ---
 toc: false
 layout: post
-title: Classroom Presence System, My Card
+title: Classroom Presence System, My Class & Card
 description: Join your room's class period and register your own RFID card so your taps count.
 permalink: /capstone/presence-system/my-card/
 year: "2026-2027"
@@ -11,8 +11,8 @@ rp_active: mycard
 <!-- markdownlint-disable MD033 MD010 MD012 -->
 <div class="rfid-presence-infograph">
   <div class="rfid-presence-header">
-    <div class="ocs__badge">My Card</div>
-    <h1 class="rfid-presence-title">Register your card</h1>
+    <div class="ocs__badge">My Class & Card</div>
+    <h1 class="rfid-presence-title">Join your class and register your card</h1>
     <p class="ocs__description">Pick your room and class period, then link your RFID card to your OCS account so your taps at the reader count.</p>
   </div>
 
