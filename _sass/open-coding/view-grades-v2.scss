@@ -1,5 +1,5 @@
-// Page-scoped styles for /student/view-grades/v2
-// (_posts/student_toolkit/assignments/2025-01-21-gradeviewer-v2.md —
+// Page-scoped styles for /student/view-grades
+// (_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md —
 // this page has no separate _layouts file, the page itself is the
 // layout).
 //
@@ -9,11 +9,8 @@
 // every prior page's JS-templated content) — this is the simplest page
 // in the series, no literal class names to preserve.
 
-.ocs__view-grades-v2-page {
-    max-width: 64rem;
-    margin: 0 auto;
-    padding: 2.5rem 1rem;
-}
+// .ocs__view-grades-v2-page has no width cap or padding, so the grades card fills the
+// content area like the other v2 pages.
 
 .ocs__view-grades-v2-card {
     color: var(--pref-text-color);
