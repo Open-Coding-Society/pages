@@ -22,7 +22,7 @@ Pages:
     tab: "Live Dashboard"
     url: "/capstone/presence-system/dashboard/"
   - key: mycard
-    tab: "My Card"
+    tab: "My Class & Card"
     url: "/capstone/presence-system/my-card/"
   - key: pipeline
     tab: "How It Works"

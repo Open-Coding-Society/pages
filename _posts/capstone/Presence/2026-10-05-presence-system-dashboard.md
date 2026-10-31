@@ -37,7 +37,7 @@ rp_active: dashboard
       <div class="rfid-presence-table-wrap">
         <table class="rfid-presence-table">
           <thead>
-            <tr><th>Student</th><th>Status</th><th>Since</th><th>Camera check</th></tr>
+            <tr><th>Student</th><th>Period</th><th>Status</th><th>Since</th><th>Camera check</th></tr>
           </thead>
           <tbody id="pd-roster"></tbody>
         </table>
@@ -74,6 +74,10 @@ rp_active: dashboard
               <label class="ocs__label" for="pd-member-uid">GitHub ID</label>
               <input class="ocs__input" id="pd-member-uid" required autocomplete="off">
             </div>
+            <div class="ocs__field">
+              <label class="ocs__label" for="pd-member-period">Period</label>
+              <select class="ocs__input" id="pd-member-period"></select>
+            </div>
             <button type="submit" class="ocs__btn pill">Add member</button>
           </form>
           <output class="pd-feedback" id="pd-member-status" aria-live="polite"></output>
@@ -105,7 +109,7 @@ rp_active: dashboard
 <script type="module">
   import { baseurl, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
   import { createPresenceApi } from '{{site.baseurl}}/assets/js/capstone/presence-api.js';
-  import { chooseRoomId } from '{{site.baseurl}}/assets/js/capstone/presence-room-model.js';
+  import { chooseRoomId, periodLabel } from '{{site.baseurl}}/assets/js/capstone/presence-room-model.js';
   import { createRoomSetup } from '{{site.baseurl}}/assets/js/capstone/presence-room-setup.js';
 
   const POLL_MS = 2000;
@@ -203,6 +207,9 @@ rp_active: dashboard
       const name = document.createElement("td");
       name.className = "pd-name";
       name.textContent = st.name;
+      // Someone who tapped in but is not a member has no period, so it isn't "All periods".
+      const periodCell = document.createElement("td");
+      periodCell.textContent = st.member ? periodLabel(st.period_name) : "—";
       const status = document.createElement("td");
       const pill = document.createElement("span");
       pill.className = `rfid-presence-pill rfid-presence-pill-${STATE_PILL[st.state] || "neutral"}`;
@@ -219,13 +226,13 @@ rp_active: dashboard
       } else {
         camera.textContent = "—";
       }
-      tr.append(name, status, since, camera);
+      tr.append(name, periodCell, status, since, camera);
       return tr;
     });
     if (!rows.length) {
       const tr = document.createElement("tr");
       const td = document.createElement("td");
-      td.colSpan = 4;
+      td.colSpan = 5;
       td.textContent = "No members or taps in this room yet.";
       tr.appendChild(td);
       rows.push(tr);
