@@ -2,7 +2,7 @@
 toc: false
 layout: post
 title: Classroom Presence System, My Card
-description: Register your own RFID card so your taps count.
+description: Join your room's class period and register your own RFID card so your taps count.
 permalink: /capstone/presence-system/my-card/
 year: "2026-2027"
 rp_active: mycard
@@ -13,12 +13,30 @@ rp_active: mycard
   <div class="rfid-presence-header">
     <div class="ocs__badge">My Card</div>
     <h1 class="rfid-presence-title">Register your card</h1>
-    <p class="ocs__description">Link your RFID card to your OCS account so your taps at the reader count. Add <code>?room=&lt;id&gt;</code> to the URL to use another room's reader.</p>
+    <p class="ocs__description">Pick your room and class period, then link your RFID card to your OCS account so your taps at the reader count.</p>
   </div>
 
   {% include presence-system-nav.html %}
 
   <div class="ocs__card" id="mc-message" hidden></div>
+
+  <div class="ocs__card" id="mc-class" hidden>
+    <h3 class="ocs__section-title">Your class</h3>
+    <p class="ocs__description" id="mc-class-text"></p>
+    <button type="button" class="ocs__btn pill" id="mc-change">Change</button>
+    <form id="mc-enroll" class="pd-setup-form" hidden>
+      <div class="ocs__field">
+        <label class="ocs__label" for="mc-room">Room</label>
+        <select class="ocs__input" id="mc-room"></select>
+      </div>
+      <div class="ocs__field">
+        <label class="ocs__label" for="mc-period">Period</label>
+        <select class="ocs__input" id="mc-period"></select>
+      </div>
+      <button type="submit" class="ocs__btn pill accent fill">Join</button>
+    </form>
+    <output class="pd-feedback" id="mc-enroll-status" aria-live="polite"></output>
+  </div>
 
   <div class="ocs__card" id="mc-card" hidden>
     <h3 class="ocs__section-title">Your card</h3>
@@ -46,12 +64,21 @@ rp_active: mycard
 
 <script type="module">
   import { baseurl, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+  import { createEnrollApi, createPresenceApi } from '{{site.baseurl}}/assets/js/capstone/presence-api.js';
+  import {
+    apiErrorText, currentEnrollment, enrollmentLabel, periodChoices, periodLabel, periodsForRoom,
+  } from '{{site.baseurl}}/assets/js/capstone/presence-room-model.js';
 
-  const roomId = Number(new URLSearchParams(location.search).get("room")) || 1;
+  // ?room=<id> overrides the enrolled room for card registration, for testing another reader.
+  const requestedRoomId = Number(new URLSearchParams(location.search).get("room")) || null;
   const POLL_MS = 1500;
-  const SECTIONS = ["mc-message", "mc-card", "mc-register", "mc-waiting"];
+  const SECTIONS = ["mc-message", "mc-class", "mc-card", "mc-register", "mc-waiting"];
   const el = (id) => document.getElementById(id);
   const call = (path, options = {}) => fetch(`${pythonURI}${path}`, { ...fetchOptions, cache: "no-store", ...options });
+  const enroll = createEnrollApi(createPresenceApi(pythonURI, fetchOptions));
+  let me = null;  // GET /api/presence/enroll/me
+  let enrollRooms = [];  // GET /api/presence/enroll/rooms, loaded when the Room select is shown
+  let roomId = null;  // the room whose reader registers the card
   let claimId = null;
   let pollTimer = null;
 
@@ -76,20 +103,69 @@ rp_active: mycard
     el("mc-result").hidden = !text;
   }
 
+  function fillPeriods(selected) {
+    const choices = periodChoices(periodsForRoom(enrollRooms, Number(el("mc-room").value)));
+    el("mc-period").replaceChildren(...choices.map((period) => new Option(periodLabel(period), period ?? "")));
+    if (choices.includes(selected)) el("mc-period").value = selected ?? "";
+  }
+
+  // The Room and Period selects, pre-selected to the current enrollment when changing it.
+  async function showEnrollForm() {
+    const status = el("mc-enroll-status");
+    el("mc-class-text").textContent = `Signed in as ${me.name}`;
+    el("mc-change").hidden = true;
+    const res = await enroll.rooms();
+    if (!res.ok) {
+      status.textContent = apiErrorText(res);
+      return;
+    }
+    enrollRooms = res.data;
+    if (!enrollRooms.length) {
+      status.textContent = "There are no rooms to join yet. Ask a teacher to create one.";
+      return;
+    }
+    const current = currentEnrollment(me);
+    el("mc-room").replaceChildren(...enrollRooms.map((room) => new Option(room.name, room.id)));
+    if (current) el("mc-room").value = current.room_id;
+    fillPeriods(current ? current.period_name : null);
+    el("mc-enroll").hidden = false;
+  }
+
+  async function loadCard() {
+    const res = await call("/api/rfid/cards/me");
+    if (!res.ok) return message(`The attendance backend returned an error (${res.status}).`);
+    const data = await res.json();
+    if (data.cards.length) {
+      const card = data.cards[0];
+      const since = card.registered_at ? ` since ${new Date(card.registered_at).toLocaleDateString()}` : "";
+      el("mc-card-text").textContent = `Your card ending ${card.card_ending} is registered${since}. Your taps count.`;
+      only("mc-class", "mc-card");
+    } else {
+      only("mc-class", "mc-register");
+    }
+  }
+
+  // Card registration needs a room's reader, so it stays hidden until the student has joined a room.
+  async function showClass() {
+    const enrollment = currentEnrollment(me);
+    if (!enrollment) {
+      only("mc-class");
+      return showEnrollForm();
+    }
+    el("mc-class-text").textContent = enrollmentLabel(me);
+    el("mc-change").hidden = false;
+    el("mc-enroll").hidden = true;
+    roomId = requestedRoomId || enrollment.room_id;
+    await loadCard();
+  }
+
   async function load() {
     try {
-      const res = await call("/api/rfid/cards/me");
+      const res = await enroll.me();
       if (res.status === 401) return message("Log in with your OCS account to register your card.", "Log in", `${baseurl}/login`);
       if (!res.ok) return message(`The attendance backend returned an error (${res.status}).`);
-      const data = await res.json();
-      if (data.cards.length) {
-        const card = data.cards[0];
-        const since = card.registered_at ? ` since ${new Date(card.registered_at).toLocaleDateString()}` : "";
-        el("mc-card-text").textContent = `Your card ending ${card.card_ending} is registered${since}. Your taps count.`;
-        only("mc-card");
-      } else {
-        only("mc-register");
-      }
+      me = res.data;
+      await showClass();
     } catch (err) {
       message(`Could not reach the attendance backend at ${pythonURI}.`);
     }
@@ -123,6 +199,38 @@ rp_active: mycard
     result(outcome[claim.status] ?? `Registration ended (${claim.status}).`);
     await load();
   }
+
+  el("mc-room").addEventListener("change", () => fillPeriods(null));
+
+  el("mc-change").addEventListener("click", () => {
+    el("mc-enroll-status").textContent = "";
+    showEnrollForm();
+  });
+
+  el("mc-enroll").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const status = el("mc-enroll-status");
+    const previous = currentEnrollment(me);
+    const nextRoomId = Number(el("mc-room").value);
+    try {
+      // An empty value is the "All periods" option, sent as null.
+      const res = await enroll.join(nextRoomId, el("mc-period").value || null);
+      if (!res.ok) {
+        status.textContent = apiErrorText(res);
+        return;
+      }
+      me = res.data;
+      // Changing rooms leaves the old one, so the student is on one room's roster, not both.
+      if (previous && previous.room_id !== nextRoomId) {
+        const left = await enroll.leave(previous.room_id);
+        if (left.ok) me = left.data;
+      }
+      status.textContent = "";
+      await showClass();
+    } catch (err) {
+      status.textContent = "Could not reach the attendance backend.";
+    }
+  });
 
   el("mc-start").addEventListener("click", async () => {
     result("");
