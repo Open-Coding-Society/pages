@@ -1,6 +1,8 @@
 // Room setup panel on the Presence dashboard: create a room, manage its members, register cards.
 // Only teachers and admins see it; the backend rejects these calls from anyone else anyway.
-import { apiErrorText, cardEnding, hasUnknownMember, memberRows, normalizeCardNumber, roomMembers } from "./presence-room-model.js";
+import {
+  apiErrorText, cardEnding, hasUnknownMember, memberRows, normalizeCardNumber, periodChoices, periodLabel, roomMembers,
+} from "./presence-room-model.js";
 
 const el = (id) => document.getElementById(id);
 
@@ -44,9 +46,16 @@ export function createRoomSetup({ request, onRoomCreated, onMembersChanged }) {
     select.replaceChildren(...schedules.map((s) => new Option(s.name, s.id)), none);
   }
 
+  // "All periods" first: a member added by staff shows in every period unless one is picked.
+  function renderPeriods(periods) {
+    const choices = periodChoices(periods, { staff: true });
+    el("pd-member-period").replaceChildren(...choices.map((period) => new Option(periodLabel(period), period ?? "")));
+  }
+
   function renderMembers(rows) {
     el("pd-members").replaceChildren(...(rows.length ? rows.map((row) => listItem(
       ...uidLabel(row),
+      document.createTextNode(` - ${periodLabel(row.period_name)}`),
       button("Remove", () => changeMember(row.uid, "DELETE")),
     )) : [listItem(document.createTextNode("No members yet."))]));
   }
@@ -76,13 +85,15 @@ export function createRoomSetup({ request, onRoomCreated, onMembersChanged }) {
     const members = roomMembers(roomRes.data);
     await loadUsers(members.map((member) => member.uid));
     const rows = memberRows(members, users, tagsRes.ok ? tagsRes.data : []);
+    renderPeriods(roomRes.data.periods || []);
     renderMembers(rows);
     renderCards(rows);
   }
 
-  async function changeMember(uid, method) {
+  // body: {period_name} when adding; null period_name means every period.
+  async function changeMember(uid, method, body) {
     const status = el("pd-member-status");
-    const res = await request(`/api/presence/rooms/${room.id}/members/${encodeURIComponent(uid)}`, { method });
+    const res = await request(`/api/presence/rooms/${room.id}/members/${encodeURIComponent(uid)}`, { method, body });
     status.textContent = res.ok ? `${method === "POST" ? "Added" : "Removed"} ${uid}.` : apiErrorText(res);
     if (res.ok) {
       await refresh();
@@ -119,7 +130,8 @@ export function createRoomSetup({ request, onRoomCreated, onMembersChanged }) {
   el("pd-add-member").addEventListener("submit", async (event) => {
     event.preventDefault();
     const input = el("pd-member-uid");
-    if (await changeMember(input.value.trim(), "POST")) input.value = "";
+    const periodName = el("pd-member-period").value || null;
+    if (await changeMember(input.value.trim(), "POST", { period_name: periodName })) input.value = "";
   });
 
   el("pd-add-card").addEventListener("submit", async (event) => {
