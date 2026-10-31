@@ -10,3 +10,15 @@ export function createPresenceApi(pythonURI, fetchOptions) {
     return { ok: res.ok, status: res.status, data };
   };
 }
+
+// Self-enrollment in a room's period (/api/presence/enroll). request: from createPresenceApi.
+// me, join and leave all answer with {uid, name, enrollments: [{room_id, room, period_name}]}.
+export function createEnrollApi(request) {
+  return {
+    rooms: () => request("/api/presence/enroll/rooms"),
+    me: () => request("/api/presence/enroll/me"),
+    // periodName null means every period, which only a room without a schedule accepts.
+    join: (roomId, periodName) => request("/api/presence/enroll/me", { method: "PUT", body: { room_id: roomId, period_name: periodName } }),
+    leave: (roomId) => request(`/api/presence/enroll/me/${roomId}`, { method: "DELETE" }),
+  };
+}
