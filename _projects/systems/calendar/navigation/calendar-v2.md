@@ -3,6 +3,7 @@ layout: opencs
 title: Calendar
 permalink: /student/calendar/v2
 search_exclude: true
+hide: true
 ---
 
 <meta http-equiv="refresh" content="0; url={{ '/student/calendar' | relative_url }}">

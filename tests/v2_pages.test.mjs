@@ -42,6 +42,19 @@ test('each /v2 address sends visitors to the main page', () => {
   }
 });
 
+// The calendar's navigation/ pages are copied into _posts, and view grades is a post, so their
+// stubs would show up as duplicate cards in the Blogs catalog.
+test('the /v2 stubs that are posts stay out of the Blogs catalog', () => {
+  for (const stub of ['_projects/systems/calendar/navigation/calendar-v2.md', '_posts/student_toolkit/assignments/2025-01-21-gradeviewer-v2.md']) {
+    assert.equal(frontMatter(read(stub)).hide, 'true', stub);
+  }
+});
+
+// The old dashboard's only tab had the admin tab's id, so clicking it hid Preferences (#1924).
+test('the dashboard has no tab that can hide Preferences', () => {
+  assert.ok(!read('_layouts/dashboard-v2.html').includes('class="tab-btn'), 'no tab buttons on the dashboard');
+});
+
 // Merges can drop an @import without any build error; the page then renders unstyled.
 test('every v2 page partial is imported into the site stylesheet', () => {
   const main = read('_sass/open-coding/_main.scss');

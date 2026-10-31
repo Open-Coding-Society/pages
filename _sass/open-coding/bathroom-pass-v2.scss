@@ -67,8 +67,9 @@
 // `if (!e.target.closest('.relative')) { close suggestions }` — this
 // class sits on the scanner wrapper/frame AND the Manual Override
 // wrapper (below). All three must keep this exact literal name, or the
-// suggestions-close-on-outside-click behavior changes.
-.relative {
+// suggestions-close-on-outside-click behavior changes. Scoped to this page so
+// the rule doesn't reach other pages' .relative elements.
+.ocs__bathroompass-v2-page .relative {
     position: relative;
 }
 
