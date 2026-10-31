@@ -16,6 +16,7 @@ function frontMatter(text) {
 // [main page source, /v2 page source, main address, what makes it the restyled page]
 const PAGES = [
   ['navigation/authentication/analytics.md', 'navigation/authentication/dashboard-v2.md', '/dashboard', { layout: 'dashboard-v2' }],
+  ['navigation/authentication/analytics-dashboard.md', 'navigation/authentication/analytics-dashboard-v2.md', '/analytics-dashboard', { layout: 'analytics-dashboard-v2' }],
   ['navigation/authentication/submissions.md', 'navigation/authentication/submissions-v2.md', '/submissions', { layout: 'submissions-v2' }],
   ['navigation/toolkit/bathroom_pass.md', 'navigation/toolkit/bathroom_pass-v2.md', '/student/bathroom_pass', { wrapper: 'ocs__bathroompass-v2-page' }],
   ['_projects/systems/calendar/index.md', '_projects/systems/calendar/navigation/calendar-v2.md', '/student/calendar', { wrapper: 'ocs__calendar-v2-page' }],
