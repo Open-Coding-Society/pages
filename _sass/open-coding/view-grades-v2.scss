@@ -9,11 +9,8 @@
 // every prior page's JS-templated content) — this is the simplest page
 // in the series, no literal class names to preserve.
 
-.ocs__view-grades-v2-page {
-    max-width: 64rem;
-    margin: 0 auto;
-    padding: 2.5rem 1rem;
-}
+// .ocs__view-grades-v2-page has no width cap or padding, so the grades card fills the
+// content area like the other v2 pages.
 
 .ocs__view-grades-v2-card {
     color: var(--pref-text-color);
