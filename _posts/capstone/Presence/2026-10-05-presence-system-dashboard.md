@@ -157,7 +157,9 @@ rp_active: dashboard
   const el = (id) => document.getElementById(id);
   const fmtTime = (iso) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
+  // A message replaces the roster, so it also replaces the "Loading period..." heading.
   function showMessage(text, linkText, href) {
+    el("pd-period").textContent = "Live attendance";
     const box = el("pd-message");
     box.replaceChildren(document.createTextNode(text + " "));
     if (linkText) {
