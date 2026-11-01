@@ -126,12 +126,11 @@ function warnIfSpringSignedOut(loginArea) {
 // on every page right away, not only after they open the dashboard.
 async function syncThemeOwner(uid) {
     const previousOwner = localStorage.getItem('sitePreferencesOwner');
-    if (!springEnabled || !uid || previousOwner === uid || window.loggingOut) return;
+    if (!springEnabled || !uid || previousOwner === uid) return;
     try {
         const response = await fetch(`${javaURI}/api/user/preferences`, fetchOptions);
         if (!response.ok) return;
         const data = await response.json();
-        if (window.loggingOut) return;
         const prefs = data?.id ? FormatConverter.toFrontend(data) : null;
         localStorage.setItem('sitePreferencesOwner', uid);
         if (prefs) {
