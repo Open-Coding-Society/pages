@@ -141,25 +141,31 @@ export function initPreferencesLayout() {
                 : '#111111';
         }
 
+        // Every text color in the preview is set as important, as the theme swatches are: the
+        // site's h4 and p rules, and a saved theme's !important text color, would otherwise paint
+        // the preview's words in the page's own colors.
         const body = $('.ocs__prefs-preview-body');
         if (body) {
             body.style.backgroundColor = prefs.bg;
             body.style.color = prefs.text;
             body.style.fontFamily = prefs.font;
             body.style.fontSize = `${prefs.size}px`;
+            body.querySelectorAll('h4, p').forEach((element) => {
+                element.style.setProperty('color', prefs.text, 'important');
+            });
         }
 
         const selection = $('[data-preview="selection"]');
         if (selection) {
             selection.style.backgroundColor = prefs.selectionColor;
-            selection.style.color = contrastRatio(prefs.selectionColor, '#ffffff') >= 4.5
+            selection.style.setProperty('color', contrastRatio(prefs.selectionColor, '#ffffff') >= 4.5
                 ? '#ffffff'
-                : '#111111';
+                : '#111111', 'important');
         }
 
         const link = $('[data-preview="link"]');
         if (link) {
-            link.style.color = prefs.accent;
+            link.style.setProperty('color', prefs.accent, 'important');
             link.style.textDecoration = 'underline';
         }
 
@@ -177,13 +183,13 @@ export function initPreferencesLayout() {
 
         if (primaryButton) {
             primaryButton.style.backgroundColor = prefs.accent;
-            primaryButton.style.color =
-                contrastRatio(prefs.accent, '#ffffff') >= 4.5 ? '#ffffff' : '#111111';
+            primaryButton.style.setProperty('color',
+                contrastRatio(prefs.accent, '#ffffff') >= 4.5 ? '#ffffff' : '#111111', 'important');
         }
 
         if (secondaryButton) {
             secondaryButton.style.backgroundColor = 'transparent';
-            secondaryButton.style.color = prefs.text;
+            secondaryButton.style.setProperty('color', prefs.text, 'important');
             secondaryButton.style.border = `1px solid ${prefs.accent}`;
         }
 

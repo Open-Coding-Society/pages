@@ -1,6 +1,6 @@
 // The layout/include supplies shared configuration, so this module works before
 // and after the Profile project's files are published to assets/js/profile/.
-export function initAiConnections(root, { request = fetch, apiBase } = {}) {
+export function initAiConnections(root, { request = fetch, javaURI, fetchOptions } = {}) {
   if (!root) return Promise.resolve();
   const availability = root.querySelector('[data-ai-availability]');
   const rows = [...root.querySelectorAll('[data-ai-provider]')].map(element => ({
@@ -44,9 +44,9 @@ export function initAiConnections(root, { request = fetch, apiBase } = {}) {
     updateControls();
   }
   async function api(method, provider, body) {
-    const response = await request(`${apiBase}/api/ai-connections${provider ? `/${provider}` : ''}`, {
-      method, credentials: 'include', cache: 'no-store',
-      headers: { 'Content-Type': 'application/json', 'X-Origin': 'client' },
+    const response = await request(`${javaURI}/api/ai-connections${provider ? `/${provider}` : ''}`, {
+      ...fetchOptions,
+      method, cache: 'no-store',
       ...(body ? { body: JSON.stringify(body) } : {}),
     });
     const data = response.status === 204 ? null : await response.json().catch(() => ({}));

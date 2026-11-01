@@ -2,7 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { initAiConnections as initialize } from '../_projects/systems/profile/js/ai-connections.js';
 
-const initAiConnections = (root, options = {}) => initialize(root, { apiBase: 'http://spring.test', ...options });
+const fetchOptions = {
+  method: 'GET', mode: 'cors', cache: 'default', credentials: 'include',
+  headers: { 'Content-Type': 'application/json', 'X-Origin': 'client' },
+};
+const initAiConnections = (root, options = {}) => initialize(root, {
+  javaURI: 'http://spring.test', fetchOptions, ...options,
+});
 
 function element() {
   return { textContent: '', value: '', disabled: false, hidden: false, dataset: {}, listeners: {},
@@ -31,6 +37,34 @@ test('loads secret-free status and enables independent provider controls', async
   assert.equal(requests[0][0], 'http://spring.test/api/ai-connections');
   assert.equal(requests[0][1].credentials, 'include');
   assert.equal(requests[0][1].cache, 'no-store');
+});
+
+test('all requests inherit shared fetch options without mutating them', async () => {
+  const root = fixture(); const requests = [];
+  const shared = { ...fetchOptions, method: 'POST', headers: {
+    ...fetchOptions.headers, 'X-Test-Configuration': 'shared',
+  } };
+  const original = structuredClone(shared);
+  await initAiConnections(root, { javaURI: 'http://configured-spring.test', fetchOptions: shared,
+    request: async (...args) => {
+      requests.push(args);
+      return response(requests.length === 3 ? null : disconnected, requests.length === 3 ? 204 : 200);
+    } });
+  const row = root.providers[0];
+  row.fields['[data-ai-key]'].value = 'fake-key';
+  await submit(row);
+  await row.fields['[data-ai-disconnect]'].listeners.click();
+  assert.deepEqual(requests.map(([, options]) => options.method), ['GET', 'PUT', 'DELETE']);
+  for (const [url, options] of requests) {
+    assert.ok(url.startsWith('http://configured-spring.test/api/ai-connections'));
+    assert.equal(options.mode, shared.mode);
+    assert.equal(options.credentials, shared.credentials);
+    assert.deepEqual(options.headers, shared.headers);
+    assert.equal(options.cache, 'no-store');
+  }
+  assert.equal(requests[0][1].body, undefined);
+  assert.equal(requests[2][1].body, undefined);
+  assert.deepEqual(shared, original);
 });
 
 test('saving Gemini uses only its endpoint and clears input after success', async () => {

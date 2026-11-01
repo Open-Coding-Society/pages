@@ -45,7 +45,8 @@ class AiProfileLayoutTest < Minitest::Test
       assert document.at_css("label[for='ai-#{provider}-key']")
     end
     assert_includes html, '/preview/assets/js/profile/ai-connections.js'
-    assert_includes html, '{ apiBase: javaURI }'
+    assert_includes html, "import { javaURI, fetchOptions } from '/preview/assets/js/api/config.js'"
+    assert_includes html, '{ javaURI, fetchOptions }'
   end
 
   def test_flask_only_profile_has_no_ai_or_gist_controls_or_starter

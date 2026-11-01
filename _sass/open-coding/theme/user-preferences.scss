@@ -5,7 +5,7 @@
   --pref-text-color: #e6eef8;
   --pref-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
   --pref-font-size: 14px;
-  --pref-accent-color: #3b82f6;
+  --pref-accent-color: #5392f7;
   --pref-success-color: #22c55e;
   --text-muted: #a0a0a0;
 
@@ -37,13 +37,19 @@
   .page-content,
   .wrapper,
   main,
-  article,
+  article:where(:not([class*="ocs__"])),
   .post,
   .content,
   .opencs_root {
     background-color: var(--pref-bg-color) !important;
     color: var(--pref-text-color) !important;
     border-color: var(--ui-border) !important;
+  }
+
+  /* The site header is see-through glass; the rule above would paint its inner .wrapper and
+     show a darker block in the middle of the bar. */
+  .site-header .wrapper {
+    background-color: transparent !important;
   }
 
   /* Full sidebar and topbar use the plain user color */
@@ -122,7 +128,7 @@
   textarea.question-input {
     background-color: var(--pref-bg-color) !important;
     color: var(--pref-text-color) !important;
-    border: 1px solid rgba(0,0,0,0.18) !important;
+    border: 1px solid var(--field-border) !important;
     padding: 0.5rem !important;
   }
 
@@ -151,6 +157,20 @@
     fill: currentColor !important;
   }
 
+  /* Grammar labels written as links keep their words in the text color, as the grammar draws
+     them: the accent is their ring, and accent text on the accent's own tint is under 4.5:1. */
+  a.ocs__status-pill,
+  a.ocs__status,
+  a.ocs__badge {
+    color: var(--pref-text-color) !important;
+  }
+
+  /* The post layouts give category chips a fixed light background, and the links rule above
+     colors their words with the accent, so the chips take the card color: the accent reads on it. */
+  .category-tags-link {
+    background-color: var(--panel) !important;
+  }
+
   /* Selected capstone navigation uses the page background for contrast. */
   .jv-nav-link.active,
   .ocs__btn.accent.fill {
@@ -171,8 +191,8 @@
     color: var(--text-muted) !important;
   }
 
-  /* Inputs/buttons default */
-  input, select, textarea, button {
+  /* Inputs/buttons default; ocs__btn keeps the grammar's own fill, whether it is a link or a button */
+  input, select, textarea, button:where(:not(.ocs__btn)) {
     background-color: var(--panel);
     border: 1px solid var(--pref-accent-color);
   }

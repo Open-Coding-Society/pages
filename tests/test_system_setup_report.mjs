@@ -45,13 +45,14 @@ test('the real agent report has the Summary and Overall lines Spring requires on
 
 test('builds the upload command for each system', () => {
   const url = 'https://spring.example/api/cs-pathway/setup-report/ABC123';
-  assert.equal(getReportUploadCommand('linux', url), `python3 scripts/linux_setup_agent.py --check --report ${url}`);
-  assert.equal(getReportUploadCommand('windows', url), `python3 scripts/windows_setup_agent.py --check --report ${url}`);
+  assert.equal(getReportUploadCommand('linux', url), `bash scripts/linux_setup_agent.sh --check --report ${url}`);
+  assert.equal(getReportUploadCommand('windows', url), `bash scripts/windows_setup_agent.sh --check --report ${url}`);
   assert.equal(getReportUploadCommand('macos', url), null);
 });
 
-test('accepts Linux reports for Kasm', () => {
-  assert.equal(parseSystemSetupReport(linuxReport, 'kasm').totalCount, 2);
+test('Kasm is no longer a setup choice', () => {
+  assert.equal(getSystemSetupConfig('kasm'), null);
+  assert.match(parseSystemSetupReport(linuxReport, 'kasm').error, /Choose Linux or Windows/);
 });
 
 test('accepts a Windows report only for the Windows selection', () => {
@@ -61,8 +62,8 @@ test('accepts a Windows report only for the Windows selection', () => {
 });
 
 test('provides the correct agent command for each supported system', () => {
-  assert.match(getSystemSetupConfig('linux').command, /linux_setup_agent\.py --check$/);
-  assert.match(getSystemSetupConfig('windows').command, /windows_setup_agent\.py --check/);
+  assert.match(getSystemSetupConfig('linux').command, /linux_setup_agent\.sh --check$/);
+  assert.match(getSystemSetupConfig('windows').command, /windows_setup_agent\.sh --check/);
   assert.match(getSystemSetupConfig('windows').command, /clip\.exe$/);
   assert.equal(getSystemSetupConfig('macos'), null);
 });

@@ -8,8 +8,10 @@ permalink: /scraper/lesson-music/
 <p>
   <strong>Scraper</strong> ·
   <a href="{{ '/scraper/' | relative_url }}">Home</a> ·
+  <a href="{{ '/scraper/getting-started/' | relative_url }}">Getting Started</a> ·
   <a href="{{ '/scraper/lesson-music/' | relative_url }}">Lesson 1 — Music</a> ·
-  <a href="{{ '/scraper/lesson-vacation/' | relative_url }}">Lesson 2 — Vacation</a>
+  <a href="{{ '/scraper/lesson-vacation/' | relative_url }}">Lesson 2 — Vacation</a> ·
+  <a href="{{ '/scraper/my-scrapes/' | relative_url }}">My Scrapes</a>
 </p>
 
 ## Goal

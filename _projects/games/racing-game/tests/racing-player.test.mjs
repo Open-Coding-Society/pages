@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import RacingPlayer from '../levels/RacingPlayer.js';
 import AccelDecelRacingPlayer from '../levels/AccelDecelRacingPlayer.js';
+import GameLevelWinter from '../levels/winter-level.js';
+import { getRandomTrackPoint } from '../levels/WinterIcicle.js';
 import {
   createKeyboardPlayer,
   pressKey,
@@ -24,6 +26,10 @@ function accelerationFixture() {
     acceleration: 0.4,
     deceleration: 0.4,
     reverseSpeed: -4,
+    temporarySpeedMultiplier: 1,
+    slowdownUntil: 0,
+    boostUntil: 0,
+    boostCooldownUntil: 0,
     scale: { width: 100, height: 100 },
     stepFactor: 100,
   });
@@ -151,4 +157,290 @@ test('movement continues if a collision clears the engine key state', () => {
   assert.deepEqual(player.pressedKeys, {});
   assert.equal(player.currentSpeed, 0.4);
   assert.ok(player.velocity.y < 0);
+});
+
+test('winter cars use acceleration, reverse-speed, and individual boost keys', () => {
+  const winterLevel = new GameLevelWinter({ path: '' });
+  const winterCars = winterLevel.classes.slice(1, 3);
+
+  assert.equal(winterLevel.iciclePath, '/images/projects/racing-game/Icicle.png');
+  assert.equal(winterCars.length, 2);
+  for (const [index, car] of winterCars.entries()) {
+    assert.equal(car.class, AccelDecelRacingPlayer);
+    assert.equal(car.data.SCALE_FACTOR, 20);
+    assert.equal(car.data.direction.default, 'right');
+    assert.equal(car.data.INIT_POSITION.x, 0.44, 'both cars should stage just before the start line');
+    assert.equal(car.data.INIT_POSITION.y, [0.775, 0.805][index], 'cars should stage in separate lanes');
+    assert.equal(car.data.currentSpeed, 0);
+    assert.equal(car.data.maxSpeed, 12);
+    assert.equal(car.data.acceleration, 0.4);
+    assert.equal(car.data.deceleration, 0.4);
+    assert.equal(car.data.reverseSpeed, -4);
+    assert.equal(car.data.STEP_FACTOR, 1100);
+    assert.equal(car.data.boostKey, [70, 75][index]);
+  }
+});
+
+test('winter countdown starts both cars together and removes its overlay after GO', () => {
+  const container = {
+    children: [],
+    appendChild(element) {
+      element.parentNode = this;
+      this.children.push(element);
+    },
+    removeChild(element) {
+      this.children = this.children.filter((child) => child !== element);
+    },
+  };
+  const originalDocument = globalThis.document;
+  const documentListeners = new Map();
+  globalThis.document = {
+    createElement() {
+      return {
+        style: {},
+        children: [],
+        setAttribute(name, value) {
+          this[name] = value;
+        },
+        append(...elements) {
+          this.children.push(...elements);
+        },
+        replaceChildren(...elements) {
+          this.children = elements;
+        },
+        remove() {
+          this.parentNode?.removeChild(this);
+        },
+      };
+    },
+    addEventListener(type, listener) {
+      documentListeners.set(type, listener);
+    },
+    removeEventListener(type, listener) {
+      if (documentListeners.get(type) === listener) documentListeners.delete(type);
+    },
+  };
+
+  try {
+    const gameEnv = { path: '', container, gameObjects: [] };
+    const winterLevel = new GameLevelWinter(gameEnv);
+    const overlay = winterLevel.countdownOverlay;
+
+    assert.equal(overlay.children[0].textContent, 'Do You Wish To Start?');
+    assert.equal(overlay.children[1].textContent, 'Press Space To Start Race');
+    assert.equal(overlay.style.background, '#000');
+    assert.equal(overlay.children[0].style.textAlign, 'center');
+    assert.equal(overlay.children[1].style.textAlign, 'center');
+    assert.equal(overlay.children[0].style.font, 'bold clamp(28px, 5vw, 56px) Arial, sans-serif');
+    assert.equal(overlay.children[1].style.font, 'bold clamp(14px, 2.5vw, 28px) Arial, sans-serif');
+    assert.equal(overlay.style.color, 'lightblue');
+    assert.equal(gameEnv.winterRaceStarted, false);
+    winterLevel.update(Date.now() + 5000);
+    assert.equal(winterLevel.countdownStartedAt, null);
+
+    let prevented = false;
+    documentListeners.get('keydown')({
+      code: 'Space',
+      preventDefault() {
+        prevented = true;
+      },
+    });
+    const start = winterLevel.countdownStartedAt;
+    assert.equal(prevented, true);
+    assert.ok(start !== null);
+    assert.equal(overlay.style.background, 'rgba(0, 0, 0, 0.55)');
+    assert.equal(overlay.style.color, '#000');
+    assert.equal(overlay.textContent, '3');
+
+    winterLevel.update(start + 1000);
+    assert.equal(overlay.textContent, '2');
+    winterLevel.update(start + 2000);
+    assert.equal(overlay.textContent, '1');
+    winterLevel.update(start + 2999);
+    assert.equal(gameEnv.winterRaceStarted, false);
+    winterLevel.update(start + 3000);
+    assert.equal(overlay.textContent, 'GO!!');
+    assert.equal(gameEnv.winterRaceStarted, true);
+    winterLevel.update(start + 4000);
+    assert.equal(container.children.includes(overlay), false);
+
+    winterLevel.destroy();
+  } finally {
+    if (originalDocument === undefined) delete globalThis.document;
+    else globalThis.document = originalDocument;
+  }
+});
+
+test('winter cars ignore movement and boost input until GO', () => {
+  const player = accelerationFixture();
+  player.gameEnv.winterRaceStarted = false;
+  player.boostKey = 70;
+
+  pressKey(player, wasd.up);
+  pressKey(player, 70);
+  player.update();
+
+  assert.equal(player.currentSpeed, 0);
+  assert.equal(player.boostUntil, 0);
+  assert.deepEqual(player.velocity, { x: 0, y: 0 });
+
+  player.gameEnv.winterRaceStarted = true;
+  pressKey(player, wasd.up);
+  player.update();
+  assert.equal(player.currentSpeed, 0.4);
+});
+
+test('winter level shows and removes the boost instructions', () => {
+  const originalDocument = globalThis.document;
+  const container = {
+    children: [],
+    appendChild(element) {
+      element.parentNode = this;
+      this.children.push(element);
+    },
+    removeChild(element) {
+      this.children = this.children.filter((child) => child !== element);
+    },
+  };
+  globalThis.document = {
+    createElement() {
+      return {
+        style: {},
+        children: [],
+        setAttribute(name, value) {
+          this[name] = value;
+        },
+        append(...elements) {
+          this.children.push(...elements);
+        },
+        remove() {
+          this.parentNode?.removeChild(this);
+        },
+      };
+    },
+    addEventListener() {},
+    removeEventListener() {},
+  };
+
+  try {
+    const winterLevel = new GameLevelWinter({ path: '', container });
+    const [redInstruction, blueInstruction] = winterLevel.boostInstructions.children;
+
+    assert.equal(redInstruction.textContent, 'Press F for Red Car Boost.');
+    assert.equal(blueInstruction.textContent, 'Press K for Blue Car Boost.');
+    assert.equal(container.children.includes(winterLevel.boostInstructions), true);
+
+    winterLevel.destroy();
+    assert.equal(container.children.length, 0);
+  } finally {
+    if (originalDocument === undefined) delete globalThis.document;
+    else globalThis.document = originalDocument;
+  }
+});
+
+test('a single boost press doubles forward movement for one second after release', () => {
+  const player = accelerationFixture();
+  player.boostKey = 70;
+  player.currentSpeed = 6;
+  player.keysPressed[wasd.up] = true;
+  player.updateMovementSpeed(1000);
+  const normalForwardVelocity = Math.abs(player.velocity.y);
+  player.startBoost(1000);
+  releaseKey(player, 70);
+  player.updateMovementSpeed(1000);
+
+  assert.equal(Math.abs(player.velocity.y), normalForwardVelocity * 2);
+
+  player.updateMovementSpeed(1999);
+  assert.equal(Math.abs(player.velocity.y), normalForwardVelocity * 2);
+
+  player.updateMovementSpeed(2000);
+  assert.equal(Math.abs(player.velocity.y), normalForwardVelocity);
+});
+
+test('pressing the assigned boost key starts the boost timer', () => {
+  const player = accelerationFixture();
+  player.boostKey = 70;
+  player.currentSpeed = 6;
+  player.keysPressed[wasd.up] = true;
+  player.updateMovementSpeed();
+  const normalForwardVelocity = Math.abs(player.velocity.y);
+  pressKey(player, 70);
+
+  assert.ok(player.boostUntil > Date.now());
+  assert.equal(Math.abs(player.velocity.y), normalForwardVelocity * 2);
+});
+
+test('boost cannot be activated again until its three-second cooldown expires', () => {
+  const player = accelerationFixture();
+
+  assert.equal(player.startBoost(1000), true);
+  assert.equal(player.startBoost(3999), false);
+  assert.equal(player.startBoost(4000), true);
+  assert.equal(player.boostUntil, 5000);
+  assert.equal(player.boostCooldownUntil, 7000);
+});
+
+test('boosted movement checks spline barriers between short movement steps', () => {
+  const player = accelerationFixture();
+  const checkedPositions = [];
+  player.width = 20;
+  player.height = 20;
+  player.gameEnv.innerWidth = 1000;
+  player.gameEnv.innerHeight = 1000;
+  player.position = { x: 100, y: 100 };
+  player.velocity = { x: 10, y: 0 };
+  player.currentSpeed = 6;
+  player.boostUntil = 2000;
+  delete player.move;
+  player.gameEnv.gameObjects = [{
+    resolvePlayerCollision() {
+      checkedPositions.push(player.position.x);
+    },
+  }];
+
+  player.move(1000);
+
+  assert.ok(checkedPositions.length > 1);
+  assert.equal(player.position.x, 110);
+  assert.equal(player.velocity.x, 10);
+});
+
+test('icicle hit halves movement speed for two seconds, then restores it', () => {
+  const player = accelerationFixture();
+  player.currentSpeed = 6;
+
+  player.applyIcicleSlowdown(1000);
+  player.updateMovementSpeed(1000);
+  assert.equal(player.xVelocity, 0.75);
+  assert.equal(player.yVelocity, 0.75);
+
+  player.updateMovementSpeed(2999);
+  assert.equal(player.xVelocity, 0.75);
+
+  player.updateMovementSpeed(3000);
+  assert.equal(player.xVelocity, 1.5);
+  assert.equal(player.yVelocity, 1.5);
+});
+
+test('colliding with a winter icicle applies the slowdown and consumes the icicle', () => {
+  const player = accelerationFixture();
+  let consumed = false;
+  player.gameEnv.gameObjects = [{
+    spriteData: { id: 'winter-icicle-1' },
+    consume() {
+      consumed = true;
+    },
+  }];
+
+  player.handleCollisionReaction({ id: 'winter-icicle-1' });
+
+  assert.equal(player.temporarySpeedMultiplier, 0.5);
+  assert.equal(consumed, true);
+});
+
+test('random icicle track points remain within the game area', () => {
+  const point = getRandomTrackPoint(() => 0.5);
+  assert.ok(point.x >= 0 && point.x <= 1);
+  assert.ok(point.y >= 0 && point.y <= 1);
 });

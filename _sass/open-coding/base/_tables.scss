@@ -1,0 +1,26 @@
+/**
+ * Base table formatting
+ * Override default table colors with user preferences
+ */
+
+/**
+ * Markdown tables - override the hardcoded dark header, stripes and borders
+ * from minima's dark skin. theme/user-preferences.scss already sets td/th text
+ * to the user's color, so on a light theme the dark rows hid that text.
+ */
+table {
+  border-color: var(--ui-border);
+
+  tr:nth-child(even) {
+    background-color: var(--bg-2);
+  }
+
+  th {
+    background-color: var(--panel);
+  }
+
+  th,
+  td {
+    border-color: var(--ui-border);
+  }
+}

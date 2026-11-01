@@ -104,8 +104,9 @@ export async function startMessagesPage({ config, richText }) {
     byId('messagesLeaveGroup').classList.toggle('hidden', isClassGroup(group));
   }
 
-  // Clears the badge straight away, then tells Spring. The count is a notification, so
-  // a failed write is not worth interrupting the person for -- the next load corrects it.
+  // Clears the badge straight away, then tells Spring, then the navbar bell. The count is
+  // a notification, so a failed write is not worth interrupting the person for -- the
+  // next load corrects it.
   async function markGroupRead(group) {
     if (!group) return;
     if (group.unreadCount) {
@@ -114,6 +115,7 @@ export async function startMessagesPage({ config, richText }) {
     }
     try {
       await api.markGroupRead(group.id);
+      window.dispatchEvent(new CustomEvent('dm:group-read', { detail: { groupId: group.id } }));
     } catch (error) {
       console.warn('Messages: could not mark the group read', error);
     }
@@ -177,11 +179,9 @@ export async function startMessagesPage({ config, richText }) {
   }
 
   // The page only follows the open conversation's socket topic, so a message posted in
-  // another group never reaches it. Re-counting when the tab comes back to the front
-  // keeps the badges honest without a polling loop running all day.
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') loadGroupUnread();
-  });
+  // another group never reaches it. The navbar bell re-counts groups when the tab comes
+  // back to the front and every couple of minutes, and its 'dm:unread' summary (below)
+  // carries the counts here, so the page doesn't ask Spring a second time.
 
   async function loadConversations() {
     try {
@@ -308,6 +308,13 @@ export async function startMessagesPage({ config, richText }) {
   // The navbar bell's summary keeps the unread counts current, and shows conversations
   // someone else started since the list loaded.
   window.addEventListener('dm:unread', ({ detail }) => {
+    // A group the bell counts but the list doesn't have is one the page leaves alone.
+    // The open group is marked read as messages arrive, so it never shows a count.
+    const groupCounts = detail.groups || {};
+    state.groups.forEach(group => {
+      const isOpen = state.active?.kind === 'group' && state.active.id === group.id;
+      group.unreadCount = isOpen ? 0 : Number(groupCounts[group.id] || 0);
+    });
     const counts = detail.conversations || {};
     const known = new Set(state.conversations.map(conversation => String(conversation.id)));
     if (Object.keys(counts).some(id => !known.has(id))) {

@@ -1,6 +1,6 @@
 /*
  * Shared rich-text layer for the course chat widgets
- * (announcement_chat.html, week_chat.html, lesson_chat.html).
+ * (announcement_chat.html, lesson_chat.html).
  *
  * Two things are exported:
  *

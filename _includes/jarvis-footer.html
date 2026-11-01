@@ -3,6 +3,12 @@
     <span class="ocs__team-label">Project Team</span>
     <span class="ocs__team-name">{{ data.Team | join: ", " }}</span>
   </div>
+  {% if data.Mentor %}
+  <div class="ocs__team">
+    <span class="ocs__team-label">Mentor</span>
+    <span class="ocs__team-name">{{ data.Mentor }}</span>
+  </div>
+  {% endif %}
   <span class="ocs__status">Prototype Stage</span>
   {% if data.Repo %}
   <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="ocs__btn accent fill">View Repo</a>

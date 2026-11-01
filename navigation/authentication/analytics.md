@@ -1,5 +1,5 @@
 ---
-layout: dashboard
+layout: dashboard-v2
 title: Dashboard
 permalink: /dashboard
 active_tab: dashboard
