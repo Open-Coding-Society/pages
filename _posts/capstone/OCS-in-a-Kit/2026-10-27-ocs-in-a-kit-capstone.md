@@ -20,6 +20,8 @@ year: "2026-2027"
     <a href="#problem" class="ocs__btn pill">The Problem</a>
     <a href="#who" class="ocs__btn pill">Who It's For</a>
     <a href="#features" class="ocs__btn pill">What You Get</a>
+    <a href="#compare" class="ocs__btn pill">Compare Kits</a>
+    <a href="#walkthrough" class="ocs__btn pill">Example</a>
     <a href="#future" class="ocs__btn pill">Future</a>
     <a href="#considerations" class="ocs__btn pill">Considerations</a>
     <a href="#how-its-built" class="ocs__btn pill">How It's Built</a>
@@ -58,6 +60,70 @@ year: "2026-2027"
     <div class="ocs__keypoint"><span class="ocs__check">✓</span><span><strong>Extras:</strong> finance simulation, resumes, face login, more</span></div>
   </div>
   <p>Admins can turn any feature on or off later. No reinstall needed.</p>
+</div>
+
+<div class="ocs__card" id="compare">
+  <h3 class="ocs__section-title">Compare the Kits</h3>
+  <p>Every feature in one table. "Add-on" means no kit includes it by default, but an admin can turn it on any time.</p>
+  <div class="ocs__table-wrap">
+    <table class="ocs__table">
+      <thead><tr><th>Feature</th><th>Vanilla</th><th>Education</th><th>Business</th></tr></thead>
+      <tbody>
+        <tr><td>Login, accounts, blog</td><td>✓</td><td>✓</td><td>✓</td></tr>
+        <tr><td>Lessons</td><td></td><td>✓</td><td></td></tr>
+        <tr><td>Code runner</td><td></td><td>✓</td><td></td></tr>
+        <tr><td>Assignments &amp; grading</td><td></td><td>✓</td><td></td></tr>
+        <tr><td>AI grading</td><td></td><td>✓</td><td></td></tr>
+        <tr><td>Hall pass</td><td></td><td>✓</td><td></td></tr>
+        <tr><td>Game engine</td><td></td><td>✓</td><td></td></tr>
+        <tr><td>AI chatbot</td><td></td><td>✓</td><td>✓</td></tr>
+        <tr><td>Chat &amp; posts</td><td></td><td>✓</td><td>✓</td></tr>
+        <tr><td>Calendar</td><td></td><td>✓</td><td>✓</td></tr>
+        <tr><td>Analytics</td><td></td><td>✓</td><td>✓</td></tr>
+        <tr><td>Resumes &amp; profiles</td><td></td><td>✓</td><td>✓</td></tr>
+        <tr><td>Finance simulation</td><td>Add-on</td><td>Add-on</td><td>Add-on</td></tr>
+        <tr><td>Kasm workspaces</td><td>Add-on</td><td>Add-on</td><td>Add-on</td></tr>
+        <tr><td>Face login</td><td>Add-on</td><td>Add-on</td><td>Add-on</td></tr>
+        <tr><td>Demo examples</td><td>Add-on</td><td>Add-on</td><td>Add-on</td></tr>
+        <tr><td><strong>Roles</strong></td><td>Admin, Editor, User</td><td>Admin, Teacher, Student</td><td>Admin, Manager, Member</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Only the Admin can turn features on or off. The other roles can use whatever is switched on.</p>
+</div>
+
+<div class="ocs__card" id="walkthrough">
+  <h3 class="ocs__section-title">Example: A Teacher Sets Up a Classroom</h3>
+  <p>A teacher at a school with no website wants a classroom platform for their CS students.</p>
+  <div class="ocs__diagram">
+    <pre class="mermaid">flowchart TD
+    A[Teacher runs the install script] --> B[A setup page opens in the browser]
+    B --> C[Picks the Education kit]
+    C --> D[Types school name,
+admin email, passwords]
+    D --> E[Optional: adds an AI key
+for the tutor and grading]
+    E --> F[Installer checks the computer
+and sets everything up]
+    F --> G[Done page shows the site address
+and the accounts]
+    G --> H[Teacher logs in as Admin]
+    H --> I[Students sign up as Students]
+    H --> J[Teacher turns features on or off
+from the dashboard]</pre>
+  </div>
+  <div class="ocs__table-wrap">
+    <table class="ocs__table">
+      <thead><tr><th>Step</th><th>What the teacher does</th><th>What happens for them</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Runs one script</td><td>A setup page opens in their browser and walks them through the rest</td></tr>
+        <tr><td>2</td><td>Answers a few questions</td><td>Kit, school name, passwords. Blank passwords are made for them</td></tr>
+        <tr><td>3</td><td>Waits a few minutes</td><td>The site and both backends are installed and started</td></tr>
+        <tr><td>4</td><td>Logs in</td><td>Lessons, code runner, grading, and hall pass are ready</td></tr>
+        <tr><td>5</td><td>Changes their mind later</td><td>Features switch on or off without reinstalling, and nothing is lost</td></tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <div class="ocs__card" id="future">
