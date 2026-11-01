@@ -73,6 +73,7 @@ export default class Player extends EnginePlayer {
     } else {
       this.speed = Math.min(this.speed + this.coasting, 0);
     }
+    this.turnRate = 0.1 / Math.abs(this.speed) || 0.1;
 
     const steering =
       (this.pressedKeys[right] ? 1 : 0) -
