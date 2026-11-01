@@ -86,6 +86,7 @@ class GameLevelTutorial {
     const lap_data = {
       totalLaps: 3,
       finishLine: { x: 0.5, top: 0.696, bottom: 0.878 },
+      checkpoint: { x: 0.5, top: 0.12, bottom: 0.3 },
       hudPosition: { x: 0.01, y: 0.02 }
     };
 

@@ -318,6 +318,7 @@ export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFram
   const car = {};
   const lapTracker = new LapTracker({
     finishLine: { x: 0.453, top: 0.794, bottom: 0.941 },
+    checkpoint: { x: 0.453, top: 0.19, bottom: 0.33 },
     totalLaps,
   });
   let heading = Math.PI / 2;

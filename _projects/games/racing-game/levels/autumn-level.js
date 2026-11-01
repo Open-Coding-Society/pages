@@ -105,6 +105,7 @@ class GameLevelAutumn {
     const lap_data = {
       totalLaps: 3,
       finishLine: { x: 0.453, top: 0.794, bottom: 0.941 },
+      checkpoint: { x: 0.453, top: 0.19, bottom: 0.33 },
       hudPosition: { x: 0.01, y: 0.02 }
     };
 

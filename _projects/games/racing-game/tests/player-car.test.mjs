@@ -50,6 +50,22 @@ test('the car continues coasting after the up key is released until speed reache
   assert.equal(player.moved, false);
 });
 
+test('slow-speed steering is faster but capped to prevent abrupt full rotations', () => {
+  const slowCar = fixture();
+  slowCar.speed = 0.2;
+  slowCar.pressedKeys[68] = true;
+  slowCar.update();
+
+  const fastCar = fixture();
+  fastCar.speed = 5.2;
+  fastCar.pressedKeys[68] = true;
+  fastCar.update();
+
+  assert.equal(slowCar.heading, 0.1);
+  assert.ok(fastCar.heading > 0);
+  assert.ok(fastCar.heading < slowCar.heading);
+});
+
 test('the sprite renders its upward-facing frame rotated by the car heading', () => {
   const player = fixture();
   const calls = [];
