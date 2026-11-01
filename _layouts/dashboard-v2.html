@@ -7,11 +7,29 @@ active_tab: dashboard
 <!-- Preline and ApexCharts CSS are loaded in <head> via aesthetihawk.html for dashboard pages, but unused on this page -->
 <div class="ocs__dashboard-page">
     <div class="ocs__stack ocs__stack--wide">
+        <div class="ocs__tabs ocs__tabs--cards">
+            <ul class="ocs__tabs-list" id="tab-bar">
+                <li>
+                    <a href="#" id="tab-appearance" class="tab-btn active ocs__tabs-btn">Appearance</a>
+                </li>
+                <li>
+                    <a href="#" id="tab-voice" class="tab-btn ocs__tabs-btn">Language &amp; voice</a>
+                </li>
+                <li>
+                    <a href="#" id="tab-tracking" class="tab-btn ocs__tabs-btn">Head tracking</a>
+                </li>
+            </ul>
+            <!-- sliding underline indicator -->
+            <div id="tab-underline" class="ocs__tabs-underline"
+                style="position:absolute;bottom:0;left:0;height:2px;width:0;transition:all 0.3s cubic-bezier(.4,0,.2,1);">
+            </div>
+        </div>
+
         <!-- tab content container -->
         <div id="tab-content-container" class="ocs__tabs-panels">
             <!-- Admin Evaluation UI (hidden by default, shown only for admins) -->
             <div id="admin-only" style="display:none;">
-                <div id="tab-content-admin-evaluation" class="tab-content block ocs__tabs-panel ocs__dashboard-tab-content">
+                <div id="admin-evaluation" class="ocs__tabs-panel ocs__dashboard-tab-content">
                     <h2 class="ocs__section-title">Admin: Search &amp; Evaluate Users</h2>
                 <div id="admin-people-list" class="ocs__dashboard-people-grid">
                     <p class="ocs__text ocs__dashboard-span-full" id="admin-people-loading">Loading users...</p>
@@ -38,66 +56,56 @@ active_tab: dashboard
             </div>
 
             <!-- Preferences tab content -->
-            <div id="tab-content-preferences" class="tab-content block ocs__tabs-panel ocs__dashboard-tab-content ocs__prefs">
-                <h2 class="ocs__section-title ocs__dashboard-page-title">Preferences</h2>
-                <p class="ocs__text ocs__dashboard-page-subtitle">How the site looks and sounds for you.</p>
-
-                <!-- Sections: assets/js/pages/dashboard/preferences-layout.js switches them -->
-                <div class="ocs__prefs-sections" role="tablist" aria-label="Preferences sections">
-                    <button type="button" role="tab" class="ocs__prefs-section-btn" data-section="appearance" aria-selected="true">Appearance</button>
-                    <button type="button" role="tab" class="ocs__prefs-section-btn" data-section="voice" aria-selected="false">Language &amp; voice</button>
-                    <button type="button" role="tab" class="ocs__prefs-section-btn" data-section="tracking" aria-selected="false">Head tracking</button>
-                </div>
+            <!-- Preferences: one panel per tab above -->
+            <div id="tab-content-preferences" class="ocs__prefs">
 
                 <!-- ===== Appearance ===== -->
-                <div class="ocs__prefs-pane" data-section-pane="appearance">
+                <div id="tab-content-appearance" class="tab-content block ocs__tabs-panel ocs__dashboard-tab-content">
                     <div class="ocs__prefs-layout">
                         <div class="ocs__prefs-main">
 
                             <!-- Step 1: pick a starting point -->
-                            <section class="ocs__dashboard-card ocs__prefs-card">
+                            <section class="ocs__card ocs__prefs-card">
                                 <div class="ocs__prefs-step">
                                     <span class="ocs__prefs-step-num" aria-hidden="true">1</span>
                                     <h3 class="ocs__dashboard-card-title">Pick a starting point</h3>
                                 </div>
 
-                                <div class="ocs__prefs-segmented" role="tablist" aria-label="Theme source">
-                                    <button type="button" role="tab" class="ocs__prefs-segment" data-source="presets" aria-selected="true">Presets</button>
-                                    <button type="button" role="tab" class="ocs__prefs-segment" data-source="mine" aria-selected="false">My themes</button>
-                                    <button type="button" role="tab" class="ocs__prefs-segment" data-source="ai" aria-selected="false">Create with AI</button>
+                                <div class="ocs__tabs">
+                                    <div class="ocs__tabs-list" role="tablist" aria-label="Theme source">
+                                        <button type="button" role="tab" class="ocs__tabs-btn ocs__prefs-segment" data-source="presets" aria-selected="true">Presets</button>
+                                        <button type="button" role="tab" class="ocs__tabs-btn ocs__prefs-segment" data-source="mine" aria-selected="false">My themes</button>
+                                        <button type="button" role="tab" class="ocs__tabs-btn ocs__prefs-segment" data-source="ai" aria-selected="false">Create with AI <span class="ocs__status-pill ocs__prefs-new-badge">New</span></button>
+                                    </div>
                                 </div>
 
                                 <div data-source-pane="presets">
                                     <!-- data-mode="fill": clicking a preset fills step 2 instead of saving -->
-                                    <div class="ocs__prefs-swatches" id="preset-themes" data-mode="fill"></div>
+                                    <div class="ocs__grid ocs__grid--standard cols-4" id="preset-themes" data-mode="fill"></div>
                                 </div>
 
                                 <div data-source-pane="mine" hidden>
                                     <div id="custom-themes" class="ocs__dashboard-column" data-mode="fill"></div>
                                     <div class="ocs__prefs-save-theme">
                                         <div class="ocs__prefs-grow">
-                                            <label for="new-theme-name" class="ocs__label">Save the current look as</label>
-                                            <input id="new-theme-name" class="ocs__input ocs__dashboard-full-width" placeholder="Theme name" maxlength="30" />
+                                            <input id="new-theme-name" class="ocs__input ocs__dashboard-full-width" placeholder="Theme name" aria-label="Theme name" maxlength="30" />
                                         </div>
                                         <button id="save-theme-btn" type="button" class="ocs__btn small">Add to my themes</button>
                                     </div>
-                                    <p class="ocs__text ocs__dashboard-fineprint">Up to 10 themes, saved to your account.</p>
                                 </div>
 
                                 <!-- AI Theme: assets/js/pages/dashboard/ai-theme.js -->
                                 <div data-source-pane="ai" id="ai-theme-panel" hidden>
                                     <form id="ai-theme-form" novalidate>
-                                        <label for="ai-theme-prompt" class="ocs__label">Describe a look</label>
-                                        <textarea id="ai-theme-prompt" maxlength="200" rows="2" class="ocs__input ocs__dashboard-full-width ocs__dashboard-textarea"
-                                            placeholder="Star Wars, Italian dinner, cozy rainy library…"></textarea>
-                                        <div id="ai-theme-chips" class="ocs__links ocs__dashboard-card-spaced-sm" role="group" aria-label="Suggestions"></div>
+                                        <div id="ai-theme-chips" class="ocs__links" role="group" aria-label="Suggestions"></div>
+                                        <textarea id="ai-theme-prompt" maxlength="200" rows="2" class="ocs__input ocs__dashboard-full-width ocs__dashboard-textarea ocs__dashboard-card-spaced-sm"
+                                            placeholder="Describe a look" aria-label="Describe a look"></textarea>
                                         <div class="ocs__links ocs__dashboard-card-spaced-sm">
                                             <button type="submit" id="ai-theme-generate" class="ocs__btn accent fill small">Generate</button>
                                             <label class="ocs__text ocs__dashboard-fineprint"><input type="checkbox" id="ai-theme-wallpaper" checked> Emoji wallpaper</label>
                                             <span id="ai-theme-status" class="ocs__text ocs__dashboard-fineprint" role="status" aria-live="polite"></span>
                                         </div>
                                     </form>
-                                    <p class="ocs__text ocs__dashboard-fineprint ocs__dashboard-card-spaced-sm" id="ai-theme-key"></p>
 
                                     <div id="ai-theme-result" class="ocs__dashboard-card-spaced-sm" hidden>
                                         <!-- Drawn in the theme's own colors and font by ai-theme.js -->
@@ -113,7 +121,6 @@ active_tab: dashboard
                                                 <span id="ai-theme-badge"></span>
                                             </div>
                                         </div>
-                                        <p class="ocs__text ocs__dashboard-fineprint ocs__dashboard-card-spaced-sm">Its colors and font are now in step 2 and the preview. Press Save to use it.</p>
                                         <div class="ocs__links ocs__dashboard-card-spaced-sm">
                                             <button type="button" id="ai-theme-regenerate" class="ocs__btn small">Regenerate</button>
                                             <button type="button" id="ai-theme-try" class="ocs__btn small">Try it on the whole page</button>
@@ -126,11 +133,10 @@ active_tab: dashboard
                             </section>
 
                             <!-- Step 2: fine-tune -->
-                            <section class="ocs__dashboard-card ocs__prefs-card">
+                            <section class="ocs__card ocs__prefs-card">
                                 <div class="ocs__prefs-step">
                                     <span class="ocs__prefs-step-num" aria-hidden="true">2</span>
                                     <h3 class="ocs__dashboard-card-title">Fine-tune</h3>
-                                    <span class="ocs__text ocs__dashboard-fineprint ocs__prefs-step-meta">Starting from: <span id="prefs-starting-from">your saved look</span></span>
                                 </div>
 
                                 <p class="ocs__prefs-group-title">Colors</p>
@@ -174,7 +180,8 @@ active_tab: dashboard
                                     <div>
                                         <label for="pref-button-style" class="ocs__label">Button style</label>
                                         <select id="pref-button-style" class="ocs__input ocs__dashboard-full-width">
-                                            <option value="rounded">Rounded (Default)</option>
+                                            <option value="default">Default</option>
+                                            <option value="rounded-all">Rounded</option>
                                             <option value="square">Square</option>
                                             <option value="pill">Pill</option>
                                         </select>
@@ -184,7 +191,7 @@ active_tab: dashboard
                         </div>
 
                         <!-- Live preview + the one Save -->
-                        <aside class="ocs__dashboard-card ocs__prefs-card ocs__prefs-aside" aria-label="Live preview">
+                        <aside class="ocs__card ocs__prefs-card ocs__prefs-aside" aria-label="Live preview">
                             <h3 class="ocs__dashboard-card-title">Live preview</h3>
                             <div id="prefs-preview" class="ocs__prefs-preview">
                                 <div class="ocs__prefs-preview-bar"></div>
@@ -206,19 +213,17 @@ active_tab: dashboard
                                 <button id="restore-styles" type="button" class="ocs__btn medium">Reset</button>
                             </div>
                             <p id="preferences-status" class="ocs__text ocs__dashboard-fineprint" role="status" aria-live="polite"></p>
-                            <p class="ocs__text ocs__dashboard-fineprint">Nothing changes on the site until you press Save. Saved to your account, so it follows you to any computer.</p>
                         </aside>
                     </div>
                 </div>
 
                 <!-- ===== Language & voice ===== -->
-                <div class="ocs__prefs-pane" data-section-pane="voice" hidden>
+                <div id="tab-content-voice" class="tab-content hidden ocs__tabs-panel ocs__dashboard-tab-content">
                     <!-- Language/Translation Section -->
-                    <div class="ocs__dashboard-card">
+                    <div class="ocs__card">
                         <div class="ocs__card-header">
                             <h3 class="ocs__dashboard-card-title">🌐 Language Translation</h3>
                         </div>
-                        <p class="ocs__text ocs__dashboard-card-desc">Translate.</p>
                         <div class="ocs__dashboard-column">
                             <div>
                                 <label class="ocs__label">Site Language</label>
@@ -250,14 +255,13 @@ active_tab: dashboard
                         </div>
                     </div>
                     <!-- Text-to-Speech Section -->
-                    <div class="ocs__dashboard-card ocs__dashboard-card-spaced">
+                    <div class="ocs__card">
                         <div class="ocs__card-header">
                             <h3 class="ocs__dashboard-card-title">Text-to-Speech</h3>
                             <div class="ocs__links">
                                 <button type="button" id="tts-test-btn" class="ocs__btn accent small">Test Voice</button>
                             </div>
                         </div>
-                        <p class="ocs__text ocs__dashboard-card-desc"> </p>
                         <div class="ocs__grid--col2">
                             <div>
                                 <label class="ocs__label">Voice</label>
@@ -284,16 +288,15 @@ active_tab: dashboard
                         </div>
                         <p class="ocs__text ocs__dashboard-fineprint ocs__dashboard-card-spaced-sm">Uses your browser's built-in speech synthesis. Available voices depend on your operating system.</p>
                     </div>
-                    <div class="ocs__dashboard-card ocs__dashboard-card-spaced ocs__prefs-actions">
+                    <div class="ocs__card ocs__prefs-actions">
                         <button type="button" data-save-all class="ocs__btn accent fill medium">Save</button>
-                        <p class="ocs__text ocs__dashboard-fineprint">Saves your language and voice along with your look.</p>
                     </div>
                 </div>
 
                 <!-- ===== Head tracking ===== -->
-                <div class="ocs__prefs-pane" data-section-pane="tracking" hidden>
+                <div id="tab-content-tracking" class="tab-content hidden ocs__tabs-panel ocs__dashboard-tab-content">
                     <!-- Head Tracking Cursor Section -->
-                    <div class="ocs__dashboard-card ocs__dashboard-card-spaced">
+                    <div class="ocs__card">
                         <div class="ocs__card-header">
                             <h3 class="ocs__dashboard-card-title">Head Tracking Cursor</h3>
                             <label class="ocs__dashboard-toggle-label">
@@ -344,7 +347,7 @@ active_tab: dashboard
 
                 // Initialize the preferences module with API configuration
                 initializePreferences(javaURI, fetchOptions);
-                initAiTheme({ javaURI, fetchOptions, profileURL: '{{ site.baseurl }}/profile#ai-connections' });
+                initAiTheme({ javaURI, fetchOptions });
                 initPreferencesLayout();
                 </script>
 
@@ -374,7 +377,36 @@ active_tab: dashboard
     import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
     // Initialize dashboard on DOM ready
+    // Tab switcher with the sliding underline: tab-X shows #tab-content-X
+    const tabs = document.querySelectorAll(".tab-btn");
+    const tabContents = document.querySelectorAll(".tab-content");
+    const underline = document.getElementById("tab-underline");
+
+    function setUnderline(el) {
+        const rect = el.getBoundingClientRect();
+        const parentRect = el.parentElement.parentElement.getBoundingClientRect();
+        underline.style.width = `${rect.width}px`;
+        underline.style.left = `${rect.left - parentRect.left}px`;
+    }
+
+    tabs.forEach((tab) => {
+        tab.addEventListener("click", (e) => {
+            e.preventDefault();
+            tabs.forEach(t => t.classList.remove("active", "text-blue-500", "border-blue-500"));
+            tabContents.forEach(c => {
+                c.classList.add("hidden");
+                c.classList.remove("block");
+            });
+            const target = document.getElementById(`tab-content-${tab.id.replace("tab-", "")}`);
+            target.classList.remove("hidden");
+            target.classList.add("block");
+            tab.classList.add("active", "text-blue-500", "border-blue-500");
+            setUnderline(tab);
+        });
+    });
+
     document.addEventListener('DOMContentLoaded', async () => {
+        setUnderline(document.querySelector(".tab-btn.active"));
         // Check admin status and gate UI
         try {
             const userRes = await fetch(`${javaURI}/api/user/info`, fetchOptions);

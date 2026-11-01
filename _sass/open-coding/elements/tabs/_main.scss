@@ -46,6 +46,28 @@
   }
 }
 
+// Card tabs: taller, spaced tabs.
+// Add to .ocs__tabs. The card colors come from the sitewide .tab-btn rule.
+.ocs__tabs--cards {
+  .ocs__tabs-list {
+    gap: 0.5rem;
+    margin-bottom: -1px;
+  }
+
+  .ocs__tabs-btn {
+    padding: 1rem;
+    border-radius: 0.5rem 0.5rem 0 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+  }
+
+  .ocs__tabs-underline {
+    background: #2563eb;
+    border-radius: 2px;
+  }
+}
+
 // Sliding active-tab indicator; a consuming page positions it with its own
 // inline style/JS, this only supplies the color.
 .ocs__tabs-underline {

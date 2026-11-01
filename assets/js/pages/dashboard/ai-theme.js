@@ -7,7 +7,8 @@ import { PreferencesConfig, PreferencesStore, ThemeRenderer } from './preference
 
 const site = () => window.SitePreferences;
 const HOLIDAYS = { Halloween: 'halloween', Thanksgiving: 'thanksgiving', Christmas: 'christmas', "Valentine's": 'valentines' };
-const SUGGESTIONS = [...Object.keys(HOLIDAYS), 'ocean at night', 'retro arcade', 'cozy rainy library'];
+// One idea per kind: a holiday, a place, a game, a movie.
+const SUGGESTIONS = ['Halloween', 'cozy rainy library', 'retro arcade', 'space movie'];
 const NAME_MAX = 30;
 
 /** The holiday key for an unedited holiday suggestion ("halloween", " Halloween "), else undefined */
@@ -30,13 +31,15 @@ export function contrast(a, b) {
     return (hi + 0.05) / (lo + 0.05);
 }
 
-/** An AI answer ({background, text, ...}) as site prefs, keeping the student's size, language and voice.
- *  wallpaper false keeps the colors and font but leaves out the emoji (decor [] means "no wallpaper"). */
-function toPrefs(theme, wallpaper = true) {
+/** An AI answer ({background, text, ...}) as site prefs, keeping the student's language and voice.
+ *  wallpaper false keeps the colors and font but leaves out the emoji (decor [] means "no wallpaper").
+ *  restyle true also takes the theme's text size and button style. */
+function toPrefs(theme, wallpaper = true, restyle = false) {
     return {
         ...(PreferencesStore.cachedPrefs || PreferencesConfig.SITE_DEFAULT),
         bg: theme.background, text: theme.text, accent: theme.accent,
         selectionColor: theme.selection, font: theme.font, decor: wallpaper ? theme.decor : [],
+        ...(restyle ? { size: theme.size, buttonStyle: theme.buttonStyle } : {}),
     };
 }
 
@@ -53,7 +56,7 @@ function holidayTheme(key) {
 /** Set a style that wins over the theme's !important overrides */
 const paint = (el, prop, value) => el.style.setProperty(prop, value, 'important');
 
-export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
+export function initAiTheme({ javaURI, fetchOptions }) {
     const $ = id => document.getElementById(id);
     const form = $('ai-theme-form');
     if (!form || !site()) return;
@@ -62,7 +65,9 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
     let theme = null, lastPrompt = '', previewBar = null;
     const wallpaperBox = $('ai-theme-wallpaper');
     const wallpaper = () => !wallpaperBox || wallpaperBox.checked;
-    const prefsFor = t => toPrefs(t, wallpaper());
+    // The built-in holiday palettes have no size or button style to apply.
+    const restyle = t => Boolean(t.buttonStyle);
+    const prefsFor = t => toPrefs(t, wallpaper(), restyle(t));
 
     const status = (msg, isError = false) => {
         statusEl.textContent = msg;
@@ -73,7 +78,7 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
     $('ai-theme-chips').replaceChildren(...SUGGESTIONS.map(text => {
         const chip = document.createElement('button');
         chip.type = 'button';
-        chip.className = form.closest('.ocs__prefs') ? 'ocs__btn small' : 'px-3 py-1 rounded-full bg-neutral-700 hover:bg-neutral-600 text-white text-sm';
+        chip.className = 'ocs__btn small ocs__prefs-suggestion';
         chip.textContent = text;
         chip.addEventListener('click', () => { promptEl.value = text; promptEl.focus(); });
         return chip;
@@ -95,7 +100,7 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
         $('ai-theme-emoji').hidden = !wallpaper();
         $('ai-theme-swatches').replaceChildren(...['background', 'text', 'accent', 'selection'].map(key => {
             const swatch = document.createElement('span');
-            swatch.className = 'inline-block w-6 h-6 rounded border';
+            swatch.className = 'ocs__prefs-ai-swatch';
             swatch.title = `${key} ${theme[key]}`;
             paint(swatch, 'background-color', theme[key]);
             return swatch;
@@ -103,7 +108,7 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
         paint(card, 'background-color', theme.background);
         paint(card, 'border-color', theme.accent);
         paint(card, 'font-family', theme.font);
-        card.querySelectorAll('h4, p, span:not(.inline-block)').forEach(el => {
+        card.querySelectorAll('h4, p, span:not(.ocs__prefs-ai-swatch)').forEach(el => {
             paint(el, 'color', theme.text);
             paint(el, 'font-family', theme.font);
         });
@@ -115,7 +120,7 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
         nameInput.value = capName(theme.name);
         result.hidden = false;
         // Dashboard v2 (preferences-layout.js) also puts the theme into the form and live preview.
-        document.dispatchEvent(new CustomEvent('ai-theme:shown', { detail: { name: theme.name, prefs: prefsFor(theme) } }));
+        document.dispatchEvent(new CustomEvent('ai-theme:shown', { detail: { name: theme.name, prefs: prefsFor(theme), restyle: restyle(theme) } }));
     }
 
     async function generate(prompt) {
@@ -170,13 +175,12 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
         previewBar = document.createElement('div');
         previewBar.setAttribute('role', 'region');
         previewBar.setAttribute('aria-label', 'Theme preview');
-        previewBar.className = 'fixed left-0 right-0 bottom-0 z-50 p-3 flex flex-wrap gap-2 items-center justify-center bg-neutral-800 border-t border-neutral-700';
-        previewBar.style.paddingBottom = 'calc(0.75rem + env(safe-area-inset-bottom, 0px))';
+        previewBar.className = 'ocs__prefs-ai-bar';
         const label = document.createElement('span');
         label.textContent = `Previewing ${theme.name}. Nothing is saved yet.`;
         const keep = document.createElement('button');
         keep.type = 'button';
-        keep.className = 'px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white';
+        keep.className = 'ocs__btn small accent fill';
         keep.textContent = 'Keep';
         keep.addEventListener('click', async () => {
             const prefs = { ...prefsFor(theme), customThemes: PreferencesStore.getThemes() };
@@ -188,7 +192,7 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
         });
         const undo = document.createElement('button');
         undo.type = 'button';
-        undo.className = 'px-3 py-1 rounded bg-neutral-700 hover:bg-neutral-600 text-white';
+        undo.className = 'ocs__btn small';
         undo.textContent = 'Undo';
         undo.addEventListener('click', () => { endPreview(true); status('Preview undone.'); });
         previewBar.append(label, keep, undo);
@@ -204,8 +208,8 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
             status(`You can keep ${PreferencesConfig.MAX_CUSTOM} custom themes. Delete one first.`, true);
             return;
         }
-        const { bg, text, accent, selectionColor, font, size, decor } = prefsFor(theme);
-        themes[name] = { bg, text, accent, selectionColor, font, size, decor, source: 'ai' };
+        const { bg, text, accent, selectionColor, font, size, buttonStyle, decor } = prefsFor(theme);
+        themes[name] = { bg, text, accent, selectionColor, font, size, buttonStyle, decor, source: 'ai' };
         const previewing = Boolean(previewBar);
         await PreferencesStore.setThemes(themes); // re-applies the saved theme
         if (previewing) site().preview(prefsFor(theme));
@@ -218,27 +222,4 @@ export function initAiTheme({ javaURI, fetchOptions, profileURL }) {
         $('ai-theme-emoji').hidden = !wallpaper();
         if (theme && previewBar) site().preview(prefsFor(theme));
     });
-
-    showKeyStatus($('ai-theme-key'), javaURI, fetchOptions, profileURL);
-}
-
-/** Which key AI Theme will use, from the AI connections saved on the profile page */
-async function showKeyStatus(el, javaURI, fetchOptions, profileURL) {
-    if (!el) return;
-    let text = "Using the school's key.", link = true;
-    try {
-        const res = await fetch(`${javaURI}/api/ai-connections`, fetchOptions);
-        if (res.status === 401) { el.textContent = 'Sign in to use AI Theme.'; return; }
-        const { providers = {} } = res.ok ? await res.json() : {};
-        const own = ['gemini', 'groq'].find(p => providers[p]?.connected && providers[p]?.modelConfigured);
-        if (own) { text = `Using your ${own === 'gemini' ? 'Gemini' : 'Groq'} key.`; link = false; }
-    } catch (_) { /* keep the school's-key line */ }
-    el.textContent = text + ' ';
-    if (link) {
-        const a = document.createElement('a');
-        a.href = profileURL;
-        a.className = 'underline';
-        a.textContent = 'Connect your own on Profile →';
-        el.append(a);
-    }
 }
