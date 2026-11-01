@@ -10,10 +10,10 @@ year: "2026-2027"
 ---
 
 {% assign data = site.data.ocs_in_a_kit_infograph %}
-<div class="ocs__container">
+<div class="ocs__container" style="max-width: 1400px;">
 <div class="ocs__badge">Design-Based Research Capstone</div>
 <h1>{{ data.Title }}</h1>
-<p class="ocs__description">Open Coding Society's classroom platform, packaged so any school or organization can run their own copy.</p>
+<p class="ocs__description" style="max-width: none; margin: 0 0 1rem;">Open Coding Society's classroom platform, packaged so any school or organization can run their own copy.</p>
 
 <nav class="ocs__capstone-nav">
   <div class="ocs__links ocs__links--wide">
