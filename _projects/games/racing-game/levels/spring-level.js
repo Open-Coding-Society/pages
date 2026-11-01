@@ -1,21 +1,125 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from './PlayerCar.js';
+import PlayerCar from './PlayerCar.js';
 import DescentEntrance from './DescentEntrance.js';
 import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js'
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+
+class Player extends PlayerCar {
+  applyTemporarySlowdown() {
+    this.slowdownUntil = performance.now() + 5000;
+  }
+
+  getSlowdownMultiplier(now = performance.now()) {
+    return now < (this.slowdownUntil || 0) ? 0.65 : 1;
+  }
+
+  handleCollisionReaction(other) {
+    if (other?.id === 'flower-grumpy') this.applyTemporarySlowdown();
+    super.handleCollisionReaction(other);
+  }
+
+  move() {
+    if (!this.velocity.x && !this.velocity.y) return super.move();
+
+    const velocityX = this.velocity.x;
+    const velocityY = this.velocity.y;
+    const multiplier = this.getSlowdownMultiplier();
+    this.velocity.x *= multiplier;
+    this.velocity.y *= multiplier;
+    const slowedVelocityX = this.velocity.x;
+    const slowedVelocityY = this.velocity.y;
+
+    super.move();
+
+    if (this.velocity.x === slowedVelocityX) this.velocity.x = velocityX;
+    if (this.velocity.y === slowedVelocityY) this.velocity.y = velocityY;
+  }
+}
 
 class FlowerNpc extends Npc {
   constructor(data, gameEnv) {
     super(data, gameEnv);
     this.patrolPhase = 0;
     this.lastPatrolTime = performance.now();
-    const patrolEndX = data.walkingArea.xMax - this.width;
-    this.patrolCenterX = (data.walkingArea.xMin + patrolEndX) / 2;
-    this.patrolAmplitude = Math.max(0, (patrolEndX - data.walkingArea.xMin) / 2);
-    this.position.x = this.patrolCenterX;
+    if (data.walkingArea) {
+      const patrolEndX = data.walkingArea.xMax - this.width;
+      this.patrolCenterX = (data.walkingArea.xMin + patrolEndX) / 2;
+      this.patrolAmplitude = Math.max(0, (patrolEndX - data.walkingArea.xMin) / 2);
+      this.position.x = this.patrolCenterX;
+    }
     this.handleFlowerClick = () => this.showReactionDialogue();
     this.canvas.style.cursor = 'pointer';
     this.canvas.addEventListener('click', this.handleFlowerClick);
+  }
+
+  showReactionDialogue() {
+    if (!this.isTouchingSpringCar()) {
+      super.showReactionDialogue();
+      return;
+    }
+
+    this.explodeOnCollision();
+  }
+
+  update() {
+    super.update();
+    if (this.isTouchingSpringCar()) this.explodeOnCollision();
+  }
+
+  isTouchingSpringCar() {
+    return this.spriteData.id === 'flower-grumpy'
+      && this.gameEnv.gameObjects.some(
+        object => object?.state?.collisionEvents?.includes(this.spriteData.id)
+          && typeof object.applyTemporarySlowdown === 'function'
+      );
+  }
+
+  explodeOnCollision() {
+    if (this.hasExploded) return;
+
+    this.hasExploded = true;
+    this.showWarningMessage();
+    this.explosionTimeout = setTimeout(() => {
+      this.explosionTimeout = null;
+      this.explode();
+    }, 700);
+  }
+
+  showWarningMessage() {
+    const message = document.createElement('div');
+    message.textContent = 'Hey! Watch it!';
+    Object.assign(message.style, {
+      position: 'absolute',
+      top: `${this.gameEnv.top + 24}px`,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      zIndex: '1000',
+      padding: '10px 18px',
+      borderRadius: '8px',
+      background: 'rgba(0, 0, 0, 0.8)',
+      color: '#fff',
+      font: 'bold 20px sans-serif',
+      pointerEvents: 'none',
+    });
+    this.gameEnv.container.appendChild(message);
+
+    const animation = message.animate(
+      [{ opacity: 1 }, { opacity: 0 }],
+      { duration: 1800, delay: 700, fill: 'forwards' }
+    );
+    animation.onfinish = () => message.remove();
+  }
+
+  explode() {
+    const animation = this.canvas.animate(
+      [
+        { transform: 'scale(1)', opacity: 1 },
+        { transform: 'scale(1.5)', opacity: 1, filter: 'brightness(4)' },
+        { transform: 'scale(2)', opacity: 0, filter: 'brightness(2)' },
+      ],
+      { duration: 500, easing: 'ease-out', fill: 'forwards' }
+    );
+    animation.onfinish = () => this.destroy();
   }
 
   patrol() {
@@ -33,6 +137,10 @@ class FlowerNpc extends Npc {
 
   destroy() {
     this.canvas.removeEventListener('click', this.handleFlowerClick);
+    if (this.explosionTimeout) {
+      clearTimeout(this.explosionTimeout);
+      this.explosionTimeout = null;
+    }
     super.destroy();
   }
 }
@@ -114,7 +222,7 @@ class GameLevelSpring {
     const flower_data = {
       id: "flower-happy",
       name: "Flower Happy",
-      greeting: "Hello there!",
+      greeting: "Hi! I am a happy flower! Enjoying the ride?",
       src: path + '/images/projects/racing-game/flowers-happy-transparent.png',
       INIT_POSITION: { x: 0.44, y: 0.01 },
       SCALE_FACTOR: 8,
@@ -129,10 +237,37 @@ class GameLevelSpring {
       },
       patrolSpeed: 0.55
     };
+    const roadside_happy_flower_data = {
+      ...flower_data,
+      id: "flower-happy-roadside",
+      name: "Roadside Happy Flower",
+      INIT_POSITION: { x: 0.18, y: 0.70 },
+      walkingArea: {
+        xMin: gameEnv.innerWidth * 0.05,
+        xMax: gameEnv.innerWidth * 0.32,
+        yMin: gameEnv.innerHeight * 0.68,
+        yMax: gameEnv.innerHeight * 0.82
+      }
+    };
+    const grumpy_flower_data = {
+      ...flower_data,
+      id: "flower-grumpy",
+      name: "Grumpy Flower",
+      src: path + '/images/projects/racing-game/Flower-grumpy.png',
+      greeting: "Hey! Watch it!",
+      INIT_POSITION: { x: 0.5, y: 0.70 },
+      walkingArea: {
+        xMin: gameEnv.innerWidth * 0.12,
+        xMax: gameEnv.innerWidth * 0.88,
+        yMin: gameEnv.innerHeight * 0.68,
+        yMax: gameEnv.innerHeight * 0.82
+      }
+    };
     // Match the painted finish line on the bottom straight.
     const lap_data = {
       totalLaps: 3,
       finishLine: { x: 0.46, top: 0.72, bottom: 0.82 },
+      checkpoint: { x: 0.46, top: 0.12, bottom: 0.25 },
       hudPosition: { x: 0.01, y: 0.02 }
     };
     this.classes = [
@@ -142,10 +277,11 @@ class GameLevelSpring {
         {class: SplineBarrier, data: barrierData1},
         {class: SplineBarrier, data: barrierData2},
         {class: FlowerNpc, data: flower_data},
+        {class: FlowerNpc, data: roadside_happy_flower_data},
+        {class: FlowerNpc, data: grumpy_flower_data},
         {class: DescentEntrance, data: lap_data}
     ]
   }
 }
 
 export default GameLevelSpring;
-

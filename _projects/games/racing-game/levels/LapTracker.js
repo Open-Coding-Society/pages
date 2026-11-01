@@ -5,9 +5,8 @@
  * { x, top, bottom }. Cars race to the right, so a lap only counts when a car crosses it moving
  * right after it has been round the far side of the track.
  *
- * The far side is checked automatically: a lap of a closed track has to cross the finish line's
- * x somewhere above the finish line too, so that crossing acts as the checkpoint. This avoids
- * hand-placing a second line per level, which is easy to get slightly wrong.
+ * Each track supplies a narrow checkpoint segment on its far side. Requiring that gate prevents
+ * shortcuts elsewhere on the track from being counted as completed laps.
  */
 
 /**
@@ -35,13 +34,14 @@ function validateLine(line, label) {
 }
 
 export default class LapTracker {
-  constructor({ finishLine, totalLaps }) {
+  constructor({ finishLine, checkpoint, totalLaps }) {
     validateLine(finishLine, 'finishLine');
+    validateLine(checkpoint, 'checkpoint');
     if (!Number.isInteger(totalLaps) || totalLaps < 1) {
       throw new RangeError('LapTracker totalLaps must be a positive whole number');
     }
     this.finishLine = finishLine;
-    this.checkpoint = { x: finishLine.x, top: 0, bottom: finishLine.top };
+    this.checkpoint = checkpoint;
     this.totalLaps = totalLaps;
     // Keyed by car object, because both cars share the same canvas id.
     this.cars = new Map();
@@ -62,8 +62,11 @@ export default class LapTracker {
     state.previous = centre;
     if (state.finished) return false;
 
-    if (getCrossingDirection(previous, centre, this.checkpoint) !== 0) {
+    const checkpointDirection = getCrossingDirection(previous, centre, this.checkpoint);
+    if (checkpointDirection < 0) {
       state.passedCheckpoint = true;
+    } else if (checkpointDirection > 0) {
+      state.passedCheckpoint = false;
     }
 
     const finishDirection = getCrossingDirection(previous, centre, this.finishLine);
