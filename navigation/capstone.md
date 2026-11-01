@@ -382,6 +382,7 @@ document.addEventListener('DOMContentLoaded', function(){
        <p>Team: Shayan, Dhyan, Arnav, Harrish, Darshan</p>
      </div>
    </div>
+
     <!-- Jarvis Classroom Object Detection -->
     <div class="ocs__grid-cell CSH" data-year="{{ site.data.jarvis_infograph.Year }}" data-frontend-url="{{ site.data.jarvis_infograph.Repo }}">
       <a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">
