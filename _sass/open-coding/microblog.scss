@@ -19,12 +19,14 @@
 
 /* Modal overlay background: dark semi-transparent */
 #microblog-modal,
+#microblog-qr-modal,
 #reply-modal {
   background: rgba(0, 0, 0, 0.5);
   z-index: 1200;
 }
 
 #microblog-modal,
+#microblog-qr-modal,
 #reply-modal {
   position: fixed;
   inset: 0;
@@ -37,6 +39,7 @@
 }
 
 #microblog-modal.hidden,
+#microblog-qr-modal.hidden,
 #reply-modal.hidden {
   display: none;
 }

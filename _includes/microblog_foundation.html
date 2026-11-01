@@ -7,6 +7,7 @@
     <button id="microblog-close-btn" class="microblog-close-btn" aria-label="Close Microblog">&times;</button>
     <h2 class="microblog-panel-title">Microblog</h2>
     <button id="guest-signup-toggle" class="guest-signup-toggle-btn">Guest Signup</button>
+    <button id="microblog-qr-btn" class="microblog-qr-btn" title="QR code: review this page from a phone" aria-label="QR code for phone reviews">QR code</button>
   </div>
 
   <!-- Guest Signup Form (initially hidden) -->
@@ -133,7 +134,7 @@ window.handleGuestSignup = async function(event) {
     }
 
     // Step 2: Login with the credentials (whether account was just created or already existed)
-    const loginResponse = await fetch(`${pythonURI}/authenticate`, {
+    const loginResponse = await fetch(`${pythonURI}/api/authenticate`, {
       ...fetchOptions,
       method: 'POST',
       body: JSON.stringify(signupData)
@@ -194,6 +195,21 @@ window.handleGuestSignup = async function(event) {
   </div>
 </div>
 
+<!-- QR Modal: the address of the phone review page for this topic, as a code to scan -->
+<div id="microblog-qr-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="microblog-modal-panel">
+    <div class="microblog-modal-header">
+      <button id="microblog-qr-close" class="microblog-modal-close" aria-label="Close QR code">&times;</button>
+      <h2 class="microblog-modal-title">Review from a phone</h2>
+    </div>
+    <div class="microblog-qr-body">
+      <div id="microblog-qr-image" class="microblog-qr-image" aria-label="QR code"></div>
+      <p class="microblog-qr-link"><a id="microblog-qr-url" href="#" target="_blank" rel="noopener"></a></p>
+      <p class="microblog-qr-note">Visitors scan this, sign in as a guest, and post their review here without using your computer. A teacher must have the Guest Window open for new guests.</p>
+    </div>
+  </div>
+</div>
+
 <!-- Reply Modal -->
 <div id="reply-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
   <div class="microblog-modal-panel">
@@ -220,6 +236,7 @@ window.handleGuestSignup = async function(event) {
 // Imports for APIs used on this page
 import { fetchPosts, createPost, updatePost, deletePost, createReply, fetchReplies, fetchCurrentUser, setPostResolved, setReplyResolved, isStatusMarker, getResolution, getReplyResolution, normalizeAuthorUids, postChannel, matchesViewFilter } from '/assets/js/api/microblog.js';
 import { markMicroblogSeen } from '/assets/js/api/microblog-notifications.js';
+import { buildReviewUrl } from '/assets/js/api/microblog-review.js';
 
 // Default Key for New MicroBlog Posts
 const pagePermalink = '{{page.permalink}}';
@@ -232,6 +249,36 @@ const currentUserPromise = fetchCurrentUser();
 // Opening the panel shows the page's posts, so its new activity counts as
 // seen: the Capstone tab's badge drops this page's share.
 document.getElementById('microblog-toggle-btn').addEventListener('click', () => markMicroblogSeen(pagePermalink));
+
+// The QR button: the phone review page for this topic (navigation/review.md), drawn by
+// the vendored qrcode-generator, which is loaded only the first time it is asked for.
+const qrModal = document.getElementById('microblog-qr-modal');
+document.getElementById('microblog-qr-close').onclick = () => qrModal.classList.add('hidden');
+document.getElementById('microblog-qr-btn').onclick = async () => {
+  const url = buildReviewUrl({ origin: location.origin, baseurl: '{{ site.baseurl }}', topicPath: pagePermalink || location.pathname });
+  if (!url) { alert('This page has no permalink to review.'); return; }
+  try {
+    if (!window.qrcode) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = '{{ site.baseurl }}/assets/js/vendor/qrcode.js';
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('The QR code library did not load.'));
+        document.head.appendChild(script);
+      });
+    }
+    const code = window.qrcode(0, 'M');
+    code.addData(url);
+    code.make();
+    document.getElementById('microblog-qr-image').innerHTML = code.createSvgTag({ cellSize: 6, margin: 12, scalable: true, title: 'QR code for the phone review page' });
+    const link = document.getElementById('microblog-qr-url');
+    link.textContent = url;
+    link.href = url;
+    qrModal.classList.remove('hidden');
+  } catch (error) {
+    alert(error.message);
+  }
+};
 
 // Channel tab and view dropdown (see matchesViewFilter for the filter values)
 let activeChannel = 'chat';
@@ -539,10 +586,11 @@ async function renderMicroblogTable() {
         // Table: rows; generated from microblog data
         let genBody = '';
         visiblePosts.forEach(post => {
+            // Every post field is text from another user: escape it before it joins the markup
             const analyticsCell = analytics.map(f => {
               let value = post[f.key] ?? '';
               if (f.format) value = f.format(value);
-              return `<div>${value}</div>`;
+              return `<div>${escapeHtml(String(value))}</div>`;
             }).join('');
             // Resolve/Reopen shows only for the post's writer and the page authors
             const isResolved = post.resolution.resolved;
@@ -555,6 +603,7 @@ async function renderMicroblogTable() {
             const messageCell = message.map(f => {
               let value = post[f.key] ?? '';
               if (f.format) value = f.format(value);
+              value = escapeHtml(String(value));
               if (f.key === 'topicPath') {
                 const archivedNote = post.archived ? '<small>(archived; read-only)</small>' : '';
                 return `<div class='microblog-post-topic'><span>${value}</span>${resolvedBadge}${archivedNote}</div>`;
