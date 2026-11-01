@@ -222,6 +222,32 @@ test('only the blue car on the autumn level is controlled by the bot', () => {
   assert.deepEqual(barriers.map(({ data }) => data.splinePoints), AUTUMN_SPLINE_BARRIER_POINTS);
 });
 
+test('restarting Autumn destroys every old game object and removes stale car canvases', () => {
+  const destroyed = [];
+  const canvases = [
+    { removed: false, remove() { this.removed = true; } },
+    { removed: false, remove() { this.removed = true; } },
+  ];
+  const gameEnv = {
+    path: '/assets',
+    gameObjects: [],
+    container: { querySelectorAll: () => canvases },
+  };
+  gameEnv.gameObjects = ['player', 'bot', 'hud'].map((name) => ({
+    destroy() {
+      destroyed.push(name);
+      gameEnv.gameObjects.splice(gameEnv.gameObjects.indexOf(this), 1);
+    },
+  }));
+  const level = new GameLevelAutumn(gameEnv);
+
+  level.destroy();
+
+  assert.deepEqual(destroyed, ['hud', 'bot', 'player']);
+  assert.deepEqual(gameEnv.gameObjects, []);
+  assert.ok(canvases.every(({ removed }) => removed));
+});
+
 test('bot is recognized as a player by spline barriers', () => {
   assert.equal(Object.create(RacingBot.prototype).isPlayer, true);
 });

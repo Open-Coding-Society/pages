@@ -7,9 +7,11 @@ import TimeLapScreen from './TimeLapScreen.js';
 import { AUTUMN_SPLINE_BARRIER_POINTS, AUTUMN_SPLINE_COLLISION_WIDTH } from './AutumnTrackGeometry.js';
 import RaceDifficultyPrompt from './RaceDifficultyPrompt.js';
 import { RACING_CAR_HITBOX } from './RacingCarPhysics.js';
+import cleanupRacingLevel from './cleanup-racing-level.js';
 
 class GameLevelAutumn {
   constructor(gameEnv) {
+    this.gameEnv = gameEnv;
     const path = gameEnv.path;
     const background_data = {
       name: "Autumn Course",
@@ -87,7 +89,7 @@ class GameLevelAutumn {
       pixels: { height: 369, width: 676 },
       orientation: { rows: 1, columns: 1 },
     };
-        const ConeData = {
+    const ConeData = {
       id: "cone-1",
       src: path + '/images/projects/racing-game/ConeObstacle.png',
       coordinateSpace: "normalized",
@@ -116,6 +118,10 @@ class GameLevelAutumn {
       { class: TimeLapScreen, data: lap_data },
       { class: RaceDifficultyPrompt, data: {} },
     ];
+  }
+
+  destroy() {
+    cleanupRacingLevel(this.gameEnv);
   }
 }
 
