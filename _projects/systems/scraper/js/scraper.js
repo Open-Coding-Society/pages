@@ -104,6 +104,28 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <pre id="scraper-response" class="scraper-response"><code>// Response JSON will appear here</code></pre>
       </div>
+
+      <div class="scraper-section">
+        <div class="scraper-section-header">
+          <span>Save these results</span>
+          <a href="/scraper/my-scrapes/" class="scraper-button scraper-button-secondary">
+            My Scrapes
+          </a>
+        </div>
+        <div class="scraper-save-row">
+          <input
+            type="text"
+            id="scraper-save-label"
+            class="scraper-save-label-input"
+            placeholder="Name this run, e.g. &quot;Music books - first try&quot;"
+            disabled
+          >
+          <button type="button" class="scraper-button" id="scraper-save" disabled>
+            Save Results
+          </button>
+        </div>
+        <span id="scraper-save-status" class="scraper-status" aria-live="polite"></span>
+      </div>
     </div>
   `;
 
@@ -114,6 +136,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const runButton = document.getElementById("scraper-run");
   const exampleButton = document.getElementById("scraper-load-example");
   const examplePayload = selectedTemplate;
+  const saveLabelInput = document.getElementById("scraper-save-label");
+  const saveButton = document.getElementById("scraper-save");
+  const saveStatusEl = document.getElementById("scraper-save-status");
+
+  // Only a successful run's exact payload/response pair is ever saveable - set together
+  // right before enabling the button, cleared together the moment a new run starts.
+  let lastSavedPayload = null;
+  let lastSavedResponse = null;
+
+  function resolveEndpoint(path) {
+    // Prefer the same base used everywhere else (javaURI), if available.
+    // This makes local dev hit http://localhost:8585<path>.
+    try {
+      if (window.javaURI && typeof window.javaURI === "string" && window.javaURI.length > 0) {
+        return window.javaURI.replace(/\/+$/, "") + path;
+      }
+    } catch (_) {
+      // Fallback stays as a relative path.
+    }
+    return path;
+  }
 
   if (exampleButton) {
     exampleButton.addEventListener("click", () => {
@@ -128,12 +171,21 @@ document.addEventListener("DOMContentLoaded", () => {
     requestInput.value = JSON.stringify(examplePayload, null, 2);
   }
 
+  function disableSaving() {
+    lastSavedPayload = null;
+    lastSavedResponse = null;
+    if (saveLabelInput) saveLabelInput.disabled = true;
+    if (saveButton) saveButton.disabled = true;
+    if (saveStatusEl) saveStatusEl.textContent = "";
+  }
+
   async function runScraper() {
     if (!requestInput || !responseOutput || !statusEl || !errorEl) return;
 
     errorEl.textContent = "";
     statusEl.textContent = "";
     responseOutput.textContent = "// Waiting for response...";
+    disableSaving();
 
     let payload;
     const raw = requestInput.value.trim();
@@ -151,17 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let endpoint = "/api/scraper/run";
-    try {
-      // Prefer the same base used everywhere else (javaURI), if available
-      // This makes local dev hit http://localhost:8585/api/scraper/run
-      if (window.javaURI && typeof window.javaURI === "string" && window.javaURI.length > 0) {
-        endpoint = window.javaURI.replace(/\/+$/, "") + "/api/scraper/run";
-      }
-    } catch (_) {
-      // Fallback stays as relative /api/scraper/run
-    }
-
+    const endpoint = resolveEndpoint("/api/scraper/run");
     statusEl.textContent = `Sending request to ${endpoint}...`;
 
     try {
@@ -198,6 +240,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       statusEl.textContent = "Success";
       responseOutput.textContent = JSON.stringify(parsed, null, 2);
+
+      if (parsed && typeof parsed === "object" && Array.isArray(parsed.items)) {
+        lastSavedPayload = payload;
+        lastSavedResponse = parsed;
+        if (saveLabelInput) saveLabelInput.disabled = false;
+        if (saveButton) saveButton.disabled = false;
+      }
     } catch (err) {
       statusEl.textContent = "Network error";
       responseOutput.textContent = JSON.stringify(
@@ -209,6 +258,55 @@ document.addEventListener("DOMContentLoaded", () => {
         2
       );
     }
+  }
+
+  async function saveResults() {
+    if (!saveLabelInput || !saveButton || !saveStatusEl) return;
+    if (!lastSavedPayload || !lastSavedResponse) return;
+
+    const label = saveLabelInput.value.trim();
+    if (!label) {
+      saveStatusEl.textContent = "Name this run before saving.";
+      return;
+    }
+
+    const endpoint = resolveEndpoint("/api/scraper/results");
+    saveButton.disabled = true;
+    saveStatusEl.textContent = "Saving...";
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          label,
+          request: lastSavedPayload,
+          response: lastSavedResponse
+        })
+      });
+
+      if (!res.ok) {
+        const body = await res.text();
+        saveStatusEl.textContent = `Save failed (${res.status}). ${body}`;
+        saveButton.disabled = false;
+        return;
+      }
+
+      saveStatusEl.textContent = "Saved! Find it under My Scrapes.";
+      saveLabelInput.value = "";
+      // Stays enabled: re-saving the same run under a new name is a reasonable thing to do.
+      saveButton.disabled = false;
+    } catch (err) {
+      saveStatusEl.textContent = `Network error while saving: ${String(err)}`;
+      saveButton.disabled = false;
+    }
+  }
+
+  if (saveButton) {
+    saveButton.addEventListener("click", () => {
+      saveResults();
+    });
   }
 
   if (runButton) {
@@ -319,6 +417,27 @@ document.addEventListener("DOMContentLoaded", () => {
     .scraper-status {
       font-size: 0.8rem;
       color: #64748b;
+    }
+    .scraper-save-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .scraper-save-label-input {
+      flex: 1 1 260px;
+      border-radius: 0.5rem;
+      border: 1px solid #cbd5e1;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      box-sizing: border-box;
+    }
+    .scraper-save-label-input:disabled,
+    .scraper-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
     }
     .scraper-error {
       margin-top: 0.25rem;

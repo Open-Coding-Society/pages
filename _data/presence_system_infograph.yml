@@ -7,6 +7,8 @@ Team:
   - "Vibha Mandayam"
   - "Kush Shah"
 
+Mentor: "Dr. Douglas Fenner"
+
 Repo: "https://github.com/vibha1019/crowpi-attendance"
 Year: "2026-2027"
 
@@ -16,6 +18,12 @@ Pages:
   - key: hub
     tab: "Overview"
     url: "/capstone/presence-system/"
+  - key: dashboard
+    tab: "Live Dashboard"
+    url: "/capstone/presence-system/dashboard/"
+  - key: mycard
+    tab: "My Class & Card"
+    url: "/capstone/presence-system/my-card/"
   - key: pipeline
     tab: "How It Works"
     url: "/capstone/presence-system/pipeline/"

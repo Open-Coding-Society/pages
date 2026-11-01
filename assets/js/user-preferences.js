@@ -9,9 +9,12 @@
  * Each class has exactly one job (SRP) so that bugs and feature changes
  * stay isolated to a single area:
  *
- *   ColorUtils                      – Pure color math (hex → rgb, luminance, lighten/darken).
- *                                     Stateless. Used to derive panel/border/muted colors
- *                                     from the user's chosen background.
+ *   ColorUtils                      – Pure color math (hex → rgb, luminance, lighten/darken,
+ *                                     mixing, WCAG contrast). Stateless. Used to derive
+ *                                     panel/border/muted colors from the user's chosen background.
+ *
+ *   RetiredThemeColors              – Swaps a theme saved with a preset's old colors for the
+ *                                     preset's current ones (the presets were made readable).
  *
  *   TailwindOverrideStyleSheetInjector         – Builds and injects a single <style> block that
  *                                     overrides Tailwind utility classes (bg-neutral-800,
@@ -79,39 +82,68 @@
     accent: '#4CAFEF',
   };
 
+  // Every preset keeps 4.5:1 (WCAG AA) for its text and its accent on the page and on --panel,
+  // and for page-colored text on an accent fill. tests/theme_contrast.test.mjs checks it.
   const PRESETS = {
     'Site Default': SITE_DEFAULT,
     Midnight: {
       bg: '#0b1220', text: '#e6eef8',
       font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
-      size: 14, accent: '#3b82f6',
+      size: 14, accent: '#5392f7',
     },
     Light: {
-      bg: '#ffffff', text: '#FF80AA',
+      bg: '#ffffff', text: '#9d174d',
       font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
-      size: 14, accent: '#2563eb',
+      size: 14, accent: '#1759ea',
     },
     Green: {
       bg: '#154734', text: '#e6f6ef',
       font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
-      size: 14, accent: '#10b981',
+      size: 14, accent: '#16eba4',
     },
     Sepia: {
-      bg: '#f4ecd8', text: '#A52A2A',
+      bg: '#f4ecd8', text: '#8b1e1e',
       font: "Georgia, 'Times New Roman', Times, serif",
-      size: 14, accent: '#b45309',
+      size: 14, accent: '#924307',
     },
     Cyberpunk: {
       bg: '#0a0a0f', text: '#f0f0f0',
       font: "'Source Code Pro', monospace",
-      size: 14, accent: '#f72585',
+      size: 14, accent: '#f84396',
     },
     Ocean: {
       bg: '#0c1929', text: '#e0f2fe',
       font: "'Open Sans', Arial, sans-serif",
       size: 15, accent: '#06b6d4',
     },
+    Sunset: {
+      bg: '#2a1433', text: '#fbe7d4',
+      font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+      size: 14, accent: '#ff7f6b',
+    },
   };
+
+  // Built-in holiday palettes. The dashboard's AI theme offers the holidays as suggestions
+  // and uses these when the AI can't answer, so a holiday theme always works.
+  const SEASONAL_THEMES = {
+    halloween: { label: 'Halloween', bg: '#1a0f1f', text: '#f5e6d3', accent: '#ff7518', decor: ['🎃', '🦇', '👻'] },
+    thanksgiving: { label: 'Thanksgiving', bg: '#2b1d0e', text: '#f3e3c3', accent: '#e58e4d', decor: ['🍂', '🦃', '🥧'] },
+    christmas: { label: 'Christmas', bg: '#0f2a1d', text: '#f8f8f8', accent: '#ff8591', decor: ['❄️', '🎄', '🎁'] },
+    valentines: { label: "Valentine's", bg: '#fff0f5', text: '#5a1030', accent: '#b41655', decor: ['💕', '💘', '🌹'] },
+  };
+
+  // The colors these themes had before they were raised to 4.5:1. A student's saved preferences
+  // keep the colors they picked, so a theme saved with old colors is drawn with its new ones.
+  const RETIRED_THEME_COLORS = [
+    { was: { bg: '#0b1220', text: '#e6eef8', accent: '#3b82f6' }, now: PRESETS.Midnight },
+    { was: { bg: '#ffffff', text: '#FF80AA', accent: '#2563eb' }, now: PRESETS.Light },
+    { was: { bg: '#154734', text: '#e6f6ef', accent: '#10b981' }, now: PRESETS.Green },
+    { was: { bg: '#f4ecd8', text: '#A52A2A', accent: '#b45309' }, now: PRESETS.Sepia },
+    { was: { bg: '#0a0a0f', text: '#f0f0f0', accent: '#f72585' }, now: PRESETS.Cyberpunk },
+    { was: { bg: '#2b1d0e', text: '#f3e3c3', accent: '#e07a2e' }, now: SEASONAL_THEMES.thanksgiving },
+    { was: { bg: '#0f2a1d', text: '#f8f8f8', accent: '#ff4d5e' }, now: SEASONAL_THEMES.christmas },
+    { was: { bg: '#fff0f5', text: '#5a1030', accent: '#c2185b' }, now: SEASONAL_THEMES.valentines },
+  ];
 
   // ============================================
   // RESPONSIBILITY: Pure color math utilities
@@ -141,19 +173,67 @@
       return ColorUtils.getLuminance(hex) > 0.5;
     }
 
+    /** Convert 0-255 channels (clamped, rounded) to a hex string */
+    static rgbToHex(r, g, b) {
+      const clamp = v => Math.round(Math.max(0, Math.min(255, v)));
+      return '#' + [r, g, b].map(v => clamp(v).toString(16).padStart(2, '0')).join('');
+    }
+
     /** Shift every channel by amt (positive = lighten, negative = darken) */
     static adjustColor(hex, amt) {
       const { r, g, b } = ColorUtils.hexToRgb(hex);
-      const clamp = v => Math.max(0, Math.min(255, v));
-      return (
-        '#' +
-        [clamp(r + amt), clamp(g + amt), clamp(b + amt)]
-          .map(v => {
-            const h = v.toString(16);
-            return h.length === 1 ? '0' + h : h;
-          })
-          .join('')
-      );
+      return ColorUtils.rgbToHex(r + amt, g + amt, b + amt);
+    }
+
+    /** Mix two colors like CSS color-mix(in srgb): share is a's part, 0-1 */
+    static mix(a, b, share) {
+      const x = ColorUtils.hexToRgb(a);
+      const y = ColorUtils.hexToRgb(b);
+      const part = k => x[k] * share + y[k] * (1 - share);
+      return ColorUtils.rgbToHex(part('r'), part('g'), part('b'));
+    }
+
+    /** WCAG relative luminance 0-1, the input to contrast ratios (getLuminance is perceived brightness) */
+    static relativeLuminance(hex) {
+      const { r, g, b } = ColorUtils.hexToRgb(hex);
+      const channel = v => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+    }
+
+    /** WCAG contrast ratio of two colors, from 1 (the same) to 21 (black on white) */
+    static contrastRatio(a, b) {
+      const [light, dark] = [ColorUtils.relativeLuminance(a), ColorUtils.relativeLuminance(b)].sort((x, y) => y - x);
+      return (light + 0.05) / (dark + 0.05);
+    }
+
+    /**
+     * Fade color toward target in 5% steps, at most maxShare of the way, and keep the last step
+     * that still has minRatio against every surface. A color that already fails stays as it is.
+     */
+    static fadeWithin(color, target, surfaces, minRatio, maxShare) {
+      let kept = color;
+      for (let step = 1; step * 0.05 <= maxShare + 1e-9; step += 1) {
+        const faded = ColorUtils.mix(target, color, step * 0.05);
+        if (!surfaces.every(surface => ColorUtils.contrastRatio(faded, surface) >= minRatio)) break;
+        kept = faded;
+      }
+      return kept;
+    }
+  }
+
+  // ============================================
+  // RESPONSIBILITY: Draw a theme saved with retired colors in its current ones
+  // ============================================
+  class RetiredThemeColors {
+    /** prefs, with text and accent replaced when bg, text and accent are a retired theme's */
+    static upgrade(prefs) {
+      if (!prefs) return prefs;
+      const same = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
+      const match = RETIRED_THEME_COLORS.find(({ was }) => ['bg', 'text', 'accent'].every(k => same(was[k], prefs[k])));
+      return match ? { ...prefs, text: match.now.text, accent: match.now.accent } : prefs;
     }
   }
 
@@ -168,7 +248,7 @@
      * theme classes when the user theme is active.
      */
     static inject(opts) {
-      const { bg, text, font, size, accent, panel, uiBorder, textMuted,
+      const { bg, text, font, size, accent, panel, uiBorder, textMuted, fieldBorder,
               selectionColor, buttonStyle } = opts;
 
       let style = document.getElementById(TailwindOverrideStyleSheetInjector.STYLE_ID);
@@ -181,6 +261,14 @@
       let btnRadius = '0.375rem';
       if (buttonStyle === 'square') btnRadius = '0';
       else if (buttonStyle === 'pill') btnRadius = '9999px';
+      // 'rounded' is the dashboard's default, so it leaves ocs__btn its own shapes (pill tabs,
+      // round small buttons). A shape the student picks reaches every button, links styled as
+      // ocs__btn included, so one row of buttons never mixes shapes.
+      const pickedShape = buttonStyle === 'square' || buttonStyle === 'pill';
+      const button = pickedShape ? 'button' : 'button:where(:not(.ocs__btn))';
+      const shaped = [button, '.btn', `[class*="rounded"] ${button}`, ...(pickedShape ? ['.ocs__btn'] : []),
+        'input[type="submit"]', 'input[type="button"]']
+        .map(selector => `html.user-theme-active ${selector}`).join(',\n        ');
 
       style.textContent = `
         html.user-theme-active,
@@ -198,11 +286,7 @@
           background-color: ${selectionColor} !important;
           color: white !important;
         }
-        html.user-theme-active button,
-        html.user-theme-active .btn,
-        html.user-theme-active [class*="rounded"] button,
-        html.user-theme-active input[type="submit"],
-        html.user-theme-active input[type="button"] {
+        ${shaped} {
           border-radius: ${btnRadius} !important;
         }
         html.user-theme-active .bg-neutral-900,
@@ -253,7 +337,14 @@
         html.user-theme-active textarea {
           background-color: ${panel} !important;
           color: ${text} !important;
-          border-color: ${uiBorder} !important;
+          border-color: ${fieldBorder} !important;
+        }
+        html.user-theme-active input:focus-visible,
+        html.user-theme-active select:focus-visible,
+        html.user-theme-active textarea:focus-visible {
+          border-color: ${accent} !important;
+          outline: 2px solid ${accent};
+          outline-offset: 2px;
         }
         html.user-theme-active .lesson-player {
           background-color: ${bg} !important;
@@ -329,7 +420,12 @@
      * Apply a preferences object to the document via CSS custom properties,
      * priority-color tokens, and the override stylesheet.
      */
-    static apply(prefs) {
+    static apply(prefs, applyLanguage = true) {
+      // The wallpaper is matched by the colors as saved, so look it up before the upgrade.
+      const decor = ThemeDecorStore.decorFor(prefs);
+      prefs = RetiredThemeColors.upgrade(prefs);
+      ThemeDecorLayer.render(decor && { decor, accent: prefs.accent || SITE_DEFAULT.accent });
+
       const base = SITE_DEFAULT;
       const bg = prefs?.bg || base.bg;
       const text = prefs?.text || base.text;
@@ -375,9 +471,16 @@
       set('--ui-bg', uiBg);
       set('--ui-border', uiBorder);
 
-      // Muted text
-      const textMuted = lightBg ? '#6b7280' : ColorUtils.adjustColor(text, -60);
+      // Muted text: the text faded toward the page color, as far as it keeps 4.5:1 (WCAG AA) on
+      // every surface muted text sits on, the accent tint of a selected card included.
+      const textMuted = ColorUtils.fadeWithin(text, bg,
+        [bg, uiBg, panel, panelMid, ColorUtils.mix(accent, panel, 0.12)], 4.5, 0.25);
       set('--text-muted', textMuted);
+
+      // A field's frame: the text faded toward the panel, as far as it keeps 3:1 (WCAG non-text
+      // contrast) on the panel and on the page, so an empty field shows on both.
+      const fieldBorder = ColorUtils.fadeWithin(text, panel, [panel, bg], 3, 0.8);
+      set('--field-border', fieldBorder);
 
       // Priority / semantic colours
       if (lightBg) {
@@ -423,13 +526,12 @@
 
       // Inject Tailwind override stylesheet
       TailwindOverrideStyleSheetInjector.inject({
-        bg, text, font, size, accent, panel, uiBorder, textMuted,
+        bg, text, font, size, accent, panel, uiBorder, textMuted, fieldBorder,
         selectionColor, buttonStyle,
       });
 
-      // Apply language translation if set
-      const lang = prefs?.language || '';
-      TranslationLanguageManager.apply(lang);
+      // Apply language translation if set (a preview leaves the language alone)
+      if (prefs && applyLanguage) TranslationLanguageManager.apply(prefs.language || '');
     }
 
     /** Remove all user-theme CSS custom properties and the override sheet */
@@ -444,13 +546,126 @@
         '--pref-cursor-style', '--background',
         '--bg-0', '--bg-1', '--bg-2', '--bg-3',
         '--text', '--text-strong', '--text-muted', '--white1',
-        '--panel', '--panel-mid', '--ui-bg', '--ui-border',
+        '--panel', '--panel-mid', '--ui-bg', '--ui-border', '--field-border',
         '--ocs-game-panel-bg', '--ocs-game-accent', '--ocs-game-text',
         '--ocs-game-muted', '--ocs-game-surface-alt', '--ocs-game-surface-contrast',
         '--ocs-game-overlay', '--ocs-game-panel-selected-bg', '--ocs-game-selected-border',
         '--ocs-game-score-accent',
       ];
       props.forEach(name => root.style.removeProperty(name));
+      ThemeDecorLayer.render(null);
+    }
+  }
+
+  // ============================================
+  // RESPONSIBILITY: Which emoji wallpaper goes with the active colors
+  // ============================================
+  class ThemeDecorStore {
+    // The last theme kept or picked, as { bg, text, accent, decor } (decor [] = wallpaper off). Matched by color
+    // rather than stored in the prefs: Spring's preferences have no field for it, and picking
+    // any theme with other colors (a preset, Reset, Save) then drops the wallpaper by itself.
+    static KEY = 'siteThemeDecor';
+
+    static get() {
+      try {
+        return JSON.parse(window.localStorage.getItem(ThemeDecorStore.KEY)) || null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    /** Remember theme's wallpaper choice (prefs-shaped: bg, text, accent, decor; no decor = off); null forgets it */
+    static set(theme) {
+      try {
+        if (theme) {
+          const { bg, text, accent, decor = [] } = theme;
+          window.localStorage.setItem(ThemeDecorStore.KEY, JSON.stringify({ bg, text, accent, decor }));
+        } else {
+          window.localStorage.removeItem(ThemeDecorStore.KEY);
+        }
+      } catch (_) { /* storage blocked: the wallpaper still shows on this page */ }
+    }
+
+    /** The emoji for prefs: its own decor ([] = wallpaper turned off), the kept theme's, or a saved custom theme's with the same colors */
+    static decorFor(prefs) {
+      if (!prefs) return null;
+      if (Array.isArray(prefs.decor)) return prefs.decor.length ? prefs.decor : null;
+      const same = t => t && ['bg', 'text', 'accent'].every(k => String(t[k]).toLowerCase() === String(prefs[k]).toLowerCase());
+      // The theme the student kept or picked wins, even when they chose no wallpaper.
+      const kept = ThemeDecorStore.get();
+      if (same(kept)) return kept.decor?.length ? kept.decor : null;
+      const match = Object.values(prefs.customThemes || {}).find(t => t?.decor?.length && same(t));
+      return match ? match.decor : null;
+    }
+  }
+
+  // ============================================
+  // RESPONSIBILITY: Remember the page's theme before a preview, to undo it exactly
+  // (inline CSS variables, classes, wallpaper attribute and the override sheet)
+  // ============================================
+  class PreviewSnapshot {
+    static saved = null;
+
+    static take() {
+      if (PreviewSnapshot.saved) return;
+      const root = document.documentElement;
+      const sheet = document.getElementById(TailwindOverrideStyleSheetInjector.STYLE_ID);
+      PreviewSnapshot.saved = {
+        style: root.getAttribute('style'),
+        className: root.className,
+        decor: root.dataset.themeDecor,
+        sheet: sheet ? sheet.textContent : null,
+      };
+    }
+
+    static restore() {
+      const saved = PreviewSnapshot.saved;
+      if (!saved) return;
+      PreviewSnapshot.saved = null;
+      const root = document.documentElement;
+      if (saved.style == null) root.removeAttribute('style');
+      else root.setAttribute('style', saved.style);
+      root.className = saved.className;
+      if (saved.decor == null) delete root.dataset.themeDecor;
+      else root.dataset.themeDecor = saved.decor;
+      if (saved.sheet == null) TailwindOverrideStyleSheetInjector.remove();
+      else document.getElementById(TailwindOverrideStyleSheetInjector.STYLE_ID).textContent = saved.sheet;
+    }
+
+    static drop() {
+      PreviewSnapshot.saved = null;
+    }
+  }
+
+  // ============================================
+  // RESPONSIBILITY: Theme decorations (a scattered emoji wallpaper)
+  // ============================================
+  class ThemeDecorLayer {
+    // One 280px tile, repeated: [x, y, size, rotation] per emoji, then [x, y] per dot.
+    // Hand-placed so neighbouring tiles don't line up into rows.
+    static EMOJI_SPOTS = [[40, 50, 34, -18], [175, 30, 28, 14], [110, 125, 38, 8], [235, 145, 30, -10], [30, 210, 30, 20], [160, 240, 34, -6]];
+    static DOT_SPOTS = [[95, 40], [250, 85], [60, 140], [200, 195], [105, 265], [265, 260]];
+
+    /** Set the wallpaper for { decor, accent }, or clear it when null */
+    static render(theme) {
+      const root = document.documentElement;
+      if (!theme) {
+        delete root.dataset.themeDecor;
+        root.style.removeProperty('--theme-decor-pattern');
+        return;
+      }
+      root.dataset.themeDecor = '';
+      root.style.setProperty('--theme-decor-pattern', `url("data:image/svg+xml,${encodeURIComponent(ThemeDecorLayer.tile(theme))}")`);
+    }
+
+    /** The SVG tile: faint emoji plus small accent-colored dots */
+    static tile({ decor, accent }) {
+      // Escaped: decor can come from an AI answer or a synced custom theme.
+      const esc = v => String(v).replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
+      const emoji = ThemeDecorLayer.EMOJI_SPOTS.map(([x, y, size, turn], i) =>
+        `<text x="${x}" y="${y}" font-size="${size}" text-anchor="middle" dominant-baseline="central" transform="rotate(${turn} ${x} ${y})">${esc(decor[i % decor.length])}</text>`).join('');
+      const dots = ThemeDecorLayer.DOT_SPOTS.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3"/>`).join('');
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280"><g opacity="0.22">${emoji}</g><g fill="${esc(accent)}" opacity="0.35">${dots}</g></svg>`;
     }
   }
 
@@ -963,11 +1178,12 @@ class GlobalNodCursor {
 
     // (2) Honor the dashboard's explicit "Reset to site defaults" action.
     //     Set by the preferences panel; presence overrides any saved theme.
-    const wasReset = window.localStorage.getItem('preferencesReset');
-    if (wasReset === 'true') return;
+    const wasReset = window.localStorage.getItem('preferencesReset') === 'true';
 
     // (3) Restore the user's saved theme (background, text color, font, accent,
-    //     selection color, button shape, language, etc.). No-op for guests.
+    //     selection color, button shape, language, emoji wallpaper, etc.).
+    //     No-op for guests with none.
+    if (wasReset) return;
     const prefs = LocalStoragePreferencesStore.get();
     if (prefs) ThemePreferencesEngine.apply(prefs);
 
@@ -997,6 +1213,20 @@ class GlobalNodCursor {
     // ── Read-only constants exposed for the dashboard's preset/lang menus ──
     PRESETS,    // Built-in named themes (Site Default, Midnight, Light, ...)
     LANGUAGES,  // Supported translation language codes for the dropdown.
+
+    // ── Theme preview & emoji wallpaper (dashboard's AI theme) ─────────────
+    SEASONAL_THEMES, // Holiday palettes, the AI theme's fallback for its holiday suggestions.
+    /** Show prefs (colors, font, optional decor emoji) on this page only: no save, no reload. */
+    preview: prefs => {
+      PreviewSnapshot.take();
+      ThemePreferencesEngine.apply(prefs, false);
+    },
+    /** Undo preview(): put the page back exactly as it was before the first preview(). */
+    cancelPreview: () => PreviewSnapshot.restore(),
+    /** The previewed theme was kept, so the next preview() starts from it. */
+    keepPreview: () => PreviewSnapshot.drop(),
+    /** Keep theme's decor emoji as the wallpaper whenever its colors are the active ones. */
+    setThemeDecor: theme => ThemeDecorStore.set(theme),
 
     // ── Text-to-Speech ─────────────────────────────────────────────────────
     /** Speak arbitrary text using the user's saved TTS voice/rate/pitch. */

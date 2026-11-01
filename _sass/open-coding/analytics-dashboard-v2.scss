@@ -1,4 +1,4 @@
-// Page-scoped styles for /analytics-dashboard/v2 (_layouts/analytics-dashboard-v2.html).
+// Page-scoped styles for /analytics-dashboard (_layouts/analytics-dashboard-v2.html).
 //
 // This page's JavaScript (one continuous inline <script type="module">,
 // plus the external assets/js/ocs-analytics-dashboard.js which owns the
@@ -9,12 +9,6 @@
 
 .ocs__analytics-page {
     width: 100%;
-}
-
-.ocs__analytics-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
 }
 
 // .ocs__tabs / -list / -btn / -underline / -panels / -panel (elements/tabs)

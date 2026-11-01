@@ -21,6 +21,7 @@
 // Dashboard, Bathroom Pass, Calendar).
 .ocs__card-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
@@ -64,7 +65,7 @@
   border: 1px solid var(--pref-accent-color);
   border-radius: 999px;
   background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
-  color: var(--pref-accent-color);
+  color: var(--pref-text-color);
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -111,7 +112,7 @@
   border: 1px solid var(--pref-accent-color);
   border-radius: 999px;
   background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
-  color: var(--pref-accent-color);
+  color: var(--pref-text-color);
   font-size: 0.72rem;
   font-weight: 600;
 }
@@ -151,6 +152,13 @@
 // Declared before the 768px rule below, so it becomes one column on phones too.
 .ocs__split--aside {
   grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+}
+
+// The narrow column on the right instead, for a sidebar beside the main content.
+// It comes second in the markup, so phones stack it under the main content.
+// Like --aside, it stays above the 768px rule.
+.ocs__split--aside-end {
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem);
 }
 
 .ocs__facts {
@@ -240,7 +248,8 @@
 
 .ocs__entity-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  // min() lets a column shrink below 220px on a phone instead of widening the card.
+  grid-template-columns: repeat(auto-fit, minmax(unquote("min(220px, 100%)"), 1fr));
   gap: 0.6rem;
   margin: 0;
   padding: 0;
@@ -318,7 +327,7 @@
 }
 
 .ocs__nav-card-kicker {
-  font-size: 0.62rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -343,7 +352,7 @@ html.user-theme-active .ocs__nav-card-title {
 }
 
 .ocs__nav-card .ocs__status {
-  font-size: 0.65rem;
+  font-size: 0.75rem;
 }
 
 .ocs__nav-card .ocs__text {
@@ -475,7 +484,7 @@ button.ocs__hub-card {
 @media (max-width: 768px) {
   .ocs__card-grid,
   .ocs__split {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

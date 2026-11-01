@@ -44,4 +44,4 @@ lxdData:
       Alt: "Unit 4 Image"
       Level: 4
 ---
-{%- include tailwind/lxd.html -%}
+{%- include lxd.html -%}

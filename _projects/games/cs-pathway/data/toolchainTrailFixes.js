@@ -3,7 +3,7 @@
  *
  * FIXES is keyed by the check ids the backend returns (ToolchainStations.java in
  * blueprint-spring). Each entry has steps per OS; an OS without its own steps uses
- * OS_FALLBACK (WSL and Kasm are Ubuntu), then `all`. A step is plain text or
+ * OS_FALLBACK (WSL is Ubuntu), then `all`. A step is plain text or
  * { text, commands }, and every command gets a Copy button.
  *
  * {project} is replaced with the student's project folder for their OS and
@@ -11,13 +11,12 @@
  */
 
 export const PROJECT_FOLDER = Object.freeze({
-  windows: '~/opencs/portfolio',
-  macos: '~/opencs/portfolio',
-  linux: '~/opencs/portfolio',
-  kasm: '~/opencs/student',
+  windows: '~/opencs/pages',
+  macos: '~/opencs/pages',
+  linux: '~/opencs/pages',
 });
 
-const OS_FALLBACK = Object.freeze({ windows: 'linux', kasm: 'linux', wsl: 'linux' });
+const OS_FALLBACK = Object.freeze({ windows: 'linux', wsl: 'linux' });
 
 const UBUNTU_TOOLS = [
   { text: 'Install Python, Ruby and the class gems from your project folder (enter your password when asked):', commands: ['cd {project}', './scripts/activate_ubuntu.sh'] },
@@ -32,8 +31,11 @@ export const FIXES = Object.freeze({
   'working-folder': {
     all: [{ text: 'Start the agent from a terminal inside your project folder, then use Pair a new agent:', commands: ['cd {project}', '{agent}'] }],
   },
-  'trail-folder': {
-    all: [{ text: 'Create the folder in your home folder, then click Check again:', commands: ['mkdir -p ~/toolchain-trail'] }],
+  'pages-clone': {
+    all: [
+      { text: 'Clone the class repo into your opencs folder (skip the clone if pages is already there):', commands: ['mkdir -p ~/opencs', 'cd ~/opencs', 'git clone https://github.com/Open-Coding-Society/pages.git'] },
+      { text: 'Start the agent from inside it, then use Pair a new agent:', commands: ['cd {project}', '{agent}'] },
+    ],
   },
   python: {
     macos: [{ text: 'Install Python with Homebrew (get Homebrew from brew.sh first if brew is missing):', commands: ['brew install python'] }],
@@ -56,7 +58,6 @@ export const FIXES = Object.freeze({
       'Install VS Code for Windows from code.visualstudio.com and keep "Add to PATH" checked.',
       { text: 'Close and reopen your Ubuntu (WSL) terminal, check it works, then click Check again:', commands: ['code --version'] },
     ],
-    kasm: [{ text: 'VS Code comes with Kasm. Check it works, then click Check again:', commands: ['code --version'] }],
     linux: [
       { text: 'Install VS Code (enter your password when asked):', commands: ['sudo snap install code --classic'] },
       { text: 'Check it works, then click Check again:', commands: ['code --version'] },
@@ -87,28 +88,44 @@ export const FIXES = Object.freeze({
   'bundle-check': {
     all: [{ text: "Install the project's gems and Python packages, then click Check again:", commands: ['cd {project}', './scripts/venv.sh'] }],
   },
-  'recent-commit': {
-    all: [{ text: 'Make a commit in your project (change the message if you like):', commands: ['cd {project}', 'git add -A && git commit -m "My first trail commit"'] }],
-  },
-  'push-dry-run': {
-    all: [
-      { text: 'See what blocks your push:', commands: ['cd {project}', 'git push --dry-run'] },
-      { text: 'If it says there is no upstream branch, push once with:', commands: ['git push -u origin HEAD'] },
-      'If it asks you to sign in or says permission denied, sign in to GitHub (Windows: Git Credential Manager), then click Check again.',
-    ],
-  },
 });
 
 /** Help for getting stuck before any check runs. */
 export const STUCK_HELP = Object.freeze({
   notSignedIn: ['You are not signed in, so no pairing code was made.', 'Sign in from the Login page, come back to this station, and click Get pairing code.'],
-  serverUnreachable: ["The game can't reach the Toolchain server, so no pairing code was made.", 'Check your internet connection, reload the page, and click Get pairing code again.'],
+  serverUnreachable: [
+    "The Toolchain server did not answer. It may be offline or not deployed yet. You can still finish this station with the Practice Check below.",
+    'Run the commands named in the Practice Check, paste their output, and click Verify Output.',
+    'To try the agent again later, reload the page and click Get pairing code.',
+  ],
   localBackendDown: [
     "The game can't reach your local backend.",
     { text: 'Start it in your blueprint-spring folder and wait for "Started Main". On a new computer, run the first command once to set up the database:', commands: ['python3 scripts/db_init.py', './mvnw spring-boot:run'] },
     'Then click Get pairing code again.',
   ],
+  // 404: the server answers but has no pairing endpoint yet (backend not deployed).
+  serverNotReady: [
+    "The server isn't ready for pairing yet, so no pairing code was made. You can still finish this station with the Practice Check box:",
+    'In your terminal, run the commands the practice check names.',
+    'Copy everything they print and paste it into the practice check box.',
+    'Click Verify Output.',
+  ],
+  serverError: [
+    'The server had a problem, so no pairing code was made. You can still finish this station.',
+    'Use the Practice Check box: run the commands it names, paste what they print, and click Verify Output.',
+    'To try the agent again later, click Get pairing code in a few minutes.',
+  ],
 });
+
+/** Which STUCK_HELP entry fits a failed pairing-code request. */
+export function stuckHelpFor(error, { localBackend = false } = {}) {
+  if (error?.status === 401) return STUCK_HELP.notSignedIn;
+  if (error?.status === 404) return STUCK_HELP.serverNotReady;
+  if (error instanceof TypeError) { // fetch got no answer at all
+    return localBackend ? STUCK_HELP.localBackendDown : STUCK_HELP.serverUnreachable;
+  }
+  return STUCK_HELP.serverError;
+}
 
 /** The fix steps for one failed check on one OS, with {project} and {agent} filled in. */
 export function fixStepsFor(checkId, os, agentCommand) {

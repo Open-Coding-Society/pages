@@ -1,8 +1,9 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from './RacingPlayer.js';
+import Player from './AccelDecelRacingPlayer.js';
 import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import TimeLapScreen from './TimeLapScreen.js';
+import WinterIcicle, { getRandomTrackPoint } from './WinterIcicle.js';
 
 
 // Npc only talks while a player is touching it; the yeti talks whenever E is pressed.
@@ -26,7 +27,12 @@ class Yeti extends Npc {
 
 class GameLevelWinter {
   constructor(gameEnv) {
+    this.gameEnv = gameEnv;
+    this.nextIcicleId = 1;
+    this.nextIcicleSpawnAt = Date.now() + 2500;
     const path = gameEnv.path;
+    this.iciclePath = path + '/images/projects/racing-game/Icicle.png';
+    this.boostInstructions = this.createBoostInstructions(gameEnv.container);
     const background_data = {
       name: "Winter Course",
       greeting: "Welcome to the Winter Level!",
@@ -38,9 +44,16 @@ class GameLevelWinter {
         name: "Red Car",
         greeting: "I'm the red car!",
         src: path + '/images/projects/racing-game/Directions_red_car.png',
-        SCALE_FACTOR: 10,
+        SCALE_FACTOR: 20,
         STEP_FACTOR: 1100,
-        INIT_POSITION: {x: 370 / 740, y: 465 / 585},
+        currentSpeed: 0,
+        maxSpeed: 12,
+        acceleration: 0.4,
+        deceleration: 0.4,
+        reverseSpeed: -4,
+        boostKey: 70, // F
+        INIT_POSITION: {x: 0.4, y: 0.79},
+        direction: { default: 'right' },
         pixels: { height: 1024, width: 1536 },
         orientation: { rows: 4, columns: 4 },
         up:        { row: 3, start: 0, columns: 1 },
@@ -58,9 +71,16 @@ class GameLevelWinter {
         name: "Blue Car",
         greeting: "I'm the blue car!",
         src: path + '/images/projects/racing-game/Directions_blue_car.png',
-        SCALE_FACTOR: 10,
+        SCALE_FACTOR: 20,
         STEP_FACTOR: 1100,
-        INIT_POSITION: {x: 340 / 740, y: 500 / 585},
+        currentSpeed: 0,
+        maxSpeed: 12,
+        acceleration: 0.4,
+        deceleration: 0.4,
+        reverseSpeed: -4,
+        boostKey: 75, // K
+        INIT_POSITION: {x: 0.31, y: 0.79},
+        direction: { default: 'right' },
         pixels: { height: 1024, width: 1536 },
         orientation: { rows: 4, columns: 4 },
         up:        { row: 3, start: 0, columns: 1 },
@@ -86,7 +106,7 @@ class GameLevelWinter {
     const barrierData2 = {
       id: "barrier-3",
       coordinateSpace: "normalized",
-      splinePoints: [{"x":0.1674,"y":0.3118},{"x":0.1173,"y":0.3309},{"x":0.079,"y":0.4118},{"x":0.135,"y":0.4475},{"x":0.0947,"y":0.457},{"x":0.0849,"y":0.4309},{"x":0.2057,"y":0.4451},{"x":0.2499,"y":0.4975},{"x":0.2734,"y":0.6166},{"x":0.2302,"y":0.6904},{"x":0.1703,"y":0.719},{"x":0.1753,"y":0.7737},{"x":0.2921,"y":0.7737},{"x":0.7575,"y":0.7737},{"x":0.8292,"y":0.7404},{"x":0.8213,"y":0.6737},{"x":0.7614,"y":0.6547},{"x":0.7378,"y":0.588},{"x":0.782,"y":0.4904},{"x":0.8704,"y":0.4761},{"x":0.9372,"y":0.4523},{"x":0.9254,"y":0.4047},{"x":0.8743,"y":0.3213},{"x":0.7928,"y":0.2737},{"x":0.6966,"y":0.2809},{"x":0.6505,"y":0.3023},{"x":0.6073,"y":0.2785},{"x":0.4325,"y":0.2761},{"x":0.3598,"y":0.3094},{"x":0.2695,"y":0.2666},{"x":0.2243,"y":0.238},{"x":0.1861,"y":0.269},{"x":0.1713,"y":0.2951}],
+      splinePoints: [{"x":0.1675,"y":0.3118},{"x":0.1173,"y":0.3309},{"x":0.079,"y":0.4118},{"x":0.135,"y":0.4475},{"x":0.0947,"y":0.457},{"x":0.0849,"y":0.4309},{"x":0.2057,"y":0.4451},{"x":0.2499,"y":0.4975},{"x":0.2734,"y":0.6166},{"x":0.2302,"y":0.6904},{"x":0.1703,"y":0.719},{"x":0.1753,"y":0.7737},{"x":0.2921,"y":0.7737},{"x":0.7575,"y":0.7737},{"x":0.8292,"y":0.7404},{"x":0.8213,"y":0.6737},{"x":0.7614,"y":0.6547},{"x":0.7378,"y":0.588},{"x":0.782,"y":0.4904},{"x":0.8704,"y":0.4761},{"x":0.9372,"y":0.4523},{"x":0.9254,"y":0.4047},{"x":0.8743,"y":0.3213},{"x":0.7928,"y":0.2737},{"x":0.6966,"y":0.2809},{"x":0.6505,"y":0.3023},{"x":0.6073,"y":0.2785},{"x":0.4325,"y":0.2761},{"x":0.3598,"y":0.3094},{"x":0.2695,"y":0.2666},{"x":0.2243,"y":0.238},{"x":0.1861,"y":0.269},{"x":0.1713,"y":0.2951}],
       visible: false,
       hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
       fromOverlay: true,
@@ -108,6 +128,79 @@ class GameLevelWinter {
       { class: SplineBarrier, data: barrierData2 },
       { class: TimeLapScreen, data: lap_data }
     ];
+  }
+
+  update(now = Date.now()) {
+    const gameObjects = this.gameEnv.gameObjects;
+    for (let index = gameObjects.length - 1; index >= 0; index -= 1) {
+      if (gameObjects[index]?.consumed) gameObjects.splice(index, 1);
+    }
+
+    if (now < this.nextIcicleSpawnAt) return;
+
+    const activeIcicles = gameObjects.filter((object) => object instanceof WinterIcicle);
+    if (activeIcicles.length >= 2) {
+      this.nextIcicleSpawnAt = now + 1000;
+      return;
+    }
+
+    const icicle = new WinterIcicle({
+      id: `winter-icicle-${this.nextIcicleId}`,
+      src: this.iciclePath,
+      SCALE_FACTOR: 16,
+      STEP_FACTOR: 1100,
+      pixels: { height: 612, width: 408 },
+      orientation: { rows: 1, columns: 1 },
+      down: { row: 0, start: 0, columns: 1 },
+      hitbox: { widthPercentage: 0.3, heightPercentage: 0.3 },
+      canvasFilter: [
+        'drop-shadow(1px 0 0 #f00)',
+        'drop-shadow(-1px 0 0 #f00)',
+        'drop-shadow(0 1px 0 #f00)',
+        'drop-shadow(0 -1px 0 #f00)',
+      ].join(' '),
+      targetPosition: getRandomTrackPoint(),
+      dropSpeed: 8,
+      landedDuration: 4400,
+    }, this.gameEnv);
+    gameObjects.push(icicle);
+
+    this.nextIcicleId += 1;
+    this.nextIcicleSpawnAt = now + 3500 + Math.random() * 3500;
+  }
+
+  createBoostInstructions(container) {
+    if (typeof document === 'undefined' || !container?.appendChild) return null;
+
+    const instructions = document.createElement('div');
+    instructions.setAttribute('aria-label', 'Car boost controls');
+    Object.assign(instructions.style, {
+      position: 'absolute',
+      top: '8px',
+      left: '12px',
+      right: '12px',
+      zIndex: '30',
+      display: 'flex',
+      justifyContent: 'space-between',
+      gap: '12px',
+      color: '#fff',
+      font: 'bold clamp(12px, 2vw, 18px) Arial, sans-serif',
+      textShadow: '0 1px 4px #000, 1px 0 2px #000, -1px 0 2px #000',
+      pointerEvents: 'none',
+    });
+
+    const redInstruction = document.createElement('span');
+    redInstruction.textContent = 'Press F for Red Car Boost.';
+    const blueInstruction = document.createElement('span');
+    blueInstruction.textContent = 'Press K for Blue Car Boost.';
+    instructions.append(redInstruction, blueInstruction);
+    container.appendChild(instructions);
+    return instructions;
+  }
+
+  destroy() {
+    this.boostInstructions?.remove();
+    this.boostInstructions = null;
   }
 }
 

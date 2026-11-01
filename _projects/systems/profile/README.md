@@ -39,6 +39,7 @@ What Profile does in each:
 | Classes | saved in Flask | saved in Flask, then Spring's course groups updated |
 | Persona and Skill check-in | saved in Flask | saved in Flask |
 | Face ID and GitHub Gist cards | left out | shown; both save in Spring |
+| Optional AI connections (grading and AI themes) | left out | Gemini/Groq keys save independently in Spring |
 | Setup list | Classes, Persona | Classes, Persona, Face ID, GitHub |
 
 The setting covers Profile, the login page's sign-up and sign-in, logout and the
@@ -64,6 +65,7 @@ Calendar and Bathroom Pass.
 | `pages/profile-v2.md` | `navigation/authentication/profile-v2.md` | sends `/profile/v2` to `/profile` |
 | `layouts/profile.html` | `_layouts/profile.html` | the page's markup and starter script |
 | `_includes/profile-gist-connection.html` | `_includes/` | the GitHub Gist card |
+| `_includes/profile-ai-connections.html` | `_includes/` | optional Gemini/Groq connection card using shared OCS controls |
 | `js/` | `assets/js/profile/` | the page's modules |
 | `sass/profile-gist-connection.scss` | `_sass/open-coding/` | the Gist card's styles |
 
@@ -84,3 +86,7 @@ can't break them. A site that uses Profile needs a `config.js` that exports
 - `node --test tests/profile_model.test.mjs`: the pure helpers in `js/profile-model.js`
   (the root file imports `tests/profile_model.test.mjs` from this system).
 - `node --test tests/test_gist_connection.mjs`: the Gist card.
+- `node --test tests/test_ai_connections.mjs`: independent AI-key saves, replacement, disconnect and failures.
+- `bundle exec ruby tests/test_ai_profile_layout.rb`: AI card rendering, shared controls,
+  publication paths and Flask-only omission. AI credentials are optional and do not add
+  a required step to the setup checklist.

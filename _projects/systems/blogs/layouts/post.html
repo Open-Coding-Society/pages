@@ -880,7 +880,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
           const notes = document.getElementById('code-notes-blog')?.value?.trim() || '';
           const btn = this.querySelector('button[type="submit"]');
           if (window.unsavedRunners().length > 0) {
-            showStatusBlog('error', 'Save your code with the 💾 button in each runner before submitting.');
+            showStatusBlog('error', 'Save each code runner with its 💾 button, and submit each reflection with its 📤 button, before submitting.');
             return;
           }
           const files = window.readRunners();
@@ -908,7 +908,8 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
           showStatusBlog('loading', 'Creating Gist and submitting...');
           try {
             const assignmentId = await ensureAssignmentIdBlog();
-            const gistUrl = await window.exportToGist(files, { type: 'submission', description: notes || 'Code submission' });
+            // kinds tells the grader which files are written reflections rather than code.
+            const gistUrl = await window.exportToGist(files, { type: 'submission', description: notes || 'Code submission', manifest: { kinds: window.readRunnerKinds() } });
             const content = { type: 'code', url: gistUrl, notes };
             const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
               ...fetchOptions,
@@ -981,7 +982,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
     import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
     import { appendGistSettingsLink } from '{{ site.baseurl }}/assets/js/gist-connection-errors.js';
-    import { listRunners, unsavedRunners, readRunners } from '{{ site.baseurl }}/assets/js/runner-io.js';
+    import { listRunners, unsavedRunners, readRunners, readRunnerKinds } from '{{ site.baseurl }}/assets/js/runner-io.js';
     window.pythonURI = pythonURI;
     window.javaURI = javaURI;
     window.fetchOptions = fetchOptions;
@@ -991,6 +992,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     window.listRunners = listRunners;
     window.unsavedRunners = unsavedRunners;
     window.readRunners = readRunners;
+    window.readRunnerKinds = readRunnerKinds;
   </script>
   <script src="{{ site.baseurl }}/assets/js/ocs-analytics-enhanced.js"></script>
   <script src="{{ site.baseurl }}/assets/js/code-runner-analytics.js"></script>

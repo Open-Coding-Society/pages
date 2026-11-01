@@ -15,10 +15,10 @@
         theme: "Onboarding & Readiness"
         goals: ["Tool Setup", "Scrum Habits"]
 
-  Blogs, each sprint's intro, each week's intro (its learning goals), and each
-  week's chat are pages of their own, made by _plugins/lesson_player_pages.rb.
+  Blogs, each sprint's intro, and each week's intro (its learning goals) are
+  pages of their own, made by _plugins/lesson_player_pages.rb.
   The URLs below must match the ones that plugin gives them:
-    /<course>/blogs/  /<course>/sprint-<n>/  /<course>/week-<w>/  /<course>/week-<w>/chat/
+    /<course>/blogs/  /<course>/sprint-<n>/  /<course>/week-<w>/
 
   Expects lessonsByWeek, this course's lessons grouped by week, from
   _layouts/post.html.
@@ -30,9 +30,8 @@
     - .lesson-status-icon                   -> per-lesson complete/incomplete
     - [data-week-group] [data-week-count]    -> per-week completion count
 
-  Sets currentWeekUrl and currentWeekChatUrl when it draws the page's own week,
-  for the top bar's week crumb and chat button. A lesson whose week is in no
-  sprint has neither page, so both stay blank.
+  Sets currentWeekUrl when it draws the page's own week, for the top bar's week
+  crumb. A lesson whose week is in no sprint has no week page, so it stays blank.
 
   The script at the bottom of this file hides and shows the sidebar, for the
   button in _includes/lesson-topbar.html.
@@ -62,7 +61,6 @@
   <div class="sprint-nav">
     {%- assign courseData = site.data[current_course] -%}
     {%- assign currentWeekUrl = "" -%}
-    {%- assign currentWeekChatUrl = "" -%}
 
     {%- for i in (1..9) -%}
       {%- assign sprintKey = "Sprint" | append: i -%}
@@ -153,26 +151,16 @@
                 </a>
                 {%- endfor -%}
 
-                {%- comment -%}
-                  The week's chat opens as its own page, beside this sidebar.
-                  It is a link, not a step, so Prev / Next pass it by.
-                {%- endcomment -%}
-                {%- assign chatUrl = weekUrl | append: "chat/" -%}
                 {%- if week == current_week -%}
                   {%- assign currentWeekUrl = weekUrl -%}
-                  {%- assign currentWeekChatUrl = chatUrl -%}
                 {%- endif -%}
+                {%- if assignmentCount > 0 -%}
                 <div class="ocs__links ocs__tree-item">
-                  {%- if assignmentCount > 0 -%}
                   <span class="ocs__status-pill ocs__status-pill--warn">
                     <i class="fas fa-calendar"></i> {{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due
                   </span>
-                  {%- endif -%}
-                  <a class="ocs__btn ocs__btn--icon small accent{% if page.url == chatUrl %} fill{% endif %}" href="{{ site.baseurl }}{{ chatUrl }}"{% if page.url == chatUrl %} aria-current="page"{% endif %}>
-                    <i class="fas fa-comments" aria-hidden="true"></i>
-                    Week {{ week }} Chat
-                  </a>
                 </div>
+                {%- endif -%}
               </div>
             </details>
             {%- endif -%}

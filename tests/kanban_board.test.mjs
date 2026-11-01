@@ -1,10 +1,30 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 import {
-    BoardError, cacheState, columnCards, filterCards, normalizeBoard, parseBoardUrl, pickFields, readEntry, refreshBoard,
-    repoStatusOf, stageOf, writeEntry,
+    BoardError, boardConfig, cacheState, columnCards, createKanbanSection, filterCards, mountAll, mountKanbanBoard,
+    normalizeBoard, parseBoardUrl, pickFields, readEntry, refreshBoard, repoStatusOf, repoToProject, stageOf, writeEntry,
 } from '../assets/js/kanban-board.js';
+
+// The board's defaults, read from _data/kanban.yml with Ruby's YAML, the parser
+// Jekyll uses. A missing or broken file fails here; only a machine without Ruby
+// skips the tests that need it.
+let hasRuby = true;
+try { execFileSync('ruby', ['-v']); } catch (_) { hasRuby = false; }
+const KANBAN_YML = fileURLToPath(new URL('../_data/kanban.yml', import.meta.url));
+const DEFAULTS = hasRuby
+    ? JSON.parse(execFileSync('ruby', ['-ryaml', '-rjson', '-e', 'puts JSON.generate(YAML.load_file(ARGV[0]))', KANBAN_YML], { encoding: 'utf8' }))
+    : null;
+const yaml = { skip: hasRuby ? false : 'needs Ruby to read _data/kanban.yml' };
+const CONFIG = DEFAULTS && boardConfig(DEFAULTS);
+// Our capstone's own columns list (_data/communication_system_infograph.yml):
+// UGRC-CSA's two note columns stay off its board.
+const OUR_COLUMNS = [{ status: '📌 Team Map', hidden: true }, { status: '🪞 Reflections', hidden: true }];
+const OURS = DEFAULTS && boardConfig(DEFAULTS, OUR_COLUMNS);
+// The defaults with one stage changed, to show the board follows the data.
+const withStage = (key, change) => boardConfig({ ...DEFAULTS, stages: DEFAULTS.stages.map((stage) => (stage.key === key ? { ...stage, ...change(stage) } : stage)) });
 
 // Shaped like GitHub's REST projectsV2 responses (fields, items), trimmed to
 // one small board: UGRC-CSA's columns and its Team / People / Shipped fields.
@@ -58,27 +78,34 @@ const ITEMS = [ISSUE, SASS_DRAFT, TEAM_MAP, SHARED_DRAFT, PULL];
 
 /* ── Stages, URLs, fields ────────────────────────────────────────────── */
 
-test('statuses from different boards land on the shared stages, and non-work columns are hidden', () => {
+test('statuses from different boards land on the shared stages; a status with no stage words has none', yaml, () => {
     const cases = {
         '📋 To Do': 'todo', '🚧 In Progress': 'doing', '👀 In Review': 'review', '✅ Done': 'done',
-        '💡 Backlog': 'backlog', Todo: 'todo', Planning: 'backlog', '': 'backlog',
-        '📌 Team Map': null, '🪞 Reflections': null,
+        '💡 Backlog': 'backlog', Todo: 'todo', Planning: 'backlog', '': null,
+        '📌 Team Map': null, '🪞 Reflections': null, 'Ground 0': null,
     };
-    for (const [status, stage] of Object.entries(cases)) assert.equal(stageOf(status), stage, status);
-    assert.equal(stageOf(null), 'backlog');
+    for (const [status, stage] of Object.entries(cases)) assert.equal(stageOf(status, CONFIG), stage, status);
 });
 
-test('the column names in OCS\'s issue lifecycle land on their stages', () => {
-    const cases = { 'Parking Lot': 'backlog', 'Parking lot': 'backlog', ToDo: 'todo', 'In Progress': 'doing', 'In Review': 'review', Done: 'done' };
-    for (const [status, stage] of Object.entries(cases)) assert.equal(stageOf(status), stage, status);
+test('the column names in OCS\'s issue lifecycle land on their stages', yaml, () => {
+    const cases = { 'Parking Lot': 'backlog', 'Parking lot': 'backlog', 'Backlog (parking lot)': 'backlog', ToDo: 'todo', 'In Progress': 'doing', 'In Review': 'review', Done: 'done' };
+    for (const [status, stage] of Object.entries(cases)) assert.equal(stageOf(status, CONFIG), stage, status);
 });
 
-test('blocked or waiting work stays in progress and released work is done, instead of disappearing', () => {
+test('blocked or waiting work stays in progress, released work is done, and a status naming two stages takes the later one', yaml, () => {
     const cases = {
-        '🚫 Blocked': 'doing', 'On hold': 'doing', 'Waiting on mentor': 'doing', Stuck: 'doing',
-        'Waiting for review': 'review', Released: 'done', Deployed: 'done', Finished: 'done', Resolved: 'done',
+        '🚫 Blocked': 'doing', 'On hold': 'doing', 'Waiting on mentor': 'doing', Stuck: 'doing', 'In progress (blocked)': 'doing',
+        'Waiting for review': 'review', 'Ready for review': 'review', Released: 'done', Deployed: 'done', Finished: 'done', Resolved: 'done',
     };
-    for (const [status, stage] of Object.entries(cases)) assert.equal(stageOf(status), stage, status);
+    for (const [status, stage] of Object.entries(cases)) assert.equal(stageOf(status, CONFIG), stage, status);
+});
+
+test('a stage\'s words, its name and whether it starts collapsed all come from _data/kanban.yml', yaml, () => {
+    const config = withStage('todo', (stage) => ({ label: 'Up next', words: [...stage.words, 'define'], collapsed: true }));
+    assert.equal(stageOf('Define', config), 'todo');
+    const fields = [{ id: 3, name: 'Status', data_type: 'single_select', options: ['Define', 'Done'].map(option) }];
+    const board = normalizeBoard({ project: PROJECT, fields, items: [] }, { url: BOARD_URL, config });
+    assert.deepEqual(board.columns.map((c) => [c.label, c.collapsed]), [['Up next', true], ['Done', false]]);
 });
 
 test('board addresses become API paths; anything that is not a GitHub project is refused', () => {
@@ -95,24 +122,29 @@ test('board addresses become API paths; anything that is not a GitHub project is
     assert.equal(parseBoardUrl('not a url'), null);
 });
 
-test('fields are found by name in any case, and a filter the board lacks is left out', () => {
-    const picked = pickFields(FIELDS, 'team');
+test('fields are found by the names in the data, in any case, and a filter the board lacks is left out', yaml, () => {
+    const picked = pickFields(FIELDS, 'team', CONFIG);
     assert.deepEqual(picked.status, { id: 3, name: 'Status', options: ['📌 Team Map', '💡 Backlog', '📋 To Do', '🚧 In Progress', '👀 In Review', '✅ Done', '🪞 Reflections'] });
     assert.deepEqual(picked.group, { id: 4, name: 'Team', options: ['Chat + Calendar', 'SASS', 'DMs', 'Everyone'] });
     assert.equal(picked.people.id, 5);
     assert.equal(picked.shipped.id, 6);
     // Linked pull requests is found by its type: GitHub names it, not the board.
     assert.equal(picked.prs.id, 7);
-    assert.equal(pickFields(FIELDS, 'Squad').group, null);
+    assert.deepEqual(picked.details, []);
+    assert.equal(pickFields(FIELDS, 'Squad', CONFIG).group, null);
     // A board whose status field has another name still gets columns.
     const stage = { id: 9, name: 'Stage', data_type: 'single_select', options: [option('Todo')] };
-    assert.equal(pickFields([FIELDS[0], stage]).status.id, 9);
+    assert.equal(pickFields([FIELDS[0], stage], '', CONFIG).status.id, 9);
+    // The names themselves are data.
+    const members = { id: 8, name: 'Members', data_type: 'multi_select', options: [option('Sathwik')] };
+    const config = boardConfig({ ...DEFAULTS, fields: { ...DEFAULTS.fields, people: 'Members' } });
+    assert.equal(pickFields([...FIELDS, members], '', config).people.id, 8);
 });
 
 /* ── Normalizing ─────────────────────────────────────────────────────── */
 
-test('a board keeps its work cards with links, groups, people and shipped dates', () => {
-    const board = normalizeBoard({ project: PROJECT, fields: FIELDS, items: ITEMS }, { filterName: 'Team', url: BOARD_URL });
+test('a board keeps its work cards with links, groups, people and shipped dates', yaml, () => {
+    const board = normalizeBoard({ project: PROJECT, fields: FIELDS, items: ITEMS }, { filterName: 'Team', url: BOARD_URL, config: OURS });
     assert.equal(board.title, 'UGRC-CSA — Team Kanban');
     assert.equal(board.url, BOARD_URL);
     assert.deepEqual(board.cards.map((c) => c.title),
@@ -131,11 +163,10 @@ test('a board keeps its work cards with links, groups, people and shipped dates'
     assert.deepEqual(pull.people, ['Wick2009']);
     assert.equal(pull.shipped, null);
 
-    // Columns follow the board's Status options in order; Team Map and
-    // Reflections are left out, and no card is missing a status.
-    // The backlog column keeps the board's own name for it.
+    // Columns follow the board's Status options in order; our page hides Team
+    // Map and Reflections, and the backlog keeps the board's own name for it.
     assert.deepEqual(board.columns.map((c) => c.label), ['💡 Backlog', 'To do', 'In progress', 'In review', 'Done']);
-    assert.deepEqual(board.columns.map((c) => c.toggle), [true, false, false, false, false]);
+    assert.deepEqual(board.columns.map((c) => c.collapsed), [true, false, false, false, false]);
     assert.equal(issue.column, 'done');
 
     // DMs has no card on this board, so it gets no filter button.
@@ -145,15 +176,40 @@ test('a board keeps its work cards with links, groups, people and shipped dates'
     assert.equal(board.updated, '2026-10-15T16:49:43Z');
 });
 
-test('a done card without a Shipped date uses the day its issue closed', () => {
+test('nothing about one team\'s board is in the code: without our page\'s list, Team Map and Reflections are columns', yaml, () => {
+    const board = normalizeBoard({ project: PROJECT, fields: FIELDS, items: ITEMS }, { url: BOARD_URL, config: CONFIG });
+    assert.deepEqual(board.columns.map((c) => c.label), ['📌 Team Map', '💡 Backlog', 'To do', 'In progress', 'In review', 'Done', '🪞 Reflections']);
+    assert.ok(board.cards.some((c) => c.title === 'Start here: who is working on what'));
+});
+
+test('a capstone renames, merges, collapses or hides a column from its own columns list', yaml, () => {
+    const fields = [{ id: 3, name: 'Status', data_type: 'single_select', options: ['Todo', 'In progress', 'Done', 'Ground 0', 'Notes'].map(option) }];
+    const config = boardConfig(DEFAULTS, [
+        { status: 'Todo', label: 'ToDo' },          // its own column, by this name
+        { status: 'Ground 0', stage: 'backlog' },   // into the backlog
+        { status: 'Notes', hidden: true },          // off the board
+        { status: 'done', collapsed: true },        // matched in any case; starts collapsed
+        { label: 'no status named' },               // ignored
+    ]);
+    const items = [
+        item(701, 'DraftIssue', draft('Anvay - Ground 0'), [statusValue('Ground 0')], '2026-10-22T00:00:00Z'),
+        item(702, 'DraftIssue', draft('Meeting notes'), [statusValue('Notes')], '2026-10-22T00:00:00Z'),
+    ];
+    const board = normalizeBoard({ project: PROJECT, fields, items }, { url: BOARD_URL, config });
+    assert.deepEqual(board.columns.map((c) => [c.label, c.collapsed]),
+        [['ToDo', false], ['In progress', false], ['Done', true], ['Ground 0', true]]);
+    assert.deepEqual(board.cards.map((c) => [c.title, c.column]), [['Anvay - Ground 0', 'backlog']]);
+});
+
+test('a done card without a Shipped date uses the day its issue closed', yaml, () => {
     const closed = item(106, 'Issue', { ...ISSUE.content, closed_at: '2026-10-12T03:00:00Z' }, [statusValue('✅ Done')], '2026-10-12T03:00:00Z');
-    const [card] = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [closed] }, { url: BOARD_URL }).cards;
+    const [card] = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [closed] }, { url: BOARD_URL, config: CONFIG }).cards;
     assert.equal(card.shipped, '2026-10-12');
 });
 
-test('a card links only to github.com; any other address opens it on the board instead', () => {
+test('a card links only to github.com; any other address opens it on the board instead', yaml, () => {
     const odd = item(108, 'Issue', { ...ISSUE.content, html_url: 'javascript:alert(1)' }, [statusValue('📋 To Do')], '2026-10-14T06:00:00Z');
-    const [card] = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [odd] }, { url: BOARD_URL }).cards;
+    const [card] = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [odd] }, { url: BOARD_URL, config: CONFIG }).cards;
     assert.equal(card.url, `${BOARD_URL}?pane=issue&itemId=108`);
 });
 
@@ -163,73 +219,82 @@ const MINIMAL_FIELDS = [
     { id: 3, name: 'Status', data_type: 'single_select', options: ['Todo', 'In Progress', 'Done'].map(option) },
 ];
 
-test('cards with no status get a No status column, open unless the board has its own Backlog', () => {
+test('cards with no status get a No status column, open unless the board has a collapsed column of its own', yaml, () => {
     const noStatus = item(107, 'DraftIssue', draft('Idea'), [statusValue(null)], '2026-10-14T05:00:00Z');
 
     // A minimal board has nowhere else to put them, so they show first, like GitHub's "No Status".
-    const minimal = normalizeBoard({ project: PROJECT, fields: MINIMAL_FIELDS, items: [noStatus] }, { url: BOARD_URL });
+    const minimal = normalizeBoard({ project: PROJECT, fields: MINIMAL_FIELDS, items: [noStatus] }, { url: BOARD_URL, config: CONFIG });
     assert.deepEqual(minimal.columns.map((c) => c.label), ['No status', 'To do', 'In progress', 'Done']);
-    assert.equal(minimal.columns[0].toggle, false);
+    assert.equal(minimal.columns[0].collapsed, false);
     assert.equal(minimal.cards[0].column, 'none');
 
-    // A board with a Backlog column keeps them behind the Backlog toggle with it.
-    const withBacklog = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [noStatus] }, { url: BOARD_URL });
+    // A board with a collapsed Backlog keeps them collapsed with it.
+    const withBacklog = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [noStatus] }, { url: BOARD_URL, config: OURS });
     assert.equal(withBacklog.columns[0].label, 'No status');
-    assert.equal(withBacklog.columns[0].toggle, true);
+    assert.equal(withBacklog.columns[0].collapsed, true);
 
-    const empty = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [] }, { filterName: 'Team', url: BOARD_URL });
+    const empty = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [] }, { filterName: 'Team', url: BOARD_URL, config: OURS });
     assert.deepEqual(empty.cards, []);
     assert.equal(empty.updated, null);
     assert.equal(empty.columns.some((c) => c.key === 'none'), false);
 });
 
-test('a status the stages don\'t know keeps a column of its own name, in the board\'s order', () => {
+test('what the board says comes from the data too', yaml, () => {
+    const config = boardConfig({ ...DEFAULTS, text: { ...DEFAULTS.text, no_status: 'Unsorted', untitled: 'A card' } });
+    const nameless = item(108, 'DraftIssue', { ...draft(''), title: '' }, [statusValue(null)], '2026-10-14T05:00:00Z');
+    const board = normalizeBoard({ project: { title: '' }, fields: MINIMAL_FIELDS, items: [nameless] }, { url: BOARD_URL, config });
+    assert.equal(board.columns[0].label, 'Unsorted');
+    assert.equal(board.cards[0].title, 'A card');
+    assert.equal(board.title, DEFAULTS.text.title);
+});
+
+test('a status the stages don\'t know keeps a column of its own name, in the board\'s order', yaml, () => {
     const fields = [{ id: 3, name: 'Status', data_type: 'single_select', options: ['Todo', 'In progress', 'Done', 'Ground 0'].map(option) }];
     const items = [
         item(301, 'DraftIssue', draft('Set up the rig'), [statusValue('Todo')], '2026-10-14T00:00:00Z'),
         item(302, 'DraftIssue', draft('Anvay - Ground 0'), [statusValue('Ground 0')], '2026-10-14T00:00:00Z'),
         // A status the board no longer lists (its option was deleted) still shows, at the end.
-        item(303, 'DraftIssue', draft('Old idea'), [statusValue('Parking lot')], '2026-10-14T00:00:00Z'),
+        item(303, 'DraftIssue', draft('Old idea'), [statusValue('Someday maybe')], '2026-10-14T00:00:00Z'),
     ];
-    const board = normalizeBoard({ project: PROJECT, fields, items }, { url: BOARD_URL });
+    const board = normalizeBoard({ project: PROJECT, fields, items }, { url: BOARD_URL, config: CONFIG });
     // No In review column: this board doesn't have one.
-    assert.deepEqual(board.columns.map((c) => c.label), ['To do', 'In progress', 'Done', 'Ground 0', 'Parking lot']);
+    assert.deepEqual(board.columns.map((c) => c.label), ['To do', 'In progress', 'Done', 'Ground 0', 'Someday maybe']);
     assert.equal(board.cards.length, 3);
     const ground = board.cards.find((c) => c.title === 'Anvay - Ground 0');
     assert.equal(ground.column, 'status:Ground 0');
     assert.equal(ground.stage, null);
 });
 
-test('only filter options that have cards become buttons', () => {
+test('only filter options that have cards become buttons', yaml, () => {
     const squads = { id: 4, name: 'Team', data_type: 'single_select', options: ['Squad 1', 'Squad 2', 'Squad 3'].map(option) };
     const fields = [...MINIMAL_FIELDS, squads];
     const unassigned = [item(401, 'DraftIssue', draft('Sprint 1 review'), [statusValue('Done')], '2026-10-14T00:00:00Z')];
-    assert.deepEqual(normalizeBoard({ project: PROJECT, fields, items: unassigned }, { filterName: 'Team', url: BOARD_URL }).groups, []);
+    assert.deepEqual(normalizeBoard({ project: PROJECT, fields, items: unassigned }, { filterName: 'Team', url: BOARD_URL, config: CONFIG }).groups, []);
 
     const one = [...unassigned, item(402, 'DraftIssue', draft('Showcase'), [statusValue('Todo'), { id: 4, name: 'Team', data_type: 'single_select', value: option('Squad 2') }], '2026-10-14T00:00:00Z')];
-    assert.deepEqual(normalizeBoard({ project: PROJECT, fields, items: one }, { filterName: 'Team', url: BOARD_URL }).groups, ['Squad 2']);
+    assert.deepEqual(normalizeBoard({ project: PROJECT, fields, items: one }, { filterName: 'Team', url: BOARD_URL, config: CONFIG }).groups, ['Squad 2']);
 });
 
-test('a board that follows OCS\'s lifecycle keeps its own name for the Parking Lot, behind the toggle', () => {
+test('a board that follows OCS\'s lifecycle keeps its own name for the Parking Lot, collapsed', yaml, () => {
     const fields = [{ id: 3, name: 'Status', data_type: 'single_select', options: ['Parking Lot', 'ToDo', 'In Progress', 'In Review', 'Done'].map(option) }];
-    const board = normalizeBoard({ project: PROJECT, fields, items: [] }, { url: BOARD_URL });
+    const board = normalizeBoard({ project: PROJECT, fields, items: [] }, { url: BOARD_URL, config: CONFIG });
     assert.deepEqual(board.columns.map((c) => c.label), ['Parking Lot', 'To do', 'In progress', 'In review', 'Done']);
-    assert.deepEqual(board.columns.map((c) => c.toggle), [true, false, false, false, false]);
+    assert.deepEqual(board.columns.map((c) => c.collapsed), [true, false, false, false, false]);
 });
 
-test('when two of a board\'s columns are both backlog, the shared column is just "Backlog"', () => {
+test('when two of a board\'s columns are both backlog, the shared column takes the stage\'s name', yaml, () => {
     const fields = [{ id: 3, name: 'Status', data_type: 'single_select', options: ['Icebox', 'Backlog', 'Todo', 'Done'].map(option) }];
-    assert.equal(normalizeBoard({ project: PROJECT, fields, items: [] }, { url: BOARD_URL }).columns[0].label, 'Backlog');
+    assert.equal(normalizeBoard({ project: PROJECT, fields, items: [] }, { url: BOARD_URL, config: CONFIG }).columns[0].label, 'Backlog');
 });
 
 const withBody = (id, body) => item(id, 'Issue', { ...ISSUE.content, number: id, body }, [statusValue('📋 To Do')], '2026-10-14T00:00:00Z');
 
-test('a card counts the boxes in its checklist; a card without one has none', () => {
+test('a card counts the boxes in its checklist; a card without one has none', yaml, () => {
     const body = [
         '## In Progress', '- [x] Prototyped', '* [X] Unit tested', '   - [ ] PR created and linked',
         '```md', '- [ ] an example inside a code block', '```', 'Notes, not a box: [ ] here',
     ].join('\n');
-    const board = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [withBody(501, body), withBody(502, 'Just prose.'), withBody(503, null)] }, { url: BOARD_URL });
+    const board = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [withBody(501, body), withBody(502, 'Just prose.'), withBody(503, null)] }, { url: BOARD_URL, config: CONFIG });
     assert.deepEqual(board.cards.map((c) => c.checklist), [{ done: 2, total: 3 }, null, null]);
 });
 
@@ -237,23 +302,23 @@ test('a card counts the boxes in its checklist; a card without one has none', ()
 const pr = (number, extra = {}) => ({ number, title: `PR ${number}`, html_url: `https://github.com/Open-Coding-Society/pages/pull/${number}`, state: 'open', merged_at: null, draft: false, ...extra });
 const prsValue = (...prs) => ({ id: 7, name: 'Linked pull requests', data_type: 'linked_pull_requests', value: prs });
 
-test('a card lists its linked pull requests as merged, open, draft or closed', () => {
+test('a card lists its linked pull requests as merged, open, draft or closed', yaml, () => {
     const issue = item(601, 'Issue', { ...ISSUE.content, number: 60, body: '' }, [statusValue('👀 In Review'), prsValue(
         pr(1823, { state: 'closed', merged_at: '2026-10-21T12:52:17Z' }), pr(1830), pr(1831, { draft: true }), pr(1799, { state: 'closed' }),
         { ...pr(9), html_url: 'javascript:alert(1)' },
     )], '2026-10-21T13:00:00Z');
-    const [card] = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [issue] }, { url: BOARD_URL }).cards;
+    const [card] = normalizeBoard({ project: PROJECT, fields: FIELDS, items: [issue] }, { url: BOARD_URL, config: CONFIG }).cards;
     assert.deepEqual(card.prs, [
         { number: 1823, url: 'https://github.com/Open-Coding-Society/pages/pull/1823', title: 'PR 1823', state: 'merged' },
         { number: 1830, url: 'https://github.com/Open-Coding-Society/pages/pull/1830', title: 'PR 1830', state: 'open' },
         { number: 1831, url: 'https://github.com/Open-Coding-Society/pages/pull/1831', title: 'PR 1831', state: 'draft' },
         { number: 1799, url: 'https://github.com/Open-Coding-Society/pages/pull/1799', title: 'PR 1799', state: 'closed' },
     ]);
-    assert.deepEqual(normalizeBoard({ project: PROJECT, fields: FIELDS, items: [ISSUE] }, { url: BOARD_URL }).cards[0].prs, []);
+    assert.deepEqual(normalizeBoard({ project: PROJECT, fields: FIELDS, items: [ISSUE] }, { url: BOARD_URL, config: CONFIG }).cards[0].prs, []);
 });
 
-test('without a filter there are no groups to choose from', () => {
-    const board = normalizeBoard({ project: PROJECT, fields: FIELDS, items: ITEMS }, { url: BOARD_URL });
+test('without a filter there are no groups to choose from', yaml, () => {
+    const board = normalizeBoard({ project: PROJECT, fields: FIELDS, items: ITEMS }, { url: BOARD_URL, config: OURS });
     assert.deepEqual(board.groups, []);
     assert.deepEqual(board.shared, []);
     assert.equal(board.cards[0].group, '');
@@ -261,23 +326,23 @@ test('without a filter there are no groups to choose from', () => {
 
 /* ── Columns ─────────────────────────────────────────────────────────── */
 
-test('a team filter shows that team\'s cards plus the cards the whole team shares', () => {
-    const board = normalizeBoard({ project: PROJECT, fields: FIELDS, items: ITEMS }, { filterName: 'Team', url: BOARD_URL });
+test('a team filter shows that team\'s cards plus the cards the whole team shares', yaml, () => {
+    const board = normalizeBoard({ project: PROJECT, fields: FIELDS, items: ITEMS }, { filterName: 'Team', url: BOARD_URL, config: OURS });
     assert.deepEqual(filterCards(board, 'SASS').map((c) => c.title), ['Lesson sidebar on ocs__tree', 'Sprint 3 team plan issue']);
     assert.deepEqual(filterCards(board, 'DMs').map((c) => c.title), ['Sprint 3 team plan issue']);
     assert.equal(filterCards(board, 'all').length, 4);
 });
 
-test('the done column lists the most recently shipped work first; other columns keep the board\'s order', () => {
+test('a done column lists the most recently shipped work first; other columns keep the board\'s order', () => {
     const cards = [
-        { title: 'Old', column: 'done', stage: 'done', shipped: '2026-09-30' },
-        { title: 'Undated', column: 'done', stage: 'done', shipped: null },
-        { title: 'Next', column: 'todo', stage: 'todo', shipped: null },
-        { title: 'New', column: 'done', stage: 'done', shipped: '2026-10-12' },
-        { title: 'Later', column: 'todo', stage: 'todo', shipped: null },
+        { title: 'Old', column: 'done', shipped: '2026-09-30' },
+        { title: 'Undated', column: 'done', shipped: null },
+        { title: 'Next', column: 'todo', shipped: null },
+        { title: 'New', column: 'done', shipped: '2026-10-12' },
+        { title: 'Later', column: 'todo', shipped: null },
     ];
-    assert.deepEqual(columnCards(cards, { key: 'done', stage: 'done' }).map((c) => c.title), ['New', 'Old', 'Undated']);
-    assert.deepEqual(columnCards(cards, { key: 'todo', stage: 'todo' }).map((c) => c.title), ['Next', 'Later']);
+    assert.deepEqual(columnCards(cards, { key: 'done', done: true }).map((c) => c.title), ['New', 'Old', 'Undated']);
+    assert.deepEqual(columnCards(cards, { key: 'todo', done: false }).map((c) => c.title), ['Next', 'Later']);
 });
 
 /* ── Fetching ────────────────────────────────────────────────────────── */
@@ -306,10 +371,10 @@ function fakeGitHub() {
     return { seen, fetchImpl };
 }
 
-test('a refresh reads the project, its fields and every page of items', async () => {
+test('a refresh reads the project, its fields and every page of items', yaml, async () => {
     const { seen, fetchImpl } = fakeGitHub();
     const now = Date.UTC(2026, 9, 20, 23, 0);
-    const entry = await refreshBoard(parseBoardUrl(BOARD_URL), { filterName: 'Team', fetchImpl, now });
+    const entry = await refreshBoard(parseBoardUrl(BOARD_URL), { filterName: 'Team', config: OURS, fetchImpl, now });
     assert.equal(seen.length, 4);
     assert.equal(seen[3], NEXT);
     assert.equal(entry.board.cards.length, 4);
@@ -318,13 +383,13 @@ test('a refresh reads the project, its fields and every page of items', async ()
     assert.equal(entry.metaAt, now);
 });
 
-test('a refresh within a day reuses the project and fields and reads only the items', async () => {
+test('a refresh within a day reuses the project and fields and reads only the items', yaml, async () => {
     const { seen, fetchImpl } = fakeGitHub();
     const now = Date.UTC(2026, 9, 20, 23, 0);
-    const first = await refreshBoard(parseBoardUrl(BOARD_URL), { filterName: 'Team', fetchImpl, now });
+    const first = await refreshBoard(parseBoardUrl(BOARD_URL), { filterName: 'Team', config: OURS, fetchImpl, now });
     seen.length = 0;
     const later = now + 30 * MINUTE;
-    const second = await refreshBoard(parseBoardUrl(BOARD_URL), { filterName: 'Team', meta: first.meta, metaAt: first.metaAt, fetchImpl, now: later });
+    const second = await refreshBoard(parseBoardUrl(BOARD_URL), { filterName: 'Team', config: OURS, meta: first.meta, metaAt: first.metaAt, fetchImpl, now: later });
     assert.equal(seen.length, 2);
     assert.ok(seen.every((url) => url.includes('/items')));
     assert.equal(second.metaAt, now);
@@ -332,7 +397,7 @@ test('a refresh within a day reuses the project and fields and reads only the it
     assert.equal(second.board.title, 'UGRC-CSA — Team Kanban');
 });
 
-test('item pages stop after five', async () => {
+test('item pages stop after five', yaml, async () => {
     let itemCalls = 0;
     const fetchImpl = async (url) => {
         if (url === `${API}`) return json(PROJECT);
@@ -341,27 +406,27 @@ test('item pages stop after five', async () => {
         const page = [item(200 + itemCalls, 'DraftIssue', draft(`Card ${itemCalls}`), [statusValue('📋 To Do')], '2026-10-14T00:00:00Z')];
         return json(page, { headers: { link: `<${API}/items?per_page=100&fields=3&after=p${itemCalls}>; rel="next"` } });
     };
-    const entry = await refreshBoard(parseBoardUrl(BOARD_URL), { fetchImpl, now: 0 });
+    const entry = await refreshBoard(parseBoardUrl(BOARD_URL), { config: CONFIG, fetchImpl, now: 0 });
     assert.equal(itemCalls, 5);
     assert.equal(entry.board.cards.length, 5);
 });
 
-test('GitHub errors are told apart: private or missing, rate limited, no answer', async () => {
+test('GitHub errors are told apart: private or missing, rate limited, no answer', yaml, async () => {
     const ref = parseBoardUrl(BOARD_URL);
     const missing = async () => json({ message: 'Not Found' }, { status: 404 });
-    await assert.rejects(refreshBoard(ref, { fetchImpl: missing, now: 0 }), (err) => err instanceof BoardError && err.kind === 'missing');
+    await assert.rejects(refreshBoard(ref, { config: CONFIG, fetchImpl: missing, now: 0 }), (err) => err instanceof BoardError && err.kind === 'missing');
 
     const limited = async () => json({ message: 'API rate limit exceeded' }, {
         status: 403, headers: { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': '1800000000' },
     });
-    await assert.rejects(refreshBoard(ref, { fetchImpl: limited, now: 0 }),
+    await assert.rejects(refreshBoard(ref, { config: CONFIG, fetchImpl: limited, now: 0 }),
         (err) => err instanceof BoardError && err.kind === 'limit' && err.resetAt === 1800000000000);
 
     const offline = async () => { throw new TypeError('Failed to fetch'); };
-    await assert.rejects(refreshBoard(ref, { fetchImpl: offline, now: 0 }), (err) => err instanceof BoardError && err.kind === 'network');
+    await assert.rejects(refreshBoard(ref, { config: CONFIG, fetchImpl: offline, now: 0 }), (err) => err instanceof BoardError && err.kind === 'network');
 
     const signInOnly = async () => json({ message: 'Requires authentication' }, { status: 401 });
-    await assert.rejects(refreshBoard(ref, { fetchImpl: signInOnly, now: 0 }), (err) => err instanceof BoardError && err.kind === 'auth');
+    await assert.rejects(refreshBoard(ref, { config: CONFIG, fetchImpl: signInOnly, now: 0 }), (err) => err instanceof BoardError && err.kind === 'auth');
 });
 
 /* ── Saved copies ────────────────────────────────────────────────────── */
@@ -391,8 +456,7 @@ test('saved copies survive a round trip, and blocked or broken storage reads as 
     assert.doesNotThrow(() => writeEntry('ocs-kanban:v1:test', { fetchedAt: 5 }, blocked));
 });
 
-
-test('Area filters and Priority and Topic values survive normalization and fetching', async () => {
+test('Area filters and Priority and Topic values survive normalization and fetching', yaml, async () => {
     const priority = { id: 20, name: 'Priority', data_type: 'single_select', options: [option('High')] };
     const topic = { id: 21, name: 'Topic', data_type: 'single_select', options: [option('Chatbot')] };
     const area = { id: 22, name: 'Area', data_type: 'single_select', options: [option('Frontend'), option('Backend')] };
@@ -410,17 +474,16 @@ test('Area filters and Priority and Topic values survive normalization and fetch
         if (url.includes('/items?')) return json(items);
         return json(PROJECT);
     };
-    const entry = await refreshBoard(parseBoardUrl(BOARD_URL), { filterName: 'Area', fetchImpl, now: 0 });
+    const entry = await refreshBoard(parseBoardUrl(BOARD_URL), { filterName: 'Area', config: CONFIG, fetchImpl, now: 0 });
     assert.deepEqual(entry.board.groups, ['Frontend', 'Backend']);
     assert.equal(filterCards(entry.board, 'Backend')[0].title, 'Backend task');
-    assert.equal(entry.board.cards[0].priority, 'High');
-    assert.equal(entry.board.cards[0].topic, 'Chatbot');
+    // Priority and Topic are the card_fields in _data/kanban.yml.
+    assert.deepEqual(entry.board.cards[0].details, [{ name: 'Priority', value: 'High' }, { name: 'Topic', value: 'Chatbot' }]);
     const requested = new URL(fetched.find(url => url.includes('/items?'))).searchParams.get('fields').split(',');
     assert.ok(requested.includes('20'));
     assert.ok(requested.includes('21'));
-    const empty = normalizeBoard({ project: PROJECT, fields, items: [item(999, 'DraftIssue', draft('Unassigned'), [statusValue('Todo')], '2026-10-22T00:00:00Z')] }, { url: BOARD_URL });
-    assert.equal(empty.cards[0].priority, '');
-    assert.equal(empty.cards[0].topic, '');
+    const empty = normalizeBoard({ project: PROJECT, fields, items: [item(999, 'DraftIssue', draft('Unassigned'), [statusValue('Todo')], '2026-10-22T00:00:00Z')] }, { url: BOARD_URL, config: CONFIG });
+    assert.deepEqual(empty.cards[0].details, []);
 });
 
 // A repository's issues as a board: for personal boards GitHub won't show
@@ -433,16 +496,100 @@ test('a repository issues address is a board; a plain repository address is not'
     assert.equal(parseBoardUrl('https://github.com/users/rex0dex/projects/3').personal, true);
 });
 
-test('an issue goes to a column by its stage label, else closed, assigned or open', () => {
+test('an issue goes to a column by its stage label, else closed, assigned or open', yaml, () => {
     const person = { login: 'rex0dex' };
-    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'In review' }], assignees: [person] }), 'In review');
-    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'bug' }, { name: 'backlog' }], assignees: [] }), 'Backlog');
-    assert.equal(repoStatusOf({ state: 'closed', labels: [], assignees: [person] }), 'Done');
-    assert.equal(repoStatusOf({ state: 'open', labels: [], assignees: [person] }), 'In progress');
-    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'bug' }], assignees: [] }), 'To do');
+    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'In review' }], assignees: [person] }, CONFIG), 'In review');
+    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'bug' }, { name: 'backlog' }], assignees: [] }, CONFIG), 'Backlog');
+    assert.equal(repoStatusOf({ state: 'closed', labels: [], assignees: [person] }, CONFIG), 'Done');
+    assert.equal(repoStatusOf({ state: 'open', labels: [], assignees: [person] }, CONFIG), 'In progress');
+    assert.equal(repoStatusOf({ state: 'open', labels: [{ name: 'bug' }], assignees: [] }, CONFIG), 'To do');
 });
 
-test('a repository board leaves out pull requests and issues closed as not planned, and filters by assignee', async () => {
+const repositoryIssue = (labels = []) => ({
+    id: 1, number: 1, title: 'Review access', state: 'open',
+    html_url: 'https://github.com/team/repo/issues/1',
+    assignees: [{ login: 'reviewer' }], body: '- [ ] Review\n- [x] Reproduce', labels,
+});
+const repositoryBoard = (issues, config) => normalizeBoard(repoToProject('team/repo', issues, 'Assignee', config), {
+    url: 'https://github.com/team/repo/issues', filterName: 'Assignee', config,
+});
+
+test('PNEC opt-in shows only valid priorities and Fibonacci-hour estimates, preserving owners and workflow', yaml, () => {
+    const config = boardConfig(DEFAULTS, undefined, true);
+    for (const priority of ['P0 Critical', 'P1 High', 'P2 Medium', 'P3 Low']) {
+        for (const hours of [1, 2, 3, 5, 8, 13, 21]) {
+            const issue = repositoryIssue([{ name: 'To do' }, { name: `Priority: ${priority}` }, `Estimate: ${hours} hours`, 'Topic: Chatbot']);
+            const board = repositoryBoard([issue], config);
+            assert.deepEqual(board.cards[0].details, [
+                { name: 'Priority', value: priority }, { name: 'Estimate', value: `${hours} hours` },
+            ]);
+            assert.deepEqual(board.cards[0].people, ['reviewer']);
+            assert.equal(board.cards[0].stage, 'todo');
+            assert.deepEqual(board.cards[0].checklist, { done: 1, total: 2 });
+            assert.equal(filterCards(board, 'reviewer').length, 1);
+            assert.equal(filterCards(board, 'other').length, 0);
+            assert.equal(issue.state, 'open');
+        }
+    }
+    for (const labels of [['Priority: ', 'Estimate: '], ['Priority: P0 Low', 'Estimate: 4 hours']]) {
+        assert.deepEqual(repositoryBoard([repositoryIssue(labels)], config).cards[0].details, []);
+    }
+});
+
+test('metadata-free and Topic-only issues keep their existing board behavior even with PNEC opt-in', yaml, () => {
+    const config = boardConfig(DEFAULTS, undefined, true);
+    for (const labels of [[], ['bug'], ['Topic: Chatbot'], ['In review'], ['backlog']]) {
+        for (const state of ['open', 'closed']) {
+            const issue = { ...repositoryIssue(labels), state };
+            assert.deepEqual(repositoryBoard([issue], config), repositoryBoard([issue], CONFIG));
+        }
+    }
+});
+
+test('other repository boards ignore Priority, Estimate and Topic labels without opt-in', yaml, () => {
+    const issue = repositoryIssue(['Priority: P0 Critical', 'Estimate: 8 hours', 'Topic: Chatbot']);
+    assert.deepEqual(repositoryBoard([issue], CONFIG), repositoryBoard([repositoryIssue()], CONFIG));
+    assert.deepEqual(CONFIG.cardFields, ['Priority', 'Topic']);
+});
+
+test('organization boards keep Priority and Topic fields but do not expose an existing Estimate field', yaml, () => {
+    const fields = [...FIELDS,
+        { id: 20, name: 'Priority', data_type: 'single_select' },
+        { id: 21, name: 'Topic', data_type: 'single_select' },
+        { id: 22, name: 'Estimate', data_type: 'single_select' },
+    ];
+    const values = [
+        { id: 20, value: { name: 'High' } }, { id: 21, value: { name: 'Chatbot' } },
+        { id: 22, value: { name: '8 hours' } },
+    ];
+    const board = normalizeBoard({ project: PROJECT, fields, items: [
+        { ...ISSUE, fields: [...ISSUE.fields, ...values] },
+    ] }, { url: BOARD_URL, config: CONFIG });
+    assert.deepEqual(board.cards[0].details, [
+        { name: 'Priority', value: 'High' }, { name: 'Topic', value: 'Chatbot' },
+    ]);
+    assert.equal(board.cards[0].stage, 'done');
+    assert.equal(pickFields(fields, '', CONFIG).details.some(field => field.name === 'Estimate'), false);
+});
+
+test('where a repository\'s issues go, and its board\'s title, come from the data too', yaml, () => {
+    const config = boardConfig({
+        ...DEFAULTS,
+        stages: DEFAULTS.stages.map((stage) => (stage.key === 'doing' ? { ...stage, label: 'Underway' } : stage)),
+        issues: { ...DEFAULTS.issues, assigned: 'review' },
+        text: { ...DEFAULTS.text, issues_title: 'Issues in {repo}' },
+    });
+    const assigned = { id: 1, number: 1, title: 'Assigned', state: 'open', labels: [], assignees: [{ login: 'rex0dex' }], updated_at: '2026-10-22T00:00:00Z' };
+    const working = { ...assigned, id: 2, number: 2, labels: [{ name: 'underway' }] };
+    assert.equal(repoStatusOf(assigned, config), 'In review');
+    const board = normalizeBoard(repoToProject('rex0dex/fops-pages', [assigned, working], '', config), { url: 'https://github.com/rex0dex/fops-pages/issues', config });
+    assert.equal(board.title, 'Issues in rex0dex/fops-pages');
+    // A status named for a stage's label joins that stage, words or not.
+    assert.deepEqual(board.cards.map((c) => [c.number, c.stage]), [[1, 'review'], [2, 'doing']]);
+    assert.equal(board.columns.find((c) => c.key === 'doing').label, 'Underway');
+});
+
+test('a repository board leaves out pull requests and issues closed as not planned, and filters by assignee', yaml, async () => {
     const issue = (number, extra) => ({
         id: 7000 + number, number, title: `Issue ${number}`, html_url: `https://github.com/rex0dex/fops-pages/issues/${number}`,
         state: 'open', labels: [], assignees: [], body: '', updated_at: `2026-10-2${number % 10}T00:00:00Z`, ...extra,
@@ -456,9 +603,434 @@ test('a repository board leaves out pull requests and issues closed as not plann
     ];
     const fetched = [];
     const fetchImpl = async (url) => { fetched.push(url); return json(issues); };
-    const entry = await refreshBoard(parseBoardUrl('https://github.com/rex0dex/fops-pages/issues'), { filterName: 'Assignee', fetchImpl, now: 0 });
+    const entry = await refreshBoard(parseBoardUrl('https://github.com/rex0dex/fops-pages/issues'), { filterName: 'Assignee', config: CONFIG, fetchImpl, now: 0 });
     assert.deepEqual(fetched, ['https://api.github.com/repos/rex0dex/fops-pages/issues?state=all&per_page=100']);
     assert.deepEqual(entry.board.cards.map(card => [card.number, card.stage]), [[1, 'doing'], [4, 'done'], [5, 'todo']]);
     assert.deepEqual(entry.board.groups, ['rex0dex', 'Kash484']);
     assert.equal(filterCards(entry.board, 'Kash484')[0].number, 4);
+});
+
+/* ── Mounting ────────────────────────────────────────────────────────── */
+
+// Just enough of a page for boards to mount in Node: elements with
+// attributes, children and listeners, found by the simple selectors the
+// script uses (a tag, .class, [name], [name="value"] and :not(...)). Any
+// other selector throws, so a script change that needs more shows up here.
+const dataAttribute = (key) => `data-${key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
+
+function matcher(selector) {
+    const tests = [];
+    for (let rest = selector.trim(), match; rest; rest = rest.slice(match[0].length)) {
+        if ((match = /^[a-z][a-z0-9]*/i.exec(rest))) {
+            const tag = match[0].toUpperCase();
+            tests.push((node) => node.tagName === tag);
+        } else if ((match = /^\.([\w-]+)/.exec(rest))) {
+            const name = match[1];
+            tests.push((node) => node.className.split(/\s+/).includes(name));
+        } else if ((match = /^\[([\w-]+)(?:="([^"]*)")?\]/.exec(rest))) {
+            const [, name, value] = match;
+            tests.push((node) => node.hasAttribute(name) && (value === undefined || node.getAttribute(name) === value));
+        } else if ((match = /^:not\(([^()]+)\)/.exec(rest))) {
+            const inner = matcher(match[1]);
+            tests.push((node) => !inner(node));
+        } else {
+            throw new Error(`The test page has no selector like ${selector}`);
+        }
+    }
+    return (node) => tests.every((check) => check(node));
+}
+
+class FakeNode {
+    constructor(doc) {
+        this.ownerDocument = doc;
+        this.parentNode = null;
+        this.childNodes = [];
+    }
+
+    get textContent() { return this.childNodes.map((node) => node.textContent).join(''); }
+
+    set textContent(text) { this.replaceChildren(...(text === '' || text == null ? [] : [String(text)])); }
+
+    get children() { return this.childNodes.filter((node) => node instanceof FakeElement); }
+
+    get childElementCount() { return this.children.length; }
+
+    adopt(node) {
+        const child = typeof node === 'string' ? new FakeText(this.ownerDocument, node) : node;
+        child.remove();
+        child.parentNode = this;
+        return child;
+    }
+
+    append(...nodes) { this.childNodes.push(...nodes.map((node) => this.adopt(node))); }
+
+    appendChild(node) { this.append(node); return node; }
+
+    replaceChildren(...nodes) {
+        [...this.childNodes].forEach((node) => node.remove());
+        this.append(...nodes);
+    }
+
+    after(...nodes) {
+        const parent = this.parentNode;
+        const added = nodes.map((node) => parent.adopt(node));
+        parent.childNodes.splice(parent.childNodes.indexOf(this) + 1, 0, ...added);
+    }
+
+    remove() {
+        if (!this.parentNode) return;
+        const siblings = this.parentNode.childNodes;
+        siblings.splice(siblings.indexOf(this), 1);
+        this.parentNode = null;
+    }
+
+    *descendants() {
+        for (const child of this.children) {
+            yield child;
+            yield* child.descendants();
+        }
+    }
+
+    querySelectorAll(selector) { return [...this.descendants()].filter(matcher(selector)); }
+
+    querySelector(selector) { return this.querySelectorAll(selector)[0] ?? null; }
+}
+
+class FakeText extends FakeNode {
+    constructor(doc, text) {
+        super(doc);
+        this.data = text;
+    }
+
+    get textContent() { return this.data; }
+
+    set textContent(text) { this.data = String(text); }
+
+    cloneNode() { return new FakeText(this.ownerDocument, this.data); }
+}
+
+class FakeElement extends FakeNode {
+    constructor(doc, tag) {
+        super(doc);
+        this.tagName = tag.toUpperCase();
+        this.attributes = new Map();
+        this.listeners = [];
+        // dataset.boardUrl is the data-board-url attribute, as in a browser.
+        this.dataset = new Proxy({}, {
+            get: (_, key) => (typeof key === 'string' ? this.getAttribute(dataAttribute(key)) ?? undefined : undefined),
+            set: (_, key, value) => { this.setAttribute(dataAttribute(key), value); return true; },
+            deleteProperty: (_, key) => { this.removeAttribute(dataAttribute(key)); return true; },
+            has: (_, key) => this.hasAttribute(dataAttribute(key)),
+        });
+    }
+
+    getAttribute(name) { return this.attributes.get(name) ?? null; }
+
+    setAttribute(name, value) { this.attributes.set(name, String(value)); }
+
+    hasAttribute(name) { return this.attributes.has(name); }
+
+    removeAttribute(name) { this.attributes.delete(name); }
+
+    get hidden() { return this.hasAttribute('hidden'); }
+
+    set hidden(on) {
+        if (on) this.setAttribute('hidden', '');
+        else this.removeAttribute('hidden');
+    }
+
+    get className() { return this.getAttribute('class') ?? ''; }
+
+    set className(value) { this.setAttribute('class', value); }
+
+    addEventListener(type, listener) { this.listeners.push({ type, listener }); }
+
+    removeEventListener(type, listener) {
+        this.listeners = this.listeners.filter((entry) => entry.type !== type || entry.listener !== listener);
+    }
+
+    // What a click or a page event does: its listeners run.
+    dispatch(type, event = {}) {
+        this.listeners.filter((entry) => entry.type === type)
+            .forEach((entry) => entry.listener({ type, target: this, preventDefault() {}, ...event }));
+    }
+
+    focus() { this.ownerDocument.activeElement = this; }
+
+    cloneNode(deep = false) {
+        const copy = this.ownerDocument.createElement(this.tagName.toLowerCase());
+        this.attributes.forEach((value, name) => copy.setAttribute(name, value));
+        if (deep) copy.append(...this.childNodes.map((node) => node.cloneNode(true)));
+        return copy;
+    }
+}
+
+// Properties the script sets that a browser keeps as attributes.
+for (const name of ['id', 'type', 'href', 'target', 'rel', 'title']) {
+    Object.defineProperty(FakeElement.prototype, name, {
+        get() { return this.getAttribute(name) ?? ''; },
+        set(value) { this.setAttribute(name, value); },
+    });
+}
+
+class FakeDocument extends FakeElement {
+    constructor() {
+        super(null, '#document');
+        this.ownerDocument = this;
+        this.readyState = 'complete';
+        this.body = this.createElement('body');
+        this.append(this.body);
+    }
+
+    createElement(tag) {
+        const node = new FakeElement(this, tag);
+        if (tag === 'template') node.content = new FakeElement(this, '#document-fragment');
+        return node;
+    }
+
+    importNode(node, deep) { return node.cloneNode(deep); }
+
+    getElementById(id) { return this.querySelector(`[id="${id}"]`); }
+}
+
+function h(doc, tag, attributes = {}, ...children) {
+    const node = doc.createElement(tag);
+    Object.entries(attributes).forEach(([name, value]) => node.setAttribute(name, value));
+    node.append(...children);
+    return node;
+}
+
+// The board as the include writes it with no options, which is also its
+// template=true copy (scripts/test_kanban_board.rb checks the include).
+function emptyBoard(doc) {
+    const { text } = DEFAULTS;
+    return h(doc, 'section', { class: 'ocs__card ocs__keypoints', 'data-ocs-kanban': '', 'data-board-url': '', 'data-filter': '', 'aria-label': text.title },
+        h(doc, 'div', { class: 'ocs__links' },
+            h(doc, 'strong', { 'data-hook': 'title' }, text.title),
+            h(doc, 'span', { class: 'ocs__text', 'data-hook': 'meta' }),
+            h(doc, 'a', { class: 'ocs__btn small pill', href: '', target: '_blank', rel: 'noopener' }, text.open)),
+        h(doc, 'div', { class: 'ocs__text', 'data-hook': 'status', role: 'status', hidden: '' }),
+        h(doc, 'div', { 'data-hook': 'mount', hidden: '' }));
+}
+
+// A page with the board's template and (unless defaults is false) its
+// defaults, plus the browser globals a board uses, each new for the test and
+// put back after it: document, fetch, localStorage and an IntersectionObserver
+// whose sections come near the screen only when a test says so.
+function boardPage(t, { fetchImpl = fakeGitHub().fetchImpl, defaults = true } = {}) {
+    const doc = new FakeDocument();
+    if (defaults) doc.body.append(h(doc, 'script', { type: 'application/json', id: 'ocs-kanban-defaults' }, JSON.stringify(DEFAULTS)));
+    const template = h(doc, 'template', { 'data-ocs-template': 'kanban' });
+    template.content.append(emptyBoard(doc));
+    doc.body.append(template);
+
+    const saved = new Map();
+    const storage = { getItem: (key) => saved.get(key) ?? null, setItem: (key, value) => saved.set(key, String(value)), saved };
+    const observers = [];
+    class Observer {
+        constructor(callback, options) {
+            Object.assign(this, { callback, options, targets: [], disconnected: false });
+            observers.push(this);
+        }
+
+        observe(target) { this.targets.push(target); }
+
+        disconnect() { this.disconnected = true; }
+
+        near(target) { this.callback([{ target, isIntersecting: true }]); }
+    }
+
+    const globals = { document: doc, fetch: fetchImpl, localStorage: storage, IntersectionObserver: Observer };
+    const before = Object.keys(globals).map((name) => [name, Object.getOwnPropertyDescriptor(globalThis, name)]);
+    Object.assign(globalThis, globals);
+    t.after(() => before.forEach(([name, descriptor]) => {
+        if (descriptor) Object.defineProperty(globalThis, name, descriptor);
+        else delete globalThis[name];
+    }));
+    return { doc, storage, observers };
+}
+
+const statusOf = (section) => section.querySelector('[data-hook="status"]');
+const columnNames = (section) => section.querySelectorAll('li.ocs__kanban-column').map((column) => column.querySelector('strong').textContent);
+
+test('createKanbanSection copies the include\'s empty board with this board\'s values, marked manual', yaml, (t) => {
+    const { doc } = boardPage(t);
+    const columns = [...OUR_COLUMNS, { status: '</script><b>', label: 'Odd' }];
+    const section = createKanbanSection({ url: ` ${BOARD_URL} `, filter: 'Team', title: 'Our board', columns }, doc);
+    const empty = doc.querySelector('template').content.querySelector('[data-ocs-kanban]');
+    assert.notEqual(section, empty);
+    assert.equal(section.dataset.boardUrl, BOARD_URL);
+    assert.equal(section.dataset.filter, 'Team');
+    assert.equal(section.dataset.mounted, 'manual');
+    assert.equal(section.querySelector('[data-hook="title"]').textContent, 'Our board');
+    assert.equal(section.getAttribute('aria-label'), 'Our board');
+    assert.equal(section.hasAttribute('data-title-fixed'), true);
+    assert.equal(section.querySelector('a.ocs__btn').href, BOARD_URL);
+    // The columns list goes in the section as the include puts it, "<" escaped.
+    const list = section.querySelector('script[data-hook="columns"]');
+    assert.equal(list.type, 'application/json');
+    assert.equal(list.textContent.includes('<'), false);
+    assert.deepEqual(JSON.parse(list.textContent), columns);
+    // The template stays empty for the next board.
+    assert.equal(empty.dataset.boardUrl, '');
+    assert.equal(empty.hasAttribute('data-mounted'), false);
+    assert.equal(empty.querySelector('script'), null);
+});
+
+test('a board made without a title keeps the default one, and an address that isn\'t a board gets no GitHub link', yaml, (t) => {
+    const { doc } = boardPage(t);
+    const issues = 'https://github.com/rex0dex/fops-pages/issues';
+    const plain = createKanbanSection({ url: issues }, doc);
+    assert.equal(plain.querySelector('[data-hook="title"]').textContent, DEFAULTS.text.title);
+    assert.equal(plain.hasAttribute('data-title-fixed'), false);
+    assert.equal(plain.querySelector('script'), null);
+    assert.equal(plain.querySelector('a.ocs__btn').href, issues);
+    const odd = createKanbanSection({ url: 'javascript:alert(1)' }, doc);
+    assert.equal(odd.querySelector('a.ocs__btn'), null);
+    assert.equal(odd.dataset.boardUrl, 'javascript:alert(1)');
+});
+
+test('createKanbanSection needs the include\'s template on the page', () => {
+    assert.throws(() => createKanbanSection({ url: BOARD_URL }, new FakeDocument()), /template=true/);
+});
+
+test('mountAll starts the include\'s boards and leaves the ones a page made to that page', yaml, (t) => {
+    const { doc, observers } = boardPage(t);
+    const included = emptyBoard(doc);
+    included.dataset.boardUrl = BOARD_URL;
+    const made = createKanbanSection({ url: BOARD_URL }, doc);
+    doc.body.append(included, made);
+    assert.equal(mountAll(doc).length, 1);
+    assert.equal(included.dataset.mounted, 'true');
+    assert.equal(made.dataset.mounted, 'manual');
+    assert.deepEqual(observers.flatMap((observer) => observer.targets), [included]);
+    assert.deepEqual(mountAll(doc), []);
+});
+
+test('a mounted board waits until it comes near the screen, and mounting it again changes nothing', yaml, async (t) => {
+    const { seen, fetchImpl } = fakeGitHub();
+    const { doc, observers } = boardPage(t, { fetchImpl });
+    const section = createKanbanSection({ url: BOARD_URL, filter: 'Team', columns: OUR_COLUMNS }, doc);
+    doc.body.append(section);
+    const board = mountKanbanBoard(section);
+    assert.equal(mountKanbanBoard(section), board);
+    assert.equal(observers.length, 1);
+    assert.equal(observers[0].options.rootMargin, '400px 0px');
+    assert.equal(seen.length, 0);
+
+    observers[0].near(section);
+    await board.refresh();   // the load the observer started, not a second one
+    assert.equal(observers[0].disconnected, true);
+    assert.equal(seen.length, 4);
+    assert.deepEqual(columnNames(section), ['To do', 'In progress', 'In review', 'Done']);
+    assert.equal(section.querySelector('[data-hook="title"]').textContent, 'UGRC-CSA — Team Kanban');
+    assert.match(section.querySelector('[data-hook="meta"]').textContent, /^4 cards/);
+    assert.equal(statusOf(section).hidden, true);
+});
+
+test('refresh keeps the reader\'s filter and redraws a fresh saved copy without asking GitHub again', yaml, async (t) => {
+    const { seen, fetchImpl } = fakeGitHub();
+    const { doc } = boardPage(t, { fetchImpl });
+    const section = createKanbanSection({ url: BOARD_URL, filter: 'Team', columns: OUR_COLUMNS }, doc);
+    doc.body.append(section);
+    const board = mountKanbanBoard(section);
+    await board.refresh();   // at once, without waiting for the screen
+    section.querySelectorAll('button').find((button) => button.textContent === 'SASS').dispatch('click');
+    await board.refresh();
+    assert.equal(seen.length, 4);
+    assert.deepEqual(section.querySelectorAll('button[aria-pressed="true"]').map((button) => button.textContent), ['SASS']);
+});
+
+test('a page can hand a board its defaults instead of #ocs-kanban-defaults', yaml, async (t) => {
+    const { seen, fetchImpl } = fakeGitHub();
+    const { doc } = boardPage(t, { fetchImpl, defaults: false });
+    const section = createKanbanSection({ url: BOARD_URL, filter: 'Team' }, doc);
+    doc.body.append(section);
+    await mountKanbanBoard(section, { defaults: DEFAULTS }).refresh();
+    assert.equal(seen.length, 4);
+    assert.equal(section.querySelector('[data-hook="title"]').textContent, 'UGRC-CSA — Team Kanban');
+});
+
+test('a board made from an address that isn\'t a board says so and asks GitHub nothing', yaml, async (t) => {
+    const { seen, fetchImpl } = fakeGitHub();
+    const { doc } = boardPage(t, { fetchImpl });
+    const section = createKanbanSection({ url: 'https://github.com/UGRC-CSA/Pages' }, doc);
+    doc.body.append(section);
+    await mountKanbanBoard(section).refresh();
+    assert.equal(statusOf(section).textContent, DEFAULTS.text.not_a_board);
+    assert.equal(seen.length, 0);
+});
+
+test('unmounting before a board comes near stops watching the screen and asks GitHub nothing', yaml, async (t) => {
+    const { seen, fetchImpl } = fakeGitHub();
+    const { doc, observers } = boardPage(t, { fetchImpl });
+    const section = createKanbanSection({ url: BOARD_URL }, doc);
+    doc.body.append(section);
+    const board = mountKanbanBoard(section);
+    board.unmount();
+    assert.equal(observers[0].disconnected, true);
+    assert.equal(section.dataset.mounted, 'manual');
+    await board.refresh();
+    assert.equal(seen.length, 0);
+});
+
+test('unmounting while GitHub is answering stops its requests and draws nothing', yaml, async (t) => {
+    const signals = [];
+    const fetchImpl = (url, init) => new Promise((_, reject) => {
+        signals.push(init.signal);
+        init.signal.addEventListener('abort', () => reject(init.signal.reason));
+    });
+    const { doc, storage } = boardPage(t, { fetchImpl });
+    const section = createKanbanSection({ url: BOARD_URL }, doc);
+    doc.body.append(section);
+    const board = mountKanbanBoard(section);
+    const loading = board.refresh();
+    assert.equal(statusOf(section).textContent, DEFAULTS.text.loading);
+    board.unmount();
+    assert.equal(signals.length, 2);   // the project and its fields
+    assert.ok(signals.every((signal) => signal.aborted));
+    await loading;
+    assert.equal(statusOf(section).hidden, true);
+    assert.equal(statusOf(section).textContent, '');
+    assert.equal(section.querySelector('[data-hook="mount"]').childElementCount, 0);
+    assert.equal(storage.saved.size, 0);
+});
+
+test('unmounting a drawn board empties it, and mounting it again starts from the saved copy', yaml, async (t) => {
+    const { seen, fetchImpl } = fakeGitHub();
+    const { doc } = boardPage(t, { fetchImpl });
+    const section = createKanbanSection({ url: BOARD_URL, filter: 'Team', columns: OUR_COLUMNS }, doc);
+    doc.body.append(section);
+    const board = mountKanbanBoard(section);
+    await board.refresh();
+    board.unmount();
+    board.unmount();   // a second time is harmless
+    const mount = section.querySelector('[data-hook="mount"]');
+    assert.equal(mount.childElementCount, 0);
+    assert.equal(mount.hidden, true);
+    assert.equal(section.querySelector('[data-hook="meta"]').textContent, '');
+    assert.equal(section.dataset.mounted, 'manual');
+
+    const again = mountKanbanBoard(section);
+    assert.notEqual(again, board);
+    await again.refresh();
+    assert.equal(seen.length, 4);   // the copy saved a moment ago is still fresh
+    assert.deepEqual(columnNames(section), ['To do', 'In progress', 'In review', 'Done']);
+});
+
+test('on its own the script starts only the include\'s boards, once the page has loaded', yaml, async (t) => {
+    const { doc, observers } = boardPage(t);
+    doc.readyState = 'loading';
+    const included = emptyBoard(doc);
+    included.dataset.boardUrl = BOARD_URL;
+    doc.body.append(included);
+    // Another copy of the script, so its start-up runs on this page.
+    const script = await import('../assets/js/kanban-board.js?page-start');
+    const made = script.createKanbanSection({ url: BOARD_URL }, doc);
+    doc.body.append(made);
+    assert.equal(included.hasAttribute('data-mounted'), false);
+    doc.dispatch('DOMContentLoaded');
+    assert.equal(included.dataset.mounted, 'true');
+    assert.equal(made.dataset.mounted, 'manual');
+    assert.deepEqual(observers.flatMap((observer) => observer.targets), [included]);
 });

@@ -25,7 +25,7 @@ import {
 } from '../services/ToolchainApi.js';
 import { TOOLCHAIN_TRAIL_SETTINGS } from '../data/toolchainTrailSettings.js';
 import { copyToClipboard } from '../services/clipboard.js';
-import { fixStepsFor, STUCK_HELP } from '../data/toolchainTrailFixes.js';
+import { fixStepsFor, stuckHelpFor } from '../data/toolchainTrailFixes.js';
 
 const { pollIntervalMs: POLL_INTERVAL_MS, silentAgentHintMs: SILENT_AGENT_HINT_MS } = TOOLCHAIN_TRAIL_SETTINGS;
 export default class StationVerificationTrial {
@@ -36,8 +36,9 @@ export default class StationVerificationTrial {
    * @param {string} opts.station.name - in-world display name (e.g. "Terminal Town Gate")
    * @param {string} opts.station.skill - real-world skill label (e.g. "Shell fundamentals and package management")
    * @param {string} opts.station.narrativeHook - 1-2 sentence flavor text shown before the terminal
-   * @param {Array<string|{text: string, commands: string[]}>} opts.station.instructions - ordered real-world
-   *   steps; a step with commands shows each one with its own Copy button
+   * @param {Array<string|{text: string, commands: string[]}|{bold: string, text: string}>} opts.station.instructions - ordered real-world
+   *   steps; a step with commands shows each one with its own Copy button, and a step with bold
+   *   shows that text in extra-bold white (e.g. how to open the terminal)
    * @param {RegExp} opts.station.expectedCommandPattern - pattern the mock terminal checks input against
    * @param {string} opts.station.exampleCommand - a valid example command (shown as a hint)
    * @param {string} opts.station.funFact - fun fact shown by the NPC popup on success (level owns the popup, not this trial)
@@ -172,6 +173,13 @@ export default class StationVerificationTrial {
           font-size: 12.5px;
           line-height: 1.7;
           color: #dbeafe;
+        }
+
+        /* A bold step (like how to open the terminal): extra-bold and bright white. */
+        .svt-bold-step {
+          color: #ffffff;
+          font-weight: 900;
+          font-size: 1.2em;
         }
 
         .svt-terminal {
@@ -447,8 +455,14 @@ export default class StationVerificationTrial {
           <div class="svt-panel" id="svt-agent-panel">
             <h4>VERIFY WITH THE TOOLCHAIN AGENT</h4>
             <div id="svt-agent-start" class="svt-hidden">
-              <div class="svt-prompt">Get a one-time pairing code and paste it into the agent. You only do this once for the whole trail.</div>
-              <button class="svt-btn primary" id="svt-get-code">Get pairing code</button>
+              <div id="svt-briefing-gate">
+                <div class="svt-prompt">Finish every Mission Briefing step first. The agent runs from inside the pages folder you cloned, so start it only once your terminal is there.</div>
+                <button class="svt-btn primary" id="svt-briefing-done">I finished the Mission Briefing</button>
+              </div>
+              <div id="svt-get-code-step" class="svt-hidden">
+                <div class="svt-prompt">Get a one-time pairing code and paste it into the agent. You only do this once for the whole trail.</div>
+                <button class="svt-btn primary" id="svt-get-code">Get pairing code</button>
+              </div>
             </div>
             <div id="svt-agent-pairing" class="svt-hidden">
               <ol class="svt-agent-steps">
@@ -514,6 +528,7 @@ export default class StationVerificationTrial {
     this.agentChecksEl = this.overlay.querySelector('#svt-agent-checks');
     this.getCodeBtn = this.overlay.querySelector('#svt-get-code');
     this.getCodeBtn.onclick = () => this._startAgentSession();
+    this.overlay.querySelector('#svt-briefing-done').onclick = () => this._showGetCodeStep(true);
     this.overlay.querySelector('#svt-copy-code').onclick = () => this._copyCode();
     // Every command's Copy button copies the command shown right next to it.
     this.overlay.addEventListener('click', (event) => {
@@ -540,16 +555,23 @@ export default class StationVerificationTrial {
     this.overlay?.querySelector(selector)?.classList.toggle('svt-hidden', !visible);
   }
 
+  /** A first pairing waits until the student says the briefing is done; a re-pair (message) skips that. */
   _showPairingStart(message) {
     this._stopPolling();
     this.session = null;
     this._show('#svt-agent-start', true);
+    this._showGetCodeStep(Boolean(message));
     this._show('#svt-agent-pairing', false);
     this._show('#svt-check-again', false);
     this._show('#svt-new-agent', false);
     this.getCodeBtn.disabled = false;
     this._renderChecks([], this.agentChecksEl);
     this._setAgentStatus(message ? 'err' : '', message || '');
+  }
+
+  _showGetCodeStep(visible) {
+    this._show('#svt-briefing-gate', !visible);
+    this._show('#svt-get-code-step', visible);
   }
 
   /** Points the already-paired agent at this station, then waits for its results. */
@@ -580,6 +602,7 @@ export default class StationVerificationTrial {
   async _startAgentSession() {
     this._stopPolling();
     this._show('#svt-agent-start', true);
+    this._showGetCodeStep(true);
     this._show('#svt-check-again', false);
     this._show('#svt-new-agent', false);
     this.getCodeBtn.disabled = true;
@@ -592,7 +615,7 @@ export default class StationVerificationTrial {
       if (!this.overlay) return;
       console.warn('[StationVerificationTrial] could not start an agent session:', error);
       this.getCodeBtn.disabled = false;
-      this._showStuckHelp(this._startFailureHelp(error), error.message);
+      this._showStuckHelp(stuckHelpFor(error, { localBackend: usesLocalBackend() }));
       this._showPasteFallback();
       return;
     }
@@ -702,8 +725,12 @@ export default class StationVerificationTrial {
   }
 
   _showPasteFallback() {
-    this.overlay?.querySelector('#svt-paste-panel').classList.remove('svt-hidden');
+    const pastePanel = this.overlay?.querySelector('#svt-paste-panel');
+    if (!pastePanel) return;
+    pastePanel.classList.remove('svt-hidden');
     this.runBtn?.classList.remove('svt-hidden');
+    // The panel opens below the fold on small windows; bring it into view so the next step is visible.
+    pastePanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   _setAgentStatus(kind, text) {
@@ -769,19 +796,8 @@ export default class StationVerificationTrial {
     return `<ol class="svt-fix">${steps.map((step) => `<li>${this._renderStep(step)}</li>`).join('')}</ol>`;
   }
 
-  /** Which help to show when no pairing code could be made. */
-  _startFailureHelp(error) {
-    if (error?.status === 401) return STUCK_HELP.notSignedIn;
-    const unreachable = error instanceof TypeError; // fetch got no answer at all
-    if (unreachable) return usesLocalBackend() ? STUCK_HELP.localBackendDown : STUCK_HELP.serverUnreachable;
-    return null; // a server error: its own message is the best help
-  }
-
-  _showStuckHelp(help, fallbackMessage) {
-    if (!help) {
-      this._setAgentStatus('err', `${fallbackMessage}. Try again, or use the practice check below.`);
-      return;
-    }
+  /** Shows what to do next when no pairing code could be made (see STUCK_HELP). */
+  _showStuckHelp(help) {
     const [summary, ...steps] = help;
     this._setAgentStatus('err', summary);
     this.agentChecksEl.innerHTML = `<ol class="svt-fix">${steps.map((step) => `<li>${this._renderStep(step)}</li>`).join('')}</ol>`;
@@ -813,8 +829,12 @@ export default class StationVerificationTrial {
     this._close(false);
   }
 
-  /** A step is plain text, or { text, commands } with a Copy button per command. */
+  /**
+   * A step is plain text, { text, commands } with a Copy button per command, or
+   * { bold } shown extra-bold in bright white (e.g. how to open the terminal).
+   */
   _renderStep(step) {
+    if (step?.bold) return `<strong class="svt-bold-step">${this._escape(step.bold)}</strong>`;
     if (typeof step === 'string') return this._escape(step);
     return this._escape(step.text) + (step.commands || []).map((command) => this._commandRow(command)).join('');
   }

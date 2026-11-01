@@ -35,7 +35,7 @@ export const springEnabled = "{{ site.spring }}" !== "false";
 export var javaWebSocketURI;
 // Port 8589 only exists on localhost; in production nginx forwards /ws-chat
 // through javaURI's normal port (443), same as announcement_chat.html and
-// week_chat.html's buildChatSocketEndpoint() already do.
+// lesson_chat.html's buildChatSocketEndpoint() already do.
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     javaWebSocketURI = "http://localhost:8589";
 } else {
@@ -70,13 +70,19 @@ export function login(options) {
     .then(response => {
         // Trap error response from the Web API
         if (!response.ok) {
-            const errorMsg = 'Login error: ' + response.status;
-            console.log(errorMsg);
-            document.getElementById(options.message).textContent = errorMsg;
-            return response;  // Exit early if response is not OK
+            // A refusal (403: an expired guest, a closed Guest Window, a pending account) says why
+            const reason = response.status === 403
+                ? response.clone().json().then(body => body && body.message).catch(() => undefined)
+                : Promise.resolve(undefined);
+            return reason.then(why => {
+                const errorMsg = 'Login error: ' + response.status + (why ? ' - ' + why : '');
+                console.log(errorMsg);
+                document.getElementById(options.message).textContent = errorMsg;
+                return response;  // Exit early if response is not OK
+            });
         }
-        // Success: Proceed with callback
-        options.callback();
+        // Success: Proceed with callback, passing the response body when it has one
+        return response.json().catch(() => undefined).then(body => options.callback(body));
     })
     .catch(error => {
         // Handle network errors

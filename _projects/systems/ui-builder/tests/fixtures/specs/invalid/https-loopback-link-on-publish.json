@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "A button to the team's own computer", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-lplink01",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-lplink01",
+              "type": "buttons",
+              "settings": {
+                "links": [ { "label": "Try our app", "url": "https://localhost:8443/flood-watch/" } ],
+                "emphasize_first": true
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

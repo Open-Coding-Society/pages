@@ -5,6 +5,7 @@ description: Play the Toolchain Trail level of the CS Pathway on its own page.
 permalink: /cs-pathway/toolchain-trail
 hide: true
 toc: false
+microblog: true
 ---
 
 {% comment %}
@@ -26,5 +27,13 @@ startFullPageLevel({
   levelClass: GameLevelCsPath4Toolchain,
   path: '{{ site.baseurl }}',
   stage: { width: 1600, height: 900 },
+});
+
+// The game listens on window and document, so typing a post would walk the player
+// and every "e" would trigger a station.
+['microblog-panel', 'microblog-modal', 'reply-modal'].forEach((id) => {
+  const microblogElement = document.getElementById(id);
+  microblogElement.addEventListener('keydown', (event) => event.stopPropagation());
+  microblogElement.addEventListener('keyup', (event) => event.stopPropagation());
 });
 </script>
