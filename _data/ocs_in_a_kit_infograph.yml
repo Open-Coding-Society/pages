@@ -1,6 +1,6 @@
 # OCS-in-a-Kit Capstone Infographic
 Title: "OCS-in-a-Kit"
-Description: "Turning Open Coding Society's in-use classroom platform into a school-neutral, installable product: three technology-specific repos (Pages, Spring, Flask) ship one codebase each, configurable into Vanilla, Education, or Business kits through a feature-flag catalog instead of separate forks."
+Year: "2026-2027"
 
 Team:
   - "Shayan"
@@ -9,14 +9,34 @@ Team:
   - "Harrish"
   - "Darshan"
 
-Repos:
-  - name: "OCS-Kit-Vanilla (installer + catalog)"
-    url: "https://github.com/CSA-Admin-OCS/OCS-Kit-Vanilla"
-  - name: "OCS-Kit-Pages"
-    url: "https://github.com/CSA-Admin-OCS/OCS-Kit-Pages"
-  - name: "OCS-Kit-Flask"
-    url: "https://github.com/CSA-Admin-OCS/OCS-Kit-Flask"
-  - name: "OCS-Kit-Spring"
-    url: "https://github.com/CSA-Admin-OCS/OCS-Kit-Spring"
-
-Year: "2026-2027"
+Topics:
+  - title: "OCS-in-a-Kit"
+    image: "OCS-Kit-Capstone.png"
+    link: "/capstone/ocs-in-a-kit/"
+    alt: "OCS-in-a-Kit, an installable version of the Open Coding Society classroom platform"
+    courseCode: "CSA"
+    subtitle: "One script installs a classroom platform any school can run"
+    description: "Open Coding Society built a full classroom platform with lessons, a code runner, grading, chat, and hall passes, but it was wired to one school. OCS-in-a-Kit turns it into a product any school or organization can install and run on its own, with no coding required."
+    keyPoints:
+      - "Three kits: Vanilla (basic site), Education (full CS classroom), Business (chat, calendar, AI chatbot)"
+      - "16 features that admins can turn on or off at any time"
+      - "Every kit bundles a Portfolio frontend with Flask and Spring backends"
+      - "School specific names, logins, and secrets are scrubbed automatically before anything is added"
+      - "One install script sets up the whole site"
+    tech:
+      - "Jekyll (Portfolio frontend)"
+      - "Python Flask (backend, mainly login)"
+      - "Java Spring (backend)"
+      - "Docker"
+      - "GitHub Actions"
+    impact:
+      - "Lets any school run its own copy of the OCS classroom tools"
+      - "Gives businesses a ready made site for members, chat, and calendars"
+      - "Removes hand copying and manual clean up of school specific code"
+    status: "In Development"
+    team:
+      - "Shayan"
+      - "Dhyan"
+      - "Arnav"
+      - "Harrish"
+      - "Darshan"
