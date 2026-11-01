@@ -134,7 +134,7 @@ window.handleGuestSignup = async function(event) {
     }
 
     // Step 2: Login with the credentials (whether account was just created or already existed)
-    const loginResponse = await fetch(`${pythonURI}/authenticate`, {
+    const loginResponse = await fetch(`${pythonURI}/api/authenticate`, {
       ...fetchOptions,
       method: 'POST',
       body: JSON.stringify(signupData)
@@ -249,6 +249,36 @@ const currentUserPromise = fetchCurrentUser();
 // Opening the panel shows the page's posts, so its new activity counts as
 // seen: the Capstone tab's badge drops this page's share.
 document.getElementById('microblog-toggle-btn').addEventListener('click', () => markMicroblogSeen(pagePermalink));
+
+// The QR button: the phone review page for this topic (navigation/review.md), drawn by
+// the vendored qrcode-generator, which is loaded only the first time it is asked for.
+const qrModal = document.getElementById('microblog-qr-modal');
+document.getElementById('microblog-qr-close').onclick = () => qrModal.classList.add('hidden');
+document.getElementById('microblog-qr-btn').onclick = async () => {
+  const url = buildReviewUrl({ origin: location.origin, baseurl: '{{ site.baseurl }}', topicPath: pagePermalink || location.pathname });
+  if (!url) { alert('This page has no permalink to review.'); return; }
+  try {
+    if (!window.qrcode) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = '{{ site.baseurl }}/assets/js/vendor/qrcode.js';
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('The QR code library did not load.'));
+        document.head.appendChild(script);
+      });
+    }
+    const code = window.qrcode(0, 'M');
+    code.addData(url);
+    code.make();
+    document.getElementById('microblog-qr-image').innerHTML = code.createSvgTag({ cellSize: 6, margin: 12, scalable: true, title: 'QR code for the phone review page' });
+    const link = document.getElementById('microblog-qr-url');
+    link.textContent = url;
+    link.href = url;
+    qrModal.classList.remove('hidden');
+  } catch (error) {
+    alert(error.message);
+  }
+};
 
 // Channel tab and view dropdown (see matchesViewFilter for the filter values)
 let activeChannel = 'chat';
