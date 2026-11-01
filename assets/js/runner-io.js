@@ -18,7 +18,11 @@ const RUNNER_SELECTOR = '.code-runner-container';
  * `data-runner-kind="reflection"` and their written answer travels as Markdown.
  */
 export const REFLECTION_KIND = 'reflection';
-const REFLECTION_EXTENSION = 'md';
+
+/** MCQ runners (_includes/runners/mcq.html) do the same; their stored answers are readable text. */
+export const MCQ_KIND = 'mcq';
+
+const ANSWER_EXTENSION = 'md';
 
 /** Runner language -> file extension. Unknown languages fall back to .txt */
 const EXTENSIONS = {
@@ -76,7 +80,7 @@ export function readRunners(opts = {}) {
       const box = container.querySelector('.challenge-box');
       const title = box?.querySelector('h3')?.textContent.trim() || `Part ${index + 1}`;
       const desc = box?.querySelector('p')?.textContent.trim() || '';
-      const label = kind === REFLECTION_KIND ? 'reflection' : 'runner';
+      const label = kind === 'code' ? 'runner' : kind;
       content = `Question: ${title}\n${desc}\n\nAnswer (${label}: ${runnerId}):\n\n${code}`;
     }
 
@@ -87,7 +91,7 @@ export function readRunners(opts = {}) {
 }
 
 /**
- * What each file readRunners() produces holds: "code" or "reflection". Sent in the gist
+ * What each file readRunners() produces holds: "code", "reflection" or "mcq". Sent in the gist
  * manifest so the grader knows which answers are written prose rather than code.
  *
  * @returns {Object} { "runner_id.java": "code", "reflection_id.md": "reflection", ... }
@@ -105,8 +109,9 @@ export function readRunnerKinds() {
 /** The bundle filename and kind for one runner element. */
 function runnerFile(container, index) {
   const runnerId = container.dataset.runnerId || `runner_${index + 1}`;
-  if (container.dataset.runnerKind === REFLECTION_KIND) {
-    return { runnerId, name: `${safeName(runnerId)}.${REFLECTION_EXTENSION}`, kind: REFLECTION_KIND };
+  const { runnerKind } = container.dataset;
+  if (runnerKind === REFLECTION_KIND || runnerKind === MCQ_KIND) {
+    return { runnerId, name: `${safeName(runnerId)}.${ANSWER_EXTENSION}`, kind: runnerKind };
   }
   const lang = container.querySelector('.languageSelect')?.value || 'java';
   const ext = EXTENSIONS[lang] || 'txt';
