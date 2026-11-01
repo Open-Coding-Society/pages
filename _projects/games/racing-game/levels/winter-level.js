@@ -29,7 +29,30 @@ class GameLevelWinter {
   constructor(gameEnv) {
     this.gameEnv = gameEnv;
     this.nextIcicleId = 1;
-    this.nextIcicleSpawnAt = Date.now() + 2500;
+    this.gameEnv.winterRaceStarted = false;
+    this.countdownStartedAt = null;
+    this.countdownOverlay = this.createCountdownOverlay(gameEnv.container);
+    this.startCountdownOnSpace = (event) => {
+      if (event.code !== 'Space' && event.keyCode !== 32) return;
+      event.preventDefault();
+      if (this.countdownStartedAt !== null) return;
+      this.countdownStartedAt = Date.now();
+      this.countdownOverlay?.replaceChildren();
+      if (this.countdownOverlay) {
+        this.countdownOverlay.setAttribute('role', 'status');
+        this.countdownOverlay.setAttribute('aria-label', 'Race starting countdown');
+        this.countdownOverlay.style.display = 'grid';
+        this.countdownOverlay.style.background = 'rgba(0, 0, 0, 0.55)';
+        this.countdownOverlay.style.color = '#000';
+        this.countdownOverlay.style.font = 'bold clamp(64px, 18vw, 160px) Arial, sans-serif';
+        this.countdownOverlay.textContent = '3';
+      }
+      document.removeEventListener('keydown', this.startCountdownOnSpace);
+    };
+    if (typeof document !== 'undefined') {
+      document.addEventListener('keydown', this.startCountdownOnSpace);
+    }
+    this.nextIcicleSpawnAt = Number.POSITIVE_INFINITY;
     const path = gameEnv.path;
     this.iciclePath = path + '/images/projects/racing-game/Icicle.png';
     this.boostInstructions = this.createBoostInstructions(gameEnv.container);
@@ -52,7 +75,7 @@ class GameLevelWinter {
         deceleration: 0.4,
         reverseSpeed: -4,
         boostKey: 70, // F
-        INIT_POSITION: {x: 0.4, y: 0.79},
+        INIT_POSITION: {x: 0.44, y: 0.775},
         direction: { default: 'right' },
         pixels: { height: 1024, width: 1536 },
         orientation: { rows: 4, columns: 4 },
@@ -79,7 +102,7 @@ class GameLevelWinter {
         deceleration: 0.4,
         reverseSpeed: -4,
         boostKey: 75, // K
-        INIT_POSITION: {x: 0.31, y: 0.79},
+        INIT_POSITION: {x: 0.44, y: 0.805},
         direction: { default: 'right' },
         pixels: { height: 1024, width: 1536 },
         orientation: { rows: 4, columns: 4 },
@@ -135,6 +158,26 @@ class GameLevelWinter {
     for (let index = gameObjects.length - 1; index >= 0; index -= 1) {
       if (gameObjects[index]?.consumed) gameObjects.splice(index, 1);
     }
+
+    if (this.countdownStartedAt === null) return;
+
+    const countdownElapsed = now - this.countdownStartedAt;
+    if (!this.gameEnv.winterRaceStarted && countdownElapsed >= 3000) {
+      this.gameEnv.winterRaceStarted = true;
+      this.nextIcicleSpawnAt = now + 2500;
+      if (this.countdownOverlay) this.countdownOverlay.textContent = 'GO!!';
+    }
+
+    if (countdownElapsed < 3000) {
+      if (this.countdownOverlay) {
+        this.countdownOverlay.textContent = String(3 - Math.floor(countdownElapsed / 1000));
+      }
+      return;
+    }
+
+    if (countdownElapsed < 4000) return;
+    this.countdownOverlay?.remove();
+    this.countdownOverlay = null;
 
     if (now < this.nextIcicleSpawnAt) return;
 
@@ -198,9 +241,54 @@ class GameLevelWinter {
     return instructions;
   }
 
+  createCountdownOverlay(container) {
+    if (typeof document === 'undefined' || !container?.appendChild) return null;
+
+    const overlay = document.createElement('div');
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-label', 'Start the Winter race');
+    Object.assign(overlay.style, {
+      position: 'absolute',
+      inset: '0',
+      zIndex: '40',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#000',
+      color: 'lightblue',
+      pointerEvents: 'none',
+    });
+    const prompt = document.createElement('div');
+    prompt.textContent = 'Do You Wish To Start?';
+    Object.assign(prompt.style, {
+      maxWidth: '90%',
+      textAlign: 'center',
+      font: 'bold clamp(28px, 5vw, 56px) Arial, sans-serif',
+    });
+    const instruction = document.createElement('div');
+    instruction.textContent = 'Press Space To Start Race';
+    Object.assign(instruction.style, {
+      marginTop: '0.75em',
+      maxWidth: '90%',
+      textAlign: 'center',
+      font: 'bold clamp(14px, 2.5vw, 28px) Arial, sans-serif',
+    });
+    overlay.append(prompt, instruction);
+    container.appendChild(overlay);
+    return overlay;
+  }
+
   destroy() {
     this.boostInstructions?.remove();
     this.boostInstructions = null;
+    if (this.startCountdownOnSpace && typeof document !== 'undefined') {
+      document.removeEventListener('keydown', this.startCountdownOnSpace);
+    }
+    this.startCountdownOnSpace = null;
+    this.countdownOverlay?.remove();
+    this.countdownOverlay = null;
+    delete this.gameEnv.winterRaceStarted;
   }
 }
 

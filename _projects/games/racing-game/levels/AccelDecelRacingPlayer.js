@@ -29,6 +29,7 @@ export default class Player extends EnginePlayer {
     const control = this.gameEnv?.gameControl;
     if (editing || event.altKey || event.ctrlKey || event.metaKey || !control || control.isPaused) return;
     if (this.gameEnv.container?.isConnected === false) return;
+    if (this.gameEnv.winterRaceStarted === false) return;
 
     const wasPressed = this.keysPressed[event.keyCode];
     this.keysPressed[event.keyCode] = true;
@@ -126,6 +127,16 @@ export default class Player extends EnginePlayer {
   }
 
   update() {
+    if (this.gameEnv.winterRaceStarted === false) {
+      this.currentSpeed = 0;
+      this.velocity.x = 0;
+      this.velocity.y = 0;
+      this.keysPressed = {};
+      this.pressedKeys = {};
+      this.draw();
+      return;
+    }
+
     super.update();
 
     // ONLY run acceleration physics if this specific car has maxSpeed defined
