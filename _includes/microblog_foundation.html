@@ -7,6 +7,7 @@
     <button id="microblog-close-btn" class="microblog-close-btn" aria-label="Close Microblog">&times;</button>
     <h2 class="microblog-panel-title">Microblog</h2>
     <button id="guest-signup-toggle" class="guest-signup-toggle-btn">Guest Signup</button>
+    <button id="microblog-qr-btn" class="microblog-qr-btn" title="QR code: review this page from a phone" aria-label="QR code for phone reviews">QR code</button>
   </div>
 
   <!-- Guest Signup Form (initially hidden) -->
@@ -194,6 +195,21 @@ window.handleGuestSignup = async function(event) {
   </div>
 </div>
 
+<!-- QR Modal: the address of the phone review page for this topic, as a code to scan -->
+<div id="microblog-qr-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="microblog-modal-panel">
+    <div class="microblog-modal-header">
+      <button id="microblog-qr-close" class="microblog-modal-close" aria-label="Close QR code">&times;</button>
+      <h2 class="microblog-modal-title">Review from a phone</h2>
+    </div>
+    <div class="microblog-qr-body">
+      <div id="microblog-qr-image" class="microblog-qr-image" aria-label="QR code"></div>
+      <p class="microblog-qr-link"><a id="microblog-qr-url" href="#" target="_blank" rel="noopener"></a></p>
+      <p class="microblog-qr-note">Visitors scan this, sign in as a guest, and post their review here without using your computer. A teacher must have the Guest Window open for new guests.</p>
+    </div>
+  </div>
+</div>
+
 <!-- Reply Modal -->
 <div id="reply-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
   <div class="microblog-modal-panel">
@@ -220,6 +236,7 @@ window.handleGuestSignup = async function(event) {
 // Imports for APIs used on this page
 import { fetchPosts, createPost, updatePost, deletePost, createReply, fetchReplies, fetchCurrentUser, setPostResolved, setReplyResolved, isStatusMarker, getResolution, getReplyResolution, normalizeAuthorUids, postChannel, matchesViewFilter } from '/assets/js/api/microblog.js';
 import { markMicroblogSeen } from '/assets/js/api/microblog-notifications.js';
+import { buildReviewUrl } from '/assets/js/api/microblog-review.js';
 
 // Default Key for New MicroBlog Posts
 const pagePermalink = '{{page.permalink}}';
