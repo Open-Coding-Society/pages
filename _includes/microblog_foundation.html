@@ -586,10 +586,11 @@ async function renderMicroblogTable() {
         // Table: rows; generated from microblog data
         let genBody = '';
         visiblePosts.forEach(post => {
+            // Every post field is text from another user: escape it before it joins the markup
             const analyticsCell = analytics.map(f => {
               let value = post[f.key] ?? '';
               if (f.format) value = f.format(value);
-              return `<div>${value}</div>`;
+              return `<div>${escapeHtml(String(value))}</div>`;
             }).join('');
             // Resolve/Reopen shows only for the post's writer and the page authors
             const isResolved = post.resolution.resolved;
@@ -602,6 +603,7 @@ async function renderMicroblogTable() {
             const messageCell = message.map(f => {
               let value = post[f.key] ?? '';
               if (f.format) value = f.format(value);
+              value = escapeHtml(String(value));
               if (f.key === 'topicPath') {
                 const archivedNote = post.archived ? '<small>(archived; read-only)</small>' : '';
                 return `<div class='microblog-post-topic'><span>${value}</span>${resolvedBadge}${archivedNote}</div>`;

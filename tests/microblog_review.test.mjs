@@ -7,12 +7,15 @@ import {
 test('normalizeTopicPath keeps a site path and drops its query and hash', () => {
     assert.equal(normalizeTopicPath('/capstone/presence-system/'), '/capstone/presence-system/');
     assert.equal(normalizeTopicPath(' /capstone/presence-system/?x=1#top '), '/capstone/presence-system/');
+    assert.equal(normalizeTopicPath('/csa/unit_04/4_9'), '/csa/unit_04/4_9');
+    assert.equal(normalizeTopicPath('/2025/02/20/rpn_calculator-tracking_IPYNB_2_.html'), '/2025/02/20/rpn_calculator-tracking_IPYNB_2_.html');
 });
 
 test('normalizeTopicPath refuses anything that is not a path on this site', () => {
     for (const bad of [
         null, undefined, 42, '', 'capstone/', 'https://evil.example/',
         '//evil.example/', '/a/../b', '/a/./b', '/a b', '/a\\b', 'javascript:alert(1)',
+        '/a<img src=x onerror=alert(1)>', "/a'b", '/a"b', '/a%3Cb', '/a&b', '/a;b',
     ]) {
         assert.equal(normalizeTopicPath(bad), null, `should refuse ${String(bad)}`);
     }

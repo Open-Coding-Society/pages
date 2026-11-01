@@ -14,7 +14,8 @@ export function normalizeTopicPath(raw) {
     const cut = path.search(/[?#]/);
     if (cut !== -1) path = path.slice(0, cut);
     if (!path.startsWith('/') || path.startsWith('//')) return null;
-    if (/\s|\\/.test(path)) return null;
+    // Only the characters a permalink is made of; anything else (markup, quotes, spaces) is refused
+    if (!/^\/[A-Za-z0-9._~\/-]*$/.test(path)) return null;
     if (path.split('/').some(part => part === '..' || part === '.')) return null;
     return path;
 }
