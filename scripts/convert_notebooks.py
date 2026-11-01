@@ -108,6 +108,13 @@ PSEUDOCODE_RUNNER_PATTERN = r'^//\s*PSEUDOCODE_RUNNER:\s*(.+)$'
 #   <!-- REFLECTION_RUNNER: Why did you use a loop here? | id: loops-why -->
 REFLECTION_RUNNER_PATTERN = r'^<!--\s*REFLECTION_RUNNER:\s*(.+?)\s*-->$'
 
+# MCQ_RUNNER pattern: first line of a markdown cell, followed by the questions as a JSON array in a
+# ```json fence. Replaced by _includes/runners/mcq.html, whose answers go in the same Gist.
+#   <!-- MCQ_RUNNER: MCQ 1.09 | id: method-signatures-mcq -->
+MCQ_RUNNER_PATTERN = r'^<!--\s*MCQ_RUNNER:\s*(.+?)\s*-->$'
+MCQ_QUESTIONS_PATTERN = r'^```json\s*\n(.*?)\n```\s*(.*)$'
+MCQ_MAX_CHOICES = 4
+
 
 #########################################
 ### Section for Core Helper Functions ###
@@ -1089,6 +1096,22 @@ def process_pseudocode_runner_cells(notebook, permalink):
     return notebook
 
 
+def fenced_block_owners(notebook):
+    """The code cell behind each fenced block of the exported Markdown, in page order.
+
+    A fence written inside a markdown cell has no code cell (None). Without those entries it
+    would take the next code cell's runner, and every later runner would land one block early.
+    """
+    owners = []
+    for cell in notebook.cells:
+        if cell.cell_type == 'code':
+            owners.append(cell)
+        elif cell.cell_type == 'markdown':
+            fence_lines = sum(1 for line in cell.source.split('\n') if line.startswith('```'))
+            owners.extend([None] * (fence_lines // 2))
+    return owners
+
+
 def inject_code_runners(markdown, notebook, front_matter=None):
     """Inject code-runner includes after code blocks with metadata
     
@@ -1103,7 +1126,7 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     lesson_key = _build_lesson_key(front_matter)
 
     ui_runner_cells, ui_runner_ids = UiRunner.collect_cells_and_source_ids(notebook)
-    code_cells = [cell for cell in notebook.cells if cell.cell_type == 'code']
+    fence_owners = fenced_block_owners(notebook)
     raw_cells = [cell for cell in notebook.cells if cell.cell_type == 'raw']
     
     # Create a mapping of cell order for proper injection
@@ -1309,7 +1332,7 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                 code_block_content.append(line)
                 
                 # Check if this corresponds to a code cell with runner metadata
-                code_cell = code_cells[code_cell_count] if code_cell_count < len(code_cells) else None
+                code_cell = fence_owners[code_cell_count] if code_cell_count < len(fence_owners) else None
                 
                 code_cell_count += 1
                 
@@ -1429,6 +1452,67 @@ def process_reflection_runner_cells(notebook, permalink):
     return notebook
 
 
+def validate_mcq_questions(questions, title: str) -> None:
+    """Fail the conversion on a malformed question, which would otherwise break only in the browser."""
+    if not isinstance(questions, list) or not questions:
+        raise ValueError(f'MCQ_RUNNER "{title}" needs a JSON array of questions.')
+    for number, item in enumerate(questions, start=1):
+        choices = item.get('choices') if isinstance(item, dict) else None
+        if not isinstance(choices, list) or not 2 <= len(choices) <= MCQ_MAX_CHOICES:
+            raise ValueError(f'MCQ_RUNNER "{title}" question {number} needs 2 to {MCQ_MAX_CHOICES} choices.')
+        if not isinstance(item.get('q'), str) or not item['q'].strip():
+            raise ValueError(f'MCQ_RUNNER "{title}" question {number} needs its "q" text.')
+        answer = item.get('answer')
+        if type(answer) is not int or not 0 <= answer < len(choices):
+            raise ValueError(f'MCQ_RUNNER "{title}" question {number} needs "answer", the index of the right choice.')
+
+
+def mcq_runner_liquid(title: str, questions: list, runner_id: str, number: int) -> str:
+    """The Liquid that embeds one MCQ runner, with its questions as one-line JSON."""
+    # Escaping < keeps question text from closing the page's <script> tag; raw keeps Liquid off code.
+    questions_json = json.dumps(questions, ensure_ascii=False, separators=(',', ':')).replace('<', '\\u003c')
+    return (
+        '{% capture mcq_title' + str(number) + ' %}' + title + '{% endcapture %}\n'
+        '{% capture mcq_questions' + str(number) + ' %}{% raw %}' + questions_json + '{% endraw %}{% endcapture %}\n'
+        '{% include runners/mcq.html runner_id="' + runner_id + '" title=mcq_title' + str(number)
+        + ' questions=mcq_questions' + str(number) + ' %}'
+    )
+
+
+def process_mcq_runner_cells(notebook, permalink):
+    """Replace <!-- MCQ_RUNNER: title | id: ... --> markdown cells with MCQ runners."""
+    number = 0
+    seen_ids = set()
+    for cell in notebook.cells:
+        if cell.cell_type != 'markdown':
+            continue
+        marker, _, body = cell.source.strip().partition('\n')
+        match = re.match(MCQ_RUNNER_PATTERN, marker.strip(), re.IGNORECASE)
+        if not match:
+            continue
+        title, options = split_marker_options(match.group(1))
+        if not title:
+            raise ValueError('An MCQ_RUNNER marker needs a title: <!-- MCQ_RUNNER: title | id: name -->')
+        fenced = re.match(MCQ_QUESTIONS_PATTERN, body.strip(), re.DOTALL)
+        if not fenced:
+            raise ValueError(f'MCQ_RUNNER "{title}" needs its questions in a ```json fence after the marker.')
+        try:
+            questions = json.loads(fenced.group(1))
+        except json.JSONDecodeError as error:
+            raise ValueError(f'MCQ_RUNNER "{title}" has invalid JSON: {error}') from error
+        validate_mcq_questions(questions, title)
+        number += 1
+        # The id names the answers' file in the Gist, so it is kept to filename-safe characters.
+        runner_id = options.get('id') or generate_runner_id(permalink, f'mcq-{number}')
+        runner_id = re.sub(r'[^A-Za-z0-9_-]', '-', runner_id)
+        if runner_id in seen_ids:
+            raise ValueError(f'Duplicate MCQ_RUNNER id "{runner_id}" in one notebook.')
+        seen_ids.add(runner_id)
+        rest = fenced.group(2).strip()
+        cell['source'] = mcq_runner_liquid(title, questions, runner_id, number) + (f'\n\n{rest}' if rest else '')
+    return notebook
+
+
 def process_custom_cells(notebook, permalink):
     """Main custom-cell orchestration pipeline for ID assignment and runner extraction."""
     notebook = assign_custom_cell_ids(notebook, permalink)
@@ -1437,6 +1521,7 @@ def process_custom_cells(notebook, permalink):
     notebook = process_game_runner_cells(notebook, permalink)
     notebook = process_pseudocode_runner_cells(notebook, permalink)
     notebook = process_reflection_runner_cells(notebook, permalink)
+    notebook = process_mcq_runner_cells(notebook, permalink)
     return notebook
 
 

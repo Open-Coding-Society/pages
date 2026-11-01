@@ -880,7 +880,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
           const notes = document.getElementById('code-notes-blog')?.value?.trim() || '';
           const btn = this.querySelector('button[type="submit"]');
           if (window.unsavedRunners().length > 0) {
-            showStatusBlog('error', 'Save each code runner with its 💾 button, and submit each reflection with its 📤 button, before submitting.');
+            showStatusBlog('error', 'Save each code runner with its 💾 button, submit each reflection with its 📤 button, and check any MCQ answers before submitting.');
             return;
           }
           const files = window.readRunners();
