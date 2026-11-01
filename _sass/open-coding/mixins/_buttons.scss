@@ -23,8 +23,17 @@
   }
 
   &:focus {
-    outline: none;
     border-color: var(--pref-accent-color);
+  }
+
+  // A ring for keyboard focus: under a preset every button's border is already the accent.
+  &:focus-visible {
+    outline: 2px solid var(--pref-accent-color);
+    outline-offset: 2px;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
   }
 }
 

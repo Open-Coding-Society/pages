@@ -225,7 +225,7 @@ active_tab: submissions
     async function init() {
         try {
             await checkAdminStatus();
-            await Promise.all([loadSubmissions(), creatorDashboard.load(currentUsername)]);
+            await Promise.all([loadSubmissions(), creatorDashboard.load(currentUsername, { isTeacher: isAdmin })]);
             setupTabSwitcher();
             setupFilters();
             setupEditModal();

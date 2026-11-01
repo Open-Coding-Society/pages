@@ -1,0 +1,194 @@
+# Unified Social Club Capstone Infographic
+# Rendered by _includes/usc-infograph.html. All styling comes from the shared,
+# theme-aware capstone infograph SASS (_sass/capstone/infograph.scss), so there is no
+# page-specific CSS.
+Title: "Unified Social Club"
+Description: "Unified Social Club gives adults with special needs in Poway a free, safe place to make friends: board and card games, arts and crafts, karaoke, and sports, twice a month at the Mickey Cafagna Community Center. Games are the heart of every club night, so we are building three club games members can play together, on the big screen at club night and on their own phones: Club Bingo, Club Trivia Live, and Club Jeopardy. Every game is easy-read, big-print, and playable hands-free with Nod to select."
+
+Board:
+  url: "https://github.com/orgs/Unified-Social-Club-CSP/projects/1"
+  title: "Team Triple T Kanban"
+  filter: "Owner"
+
+Topics:
+  - title: "Club Bingo"
+    phase: "Round 1"
+    link: "https://www.unifiedsocialclub.com/"
+    linkLabel: "See What the Club Does"
+    subtitle: "Big-print Bingo with a caller who reads every number out loud"
+    keyPoints:
+      - "Play solo, or join friends in a room with a 4-digit code"
+      - "The server calls the numbers and checks every Bingo, so no one can cheat"
+      - "Big cards, a speaking caller, and Nod to select for members who can't use a mouse"
+      - "Saved progress: games played and Bingos won show on the member's profile"
+    tech:
+      - "Bingo rooms API"
+      - "Server-checked caller"
+      - "Saved progress"
+      - "Speech caller"
+    description: "Bingo is a club-night favorite. We start from the multiplayer Bingo we built for Friends of Poway Seniors and make it simpler and bigger for club members."
+    impact:
+      - "Members keep playing with friends between club dates"
+      - "Volunteers can run a Bingo round on the big screen"
+    status: "Planned"
+    team:
+      - "Kashyap"
+
+  - title: "Club Trivia Live"
+    phase: "Round 2"
+    link: "https://www.unifiedsocialclub.com/event-list"
+    linkLabel: "See Club Dates"
+    subtitle: "A live game show for club night, like Kahoot"
+    keyPoints:
+      - "A host shows each question on the big screen; members join on their phones with a 4-digit code"
+      - "Answers are four big picture buttons, with a timer and a live scoreboard"
+      - "Volunteers write their own question sets without touching code"
+      - "Solo practice mode for playing at home"
+    tech:
+      - "Game rooms API"
+      - "Live polling"
+      - "Question sets CRUD"
+      - "Scoreboard"
+    description: "Trivia brings the whole room together at once. Members who can't read well still play, because every question is read out loud and every answer has a picture."
+    impact:
+      - "Everyone at club night plays in the same game"
+      - "Volunteers can make a new game in minutes"
+    status: "Planned"
+    team:
+      - "Chetan"
+
+  - title: "Club Jeopardy"
+    phase: "Round 3"
+    link: "https://www.unifiedsocialclub.com/blank-6"
+    linkLabel: "See the Club in Photos"
+    subtitle: "Pick a category, pick a value, answer together"
+    keyPoints:
+      - "A board of club-life categories: Games, Music and Karaoke, Sports, Arts and Crafts, Poway, Holidays"
+      - "Teams take turns picking a square; easier questions are worth fewer points"
+      - "Volunteers edit categories and questions, and choose easy or harder boards"
+      - "Works on the big screen at club night or on one device at home"
+    tech:
+      - "Boards and clues API"
+      - "Team scores"
+      - "Volunteer editor"
+      - "Big-print board"
+    description: "Jeopardy turns the things members already love about club night into a team game, so members cheer each other on instead of competing alone."
+    impact:
+      - "Members practice teamwork and taking turns"
+      - "Volunteers get a ready-made club-night activity"
+    status: "Planned"
+    team:
+      - "Aaditya"
+
+  - title: "Built In For Every Game"
+    phase: "Round 4"
+    link: "https://www.unifiedsocialclub.com/blank-1"
+    linkLabel: "Read Their FAQ"
+    subtitle: "Accessibility, accounts, and club dates shared by all three games"
+    keyPoints:
+      - "Nod to select: a head nod presses the highlighted button for members who can't use a mouse"
+      - "Text-size buttons, plain words, and pictures on every main link"
+      - "One OCS login with roles for members, families, volunteers, and staff"
+      - "Club dates in order with times, and private messages with volunteers only"
+    tech:
+      - "Nod to select"
+      - "OCS login and roles"
+      - "OCS direct messages"
+      - "Events API"
+    description: "These pieces carry over from our Friends of Poway Seniors capstone and are shared by all three games, so each game stays simple."
+    impact:
+      - "Members can play on their own"
+      - "Families and volunteers stay connected"
+    status: "Planned"
+    team:
+      - "Aaditya"
+      - "Chetan"
+      - "Kashyap"
+
+  - title: "New Ideas We Want To Try"
+    phase: "Exploring"
+    link: "https://www.unifiedsocialclub.com/blank-6"
+    linkLabel: "Their Photo Gallery"
+    subtitle: "Rough versions first; we keep what works"
+    keyPoints:
+      - "Karaoke request line members can add songs to before club night"
+      - "Art studio with big brushes and a volunteer-approved gallery"
+      - "Color Match, a simple card game played with friends"
+    tech:
+      - "Song queue"
+      - "Gallery"
+    description: "Ideas we will prototype with the club before committing to them."
+    impact:
+      - "More ways for members to join in"
+      - "Members see their own work on the site"
+    status: "Exploring"
+    team:
+      - "Aaditya"
+      - "Chetan"
+      - "Kashyap"
+
+Sections:
+  - title: "Strengths vs Problems"
+    subtitle: "What already works, and what gets in a family's way"
+    items:
+      - "Works: free for members, twice a month, with refreshments covered by community sponsors."
+      - "Works: strong community support, from the City of Poway and the Poway Sheriff's Department to sponsors like General Atomics and Unified ESports League."
+      - "Works: a clear FAQ that covers aides, service animals, age limits, and photo consent."
+      - "Problem: club dates are listed out of order, with no year and no start or pickup time."
+      - "Problem: no phone number or email anywhere on the site."
+      - "Problem: pages are named /blank-1 through /blank-6, and volunteering and the waiver are separate steps."
+
+  - title: "Ideas We Are Bringing From Our First Capstone"
+    subtitle: "What carries over from Friends of Poway Seniors, and what doesn't"
+    items:
+      - "Bringing: accessibility first, with big text, text-size buttons, and hands-free Nod to select."
+      - "Bringing: multiplayer Bingo rooms and the room-code pattern, which Trivia Live reuses, plus saved progress and the tap-only profile survey."
+      - "Bringing: OCS login and roles, direct messages with volunteers, and the microblog."
+      - "Leaving behind: the scam-defense trainer, which was built for older adults."
+
+  - title: "The Direction"
+    subtitle: "Four goals behind every game"
+    items:
+      - "Together: every game works on the big screen at club night and on members' own phones."
+      - "Easy-read: plain words and pictures, usable without help."
+      - "Connected: members, families, and volunteers share one account."
+      - "Safe: messages only with volunteers and staff, and photo consent respected."
+
+  - title: "Team Roles"
+    subtitle: "Sprint 3 roles; each person also owns one game"
+    items:
+      - "Kashyap: Scrum Master and frontend Deployment Admin. Owns Club Bingo."
+      - "Chetan: backend Deployment Admin and Data Modeler. Owns Club Trivia Live."
+      - "Aaditya: Integrator and Visual Design owner. Owns Club Jeopardy."
+      - "Everyone: shared features, reviews each other's pull requests, and tests with real users."
+
+  - title: "Sprint 3 Plan"
+    subtitle: "Ideate, define, prototype, then test at Night at the Museum"
+    items:
+      - "Ideate and Define: empathy notes, problem statements, and how-might-we questions for each game."
+      - "Prototype: Home, Login, and the interest Survey live on our site, plus playable Bingo, Trivia practice, and Jeopardy."
+      - "Night at the Museum (Nov 2–6): a test-driven Google Form and a usability test plan for all three games."
+      - "Done when: every game works on the live site, with Nod to select and big print, and each owner can explain their CPT procedure."
+
+Links:
+  title: "Following Along"
+  subtitle: "Where this work is tracked"
+  items:
+    - label: "Our Kanban Board"
+      url: "https://github.com/orgs/Unified-Social-Club-CSP/projects/1"
+    - label: "Our Live Site"
+      url: "https://unified-social-club-csp.github.io/usc-pages/"
+    - label: "Their Live Site"
+      url: "https://www.unifiedsocialclub.com/"
+    - label: "Club Dates and Register"
+      url: "https://www.unifiedsocialclub.com/event-list"
+    - label: "Their FAQ"
+      url: "https://www.unifiedsocialclub.com/blank-1"
+    - label: "Volunteer Registration"
+      url: "https://www.unifiedsocialclub.com/blank-4"
+    - label: "Our First Capstone: Friends of Poway Seniors"
+      url: "https://pages.opencodingsociety.com/capstone/fops-2026-2027/"
+    - label: "Our Frontend (usc-pages)"
+      url: "https://github.com/Unified-Social-Club-CSP/usc-pages"
+    - label: "Our Backend (usc-flask)"
+      url: "https://github.com/Unified-Social-Club-CSP/usc-flask"

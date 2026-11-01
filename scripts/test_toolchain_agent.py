@@ -49,14 +49,28 @@ class CollectEvidenceTest(unittest.TestCase):
         evidence = toolchain_agent.collect_evidence("editor-isle-tower", Path("."), runner)
         self.assertEqual(evidence[0]["exitCode"], 0)
 
-    def test_terminal_gate_finds_the_folder_in_home(self):
-        with tempfile.TemporaryDirectory() as home, tempfile.TemporaryDirectory() as cwd:
-            (Path(home) / "toolchain-trail").mkdir()
-            with mock.patch.object(Path, "home", return_value=Path(home)), mock.patch.object(Path, "cwd", return_value=Path(cwd)):
-                evidence = toolchain_agent.collect_evidence("terminal-town-gate", Path("."))
+    def test_terminal_gate_reports_where_pages_is_cloned(self):
+        runner = fake_runner({"git rev-parse --show-toplevel": (0, "/home/ada/opencs/pages\n")})
+        with mock.patch.object(Path, "cwd", return_value=Path("/home/ada/opencs/pages")):
+            evidence = toolchain_agent.collect_evidence("terminal-town-gate", Path("."), runner)
         by_id = {item["id"]: item for item in evidence}
-        self.assertEqual(by_id["working-folder"]["output"], cwd)
-        self.assertTrue(by_id["trail-folder"]["output"].endswith("toolchain-trail"))
+        self.assertEqual([item["id"] for item in evidence], ["working-folder", "pages-clone"])
+        self.assertEqual(by_id["pages-clone"], {"id": "pages-clone", "exitCode": 0, "output": "/home/ada/opencs/pages\n"})
+
+    def test_summit_rechecks_pages_and_tools_and_never_commits_or_pushes(self):
+        commands = []
+
+        def recording_runner(command, cwd=None):
+            commands.append(" ".join(command))
+            return 0, "ok"
+
+        evidence = toolchain_agent.collect_evidence("integration-summit", Path("."), recording_runner)
+        ids = [item["id"] for item in evidence]
+        for check_id in ["pages-clone", "python", "pip", "ruby", "bundler", "rubygems", "editor", "git"]:
+            self.assertIn(check_id, ids)
+        self.assertNotIn("recent-commit", ids)
+        self.assertNotIn("push-dry-run", ids)
+        self.assertFalse([c for c in commands if " commit" in c or " push" in c or " add" in c], commands)
 
     def test_every_station_the_backend_knows_has_checks(self):
         runner = fake_runner({})

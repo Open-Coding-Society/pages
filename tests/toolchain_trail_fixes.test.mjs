@@ -8,10 +8,10 @@ import { FIXES, STUCK_HELP, fixStepsFor, stuckHelpFor } from '../_projects/games
 const agent = readFileSync(new URL('../scripts/toolchain_agent.py', import.meta.url), 'utf8');
 const evidence = agent.slice(agent.indexOf('def collect_evidence'), agent.indexOf('class AgentError'));
 const CHECK_IDS = [...new Set([...evidence.matchAll(/\("([a-z][a-z-]*)", /g)].map((match) => match[1]))];
-const GAME_OSES = ['windows', 'macos', 'linux', 'kasm'];
+const GAME_OSES = ['windows', 'macos', 'linux'];
 
 test('the agent check list was found', () => {
-  assert.ok(CHECK_IDS.length >= 16, `only found ${CHECK_IDS.join(', ')}`);
+  assert.ok(CHECK_IDS.length >= 14, `only found ${CHECK_IDS.join(', ')}`);
 });
 
 test('every check the agent can fail has fix steps on every OS', () => {
@@ -27,9 +27,9 @@ test('fix steps have no unknown check ids', () => {
 });
 
 test('placeholders are filled with the OS project folder and the agent command', () => {
-  const kasm = JSON.stringify(fixStepsFor('working-folder', 'kasm', 'python3 scripts/toolchain_agent.py'));
-  assert.match(kasm, /cd ~\/opencs\/student/);
-  assert.match(kasm, /python3 scripts\/toolchain_agent\.py/);
+  const linux = JSON.stringify(fixStepsFor('working-folder', 'linux', 'python3 scripts/toolchain_agent.py'));
+  assert.match(linux, /cd ~\/opencs\/pages/);
+  assert.match(linux, /python3 scripts\/toolchain_agent\.py/);
   for (const id of CHECK_IDS) {
     assert.doesNotMatch(JSON.stringify(fixStepsFor(id, 'macos', 'AGENT')), /\{project\}|\{agent\}/, id);
   }
@@ -59,4 +59,11 @@ test('every pairing failure says what to do next', () => {
   assert.match(STUCK_HELP.serverUnreachable.join(' '), /Verify Output/);
   assert.equal(stuckHelpFor(new TypeError('Failed to fetch'), { localBackend: true }), STUCK_HELP.localBackendDown);
   for (const help of Object.values(STUCK_HELP)) assert.ok(help.length >= 2, 'has a next step');
+});
+
+test('the Toolchain Trail page has a microblog that keeps typing out of the game', () => {
+  const page = readFileSync(new URL('../_projects/games/cs-pathway/navigation/toolchain-trail.md', import.meta.url), 'utf8');
+  assert.match(page, /^microblog: true$/m);
+  for (const element of ['microblog-panel', 'microblog-modal', 'reply-modal']) assert.ok(page.includes(`'${element}'`));
+  for (const key of ['keydown', 'keyup']) assert.ok(page.includes(`addEventListener('${key}', (event) => event.stopPropagation())`));
 });

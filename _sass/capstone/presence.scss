@@ -118,4 +118,102 @@
       white-space: nowrap;
     }
   }
+
+  // Live dashboard (/capstone/presence-system/dashboard/)
+  // The dashboard shows and hides its parts with the hidden attribute. !important because
+  // equally specific display rules (.pd-controls is flex) would otherwise show staff-only controls.
+  [hidden] { display: none !important; }
+
+  .pd-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .pd-stat {
+    border: 1px solid var(--rp-card-border);
+    background: var(--rp-surface);
+    border-radius: 10px;
+    padding: 0.75rem;
+    text-align: center;
+  }
+
+  .pd-stat-count {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--rp-text);
+  }
+
+  .pd-stat-label {
+    font-size: 0.85rem;
+    color: var(--rp-text-muted);
+  }
+
+  .pd-updated {
+    font-size: 0.8rem;
+    color: var(--rp-text-muted);
+    margin-top: 0.5rem;
+  }
+
+  .rfid-presence-table td.pd-name { color: var(--rp-text); }
+
+  // Teacher-only room picker and control to start a manual demo period
+  .pd-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .pd-room-field { flex: 0 1 16rem; }
+
+  .pd-controls-text {
+    flex: 1 1 260px;
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--rp-text-muted);
+  }
+
+  .pd-start-feedback,
+  .pd-feedback,
+  .pd-hint {
+    font-size: 0.85rem;
+    color: var(--rp-text-muted);
+  }
+
+  // Teacher-only Room setup panel
+  .pd-setup {
+    margin-top: 1rem;
+
+    > summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--rp-text);
+    }
+
+    > .ocs__stack { margin-top: 1rem; }
+
+    h3 { margin: 0 0 0.5rem; }
+  }
+
+  .pd-setup-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+
+    > .ocs__field { flex: 1 1 14rem; }
+  }
+
+  .pd-setup-list {
+    margin: 0 0 0.75rem;
+    padding-left: 1.25rem;
+    color: var(--rp-text);
+
+    li { margin-bottom: 0.4rem; }
+
+    .ocs__btn { margin-left: 0.5rem; }
+  }
 }
