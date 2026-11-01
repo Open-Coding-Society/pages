@@ -29,7 +29,11 @@ class TimeLapScreen extends GameObject {
     this.drawsFinishLine = data.drawFinishLine === true;
     this.hudPosition = data.hudPosition || { x: 0.01, y: 0.02 };
     this.showLosingScreen = data.showLosingScreen !== false;
-    this.lapTracker = new LapTracker({ finishLine: this.finishLine, totalLaps: this.totalLaps });
+    this.lapTracker = new LapTracker({
+      finishLine: this.finishLine,
+      checkpoint: data.checkpoint,
+      totalLaps: this.totalLaps,
+    });
     this.elapsedMs = 0;
     this.lastFrameAt = null;
     this.raceStarted = false;

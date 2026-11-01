@@ -89,6 +89,7 @@ class GameLevelSecret {
     const lap_data = {
       totalLaps: 3,
       finishLine: { x: 0.568, top: 0.841, bottom: 0.939 },
+      checkpoint: { x: 0.568, top: 0.1, bottom: 0.22 },
       drawFinishLine: true,
       hudPosition: { x: 0.42, y: 0.63 }
     };
