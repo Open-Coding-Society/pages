@@ -407,9 +407,12 @@ export function createCreatorDashboard(options) {
 
   function bindInteractions() {
     element("creator-submission-filters").addEventListener("submit", (event) => event.preventDefault());
+    // The topic narrows both tables, so the submissions shown match what "Re-run AI grading" will touch.
     element("creator-filter-topic").addEventListener("input", () => {
       populateAssignmentFilter();
       renderAssignments();
+      currentPage = 1;
+      renderSubmissions();
     });
     element("creator-bulk-ai-regrade").addEventListener("click", (event) => rerunAiGrading(event.currentTarget));
     ["creator-filter-course", "creator-filter-assignment", "creator-filter-student", "creator-filter-status"]
