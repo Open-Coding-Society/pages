@@ -1,17 +1,13 @@
 import EnginePlayer from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import { RACING_CAR_PHYSICS } from './RacingCarPhysics.js';
 
 export default class Player extends EnginePlayer {
   constructor(data = {}, gameEnv = null) {
     super(data, gameEnv);
 
     this.speed = 0;
-    this.maxSpeed = 6;
-    this.reverseSpeed = 2;
-    this.acceleration = 0.20;
-    this.braking = 0.2;
-    this.coasting = 0.05;
-    this.turnRate = 0.1 / speed;
-    this.heading = 0; // Radians; 0 points upward.
+    Object.assign(this, RACING_CAR_PHYSICS);
+    this.heading = Number.isFinite(data.heading) ? data.heading : 0; // Radians; 0 points upward.
     this.gravity = false;
     this.updateDirection();
   }

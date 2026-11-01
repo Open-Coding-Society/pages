@@ -5,6 +5,60 @@ $racing-panel-bg: rgba(15, 23, 42, 0.92);
 $racing-accent: #facc15;
 $racing-text: #f8fafc;
 
+.racing-difficulty {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.82);
+  color: $racing-text;
+
+  &__content {
+    width: min(100%, 420px);
+    padding: 24px;
+    border: 2px solid $racing-accent;
+    border-radius: 8px;
+    background: $racing-panel-bg;
+    text-align: center;
+  }
+
+  h2 {
+    margin: 0 0 8px;
+    color: $racing-accent;
+    font: bold 24px sans-serif;
+  }
+
+  p {
+    margin: 0 0 20px;
+    font: 14px sans-serif;
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  &__button {
+    min-width: 100px;
+    padding: 8px 16px;
+    border: 1px solid $racing-accent;
+    border-radius: 4px;
+    background: rgba(250, 204, 21, 0.15);
+    color: $racing-text;
+    font: bold 14px sans-serif;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: rgba(250, 204, 21, 0.35);
+    }
+  }
+}
+
 .racing-hud-restart {
   position: absolute;
   z-index: 20;
