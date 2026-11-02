@@ -13,8 +13,8 @@ same way they reach a direct message.
 | `js/messages-page.js` | Starts the page: who is signed in, the two lists, opening a conversation, the group header buttons, the socket. |
 | `js/conversation-embed.js` | One group chat or direct message inside another page, such as a UI Builder page. See [Embedding a conversation](#embedding-a-conversation). |
 | `js/thread.js` | The open conversation: loads it, follows its socket topic, sends, edits and deletes, and keeps DM read state. An embed's pane can also be read-only, use the host's wording and be destroyed. |
-| `js/message-log.js` | Draws the messages: day dividers, avatars, edit and delete buttons. Also the small text helpers the pane and the embed share. |
-| `js/sidebar.js` | The Groups and Direct messages lists, as `ocs__nav-card` links. |
+| `js/message-log.js` | Draws the messages: day dividers, avatars, reply quotes, and Reply, edit and delete buttons; `setFilter` hides messages that don't match the conversation search. Also the small text helpers the pane and the embed share. |
+| `js/sidebar.js` | The Groups and Direct messages lists, as `ocs__nav-card` links, filtered by the "Search conversations" box. |
 | `js/new-chat.js` | The New chat dialog. |
 | `js/group-dialogs.js` | Find a group (search, join, make a group), Members (with Delete group at the bottom, for admins), and Files. |
 | `js/delete-group.js` | The Delete group dialog: says what deleting takes away, and waits for the group's name. |
@@ -25,7 +25,7 @@ same way they reach a direct message.
 | `js/messages-model.js` | Pure functions: one message shape for DMs and groups, labels, roles. |
 | `js/formation-model.js` | Pure functions: the steps of forming groups. |
 | `sass/` | The `/dm` skin, scoped under `.dm`; `.dm--embed` in `_layout.scss` fits an embed into its host's column. |
-| `tests/*.test.mjs` | Node tests: the two model files, the sidebar, the message log, the pane, the embed, and the shared composer's `enterKey` and `destroy()`. |
+| `tests/*.test.mjs` | Node tests: the two model files, the sidebar, the message log, the pane, the embed, the shared composer's `enterKey` and `destroy()`, and replies, pasted images and both searches (`replies_and_search.test.mjs`). |
 | `tests/fake-dom.mjs` | A small stand-in for the browser DOM that the pane, log, embed and composer tests run on. |
 
 The modules import each other with `./` paths only. The page imports `config.js` and
@@ -48,6 +48,18 @@ module needs a `../` path that breaks when files move.
   already succeeded, so a failed fetch isn't reported as a failed send.
 - **Edits and deletes** are `PATCH` and `DELETE` on the message; Spring sends the change
   to everyone on the topic.
+- **Replies:** Reply on any message puts "Replying to …" above the composer; the sent
+  body starts with a `[[reply:<id>|<sender>|<excerpt>]]` marker
+  (`assets/js/chat/chat-reply.js`, reached through `richText`), which the log takes out
+  and shows as a quote that scrolls to the original. Editing a reply keeps its marker out
+  of the composer and puts it back on save. The course announcement chats use the same
+  marker.
+- **Pasted images:** an image pasted into the composer (`onPasteImage`) is attached like
+  one picked with Image, where the conversation can store images and not while editing.
+- **Search:** "Search conversations" filters both lists by group name, course, period and
+  members, or a DM's participants (`matchesConversationSearch`). "Search this
+  conversation" hides messages whose sender or text don't contain every typed word; it
+  clears when another conversation opens.
 - **Which messages are yours:** a DM carries the sender's uid. A saved group message
   stores only the sender's name, the signed-in account's, and Spring checks that name
   before an edit or delete, so the page matches your group messages by your name.
@@ -135,13 +147,15 @@ back the listeners the pane and its composer put on `document` and `window`, and
 | `deleteFailed` | Could not delete the message. Try again. |
 | `waitForSave` | Wait for your message to finish saving first. |
 | `you`, `edited`, `deleted` | You; (edited); This message was deleted. |
-| `editMessage`, `deleteMessage` | Edit message; Delete message (button labels) |
+| `editMessage`, `deleteMessage`, `replyMessage` | Edit message; Delete message; Reply (button labels) |
+| `noMatches` | No messages match “{query}”. (the conversation search) |
+| `imageWhileEditing` | Images can’t be added while you edit a message. |
 | `imageFrom` | Image from {name} |
 | `today`, `yesterday` | Today; Yesterday (day dividers; older days use the browser's date format) |
 | `fileShared`, `fileSharedBySomeone` | {sender} shared a file:; A file was shared: |
 | `fileGone`, `fileFailed` | {filename} is no longer shared with this group.; Could not download {filename}. Try again. |
 
-`{name}`, `{sender}` and `{filename}` are filled in. `thread.js` also has `idleTitle`,
+`{name}`, `{sender}`, `{filename}` and `{query}` are filled in. `thread.js` also has `idleTitle`,
 `idleHint` and `imageUnreadable`, which only `/dm` shows.
 
 Under the embed, `createThread` takes `readOnly`, `emptyState` (`{ title, hint }`), `texts`

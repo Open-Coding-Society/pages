@@ -188,3 +188,61 @@
   line-height: 1.5;
   color: var(--dm-accent);
 }
+
+// "Replying to …" above the composer, with its own cancel (chat-reply.js).
+.dm .chat-reply-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--dm-space-sm);
+  margin-top: var(--dm-space-sm);
+  padding: 0.35rem 0.6rem;
+  border-left: 3px solid var(--dm-accent);
+  border-radius: var(--dm-radius-sm);
+  background: var(--dm-wash);
+  font-size: 0.8125rem;
+  color: var(--dm-ink);
+
+  &[hidden] {
+    display: none;
+  }
+
+  > i {
+    color: var(--dm-accent);
+  }
+}
+
+.dm .chat-reply-bar-text {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+
+  b {
+    font-family: var(--dm-font);
+    font-size: 0.6875rem;
+    font-weight: 600;
+  }
+
+  small {
+    overflow: hidden;
+    color: var(--dm-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.dm .chat-reply-bar-cancel {
+  padding: 0 0.3rem;
+  border: 0;
+  background: none;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--dm-faint);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--dm-ink);
+  }
+
+  @include dm-focus-ring;
+}

@@ -52,7 +52,7 @@ export async function startMessagesPage({ config, richText }) {
 
   const me = await signedInPerson(api, setStatus);
   if (!me) return;
-  const state = { groups: [], conversations: [], active: null };
+  const state = { groups: [], conversations: [], active: null, query: '' };
   const findItem = (kind, id) => (kind === 'group' ? state.groups : state.conversations).find(item => item.id === id);
 
   const sidebar = createSidebar({
@@ -61,6 +61,10 @@ export async function startMessagesPage({ config, richText }) {
     onOpen: (kind, id) => openConversation(kind, id),
   });
   const render = () => sidebar.render(state);
+  byId('messagesSearch')?.addEventListener('input', event => {
+    state.query = event.target.value.trim();
+    render();
+  });
 
   const socket = createChatSocket(config.javaWebSocketURI, { onClose: () => setStatus('disconnected', 'is-error') });
   const files = initFiles({
@@ -82,6 +86,7 @@ export async function startMessagesPage({ config, richText }) {
       imageAttach: byId('messagesImageAttach'), imageInput: byId('messagesImage'),
       imagePreview: byId('messagesImagePreview'), imageThumb: byId('messagesImageThumb'),
       imageRemove: byId('messagesImageRemove'),
+      searchBox: byId('messagesThreadSearchBox'), search: byId('messagesThreadSearch'),
     },
     onDmRead: id => {
       const conversation = findItem('dm', id);

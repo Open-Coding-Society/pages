@@ -32,15 +32,22 @@
       <button type="button" role="tab" class="microblog-channel-tab is-active" data-channel="chat" aria-selected="true">Chat</button>
       <button type="button" role="tab" class="microblog-channel-tab" data-channel="suggestions" aria-selected="false">Suggestions</button>
     </div>
-    <!-- View filter: Active (default) hides resolved posts, History shows only them -->
-    <div class="microblog-view-filter">
-      <label for="microblog-view-select">Show</label>
-      <select id="microblog-view-select" class="microblog-view-select">
-        <option value="all">All messages</option>
-        <option value="active" selected>Active</option>
-        <option value="mine">Mine</option>
-        <option value="history">History (resolved)</option>
-      </select>
+    <div class="microblog-toolbar">
+      <!-- Search: filters posts by text, writer, topic, survey choices and replies (matchesSearch) -->
+      <div class="microblog-search" role="search">
+        <svg class="microblog-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" /></svg>
+        <input type="search" id="microblog-search-input" class="microblog-search-input" placeholder="Search posts…" aria-label="Search microblog posts, people and replies" autocomplete="off">
+      </div>
+      <!-- View filter: Active (default) hides resolved posts, History shows only them -->
+      <div class="microblog-view-filter">
+        <label for="microblog-view-select">Show</label>
+        <select id="microblog-view-select" class="microblog-view-select">
+          <option value="all">All messages</option>
+          <option value="active" selected>Active</option>
+          <option value="mine">Mine</option>
+          <option value="history">History (resolved)</option>
+        </select>
+      </div>
     </div>
     <p id="microblog-status" class="microblog-status" aria-live="polite"></p>
 
@@ -177,18 +184,35 @@ window.handleGuestSignup = async function(event) {
       <button id="modal-close" class="microblog-modal-close" aria-label="Close Modal">&times;</button>
       <h2 id="modal-title" class="microblog-modal-title">Create Microblog Post</h2>
     </div>
-    <form id="microblog-form" class="space-y-4">
+    <form id="microblog-form" class="microblog-form">
       <input type="hidden" id="post-id" name="id">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Topic</label>
-        <input id="topic-id" name="topicId" type="text" class="mt-1 block w-full border border-gray-300 rounded-md p-2" readonly>
+      <div class="microblog-form-group">
+        <label for="topic-id" class="microblog-form-label">Topic</label>
+        <input id="topic-id" name="topicId" type="text" class="microblog-topic-input" readonly>
       </div>
       <div class="microblog-form-group">
-        <label for="content" class="microblog-form-label">Content <span class="required">*</span></label>
-        <textarea id="content" name="content" required class=""></textarea>
+        <label for="content" class="microblog-form-label"><span id="content-label-text">Content</span> <span class="required">*</span></label>
+        <textarea id="content" name="content" required maxlength="280"></textarea>
       </div>
-      <div class="flex justify-end space-x-2">
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+      <!-- Survey builder: new posts only (votes point at choices by position, so
+           choices can't change once people vote) -->
+      <div id="survey-builder" class="microblog-survey-builder">
+        <button type="button" id="survey-toggle" class="microblog-survey-toggle" aria-expanded="false" aria-controls="survey-fields">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6m4 6V5m4 14v-9M5 19h14" /></svg>
+          Add a survey
+        </button>
+        <fieldset id="survey-fields" class="microblog-survey-fields" hidden>
+          <legend class="microblog-form-label">Survey choices</legend>
+          <p class="microblog-survey-hint">Your post is the question. Add 2–6 choices; anyone signed in can vote once and change their vote.</p>
+          <div id="survey-options" class="microblog-survey-option-inputs"></div>
+          <div class="microblog-survey-builder-actions">
+            <button type="button" id="survey-add-option" class="microblog-text-btn">+ Add choice</button>
+            <button type="button" id="survey-remove" class="microblog-text-btn is-danger">Remove survey</button>
+          </div>
+        </fieldset>
+      </div>
+      <div class="microblog-form-actions">
+        <button type="submit" class="microblog-btn">Save</button>
       </div>
     </form>
   </div>
@@ -201,15 +225,15 @@ window.handleGuestSignup = async function(event) {
       <button id="reply-modal-close" class="microblog-modal-close" aria-label="Close Reply Modal">&times;</button>
       <h2 id="reply-modal-title" class="microblog-modal-title">Reply to Post</h2>
     </div>
-    <form id="reply-form" class="space-y-4">
+    <form id="reply-form" class="microblog-form">
       <input type="hidden" id="reply-post-id" name="postId">
       <div class="microblog-form-group">
         <label for="reply-content" class="microblog-form-label">Content <span class="required">*</span></label>
-        <textarea id="reply-content" name="content" required class=""></textarea>
+        <textarea id="reply-content" name="content" required></textarea>
       </div>
-      <div class="flex justify-end space-x-2">
-        <button type="button" id="reply-cancel-btn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Cancel</button>
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Reply</button>
+      <div class="microblog-form-actions">
+        <button type="button" id="reply-cancel-btn" class="microblog-btn microblog-btn-cancel">Cancel</button>
+        <button type="submit" class="microblog-btn">Reply</button>
       </div>
     </form>
   </div>
@@ -218,7 +242,7 @@ window.handleGuestSignup = async function(event) {
 <!--JavaScript Logic for MicroBlog -->
 <script type="module">
 // Imports for APIs used on this page
-import { fetchPosts, createPost, updatePost, deletePost, createReply, fetchReplies, fetchCurrentUser, setPostResolved, setReplyResolved, isStatusMarker, getResolution, getReplyResolution, normalizeAuthorUids, postChannel, matchesViewFilter } from '/assets/js/api/microblog.js';
+import { fetchPosts, createPost, updatePost, deletePost, createReply, fetchReplies, fetchCurrentUser, setPostResolved, setReplyResolved, isStatusMarker, getResolution, getReplyResolution, normalizeAuthorUids, postChannel, matchesViewFilter, matchesSearch, normalizeSurveyOptions, getSurveyResults, voteInSurvey, SURVEY_LIMITS } from '/assets/js/api/microblog.js';
 import { markMicroblogSeen } from '/assets/js/api/microblog-notifications.js';
 
 // Default Key for New MicroBlog Posts
@@ -236,8 +260,12 @@ document.getElementById('microblog-toggle-btn').addEventListener('click', () => 
 // Channel tab and view dropdown (see matchesViewFilter for the filter values)
 let activeChannel = 'chat';
 let viewFilter = 'active';
+// The search box's text (see matchesSearch)
+let searchQuery = '';
 // Posts from the last render, keyed by id, for the edit/reply/resolve buttons
 let postsById = new Map();
+// The last posts response, so typing in the search box redraws without refetching
+let cachedPostsData = null;
 
 // Resolve / Reopen icons, shared by posts and replies
 const resolveIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="14" height="14" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
@@ -290,6 +318,59 @@ document.getElementById('microblog-view-select').onchange = async function() {
   renderMicroblogTable();
 };
 
+// Search box: redraws from the last fetch, a moment after typing stops
+let searchTimer = null;
+document.getElementById('microblog-search-input').addEventListener('input', function() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    searchQuery = this.value.trim();
+    renderMicroblogTable({ refetch: false });
+  }, 200);
+});
+
+// Survey builder (create modal only)
+const surveyFields = document.getElementById('survey-fields');
+const surveyToggle = document.getElementById('survey-toggle');
+const surveyOptionsList = document.getElementById('survey-options');
+
+function addSurveyOptionInput(value = '') {
+  const count = surveyOptionsList.children.length;
+  if (count >= SURVEY_LIMITS.maxOptions) return;
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'microblog-survey-option-input';
+  input.maxLength = SURVEY_LIMITS.optionLength;
+  input.placeholder = `Choice ${count + 1}`;
+  input.setAttribute('aria-label', `Survey choice ${count + 1}`);
+  input.value = value;
+  surveyOptionsList.appendChild(input);
+  document.getElementById('survey-add-option').disabled = surveyOptionsList.children.length >= SURVEY_LIMITS.maxOptions;
+  return input;
+}
+
+function setSurveyOpen(open) {
+  surveyFields.hidden = !open;
+  surveyToggle.hidden = open;
+  surveyToggle.setAttribute('aria-expanded', String(open));
+  document.getElementById('content-label-text').textContent = open ? 'Question' : 'Content';
+  surveyOptionsList.replaceChildren();
+  if (open) {
+    for (let i = 0; i < SURVEY_LIMITS.minOptions; i++) addSurveyOptionInput();
+    surveyOptionsList.firstChild.focus();
+  }
+}
+
+// The choices to save with a new post, or null when no survey is open.
+// Throws (shown by the form's alert) when the choices aren't usable.
+function readSurveyOptions() {
+  if (surveyFields.hidden) return null;
+  return normalizeSurveyOptions([...surveyOptionsList.querySelectorAll('input')].map(input => input.value));
+}
+
+surveyToggle.onclick = () => setSurveyOpen(true);
+document.getElementById('survey-remove').onclick = () => setSurveyOpen(false);
+document.getElementById('survey-add-option').onclick = () => addSurveyOptionInput()?.focus();
+
 // Create/Edit Modal Functions
 function openModal({ mode, post = {} }) {
   document.getElementById('microblog-modal').classList.remove('hidden');
@@ -299,6 +380,10 @@ function openModal({ mode, post = {} }) {
   document.getElementById('post-id').value = post.id || '';
   document.getElementById('topic-id').value = post.topicPath || pagePermalink;
   document.getElementById('content').value = post.content || '';
+  // Surveys are added when a post is created; editing keeps the post's survey as is
+  setSurveyOpen(false);
+  document.getElementById('survey-builder').hidden = mode === 'edit';
+  document.getElementById('content').focus();
 }
 function closeModal() {
   document.getElementById('microblog-modal').classList.add('hidden');
@@ -375,24 +460,24 @@ async function loadRepliesForPost(postId) {
         
         // Format replies HTML
         const repliesHtml = replies.map(reply => {
-          const replyDate = reply.timestamp ? new Date(reply.timestamp).toLocaleString() : '';
           // Replies without an id (or a post) can't be told apart, so they get no status
           const status = post && reply.id != null ? getReplyResolution(post, reply.id, authorsForPost(post)) : null;
           return `
-            <div class="reply-item microblog-reply${status && status.resolved ? ' is-resolved' : ''} ml-4 mt-2 p-2 rounded border-l-4 border-green-500">
-              <div class="microblog-reply-byline text-sm text-gray-600">
-                <span>${escapeHtml(reply.userName || 'Anonymous')} - ${replyDate}</span>
+            <div class="reply-item microblog-reply${status && status.resolved ? ' is-resolved' : ''}">
+              <div class="microblog-reply-byline">
+                <strong class="microblog-reply-author">${escapeHtml(reply.userName || 'Anonymous')}</strong>
+                <time class="microblog-reply-time">${escapeHtml(formatPostTime(reply.timestamp))}</time>
                 ${status ? replyStatusHtml(post, reply, status, user) : ''}
               </div>
-              <div class="mt-1">${escapeHtml(reply.content || '')}</div>
+              <div class="microblog-reply-content">${escapeHtml(reply.content || '')}</div>
             </div>
           `;
         }).join('');
-        
+
         repliesRow.innerHTML = `
-          <td colspan="2" class="text-left p-2">
+          <td colspan="2">
             <div class="replies-container">
-              <strong class="text-sm text-gray-600">Replies (${replies.length}):</strong>
+              <div class="microblog-replies-heading">${replies.length} ${replies.length === 1 ? 'reply' : 'replies'}</div>
               ${repliesHtml}
             </div>
           </td>
@@ -419,11 +504,45 @@ function replyStatusHtml(post, reply, status, user) {
   return badge + button;
 }
 
-// Utility function to escape HTML
+// Utility function to escape HTML (quotes too, since some values land in attributes)
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
-  return div.innerHTML;
+  return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// "Oct 30, 3:37 AM", with the year only when it isn't this year
+function formatPostTime(timestamp) {
+  if (!timestamp) return '';
+  const date = new Date(timestamp);
+  if (isNaN(date)) return String(timestamp);
+  const sameYear = date.getFullYear() === new Date().getFullYear();
+  return date.toLocaleString(undefined, {
+    month: 'short', day: 'numeric', ...(sameYear ? {} : { year: 'numeric' }), hour: 'numeric', minute: '2-digit'
+  });
+}
+
+// A post's survey: each choice is a vote button with its share of the votes.
+// Voting closes while the post is resolved, and needs a sign-in.
+function surveyHtml(post, user) {
+  const results = getSurveyResults(post, user ? user.id : null);
+  if (!results) return '';
+  const closed = post.resolution.resolved || post.archived;
+  const choices = results.options.map((option, index) => {
+    const share = results.total ? Math.round((option.votes / results.total) * 100) : 0;
+    const chosen = results.myChoice === index;
+    const title = closed ? 'This survey is closed' : !user ? 'Sign in to vote' : chosen ? 'Your vote' : 'Vote for this choice';
+    return `<button type='button' class='survey-vote-btn microblog-survey-choice${chosen ? ' is-chosen' : ''}' ` +
+      `data-post-id='${escapeHtml(String(post.id))}' data-option='${index}' aria-pressed='${chosen}' title='${title}'${closed ? ' disabled' : ''}>` +
+      `<i class='microblog-survey-bar' style='width:${share}%' aria-hidden='true'></i>` +
+      `<b class='microblog-survey-label'>${chosen ? '✓ ' : ''}${escapeHtml(option.label)}</b>` +
+      `<small class='microblog-survey-share'>${share}% · ${option.votes}</small>` +
+      `</button>`;
+  }).join('');
+  const votes = `${results.total} ${results.total === 1 ? 'vote' : 'votes'}`;
+  const hint = closed ? 'Survey closed' : !user ? 'Sign in to vote' : results.myChoice === null ? 'Pick a choice to vote' : 'Pick another choice to change your vote';
+  return `<div class='microblog-survey' role='group' aria-label='Survey'>${choices}` +
+    `<small class='microblog-survey-total'>${votes} · ${hint}</small></div>`;
 }
 
 // Save Button Listner for Update and Create
@@ -444,6 +563,8 @@ document.getElementById('microblog-form').onsubmit = async function(e) {
       // Save the open channel, and the page's authors so they can resolve the
       // post from any page
       const data = pageAuthors.length ? { channel: activeChannel, pageAuthors } : { channel: activeChannel };
+      const surveyOptions = readSurveyOptions();
+      if (surveyOptions) data.survey = { options: surveyOptions };
       await createPost({ content, topicPath, data });
     }
     closeModal();
@@ -456,41 +577,48 @@ document.getElementById('microblog-form').onsubmit = async function(e) {
   }
 };
 
-// MicroBlog Table Manager
-async function renderMicroblogTable() {
+// Reads the posts for the page/all-pages filter (plus archived SFI emails)
+async function loadPostsData() {
+    // Determine filter mode and pass page if needed
+    let pageArg = undefined;
+    if (window.__microblogFilterMode === undefined || window.__microblogFilterMode === 'page') {
+      // Use current page as filter; fallback to location.pathname or a default string
+      pageArg = window.location ? window.location.pathname : 'default';
+    }
+    // API call to Read former Posts
+    let data;
+    try {
+      data = await fetchPosts(pageArg);
+    } catch (error) {
+      if (!{{ page.sfi_correspondence_microblog | default: false | jsonify }}) throw error;
+      data = { microblogs: [] };
+    }
+    if ({{ page.sfi_correspondence_microblog | default: false | jsonify }} && pageArg !== undefined) {
+      const archived = sfiArchivedPosts.map((item, i) => ({
+        id: 'sfi-archived-' + i,
+        userName: item.author,
+        timestamp: item.date + 'T12:00:00',
+        characterCount: item.message.length,
+        topicPath: 'SFI partnership correspondence',
+        content: item.message,
+        archived: true
+      }));
+      data.microblogs = archived.concat(data.microblogs || []);
+    }
+    return data;
+}
+
+// MicroBlog Table Manager. `refetch: false` redraws from the last response (search typing).
+async function renderMicroblogTable({ refetch = true } = {}) {
     const container = document.getElementById('microblog-playground');
     try {
-        // Determine filter mode and pass page if needed
-        let pageArg = undefined;
-        if (window.__microblogFilterMode === undefined || window.__microblogFilterMode === 'page') {
-          // Use current page as filter; fallback to location.pathname or a default string
-          pageArg = window.location ? window.location.pathname : 'default';
-        }
-        // API call to Read former Posts
-        let data;
-        try {
-          data = await fetchPosts(pageArg);
-        } catch (error) {
-          if (!{{ page.sfi_correspondence_microblog | default: false | jsonify }}) throw error;
-          data = { microblogs: [] };
-        }
-        if ({{ page.sfi_correspondence_microblog | default: false | jsonify }} && pageArg !== undefined) {
-          const archived = sfiArchivedPosts.map((item, i) => ({
-            id: 'sfi-archived-' + i,
-            userName: item.author,
-            timestamp: item.date + 'T12:00:00',
-            characterCount: item.message.length,
-            topicPath: 'SFI partnership correspondence',
-            content: item.message,
-            archived: true
-          }));
-          data.microblogs = archived.concat(data.microblogs || []);
-        }
+        if (refetch || !cachedPostsData) cachedPostsData = await loadPostsData();
+        const data = cachedPostsData;
         const user = await currentUserPromise;
         const posts = (data.microblogs || []).map(post => ({ ...post, resolution: getResolution(post, authorsForPost(post)) }));
         postsById = new Map(posts.map(post => [String(post.id), post]));
         const visiblePosts = posts.filter(post =>
-          postChannel(post) === activeChannel && matchesViewFilter(post, viewFilter, user));
+          postChannel(post) === activeChannel && matchesViewFilter(post, viewFilter, user) && matchesSearch(post, searchQuery));
         // SVG icons for Create (+) and Edit (pencil)
         const createIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>`;
         const editIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-2.828 1.172H7v-2a4 4 0 011.172-2.828z" /></svg>`;
@@ -503,27 +631,21 @@ async function renderMicroblogTable() {
         // Create and Page Icons
         const controlsInfo = `
           <span id="filter-icons" class="microblog-filter-controls">
-            <button id="create-btn" class="microblog-btn microblog-btn-create" title="Create Post">${createIcon}</button>
+            <button id="create-btn" class="microblog-btn microblog-btn-create" title="Create Post">${createIcon}New</button>
             ${pageIcon}
             ${manyPagesIcon}
           </span>
         `;
 
-        // Table: Keys and Special Formatting
+        // Table: Keys and Special Formatting (values are escaped before formatting)
         const analytics = [
-          { key: 'userName' },
-          { key: 'timestamp', format: ts => {
-              if (!ts) return '';
-              const d = new Date(ts);
-              if (isNaN(d)) return ts;
-              return d.toLocaleString();
-            }
-          },
-          { key: 'characterCount', format: v => `Count: ${v}` }
+          { key: 'userName', className: 'microblog-post-author' },
+          { key: 'timestamp', className: 'microblog-post-time', raw: true, format: ts => escapeHtml(formatPostTime(ts)) },
+          { key: 'characterCount', className: 'microblog-post-count', format: v => v === '' ? '' : `${v} chars` }
         ];
         const message = [
-          { key: 'topicPath', format: v => `Topic: ${v}` },
-          { key: 'content' }
+          { key: 'topicPath' },
+          { key: 'content', className: 'microblog-post-content' }
         ];
 
         // Table: columns
@@ -541,8 +663,8 @@ async function renderMicroblogTable() {
         visiblePosts.forEach(post => {
             const analyticsCell = analytics.map(f => {
               let value = post[f.key] ?? '';
-              if (f.format) value = f.format(value);
-              return `<div>${value}</div>`;
+              value = f.raw ? f.format(value) : escapeHtml(f.format ? f.format(value) : value);
+              return value ? `<div class='${f.className}'>${value}</div>` : '';
             }).join('');
             // Resolve/Reopen shows only for the post's writer and the page authors
             const isResolved = post.resolution.resolved;
@@ -553,14 +675,14 @@ async function renderMicroblogTable() {
             const resolvedBadge = isResolved ? `<span class='microblog-resolved-badge'>Resolved</span>` : '';
             // Topic (+ Resolved badge), then content, then one row of post actions
             const messageCell = message.map(f => {
-              let value = post[f.key] ?? '';
-              if (f.format) value = f.format(value);
+              let value = escapeHtml(post[f.key] ?? '');
               if (f.key === 'topicPath') {
                 const archivedNote = post.archived ? '<small>(archived; read-only)</small>' : '';
                 return `<div class='microblog-post-topic'><span>${value}</span>${resolvedBadge}${archivedNote}</div>`;
               }
-              return `<div>${value}</div>`;
+              return `<div class='${f.className}'>${value}</div>`;
             }).join('') +
+              surveyHtml(post, user) +
               // Archived SFI emails are read-only: no reply, edit, delete or resolve
               (post.archived ? '' :
               `<div class='microblog-post-actions'>` +
@@ -584,8 +706,8 @@ async function renderMicroblogTable() {
 
         // Table: set container with scrollable wrapper
         container.innerHTML = `
-        <div class="max-h-[45vh] sm:max-h-[60vh] lg:max-h-[70vh] overflow-y-auto" style="max-height:70vh;">
-          <table id="microblog-table" border="1" style="border-collapse:collapse; margin-top:1em; width:100%;">
+        <div class="microblog-table-scroll">
+          <table id="microblog-table" class="microblog-table">
               ${head}
               ${body}
           </table>
@@ -597,6 +719,14 @@ async function renderMicroblogTable() {
         // JQuery micro-table Bottom and Top control updates
         if (window.jQuery && $('#microblog-table').length) {
             $('#microblog-table').DataTable({
+                // The panel's own search box (above) also searches replies and surveys
+                searching: false,
+                language: {
+                  emptyTable: searchQuery ? 'No posts match your search.' : 'No posts yet. Start one with New.',
+                  info: '_START_–_END_ of _TOTAL_',
+                  infoEmpty: '0 posts',
+                  lengthMenu: 'Show _MENU_'
+                },
                 initComplete: function() {
                     // Top controls (Show entries)
                     const lengthDiv = document.querySelector('.dataTables_length');
@@ -715,6 +845,27 @@ async function renderMicroblogTable() {
               } catch (err) {
                 this.disabled = false;
                 alert('Error updating reply status: ' + err.message);
+              }
+            });
+
+            // Bind survey votes (one per person; voting again changes it)
+            $('#microblog-table').off('click', '.survey-vote-btn').on('click', '.survey-vote-btn', async function() {
+              const post = postsById.get(String(this.dataset.postId));
+              const optionIndex = Number(this.dataset.option);
+              if (!post) return;
+              if (!user) {
+                showStatus('Sign in to vote in surveys.');
+                return;
+              }
+              if (this.classList.contains('is-chosen')) return;
+              $(this).closest('.microblog-survey').find('button').prop('disabled', true);
+              try {
+                await voteInSurvey(post.id, optionIndex);
+                showStatus('Vote saved.');
+                renderMicroblogTable();
+              } catch (err) {
+                $(this).closest('.microblog-survey').find('button').prop('disabled', false);
+                alert('Error saving your vote: ' + err.message);
               }
             });
 

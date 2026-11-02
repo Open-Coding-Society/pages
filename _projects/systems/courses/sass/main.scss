@@ -3164,6 +3164,129 @@
     color: $text-muted;
     font-style: italic;
   }
+
+  /* Replies and pasted images (assets/js/chat/chat-reply.js). Reply is on every
+     message, so where a pointer can hover it waits for the message to be hovered. */
+  @media (hover: hover) {
+    .chat-msg:not(:hover):not(:focus-within) .chat-msg-action--reply {
+      opacity: 0;
+    }
+  }
+
+  .chat-reply-quote {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    max-width: 100%;
+    margin: 2px 0 4px;
+    padding: 4px 8px;
+    border: 0;
+    border-left: 3px solid $accent;
+    border-radius: $radius-xxs;
+    background: rgba(255, 255, 255, 0.05);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover { background: rgba(255, 255, 255, 0.1); }
+
+    &:focus-visible {
+      outline: 2px solid $accent;
+      outline-offset: 2px;
+    }
+  }
+
+  .chat-reply-quote-sender {
+    color: $text;
+    font-size: $text-xs;
+    font-weight: 600;
+  }
+
+  .chat-reply-quote-text {
+    overflow: hidden;
+    color: $text-muted;
+    font-size: $text-xs;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .chat-msg.is-reply-target {
+    border-radius: $radius-xxs;
+    background: rgba(255, 255, 255, 0.08);
+    transition: background 0.3s ease;
+  }
+
+  .chat-msg-image {
+    display: block;
+    max-width: min(100%, 22rem);
+    max-height: 18rem;
+    margin-top: 6px;
+    border: 1px solid $bg-3;
+    border-radius: $radius-xxs;
+    object-fit: contain;
+  }
+
+  .chat-reply-bar,
+  .chat-attach-preview {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: $text-sm;
+
+    &[hidden] { display: none; }
+  }
+
+  .chat-reply-bar {
+    padding: 4px 8px;
+    border-left: 3px solid $accent;
+    border-radius: $radius-xxs;
+    background: rgba(255, 255, 255, 0.05);
+
+    > i { color: $accent; }
+
+    + .chat-form {
+      margin-top: 6px;
+      padding-top: 0;
+      border-top: 0;
+    }
+  }
+
+  .chat-reply-bar-text {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+
+    b { color: $text; font-size: $text-xs; }
+
+    small {
+      overflow: hidden;
+      color: $text-muted;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .chat-reply-bar-cancel {
+    padding: 0 4px;
+    border: 0;
+    background: none;
+    color: $text-muted;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+
+    &:hover { color: $text; }
+  }
+
+  .chat-attach-preview img {
+    width: 48px;
+    height: 48px;
+    border: 1px solid $bg-3;
+    border-radius: $radius-xxs;
+    object-fit: cover;
+  }
 }
 
 @media (max-width: 768px) {

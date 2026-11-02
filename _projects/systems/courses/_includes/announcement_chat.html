@@ -12,6 +12,10 @@
 <!-- Calendar: a strip of this school week sits above the messages, anyone -->
 <!-- signed in adds events with the /event slash command, and announcements -->
 <!-- that carry events show event cards. See assets/js/chat/calendar/calendar-announcements.js. -->
+<!-- -->
+<!-- Replies: every message has a Reply button; a reply carries a [[reply:...]] marker -->
+<!-- and shows a quote of the original (assets/js/chat/chat-reply.js). An image pasted -->
+<!-- into the composer is attached to the next message (Spring's group chat `image`). -->
 
 <section id="announcementChat" class="announcement-chat" data-course="{{ page.course }}" aria-labelledby="announcementChatTitle">
   <div class="chat-header">
@@ -47,6 +51,10 @@
         <i class="fas fa-paper-plane" aria-hidden="true"></i><span>Send</span>
       </button>
     </form>
+    <div class="chat-attach-preview" id="announcementChatImagePreview" hidden>
+      <img id="announcementChatImageThumb" alt="Image attached to your next message">
+      <button type="button" class="chat-msg-action" id="announcementChatImageRemove">Remove image</button>
+    </div>
     <p class="dm-form-status" id="announcementChatFormStatus" role="alert" hidden></p>
   </div>
 </section>
@@ -73,7 +81,10 @@
 
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-  import { createRichComposer, renderDeletedMessage, renderRichMessage } from '{{site.baseurl}}/assets/js/chat/rich-text.js';
+  import {
+    addReplyMarker, createReplyBar, createRichComposer, extractReplyMarker, highlightMessage, readImageFile,
+    renderDeletedMessage, renderReplyQuote, renderRichMessage, replyExcerpt,
+  } from '{{site.baseurl}}/assets/js/chat/rich-text.js';
   import { attachAnnouncementCalendar } from '{{site.baseurl}}/assets/js/chat/calendar/calendar-announcements.js';
 
   const COURSE = {{ page.course | jsonify }};
@@ -129,6 +140,9 @@
     editingMessage: null,
     editInProgress: false,
     deletingMessageIds: new Set(),
+    replyingTo: null, // { id, sender, excerpt } the next message answers
+    editingReply: null, // the reply marker of the message being edited, kept on save
+    pendingImage: null, // a data URL attached to the next message
     // Cursors used to group the log by day and by consecutive sender
     lastDayKey: null,
     lastSender: null,
@@ -144,14 +158,21 @@
   const cancelEditBtn = document.getElementById('announcementChatCancelEdit');
   const formStatusEl = document.getElementById('announcementChatFormStatus');
   const formEl = document.getElementById('announcementChatForm');
+  const imagePreviewEl = document.getElementById('announcementChatImagePreview');
+  const imageThumbEl = document.getElementById('announcementChatImageThumb');
 
   const composer = createRichComposer({
     placeholder: 'Message the class…',
     maxLength: 2000,
     onSubmit: submitMessage,
+    onPasteImage: attachImage,
   });
   formEl.classList.add('chat-form--rich');
   formEl.insertBefore(composer.element, cancelEditBtn);
+
+  // "Replying to …" sits just above the composer.
+  const replyBar = createReplyBar({ onCancel: clearReply });
+  formEl.parentNode.insertBefore(replyBar.element, formEl);
 
   const calendar = attachAnnouncementCalendar({
     root: document.getElementById('announcementChat'),
@@ -192,9 +213,76 @@
     formStatusEl.hidden = !message;
   }
 
+  /* ── Replies and pasted images ─────────────────────────────────────── */
+
+  function clearReply() {
+    state.replyingTo = null;
+    replyBar.hide();
+  }
+
+  function beginReply(message) {
+    if (state.editInProgress || !message?.id || message.deleted) return;
+    if (state.editingMessageId) resetEditState();
+    const { html } = extractReplyMarker(message.message);
+    state.replyingTo = {
+      id: message.id,
+      sender: message.sender || 'Unknown',
+      excerpt: replyExcerpt(calendar.splitMessage(html).html) || (message.image ? '🖼 Image' : ''),
+    };
+    replyBar.show(state.replyingTo);
+    showFormMessage('');
+    composer.focus();
+  }
+
+  function clearImage() {
+    state.pendingImage = null;
+    imagePreviewEl.hidden = true;
+    imageThumbEl.removeAttribute('src');
+  }
+
+  async function attachImage(file) {
+    if (state.editingMessageId) {
+      showFormMessage('Images can’t be added while you edit a message.');
+      return;
+    }
+    try {
+      state.pendingImage = await readImageFile(file);
+    } catch (err) {
+      console.warn('Announcement chat: could not read the pasted image', err);
+      clearImage();
+      showFormMessage('Could not read that image. Try a different one.');
+      return;
+    }
+    imageThumbEl.src = state.pendingImage;
+    imagePreviewEl.hidden = false;
+    showFormMessage('');
+  }
+
+  document.getElementById('announcementChatImageRemove').addEventListener('click', () => {
+    clearImage();
+    composer.focus();
+  });
+
+  function jumpToMessage(messageId) {
+    highlightMessage(messagesEl.querySelector(`[data-message-id="${CSS.escape(String(messageId))}"]`));
+  }
+
+  // A message body without its markers: the reply quote goes above it, event cards
+  // below (returned for calendar.attachEvents).
+  function renderBody(main, bodyTarget, raw) {
+    const { reply, html } = extractReplyMarker(raw || '');
+    main.querySelector('.chat-reply-quote')?.remove();
+    if (reply) main.insertBefore(renderReplyQuote(reply, { onJump: jumpToMessage }), bodyTarget);
+    const split = calendar.splitMessage(html);
+    bodyTarget.innerHTML = '';
+    renderRichMessage(bodyTarget, split.html);
+    return split.events;
+  }
+
   function resetEditState() {
     state.editingMessageId = null;
     state.editingMessage = null;
+    state.editingReply = null;
     state.editInProgress = false;
     composer.clear();
     showFormMessage('');
@@ -204,10 +292,14 @@
   function beginEditMessage(message) {
     if (state.editInProgress || !message || !message.id || message.deleted
       || message.sender !== state.currentUserDisplayName) return;
+    clearReply();
     state.editingMessageId = message.id;
     state.editingMessage = message;
+    // The quote isn't editable text: it is set aside and put back on save.
+    const { reply, html } = extractReplyMarker(message.message || '');
+    state.editingReply = reply;
     composer.clear();
-    composer.setHTML(message.message || '');
+    composer.setHTML(html);
     showFormMessage('');
     setComposerEnabled(true);
     composer.focus();
@@ -217,6 +309,9 @@
     if (event.key === 'Escape' && state.editingMessageId && !state.editInProgress) {
       event.preventDefault();
       resetEditState();
+    } else if (event.key === 'Escape' && state.replyingTo) {
+      event.preventDefault();
+      clearReply();
     }
   });
   cancelEditBtn.addEventListener('click', resetEditState);
@@ -230,11 +325,7 @@
     const row = messagesEl.querySelector(`[data-message-id="${CSS.escape(key)}"]`);
     if (row) {
       const bodyTarget = row.querySelector('.chat-msg-body');
-      if (bodyTarget) {
-        bodyTarget.innerHTML = '';
-        const { html } = calendar.splitMessage(message || '');
-        renderRichMessage(bodyTarget, html);
-      }
+      if (bodyTarget) renderBody(bodyTarget.parentNode, bodyTarget, message);
       const meta = row.querySelector('.chat-msg-meta');
       if (meta && !meta.querySelector('.chat-msg-edited')) {
         const editedEl = document.createElement('span');
@@ -265,6 +356,8 @@
     const bodyTarget = row.querySelector('.chat-msg-body');
     if (bodyTarget) renderDeletedMessage(bodyTarget);
     row.classList.add('is-deleted');
+    row.querySelector('.chat-reply-quote')?.remove();
+    row.querySelector('.chat-msg-image')?.remove();
     row.querySelector('.chat-msg-actions')?.remove();
     if (state.editingMessageId === key && !state.editInProgress) resetEditState();
   }
@@ -281,7 +374,7 @@
       state.editInProgress = true;
       showFormMessage('');
       setComposerEnabled(true);
-      const ok = await editMessage(state.editingMessageId, composer.getHTML());
+      const ok = await editMessage(state.editingMessageId, addReplyMarker(composer.getHTML(), state.editingReply));
       if (ok) {
         resetEditState();
       } else if (state.messageMap.get(String(state.editingMessageId))?.deleted) {
@@ -298,12 +391,18 @@
 
     submitting = true;
     try {
-      const html = await calendar.prepareMessage(composer.isEmpty() ? '' : composer.getHTML());
-      if (html === null) return;
+      let html = await calendar.prepareMessage(composer.isEmpty() ? '' : composer.getHTML());
+      // A pasted image is a message on its own, even with nothing typed.
+      if (html === null && !(state.pendingImage && composer.isEmpty())) return;
+      const reply = state.replyingTo;
+      const image = state.pendingImage;
+      html = addReplyMarker(html || '', reply);
       showFormMessage('');
-      if (await sendMessage(html)) {
+      if (await sendMessage(html, image)) {
         composer.clear();
         calendar.reset();
+        if (state.replyingTo === reply) clearReply();
+        if (state.pendingImage === image) clearImage();
       } else {
         showFormMessage('Could not send the message. Please try again.');
       }
@@ -394,6 +493,7 @@
     if (messageId) {
       state.messageMap.set(messageId, {
         id: messageId, sender, message: isDeleted ? '' : message, date, deleted: isDeleted, edited: isEdited,
+        image: isDeleted ? null : (entry.image || null),
       });
     }
 
@@ -458,10 +558,20 @@
     }
 
     let actions;
-    if (isSelf && !isDeleted && messageId) {
+    if (!isDeleted && messageId) {
       actions = document.createElement('div');
       actions.className = 'chat-msg-actions';
 
+      const replyBtn = document.createElement('button');
+      replyBtn.type = 'button';
+      replyBtn.className = 'chat-msg-action chat-msg-action--reply';
+      replyBtn.setAttribute('aria-label', 'Reply');
+      replyBtn.title = 'Reply';
+      replyBtn.innerHTML = '<i class="fas fa-reply" aria-hidden="true"></i>';
+      replyBtn.addEventListener('click', () => beginReply(state.messageMap.get(messageId)));
+      actions.appendChild(replyBtn);
+    }
+    if (isSelf && actions) {
       const editBtn = document.createElement('button');
       editBtn.type = 'button';
       editBtn.className = 'chat-msg-action';
@@ -490,16 +600,22 @@
 
     const body = document.createElement('span');
     body.className = 'chat-msg-body';
+    main.append(meta, body);
     let events = [];
     if (isDeleted) {
       renderDeletedMessage(body);
     } else {
-      const split = calendar.splitMessage(message);
-      renderRichMessage(body, split.html);
-      events = split.events;
+      events = renderBody(main, body, message);
+      if (entry.image) {
+        const image = document.createElement('img');
+        image.className = 'chat-msg-image';
+        image.src = pfpSrc(entry.image);
+        image.alt = `Image from ${who}`;
+        image.loading = 'lazy';
+        main.appendChild(image);
+      }
     }
 
-    main.append(meta, body);
     calendar.attachEvents(row, main, events);
     if (actions) main.appendChild(actions);
     row.append(avatar, main);
@@ -675,7 +791,7 @@
         const key = eventKey({ sender: msg.author, date: msg.date, message: msg.message });
         if (state.seenKeys.has(key)) return;
         state.seenKeys.add(key);
-        appendMessage({ id: msg.id, sender: msg.author, message: msg.message, date: msg.date, edited: msg.edited });
+        appendMessage({ id: msg.id, sender: msg.author, message: msg.message, date: msg.date, edited: msg.edited, image: msg.image });
       });
     } catch (err) {
       console.warn('Announcement chat: history load failed', err);
@@ -696,7 +812,7 @@
     const key = eventKey(event);
     if (state.seenKeys.has(key)) return;
     state.seenKeys.add(key);
-    appendMessage({ id: event.messageId, sender: event.sender, message: event.message, date: event.date });
+    appendMessage({ id: event.messageId, sender: event.sender, message: event.message, date: event.date, image: event.image });
   }
 
   function connect() {
@@ -735,9 +851,9 @@
   // Posted over HTTP, like the Messages page: Spring takes the sender from the
   // login cookie, which the socket's sendMessage can't read. The saved message
   // comes back to every reader, this one included, on the group topic.
-  async function sendMessage(text) {
+  async function sendMessage(text, image = null) {
     if (state.mode === 'preview') {
-      const entry = { id: crypto.randomUUID(), sender: state.currentUserDisplayName || 'You', message: text, date: new Date().toISOString() };
+      const entry = { id: crypto.randomUUID(), sender: state.currentUserDisplayName || 'You', message: text, date: new Date().toISOString(), image };
       state.seenKeys.add(eventKey(entry));
       writePreviewMessage(entry);
       appendMessage(entry);
@@ -747,7 +863,7 @@
     if (!state.backboneGroupId) return false;
     try {
       const res = await fetch(`${javaURI}/api/groups/chat/${state.backboneGroupId}/messages`, {
-        ...fetchOptions, method: 'POST', body: JSON.stringify({ message: text, image: null }),
+        ...fetchOptions, method: 'POST', body: JSON.stringify({ message: text, image }),
       });
       if (!res.ok) { console.warn('Announcement chat: send HTTP', res.status); return false; }
       return true;

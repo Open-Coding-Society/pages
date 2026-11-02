@@ -53,6 +53,7 @@ export function saveFile(file) {
 // later read of that conversation; 1280px is still sharp at the width the log renders.
 // Re-encoded as JPEG unless the source is a PNG, which is kept so screenshots of text
 // and anything transparent do not pick up compression artefacts.
+// The course chats use the same rule from assets/js/chat/chat-image.js; change both together.
 const MAX_IMAGE_EDGE = 1280;
 
 export function readImageFile(file) {

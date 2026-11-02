@@ -1,7 +1,8 @@
 // The open conversation's messages, drawn with the chat-* class names the course chats
 // use and styled for /dm in sass/_thread.scss: a divider for each day, then each message
-// with its avatar, sender and time, and edit and delete buttons on your own messages
-// (none in a read-only log).
+// with its avatar, sender and time, a Reply button, and edit and delete buttons on your
+// own messages (none in a read-only log). A reply shows a quote of the message it
+// answers, from the [[reply:...]] marker at the start of its body (chat-reply.js).
 import { dayKey, dayLabel, initialsFor, pfpSrc, tintFor } from './messages-model.js';
 
 // What the log says, worded for /dm. A host passes its own wording for any of these in
@@ -11,8 +12,10 @@ export const LOG_TEXTS = Object.freeze({
   edited: '(edited)',
   editMessage: 'Edit message',
   deleteMessage: 'Delete message',
+  replyMessage: 'Reply',
   imageFrom: 'Image from {name}',
   deleted: 'This message was deleted.',
+  noMatches: 'No messages match “{query}”.',
   today: 'Today',
   yesterday: 'Yesterday',
 });
@@ -49,13 +52,24 @@ export function shownBody(message, formatBody) {
   }
 }
 
-export function createMessageLog(element, { richText, me, onEdit, onDelete, readOnly = false, texts = {}, formatBody = null }) {
+// A body without its reply marker, and the reply it carries. A host whose richText
+// predates replies shows bodies as stored.
+function splitReply(richText, body) {
+  return typeof richText.extractReplyMarker === 'function'
+    ? richText.extractReplyMarker(body)
+    : { reply: null, html: body };
+}
+
+export function createMessageLog(element, {
+  richText, me, onEdit, onDelete, onReply = null, readOnly = false, texts = {}, formatBody = null,
+}) {
   if (formatBody !== null && typeof formatBody !== 'function') {
     throw new TypeError('createMessageLog: formatBody must be a function or null');
   }
   const text = withTexts(LOG_TEXTS, texts);
   const messages = new Map();
   let lastDay = null;
+  let filterTerms = []; // the conversation search's words; empty shows every message
 
   const rowFor = key => element.querySelector(`[data-key="${CSS.escape(key)}"]`);
   const isNearBottom = () => element.scrollHeight - element.scrollTop - element.clientHeight < 40;
@@ -64,6 +78,33 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     element.replaceChildren();
     messages.clear();
     lastDay = null;
+  }
+
+  // A message row stays shown when every search word is in its sender or text.
+  function applyFilter(row) {
+    const shown = !filterTerms.length
+      || filterTerms.every(term => row.textContent.toLowerCase().includes(term));
+    row.hidden = !shown;
+    return shown;
+  }
+
+  // Searching the open conversation: only matching messages show, without day
+  // dividers or file lines, which would otherwise sit around empty days.
+  function setFilter(query) {
+    filterTerms = String(query || '').toLowerCase().split(/\s+/).filter(Boolean);
+    const searching = filterTerms.length > 0;
+    let matches = 0;
+    element.querySelectorAll('.chat-msg').forEach(row => { if (applyFilter(row)) matches += 1; });
+    element.querySelectorAll('.chat-day, .chat-system').forEach(line => { line.hidden = searching; });
+    element.querySelector('[data-search-empty]')?.remove();
+    if (searching && !matches && messages.size) {
+      const none = document.createElement('p');
+      none.className = 'chat-system';
+      none.dataset.searchEmpty = 'true';
+      none.textContent = fillText(text.noMatches, { query: String(query).trim() });
+      element.appendChild(none);
+    }
+    return matches;
   }
 
   function showEmpty(title, hint = '') {
@@ -132,6 +173,21 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     body.classList.add('is-deleted');
   }
 
+  // The body's reply quote (if any) goes before the body; formatBody sees the rest.
+  function renderBody(body, stored) {
+    const { reply, html } = splitReply(richText, stored.body);
+    const main = body.parentNode;
+    main.querySelector('.chat-reply-quote')?.remove();
+    if (reply && typeof richText.renderReplyQuote === 'function') {
+      const quote = richText.renderReplyQuote(reply, {
+        onJump: id => richText.highlightMessage?.(rowFor(id)),
+      });
+      main.insertBefore(quote, body);
+    }
+    body.replaceChildren();
+    richText.renderRichMessage(body, shownBody({ ...stored, body: html }, formatBody));
+  }
+
   function actionButton(icon, label, handler) {
     const button = document.createElement('button');
     button.type = 'button';
@@ -189,7 +245,7 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     if (message.deleted) {
       showDeleted(body);
     } else {
-      richText.renderRichMessage(body, shownBody(messages.get(message.key), formatBody));
+      renderBody(body, messages.get(message.key));
       if (message.image) {
         const image = document.createElement('img');
         image.className = 'ocs__image-frame';
@@ -199,19 +255,23 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
         main.appendChild(image);
       }
     }
-    // A message saved before ids existed can't be edited or deleted.
-    if (!readOnly && isSelf && message.id && !message.deleted) {
+    // A message saved before ids existed can't be replied to, edited or deleted.
+    if (!readOnly && message.id && !message.deleted && (onReply || isSelf)) {
       const actions = document.createElement('div');
       actions.className = 'chat-msg-actions';
-      actions.append(
-        actionButton('fa-pen', text.editMessage, () => onEdit(messages.get(message.key))),
-        actionButton('fa-trash', text.deleteMessage, button => onDelete(messages.get(message.key), button)),
-      );
+      if (onReply) actions.append(actionButton('fa-reply', text.replyMessage, () => onReply(messages.get(message.key))));
+      if (isSelf) {
+        actions.append(
+          actionButton('fa-pen', text.editMessage, () => onEdit(messages.get(message.key))),
+          actionButton('fa-trash', text.deleteMessage, button => onDelete(messages.get(message.key), button)),
+        );
+      }
       main.appendChild(actions);
     }
 
     row.append(avatarFor(message, isSelf), main);
     element.appendChild(row);
+    if (filterTerms.length && applyFilter(row)) element.querySelector('[data-search-empty]')?.remove();
     if (stickToBottom) element.scrollTop = element.scrollHeight;
   }
 
@@ -222,9 +282,7 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     stored.edited = true;
     const row = rowFor(key);
     if (!row) return;
-    const bodyElement = row.querySelector('.chat-msg-body');
-    bodyElement.replaceChildren();
-    richText.renderRichMessage(bodyElement, shownBody(stored, formatBody));
+    renderBody(row.querySelector('.chat-msg-body'), stored);
     const meta = row.querySelector('.chat-msg-meta');
     if (!meta.querySelector('.chat-msg-edited')) meta.appendChild(editedTag());
   }
@@ -238,6 +296,7 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     const row = rowFor(key);
     if (!row) return;
     showDeleted(row.querySelector('.chat-msg-body'));
+    row.querySelector('.chat-reply-quote')?.remove();
     row.querySelector('.chat-msg-actions')?.remove();
     row.querySelector('.chat-msg-edited')?.remove();
     row.querySelector('img.ocs__image-frame')?.remove();
@@ -265,7 +324,7 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
   }
 
   return {
-    clear, showEmpty, append, updateBody, markDeleted, note,
+    clear, showEmpty, append, updateBody, markDeleted, note, setFilter,
     has: key => messages.has(key),
     get: key => messages.get(key),
   };

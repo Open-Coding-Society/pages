@@ -48,6 +48,9 @@ bottom; README.md in that folder explains how it fits together.
   <div class="dm__shell">
 
     <nav class="dm__aside" aria-label="Conversations">
+      <div class="dm__search-box" role="search">
+        <input class="ocs__input dm__search" id="messagesSearch" type="search" autocomplete="off" placeholder="Search conversations" aria-label="Search groups and direct messages">
+      </div>
       <div class="dm__aside-scroll">
         <section class="dm__group">
           <div class="dm__group-head">
@@ -80,6 +83,10 @@ bottom; README.md in that folder explains how it fits together.
           <button type="button" class="dm__action" id="messagesLeaveGroup">Leave</button>
         </div>
       </header>
+
+      <div class="dm__search-box dm__search-box--thread hidden" id="messagesThreadSearchBox" role="search">
+        <input class="ocs__input dm__search" id="messagesThreadSearch" type="search" autocomplete="off" placeholder="Search this conversation" aria-label="Search messages in this conversation">
+      </div>
 
       <div class="dm__log" id="messagesLog" role="log" aria-live="polite" tabindex="0"></div>
 

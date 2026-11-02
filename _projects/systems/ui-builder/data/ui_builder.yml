@@ -805,8 +805,11 @@ text:
     deleted: This message was deleted.
     editMessage: Edit message
     deleteMessage: Delete message
+    replyMessage: Reply
     imageFrom: "Image from {name}"
     imageUnreadable: Could not read that image. Try a different file.
+    imageWhileEditing: "Images can't be added while you edit a message."
+    noMatches: "No messages match “{query}”."
     today: Today
     yesterday: Yesterday
     fileShared: "{sender} shared a file:"

@@ -237,3 +237,25 @@
     display: flex;
   }
 }
+
+// Search boxes: "Search conversations" over the lists, "Search this conversation" under
+// the thread's header. Both filter what is already loaded (sidebar.js, message-log.js).
+.dm__search-box {
+  padding: var(--dm-space-md) var(--dm-space-md) 0 0;
+}
+
+.dm__search-box--thread {
+  padding: var(--dm-space-sm) 0 0;
+}
+
+.dm .dm__search {
+  width: 100%;
+  font-family: var(--dm-font);
+  font-size: 0.8125rem;
+}
+
+@include dm-below($breakpoint-mobile) {
+  .dm__search-box {
+    padding-right: 0;
+  }
+}
