@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import RacingPlayer from '../levels/RacingPlayer.js';
 import AccelDecelRacingPlayer from '../levels/AccelDecelRacingPlayer.js';
+import TimeLapScreen from '../levels/TimeLapScreen.js';
+import LapTracker from '../levels/LapTracker.js';
 import GameLevelWinter from '../levels/winter-level.js';
 import { getRandomTrackPoint } from '../levels/WinterIcicle.js';
 import {
@@ -178,7 +180,94 @@ test('winter cars use acceleration, reverse-speed, and individual boost keys', (
     assert.equal(car.data.reverseSpeed, -4);
     assert.equal(car.data.STEP_FACTOR, 1100);
     assert.equal(car.data.boostKey, [70, 75][index]);
+    assert.equal(car.data.boostLabel, ['F', 'K'][index]);
   }
+  assert.equal(winterLevel.classes.at(-1).data.showBoostBars, true);
+  assert.equal(winterLevel.classes.at(-1).data.usePositionForLapTracking, true);
+});
+
+test('Winter counts each car crossing the finish line, including after an icicle slowdown', () => {
+  const screen = Object.create(TimeLapScreen.prototype);
+  screen.gameEnv = { innerWidth: 1000, innerHeight: 1000, gameObjects: [] };
+  screen.usePositionForLapTracking = true;
+  screen.lapTracker = new LapTracker({
+    finishLine: { x: 0.5, top: 0.764, bottom: 0.864 },
+    totalLaps: 3,
+  });
+  screen.winnerLabel = null;
+  screen.raceStarted = false;
+
+  const cars = [
+    { spriteData: { name: 'Red Car' }, position: {}, width: 20, height: 20, velocity: { x: 1, y: 0 }, getCenter: () => ({ x: 0, y: 0 }) },
+    { spriteData: { name: 'Blue Car' }, position: {}, width: 20, height: 20, velocity: { x: 1, y: 0 }, getCenter: () => ({ x: 0, y: 0 }) },
+  ];
+  screen.getPlayers = () => cars;
+  const route = [
+    { x: 0.45, y: 0.8 },
+    { x: 0.55, y: 0.8 },
+    { x: 0.9, y: 0.5 },
+    { x: 0.55, y: 0.2 },
+    { x: 0.45, y: 0.2 },
+    { x: 0.1, y: 0.5 },
+    { x: 0.45, y: 0.8 },
+    { x: 0.55, y: 0.8 },
+  ];
+  const placeCar = (car, point) => {
+    car.position.x = point.x * screen.gameEnv.innerWidth - car.width / 2;
+    car.position.y = point.y * screen.gameEnv.innerHeight - car.height / 2;
+  };
+
+  for (const car of cars) placeCar(car, route[0]);
+  screen.trackLaps();
+  cars[0].temporarySpeedMultiplier = 0.5;
+  for (const point of route.slice(1)) {
+    for (const car of cars) placeCar(car, point);
+    screen.trackLaps();
+  }
+
+  assert.equal(screen.lapTracker.getLapsCompleted(cars[0]), 1);
+  assert.equal(screen.lapTracker.getLapsCompleted(cars[1]), 1);
+  assert.equal(cars[0].temporarySpeedMultiplier, 0.5);
+});
+
+test('Winter boost bars use red and blue colors and refill with cooldown charge', () => {
+  const players = [
+    { boostLabel: 'F', getBoostCharge: () => 0.5 },
+    { boostLabel: 'K', getBoostCharge: () => 0.25 },
+  ];
+  const screen = Object.create(TimeLapScreen.prototype);
+  screen.gameEnv = {
+    innerWidth: 800,
+    innerHeight: 500,
+    gameObjects: players,
+  };
+  screen.showBoostBars = true;
+  screen.getPlayers = () => players;
+  const fillStyles = [];
+  const ctx = {
+    fillRect() {
+      fillStyles.push(this.fillStyle);
+    },
+    strokeRect() {},
+    fillText() {},
+  };
+
+  screen.drawBoostBars(ctx);
+
+  assert.deepEqual(fillStyles, [
+    'rgba(15, 23, 42, 0.8)', '#f87171',
+    'rgba(15, 23, 42, 0.8)', '#60a5fa',
+  ]);
+});
+
+test('boost charge refills over its cooldown only', () => {
+  const player = accelerationFixture();
+
+  assert.equal(player.getBoostCharge(1000), 1);
+  player.startBoost(1000);
+  assert.equal(player.getBoostCharge(1000), 0);
+  assert.equal(player.getBoostCharge(2500), 0.5);
+  assert.equal(player.getBoostCharge(4000), 1);
 });
 
 test('winter countdown starts both cars together and removes its overlay after GO', () => {
