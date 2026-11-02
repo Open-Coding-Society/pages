@@ -4,13 +4,65 @@ import DescentEntrance from './DescentEntrance.js';
 import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js'
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 
+const GREEN_ORB_RESPAWN_MS = 30000;
+const SPEED_BOOST_DURATION_MS = 10000;
+
 class Player extends PlayerCar {
   applyTemporarySlowdown() {
     this.slowdownUntil = performance.now() + 5000;
   }
 
+  applyTemporarySpeedBoost() {
+    this.speedBoostUntil = performance.now() + SPEED_BOOST_DURATION_MS;
+    this.showSpeedBoostBanner();
+  }
+
+  showSpeedBoostBanner() {
+    if (!this.speedBoostBanner) {
+      this.speedBoostBanner = document.createElement('div');
+      Object.assign(this.speedBoostBanner.style, {
+        position: 'absolute',
+        top: `${this.gameEnv.top + 16}px`,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: '1000',
+        padding: '10px 18px',
+        borderRadius: '8px',
+        background: 'rgba(0, 100, 30, 0.9)',
+        color: '#fff',
+        font: 'bold 20px sans-serif',
+        pointerEvents: 'none',
+      });
+      this.gameEnv.container.appendChild(this.speedBoostBanner);
+    }
+
+    const updateCountdown = () => {
+      const secondsRemaining = Math.ceil(
+        (this.speedBoostUntil - performance.now()) / 1000
+      );
+      if (secondsRemaining <= 0) {
+        clearInterval(this.speedBoostBannerInterval);
+        this.speedBoostBannerInterval = null;
+        this.speedBoostBanner.remove();
+        this.speedBoostBanner = null;
+        return;
+      }
+
+      this.speedBoostBanner.textContent =
+        `Speed boost: ${secondsRemaining} second${secondsRemaining === 1 ? '' : 's'}`;
+    };
+
+    clearInterval(this.speedBoostBannerInterval);
+    updateCountdown();
+    this.speedBoostBannerInterval = setInterval(updateCountdown, 100);
+  }
+
   getSlowdownMultiplier(now = performance.now()) {
     return now < (this.slowdownUntil || 0) ? 0.65 : 1;
+  }
+
+  getSpeedBoostMultiplier(now = performance.now()) {
+    return now < (this.speedBoostUntil || 0) ? 2.5 : 1;
   }
 
   handleCollisionReaction(other) {
@@ -23,7 +75,7 @@ class Player extends PlayerCar {
 
     const velocityX = this.velocity.x;
     const velocityY = this.velocity.y;
-    const multiplier = this.getSlowdownMultiplier();
+    const multiplier = this.getSlowdownMultiplier() * this.getSpeedBoostMultiplier();
     this.velocity.x *= multiplier;
     this.velocity.y *= multiplier;
     const slowedVelocityX = this.velocity.x;
@@ -33,6 +85,12 @@ class Player extends PlayerCar {
 
     if (this.velocity.x === slowedVelocityX) this.velocity.x = velocityX;
     if (this.velocity.y === slowedVelocityY) this.velocity.y = velocityY;
+  }
+
+  destroy() {
+    clearInterval(this.speedBoostBannerInterval);
+    this.speedBoostBanner?.remove();
+    super.destroy();
   }
 }
 
@@ -145,6 +203,60 @@ class FlowerNpc extends Npc {
   }
 }
 
+class GreenOrb extends Npc {
+  constructor(data, gameEnv) {
+    super(data, gameEnv);
+    this.spawnPositions = data.spawnPositions;
+    this.positionIndex = 0;
+    this.respawnTimeout = null;
+  }
+
+  showReactionDialogue() {}
+
+  update() {
+    super.update();
+    if (!this.visible || this.gameEnv.gameControl?.isPaused) return;
+
+    const player = this.gameEnv.gameObjects.find(
+      object => object?.state?.collisionEvents?.includes(this.spriteData.id)
+        && typeof object.applyTemporarySpeedBoost === 'function'
+    );
+    if (player) {
+      player.applyTemporarySpeedBoost();
+      this.hideUntilRespawn();
+    }
+  }
+
+  hideUntilRespawn() {
+    if (!this.visible) return;
+
+    this.visible = false;
+    this.canvas.style.display = 'none';
+    this.respawnTimeout = setTimeout(() => {
+      const availablePositions = this.spawnPositions
+        .map((position, index) => ({ position, index }))
+        .filter(({ index }) => index !== this.positionIndex);
+      const next = availablePositions[Math.floor(Math.random() * availablePositions.length)];
+      this.positionIndex = next.index;
+      this.position = {
+        x: next.position.x * this.gameEnv.innerWidth,
+        y: next.position.y * this.gameEnv.innerHeight,
+      };
+      this.visible = true;
+      this.canvas.style.display = '';
+      this.respawnTimeout = null;
+    }, GREEN_ORB_RESPAWN_MS);
+  }
+
+  destroy() {
+    if (this.respawnTimeout) {
+      clearTimeout(this.respawnTimeout);
+      this.respawnTimeout = null;
+    }
+    super.destroy();
+  }
+}
+
 class GameLevelSpring {
   constructor(gameEnv) {
     const path = gameEnv.path;
@@ -224,7 +336,7 @@ class GameLevelSpring {
       name: "Flower Happy",
       greeting: "Hi! I am a happy flower! Enjoying the ride?",
       src: path + '/images/projects/racing-game/flowers-happy-transparent.png',
-      INIT_POSITION: { x: 0.44, y: 0.01 },
+      INIT_POSITION: { x: 0.44, y: 0 },
       SCALE_FACTOR: 8,
       canvasFilter: 'saturate(1.5) contrast(1.2) drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px rgba(0, 0, 0, 0.9))',
       orientation: { rows: 2, columns: 5 },
@@ -232,8 +344,8 @@ class GameLevelSpring {
       walkingArea: {
         xMin: gameEnv.innerWidth * 0.36,
         xMax: gameEnv.innerWidth * 0.65,
-        yMin: gameEnv.innerHeight * 0.01,
-        yMax: gameEnv.innerHeight * 0.14
+        yMin: 0,
+        yMax: gameEnv.innerHeight * 0.05
       },
       patrolSpeed: 0.55
     };
@@ -241,12 +353,12 @@ class GameLevelSpring {
       ...flower_data,
       id: "flower-happy-roadside",
       name: "Roadside Happy Flower",
-      INIT_POSITION: { x: 0.18, y: 0.70 },
+      INIT_POSITION: { x: 0.18, y: 0.90 },
       walkingArea: {
         xMin: gameEnv.innerWidth * 0.05,
         xMax: gameEnv.innerWidth * 0.32,
-        yMin: gameEnv.innerHeight * 0.68,
-        yMax: gameEnv.innerHeight * 0.82
+        yMin: gameEnv.innerHeight * 0.86,
+        yMax: gameEnv.innerHeight * 0.98
       }
     };
     const grumpy_flower_data = {
@@ -255,13 +367,30 @@ class GameLevelSpring {
       name: "Grumpy Flower",
       src: path + '/images/projects/racing-game/Flower-grumpy.png',
       greeting: "Hey! Watch it!",
-      INIT_POSITION: { x: 0.5, y: 0.70 },
+      INIT_POSITION: { x: 0.86, y: 0.44 },
       walkingArea: {
-        xMin: gameEnv.innerWidth * 0.12,
-        xMax: gameEnv.innerWidth * 0.88,
-        yMin: gameEnv.innerHeight * 0.68,
-        yMax: gameEnv.innerHeight * 0.82
+        xMin: gameEnv.innerWidth * 0.79,
+        xMax: gameEnv.innerWidth * 0.94,
+        yMin: gameEnv.innerHeight * 0.38,
+        yMax: gameEnv.innerHeight * 0.52
       }
+    };
+    const green_orb_data = {
+      id: 'green-orb-spring',
+      name: 'Spring Speed Orb',
+      src: path + '/images/projects/racing-game/green-orb-springlevel.png',
+      INIT_POSITION: { x: 0.24, y: 0.24 },
+      SCALE_FACTOR: 14,
+      hitbox: { radiusPercentage: 0.5 },
+      spawnPositions: [
+        { x: 0.24, y: 0.24 },
+        { x: 0.47, y: 0.24 },
+        { x: 0.68, y: 0.25 },
+        { x: 0.88, y: 0.40 },
+        { x: 0.78, y: 0.63 },
+        { x: 0.55, y: 0.63 },
+        { x: 0.22, y: 0.49 }
+      ]
     };
     // Match the painted finish line on the bottom straight.
     const lap_data = {
@@ -279,6 +408,7 @@ class GameLevelSpring {
         {class: FlowerNpc, data: flower_data},
         {class: FlowerNpc, data: roadside_happy_flower_data},
         {class: FlowerNpc, data: grumpy_flower_data},
+        {class: GreenOrb, data: green_orb_data},
         {class: DescentEntrance, data: lap_data}
     ]
   }
