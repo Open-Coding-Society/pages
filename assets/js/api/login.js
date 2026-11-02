@@ -1,8 +1,15 @@
 import { baseurl, pythonURI, javaURI, fetchOptions, springEnabled } from './config.js';
+import { addLoginReturn } from './login-return.js';
 import { savedCourse, selectEntryCourse, courseEntryUrl } from '../course-entry.js';
 import { FormatConverter } from '../pages/dashboard/preferences.js';
 
 console.log("login.js loaded");
+
+// Delegation also covers login links inserted after the credentials check.
+document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href]');
+    if (link) addLoginReturn(link, window.location.href, baseurl);
+}, true);
 
 document.addEventListener('DOMContentLoaded', function () {
     console.log("Base URL:", baseurl); // Debugging line
