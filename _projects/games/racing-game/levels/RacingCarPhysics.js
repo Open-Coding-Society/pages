@@ -4,7 +4,7 @@ export const RACING_CAR_PHYSICS = Object.freeze({
   acceleration: 0.2,
   braking: 0.2,
   coasting: 0.05,
-  turnRate: 0.05,
+  turnRate: 0.1,
 });
 
 export const RACING_CAR_HITBOX = Object.freeze({
