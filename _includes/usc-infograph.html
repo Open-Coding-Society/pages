@@ -1,0 +1,113 @@
+{% assign data = site.data.usc_infograph %}
+
+<div class="usc-infograph">
+  <!-- Header Section -->
+  <div class="usc-header">
+    <div class="usc-badge">Design-Based Research Capstone</div>
+    <h1 class="usc-title">{{ data.Title }}</h1>
+    <p class="usc-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- Sprint Board: live from the team's GitHub project -->
+  {% if data.Board %}
+  {% include ocs_kanban_board.html url=data.Board.url filter=data.Board.filter %}
+  {% endif %}
+
+  <!-- Project Cards -->
+  {% for topic in data.Topics %}
+  {% if topic.link contains '://' %}
+    {% assign topicHref = topic.link %}
+  {% else %}
+    {% assign topicHref = topic.link | prepend: site.baseurl %}
+  {% endif %}
+  <div class="usc-card">
+    <div class="usc-card-grid">
+
+      <!-- Left: Image & Status -->
+      <div class="usc-visual">
+        {% if topic.image %}
+        <a href="{{ topicHref }}" class="usc-image-link">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="usc-image">
+          <div class="usc-overlay">
+            <span>View Screenshot</span>
+          </div>
+        </a>
+        {% if topic.caption %}
+        <p class="usc-subtitle">{{ topic.caption }}</p>
+        {% endif %}
+        {% else %}
+        <div class="usc-badge">{{ topic.phase }}</div>
+        {% endif %}
+        <div class="usc-status">{{ topic.status }}</div>
+        <div class="usc-team">
+          <span class="usc-team-label">Project Leads</span>
+          <span class="usc-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="usc-content">
+        <h2 class="usc-project-title">{{ topic.title }}</h2>
+        <p class="usc-subtitle">{{ topic.subtitle }}</p>
+
+        <div class="usc-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="usc-keypoint">
+            <span class="usc-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="usc-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="usc-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: Description & Impact -->
+      <div class="usc-details">
+        <h3 class="usc-section-title">About</h3>
+        <p class="usc-about">{{ topic.description }}</p>
+
+        <h3 class="usc-section-title">Impact</h3>
+        <div class="usc-impact-list">
+          {% for item in topic.impact %}
+          <div class="usc-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ topicHref }}" class="usc-btn">{{ topic.linkLabel | default: "Learn More" }}</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Supporting Sections -->
+  {% for section in data.Sections %}
+  <div class="usc-card">
+    <h2 class="usc-project-title">{{ section.title }}</h2>
+    <p class="usc-subtitle">{{ section.subtitle }}</p>
+    <div class="usc-impact-list">
+      {% for item in section.items %}
+      <div class="usc-impact-item">{{ item }}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Following Along -->
+  {% if data.Links %}
+  <div class="usc-card">
+    <h2 class="usc-project-title">{{ data.Links.title }}</h2>
+    <p class="usc-subtitle">{{ data.Links.subtitle }}</p>
+    <div class="usc-tech-stack">
+      {% for item in data.Links.items %}
+      <a href="{{ item.url }}" class="usc-btn" target="_blank" rel="noopener">{{ item.label }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>

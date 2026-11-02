@@ -1,5 +1,5 @@
 # Checks _plugins/lesson_player_pages.rb, which builds the lesson player's
-# sprint, week, chat, and blogs pages from the course data in _data/.
+# sprint, week, and blogs pages from the course data in _data/.
 #
 #   bundle exec ruby scripts/test_player_pages.rb
 require "jekyll"
@@ -45,13 +45,13 @@ pages = generate({ "cs" => shared, "csx" => course, "infograph" => infographic }
 by_url = pages.to_h { |page| [page.url, page] }
 
 expected = %w[
-  /csx/sprint-1/ /csx/week-0/ /csx/week-0/chat/
-  /csx/sprint-2/ /csx/week-2/ /csx/week-2/chat/
+  /csx/sprint-1/ /csx/week-0/
+  /csx/sprint-2/ /csx/week-2/
   /csx/sprint-3/ /csx/blogs/
 ]
 assert(by_url.keys.sort == expected.sort,
        "Each sprint and the course's blogs get a page, and so does each week with lessons, the weeks " \
-       "the sidebar lists, with its chat; data without a course block gets none; got #{by_url.keys.inspect}")
+       "the sidebar lists; data without a course block gets none; got #{by_url.keys.inspect}")
 
 titles = by_url.transform_values { |page| page.data["title"] }
 assert(titles["/csx/sprint-1/"] == "Sprint 1: Setting Up Tools", "A shared sprint takes its title from _data/cs.yml; got #{titles["/csx/sprint-1/"].inspect}")
@@ -59,13 +59,12 @@ assert(titles["/csx/sprint-2/"] == "Sprint 2: Projects", "Sprint titles are trim
 assert(titles["/csx/sprint-3/"] == "Sprint 3", "A sprint without a title is just its number; got #{titles["/csx/sprint-3/"].inspect}")
 assert(titles["/csx/week-0/"] == "Week 0: Tools", "A week with a theme names it; got #{titles["/csx/week-0/"].inspect}")
 assert(titles["/csx/week-2/"] == "Week 2", "A week without a theme is just its number; got #{titles["/csx/week-2/"].inspect}")
-assert(titles["/csx/week-0/chat/"] == "Week 0 Chat", "Chat pages are named for their week; got #{titles["/csx/week-0/chat/"].inspect}")
 assert(titles["/csx/blogs/"] == "Blogs", "The blogs page is called Blogs; got #{titles["/csx/blogs/"].inspect}")
 
 expected_player_pages = {
   "/csx/sprint-1/" => { "course" => "csx", "kind" => "sprint", "sprint" => 1, "week" => nil },
   "/csx/week-0/" => { "course" => "csx", "kind" => "week", "sprint" => 1, "week" => 0 },
-  "/csx/week-2/chat/" => { "course" => "csx", "kind" => "chat", "sprint" => 2, "week" => 2 },
+  "/csx/week-2/" => { "course" => "csx", "kind" => "week", "sprint" => 2, "week" => 2 },
   "/csx/blogs/" => { "course" => "csx", "kind" => "blogs", "sprint" => nil, "week" => nil }
 }
 expected_player_pages.each do |url, player_page|
@@ -89,4 +88,4 @@ end
 assert(error&.message&.include?("_data/csy.yml") && error.message.include?("Sprint3"),
        "A sprint without start and end weeks fails the build and names the file and sprint; got #{error.inspect}")
 
-puts "PASS: sprint and blogs pages, week and chat pages for weeks with lessons, their titles and front matter, and the missing-weeks error"
+puts "PASS: sprint and blogs pages, week pages for weeks with lessons, their titles and front matter, and the missing-weeks error"

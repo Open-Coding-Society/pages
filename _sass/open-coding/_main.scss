@@ -1,6 +1,7 @@
 @import "theme/legacy/root-color-map";
 @import "mixins/variables";
 @import "base/code";
+@import "base/tables";
 @import "bathroom";
 @import "blogs";
 @import "projects/all";  // Auto-generated project imports
@@ -8,6 +9,7 @@
 @import "chatbot";
 @import "forms/code-runner";
 @import "forms/reflection-runner";
+@import "forms/mcq-runner";
 @import "forms/ui-runner";
 @import "forms/game-runner";
 @import "forms/container-panel";
@@ -22,6 +24,7 @@
 @import "hacks_lxd";
 @import "hallpass";
 @import "microblog";
+@import "microblog-review";
 @import "grading";
 @import "navbar";
 @import "platformer-game";
@@ -56,8 +59,12 @@ select {
 }
 @import "profile-gist-connection";
 @import "dashboard-v2";
+@import "preferences";
 @import "analytics-dashboard-v2";
 @import "calendar-v2";
+@import "submissions-v2";
+@import "bathroom-pass-v2";
+@import "view-grades-v2";
 
 // Shared by every ocs__<page>-v2 partial above: several of them toggle the
 // literal class "hidden" from JS (a Tailwind-style utility, not a grammar

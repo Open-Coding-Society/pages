@@ -3,9 +3,9 @@
          aria-labelledby="creator-workspace-title">
   <header class="creator-workspace__header">
     <div>
-      <p class="creator-workspace__eyebrow">Assignment ownership</p>
+      <p id="creator-workspace-eyebrow" class="creator-workspace__eyebrow">Assignment ownership</p>
       <h2 id="creator-workspace-title">Assignments you created</h2>
-      <p>Review assignments you own and the submissions received from enrolled students.</p>
+      <p id="creator-workspace-description">Review assignments you own and the submissions received from enrolled students.</p>
     </div>
     <p id="creator-dashboard-summary" class="creator-workspace__summary" aria-live="polite"></p>
   </header>
@@ -44,6 +44,12 @@
           </select>
         </label>
         <label class="creator-filter">
+          <span>Topic</span>
+          <select id="creator-filter-topic" class="ocs__input">
+            <option value="">All topics</option>
+          </select>
+        </label>
+        <label class="creator-filter">
           <span>Assignment</span>
           <select id="creator-filter-assignment" class="ocs__input">
             <option value="">All assignments</option>
@@ -67,6 +73,11 @@
 
       <div class="creator-results-bar">
         <p id="creator-results-summary" aria-live="polite"></p>
+        <div class="ocs__links">
+          <button id="creator-bulk-ai-regrade" class="ocs__btn medium" type="button"
+            title="Ask the AI to grade every filtered submission again">Re-run AI grading</button>
+        </div>
+        <small id="creator-bulk-ai-status" class="creator-grade-status" role="status"></small>
       </div>
       <div id="creator-submissions-container" class="creator-workspace__table-scroll ocs__table-wrap"></div>
       <nav id="creator-pagination" class="creator-pagination" aria-label="Creator submission pages"></nav>

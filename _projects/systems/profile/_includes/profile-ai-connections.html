@@ -47,7 +47,7 @@
   </div>
 </section>
 <script type="module">
-  import { javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
   import { initAiConnections } from '{{ site.baseurl }}/assets/js/profile/ai-connections.js';
-  initAiConnections(document.getElementById('ai-connections'), { apiBase: javaURI });
+  initAiConnections(document.getElementById('ai-connections'), { javaURI, fetchOptions });
 </script>

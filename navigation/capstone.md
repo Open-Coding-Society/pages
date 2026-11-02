@@ -479,6 +479,20 @@ document.addEventListener('DOMContentLoaded', function(){
        <p>Mentor: {{ site.data.presence_system_infograph.Mentor }}</p>
      </div>
    </div>
+
+
+   <!-- OCS-in-a-Kit -->
+   <div class="ocs__grid-cell CSA" data-year="2026-2027">
+     <a href="{% post_url capstone/OCS-in-a-Kit/2026-10-27-ocs-in-a-kit-capstone %}">
+       <img src="{{ '/images/OCS-Kit-Capstone.png' | relative_url }}" alt="OCS-in-a-Kit" class="ocs__image-frame ocs__image-frame--thumbnail" />
+     </a>
+     <div>
+       <h3><a href="{% post_url capstone/OCS-in-a-Kit/2026-10-27-ocs-in-a-kit-capstone %}">OCS-in-a-Kit</a></h3>
+       <p>Open Coding Society built a full classroom platform with lessons, a code runner, grading, chat, and hall passes, but it was wired to one school, with names, logins, and settings hard coded in. OCS-in-a-Kit turns that into a product any school or organization can run on its own. An admin picks a kit, answers a few questions, and gets a working copy with no coding required. Vanilla is a basic site with accounts and a blog. Education adds a full CS classroom: lessons, code runner, assignments, grading, an AI tutor, and hall pass. Business drops the classroom features for chat, calendar, and an AI chatbot aimed at organizations. Every kit bundles the same three codebases, a Portfolio frontend plus Flask and Spring backends, and admins can turn individual features on or off later without reinstalling.</p>
+       <p>Team: Shayan, Dhyan, Arnav, Harrish, Darshan</p>
+     </div>
+   </div>
+
     <!-- Jarvis Classroom Object Detection -->
     <div class="ocs__grid-cell CSH" data-year="{{ site.data.jarvis_infograph.Year }}" data-frontend-url="{{ site.data.jarvis_infograph.Repo }}">
       <a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">
@@ -931,6 +945,22 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
     </div>
 
+
+   <!-- Unified Social Club (CSP, 2026-2027) -->
+   <div class="ocs__grid-cell CSP"
+        data-year="2026-2027"
+        data-page-url="{{ '/capstone/unified-social-club/' | relative_url }}"
+        data-frontend-url="https://github.com/Unified-Social-Club-CSP/usc-pages"
+        data-backend-url="https://github.com/Unified-Social-Club-CSP/usc-flask">
+       <a href="{{ '/capstone/unified-social-club/' | relative_url }}">
+           <img src="{{ '/images/capstone/unified-social-club.png' | relative_url }}" alt="Unified Social Club 2026–27" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{{ '/capstone/unified-social-club/' | relative_url }}">Unified Social Club</a></h3>
+           <p>Club games for Poway's free social club for adults with special needs: Club Bingo, Club Trivia Live (like Kahoot), and Club Jeopardy, played together at club night or at home, with big print and hands-free Nod to select.</p>
+           <p>Team: Triple T (Chetan Tiduwar, Aaditya Prem, Kashyap Tubati)</p>
+       </div>
+   </div>
 
    <!-- San Diego Rescue Mission (2026-2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/sdrm/' | relative_url }}">

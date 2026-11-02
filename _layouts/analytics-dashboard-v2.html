@@ -242,12 +242,25 @@ score += gists * 0.5
                                 <span class="ocs__analytics-fineprint">Value: <span id="val-organization">4</span></span>
                             </div>
                         </form>
+                        <label for="forecastGuess" class="ocs__label">
+                            Before you predict, what grade do you expect? (optional, %)
+                        </label>
+                        <input type="number" id="forecastGuess" min="0" max="100" step="1" placeholder="e.g. 88"
+                            class="ocs__input ocs__analytics-card-spaced-sm" style="max-width: 8rem;" />
                         <button id="smartPredictBtn" class="ocs__btn accent fill medium">
                             Smart Predict Grade
                         </button>
                         <p id="userGrade" class="ocs__analytics-result-text ocs__analytics-card-spaced-sm"></p>
+                        <p id="forecastSaved" class="ocs__analytics-fineprint" hidden>
+                            Forecast saved. See how your guesses compare over time in your
+                            <a href="{{ site.baseurl }}/retrospective#forecast">Retrospective</a>.
+                        </p>
                     </div>
                 </div>
+
+                <!-- Grade Calculator, rendered by assets/js/analytics/grade-calculator.js -->
+                <div id="grade-calculator-root" style="margin-top: 2rem;"></div>
+
 
                 <!-- Help content -->
                 <div class="ocs__analytics-card-spaced">
@@ -382,21 +395,37 @@ score += gists * 0.5
                 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
     import { initOCSAnalyticsDashboard } from '{{ site.baseurl }}/assets/js/ocs-analytics-dashboard.js';
+    import { recordForecast } from '{{ site.baseurl }}/assets/js/analytics/forecast-retrospective.js';
+    import { initGradeCalculator } from '{{ site.baseurl }}/assets/js/analytics/grade-calculator.js';
 
-    // ===== Commits Over Time: calendar-week sprint periods =====
-    // The weekly calendar announcements define Week 1 as Aug 17–21,
-    // with Sprint 1 beginning that week. Four calendar weeks make a sprint.
-    const CALENDAR_WEEK_START = new Date("2026-08-17T00:00:00");
-    const WEEKS_PER_SPRINT = 4;
+    // Under the predictor: the student's own Grade Calculator (scores copied from their gradebook, plus
+    // what-ifs). Each Smart Predict is logged for the Forecast Retrospective on the Retrospective page.
+    let gradeCalculatorStarted = false;
+
+    async function showGradeCalculator() {
+        if (gradeCalculatorStarted) return;
+        gradeCalculatorStarted = true;
+        await initGradeCalculator(document.getElementById("grade-calculator-root"));
+    }
+
+    async function logForecast(sliderValues, modelGrade) {
+        const guessInput = document.getElementById("forecastGuess");
+        const guess = guessInput && guessInput.value !== "" ? Number(guessInput.value) : null;
+        const saved = await recordForecast(sliderValues, Math.min(100, Math.max(0, modelGrade)), guess);
+        if (saved) {
+            if (guessInput) guessInput.value = "";
+            document.getElementById("forecastSaved").hidden = false;
+        }
+    }
+
+    // ===== Commits Over Time: sprint periods from the school calendar =====
+    // Sprints and breaks come from _data/school_calendar.yml, so new sprint
+    // tabs appear as the dates pass without editing this page.
+    const SCHOOL_CALENDAR = {{ site.data.school_calendar | jsonify }};
     const DAY_MS = 86400000;
 
     const localDateKey = (date) =>
         `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-
-    const dateFromKey = (key) => {
-        const [year, month, day] = key.split("-").map(Number);
-        return new Date(year, month - 1, day);
-    };
 
     const formatDate = (date) =>
         date.toLocaleDateString(undefined, {
@@ -404,49 +433,50 @@ score += gists * 0.5
             day: "numeric"
         });
 
-    const addDays = (date, days) => {
-        const result = new Date(date);
-        result.setDate(result.getDate() + days);
-        return result;
+    // Sprints come from the "Sprint N ..." notes in _data/school_calendar.yml.
+    // A sprint runs until the day before the next one starts (breaks included),
+    // and only sprints that have started get a tab; the current one ends today.
+    const dateFromKey = (key) => {
+        const [year, month, day] = String(key).split("-").map(Number);
+        return new Date(year, month - 1, day);
     };
 
-    // Build the calendar weeks from the weekly announcement schedule.
-    // Week 1 = Aug 17–21, Week 8 = Oct 5–9.
-    function buildCalendarWeeks() {
-        const weeks = [];
+    function buildCommitPeriods(calendar, today) {
+        const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const weeks = Object.values(calendar.weeks || {})
+            .filter((week) => week && week.monday)
+            .sort((a, b) => String(a.monday).localeCompare(String(b.monday)));
+        const yearEnd = dateFromKey(calendar.last_day);
 
-        for (let i = 0; i < 8; i++) {
-            const start = addDays(CALENDAR_WEEK_START, i * 7);
-            const end = addDays(start, 4);
+        const starts = [];
+        weeks.forEach((week) => {
+            const match = /Sprint\s+(\d+)/i.exec(week.notes || "");
+            if (match && !starts.some((s) => s.number === Number(match[1]))) {
+                starts.push({ number: Number(match[1]), start: dateFromKey(week.monday) });
+            }
+        });
 
-            weeks.push({
-                number: i + 1,
-                start,
-                end
-            });
-        }
+        const sprints = starts
+            .map(({ number, start }, index) => {
+                const next = starts[index + 1];
+                const scheduledEnd = next
+                    ? new Date(next.start.getFullYear(), next.start.getMonth(), next.start.getDate() - 1)
+                    : yearEnd;
+                const current = start <= now && now <= scheduledEnd;
+                return {
+                    id: `sprint-${number}`,
+                    label: `Sprint ${number}`,
+                    start,
+                    end: current ? now : scheduledEnd,
+                    current
+                };
+            })
+            .filter((sprint) => sprint.start <= now);
 
-        return weeks;
-    }
-
-    function buildSprintPeriods() {
-        const weeks = buildCalendarWeeks();
-        const periods = [];
-
-        for (let i = 0; i < weeks.length; i += WEEKS_PER_SPRINT) {
-            const sprintWeeks = weeks.slice(i, i + WEEKS_PER_SPRINT);
-            if (!sprintWeeks.length) continue;
-
-            periods.push({
-                id: `sprint-${periods.length + 1}`,
-                label: `Sprint ${periods.length + 1}`,
-                start: sprintWeeks[0].start,
-                end: sprintWeeks[sprintWeeks.length - 1].end,
-                weeks: sprintWeeks
-            });
-        }
-
-        return periods;
+        return [
+            { id: "all", label: "All Time", start: dateFromKey(weeks[0].monday), end: now < yearEnd ? now : yearEnd, current: false },
+            ...sprints
+        ];
     }
 
     async function renderCommitsOverTimeChart(commitsArray) {
@@ -474,16 +504,7 @@ score += gists * 0.5
             .sort()
             .map(dateFromKey);
 
-        const sprintPeriods = buildSprintPeriods();
-        const periods = [
-            {
-                id: "all",
-                label: "All Time",
-                start: dateFromKey("2026-08-10"),
-                end: sprintPeriods[sprintPeriods.length - 1].end
-            },
-            ...sprintPeriods
-        ];
+        const periods = buildCommitPeriods(SCHOOL_CALENDAR, new Date());
 
         const countCommits = (start, end) => {
             return commitDates.reduce((total, date) => {
@@ -515,7 +536,10 @@ score += gists * 0.5
                 if (period.id === "all") {
                     labelEl.textContent = `All Time · ${formatDate(period.start)} – ${formatDate(period.end)} · ${totalCommits} commits`;
                 } else {
-                    labelEl.textContent = `${period.label} · ${formatDate(period.start)} – ${formatDate(period.end)} · ${totalCommits} commits`;
+                    const range = period.current
+                        ? `${formatDate(period.start)} – today`
+                        : `${formatDate(period.start)} – ${formatDate(period.end)}`;
+                    labelEl.textContent = `${period.label} · ${range} · ${totalCommits} commits`;
                 }
             }
 
@@ -644,7 +668,7 @@ score += gists * 0.5
         select(
             periods.some((period) => period.id === window.selectedCommitPeriod)
                 ? window.selectedCommitPeriod
-                : "all"
+                : (periods.find((period) => period.current)?.id || "all")
         );
     }
 
@@ -790,6 +814,9 @@ score += gists * 0.5
             });
             const data = await predict.json();
             userGradeEl.textContent = `Saved & Smart Grade: ${data.predicted_final_grade || 'N/A'}`;
+            if (typeof data.predicted_final_grade === 'number') {
+                await logForecast(body, data.predicted_final_grade);
+            }
         } catch (error) {
             console.error("Error fetching prediction:", error);
             userGradeEl.textContent = "Saved, but error predicting grade.";
@@ -1177,6 +1204,9 @@ score += gists * 0.5
                 if (window.OCSAnalytics && window.OCSAnalytics.loadAnalyticsSummary) {
                     await window.OCSAnalytics.loadAnalyticsSummary();
                 }
+            }
+            if (targetId === "tab-content-grade") {
+                await showGradeCalculator();
             }
             if (targetId === "tab-content-skill-passport") {
                 await loadSkillPassport();

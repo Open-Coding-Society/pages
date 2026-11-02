@@ -6,26 +6,23 @@ permalink: /student/view-grades
 comments: false
 ---
 
-<div class="min-h-screen bg-neutral-900">
-  <div>
-    <!-- Grades Card -->
-    <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-6">
-      <h2 class="text-2xl font-semibold text-white text-center mb-6">Your Grades</h2>
-      <div class="overflow-x-auto">
-        <table id="gradesTable" class="min-w-full divide-y divide-neutral-700 text-white text-sm">
-          <thead class="text-white">
-            <tr>
-              <th class="px-4 py-2 text-left font-bold text-base">Assignment</th>
-              <th class="px-4 py-2 text-left font-bold text-base">Grade</th>
-              <th class="px-4 py-2 text-left font-bold text-base">Feedback</th>
-              <th class="px-4 py-2 text-left font-bold text-base">Status</th>
-            </tr>
-          </thead>
-          <tbody id="gradesTableBody" class="divide-y divide-neutral-700">
-            <!-- Grade rows will be dynamically added here -->
-          </tbody>
-        </table>
-      </div>
+<div class="ocs__view-grades-v2-page">
+  <div class="ocs__card ocs__view-grades-v2-card">
+    <h2 class="ocs__section-title ocs__view-grades-v2-title">Your Grades</h2>
+    <div class="ocs__table-wrap">
+      <table id="gradesTable" class="ocs__table">
+        <thead>
+          <tr>
+            <th>Assignment</th>
+            <th>Grade</th>
+            <th>Feedback</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="gradesTableBody">
+          <!-- Grade rows will be dynamically added here -->
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

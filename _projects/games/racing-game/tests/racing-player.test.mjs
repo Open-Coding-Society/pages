@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import RacingPlayer from '../levels/RacingPlayer.js';
 import AccelDecelRacingPlayer from '../levels/AccelDecelRacingPlayer.js';
+import GameLevelSpring from '../levels/spring-level.js';
 import GameLevelWinter from '../levels/winter-level.js';
 import { getRandomTrackPoint } from '../levels/WinterIcicle.js';
 import {
@@ -169,8 +170,8 @@ test('winter cars use acceleration, reverse-speed, and individual boost keys', (
     assert.equal(car.class, AccelDecelRacingPlayer);
     assert.equal(car.data.SCALE_FACTOR, 20);
     assert.equal(car.data.direction.default, 'right');
-    assert.ok(car.data.INIT_POSITION.x < 0.5, 'both cars should start before the finish line');
-    assert.equal(car.data.INIT_POSITION.y, 0.79);
+    assert.equal(car.data.INIT_POSITION.x, 0.44, 'both cars should stage just before the start line');
+    assert.equal(car.data.INIT_POSITION.y, [0.775, 0.805][index], 'cars should stage in separate lanes');
     assert.equal(car.data.currentSpeed, 0);
     assert.equal(car.data.maxSpeed, 12);
     assert.equal(car.data.acceleration, 0.4);
@@ -179,6 +180,166 @@ test('winter cars use acceleration, reverse-speed, and individual boost keys', (
     assert.equal(car.data.STEP_FACTOR, 1100);
     assert.equal(car.data.boostKey, [70, 75][index]);
   }
+});
+
+test('spring cars use winter acceleration movement with their own power-ups', () => {
+  const springLevel = new GameLevelSpring({ path: '' });
+  const springCars = springLevel.classes.slice(1, 3);
+
+  assert.equal(springCars.length, 2);
+  for (const car of springCars) {
+    assert.equal(car.class.prototype instanceof AccelDecelRacingPlayer, true);
+    assert.equal(car.data.SCALE_FACTOR, 10);
+    assert.equal(car.data.STEP_FACTOR, 1100);
+    assert.equal(car.data.currentSpeed, 0);
+    assert.equal(car.data.maxSpeed, 12);
+    assert.equal(car.data.acceleration, 0.4);
+    assert.equal(car.data.deceleration, 0.4);
+    assert.equal(car.data.reverseSpeed, -4);
+    assert.equal(car.data.direction.default, 'right');
+  }
+
+  const car = springCars[0];
+  const player = createKeyboardPlayer(car.class, { keypress: car.data.keypress });
+  Object.assign(player, {
+    keysPressed: {},
+    currentSpeed: 0,
+    maxSpeed: 12,
+    acceleration: 0.4,
+    deceleration: 0.4,
+    reverseSpeed: -4,
+    temporarySpeedMultiplier: 1,
+    slowdownUntil: 0,
+    boostUntil: 0,
+    boostCooldownUntil: 0,
+    scale: { width: 100, height: 100 },
+    stepFactor: 100,
+  });
+  player.draw = () => {};
+  player.collisionChecks = () => {};
+  player.move = () => {};
+  player.showSpeedBoostBanner = () => {};
+
+  pressKey(player, wasd.up);
+  player.update();
+  assert.equal(player.currentSpeed, 0.4);
+
+  player.currentSpeed = 6;
+  player.updateMovementSpeed();
+  const normalVelocity = player.xVelocity;
+  player.applyTemporarySlowdown();
+  assert.equal(player.xVelocity, normalVelocity * 0.65);
+  player.applyTemporarySpeedBoost();
+  assert.ok(Math.abs(player.xVelocity - normalVelocity * 0.65 * 2.5) < 1e-10);
+});
+
+test('winter countdown starts both cars together and removes its overlay after GO', () => {
+  const container = {
+    children: [],
+    appendChild(element) {
+      element.parentNode = this;
+      this.children.push(element);
+    },
+    removeChild(element) {
+      this.children = this.children.filter((child) => child !== element);
+    },
+  };
+  const originalDocument = globalThis.document;
+  const documentListeners = new Map();
+  globalThis.document = {
+    createElement() {
+      return {
+        style: {},
+        children: [],
+        setAttribute(name, value) {
+          this[name] = value;
+        },
+        append(...elements) {
+          this.children.push(...elements);
+        },
+        replaceChildren(...elements) {
+          this.children = elements;
+        },
+        remove() {
+          this.parentNode?.removeChild(this);
+        },
+      };
+    },
+    addEventListener(type, listener) {
+      documentListeners.set(type, listener);
+    },
+    removeEventListener(type, listener) {
+      if (documentListeners.get(type) === listener) documentListeners.delete(type);
+    },
+  };
+
+  try {
+    const gameEnv = { path: '', container, gameObjects: [] };
+    const winterLevel = new GameLevelWinter(gameEnv);
+    const overlay = winterLevel.countdownOverlay;
+
+    assert.equal(overlay.children[0].textContent, 'Do You Wish To Start?');
+    assert.equal(overlay.children[1].textContent, 'Press Space To Start Race');
+    assert.equal(overlay.style.background, '#000');
+    assert.equal(overlay.children[0].style.textAlign, 'center');
+    assert.equal(overlay.children[1].style.textAlign, 'center');
+    assert.equal(overlay.children[0].style.font, 'bold clamp(28px, 5vw, 56px) Arial, sans-serif');
+    assert.equal(overlay.children[1].style.font, 'bold clamp(14px, 2.5vw, 28px) Arial, sans-serif');
+    assert.equal(overlay.style.color, 'lightblue');
+    assert.equal(gameEnv.winterRaceStarted, false);
+    winterLevel.update(Date.now() + 5000);
+    assert.equal(winterLevel.countdownStartedAt, null);
+
+    let prevented = false;
+    documentListeners.get('keydown')({
+      code: 'Space',
+      preventDefault() {
+        prevented = true;
+      },
+    });
+    const start = winterLevel.countdownStartedAt;
+    assert.equal(prevented, true);
+    assert.ok(start !== null);
+    assert.equal(overlay.style.background, 'rgba(0, 0, 0, 0.55)');
+    assert.equal(overlay.style.color, '#000');
+    assert.equal(overlay.textContent, '3');
+
+    winterLevel.update(start + 1000);
+    assert.equal(overlay.textContent, '2');
+    winterLevel.update(start + 2000);
+    assert.equal(overlay.textContent, '1');
+    winterLevel.update(start + 2999);
+    assert.equal(gameEnv.winterRaceStarted, false);
+    winterLevel.update(start + 3000);
+    assert.equal(overlay.textContent, 'GO!!');
+    assert.equal(gameEnv.winterRaceStarted, true);
+    winterLevel.update(start + 4000);
+    assert.equal(container.children.includes(overlay), false);
+
+    winterLevel.destroy();
+  } finally {
+    if (originalDocument === undefined) delete globalThis.document;
+    else globalThis.document = originalDocument;
+  }
+});
+
+test('winter cars ignore movement and boost input until GO', () => {
+  const player = accelerationFixture();
+  player.gameEnv.winterRaceStarted = false;
+  player.boostKey = 70;
+
+  pressKey(player, wasd.up);
+  pressKey(player, 70);
+  player.update();
+
+  assert.equal(player.currentSpeed, 0);
+  assert.equal(player.boostUntil, 0);
+  assert.deepEqual(player.velocity, { x: 0, y: 0 });
+
+  player.gameEnv.winterRaceStarted = true;
+  pressKey(player, wasd.up);
+  player.update();
+  assert.equal(player.currentSpeed, 0.4);
 });
 
 test('winter level shows and removes the boost instructions', () => {
@@ -209,6 +370,8 @@ test('winter level shows and removes the boost instructions', () => {
         },
       };
     },
+    addEventListener() {},
+    removeEventListener() {},
   };
 
   try {

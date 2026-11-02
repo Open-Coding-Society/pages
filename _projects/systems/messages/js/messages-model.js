@@ -115,9 +115,9 @@ export const canFormGroups = person => isAdmin(person) || hasRole(person, 'ROLE_
 
 export const isGroupMember = (group, personId) => (group.members || []).some(member => member.id === personId);
 
-// The course pages chat in groups named "lessons", "<course>-announcements" and
-// "<course>-week-<n>" (_projects/systems/courses/_includes/*_chat.html). Those aren't
-// groups to join here.
+// The course pages chat in groups named "lessons" and "<course>-announcements"
+// (_projects/systems/courses/_includes/*_chat.html). "<course>-week-<n>" groups are left
+// from the removed week chats. None of those are groups to join here.
 export const isCourseChannel = group => /^(lessons|[a-z]+-announcements|[a-z]+-week-\d+)$/i.test(group.name || '');
 
 // Spring's courses.class-groups. Profile class changes add and remove these memberships

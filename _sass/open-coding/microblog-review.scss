@@ -1,0 +1,191 @@
+// The phone review page (navigation/review.md) and the microblog panel's QR modal.
+// One narrow column that fits a phone held upright; the OCS field, button and card
+// classes do the controls, these rules do the layout.
+
+.review-page {
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+  display: grid;
+  gap: 1.25rem;
+
+  // The page shows and hides its sections with the hidden attribute; the display
+  // rules below must not undo it
+  [hidden] { display: none !important; }
+}
+
+.review-head {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.review-title {
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.review-topic {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.review-topic a { color: var(--pref-accent-color); }
+
+.review-callout { margin-top: 0; }
+
+.review-identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.review-card { padding: 1.25rem; }
+
+.review-form {
+  display: grid;
+  gap: 1rem;
+}
+
+// A button that reads as a link: "Not you?", "Sign in with your account"
+.review-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--pref-accent-color);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.review-center { text-align: center; }
+
+.review-note {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.review-textarea {
+  resize: vertical;
+  min-height: 7rem;
+  font-size: 1rem;  // 16px: below that iOS zooms the page when the box is focused
+}
+
+// A full-width button is the easiest thumb target
+.review-submit { width: 100%; }
+
+.review-message {
+  margin: 0;
+  min-height: 1.4em;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+
+  &[data-tone="error"] { color: #ef4444; }
+  &[data-tone="ok"] { color: #22c55e; }
+}
+
+.review-posts-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.review-post-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+
+  li {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--ui-border);
+    border-radius: 0.75rem;
+    background: var(--panel);
+  }
+
+  strong { font-size: 0.85rem; color: var(--text-muted); }
+
+  p {
+    margin: 0.25rem 0 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.review-share {
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ui-border);
+}
+
+// The QR code: white quiet zone whatever the theme, so a phone camera reads it
+.review-qr,
+.microblog-qr-body {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  width: 100%;
+}
+
+.review-qr-image,
+.microblog-qr-image {
+  width: min(100%, 18rem);
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: #fff;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.review-qr-link,
+.microblog-qr-link {
+  margin: 0;
+  font-size: 0.85rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+
+  a { color: var(--pref-accent-color); }
+}
+
+// The panel's QR button sits in the panel header beside Guest Signup
+.microblog-qr-btn {
+  margin-left: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  background: none;
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.microblog-qr-body {
+  padding-top: 0.5rem;
+  color: #f1f5f9;
+
+  .microblog-qr-note {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    text-align: center;
+    opacity: 0.85;
+  }
+}
