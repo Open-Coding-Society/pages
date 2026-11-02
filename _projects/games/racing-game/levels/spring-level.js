@@ -1,19 +1,22 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import PlayerCar from './PlayerCar.js';
+import AccelDecelRacingPlayer from './AccelDecelRacingPlayer.js';
 import DescentEntrance from './DescentEntrance.js';
 import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js'
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import cleanupRacingLevel from './cleanup-racing-level.js';
 
 const GREEN_ORB_RESPAWN_MS = 30000;
 const SPEED_BOOST_DURATION_MS = 10000;
 
-class Player extends PlayerCar {
+class Player extends AccelDecelRacingPlayer {
   applyTemporarySlowdown() {
-    this.slowdownUntil = performance.now() + 5000;
+    this.springSlowdownUntil = Date.now() + 5000;
+    this.updateMovementSpeed();
   }
 
   applyTemporarySpeedBoost() {
-    this.speedBoostUntil = performance.now() + SPEED_BOOST_DURATION_MS;
+    this.springSpeedBoostUntil = Date.now() + SPEED_BOOST_DURATION_MS;
+    this.updateMovementSpeed();
     this.showSpeedBoostBanner();
   }
 
@@ -38,7 +41,7 @@ class Player extends PlayerCar {
 
     const updateCountdown = () => {
       const secondsRemaining = Math.ceil(
-        (this.speedBoostUntil - performance.now()) / 1000
+        (this.springSpeedBoostUntil - Date.now()) / 1000
       );
       if (secondsRemaining <= 0) {
         clearInterval(this.speedBoostBannerInterval);
@@ -57,34 +60,25 @@ class Player extends PlayerCar {
     this.speedBoostBannerInterval = setInterval(updateCountdown, 100);
   }
 
-  getSlowdownMultiplier(now = performance.now()) {
-    return now < (this.slowdownUntil || 0) ? 0.65 : 1;
+  getSlowdownMultiplier(now = Date.now()) {
+    return now < (this.springSlowdownUntil || 0) ? 0.65 : 1;
   }
 
-  getSpeedBoostMultiplier(now = performance.now()) {
-    return now < (this.speedBoostUntil || 0) ? 2.5 : 1;
+  getSpeedBoostMultiplier(now = Date.now()) {
+    return now < (this.springSpeedBoostUntil || 0) ? 2.5 : 1;
+  }
+
+  updateMovementSpeed(now = Date.now()) {
+    super.updateMovementSpeed(now);
+    const multiplier = this.getSlowdownMultiplier(now) * this.getSpeedBoostMultiplier(now);
+    this.xVelocity *= multiplier;
+    this.yVelocity *= multiplier;
+    this.updateVelocity();
   }
 
   handleCollisionReaction(other) {
     if (other?.id === 'flower-grumpy') this.applyTemporarySlowdown();
     super.handleCollisionReaction(other);
-  }
-
-  move() {
-    if (!this.velocity.x && !this.velocity.y) return super.move();
-
-    const velocityX = this.velocity.x;
-    const velocityY = this.velocity.y;
-    const multiplier = this.getSlowdownMultiplier() * this.getSpeedBoostMultiplier();
-    this.velocity.x *= multiplier;
-    this.velocity.y *= multiplier;
-    const slowedVelocityX = this.velocity.x;
-    const slowedVelocityY = this.velocity.y;
-
-    super.move();
-
-    if (this.velocity.x === slowedVelocityX) this.velocity.x = velocityX;
-    if (this.velocity.y === slowedVelocityY) this.velocity.y = velocityY;
   }
 
   destroy() {
@@ -259,6 +253,7 @@ class GreenOrb extends Npc {
 
 class GameLevelSpring {
   constructor(gameEnv) {
+    this.gameEnv = gameEnv;
     const path = gameEnv.path;
     const background_data = {
       name: "Spring Course",
@@ -272,7 +267,13 @@ class GameLevelSpring {
         src: path + '/images/projects/racing-game/Directions_red_car.png',
         INIT_POSITION: { x: 340 / 740, y: 450 / 585},
         SCALE_FACTOR: 10,
-        STEP_FACTOR: 1200,
+        STEP_FACTOR: 1100,
+        currentSpeed: 0,
+        maxSpeed: 12,
+        acceleration: 0.4,
+        deceleration: 0.4,
+        reverseSpeed: -4,
+        direction: { default: 'right' },
         pixels: { height: 1024, width: 1536 },
         orientation: { rows: 4, columns: 4 },
         up:        { row: 3, start: 0, columns: 1 },
@@ -412,7 +413,7 @@ class GameLevelSpring {
         {class: DescentEntrance, data: lap_data}
     ]
   }
-  destroy () {
+  destroy() {
     cleanupRacingLevel(this.gameEnv);
   }
 }
