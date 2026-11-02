@@ -22,6 +22,7 @@ How it fits together (one-time device pairing, once for the whole trail):
   6. The game polls the backend and updates the quest when the station is verified.
 
 Usage (run it from inside your cloned pages repository):
+    Students:             bash scripts/toolchain_agent.sh   (checks for Python first)
     macOS / Linux / WSL:  python3 scripts/toolchain_agent.py
     Windows (PowerShell): py scripts\\toolchain_agent.py
     Local backend:        python3 scripts/toolchain_agent.py --server http://localhost:8585
