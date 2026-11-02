@@ -51,7 +51,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
-                    warnIfSpringSignedOut(loginArea);
+                    // A limited account (a guest) never has a Spring account, so there is nothing to warn about
+                    if (!data.limited) warnIfSpringSignedOut(loginArea);
 
                     // Update navigation AFTER dropdown is set up
                     waitForElement('.trigger', 20, 100).then(() => {
