@@ -19,6 +19,21 @@ a page of your own. If you built the Spring feature in
 [Backend Fullstack Development]({{ site.baseurl }}/fullstack/java/backend),
 you will see the same five parts arranged differently.
 
+## Popcorn Hack 1: Post and Watch the Request
+
+Send a real request before reading any code.
+
+1. Open your browser's developer tools, choose the **Network** tab, and filter
+   by `microblog`.
+2. Press **Microblog** at the top of this page. If you are not signed in, use
+   **Guest Signup** in the panel.
+3. Post one sentence: what should an API check before it saves a post? Posts
+   are public, so leave out anything personal.
+4. Select the `POST` request in the Network tab. Find the URL, the `content`
+   and `topicPath` you sent, the status code, and the `id` that came back.
+
+Keep that request open. The rest of this lesson explains what happened to it.
+
 ## Read Posts with REST Client
 
 Use the Flask backend's `local` REST Client environment and authenticate with
