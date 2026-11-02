@@ -25,19 +25,19 @@
         "id": "growth-comparison",
         "supporting_lessons": ["/csa/unit_02/2_12", "/csa/unit_04/4_15"],
         "title": "C. Growth function comparison as the number of inputs increases",
-        "coverage": "Search and sorting examples provide different growth rates. Java sorting runners compare operation counts on sorted and reversed inputs; advanced analysis has an authoring draft.",
+        "coverage": "Sorting examples provide different growth rates. Java sorting runners compare operation counts on sorted and reversed inputs; advanced analysis has an authoring draft.",
         "gap": "Add reproducible comparisons across increasing input sizes, with operation counts and controlled data.",
         "pbl": "Compare list scanning and map lookup for a growing project dataset; plot counts alongside timings.",
-        "lessons": ["/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/sortingTTG/sorting/hw/", "/csa/cs113/drafts/advanced-sort-analysis/"]
+        "lessons": ["/sortingTTG/sorting/hw/", "/csa/cs113/drafts/advanced-sort-analysis/"]
       },
       {
         "id": "time-complexity",
         "supporting_lessons": ["/csa/unit_02/2_12", "/csa/unit_04/4_14", "/csa/unit_04/4_15", "/csa/unit_04/4_17"],
         "title": "D. Time complexity issues",
-        "coverage": "Search, sort, and graph-search materials offer examples for discussing best/worst cases and algorithm trade-offs.",
+        "coverage": "Sort and graph-search materials offer examples for discussing best/worst cases and algorithm trade-offs.",
         "gap": "Separate asymptotic analysis from measured runtime, including setup costs and input-order effects.",
         "pbl": "Identify a slow lookup or ordering operation and explain whether an algorithm or data-structure change would help.",
-        "lessons": ["/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/csa/sorting/common", "/2025/01/06/sort-merge_IPYNB_2_.html", "/heuristics/searches", "/csa/cs113/drafts/advanced-sort-analysis/"]
+        "lessons": ["/csa/sorting/common", "/2025/01/06/sort-merge_IPYNB_2_.html", "/heuristics/searches", "/csa/cs113/drafts/advanced-sort-analysis/"]
       },
       {
         "id": "test-preparation",
@@ -91,10 +91,10 @@
       {
         "id": "collection-implementation",
         "title": "C. Application and implementation approaches",
-        "coverage": "RPN variants, tracking, and enactments show how stacks and queues participate in a complete expression-processing pipeline.",
+        "coverage": "RPN variants, tracking, and enactments show how stacks and queues participate in a complete expression-processing pipeline. The Collectables lessons, homework, and mentor dashboard apply abstract classes, Comparable, and registries to data-driven collections.",
         "gap": "Make the layers explicit: trace the existing example, use a collection API, then implement and test a selected structure from scratch.",
         "pbl": "Extend the calculator or a project work queue and document where a library structure was used versus implemented.",
-        "lessons": ["/2025/02/20/rpn_calculator_IPYNB_2_.html", "/csa/rpn-calculator/graph-variant/", "/2025/02/20/rpn_calculator-tracking_IPYNB_2_.html", "/csa/rpn-calculator-wayfinding", "/csa/rpn-lesson2", "/csa/rpn-calculator-lesson", "/csa/rpn-lesson/", "/csa/calculator-enactment", "/2025/03/17/calculatorlesson_IPYNB_2_.html", "/csa/cs113/drafts/backend-collection-choice/"]
+        "lessons": ["/2025/02/20/rpn_calculator_IPYNB_2_.html", "/csa/rpn-calculator/graph-variant/", "/2025/02/20/rpn_calculator-tracking_IPYNB_2_.html", "/csa/rpn-calculator-wayfinding", "/csa/rpn-lesson2", "/csa/rpn-calculator-lesson", "/csa/rpn-lesson/", "/csa/calculator-enactment", "/2025/03/17/calculatorlesson_IPYNB_2_.html", "/java/collectablev1", "/java/collectable", "/java/collectable/homework", "/java/collectable/mentor-dashboard", "/csa/cs113/drafts/backend-collection-choice/"]
       }
     ]
   },
@@ -113,10 +113,10 @@
       {
         "id": "hash-collisions",
         "title": "B. Hashing functions and resolving collisions",
-        "coverage": "The search/HashMap lesson introduces hashing and lookup costs. A hash-table implementation draft addresses collisions and load factor.",
+        "coverage": "No published lesson currently introduces hashing. A hash-table implementation draft addresses collisions and load factor.",
         "gap": "Finish a custom table with collision resolution and collision-heavy tests; library HashMap use alone is not implementation evidence.",
         "pbl": "Build a small keyed lookup table and compare chaining with open addressing under deliberate collisions.",
-        "lessons": ["/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/csa/cs113/drafts/hash-table-layers/"]
+        "lessons": ["/csa/cs113/drafts/hash-table-layers/"]
       },
       {
         "id": "graph-map-implementation",
@@ -124,7 +124,7 @@
         "coverage": "Set lessons provide uniqueness and collection operations; Java graph and search examples support adjacency representations and traversals.",
         "gap": "Require students to justify representation choices and test equality, duplicate handling, missing keys, and disconnected graphs.",
         "pbl": "Use a set for deduplication, a map for keyed records, and a graph for relationships; explain each choice.",
-        "lessons": ["/teamTeachCollectables/sets", "/collectablesToolkitSets", "/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/graphs/java", "/graphs/searching", "/csa/cs113/drafts/hash-table-layers/", "/csa/cs113/drafts/set-map-graph-api/"]
+        "lessons": ["/teamTeachCollectables/sets", "/collectablesToolkitSets", "/graphs/java", "/graphs/searching", "/csa/cs113/drafts/hash-table-layers/", "/csa/cs113/drafts/set-map-graph-api/"]
       }
     ]
   },
@@ -177,10 +177,10 @@
         "id": "search-performance",
         "supporting_lessons": ["/csa/unit_04/4_14", "/csa/unit_04/4_17"],
         "title": "C. Performance characteristics of search routines",
-        "coverage": "Java Linear Search Algorithms and Recursive Searching and Sorting add array search and recursive binary-search foundations to the linear/binary/hash and graph-search analysis examples.",
+        "coverage": "Java Linear Search Algorithms and Recursive Searching and Sorting add array search and recursive binary-search foundations to the graph-search analysis examples.",
         "gap": "Make preconditions and trade-offs explicit: sorted input for binary search, hash distribution, and graph structure. Verify missing-target behavior.",
         "pbl": "Compare linear, binary, and keyed lookup for a feature, then explain when graph traversal is the right model instead.",
-        "lessons": ["/2025/01/06/search_linear_binary_hash_IPYNB_2_.html", "/graphs/searching", "/heuristics/searches", "/graph", "graphHeuristics"]
+        "lessons": ["/graphs/searching", "/heuristics/searches", "/graph", "graphHeuristics"]
       }
     ]
   },
@@ -191,10 +191,10 @@
       {
         "id": "projects",
         "title": "Individual and group hands-on projects",
-        "coverage": "Calculator enactments, RPN implementations, sorting visualizations, and graph exercises support, complement, and extend the lecture material and theory.",
+        "coverage": "Calculator enactments, RPN implementations, sorting visualizations, graph exercises, and the Collectables mentor dashboard support, complement, and extend the lecture material and theory.",
         "gap": "Collect individual competence evidence alongside group project work. Advanced from-scratch CS113 layers are differentiated opportunities, not a claim that every student completes them.",
         "pbl": "Choose a structure or algorithm layer, demonstrate its use or implementation in a project, and reflect on correctness and efficiency evidence.",
-        "lessons": ["/csa/calculator-enactment", "/2025/03/17/calculatorlesson_IPYNB_2_.html", "/csa/rpn-calculator-lesson", "/2025/02/20/rpn_calculator-tracking_IPYNB_2_.html", "/csa/rpn-calculator-wayfinding", "/sortingTTG/sorting/hw/", "/graphs/java", "/graphs/searching"]
+        "lessons": ["/csa/calculator-enactment", "/2025/03/17/calculatorlesson_IPYNB_2_.html", "/csa/rpn-calculator-lesson", "/2025/02/20/rpn_calculator-tracking_IPYNB_2_.html", "/csa/rpn-calculator-wayfinding", "/sortingTTG/sorting/hw/", "/graphs/java", "/graphs/searching", "/java/collectable/mentor-dashboard"]
       }
     ]
   }
