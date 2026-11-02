@@ -8,19 +8,24 @@ permalink: /scraper/
 <p>
   <strong>Scraper</strong> ·
   <a href="{{ '/scraper/' | relative_url }}">Home</a> ·
+  <a href="{{ '/scraper/getting-started/' | relative_url }}">Getting Started</a> ·
   <a href="{{ '/scraper/lesson-music/' | relative_url }}">Lesson 1 — Music</a> ·
-  <a href="{{ '/scraper/lesson-vacation/' | relative_url }}">Lesson 2 — Vacation</a>
+  <a href="{{ '/scraper/lesson-vacation/' | relative_url }}">Lesson 2 — Vacation</a> ·
+  <a href="{{ '/scraper/my-scrapes/' | relative_url }}">My Scrapes</a>
 </p>
 
 ## What this system does
 
 The Spring scraper API accepts a JSON `ScrapeRequest` and returns scraped items. This project is the **frontend + lessons** for building those JSON files and testing them live.
 
+New to this? Start with [Getting Started]({{ '/scraper/getting-started/' | relative_url }}) — no JSON or CSS experience assumed.
+
 | Piece | Location |
 | --- | --- |
 | Backend API | `POST /api/scraper/run` (Spring, port `8585` locally) |
 | Runner UI | Below on this page |
-| Lessons | [Music]({{ '/scraper/lesson-music/' | relative_url }}) · [Vacation]({{ '/scraper/lesson-vacation/' | relative_url }}) |
+| Lessons | [Getting Started]({{ '/scraper/getting-started/' | relative_url }}) · [Music]({{ '/scraper/lesson-music/' | relative_url }}) · [Vacation]({{ '/scraper/lesson-vacation/' | relative_url }}) |
+| Saved results | [My Scrapes]({{ '/scraper/my-scrapes/' | relative_url }}) |
 
 ## JSON request shape
 

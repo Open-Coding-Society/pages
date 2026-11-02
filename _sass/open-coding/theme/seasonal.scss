@@ -13,7 +13,7 @@ html[data-theme-decor] {
   .page-content,
   .wrapper,
   main,
-  article,
+  article:where(:not([class*="ocs__"])),
   .post,
   .content,
   .opencs_root,

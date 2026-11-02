@@ -1,4 +1,4 @@
-// Linux, Kasm, and Windows/WSL setup-check panel for Toolchain Trail.
+// Linux and Windows/WSL setup-check panel for Toolchain Trail.
 // macOS keeps using MacSetupCheck.js and its existing implementation.
 // Like the Mac panel, a signed-in student gets a check command that sends the
 // report to Spring, and the panel shows it when it arrives; otherwise (or if
@@ -51,7 +51,7 @@ class SystemSetupCheck {
       <div class="cs-pathway-system-check__dialog" role="dialog" aria-modal="true" aria-labelledby="system-check-title">
         <button type="button" class="cs-pathway-system-check__close" aria-label="Close">×</button>
         <h2 id="system-check-title">${config.icon} Check my ${this._escape(config.label)} setup</h2>
-        <p><strong>1.</strong> In your ${this._escape(config.terminalName)}, go to your <code>blueprints_pages</code> folder and run:</p>
+        <p><strong>1.</strong> In your ${this._escape(config.terminalName)}, go to your pages folder (<code>cd ~/opencs/pages</code>) and run:</p>
         <div class="cs-pathway-system-check__command">
           <code></code>
           <button type="button" class="cs-pathway-system-check__copy">Copy command</button>

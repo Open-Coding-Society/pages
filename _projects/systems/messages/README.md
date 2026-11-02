@@ -54,9 +54,16 @@ module needs a `../` path that breaks when files move.
 - **Read state:** opening a DM, or a message arriving while the tab is visible, posts
   `/read` and fires `dm:refresh-unread` for the navbar bell
   (`assets/js/api/dm-notifications.js`). The bell's `dm:unread` summary keeps the
-  sidebar's DM counts current. Groups have their own counts for the sidebar
+  sidebar's DM counts current. Groups have their own counts
   (`GET /api/groups/chat/unread`): opening a group, or a message arriving while it is
-  open, posts `/api/groups/chat/{id}/read`. The bell counts DMs only.
+  open, posts `/api/groups/chat/{id}/read` and fires `dm:group-read` for the bell.
+- **The bell** counts conversations waiting: each person with unread DMs, plus each
+  group with unread messages. Spring counts a group by reading its whole chat file, so
+  the bell asks about groups when a page loads, when the tab comes back to the front
+  and at most every two minutes, not on its 30-second DM poll. Its `dm:unread`
+  summary carries the group counts too (`groups`, by group id), and the sidebar takes
+  them from there instead of asking Spring again. `/dm` asks once itself, when the
+  groups load.
 
 ## Embedding a conversation
 
@@ -152,7 +159,7 @@ Things to know:
   to members is the host's choice (the UI Builder checks `viewerIsMember`), not access
   control.
 - A DM embed marks the conversation read, as `/dm` does. A group embed leaves group unread
-  counts alone; only `/dm` shows them.
+  counts alone, so the group stays on the navbar bell until it's opened in `/dm`.
 - An embed has no image attach and no Members or Files dialog (`createDialog` in
   `dialogs.js` leaves a `document` listener it can't take back). A shared-file line in the
   log still downloads the file.

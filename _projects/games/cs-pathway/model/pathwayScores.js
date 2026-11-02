@@ -18,6 +18,7 @@ export const PATHWAY_LEVELS = [
     pagePath: '/cs-pathway',
     tasks: ['identity', 'course', 'persona', 'avatar', 'theme'],
   },
+  { key: 'toolchain-trail', name: 'Toolchain Trail', shortName: 'Toolchain', pagePath: '/cs-pathway/toolchain-trail', tasks: null },
   {
     key: 'wayfinding-world',
     name: 'Wayfinding World',
@@ -33,7 +34,6 @@ export const PATHWAY_LEVELS = [
     pagePath: '/cs-pathway/assessment-observatory',
     tasks: ['ai-skill-advisor', 'github-analytics', 'sprint-coach'],
   },
-  { key: 'toolchain-trail', name: 'Toolchain Trail', shortName: 'Toolchain', pagePath: '/cs-pathway/toolchain-trail', tasks: null },
 ];
 
 const TASKS_STORAGE_KEY = 'cs_pathway_level_tasks';

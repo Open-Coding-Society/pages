@@ -2759,15 +2759,13 @@
 }
 
 /* ============================= */
-/*      COURSE / WEEK CHAT       */
+/*     COURSE ANNOUNCEMENTS      */
 /* ============================= */
-/* Shared styling for the class announcement panel at the top of a sprint page
-   and the per-week chat inside every week card. Uses the same tokens as the
-   surrounding timeline cards ($bg-3 borders, $accent headings, $text-muted
-   secondary text) so the chats read as part of the page, not bolted on. */
+/* The class announcement panel at the top of a sprint page. It uses the same
+   tokens as the surrounding timeline cards so the chat reads as part of the
+   page, not bolted on. */
 
-.announcement-chat,
-.week-chat {
+.announcement-chat {
   color: $text;
   font-family: var(--pref-font-family);
 
@@ -3168,99 +3166,6 @@
   }
 }
 
-/* ── Per-week chat (inside each week card) ────────────────────────── */
-.week-chat {
-  margin-top: 16px;
-  border: 1px solid $bg-3;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: border-color 0.2s;
-
-  &[open] { border-color: rgba($accent, 0.4); }
-
-  .chat-summary {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    cursor: pointer;
-    list-style: none;
-    color: $text;
-    font-size: 13px;
-    transition: background 0.2s;
-
-    &::-webkit-details-marker { display: none; }
-
-    &:hover { background: rgba($text, 0.05); }
-
-    &:focus-visible {
-      outline: 2px solid $accent;
-      outline-offset: -2px;
-    }
-  }
-
-  .chat-summary-icon {
-    color: $accent;
-    font-size: 13px;
-  }
-
-  .chat-summary-title {
-    font-weight: 600;
-    color: $text;
-  }
-
-  .chat-status-pill { margin-left: 4px; }
-
-  .chat-summary-caret {
-    margin-left: auto;
-    color: $text-muted;
-    font-size: 11px;
-    transition: transform 0.2s;
-  }
-
-  &[open] .chat-summary-caret { transform: rotate(180deg); }
-
-  .chat-body {
-    padding: 12px;
-    border-top: 1px solid $bg-3;
-  }
-
-  .chat-messages { height: 14em; }
-
-  .chat-empty {
-    margin: 0;
-    padding: 4px 0;
-    color: $text-muted;
-    font-size: 13px;
-    font-style: italic;
-  }
-
-  /* Compact bubbles — this widget is small and lives inside a week card */
-  .chat-msg {
-    margin: 0 0 8px 0;
-    padding: 8px 10px;
-    border: 1px solid $bg-3;
-    border-radius: 8px;
-    background: rgba($text, 0.03);
-    line-height: 1.45;
-    word-break: break-word;
-
-    &:last-child { margin-bottom: 0; }
-
-    &.is-self {
-      border-color: rgba($accent, 0.35);
-      background: rgba($accent, 0.08);
-    }
-  }
-
-  .chat-msg-meta {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 2px;
-  }
-}
-
 @media (max-width: 768px) {
   .announcement-chat {
     .chat-header {
@@ -3281,14 +3186,7 @@
     }
   }
 
-  .week-chat {
-    .chat-messages { height: 12em; }
-
-    .chat-send span { display: none; }
-  }
-
-  .announcement-chat,
-  .week-chat {
+  .announcement-chat {
     .chat-send span { display: none; }
   }
 }

@@ -32,9 +32,8 @@ Courses - collection, selector, and navigation system
     │       └── Week collection
     │           └── Week
     │               ├── Introduction and learning goals
-    │               ├── Document collection
-    │               │   └── Lesson / assignment / reference document
-    │               └── Week-scoped Group Chat
+    │               └── Document collection
+    │                   └── Lesson / assignment / reference document
     └── Blogs view
         ├── Post catalog
         └── Post reader
@@ -87,7 +86,7 @@ a functional system does not necessarily correspond to one directory or service.
 | Grading | Evaluate submitted evidence and expose feedback/results | Shared helpers and backend services; derives from Submissions |
 
 Calendar and Chat are external capabilities from the course domain's perspective.
-Their course-facing announcement, week and document-chat views and
+Their course-facing announcement and document-chat views and
 calendar/announcement adapters live in Courses. Chat uses scoped groups and
 document markers to associate conversations with the appropriate view.
 Authentication, subscriptions, reconnection and deduplication belong to the

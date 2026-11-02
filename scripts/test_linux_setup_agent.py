@@ -18,7 +18,9 @@ from linux_setup_agent import (LiveFeedback, diagnose, feedback, format_setup_re
                                run_setup_check, upload_report, write_report_file)
 
 SCRIPT = Path(__file__).with_name('linux_setup_agent.py')
-WINDOWS_SCRIPT = Path(__file__).with_name('windows_setup_agent.py')
+WINDOWS_SCRIPT = Path(__file__).with_name('windows_setup_agent.sh')
+BASH_SCRIPT = Path(__file__).with_name('linux_setup_agent.sh')
+LIVE_SCRIPT = Path(__file__).with_name('linux_setup_agent_live.sh')
 
 
 class LinuxSetupTests(unittest.TestCase):
@@ -94,7 +96,7 @@ class LinuxSetupTests(unittest.TestCase):
     @unittest.skipIf(is_wsl(), 'This guard is only expected outside WSL')
     def test_windows_entry_point_requires_wsl(self):
         result = subprocess.run(
-            [sys.executable, str(WINDOWS_SCRIPT), '--check'],
+            ['bash', str(WINDOWS_SCRIPT), '--check'],
             capture_output=True,
             text=True,
         )
@@ -195,6 +197,73 @@ class LinuxSetupTests(unittest.TestCase):
             self.assertEqual(result.returncode, 1)
             self.assertIn('\033[33m', result.stdout)
             self.assertIn('python3-venv', result.stdout)
+
+
+
+@unittest.skipUnless(platform.system() == 'Linux' and shutil.which('bash'), 'The Bash agent checks run on Linux')
+class BashAgentTests(unittest.TestCase):
+    """The game runs the Bash agents (linux_setup_agent.sh / windows_setup_agent.sh), like the Mac agent."""
+
+    def run_agent(self, *args, env=None, script=BASH_SCRIPT):
+        return subprocess.run(['bash', str(script), *args], capture_output=True, text=True, env=env)
+
+    def without_wsl(self):
+        env = dict(os.environ)
+        env.pop('WSL_DISTRO_NAME', None)
+        env.pop('WSL_INTEROP', None)
+        return env
+
+    def test_report_matches_the_python_format(self):
+        result = self.run_agent('--check', env=self.without_wsl())
+        self.assertIn(result.returncode, (0, 1))
+        report = result.stdout
+        start = '=== WINDOWS SETUP CHECK v1 ===' if is_wsl() else '=== LINUX SETUP CHECK v1 ==='
+        self.assertIn(start, report)
+        self.assertRegex(report, r'(?m)^Started: \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}')
+        self.assertRegex(report, r'(?m)^(PASS|FAIL) git \| Git')
+        self.assertRegex(report, r'(?m)^(PASS|FAIL) pages-repo \| Pages repository cloned')
+        self.assertRegex(report, r'(?m)^Duration: \d+ seconds?$')
+        self.assertRegex(report, r'(?m)^Summary: \d+ passed, 0 warned, \d+ failed$')
+        self.assertRegex(report, r'(?m)^Overall: (PASS|FAIL)$')
+
+    def test_report_is_saved_and_sent_to_the_upload_url(self):
+        received = []
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_POST(self):
+                received.append(self.rfile.read(int(self.headers['Content-Length'])).decode())
+                self.send_response(200)
+                self.end_headers()
+
+            def log_message(self, *args):
+                pass
+
+        server = http.server.HTTPServer(('127.0.0.1', 0), Handler)
+        threading.Thread(target=server.handle_request, daemon=True).start()
+        with tempfile.TemporaryDirectory() as project:
+            result = self.run_agent('--check', '--project', project, '--report',
+                                    f'http://127.0.0.1:{server.server_port}/api/cs-pathway/setup-report/CODE')
+            saved = (Path(project) / 'setup-report.md').read_text()
+        server.server_close()
+        self.assertIn('Sent these results to the game', result.stdout)
+        self.assertEqual(len(received), 1)
+        self.assertIn('SETUP CHECK v1 ===', received[0])
+        self.assertIn('FAIL pages-repo | Pages repository cloned', received[0])
+        self.assertIn(received[0].strip(), saved)
+
+    def test_report_option_rejects_urls_that_are_not_upload_urls(self):
+        result = self.run_agent('--check', '--report', 'http://example.com/x')
+        self.assertEqual(result.returncode, 2)
+        self.assertIn('is not an upload URL', result.stderr)
+
+    def test_wsl_report_is_labeled_windows(self):
+        env = dict(os.environ, WSL_DISTRO_NAME='Ubuntu-24.04')
+        result = self.run_agent('--check', env=env, script=WINDOWS_SCRIPT)
+        self.assertIn('=== WINDOWS SETUP CHECK v1 ===', result.stdout)
+        self.assertIn('=== END WINDOWS SETUP CHECK ===', result.stdout)
+
+    def test_live_helper_is_valid_bash(self):
+        self.assertEqual(subprocess.run(['bash', '-n', str(LIVE_SCRIPT)]).returncode, 0)
 
 
 @unittest.skipUnless(platform.system() == 'Linux', 'Live shell integration requires actual Linux')

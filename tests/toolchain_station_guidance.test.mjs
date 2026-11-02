@@ -13,8 +13,9 @@ const stationBlock = (id, nextId) => {
 
 test('macOS stations 1-4 teach the exact commands required by the practice checks', () => {
   const terminal = stationBlock('terminal-town-gate', 'compiler-canyon-forge');
-  assert.match(terminal, /mkdir -p toolchain-trail/);
-  assert.match(terminal, /ls -ld toolchain-trail/);
+  assert.match(terminal, /mkdir -p opencs/);
+  assert.match(terminal, /git clone https:\/\/github\.com\/Open-Coding-Society\/pages\.git/);
+  assert.doesNotMatch(terminal, /toolchain-trail/);
 
   const runtime = stationBlock('compiler-canyon-forge', 'editor-isle-tower');
   assert.match(runtime, /python3 --version/);
@@ -31,3 +32,10 @@ test('macOS stations 1-4 teach the exact commands required by the practice check
   assert.match(git, /git config --global --get user\.email/);
   assert.match(git, /\[redacted\]/);
 });
+
+test('the last station only checks the setup and never asks for a commit or a push', () => {
+  const summit = stationBlock('integration-summit');
+  assert.doesNotMatch(summit, /git commit|git push|git add/);
+  assert.match(summit, /You do not commit or push anything/);
+});
+

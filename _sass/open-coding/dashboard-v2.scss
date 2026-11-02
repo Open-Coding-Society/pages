@@ -1,4 +1,4 @@
-// Page-scoped styles for /dashboard/v2 (_layouts/dashboard-v2.html).
+// Page-scoped styles for /dashboard (_layouts/dashboard-v2.html).
 //
 // This page's JavaScript (the inline tab-switch/Ask-AI/Admin-Evaluation
 // scripts, plus the external assets/js/pages/dashboard/preferences.js) is
@@ -17,12 +17,8 @@
 // JS-coupled selectors (.active.text-blue-500 etc., keyed off
 // querySelectorAll('.tab-btn') / ('.tab-content')) live there too.
 
-// Page-specific delta on top of the shared .ocs__tabs-panel: this page's
-// panes are narrower and centered.
-.ocs__dashboard-tab-content {
-    max-width: 64rem;
-    margin: 0 auto;
-}
+// The admin pane fills the content area like the rest of the page; Preferences keeps its
+// own centered width (.ocs__prefs below).
 
 .ocs__dashboard-page-title {
     margin-bottom: 0.5rem;
@@ -248,6 +244,7 @@
 
 .ocs__prefs {
     max-width: 72rem;
+    margin: 0 auto;
 }
 
 .ocs__prefs-sections {

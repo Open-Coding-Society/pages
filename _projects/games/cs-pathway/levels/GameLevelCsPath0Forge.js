@@ -17,9 +17,8 @@ import PersonaHallTrial from './PersonaHallTrial.js';
 import { pythonURI, javaURI, fetchOptions } from '@assets/js/api/config.js';
 import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/courseNavigation.js';
 const PROFILE_PANEL_ID = 'csse-profile-panel';
-import GameLevelCsPath1Way from './GameLevelCsPath1Way.js';
 import PathwayScoreboard from './PathwayScoreboard.js';
-import { completeLevelTask } from '../model/pathwayScores.js';
+import { completeLevelTask, getNextLevel } from '../model/pathwayScores.js';
 
 // Track player progress and choices per session.
 const identityState = {
@@ -491,20 +490,21 @@ class GameLevelCsPath0Forge {
             level.clearZoneAlert?.();
             level.clearPanel?.();
 
-            // 5. Calculate transition index safely
-            const wayfindingIndex = gc.levelClasses?.findIndex(
-              (lc) => lc.levelId === 'wayfinding-world'
-            );
+            // 5. The next level comes from the play order in PATHWAY_LEVELS
+            const nextLevel = getNextLevel('identity-forge');
+            const nextIndex = gc.levelClasses?.findIndex(
+              (lc) => lc.levelId === nextLevel.key
+            ) ?? -1;
+            const nextLevelIsLoaded = nextIndex >= 0;
 
-            if (wayfindingIndex !== -1 && wayfindingIndex !== undefined) {
-              gc.currentLevelIndex = wayfindingIndex;
+            if (nextLevelIsLoaded) {
+              // 6. Execute level state transformation
+              gc.currentLevelIndex = nextIndex;
+              gc.transitionToLevel();
             } else {
-              gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelCsPath1Way);
-              gc.currentLevelIndex++;
+              // This page did not load the next level, so open its own page
+              window.location.href = `${level.gameEnv?.path || ''}${nextLevel.pagePath}`;
             }
-
-            // 6. Execute level state transformation
-            gc.transitionToLevel();
           },
 
           onClose: () => {

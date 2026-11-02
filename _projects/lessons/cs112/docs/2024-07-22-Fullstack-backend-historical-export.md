@@ -6,11 +6,23 @@ permalink: /fullstack/java/backend
 menu: nav/fullstack_java.html
 toc: True
 comments: True
-author: Finn Carpenter
+author: Finn Carpenter, Akshaj Gurugubelli
 lesson_group: "cs112"
 articulation: {"institution":"MiraCosta College","course":"CS112"}
-categories: []
+courses: {'csa': {'week': 5}}
+categories: [Java, Spring]
 ---
+
+## Before You Start
+> Look back at these lessons from week 4
+- This lesson puts them together into one working feature, so skim any that feel unfamiliar
+
+| Lesson | Idea | Where it shows up here |
+|---|---|---|
+| [Spring intro](/java/spring/intro/) | How a Spring project fits together | The whole lesson |
+| [POJO](/java/spring/pojo/) | A Java class that becomes a table | Step 2, the entity |
+| [JPA](/java/spring/jpa/) | Reading and writing without SQL | Step 3, the repository |
+| [API Controller](/java/spring/api/) | Turning HTTP into method calls | Step 5, the controller |
 
 ## How do API work?
 > Five standard parts
@@ -44,6 +56,24 @@ categories: []
     - [The rest of them](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers) (still very important things to know)
 
 
+
+## How This Connects
+> Where this feature sits in OCS and in CS112
+
+### In OCS
+- **Spring** holds the data and the rules, which is what this lesson builds
+- **Pages** is the frontend students see, built from `ocs__` classes
+- **UI Builder** lets you put your API on a Pages page without writing HTML, which is Step 8
+- Your feature follows the same path: copy the five parts, rename them, then connect a page
+
+### In CS112
+> These come from the [CS112 outline report](/csa/cs112/)
+
+| CS112 topic | What you do in this lesson |
+|---|---|
+| V.B Java applets or Web | Connect a browser page to a Spring endpoint and retrieve project data (Steps 5 and 8) |
+| III.D Fault-tolerance through exception and error handling | Read the status code each route returns and test the error cases (Step 7) |
+| III.B.1 Text and binary files | Save data to a table with JPA; this is related but does not replace writing files yourself |
 
 ## Step 1
 > File Management
@@ -361,6 +391,57 @@ public class AnnouncementService {
 - Install the **REST Client** extension in VS Code, open the file, and click **Send Request** above each request
 - Put `baseUrl`, `adminUid` and `adminPassword` in the Git-ignored `.vscode/settings.json`, never in the `.http` file
 - Then copy it to `api/yourfeature.http` and change the routes to test your own API
+
+## Step 8
+> Popcorn Hack: show your API with UI Builder
+- Sign in, open [UI Builder](/ui-builder/), and start from the **Flask API starter** template
+- In **Data from your API**, press **Test connection** to see live jokes on your page
+- Change the link to `http://localhost:8585/api/announcements` and press **Test connection** again
+- It says the route needs sign-in: every announcement route does, and UI Builder never sends sign-in cookies
+- So your feature needs one read-only route that returns only public fields, for example `GET /api/yourfeature/public`
+- Add that route to your controller, then allow it in `SecurityConfig.java` above the `/api/**` rule
+
+```java
+.requestMatchers(HttpMethod.GET, "/api/yourfeature/public").permitAll()
+```
+
+- Point the block at your new route, press **Test connection**, and choose how to show it (cards, list, table or numbers)
+- Press **Code** to read the HTML and the `ocs__` classes behind your page
+- A link to your own computer only works while you edit, so use your deployed `https://` address before you **Publish**
+
+> The **Class announcements** block is a different feature: it shows a course's announcement channel from Messages, not this API
+
+## Study This With AI
+> Paste your own code into your AI tool, then check what it says against the code
+- Never paste passwords, tokens or your `.env` file
+
+**Draw it**
+
+```text
+Draw a Mermaid sequence diagram of one GET request moving through my controller,
+service, repository and database, and back to the browser. Use my class names.
+```
+
+**Explain it**
+
+```text
+Explain why my controller calls a service instead of the repository. Use my
+feature as the example, in under 100 words.
+```
+
+**Quiz me**
+
+```text
+Ask me 5 questions, one at a time, on the five standard parts of a Spring feature.
+Wait for each answer and tell me what I missed.
+```
+
+**Break it**
+
+```text
+List 3 requests that would fail on my API and the status code each one returns.
+I will test them in my .http file and tell you where you were wrong.
+```
 
 ## Further Questions
 > Please use the comments below to suggest things to be added

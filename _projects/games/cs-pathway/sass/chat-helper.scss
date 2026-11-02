@@ -1,0 +1,222 @@
+// Station Helper (levels/ChatHelper.js): a 💬 button in the bottom-right of the game
+// box, mounted in the game container. "fixed" is relative to that container when the
+// stage is fitted (it has a transform), so it stays inside the game and scales with the
+// map. The open panel looks like the PLAYER PROFILE StatusPanel. Commands in answers
+// show as code with a Copy button (model/chatAnswerParts.js).
+$chat-accent: var(--ocs-game-accent, #38bdf8);
+$chat-text: var(--ocs-game-text, #dbeafe);
+$chat-muted: var(--ocs-game-muted, #a5b4fc);
+$chat-bg: var(--ocs-game-panel-bg, rgba(6, 8, 22, 0.94));
+$chat-input-bg: var(--ocs-game-surface-alt, #0b1026);
+$chat-button-text: var(--ocs-game-surface-contrast, #04060f);
+$chat-student-bg: rgba(56, 189, 248, 0.16);
+$chat-helper-bg: rgba(30, 41, 59, 0.85);
+$chat-error: #f87171;
+
+.cs-pathway-chat {
+  position: fixed;
+  right: 20px;
+  bottom: 24px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  font-family: "Courier New", monospace;
+
+  &__button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 2px solid $chat-accent;
+    border-radius: 50%;
+    background: $chat-bg;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible,
+    &[aria-expanded="true"] {
+      background: rgba(56, 189, 248, 0.3);
+    }
+  }
+
+  &__panel {
+    width: 300px;
+    max-height: 480px;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 14px;
+    border: 1px solid $chat-accent;
+    border-radius: 10px;
+    background: $chat-bg;
+    color: $chat-text;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.18);
+
+    &[hidden] { display: none; }
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: $chat-accent;
+  }
+
+  &__close {
+    padding: 0 2px;
+    border: none;
+    background: transparent;
+    color: $chat-accent;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  &__log {
+    flex: 1;
+    min-height: 120px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 8px;
+  }
+
+  &__message {
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: $chat-text;
+
+    &--student {
+      align-self: flex-end;
+      max-width: 85%;
+      background: $chat-student-bg;
+    }
+
+    &--helper {
+      align-self: flex-start;
+      max-width: 95%;
+      background: $chat-helper-bg;
+    }
+
+    &[data-tone="error"] { color: $chat-error; }
+  }
+
+  // A command on its own line: the code, then its Copy button.
+  &__command {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin: 6px 0;
+    padding: 6px 8px;
+    border: 1px solid $chat-accent;
+    border-radius: 6px;
+    background: $chat-input-bg;
+  }
+
+  &__code {
+    padding: 0;
+    border: none;
+    // The theme presets give every code element a background with !important, which
+    // draws a second box inside the command box.
+    background: none !important;
+    font-family: inherit;
+    font-size: inherit;
+    color: #67e8f9;
+    overflow-wrap: anywhere;
+
+    .cs-pathway-chat__command & {
+      flex: 1;
+      min-width: 0;
+      white-space: pre-wrap;
+    }
+  }
+
+  &__copy {
+    flex-shrink: 0;
+    padding: 1px 6px;
+    border: 1px solid $chat-accent;
+    border-radius: 4px;
+    background: transparent;
+    color: $chat-accent;
+    font-family: inherit;
+    font-size: 10.5px;
+    font-weight: bold;
+    vertical-align: baseline;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: $chat-accent;
+      color: $chat-button-text;
+    }
+  }
+
+  // Backticked text in a sentence: the code, then a small Copy button.
+  &__inline {
+    white-space: nowrap;
+
+    .cs-pathway-chat__code { white-space: normal; }
+    .cs-pathway-chat__copy { margin-left: 4px; }
+  }
+
+  &__form {
+    display: flex;
+    gap: 6px;
+    padding-top: 10px;
+    border-top: 1px solid $chat-accent;
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 8px;
+    border: 1px solid $chat-accent;
+    border-radius: 4px;
+    background: $chat-input-bg;
+    color: $chat-text;
+    font-family: inherit;
+    font-size: 12px;
+  }
+
+  &__send {
+    padding: 6px 10px;
+    border: 1px solid $chat-accent;
+    border-radius: 4px;
+    background: $chat-accent;
+    color: $chat-button-text;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
+  &__note {
+    margin: 6px 0 0;
+    font-size: 10.5px;
+    color: $chat-muted;
+  }
+}

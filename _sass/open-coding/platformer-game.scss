@@ -127,9 +127,9 @@ $spacing-unit: 2rem;
 $dt-leaderboard: #e85252;
 
 .table.scores,
-th,
-tr,
-td {
+.table.scores th,
+.table.scores tr,
+.table.scores td {
     text-align: center;
     font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }

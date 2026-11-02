@@ -77,7 +77,9 @@ published copies. Edit the sources here.
 The layout's starter script imports the shared helpers (`assets/js/api/config.js`
 and `assets/js/api/profile.js`) with `{{ site.baseurl }}` and passes them to
 `initProfilePage(api)`, `springEnabled` included. The Gist include does the same for
-`javaURI`. The modules import each other only with `./` paths, so moving this folder
+`javaURI`. The AI connections include passes both `javaURI` and shared `fetchOptions`
+from that configuration; requests override only the method, cache (`no-store`) and
+save body. The modules import each other only with `./` paths, so moving this folder
 can't break them. A site that uses Profile needs a `config.js` that exports
 `springEnabled`.
 

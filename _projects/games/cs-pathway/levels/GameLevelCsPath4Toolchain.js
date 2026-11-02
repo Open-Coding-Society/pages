@@ -55,8 +55,8 @@ import TrailPath from './TrailPath.js';
 import PathwayScoreboard from './PathwayScoreboard.js';
 import MacSetupCheck from './MacSetupCheck.js';
 import SystemSetupCheck from './SystemSetupCheck.js';
-import HelpFlag from './HelpFlag.js';
-import { buildHelpRequestMessage } from '../model/helpRequestMessage.js';
+import ChatHelper from './ChatHelper.js';
+import { buildChatProgress } from '../model/chatContext.js';
 import { sampleSpline, resolveCircle, clampToCorridor, roundedLoop } from '../model/splineBarriers.js';
 import { recordLevelRatio } from '../model/pathwayScores.js';
 import {
@@ -177,7 +177,6 @@ function detectTerminalFailure(output) {
  */
 const OS_OPTIONS = Object.freeze([
   { id: 'windows', label: 'Windows' },
-  { id: 'kasm', label: 'Kasm (Cloud Linux Desktop)' },
   { id: 'macos', label: 'macOS' },
   { id: 'linux', label: 'Linux' },
 ]);
@@ -238,7 +237,10 @@ class GameLevelCsPath4Toolchain {
      */
     this.selectedOS = null;
     try {
-      this.selectedOS = localStorage.getItem(OS_STORAGE_KEY) || null;
+      const storedOS = localStorage.getItem(OS_STORAGE_KEY);
+      // A saved choice the trail no longer offers (such as Kasm) asks the student to pick again.
+      const isOfferedOS = OS_OPTIONS.some((option) => option.id === storedOS);
+      this.selectedOS = isOfferedOS ? storedOS : null;
     } catch (err) {
       this.selectedOS = null;
     }
@@ -296,48 +298,47 @@ class GameLevelCsPath4Toolchain {
         zone: 1,
         position: { x: width * 0.16, y: height * 0.28 },
         narrativeHook: "The gate won't open until you prove you can pilot the shell.",
+        // The first step of each list ({ bold }) is shown extra-bold in bright
+        // white by StationVerificationTrial; text is a bold fallback.
         instructions: [
-          'Open a Terminal.',
+          { bold: 'Open a terminal: press Ctrl + Alt + T, or search for Terminal in your apps menu.', text: '𝗢𝗽𝗲𝗻 𝗮 𝘁𝗲𝗿𝗺𝗶𝗻𝗮𝗹: 𝗽𝗿𝗲𝘀𝘀 𝗖𝘁𝗿𝗹 + 𝗔𝗹𝘁 + 𝗧, 𝗼𝗿 𝘀𝗲𝗮𝗿𝗰𝗵 𝗳𝗼𝗿 𝗧𝗲𝗿𝗺𝗶𝗻𝗮𝗹 𝗶𝗻 𝘆𝗼𝘂𝗿 𝗮𝗽𝗽𝘀 𝗺𝗲𝗻𝘂.' },
           { text: "Go to your home folder:", commands: ["cd ~"] },
           { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
           { text: "Clone the class repo into it:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
           { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
+          { text: "Turn on the setup agent. It gives you a tip whenever a setup command fails:", commands: ["source scripts/linux_setup_agent_live.sh"] },
         ],
         instructionsByOS: {
           windows: [
-            'Open Windows Terminal (pin it to your taskbar).',
+            { bold: 'Open Windows Terminal: press the Windows key, type Terminal, and press Enter.', text: '𝗢𝗽𝗲𝗻 𝗪𝗶𝗻𝗱𝗼𝘄𝘀 𝗧𝗲𝗿𝗺𝗶𝗻𝗮𝗹: 𝗽𝗿𝗲𝘀𝘀 𝘁𝗵𝗲 𝗪𝗶𝗻𝗱𝗼𝘄𝘀 𝗸𝗲𝘆, 𝘁𝘆𝗽𝗲 𝗧𝗲𝗿𝗺𝗶𝗻𝗮𝗹, 𝗮𝗻𝗱 𝗽𝗿𝗲𝘀𝘀 𝗘𝗻𝘁𝗲𝗿.' },
             { text: "Install WSL with Ubuntu, then set a username and password when prompted:", commands: ["wsl --install -d Ubuntu-24.04"] },
             { text: "Set it as your default:", commands: ["wsl --set-default Ubuntu-24.04"] },
             { text: "Open your Ubuntu shell and go to your Linux home folder:", commands: ["wsl", "cd ~"] },
             { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
             { text: "Clone the class repo into it:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
             { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
-          ],
-          kasm: [
-            'Open a Terminal in your Kasm Workspace.',
-            { text: "Go to your home folder:", commands: ["cd ~"] },
-            { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
-            { text: "Clone the class repo into it:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
-            { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
+            { text: "Turn on the setup agent. It gives you a tip whenever a setup command fails:", commands: ["source scripts/linux_setup_agent_live.sh"] },
           ],
           macos: [
-            'Open Terminal (keep it in the Dock for easy access).',
+            { bold: 'Open Terminal: press Command + Space, type Terminal, and press Return.', text: '𝗢𝗽𝗲𝗻 𝗧𝗲𝗿𝗺𝗶𝗻𝗮𝗹: 𝗽𝗿𝗲𝘀𝘀 𝗖𝗼𝗺𝗺𝗮𝗻𝗱 + 𝗦𝗽𝗮𝗰𝗲, 𝘁𝘆𝗽𝗲 𝗧𝗲𝗿𝗺𝗶𝗻𝗮𝗹, 𝗮𝗻𝗱 𝗽𝗿𝗲𝘀𝘀 𝗥𝗲𝘁𝘂𝗿𝗻.' },
             { text: "Go to your home folder:", commands: ["cd ~"] },
             { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
             { text: "Clone the class repo into it. If a window asks to install the command line developer tools, click Install, then run this again:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
             { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
+            { text: "Turn on the setup agent. It gives you a tip whenever a setup command fails:", commands: ["source scripts/mac_setup_agent.zsh"] },
           ],
           linux: [
-            'Open a Terminal.',
+            { bold: 'Open a terminal: press Ctrl + Alt + T, or search for Terminal in your apps menu.', text: '𝗢𝗽𝗲𝗻 𝗮 𝘁𝗲𝗿𝗺𝗶𝗻𝗮𝗹: 𝗽𝗿𝗲𝘀𝘀 𝗖𝘁𝗿𝗹 + 𝗔𝗹𝘁 + 𝗧, 𝗼𝗿 𝘀𝗲𝗮𝗿𝗰𝗵 𝗳𝗼𝗿 𝗧𝗲𝗿𝗺𝗶𝗻𝗮𝗹 𝗶𝗻 𝘆𝗼𝘂𝗿 𝗮𝗽𝗽𝘀 𝗺𝗲𝗻𝘂.' },
             { text: "Go to your home folder:", commands: ["cd ~"] },
             { text: "Make a folder called opencs and go into it:", commands: ["mkdir -p opencs", "cd opencs"] },
             { text: "Clone the class repo into it. If git is missing, run sudo apt install git first:", commands: ["git clone https://github.com/Open-Coding-Society/pages.git"] },
             { text: "Go into the pages repo you just cloned:", commands: ["cd pages"] },
+            { text: "Turn on the setup agent. It gives you a tip whenever a setup command fails:", commands: ["source scripts/linux_setup_agent_live.sh"] },
           ],
         },
-        expectedCommandPattern: /^(git\s+clone\s+\S+|mkdir\s+.*|cd(\s+.*)?|ls(\s+.*)?|pwd)/i,
+        expectedCommandPattern: /^(git\s+clone\s+\S+|mkdir\s+.*|cd(\s+.*)?|ls(\s+.*)?|pwd|source\s+scripts\/\S+)/i,
         expectedCommandPatternByOS: {
-          windows: /^(wsl(\s+.*)?|git\s+clone\s+\S+|mkdir\s+.*|cd(\s+.*)?|ls(\s+.*)?|pwd)/i,
+          windows: /^(wsl(\s+.*)?|git\s+clone\s+\S+|mkdir\s+.*|cd(\s+.*)?|ls(\s+.*)?|pwd|source\s+scripts\/\S+)/i,
         },
         exampleCommand: 'git clone https://github.com/Open-Coding-Society/pages.git',
         funFact: "Fun fact: 'ls' has been a Unix command since 1971 — older than most operating systems still in use today.",
@@ -347,7 +348,7 @@ class GameLevelCsPath4Toolchain {
         name: 'Compiler Canyon Forge',
         icon: '☕',
         accentColor: '#f97316',
-        skill: 'Java or Python runtime',
+        skill: 'Python and Ruby runtimes with pip and Bundler',
         zone: 2,
         position: { x: width * 0.45, y: height * 0.18 },
         narrativeHook: 'The forge only ignites for a verified runtime.',
@@ -372,12 +373,6 @@ class GameLevelCsPath4Toolchain {
             { text: "Check the Ruby tools. Each command should print a version number:", commands: ["ruby -v", "bundle -v", "gem --version"] },
             { text: "If a tool is missing, install Homebrew from brew.sh, then run the macOS setup script and reload your shell:", commands: ["bash scripts/activate_macos.sh", "source ~/.zshrc"] },
           ],
-          kasm: [
-            'Open a Terminal in your Kasm Workspace.',
-            { text: "Confirm Python is installed:", commands: ["python --version", "pip --version"] },
-            { text: "Confirm the Ruby tools too (the class stack uses them):", commands: ["ruby -v", "bundle -v", "gem --version"] },
-            { text: "If anything is missing, install it from your project folder:", commands: ["./scripts/activate.sh"] },
-          ],
           linux: [
             'Open a Terminal.',
             { text: "Confirm Python is installed:", commands: ["python --version", "pip --version"] },
@@ -389,14 +384,12 @@ class GameLevelCsPath4Toolchain {
         expectedCommandPatternByOS: {
           windows: /^(python3?\s+.*|pip\s+.*|ruby\s+.*|bundle\s+.*|gem\s+.*)/i,
           macos: /^(python3?\s+.*|pip\s+.*|ruby\s+.*|bundle\s+.*|gem\s+.*)/i,
-          kasm: /^(python3?\s+.*|pip\s+.*|ruby\s+.*|bundle\s+.*|gem\s+.*)/i,
           linux: /^(python3?\s+.*|pip\s+.*|ruby\s+.*|bundle\s+.*|gem\s+.*)/i,
         },
         exampleCommand: 'java -version',
         exampleCommandByOS: {
           windows: 'python --version',
           macos: 'python --version',
-          kasm: 'python --version',
           linux: 'python --version',
         },
         funFact: "Fun fact: Java was originally called 'Oak', named after a tree outside its creator's office.",
@@ -427,12 +420,6 @@ class GameLevelCsPath4Toolchain {
             { text: "Open a new Terminal and check the command. You should see a version number:", commands: ["code --version"] },
             { text: "Go into your project folder and open it:", commands: ["cd ~/opencs/pages", "code ."] },
             'Install one recommended extension.',
-          ],
-          kasm: [
-            'Open a new Terminal in your Kasm Workspace.',
-            { text: "Go into your project folder:", commands: ["cd ~/opencs/pages"] },
-            { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
-            { text: "Open it in VS Code:", commands: ["code ."] },
           ],
           linux: [
             'Install VS Code from code.visualstudio.com (choose the Debian/Ubuntu package and default options).',
@@ -473,12 +460,6 @@ class GameLevelCsPath4Toolchain {
             { text: "Check your name:", commands: ["git config --global --get user.name"] },
             { text: "Check your email. Before pasting into the Practice Check, you may replace the domain with [redacted]:", commands: ["git config --global --get user.email"] },
           ],
-          kasm: [
-            'Open a Terminal in your Kasm Workspace.',
-            { text: "Confirm git is installed (Kasm images ship with it):", commands: ["git --version"] },
-            { text: "Set your Git UID and personal email (it asks for them):", commands: ["./scripts/activate.sh"] },
-            { text: "Confirm it worked:", commands: ["git config --global --list"] },
-          ],
           linux: [
             { text: "Install git:", commands: ["sudo apt update", "sudo apt install git"] },
             { text: "Set your Git UID and personal email (it asks for them):", commands: ["./scripts/activate.sh"] },
@@ -490,7 +471,6 @@ class GameLevelCsPath4Toolchain {
         exampleCommandByOS: {
           windows: 'git config --global credential.helper "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe"',
           macos: 'git config --global --list',
-          kasm: 'git config --global --list',
           linux: 'git config --global --list',
         },
         funFact: 'Fun fact: Linus Torvalds wrote Git in 2005 — in about a weekend — to manage Linux kernel development.',
@@ -534,12 +514,6 @@ class GameLevelCsPath4Toolchain {
             { text: "Set up Git (enter your Git username and email when asked):", commands: ["./scripts/activate.sh"] },
             { text: "Build the Python virtual environment:", commands: ["./scripts/venv.sh"] },
           ],
-          kasm: [
-            { text: "In your Kasm Terminal, go into the cloned folder:", commands: ["cd ~/opencs/pages"] },
-            { text: "Set up Git (enter your Git UID and personal email when asked):", commands: ["./scripts/activate.sh"] },
-            { text: "Build the Python virtual environment:", commands: ["./scripts/venv.sh"] },
-            { text: "Open the project in VS Code:", commands: ["code ."] },
-          ],
           macos: [
             { text: "In Terminal, go into the cloned folder:", commands: ["cd ~/opencs/pages"] },
             { text: "Install the macOS tools:", commands: ["./scripts/activate_macos.sh"] },
@@ -556,13 +530,11 @@ class GameLevelCsPath4Toolchain {
         expectedCommandPattern: /^(mvn|gradle|\.\/gradlew|make)\s+\S+/i,
         expectedCommandPatternByOS: {
           windows: /^\.\/scripts\/\S+/i,
-          kasm: /^\.\/scripts\/\S+/i,
           macos: /^\.\/scripts\/\S+/i,
           linux: /^\.\/scripts\/\S+/i,
         },
         exampleCommandByOS: {
           windows: './scripts/venv.sh',
-          kasm: './scripts/venv.sh',
           macos: './scripts/venv.sh',
           linux: './scripts/venv.sh',
         },
@@ -580,40 +552,32 @@ class GameLevelCsPath4Toolchain {
         position: { x: width * 0.93, y: height * 0.48 },
         narrativeHook: 'Only a fully verified toolchain can reach the summit.',
         instructions: [
-          'Clone the starter project.',
-          'Build it successfully.',
-          'Run the provided test suite.',
-          'Make one commit.',
-          'Push it.',
+          'Go back into your cloned pages repo.',
+          'Activate your environment and open it in your editor.',
+          'Keep your agent running. This station checks that pages is cloned and every tool is installed. You do not commit or push anything.',
         ],
         instructionsByOS: {
           windows: [
             { text: "From your WSL Ubuntu terminal, go back into your project:", commands: ["cd ~/opencs/pages"] },
             { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
             { text: "Open it in your editor:", commands: ["code ."] },
-            { text: "Make one commit and push it (change the message if you like):", commands: ["git add -A && git commit -m \"My first trail commit\"", "git push"] },
-          ],
-          kasm: [
-            { text: "From your Kasm Terminal, go back into your project:", commands: ["cd ~/opencs/pages"] },
-            { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
-            { text: "Open it in your editor:", commands: ["code ."] },
-            { text: "Make one commit and push it (change the message if you like):", commands: ["git add -A && git commit -m \"My first trail commit\"", "git push"] },
+            'Keep your agent running. This station checks that pages is cloned and every tool is installed. You do not commit or push anything.',
           ],
           macos: [
             { text: "From Terminal, go back into your project:", commands: ["cd ~/opencs/pages"] },
             { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
             { text: "Open it in your editor:", commands: ["code ."] },
-            { text: "Make one commit and push it (change the message if you like):", commands: ["git add -A && git commit -m \"My first trail commit\"", "git push"] },
+            'Keep your agent running. This station checks that pages is cloned and every tool is installed. You do not commit or push anything.',
           ],
           linux: [
             { text: "Open a new Terminal (close the old one) and go back into your project:", commands: ["cd ~/opencs/pages"] },
             { text: "Activate your environment:", commands: ["source venv/bin/activate"] },
             { text: "Open it in your editor:", commands: ["code ."] },
-            { text: "Make one commit and push it (change the message if you like):", commands: ["git add -A && git commit -m \"My first trail commit\"", "git push"] },
+            'Keep your agent running. This station checks that pages is cloned and every tool is installed. You do not commit or push anything.',
           ],
         },
-        expectedCommandPattern: /^git\s+push/i,
-        exampleCommand: 'git push',
+        expectedCommandPattern: /^(cd|source|code)(\s+.*)?/i,
+        exampleCommand: 'cd ~/opencs/pages',
         funFact: 'Every station verified end-to-end — your development environment is complete.',
       },
     ];
@@ -968,25 +932,25 @@ class GameLevelCsPath4Toolchain {
     // Mac setup agent trigger: only offered when macOS is the selected OS.
     this.macSetupCheck = new MacSetupCheck();
     this.macSetupCheck.setVisible(this.selectedOS === 'macos');
-    // Linux, Kasm, and Windows/WSL use their own setup-agent panel. The
+    // Linux and Windows/WSL use their own setup-agent panel. The
     // existing macOS component above remains separate and unchanged.
     this.systemSetupCheck = new SystemSetupCheck();
     this.systemSetupCheck.setOS(this.selectedOS);
-    // Red flag: the message names the station the student is working on right now.
-    this.helpFlag = new HelpFlag({
-      getRequest: () => {
+    // Chat helper: answers questions using the station the student is on right now.
+    this.chatHelper = new ChatHelper({
+      levelKey: 'toolchain-trail',
+      mountTo: hudMount,
+      getProgress: () => {
         const stationId = this._getActiveStationId();
         const station = stationId ? this._stationById[stationId] : null;
-        return {
-          levelKey: 'toolchain-trail',
-          station: station?.name || null,
-          message: buildHelpRequestMessage({
-            levelName: 'Toolchain Trail',
-            stationName: station?.name,
-            osLabel: OS_OPTIONS.find((option) => option.id === this.selectedOS)?.label,
-            stuck: stationId ? this.getStationStatus(stationId) === STATION_STATUS.STUCK : false,
-          }),
-        };
+        return buildChatProgress({
+          stations: this.STATIONS,
+          completedIds: this.completedStations,
+          activeStation: station ? this._localizeStation(station) : null,
+          activeStatus: stationId && this.getStationStatus(stationId) === STATION_STATUS.STUCK ? 'stuck' : 'active',
+          failure: this.failureState?.stationId === stationId ? this.failureState : null,
+          osLabel: OS_OPTIONS.find((option) => option.id === this.selectedOS)?.label,
+        });
       },
     });
 
@@ -1116,14 +1080,10 @@ class GameLevelCsPath4Toolchain {
 
       const status = this.getStationStatus(stationId);
 
-      if (status === STATION_STATUS.LOCKED) {
-        await this.showDialogue(`${station.icon} ${station.name}`, [
-          station.isBoss
-            ? 'Integration Summit is sealed until every other station is verified.'
-            : 'This station is still sealed. Complete the earlier stations first.',
-        ]);
-        return;
-      }
+      // Locked stations still show their instructions, flagged as preview-only,
+      // so the whole trail can be walked through. Nothing done here counts.
+      const previewOnly = status === STATION_STATUS.LOCKED;
+      const previewNote = previewOnly ? this._previewNote(station) : null;
 
       if (status === STATION_STATUS.COMPLETE) {
         await this.showDialogue(`${station.icon} ${station.name}`, [
@@ -1145,8 +1105,16 @@ class GameLevelCsPath4Toolchain {
         os: this.selectedOS || 'linux',
         // If StationVerificationTrial supports it, it can call this with the
         // pasted output before onComplete and skip completion when it returns true.
-        onOutputSubmitted: (output) => this._handleTerminalOutput(station.id, output),
+        onOutputSubmitted: (output) => (previewOnly ? true : this._handleTerminalOutput(station.id, output)),
         onComplete: async ({ stationId: completedId, output }) => {
+          if (previewOnly) {
+            this._stationTrialOpen = false;
+            this._openTrialStationId = null;
+            this._previewStationId = null;
+            this._hidePreviewBanner();
+            this.showToast('Preview only. Finish the earlier stations to verify this one.');
+            return;
+          }
           this._stationTrialOpen = false;
           this._openTrialStationId = null;
           this._hidePanelFailureAlert();
@@ -1172,12 +1140,16 @@ class GameLevelCsPath4Toolchain {
           }
         },
         onClose: () => {
+          this._previewStationId = null;
+          this._hidePreviewBanner();
           this._stationTrialOpen = false;
           this._openTrialStationId = null;
           this._hidePanelFailureAlert();
         },
       });
+      this._previewStationId = previewOnly ? station.id : null;
       trial.start();
+      if (previewNote) this._showPreviewBanner(previewNote);
       // Reopening the failing station: show the in-panel alert right away.
       if (this.failureState) this._showPanelFailureAlert();
     };
@@ -1189,9 +1161,13 @@ class GameLevelCsPath4Toolchain {
      */
     this._localizeStation = function (station) {
       const os = this.selectedOS || 'linux';
+      const steps = station.instructionsByOS?.[os] || station.instructions;
+      const instructions = steps.map((step, i) => (
+        i === 0 && typeof step === 'string' ? { bold: step, text: step } : step
+      ));
       return {
         ...station,
-        instructions: station.instructionsByOS?.[os] || station.instructions,
+        instructions,
         exampleCommand: station.exampleCommandByOS?.[os] || station.exampleCommand,
         expectedCommandPattern: station.expectedCommandPatternByOS?.[os] || station.expectedCommandPattern,
       };
@@ -1370,6 +1346,7 @@ class GameLevelCsPath4Toolchain {
     const checkText = (text, path) => {
       if (!text) return;
       if (path.some((n) => n?.id === PROFILE_PANEL_ID)) return;
+      if (this._previewStationId) return; // preview panels never charge a failure
       if (this._stationTrialOpen) this._lastPastedOutput = text;
       if (this.failureState) return; // already locked; clears on a clean verify
       const stationId = this._openTrialStationId || this._getActiveStationId();
@@ -1838,6 +1815,40 @@ class GameLevelCsPath4Toolchain {
     el.style.width = `${Math.max(220, Math.min(320, innerW * scale))}px`;
   }
 
+  /** Text for the preview banner: which station must be finished first. */
+  _previewNote(station) {
+    const firstId = this._nonBossOrder.find((id) => !this.completedStations.has(id));
+    const first = this._stationById[firstId];
+    const needed = first && first.id !== station.id
+      ? `${first.icon} ${first.name}`
+      : 'the earlier stations';
+    return `🔒 PREVIEW ONLY: finish ${needed} first. Nothing you do here counts.`;
+  }
+
+  _showPreviewBanner(message) {
+    this._hidePreviewBanner();
+    const el = document.createElement('div');
+    el.setAttribute('role', 'status');
+    el.textContent = message;
+    el.style.cssText = `
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      z-index: 2147483000; pointer-events: none;
+      width: min(460px, calc(100vw - 32px)); box-sizing: border-box;
+      background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+      border: 2px solid #fef3c7; border-radius: 8px;
+      color: #1f1300; font-family: "Courier New", monospace;
+      font-size: 13px; font-weight: 900; line-height: 1.4; text-align: center;
+      padding: 10px 16px;
+    `;
+    document.body.appendChild(el);
+    this._previewBannerEl = el;
+  }
+
+  _hidePreviewBanner() {
+    this._previewBannerEl?.remove();
+    this._previewBannerEl = null;
+  }
+
   _hideFailureBanner() {
     this._failureBannerEl?.remove();
     this._failureBannerEl = null;
@@ -2046,7 +2057,7 @@ class GameLevelCsPath4Toolchain {
     this._barrierCanvas?.remove();
     this.macSetupCheck?.destroy();
     this.systemSetupCheck?.destroy();
-    this.helpFlag?.destroy();
+    this.chatHelper?.destroy();
     if (this._stuckCheckInterval) clearInterval(this._stuckCheckInterval);
     if (this._setupReportInterval) clearInterval(this._setupReportInterval);
     this._hideLoading();
