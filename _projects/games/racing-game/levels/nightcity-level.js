@@ -2,17 +2,21 @@ import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
+import LapTracker from './LapTracker.js';
 
 class TimeLapScreen extends GameObject {
   constructor(data = {}, gameEnv = null) {
     super(gameEnv);
     this.data = data;
     this.totalLaps = Number.isFinite(data.totalLaps) ? data.totalLaps : 3;
-    this.currentLap = Number.isFinite(data.currentLap) ? data.currentLap : 1;
+    this.currentLap = 1;
     this.startedAt = null;
     this.finishedAt = null;
-    this.lapArmed = false;
-    this.previousPlayerPosition = null;
+    this.lapTracker = new LapTracker({
+      finishLine: { x: 0.5, top: 0.7, bottom: 0.85 },
+      checkpoint: { x: 0.5, top: 0.22, bottom: 0.34 },
+      totalLaps: this.totalLaps,
+    });
     this.player = gameEnv?.gameObjects?.find((object) => object instanceof NightCityPlayer);
     this.panel = { x: 18, y: 18, width: 240, height: 138 };
   }
@@ -38,36 +42,14 @@ class TimeLapScreen extends GameObject {
       x: center.x / this.gameEnv.innerWidth,
       y: center.y / this.gameEnv.innerHeight
     };
-    const finishLineX = 0.5;
-    const finishLineYMin = 0.7;
-    const finishLineYMax = 0.85;
-
-    if (!this.lapArmed) {
-      if (Math.abs(position.x - finishLineX) >= 0.04) {
-        this.lapArmed = true;
-      }
-      this.previousPlayerPosition = position;
-      return;
+    const justFinished = this.lapTracker.update(this.player, position);
+    this.currentLap = Math.min(
+      this.lapTracker.getLapsCompleted(this.player) + 1,
+      this.totalLaps
+    );
+    if (justFinished) {
+      this.finishedAt = now;
     }
-
-    const previousPosition = this.previousPlayerPosition;
-    const crossedFinishLine = previousPosition
-      && ((previousPosition.x < finishLineX && position.x >= finishLineX)
-        || (previousPosition.x > finishLineX && position.x <= finishLineX))
-      && previousPosition.y >= finishLineYMin
-      && previousPosition.y <= finishLineYMax
-      && position.y >= finishLineYMin
-      && position.y <= finishLineYMax;
-
-    if (crossedFinishLine) {
-      this.currentLap = Math.min(this.currentLap + 1, this.totalLaps);
-      this.lapArmed = false;
-      if (this.currentLap >= this.totalLaps) {
-        this.finishedAt = now;
-      }
-    }
-
-    this.previousPlayerPosition = position;
   }
 
   draw() {
@@ -394,7 +376,6 @@ class GameLevelNightcity {
         keypress: { up: 87, left: 65, down: 83, right: 68 } // W, A, S, D
     };
     const timer_data = {
-      currentLap: 1,
       totalLaps: 3
     };
     const trackBarrierData = [
