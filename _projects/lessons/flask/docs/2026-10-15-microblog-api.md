@@ -11,6 +11,14 @@ microblog: true
 
 [Flask API learning path]({{ site.baseurl }}/python/flask/api)
 
+## Before You Start
+
+Microblog is the comment panel on OCS pages, and a Flask API runs it. In this
+lesson you use it first, then read the code behind it, then show its posts on
+a page of your own. If you built the Spring feature in
+[Backend Fullstack Development]({{ site.baseurl }}/fullstack/java/backend),
+you will see the same five parts arranged differently.
+
 ## Read Posts with REST Client
 
 Use the Flask backend's `local` REST Client environment and authenticate with
