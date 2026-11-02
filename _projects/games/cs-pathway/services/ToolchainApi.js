@@ -109,14 +109,13 @@ export function usesLocalBackend() {
   return javaURI.startsWith('http://localhost');
 }
 
-/** The command a student runs for their OS, from inside their pages repository. */
+/**
+ * The command a student runs for their OS, from inside their pages repository.
+ * The launcher checks for Python first and prints how to install it if it is
+ * missing. Windows students run it in WSL Ubuntu, which Terminal Town Gate sets up.
+ */
 export function agentCommands(os) {
   const local = usesLocalBackend() ? ` --server ${javaURI}` : '';
-  if (os === 'windows') {
-    return [
-      { label: 'Ubuntu (WSL) terminal', command: `python3 scripts/toolchain_agent.py${local}` },
-      { label: 'or PowerShell', command: `py scripts\\toolchain_agent.py${local}` },
-    ];
-  }
-  return [{ label: 'Terminal', command: `python3 scripts/toolchain_agent.py${local}` }];
+  const label = os === 'windows' ? 'Ubuntu (WSL) terminal' : 'Terminal';
+  return [{ label, command: `bash scripts/toolchain_agent.sh${local}` }];
 }
