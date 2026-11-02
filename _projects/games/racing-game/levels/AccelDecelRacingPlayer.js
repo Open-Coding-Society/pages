@@ -17,6 +17,7 @@ export default class Player extends EnginePlayer {
     this.deceleration = data.deceleration;
     this.reverseSpeed = data.reverseSpeed;
     this.boostKey = data.boostKey;
+    this.boostLabel = data.boostLabel;
     this.temporarySpeedMultiplier = 1;
     this.slowdownUntil = 0;
     this.boostUntil = 0;
@@ -71,6 +72,10 @@ export default class Player extends EnginePlayer {
     this.boostCooldownUntil = now + BOOST_COOLDOWN;
     this.updateMovementSpeed(now);
     return true;
+  }
+
+  getBoostCharge(now = Date.now()) {
+    return Math.max(0, Math.min(1, 1 - (this.boostCooldownUntil - now) / BOOST_COOLDOWN));
   }
 
   move(now = Date.now()) {
