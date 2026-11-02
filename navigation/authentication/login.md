@@ -140,8 +140,13 @@ show_reading_time: false
 
 <script type="module">
     import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, springEnabled } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { loginReturnPath } from '{{site.baseurl}}/assets/js/api/login-return.js';
+
     import { reverifyNeeded, staffMustVerify, reverify } from '{{site.baseurl}}/assets/js/api/reverify.js';
     import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
+
+    // Capture once so failed attempts and verification steps retain the destination.
+    const returnPath = loginReturnPath(window.location.href, document.referrer, {{ site.baseurl | jsonify }});
 
     let signupFormData = {};
     let verifiedSchoolEmail = null;
@@ -485,13 +490,13 @@ show_reading_time: false
         // login() shows the error in #message and the page stays put.
         Promise.all([javaPromise, pythonPromise]).then(([springLoggedIn, flaskBody]) => {
             const finish = () => {
-                // A limited account (a guest) has no Spring account and no profile: it goes to the home page.
+                // Guests have no profile; direct logins fall back to the home page.
                 if (flaskBody && flaskBody.user && flaskBody.user.limited) {
-                    window.location.href = '{{site.baseurl}}/';
+                    window.location.href = returnPath || '{{site.baseurl}}/';
                     return;
                 }
                 if (springLoggedIn) {
-                    window.location.href = '{{site.baseurl}}/profile';
+                    window.location.href = returnPath || '{{site.baseurl}}/profile';
                     return;
                 }
                 showSpringLoginWarning();
