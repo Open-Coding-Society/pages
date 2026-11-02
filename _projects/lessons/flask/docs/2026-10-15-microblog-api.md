@@ -6,6 +6,7 @@ permalink: /python/flask/api/microblog
 categories: [Flask, Python, APIs]
 lesson_group: Flask
 toc: true
+microblog: true
 ---
 
 [Flask API learning path]({{ site.baseurl }}/python/flask/api)
