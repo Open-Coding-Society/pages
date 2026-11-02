@@ -1,0 +1,32 @@
+{% comment %}
+  Reusable MCQ Runner: one question at a time, with tabs to move between them.
+  code-runner-container lets runner-io.js list, check and bundle it with the code runners, so the
+  lesson's Submit Code sends the last saved answers in the same Gist; data-runner-kind marks it.
+
+  Usage: include runners/mcq.html runner_id="loops-mcq" title="MCQ 1.09" questions=mcq_json
+    runner_id - unique on the page; becomes the answers' file name in the Gist
+    title     - heading above the questions
+    questions - JSON array of { q, code?, choices, answer (index), why?, ref? }. Students can read
+                it in the page source, as with every MCQ on the site. The MCQ_RUNNER notebook
+                marker writes and validates it.
+{% endcomment %}
+{% assign mcq_bundled = false %}
+{% if page.assignment and page.assignment_submission_type == "code" %}{% assign mcq_bundled = true %}{% endif %}
+<div class="code-runner-container mcq-runner-container"
+  id="runner-{{ include.runner_id }}"
+  data-runner-id="{{ include.runner_id }}"
+  data-runner-kind="mcq"
+  data-bundled="{{ mcq_bundled }}"
+  data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+  {% include runners/fragments/challenge-box.html title=include.title challenge="Check each answer as many times as you need. Your last saved answers are the ones submitted." %}
+  <section class="ocs__dnd" data-mcq-root></section>
+  <script type="application/json" data-mcq-questions>{{ include.questions }}</script>
+</div>
+
+<script type="module">
+import { mountMcqRunner } from '{{site.baseurl}}/assets/js/mcq-runner.js';
+
+const container = document.getElementById('runner-{{ include.runner_id }}');
+const questions = JSON.parse(container.querySelector('[data-mcq-questions]').textContent);
+mountMcqRunner(container, questions);
+</script>
