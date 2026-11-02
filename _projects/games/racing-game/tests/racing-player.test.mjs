@@ -183,7 +183,7 @@ test('winter cars use acceleration, reverse-speed, and individual boost keys', (
     assert.equal(car.data.boostLabel, ['F', 'K'][index]);
   }
   assert.equal(winterLevel.classes.at(-1).data.showBoostBars, true);
-  assert.equal(winterLevel.classes.at(-1).data.usePositionForLapTracking, true);
+  assert.deepEqual(winterLevel.classes.at(-1).data.checkpoint, { x: 0.5, top: 0.11, bottom: 0.24 });
 });
 
 test('Winter counts each car crossing the finish line, including after an icicle slowdown', () => {

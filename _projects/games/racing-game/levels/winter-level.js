@@ -143,7 +143,8 @@ class GameLevelWinter {
       totalLaps: 3,
       finishLine: { x: 0.5, top: 0.764, bottom: 0.864 },
       checkpoint: { x: 0.5, top: 0.11, bottom: 0.24 },
-      hudPosition: { x: 0.01, y: 0.02 }
+      hudPosition: { x: 0.01, y: 0.02 },
+      showBoostBars: true
     };
 
     this.classes = [
