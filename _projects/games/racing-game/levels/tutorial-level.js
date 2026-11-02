@@ -99,9 +99,6 @@ class GameLevelTutorial {
       { class: TimeLapScreen, data: lap_data }
     ];
   }
-  destroy () {
-    cleanupRacingLevel(this.gameEnv);
-  }
 }
 
 export default GameLevelTutorial; 

@@ -290,8 +290,6 @@ class GameLevelWinter {
     this.countdownOverlay?.remove();
     this.countdownOverlay = null;
     delete this.gameEnv.winterRaceStarted;
-    cleanupRacingLevel(this.gameEnv);
-
   }
 }
 
