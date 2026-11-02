@@ -3,11 +3,13 @@ import { AUTUMN_BOT_GENOME } from './AutumnBotGenome.js';
 import {
   createEasyRoute,
   createRouteFromGenome,
+  createSuperEasyRoute,
   getBotControls,
   hasReachedRouteWaypoint,
 } from './AutumnBotGenetics.js';
 
 const MODES = {
+  superEasy: { label: 'Super easy bot' },
   hardcoded: { label: 'Easy bot' },
   ai: { label: 'Hard bot' },
 };
@@ -39,7 +41,7 @@ export default class RacingBot extends PlayerCar {
     this.waypointIndex = 1;
     this.route = mode === 'ai'
       ? createRouteFromGenome(AUTUMN_BOT_GENOME)
-      : createEasyRoute();
+      : mode === 'superEasy' ? createSuperEasyRoute() : createEasyRoute();
   }
 
   updateBotControls() {

@@ -84,6 +84,13 @@ export default class RaceDifficultyPrompt extends GameObject {
     this.styleButton(this.easyButton, '#166534', '#86efac');
     this.easyButton.addEventListener('click', () => this.startRace('hardcoded'));
 
+    this.superEasyButton = document.createElement('button');
+    this.superEasyButton.type = 'button';
+    this.superEasyButton.className = 'racing-difficulty__button';
+    this.superEasyButton.textContent = 'Super Easy';
+    this.styleButton(this.superEasyButton, '#854d0e', '#fde047');
+    this.superEasyButton.addEventListener('click', () => this.startRace('superEasy'));
+
     this.hardButton = document.createElement('button');
     this.hardButton.type = 'button';
     this.hardButton.className = 'racing-difficulty__button';
@@ -91,7 +98,7 @@ export default class RaceDifficultyPrompt extends GameObject {
     this.styleButton(this.hardButton, '#1d4ed8', '#93c5fd');
     this.hardButton.addEventListener('click', () => this.startRace('ai'));
 
-    buttons.append(this.easyButton, this.hardButton);
+    buttons.append(this.superEasyButton, this.easyButton, this.hardButton);
     content.append(title, description, buttons);
     element.appendChild(content);
     return element;

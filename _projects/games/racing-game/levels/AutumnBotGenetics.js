@@ -47,6 +47,7 @@ const MAX_LATERAL_OFFSET = 0.08;
 const LEGACY_MAX_LATERAL_OFFSET = 0.028;
 const REACH_DISTANCE = 0.025;
 const EASY_TARGET_SPEED = 2.4;
+const SUPER_EASY_TARGET_SPEED = 1.2;
 const CAR_SIZE = 360 / 10;
 const BARRIER_SEGMENTS_PER_SECTION = 24;
 const BARRIER_COLLISION_RADIUS = CAR_SIZE * (1 - RACING_CAR_HITBOX.widthPercentage) / 2
@@ -231,6 +232,16 @@ export function createEasyRoute() {
   ];
 }
 
+export function createSuperEasyRoute() {
+  const route = createEasyRoute();
+  route.splice(1, 0,
+    { x: 0.55, y: 0.86 },
+    { x: 0.44, y: 0.86 },
+    { x: 0.53, y: 0.86 },
+  );
+  return route;
+}
+
 function getSafeSteering({ position, heading, speed, desiredSteer, route, width, height }) {
   const grid = getBarrierIndex(width, height);
   const candidateSteers = [-1, 0, 1];
@@ -364,7 +375,7 @@ export function getBotControls({
   });
   const targetSpeed = mode === 'ai'
     ? RACING_CAR_PHYSICS.maxSpeed * point.speedFraction * Math.max(0.35, 1 - Math.abs(headingError) / Math.PI)
-    : EASY_TARGET_SPEED;
+    : mode === 'superEasy' ? SUPER_EASY_TARGET_SPEED : EASY_TARGET_SPEED;
   return {
     steer: steering.steer,
     throttle: speed < targetSpeed - 0.1 ? 1 : speed > targetSpeed + 0.1 ? -1 : 0,
@@ -382,7 +393,7 @@ export function createInitialGenome() {
 export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFrames = 3000 } = {}) {
   const route = mode === 'ai'
     ? createRouteFromGenome(genome)
-    : createEasyRoute();
+    : mode === 'superEasy' ? createSuperEasyRoute() : createEasyRoute();
   const position = { x: 0.4 * 643, y: 0.82 * 360 };
   const car = {};
   const lapTracker = new LapTracker({
