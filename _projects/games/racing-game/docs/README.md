@@ -16,9 +16,9 @@ Overall Kanban Board: <https://github.com/orgs/cssedelnortetri2027/projects/1>
 The tutorial course is a two-player race:
 
 - Red car: steer with **WASD** and press **F** for a 30% speed boost lasting 3 seconds.
-- Autumn level: race the blue car by steering the red car with **WASD**. Choose **Easy** for the
-  simpler racing line or **Hard** for the offline-trained genetic-algorithm controller on the
-  setup screen before the race begins.
+- Autumn level: race the blue car by steering the red car with **WASD**. Choose **Super Easy** for
+  a deliberately slow, indirect route, **Easy** for the simpler racing line, or **Hard** for the
+  offline-trained genetic-algorithm controller on the setup screen before the race begins.
 - Other levels continue to use the arrow keys to control the blue car.
 
 Each car's boost then recharges for 5 seconds. Its matching red or blue meter sits at the
