@@ -120,6 +120,35 @@ Answer these in the Microblog panel on this page:
 2. `put` checks that the caller owns the post. Which Spring file would hold
    that check?
 
+## Popcorn Hack 3: Show Posts with UI Builder
+
+UI Builder never sends sign-in cookies, so `GET /api/microblog` will not work
+there: it needs `token_required()`. Find `TopicAPI._PageMicroblogs` in
+`api/microblog_api.py`. Its `get` has no `token_required()`, but it still checks
+the topic first:
+
+| Response | Reason |
+| --- | --- |
+| 200 | The topic exists and allows anonymous viewers |
+| 401 | The topic does not allow anonymous viewers and nobody is signed in |
+| 404 | No topic has this key yet |
+
+Your Popcorn Hack 1 post sent a `topicPath`, so the create handler made this
+page's topic with `allow_anonymous=True`. `Topic._generate_page_key` then turned
+`/python/flask/api/microblog` into the key `python_flask_api_microblog`.
+
+1. Sign in, open [UI Builder]({{ site.baseurl }}/ui-builder/), and start from the
+   **Flask API starter** template.
+2. In **Data from your API**, change the link to
+   `https://flask.opencodingsociety.com/api/microblog/page/python_flask_api_microblog`
+   and press **Test connection**. A 404 means nobody has posted on this page yet.
+3. Read the warning about `userUid`. This route is public, so everyone can read
+   what it returns, and a response should only carry fields a stranger may see.
+4. Choose how to show the posts, then press **Code** to read the `ocs__` classes
+   behind your page.
+
+These are manual checks, so inspect the status and the posts yourself.
+
 ## Continue by Reading the Repository
 
 Choose a reply, reaction, or topic resource in this same source file. Apply
