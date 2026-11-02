@@ -1,5 +1,13 @@
-import { RACING_CAR_HITBOX, RACING_CAR_PHYSICS } from './RacingCarPhysics.js';
-import { AUTUMN_SPLINE_BARRIER_POINTS, AUTUMN_SPLINE_COLLISION_WIDTH } from './AutumnTrackGeometry.js';
+import {
+  getRacingTurnRate,
+  RACING_CAR_HITBOX,
+  RACING_CAR_PHYSICS,
+} from './RacingCarPhysics.js';
+import {
+  AUTUMN_SPLINE_BARRIER_POINTS,
+  AUTUMN_SPLINE_COLLISION_WIDTH,
+  AUTUMN_TRACK_OBSTACLES,
+} from './AutumnTrackGeometry.js';
 import { AUTUMN_BOT_GENOME } from './AutumnBotGenome.js';
 import LapTracker from './LapTracker.js';
 
@@ -32,10 +40,11 @@ export const AUTUMN_TRACK_CENTERLINE = [
   { x: 0.075, y: 0.68 },
   { x: 0.075, y: 0.78 },
   { x: 0.14, y: 0.86 },
-  { x: 0.25, y: 0.86 },
+  { x: 0.27, y: 0.837 },
 ];
 
-const MAX_LATERAL_OFFSET = 0.028;
+const MAX_LATERAL_OFFSET = 0.08;
+const LEGACY_MAX_LATERAL_OFFSET = 0.028;
 const REACH_DISTANCE = 0.025;
 const EASY_TARGET_SPEED = 2.4;
 const CAR_SIZE = 360 / 10;
@@ -46,6 +55,21 @@ const BARRIER_SAFE_DISTANCE = BARRIER_COLLISION_RADIUS + 17;
 const BARRIER_STEERING_MARGIN = 2;
 const BARRIER_GRID_CELL_SIZE = 32;
 const AVOIDANCE_LOOKAHEAD_FRAMES = 12;
+const CAR_COLLISION_RADIUS = Math.min(
+  CAR_SIZE * (1 - RACING_CAR_HITBOX.widthPercentage),
+  CAR_SIZE * (1 - RACING_CAR_HITBOX.heightPercentage),
+) / 2;
+const OBSTACLE_COLLISION_RADIUS = Math.min(
+  CAR_SIZE * (1 - AUTUMN_TRACK_OBSTACLES.box.hitbox.widthPercentage),
+  CAR_SIZE * (1 - AUTUMN_TRACK_OBSTACLES.box.hitbox.heightPercentage),
+) / 2;
+const OBSTACLE_STEERING_MARGIN = 0.5;
+const OBSTACLE_CONTACT_PENALTY = 10000;
+const BARRIER_CONTACT_PENALTY = 10000;
+const AUTUMN_TRACK_OBSTACLE_CENTERS = Object.values(AUTUMN_TRACK_OBSTACLES).map(({ position }) => ({
+  x: position.x,
+  y: position.y,
+}));
 
 function catmullRom(p0, p1, p2, p3, t) {
   const t2 = t * t;
@@ -181,6 +205,32 @@ function getNearestPoint(point, grid) {
   return nearest;
 }
 
+function getObstacleClearance(position, width, height) {
+  return Math.min(...AUTUMN_TRACK_OBSTACLE_CENTERS.map(({ x, y }) => (
+    Math.hypot(position.x - (x * width + CAR_SIZE / 2), position.y - (y * height + CAR_SIZE / 2))
+      - CAR_COLLISION_RADIUS
+      - OBSTACLE_COLLISION_RADIUS
+  )));
+}
+
+function addConeDetour(route, includeApproach = true) {
+  const lastPoint = route.at(-1);
+  return [
+    ...route.slice(0, -1),
+    ...(includeApproach ? [{ x: 0.2, y: 0.842, speedFraction: lastPoint.speedFraction }] : []),
+    lastPoint,
+    { x: 0.38, y: lastPoint.y, speedFraction: lastPoint.speedFraction },
+  ];
+}
+
+export function createEasyRoute() {
+  return [
+    ...AUTUMN_TRACK_CENTERLINE,
+    { x: 0.31, y: 0.825 },
+    { x: 0.36, y: 0.837 },
+  ];
+}
+
 function getSafeSteering({ position, heading, speed, desiredSteer, route, width, height }) {
   const grid = getBarrierIndex(width, height);
   const candidateSteers = [-1, 0, 1];
@@ -189,28 +239,36 @@ function getSafeSteering({ position, heading, speed, desiredSteer, route, width,
     let predictedHeading = heading;
     let predictedSpeed = speed;
     let minimumDistance = Infinity;
+    let minimumObstacleClearance = Infinity;
     let totalRouteDeviation = 0;
 
     for (let frame = 0; frame < AVOIDANCE_LOOKAHEAD_FRAMES; frame += 1) {
       predictedSpeed = Math.min(predictedSpeed + RACING_CAR_PHYSICS.acceleration, RACING_CAR_PHYSICS.maxSpeed);
-      predictedHeading += steer * RACING_CAR_PHYSICS.turnRate;
+      predictedHeading += steer * getRacingTurnRate(predictedSpeed);
       predictedPosition.x += Math.sin(predictedHeading) * predictedSpeed;
       predictedPosition.y -= Math.cos(predictedHeading) * predictedSpeed;
       const nearest = getNearestPoint(predictedPosition, grid);
       if (nearest) minimumDistance = Math.min(minimumDistance, nearest.distance);
+      minimumObstacleClearance = Math.min(
+        minimumObstacleClearance,
+        getObstacleClearance(predictedPosition, width, height),
+      );
       totalRouteDeviation += distanceToRoute(predictedPosition, route, width, height);
     }
 
     return {
       steer,
       minimumDistance,
+      minimumObstacleClearance,
       score: Math.min(minimumDistance, BARRIER_SAFE_DISTANCE)
         - totalRouteDeviation / AVOIDANCE_LOOKAHEAD_FRAMES * 2
         - Math.abs(steer - desiredSteer) * 2,
+      obstaclePenalty: Math.max(0, OBSTACLE_STEERING_MARGIN - minimumObstacleClearance) * 4,
     };
   });
   const desiredCandidate = predictedDistances.find(({ steer }) => steer === desiredSteer);
-  if (desiredCandidate.minimumDistance >= BARRIER_COLLISION_RADIUS + BARRIER_STEERING_MARGIN) {
+  if (desiredCandidate.minimumDistance >= BARRIER_COLLISION_RADIUS + BARRIER_STEERING_MARGIN
+      && desiredCandidate.minimumObstacleClearance >= OBSTACLE_STEERING_MARGIN) {
     return {
       steer: desiredSteer,
       minimumDistance: desiredCandidate.minimumDistance,
@@ -218,11 +276,16 @@ function getSafeSteering({ position, heading, speed, desiredSteer, route, width,
   }
 
   const chosen = predictedDistances.reduce((best, candidate) => {
-    return candidate.score > best.score ? candidate : best;
+    return candidate.score - candidate.obstaclePenalty > best.score - best.obstaclePenalty
+      ? candidate
+      : best;
   });
 
   return {
-    steer: chosen.minimumDistance > desiredCandidate.minimumDistance ? chosen.steer : desiredSteer,
+    steer: chosen.score - chosen.obstaclePenalty
+      > desiredCandidate.score - desiredCandidate.obstaclePenalty
+      ? chosen.steer
+      : desiredSteer,
     minimumDistance: chosen.minimumDistance,
   };
 }
@@ -232,18 +295,19 @@ export function createRouteFromGenome(genome) {
     throw new TypeError('Autumn bot genome has an invalid shape');
   }
 
-  return AUTUMN_TRACK_CENTERLINE.map((point, index) => {
+  const route = AUTUMN_TRACK_CENTERLINE.map((point, index) => {
     const normal = getNormal(
       AUTUMN_TRACK_CENTERLINE[(index - 1 + AUTUMN_TRACK_CENTERLINE.length) % AUTUMN_TRACK_CENTERLINE.length],
       AUTUMN_TRACK_CENTERLINE[(index + 1) % AUTUMN_TRACK_CENTERLINE.length],
     );
-    const offset = genome.offsets[index] * MAX_LATERAL_OFFSET * 360;
+    const offset = genome.offsets[index] * (genome.offsetScale ?? LEGACY_MAX_LATERAL_OFFSET) * 360;
     return {
       x: point.x + normal.x * offset / 643,
       y: point.y + normal.y * offset / 360,
       speedFraction: genome.speedFractions[index],
     };
   });
+  return addConeDetour(route);
 }
 
 function isValidGenome(genome) {
@@ -253,7 +317,11 @@ function isValidGenome(genome) {
     && genome.offsets.length === AUTUMN_TRACK_CENTERLINE.length
     && genome.speedFractions.length === AUTUMN_TRACK_CENTERLINE.length
     && !genome.offsets.some((value) => !Number.isFinite(value) || value < -1 || value > 1)
-    && !genome.speedFractions.some((value) => !Number.isFinite(value) || value < 0.35 || value > 1);
+    && !genome.speedFractions.some((value) => !Number.isFinite(value) || value < 0.35 || value > 1)
+    && (genome.offsetScale === undefined
+      || (Number.isFinite(genome.offsetScale)
+        && genome.offsetScale >= LEGACY_MAX_LATERAL_OFFSET
+        && genome.offsetScale <= MAX_LATERAL_OFFSET));
 }
 
 export function hasReachedRouteWaypoint(position, route, waypointIndex, width, height, reachDistance) {
@@ -283,7 +351,7 @@ export function getBotControls({
   const targetY = point.y * height - position.y;
   const desiredHeading = Math.atan2(targetX, -targetY);
   const headingError = normalizeAngle(desiredHeading - heading);
-  const steerThreshold = 0.12;
+  const steerThreshold = 0.03;
   const desiredSteer = headingError > steerThreshold ? 1 : headingError < -steerThreshold ? -1 : 0;
   const steering = getSafeSteering({
     position,
@@ -307,13 +375,14 @@ export function createInitialGenome() {
   return {
     offsets: AUTUMN_TRACK_CENTERLINE.map(() => 0),
     speedFractions: AUTUMN_TRACK_CENTERLINE.map(() => 0.82),
+    offsetScale: MAX_LATERAL_OFFSET,
   };
 }
 
 export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFrames = 3000 } = {}) {
   const route = mode === 'ai'
     ? createRouteFromGenome(genome)
-    : AUTUMN_TRACK_CENTERLINE;
+    : createEasyRoute();
   const position = { x: 0.4 * 643, y: 0.82 * 360 };
   const car = {};
   const lapTracker = new LapTracker({
@@ -325,6 +394,7 @@ export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFram
   let speed = 0;
   let waypointIndex = 1;
   let barrierContacts = 0;
+  let obstacleContacts = 0;
   const lapFrames = [];
 
   for (let frame = 0; frame < maxFrames; frame += 1) {
@@ -354,16 +424,14 @@ export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFram
         ? Math.max(speed - RACING_CAR_PHYSICS.coasting, 0)
         : Math.min(speed + RACING_CAR_PHYSICS.coasting, 0);
     }
-    if (speed !== 0) heading += control.steer * RACING_CAR_PHYSICS.turnRate * Math.sign(speed);
+    if (speed !== 0) heading += control.steer * getRacingTurnRate(speed) * Math.sign(speed);
     position.x += Math.sin(heading) * speed;
     position.y -= Math.cos(heading) * speed;
     position.x = Math.min(Math.max(position.x, 0), 643 - CAR_SIZE);
     position.y = Math.min(Math.max(position.y, 0), 360 - CAR_SIZE);
 
-    const nearest = getNearestPoint(
-      { x: position.x + CAR_SIZE / 2, y: position.y + CAR_SIZE / 2 },
-      getBarrierIndex(643, 360),
-    );
+    let collisionCenter = { x: position.x + CAR_SIZE / 2, y: position.y + CAR_SIZE / 2 };
+    const nearest = getNearestPoint(collisionCenter, getBarrierIndex(643, 360));
     if (nearest && nearest.distance < BARRIER_COLLISION_RADIUS) {
       barrierContacts += 1;
       const direction = nearest.distance > 0
@@ -372,7 +440,10 @@ export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFram
       const correction = BARRIER_COLLISION_RADIUS - nearest.distance;
       position.x += direction.x * correction;
       position.y += direction.y * correction;
+      collisionCenter = { x: position.x + CAR_SIZE / 2, y: position.y + CAR_SIZE / 2 };
     }
+    const obstacleClearance = getObstacleClearance(collisionCenter, 643, 360);
+    if (obstacleClearance < 0) obstacleContacts += 1;
 
     if (lapTracker.update(car, {
       x: (position.x + CAR_SIZE / 2) / 643,
@@ -384,6 +455,7 @@ export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFram
         seconds: (frame + 1) / 60,
         lapsCompleted: lapTracker.getLapsCompleted(car),
         barrierContacts,
+        obstacleContacts,
         lapFrames,
       };
     }
@@ -397,13 +469,16 @@ export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFram
     seconds: maxFrames / 60,
     lapsCompleted: lapTracker.getLapsCompleted(car),
     barrierContacts,
+    obstacleContacts,
     lapFrames,
   };
 }
 
 export function scoreGenome(genome) {
   const result = simulateAutumnRace({ mode: 'ai', genome, totalLaps: 3, maxFrames: 1500 });
-  const collisionPenalty = result.barrierContacts * 10;
+  const collisionPenalty = result.barrierContacts * BARRIER_CONTACT_PENALTY
+    + result.obstacleContacts * OBSTACLE_CONTACT_PENALTY;
+  if (result.completed && collisionPenalty === 0) return 2_000_000 - result.frames;
   if (result.completed) return 1_000_000 - result.frames - collisionPenalty;
   return result.lapsCompleted * 300_000 - result.frames - collisionPenalty;
 }
@@ -412,10 +487,14 @@ export function evolveAutumnBot({
   generations = 80,
   populationSize = 48,
   seed = 20261030,
+  seedGenomes = [],
 } = {}) {
   if (!Number.isInteger(generations) || generations < 1
       || !Number.isInteger(populationSize) || populationSize < 4) {
     throw new RangeError('Training needs generations >= 1 and populationSize >= 4');
+  }
+  if (!Array.isArray(seedGenomes)) {
+    throw new TypeError('Training seedGenomes must be an array');
   }
 
   let randomSeed = seed >>> 0;
@@ -428,19 +507,42 @@ export function evolveAutumnBot({
       value + (random() < rate ? (random() * 2 - 1) * 0.35 : 0)))),
     speedFractions: genome.speedFractions.map((value) => Math.max(0.35, Math.min(1,
       value + (random() < rate ? (random() * 2 - 1) * 0.2 : 0)))),
+    offsetScale: MAX_LATERAL_OFFSET,
   });
   const crossover = (first, second) => ({
     offsets: first.offsets.map((value, index) => random() < 0.5 ? value : second.offsets[index]),
     speedFractions: first.speedFractions.map((value, index) => random() < 0.5 ? value : second.speedFractions[index]),
+    offsetScale: MAX_LATERAL_OFFSET,
   });
 
-  const savedGenome = isValidGenome(AUTUMN_BOT_GENOME) ? AUTUMN_BOT_GENOME : createInitialGenome();
-  let population = Array.from({ length: populationSize }, (_, index) => {
-    if (index === 0) return savedGenome;
-    if (index === 1) return createInitialGenome();
-    const seedGenome = index % 2 === 0 ? savedGenome : createInitialGenome();
-    return mutate(seedGenome, index % 2 === 0 ? 0.25 : 1);
-  });
+  const normalizeSeedGenome = (genome) => {
+    if (!isValidGenome(genome)) {
+      throw new TypeError('Autumn bot seed genome has an invalid shape');
+    }
+
+    return {
+      ...genome,
+      offsets: genome.offsets.map((value) => (
+        genome.offsetScale === undefined
+          ? value * LEGACY_MAX_LATERAL_OFFSET / MAX_LATERAL_OFFSET
+          : value
+      )),
+      offsetScale: MAX_LATERAL_OFFSET,
+    };
+  };
+  const startingGenomes = [
+    isValidGenome(AUTUMN_BOT_GENOME)
+      ? normalizeSeedGenome(AUTUMN_BOT_GENOME)
+      : createInitialGenome(),
+    ...seedGenomes.map(normalizeSeedGenome),
+    createInitialGenome(),
+  ];
+  let population = startingGenomes.slice(0, populationSize);
+  while (population.length < populationSize) {
+    const index = population.length;
+    const seedGenome = startingGenomes[index % startingGenomes.length];
+    population.push(mutate(seedGenome, index % 2 === 0 ? 0.25 : 1));
+  }
   let best = null;
   let bestScore = -Infinity;
   const history = [];

@@ -34,9 +34,11 @@ node _projects/games/racing-game/scripts/train-autumn-bot.mjs
 ```
 
 The trainer uses a deterministic seed and defaults to 80 generations of 48 candidate controllers.
-It evaluates three-lap races, penalizes spline contacts, and warm-starts from the currently saved
-genome. It writes the best genome back to `levels/AutumnBotGenome.js`, which the racing-game build
-copies with the other level scripts. A smaller search is useful for a quicker local run:
+It evaluates three-lap races against the spline barriers, box, and cone, with the same car
+dimensions and steering response as the game. It ranks clean completed races ahead of all runs
+with barrier or obstacle contacts, then minimizes race time. It warm-starts from the currently
+saved genome and writes the best genome back to `levels/AutumnBotGenome.js`, which the racing-game
+build copies with the other level scripts. A smaller search is useful for a quicker local run:
 
 ```sh
 node _projects/games/racing-game/scripts/train-autumn-bot.mjs --generations=32 --population=32 --seed=20261030
@@ -48,11 +50,9 @@ You can spend more local CPU time for a larger search, for example:
 node _projects/games/racing-game/scripts/train-autumn-bot.mjs --generations=300 --population=96 --seed=20261030
 ```
 
-The fitness function rewards completing three laps quickly and penalizes spline-barrier contacts;
-incomplete races rank below completed ones. The offline simulator and both cars share the same
-acceleration, braking, coasting, reverse, steering, maximum-speed, and hitbox settings. The simulator
-uses the same autumn spline geometry and push-out response as the game. Difficulty is chosen on a
-paused setup screen before the race starts; movement keys are ignored until a choice is made. The
-simulator still approximates browser timing and collisions, so verify a newly trained genome in the
-game before publishing it. A genetic algorithm finds the best controller in its search, not a
-guaranteed globally optimal route.
+The offline simulator and both cars share the same acceleration, braking, coasting, reverse,
+steering, maximum-speed, and hitbox settings. It uses the same autumn spline geometry and push-out
+response as the game. Difficulty is chosen on a paused setup screen before the race starts; movement
+keys are ignored until a choice is made. The simulator still approximates browser timing and
+collisions, so verify a newly trained genome in the game before publishing it. A genetic algorithm
+finds the best controller in its search, not a guaranteed globally optimal route.

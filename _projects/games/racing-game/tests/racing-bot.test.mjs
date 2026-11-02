@@ -6,6 +6,7 @@ import { AUTUMN_BOT_GENOME } from '../levels/AutumnBotGenome.js';
 import {
   AUTUMN_TRACK_CENTERLINE,
   createInitialGenome,
+  createEasyRoute,
   createRouteFromGenome,
   evolveAutumnBot,
   getBotControls,
@@ -17,7 +18,10 @@ import { createKeyboardPlayer, pressKey } from '@assets/js/GameEnginev1.1/test/k
 import { RACING_CAR_HITBOX, RACING_CAR_PHYSICS } from '../levels/RacingCarPhysics.js';
 import PlayerCar from '../levels/PlayerCar.js';
 import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
-import { AUTUMN_SPLINE_BARRIER_POINTS } from '../levels/AutumnTrackGeometry.js';
+import {
+  AUTUMN_SPLINE_BARRIER_POINTS,
+  AUTUMN_TRACK_OBSTACLES,
+} from '../levels/AutumnTrackGeometry.js';
 import RaceDifficultyPrompt from '../levels/RaceDifficultyPrompt.js';
 
 const keys = { up: 38, left: 37, down: 40, right: 39 };
@@ -33,7 +37,7 @@ function fixture(mode = 'hardcoded') {
     speed: mode === 'hardcoded' ? 2 : 4,
     waypointIndex: 1,
     mode,
-    route: mode === 'ai' ? createRouteFromGenome(AUTUMN_BOT_GENOME) : AUTUMN_TRACK_CENTERLINE,
+    route: mode === 'ai' ? createRouteFromGenome(AUTUMN_BOT_GENOME) : createEasyRoute(),
     position: { x: 0.4 * 643, y: 0.86 * 360 },
     width: 10,
     height: 10,
@@ -44,13 +48,14 @@ function fixture(mode = 'hardcoded') {
   return bot;
 }
 
-test('hardcoded mode follows the fixed racing line and accelerates', () => {
+test('hardcoded mode accelerates and chooses a safe turn', () => {
   const bot = fixture('hardcoded');
   bot.updateBotControls();
 
   assert.equal(bot.pressedKeys[keys.up], true);
   assert.equal(bot.pressedKeys[keys.down], undefined);
-  assert.equal(bot.pressedKeys[keys.right], true);
+  assert.equal(bot.pressedKeys[keys.left], true);
+  assert.equal(bot.pressedKeys[keys.right], undefined);
 });
 
 test('both bot routes steer away from the autumn spline geometry', () => {
@@ -70,14 +75,15 @@ test('both bot routes steer away from the autumn spline geometry', () => {
   assert.ok(controls.every(({ steer }) => steer !== 0), 'both modes must steer away from a nearby barrier');
 });
 
-test('both bot difficulties complete three laps without spline barrier contacts', () => {
+test('both bot difficulties complete three laps without track or scenery contacts', () => {
   for (const mode of ['hardcoded', 'ai']) {
     const result = simulateAutumnRace({ mode, genome: AUTUMN_BOT_GENOME });
     assert.equal(result.completed, true, `${mode} should complete three laps`);
     assert.equal(result.lapsCompleted, 3);
     assert.equal(result.barrierContacts, 0, `${mode} must avoid the spline barriers`);
+    assert.equal(result.obstacleContacts, 0, `${mode} must avoid the box and cone`);
     if (mode === 'ai') {
-      assert.ok(result.seconds <= 16, `hard bot took ${result.seconds}s`);
+      assert.ok(result.seconds <= 17, `hard bot took ${result.seconds}s`);
     }
   }
 });
@@ -220,6 +226,16 @@ test('only the blue car on the autumn level is controlled by the bot', () => {
   assert.deepEqual(cars[1].data.hitbox, RACING_CAR_HITBOX);
   const barriers = level.classes.filter(({ class: ObjectClass }) => ObjectClass === SplineBarrier);
   assert.deepEqual(barriers.map(({ data }) => data.splinePoints), AUTUMN_SPLINE_BARRIER_POINTS);
+  const obstacles = level.classes
+    .filter(({ data }) => data.id === 'box-1' || data.id === 'cone-1');
+  assert.deepEqual(obstacles.map(({ data }) => data.INIT_POSITION), [
+    AUTUMN_TRACK_OBSTACLES.box.position,
+    AUTUMN_TRACK_OBSTACLES.cone.position,
+  ]);
+  assert.deepEqual(obstacles.map(({ data }) => data.hitbox), [
+    AUTUMN_TRACK_OBSTACLES.box.hitbox,
+    AUTUMN_TRACK_OBSTACLES.cone.hitbox,
+  ]);
 });
 
 test('restarting Autumn destroys every old game object and removes stale car canvases', () => {
@@ -293,6 +309,13 @@ test('genetic training is repeatable for the same seed and completes a simulated
 
 test('saved offline genome beats the untrained centerline baseline', () => {
   assert.ok(scoreGenome(AUTUMN_BOT_GENOME) > scoreGenome(createInitialGenome()));
+});
+
+test('saved offline genome avoids both scenery obstacles in three laps', () => {
+  const result = simulateAutumnRace({ mode: 'ai', genome: AUTUMN_BOT_GENOME });
+
+  assert.equal(result.completed, true);
+  assert.equal(result.obstacleContacts, 0);
 });
 
 test('genome route and steering controls reject invalid training data', () => {

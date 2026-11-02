@@ -24,6 +24,6 @@ await writeFile(outputPath, source);
 console.log(`Saved evolved controller to ${path.relative(process.cwd(), outputPath)}`);
 console.log(`Seed ${training.seed}; ${training.generations} generations; population ${training.populationSize}`);
 console.log(`Best score: ${training.score}; ${training.result.completed
-  ? `${training.result.lapsCompleted} laps in ${training.result.frames} simulated frames (${(training.result.frames / 60).toFixed(2)} simulated seconds), ${training.result.barrierContacts} spline contacts`
+  ? `${training.result.lapsCompleted} laps in ${training.result.frames} simulated frames (${(training.result.frames / 60).toFixed(2)} simulated seconds), ${training.result.barrierContacts} spline contacts, ${training.result.obstacleContacts} obstacle contacts`
   : `${training.result.lapsCompleted} laps completed; three-lap race not finished`}`);
 console.log(`Generation 1: ${training.history[0].score}; final generation: ${training.history.at(-1).score}`);
