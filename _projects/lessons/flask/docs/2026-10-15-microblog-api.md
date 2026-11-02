@@ -159,3 +159,19 @@ After Jokes, Users, and Microblog, the Flask source code is the API learning
 reference. Use your existing project discussion to explain your trace and
 compare the contract with the observed response, rather than looking for
 another standalone API tutorial.
+
+## Study This With AI
+
+Paste `api/microblog_api.py` and `model/microblog.py` into your AI tool, then
+check its answers against the code. Never paste passwords, tokens, or your
+`.env` file.
+
+- **Draw it:** Draw a Mermaid sequence diagram of one POST to /api/microblog,
+  from the browser through the handler and model to the database and back.
+- **Quiz me:** Ask me 5 questions, one at a time, on which GET branch wins when
+  a request sends more than one filter. Tell me what I missed.
+- **Compare it:** Show where a Spring service would hold the rules in this
+  handler, and what Flask gains and loses by keeping them there.
+- **Break it:** List 3 requests that would fail on this API and the status code
+  each returns. I will test them in my `.http` file and tell you where you were
+  wrong.
