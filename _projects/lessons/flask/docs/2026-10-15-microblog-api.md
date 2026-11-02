@@ -89,15 +89,16 @@ Follow one retrieval branch into `MicroBlog.search_content`, `get_by_topic`,
 `get_by_user`, or `get_all`. For the page-path branch, identify the lookup in
 `Topic` before the post retrieval call.
 
-Read the create handler without sending a real create request: optional
+Read the create handler with your Popcorn Hack 1 request beside it: optional
 `topicPath` can trigger `Topic.get_or_create_for_page`, then a `MicroBlog`
 instance is created and its model methods produce response data. Identify
 the inputs and returned values at each boundary.
 
 That is the model scope of this lesson. Table design, joins, relationships,
 SQLAlchemy queries, and migrations belong in a separate database series.
-Actual writes should use disposable, authorized development records with a
-cleanup plan; they are not required for the read and validation checks above.
+Beyond your one post in the panel, actual writes should use disposable,
+authorized development records with a cleanup plan; they are not required for
+the read and validation checks above.
 
 ## Continue by Reading the Repository
 
