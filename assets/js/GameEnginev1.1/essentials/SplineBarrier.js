@@ -1,4 +1,5 @@
 import GameObject from './GameObject.js';
+import Player from './Player.js';
 
 /**
  * @class SplineBarrier
@@ -93,10 +94,8 @@ class SplineBarrier extends GameObject {
     }
 
     resolvePlayerCollision() {
-        // Every Player is blocked, so multiplayer levels cannot drive through the barrier.
-        const players = this.gameEnv.gameObjects.filter(
-            (object) => object?.isPlayer === true || object?.constructor?.name === 'Player'
-        );
+        // Player subclasses must also be blocked, including game-specific cars.
+        const players = this.gameEnv.gameObjects.filter((object) => object instanceof Player);
         if (players.length === 0) return;
 
         const curvePoints = SplineBarrier.getCurvePoints(this.getCanvasPoints());

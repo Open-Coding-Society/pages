@@ -56,3 +56,8 @@ response as the game. Difficulty is chosen on a paused setup screen before the r
 keys are ignored until a choice is made. The simulator still approximates browser timing and
 collisions, so verify a newly trained genome in the game before publishing it. A genetic algorithm
 finds the best controller in its search, not a guaranteed globally optimal route.
+## Tutorial Level
+- Blue car: steer with the **arrow keys** and press **Shift** for a 30% speed boost lasting 3 seconds.
+
+Each car's boost then recharges for 5 seconds. Its matching red or blue meter sits at the
+corresponding edge of the screen and fills as the boost becomes available again.
