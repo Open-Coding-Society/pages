@@ -9,6 +9,7 @@
 @import "chatbot";
 @import "forms/code-runner";
 @import "forms/reflection-runner";
+@import "forms/mcq-runner";
 @import "forms/ui-runner";
 @import "forms/game-runner";
 @import "forms/container-panel";
@@ -57,6 +58,7 @@ select {
 }
 @import "profile-gist-connection";
 @import "dashboard-v2";
+@import "preferences";
 @import "analytics-dashboard-v2";
 @import "calendar-v2";
 @import "submissions-v2";

@@ -56,3 +56,18 @@ test("a reflection answer loads back from a gist bundle by id", () => {
   assert.deepEqual(writeRunners({ "loops-why.md": { content: "From the gist." } }), ["loops-why"]);
   assert.equal(storage.get("page_loops-why"), "From the gist.");
 });
+
+test("MCQ answers are bundled as Markdown and marked as mcq in the kinds", () => {
+  containers = [runner({ id: "Sig MCQ", kind: "mcq", title: "MCQ 1.09", question: "Check each answer." })];
+  storage.set("page_Sig MCQ", "Score: 4/5 | answers: B,C,A,D,A");
+
+  assert.deepEqual(Object.keys(readRunners()), ["sig_mcq.md"]);
+  assert.ok(readRunners()["sig_mcq.md"].content.startsWith("Question: MCQ 1.09\nCheck each answer.\n\nAnswer (mcq: Sig MCQ):\n\nScore: 4/5"));
+  assert.deepEqual(readRunnerKinds(), { "sig_mcq.md": "mcq" });
+});
+
+test("an MCQ with no checked answers counts as unsaved", () => {
+  containers = [runner({ id: "sig-mcq", kind: "mcq", title: "MCQ", question: "" })];
+
+  assert.deepEqual(unsavedRunners(), containers);
+});

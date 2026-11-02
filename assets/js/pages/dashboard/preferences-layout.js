@@ -1,4 +1,4 @@
-import { FormManager } from './preferences.js';
+import { ThemeRenderer } from './preferences.js';
 
 export function initPreferencesLayout() {
     const root = document.getElementById('tab-content-preferences');
@@ -8,43 +8,7 @@ export function initPreferencesLayout() {
     const $ = (selector) => root.querySelector(selector);
     const $$ = (selector) => [...root.querySelectorAll(selector)];
 
-    // ----------------------------------------
-    // Section tabs: Appearance, Voice, Tracking
-    // ----------------------------------------
-    function selectSection(name) {
-        $$('.ocs__prefs-section-btn').forEach((button) => {
-            const active = button.dataset.section === name;
-            button.setAttribute('aria-selected', String(active));
-            button.tabIndex = active ? 0 : -1;
-        });
-
-        $$('[data-section-pane]').forEach((pane) => {
-            pane.hidden = pane.dataset.sectionPane !== name;
-        });
-    }
-
-    $$('.ocs__prefs-section-btn').forEach((button) => {
-        button.addEventListener('click', () => {
-            selectSection(button.dataset.section);
-        });
-
-        button.addEventListener('keydown', (event) => {
-            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-
-            const tabs = $$('.ocs__prefs-section-btn');
-            const current = tabs.indexOf(button);
-            let next = current;
-
-            if (event.key === 'ArrowRight') next = (current + 1) % tabs.length;
-            if (event.key === 'ArrowLeft') next = (current - 1 + tabs.length) % tabs.length;
-            if (event.key === 'Home') next = 0;
-            if (event.key === 'End') next = tabs.length - 1;
-
-            event.preventDefault();
-            tabs[next].focus();
-            selectSection(tabs[next].dataset.section);
-        });
-    });
+    // Appearance / Language & voice / Head tracking are the page's top tabs (dashboard-v2.html).
 
     // ----------------------------------------
     // Theme source tabs: Presets, My themes, AI
@@ -69,7 +33,6 @@ export function initPreferencesLayout() {
     // Preview and readability checks
     // ----------------------------------------
     const preview = $('#prefs-preview');
-    const startingFrom = $('#prefs-starting-from');
     const textCheck = $('#prefs-check-text');
     const accentCheck = $('#prefs-check-accent');
 
@@ -86,7 +49,7 @@ export function initPreferencesLayout() {
             selectionColor: readColor('pref-selection-color', '#3b82f6'),
             font: document.getElementById('pref-font-family')?.value || 'Inter, system-ui, sans-serif',
             size: Number(document.getElementById('pref-font-size')?.value || 14),
-            buttonStyle: document.getElementById('pref-button-style')?.value || 'rounded'
+            buttonStyle: document.getElementById('pref-button-style')?.value || 'default'
         };
     }
 
@@ -117,81 +80,61 @@ export function initPreferencesLayout() {
             `Contrast ratio ${ratio.toFixed(2)} to 1. ${passed ? 'Passes' : 'Below'} the recommended 4.5 to 1 text contrast.`);
     }
 
+    // The site theme sets text colors with !important, so the preview has to as well,
+    // or it shows the saved theme instead of the one in the form.
+    const paint = (element, property, value) => {
+        if (element) element.style.setProperty(property, value, 'important');
+    };
+    const readableOn = (color) => (contrastRatio(color, '#ffffff') >= 4.5 ? '#ffffff' : '#111111');
+
     function updatePreview() {
         const prefs = readPrefs();
         if (!preview) return;
 
-        preview.style.setProperty('--prefs-preview-bg', prefs.bg);
-        preview.style.setProperty('--prefs-preview-text', prefs.text);
-        preview.style.setProperty('--prefs-preview-accent', prefs.accent);
-        preview.style.setProperty('--prefs-preview-selection', prefs.selectionColor);
-        preview.style.setProperty('--prefs-preview-font', prefs.font);
-        preview.style.setProperty('--prefs-preview-size', `${prefs.size}px`);
+        paint(preview, 'background-color', prefs.bg);
+        paint(preview, 'color', prefs.text);
+        paint(preview, 'font-family', prefs.font);
+        paint(preview, 'font-size', `${prefs.size}px`);
 
-        preview.style.backgroundColor = prefs.bg;
-        preview.style.color = prefs.text;
-        preview.style.fontFamily = prefs.font;
-        preview.style.fontSize = `${prefs.size}px`;
-
-        const bar = $('.ocs__prefs-preview-bar');
-        if (bar) {
-            bar.style.backgroundColor = prefs.accent;
-            bar.style.color = contrastRatio(prefs.accent, '#ffffff') >= 4.5
-                ? '#ffffff'
-                : '#111111';
-        }
-
-        // Every text color in the preview is set as important, as the theme swatches are: the
-        // site's h4 and p rules, and a saved theme's !important text color, would otherwise paint
-        // the preview's words in the page's own colors.
         const body = $('.ocs__prefs-preview-body');
-        if (body) {
-            body.style.backgroundColor = prefs.bg;
-            body.style.color = prefs.text;
-            body.style.fontFamily = prefs.font;
-            body.style.fontSize = `${prefs.size}px`;
-            body.querySelectorAll('h4, p').forEach((element) => {
-                element.style.setProperty('color', prefs.text, 'important');
-            });
-        }
+        paint(body, 'background-color', prefs.bg);
+        paint(body, 'color', prefs.text);
+
+        body?.querySelectorAll('h4, p').forEach((element) => {
+            paint(element, 'color', prefs.text);
+            paint(element, 'font-family', prefs.font);
+        });
+
+        paint($('.ocs__prefs-preview-bar'), 'background-color', prefs.accent);
 
         const selection = $('[data-preview="selection"]');
-        if (selection) {
-            selection.style.backgroundColor = prefs.selectionColor;
-            selection.style.setProperty('color', contrastRatio(prefs.selectionColor, '#ffffff') >= 4.5
-                ? '#ffffff'
-                : '#111111', 'important');
-        }
+        paint(selection, 'background-color', prefs.selectionColor);
+        paint(selection, 'color', readableOn(prefs.selectionColor));
 
         const link = $('[data-preview="link"]');
-        if (link) {
-            link.style.setProperty('color', prefs.accent, 'important');
-            link.style.textDecoration = 'underline';
-        }
+        paint(link, 'color', prefs.accent);
+        paint(link, 'text-decoration', 'underline');
 
         const primaryButton = $('[data-preview="button"]');
         const secondaryButton = $('[data-preview="ghost"]');
         const radius = {
-            rounded: '8px',
-            square: '0px',
-            pill: '999px'
-        }[prefs.buttonStyle] || '8px';
+            default: '12px',   // ocs__btn's own medium shape
+            'rounded-all': '0.375rem',
+            square: '0',
+            pill: '9999px'
+        }[prefs.buttonStyle] ?? '12px';
 
         [primaryButton, secondaryButton].forEach((button) => {
-            if (button) button.style.borderRadius = radius;
+            paint(button, 'border-radius', radius);
+            paint(button, 'font-family', prefs.font);
         });
 
-        if (primaryButton) {
-            primaryButton.style.backgroundColor = prefs.accent;
-            primaryButton.style.setProperty('color',
-                contrastRatio(prefs.accent, '#ffffff') >= 4.5 ? '#ffffff' : '#111111', 'important');
-        }
+        paint(primaryButton, 'background-color', prefs.accent);
+        paint(primaryButton, 'color', readableOn(prefs.accent));
 
-        if (secondaryButton) {
-            secondaryButton.style.backgroundColor = 'transparent';
-            secondaryButton.style.setProperty('color', prefs.text, 'important');
-            secondaryButton.style.border = `1px solid ${prefs.accent}`;
-        }
+        paint(secondaryButton, 'background-color', 'transparent');
+        paint(secondaryButton, 'color', prefs.text);
+        paint(secondaryButton, 'border', `1px solid ${prefs.accent}`);
 
         updateCheck(textCheck, contrastRatio(prefs.bg, prefs.text));
         updateCheck(accentCheck, contrastRatio(prefs.bg, prefs.accent));
@@ -222,12 +165,6 @@ export function initPreferencesLayout() {
 
     // ThemeRenderer.fill() dispatches this event when a theme is selected.
     document.addEventListener('prefs:filled', (event) => {
-        if (startingFrom) {
-            startingFrom.textContent = event.detail?.name
-                ? `Starting from: ${event.detail.name}`
-                : 'Custom theme';
-        }
-
         $$('.ocs__prefs-swatch').forEach((button) => {
             const selected = button.dataset.theme === event.detail?.name;
             button.setAttribute('aria-pressed', String(selected));
@@ -241,14 +178,25 @@ export function initPreferencesLayout() {
         selectSource('ai');
 
         if (event.detail?.prefs) {
-            FormManager.set(event.detail.prefs);
-            document.dispatchEvent(new CustomEvent('prefs:filled', {
-                detail: { name: event.detail.name || 'AI theme' }
-            }));
+            // Only the theme's own look. A theme with no size or button style (a built-in holiday
+            // palette) leaves the student's unsaved ones in the form.
+            const { bg, text, accent, selectionColor, font, decor, size, buttonStyle } = event.detail.prefs;
+            ThemeRenderer.fill(event.detail.name || 'AI theme', {
+                bg, text, accent, selectionColor, font, decor,
+                ...(event.detail.restyle ? { size, buttonStyle } : {}),
+            });
         }
 
         updatePreview();
     });
+
+    // Language & voice has its own Save button; it saves the same form as the Appearance one.
+    $('[data-save-all]')?.addEventListener('click', () => {
+        document.getElementById('save-preferences').click();
+    });
+
+    // Saved preferences load after this script runs, so draw again once they're in the form.
+    document.addEventListener('prefs:loaded', updatePreview);
 
     // Show the current form values immediately.
     updatePreview();

@@ -261,10 +261,11 @@
       let btnRadius = '0.375rem';
       if (buttonStyle === 'square') btnRadius = '0';
       else if (buttonStyle === 'pill') btnRadius = '9999px';
-      // 'rounded' is the dashboard's default, so it leaves ocs__btn its own shapes (pill tabs,
-      // round small buttons). A shape the student picks reaches every button, links styled as
-      // ocs__btn included, so one row of buttons never mixes shapes.
-      const pickedShape = buttonStyle === 'square' || buttonStyle === 'pill';
+      // 'default' leaves ocs__btn its own shapes (pill tabs, round small buttons), and so does
+      // the 'rounded' saved before Default existed, which behaved the same way. A shape the
+      // student picks reaches every button, links styled as ocs__btn included, so one row of
+      // buttons never mixes shapes.
+      const pickedShape = ['rounded-all', 'square', 'pill'].includes(buttonStyle);
       const button = pickedShape ? 'button' : 'button:where(:not(.ocs__btn))';
       const shaped = [button, '.btn', `[class*="rounded"] ${button}`, ...(pickedShape ? ['.ocs__btn'] : []),
         'input[type="submit"]', 'input[type="button"]']
@@ -433,7 +434,7 @@
       const size = prefs?.size || base.size;
       const accent = prefs?.accent || base.accent;
       const selectionColor = prefs?.selectionColor || accent;
-      const buttonStyle = prefs?.buttonStyle || 'rounded';
+      const buttonStyle = prefs?.buttonStyle || 'default';
 
       const root = document.documentElement;
       const set = (name, value) => root.style.setProperty(name, value);

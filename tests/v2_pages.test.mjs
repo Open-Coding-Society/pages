@@ -52,7 +52,11 @@ test('the /v2 stubs that are posts stay out of the Blogs catalog', () => {
 
 // The old dashboard's only tab had the admin tab's id, so clicking it hid Preferences (#1924).
 test('the dashboard has no tab that can hide Preferences', () => {
-  assert.ok(!read('_layouts/dashboard-v2.html').includes('class="tab-btn'), 'no tab buttons on the dashboard');
+  const layout = read('_layouts/dashboard-v2.html');
+  assert.ok(!layout.includes('id="tab-admin-evaluation"'), 'no tab has the admin id');
+  const tabs = [...layout.matchAll(/id="tab-(appearance|voice|tracking)"/g)].map((match) => match[1]);
+  assert.deepEqual(tabs, ['appearance', 'voice', 'tracking'], 'one tab per Preferences panel');
+  for (const tab of tabs) assert.ok(layout.includes(`id="tab-content-${tab}"`), `${tab} has its own panel`);
 });
 
 // Merges can drop an @import without any build error; the page then renders unstyled.
