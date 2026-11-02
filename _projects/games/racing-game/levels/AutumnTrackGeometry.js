@@ -23,3 +23,16 @@ export const AUTUMN_SPLINE_BARRIER_POINTS = [
 ];
 
 export const AUTUMN_SPLINE_COLLISION_WIDTH = 5;
+
+export const AUTUMN_TRACK_OBSTACLES = Object.freeze({
+  box: Object.freeze({
+    position: Object.freeze({ x: 0.47, y: 0.25 }),
+    scaleFactor: 10,
+    hitbox: Object.freeze({ widthPercentage: 0.5, heightPercentage: 0.5 }),
+  }),
+  cone: Object.freeze({
+    position: Object.freeze({ x: 0.2985, y: 0.8404 }),
+    scaleFactor: 10,
+    hitbox: Object.freeze({ widthPercentage: 0.5, heightPercentage: 0.5 }),
+  }),
+});

@@ -1,7 +1,7 @@
 import PlayerCar from './PlayerCar.js';
 import { AUTUMN_BOT_GENOME } from './AutumnBotGenome.js';
 import {
-  AUTUMN_TRACK_CENTERLINE,
+  createEasyRoute,
   createRouteFromGenome,
   getBotControls,
   hasReachedRouteWaypoint,
@@ -39,7 +39,7 @@ export default class RacingBot extends PlayerCar {
     this.waypointIndex = 1;
     this.route = mode === 'ai'
       ? createRouteFromGenome(AUTUMN_BOT_GENOME)
-      : AUTUMN_TRACK_CENTERLINE;
+      : createEasyRoute();
   }
 
   updateBotControls() {

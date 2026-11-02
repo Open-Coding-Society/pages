@@ -4,7 +4,11 @@ import RacingBot from './RacingBot.js';
 import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
 import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
 import TimeLapScreen from './TimeLapScreen.js';
-import { AUTUMN_SPLINE_BARRIER_POINTS, AUTUMN_SPLINE_COLLISION_WIDTH } from './AutumnTrackGeometry.js';
+import {
+  AUTUMN_SPLINE_BARRIER_POINTS,
+  AUTUMN_SPLINE_COLLISION_WIDTH,
+  AUTUMN_TRACK_OBSTACLES,
+} from './AutumnTrackGeometry.js';
 import RaceDifficultyPrompt from './RaceDifficultyPrompt.js';
 import { RACING_CAR_HITBOX } from './RacingCarPhysics.js';
 import cleanupRacingLevel from './cleanup-racing-level.js';
@@ -83,9 +87,9 @@ class GameLevelAutumn {
       id: "box-1",
       src: path + '/images/projects/racing-game/BoxObstacle.png',
       coordinateSpace: "normalized",
-      SCALE_FACTOR: 10,
-      INIT_POSITION: { x: 0.47, y: 0.25 },
-      hitbox: { widthPercentage: 0.5, heightPercentage: 0.5 },
+      SCALE_FACTOR: AUTUMN_TRACK_OBSTACLES.box.scaleFactor,
+      INIT_POSITION: AUTUMN_TRACK_OBSTACLES.box.position,
+      hitbox: AUTUMN_TRACK_OBSTACLES.box.hitbox,
       pixels: { height: 369, width: 676 },
       orientation: { rows: 1, columns: 1 },
     };
@@ -93,9 +97,9 @@ class GameLevelAutumn {
       id: "cone-1",
       src: path + '/images/projects/racing-game/ConeObstacle.png',
       coordinateSpace: "normalized",
-      SCALE_FACTOR: 10,
-      INIT_POSITION: { x: 0.2985, y: 0.8404 },
-      hitbox: { widthPercentage: 0.5, heightPercentage: 0.5 },
+      SCALE_FACTOR: AUTUMN_TRACK_OBSTACLES.cone.scaleFactor,
+      INIT_POSITION: AUTUMN_TRACK_OBSTACLES.cone.position,
+      hitbox: AUTUMN_TRACK_OBSTACLES.cone.hitbox,
       pixels: { height: 369, width: 676 },
       orientation: { rows: 1, columns: 1 },
     };
@@ -116,6 +120,7 @@ class GameLevelAutumn {
       { class: SplineBarrier, data: barrierData1 },
       { class: SplineBarrier, data: barrierData2 },
       { class: Character, data: BoxData },
+      { class: Character, data: ConeData },
       { class: TimeLapScreen, data: lap_data },
       { class: RaceDifficultyPrompt, data: {} },
     ];
