@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import RacingPlayer from '../levels/RacingPlayer.js';
 import AccelDecelRacingPlayer from '../levels/AccelDecelRacingPlayer.js';
+import GameLevelSpring from '../levels/spring-level.js';
 import GameLevelWinter from '../levels/winter-level.js';
 import { getRandomTrackPoint } from '../levels/WinterIcicle.js';
 import {
@@ -179,6 +180,57 @@ test('winter cars use acceleration, reverse-speed, and individual boost keys', (
     assert.equal(car.data.STEP_FACTOR, 1100);
     assert.equal(car.data.boostKey, [70, 75][index]);
   }
+});
+
+test('spring cars use winter acceleration movement with their own power-ups', () => {
+  const springLevel = new GameLevelSpring({ path: '' });
+  const springCars = springLevel.classes.slice(1, 3);
+
+  assert.equal(springCars.length, 2);
+  for (const car of springCars) {
+    assert.equal(car.class.prototype instanceof AccelDecelRacingPlayer, true);
+    assert.equal(car.data.SCALE_FACTOR, 10);
+    assert.equal(car.data.STEP_FACTOR, 1100);
+    assert.equal(car.data.currentSpeed, 0);
+    assert.equal(car.data.maxSpeed, 12);
+    assert.equal(car.data.acceleration, 0.4);
+    assert.equal(car.data.deceleration, 0.4);
+    assert.equal(car.data.reverseSpeed, -4);
+    assert.equal(car.data.direction.default, 'right');
+  }
+
+  const car = springCars[0];
+  const player = createKeyboardPlayer(car.class, { keypress: car.data.keypress });
+  Object.assign(player, {
+    keysPressed: {},
+    currentSpeed: 0,
+    maxSpeed: 12,
+    acceleration: 0.4,
+    deceleration: 0.4,
+    reverseSpeed: -4,
+    temporarySpeedMultiplier: 1,
+    slowdownUntil: 0,
+    boostUntil: 0,
+    boostCooldownUntil: 0,
+    scale: { width: 100, height: 100 },
+    stepFactor: 100,
+  });
+  player.draw = () => {};
+  player.collisionChecks = () => {};
+  player.move = () => {};
+  player.showSpeedBoostBanner = () => {};
+
+  pressKey(player, wasd.up);
+  player.update();
+  assert.equal(player.currentSpeed, 0.4);
+
+  player.currentSpeed = 6;
+  player.updateMovementSpeed();
+  const normalVelocity = player.xVelocity;
+  player.applyTemporarySlowdown();
+  assert.equal(player.xVelocity, normalVelocity * 0.65);
+  player.applyTemporarySpeedBoost();
+  assert.ok(Math.abs(player.xVelocity - normalVelocity * 0.65 * 2.5) < 1e-10);
 });
 
 test('winter countdown starts both cars together and removes its overlay after GO', () => {

@@ -1030,7 +1030,7 @@
         const notes = document.getElementById('code-notes')?.value?.trim() || '';
         const submitBtn = codeForm.querySelector('button[type="submit"]');
         if (unsavedRunners().length > 0) {
-          showStatus('error', 'Save each code runner with its 💾 button, and submit each reflection with its 📤 button, before submitting.');
+          showStatus('error', 'Save each code runner with its 💾 button, submit each reflection with its 📤 button, and check any MCQ answers before submitting.');
           return;
         }
         const files = readRunners();
