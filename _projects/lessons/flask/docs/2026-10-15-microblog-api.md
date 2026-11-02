@@ -100,6 +100,26 @@ Beyond your one post in the panel, actual writes should use disposable,
 authorized development records with a cleanup plan; they are not required for
 the read and validation checks above.
 
+## Popcorn Hack 2: Match the Spring Parts
+
+The Spring feature splits its work across five files. Microblog does the same
+jobs in fewer places.
+
+| Spring Part | Its Job | Where Microblog Does It |
+| --- | --- | --- |
+| Entity | Describes the table | `MicroBlog` class with `db.Column` fields in `model/microblog.py` |
+| JPA Repository | Reads and saves rows | Methods on the same class, such as `get_by_topic`, `search_content`, and `create` |
+| Service | Holds the rules | No separate file: rules sit in the handler, such as the `Content is required` check |
+| Controller | Turns HTTP into method calls | `MicroBlogAPI._CRUD` in `api/microblog_api.py` |
+| Table Initializer | Makes sure the table exists | `db.create_all()` in the backend's database scripts builds tables from the models |
+
+Answer these in the Microblog panel on this page:
+
+1. The 280 character limit appears in two places. Find `len(content) > 280` in
+   the handler and `db.String(280)` in the model. What does each one protect?
+2. `put` checks that the caller owns the post. Which Spring file would hold
+   that check?
+
 ## Continue by Reading the Repository
 
 Choose a reply, reaction, or topic resource in this same source file. Apply
