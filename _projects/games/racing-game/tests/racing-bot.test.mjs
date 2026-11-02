@@ -7,6 +7,7 @@ import {
   AUTUMN_TRACK_CENTERLINE,
   createInitialGenome,
   createEasyRoute,
+  createSuperEasyRoute,
   createRouteFromGenome,
   evolveAutumnBot,
   getBotControls,
@@ -88,6 +89,28 @@ test('both bot difficulties complete three laps without track or scenery contact
   }
 });
 
+test('super easy bot takes a slow detour and completes cleanly', () => {
+  const result = simulateAutumnRace({ mode: 'superEasy', maxFrames: 7000 });
+  const easyResult = simulateAutumnRace({ mode: 'hardcoded' });
+
+  assert.ok(createSuperEasyRoute().length > createEasyRoute().length);
+  assert.equal(result.completed, true);
+  assert.equal(result.lapsCompleted, 3);
+  assert.equal(result.barrierContacts, 0);
+  assert.equal(result.obstacleContacts, 0);
+  assert.ok(result.seconds > easyResult.seconds * 2);
+});
+
+test('super easy bot waits before starting so the player gets a head start', () => {
+  const bot = fixture('hardcoded');
+  bot.setMode('superEasy');
+
+  assert.ok(bot.superEasyStartDelayFrames > 0);
+  bot.updateBotControls();
+  assert.equal(bot.superEasyStartDelayFrames, 299);
+  assert.deepEqual(bot.pressedKeys, {});
+});
+
 test('waypoints advance when the bot passes them instead of orbiting behind', () => {
   const route = [{ x: 0.1, y: 0.5 }, { x: 0.5, y: 0.5 }, { x: 0.9, y: 0.5 }];
 
@@ -127,7 +150,7 @@ test('unknown bot modes fail explicitly', () => {
   assert.throws(() => bot.setMode('expert'), /Unknown racing bot mode/);
 });
 
-test('race setup pauses until Easy or Hard is chosen, then starts with that mode', () => {
+test('race setup pauses until a difficulty is chosen, then starts with that mode', () => {
   const originalDocument = globalThis.document;
   const originalWindow = globalThis.window;
   const events = new Map();

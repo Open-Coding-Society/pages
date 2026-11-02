@@ -48,6 +48,7 @@ const LEGACY_MAX_LATERAL_OFFSET = 0.028;
 const REACH_DISTANCE = 0.025;
 const EASY_TARGET_SPEED = 2.4;
 const SUPER_EASY_TARGET_SPEED = 1.2;
+export const SUPER_EASY_START_DELAY_FRAMES = 300;
 const CAR_SIZE = 360 / 10;
 const BARRIER_SEGMENTS_PER_SECTION = 24;
 const BARRIER_COLLISION_RADIUS = CAR_SIZE * (1 - RACING_CAR_HITBOX.widthPercentage) / 2
@@ -414,16 +415,18 @@ export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFram
       waypointIndex = (waypointIndex + 1) % route.length;
     }
 
-    const control = getBotControls({
-      position: center,
-      heading,
-      speed,
-      waypointIndex,
-      route,
-      width: 643,
-      height: 360,
-      mode,
-    });
+    const control = mode === 'superEasy' && frame < SUPER_EASY_START_DELAY_FRAMES
+      ? { steer: 0, throttle: 0 }
+      : getBotControls({
+        position: center,
+        heading,
+        speed,
+        waypointIndex,
+        route,
+        width: 643,
+        height: 360,
+        mode,
+      });
     if (control.throttle > 0) {
       speed = Math.min(speed + RACING_CAR_PHYSICS.acceleration, RACING_CAR_PHYSICS.maxSpeed);
     } else if (control.throttle < 0) {

@@ -6,6 +6,7 @@ import {
   createSuperEasyRoute,
   getBotControls,
   hasReachedRouteWaypoint,
+  SUPER_EASY_START_DELAY_FRAMES,
 } from './AutumnBotGenetics.js';
 
 const MODES = {
@@ -39,12 +40,19 @@ export default class RacingBot extends PlayerCar {
     this.mode = mode;
     this.controlLabel = settings.label;
     this.waypointIndex = 1;
+    this.superEasyStartDelayFrames = mode === 'superEasy' ? SUPER_EASY_START_DELAY_FRAMES : 0;
     this.route = mode === 'ai'
       ? createRouteFromGenome(AUTUMN_BOT_GENOME)
       : mode === 'superEasy' ? createSuperEasyRoute() : createEasyRoute();
   }
 
   updateBotControls() {
+    if (this.superEasyStartDelayFrames > 0) {
+      this.superEasyStartDelayFrames -= 1;
+      this.pressedKeys = {};
+      return;
+    }
+
     const center = this.getCenter();
     const reachDistance = Math.min(this.gameEnv.innerWidth, this.gameEnv.innerHeight) * 0.025;
 
