@@ -56,3 +56,13 @@ for (const formId of ['microblog-form', 'reply-form']) {
         assert.equal(button.disabled, false);
     });
 }
+
+test('renderMicroblogTable escapes every post field before it joins the markup', () => {
+    const start = html.indexOf('const analyticsCell = analytics.map');
+    const end = html.indexOf('.join(\'\') +', html.indexOf('const messageCell = message.map'));
+    const render = html.slice(start, end);
+    // Both cells pass the (formatted) value through escapeHtml; a raw `${value}` would be a stored XSS
+    assert.match(render, /return `<div>\$\{escapeHtml\(String\(value\)\)\}<\/div>`;/);
+    assert.match(render, /value = escapeHtml\(String\(value\)\);\s*if \(f\.key === 'topicPath'\)/);
+    assert.doesNotMatch(render, /<span>\$\{post\./);
+});
