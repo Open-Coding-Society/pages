@@ -282,6 +282,9 @@ class GameLevelSpring {
         {class: DescentEntrance, data: lap_data}
     ]
   }
+  destroy () {
+    cleanupRacingLevel(this.gameEnv);
+  }
 }
 
 export default GameLevelSpring;

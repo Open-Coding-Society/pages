@@ -482,6 +482,9 @@ class GameLevelNightcity {
         ...trackBarrierData.map((data) => ({ class: SplineBarrier, data }))
     ];
   }
+  destroy () {
+    cleanupRacingLevel(this.gameEnv);
+  }
 }
 
 export default GameLevelNightcity;
