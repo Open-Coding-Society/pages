@@ -32,6 +32,10 @@
     <div class="microblog-channel-tabs" role="tablist" aria-label="Microblog channels">
       <button type="button" role="tab" class="microblog-channel-tab is-active" data-channel="chat" aria-selected="true">Chat</button>
       <button type="button" role="tab" class="microblog-channel-tab" data-channel="suggestions" aria-selected="false">Suggestions</button>
+      {% if page.team_teach and page.assignment %}
+      {% comment %} Not a channel: Ratings shows lesson feedback (Spring), never posts {% endcomment %}
+      <button type="button" role="tab" class="microblog-channel-tab" data-panel="ratings" aria-selected="false" aria-controls="microblog-ratings-panel">Ratings</button>
+      {% endif %}
     </div>
     <!-- View filter: Active (default) hides resolved posts, History shows only them -->
     <div class="microblog-view-filter">
@@ -49,6 +53,12 @@
     <div id="microblog-playground">
       <em>Loading microblog posts...</em>
     </div>
+
+    {% if page.team_teach and page.assignment %}
+    <div id="microblog-ratings-panel" role="tabpanel" hidden>
+      {% include projects/lesson-feedback/lesson-feedback-ratings.html %}
+    </div>
+    {% endif %}
   </div>
 </aside>
 
@@ -316,14 +326,31 @@ function canResolveReply(post, reply, user) {
   return Boolean(user) && (reply.userId === user.id || canResolve(post, user));
 }
 
+// Team-taught lessons add a Ratings tab (lesson feedback, stored in Spring). It is
+// not a channel: activeChannel keeps the last Chat/Suggestions choice, so any
+// re-render still targets that channel while Ratings is shown. style.display, not
+// `hidden`, because .microblog-view-filter sets its own display.
+function showRatingsPanel(shown) {
+  const ratingsPanel = document.getElementById('microblog-ratings-panel');
+  if (!ratingsPanel) return;
+  ratingsPanel.hidden = !shown;
+  for (const id of ['microblog-status', 'microblog-playground']) {
+    document.getElementById(id).style.display = shown ? 'none' : '';
+  }
+  document.querySelector('.microblog-view-filter').style.display = shown ? 'none' : '';
+}
+
 // Channel tabs
 document.querySelectorAll('.microblog-channel-tab').forEach(tab => {
   tab.onclick = () => {
-    activeChannel = tab.dataset.channel;
+    const ratings = tab.dataset.panel === 'ratings';
+    if (!ratings) activeChannel = tab.dataset.channel;
     document.querySelectorAll('.microblog-channel-tab').forEach(other => {
       other.classList.toggle('is-active', other === tab);
       other.setAttribute('aria-selected', String(other === tab));
     });
+    showRatingsPanel(ratings);
+    if (ratings) return;
     showStatus('');
     renderMicroblogTable();
   };

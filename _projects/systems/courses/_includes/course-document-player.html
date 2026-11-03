@@ -148,6 +148,9 @@
   import { createNavigationState } from '{{ site.baseurl }}/assets/js/course-navigation-state.js';
   import { readGradingResponse } from '{{ site.baseurl }}/assets/js/submissions/grading.js';
   import { rememberCourse } from '{{ site.baseurl }}/assets/js/course-entry.js';
+  {% if page.assignment and page.team_teach %}
+  import { startLessonFeedback } from '{{ site.baseurl }}/assets/js/projects/lesson-feedback/lesson-feedback-page.js';
+  {% endif %}
 
   /**
    * ============================================
@@ -947,6 +950,25 @@
 
   /**
    * ============================================
+   * LESSON FEEDBACK: team-taught lessons (team_teach: true)
+   * ============================================
+   * The student rates the lesson in the microblog panel's Ratings tab, and the
+   * submission step is saved before the homework is sent (_projects/systems/lesson-feedback/).
+   */
+  {% if page.assignment and page.team_teach %}
+  const lessonFeedback = startLessonFeedback({ javaURI, fetchOptions, resolveAssignmentId: ensureAssignmentId });
+  {% else %}
+  const lessonFeedback = null;
+  {% endif %}
+
+  async function saveLessonFeedbackFirst() {
+    if (!lessonFeedback) return;
+    const result = await lessonFeedback.beforeSubmit();
+    if (!result.ok) throw new Error(result.message);
+  }
+
+  /**
+   * ============================================
    * FORM SUBMISSION: Handle submissions
    * ============================================
    */
@@ -972,6 +994,7 @@
         submitBtn.disabled = true;
         showStatus('loading', 'Submitting...');
         try {
+          await saveLessonFeedbackFirst();
           await submitLinkToBackend(link, description, selfAssessment);
           saveSubmissionLocally('link', { link, description, selfAssessment });
           showStatus('success', 'Link submitted successfully!');
@@ -1002,6 +1025,7 @@
         submitBtn.disabled = true;
         showStatus('loading', 'Uploading...');
         try {
+          await saveLessonFeedbackFirst();
           for (const file of fileInput.files) {
             if (file.size > FILE_SIZE_LIMIT_MB * 1024 * 1024) {
               throw new Error(`${file.name} exceeds ${FILE_SIZE_LIMIT_MB}MB limit.`);
@@ -1056,6 +1080,7 @@
         }
         showStatus('loading', 'Creating Gist and submitting...');
         try {
+          await saveLessonFeedbackFirst();
           await submitCodeToBackend(files, notes, selfAssessment);
           saveSubmissionLocally('code', { notes, selfAssessment });
           showStatus('success', 'Code submitted successfully!');

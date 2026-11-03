@@ -53,6 +53,7 @@ The data, as it moves through the three systems:
       "assignmentType": "code",
       "creatorUids": ["psai-github"],
       "courseCodes": [],                # empty: not sent, Spring keeps its stored courses
+      "teamTeach": "false",             # always sent; "true" for `team_teach: true`
   }
 """
 
@@ -98,9 +99,11 @@ class Assignment:
     # None means "not declared"; defaults are applied only after copies are merged.
     creator_uids: tuple | None = None
     course_codes: tuple | None = None
+    # `team_teach: true`: the homework waits for lesson feedback (Spring mvc/lessonfeedback).
+    team_teach: bool | None = None
 
     # Fields that must agree when the same page appears twice (notebook + converted post).
-    SYNC_FIELDS = ("submission_type", "creator_uids", "course_codes")
+    SYNC_FIELDS = ("submission_type", "creator_uids", "course_codes", "team_teach")
     # Attribute -> frontmatter key for the fields the grader cannot work without.
     # Not included: courses (assignments span courses), points (an override, default 1.0)
     # and due date (set through the calendar).
@@ -126,6 +129,7 @@ class Assignment:
             or DEFAULT_SUBMISSION_TYPE,
             creator_uids=cls._clean_creator_uids(fm.get("assignment_creator_uids"), path),
             course_codes=cls._clean_course_codes(fm.get("courses"), path),
+            team_teach=cls._clean_flag(fm.get("team_teach"), "team_teach", path),
         )
 
     def merge(self, other: "Assignment") -> "Assignment":
@@ -161,6 +165,8 @@ class Assignment:
             "points": self.points,
             "creatorUids": list(self.creator_uids or ()),
             "courseCodes": list(self.course_codes or ()),
+            # Always sent, so removing `team_teach` from a page also clears it in Spring.
+            "teamTeach": "true" if self.team_teach else "false",
         }
         if self.due_date:
             payload["dueDate"] = self.due_date
@@ -174,7 +180,8 @@ class Assignment:
             f"points={self.points} dueDate={self.due_date} "
             f"assignmentType={self.submission_type or 'unchanged/default'} "
             f"creatorUids={','.join(self.creator_uids or ())} "
-            f"courseCodes={','.join(self.course_codes or ()) or 'none'}"
+            f"courseCodes={','.join(self.course_codes or ()) or 'none'} "
+            f"teamTeach={bool(self.team_teach)}"
         )
 
     # ---- cleaning raw frontmatter values; bad input warns and returns a fallback
@@ -202,6 +209,13 @@ class Assignment:
             pass
         warn(f"Invalid points {value!r}; using {DEFAULT_POINTS}", path)
         return DEFAULT_POINTS
+
+    @staticmethod
+    def _clean_flag(value, field, path):
+        if value is None or isinstance(value, bool):
+            return value
+        warn(f"{field} must be true or false, got {value!r}; treating it as not set", path)
+        return None
 
     @staticmethod
     def _clean_creator_uids(value, path):

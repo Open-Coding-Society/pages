@@ -89,6 +89,8 @@ export function createCreatorDashboard(options) {
     getFilterStatus,
     escapeHtml,
     cellTitle,
+    // Opens a team-taught lesson's Lesson Summary (lesson-feedback-teacher.js); teachers only.
+    openLessonSummary = null,
   } = options;
 
   let assignments = [];
@@ -123,6 +125,15 @@ export function createCreatorDashboard(options) {
       : '<span class="creator-muted">None</span>';
   }
 
+  // Only teachers see the Lesson Summary; the teaching team (the creators) does not.
+  const showsLessonFeedback = () => teacherView && Boolean(openLessonSummary);
+
+  function lessonFeedbackCell(assignment) {
+    return assignment.teamTeach
+      ? `<button type="button" class="ocs__btn small" data-lesson-summary="${text(assignment.id)}">Lesson Summary</button>`
+      : '<span class="creator-muted">Not team-taught</span>';
+  }
+
   function visibleAssignments() {
     return assignmentsWithTopic(assignments, element("creator-filter-topic").value);
   }
@@ -143,6 +154,7 @@ export function createCreatorDashboard(options) {
       <table class="submissions-table ocs__table">
         <thead><tr>
           <th>Assignment</th><th>Courses</th><th>Topics</th><th>Due date</th><th>Points</th><th>Submissions</th><th>Creators</th>
+          ${showsLessonFeedback() ? "<th>Lesson feedback</th>" : ""}
         </tr></thead>
         <tbody>${rows.map((assignment) => {
           const count = submissions.filter((submission) =>
@@ -155,6 +167,7 @@ export function createCreatorDashboard(options) {
             <td>${text(assignment.points, "Not set")}</td>
             <td><button type="button" class="creator-assignment-count" data-assignment-id="${text(assignment.id)}" aria-label="Show ${count} submissions for ${text(assignment.name, "this assignment")}">${count}</button></td>
             <td>${text((assignment.creatorUids || []).join(", "), "Unassigned")}</td>
+            ${showsLessonFeedback() ? `<td>${lessonFeedbackCell(assignment)}</td>` : ""}
           </tr>`;
         }).join("")}</tbody>
       </table>`;
@@ -430,6 +443,12 @@ export function createCreatorDashboard(options) {
     });
 
     element("created-assignments-container").addEventListener("click", (event) => {
+      const summaryButton = event.target.closest("[data-lesson-summary]");
+      if (summaryButton) {
+        const assignment = assignments.find((candidate) => String(candidate.id) === summaryButton.dataset.lessonSummary);
+        if (assignment) openLessonSummary(assignment);
+        return;
+      }
       const button = event.target.closest("[data-assignment-id]");
       if (!button) return;
       element("creator-filter-assignment").value = button.dataset.assignmentId;

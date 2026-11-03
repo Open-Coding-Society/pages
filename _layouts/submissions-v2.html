@@ -219,7 +219,12 @@ active_tab: submissions
         getStatusBadge,
         getFilterStatus,
         escapeHtml,
-        cellTitle
+        cellTitle,
+        // Loaded on first use, so the dashboard still works if the lesson-feedback project isn't built.
+        openLessonSummary: async (assignment) => {
+            const { openLessonSummary } = await import('{{ site.baseurl }}/assets/js/projects/lesson-feedback/lesson-feedback-teacher.js');
+            return openLessonSummary({ javaURI, fetchOptions, assignment });
+        }
     });
 
     async function init() {
