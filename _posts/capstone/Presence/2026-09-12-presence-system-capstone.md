@@ -22,13 +22,27 @@ rp_active: hub
   {% include presence-system-nav.html %}
 
 <div class="ocs__card">
-    <img class="ocs__image-frame" src="{{ site.baseurl }}/images/presence-system/pipeline-hero.svg" alt="A student taps the RFID tag on their laptop on the CrowPi reader by the classroom door. Flask logs the tap and the dashboard shows the student as present. A wall camera, drawn dashed, is the next step.">
-    <p class="ocs__description">How it works today: tap the laptop tag, and the teacher's dashboard updates in about 2 seconds.</p>
+    <h2 class="ocs__section-title">Executive Pitch</h2>
+    <p class="ocs__description">Our pitch covering the problem, solution, implementation, the $700 pilot funding, and future directions.</p>
+    <div class="rfid-presence-embed">
+      <iframe src="https://docs.google.com/presentation/d/1hTkLhppCcGVm9slWL8fWRGJrmDMqWWVMC8GMk5D7l_Q/embed?start=false&amp;loop=false" title="Classroom Presence System executive pitch slides" loading="lazy" allowfullscreen></iframe>
+    </div>
+    <a class="ocs__btn pill" href="https://docs.google.com/presentation/d/1hTkLhppCcGVm9slWL8fWRGJrmDMqWWVMC8GMk5D7l_Q/edit" target="_blank" rel="noopener">Open the slides</a>
+  </div>
+
+<div class="ocs__card">
+    <img class="ocs__image-frame" src="{{ site.baseurl }}/images/presence-system/presence-setup.svg" alt="The prototype tap station on a desk: a monitor showing the Live Dashboard with Vibha marked Present and a camera match, a webcam on top of the monitor, a Mac Mini that runs the camera check, a Raspberry Pi keyboard and mouse, a Raspberry Pi 4 with a PN532 NFC reader, and a row of labeled RFID cards.">
+    <p class="ocs__description">Fig. 1: The prototype tap station. A card tap on the Raspberry Pi 4 and PN532 reader reaches OCS, the webcam and Mac Mini cross-check the face, and the Live Dashboard updates in about 2 seconds.</p>
+  </div>
+
+<div class="ocs__card">
+    <img class="ocs__image-frame" src="{{ site.baseurl }}/images/presence-system/presence-installed.svg" alt="The classroom corner with the system installed: a UHF RFID reader panel at chest height beside the door with a read zone across the doorway, and a camera on a short arm above the large dark poster on the back wall, aimed across the room at the door. The back wall has a desk counter with monitors, laptops and navy chairs.">
+    <p class="ocs__description">Fig. 2: Planned installation of UHF RFID reader and wall-mounted camera at the classroom entrance. The reader detects tags automatically as students walk in, so nobody taps, and the camera on the back wall faces them as they enter.</p>
   </div>
 
 <div class="ocs__card">
     <img class="ocs__image-frame" src="{{ site.baseurl }}/images/presence-system/pipeline-problem.svg" alt="One 66-minute class period. The student arrives 12 minutes late and is out for 17 minutes mid-class, but roll call still records Present.">
-    <p class="ocs__description">The problem: roll call says Present, but this student missed 29 of 66 minutes.</p>
+    <p class="ocs__description">Fig. 3: The problem. Roll call says Present, but this student missed 29 of 66 minutes.</p>
   </div>
 
 <div class="ocs__card">
