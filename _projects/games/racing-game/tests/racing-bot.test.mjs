@@ -10,8 +10,11 @@ import {
   createSuperEasyRoute,
   createRouteFromGenome,
   evolveAutumnBot,
+  advanceRouteWaypoint,
   getBotControls,
   hasReachedRouteWaypoint,
+  recoverRouteWaypoint,
+  refineAutumnBotGenome,
   scoreGenome,
   simulateAutumnRace,
 } from '../levels/AutumnBotGenetics.js';
@@ -24,6 +27,7 @@ import {
   AUTUMN_TRACK_OBSTACLES,
 } from '../levels/AutumnTrackGeometry.js';
 import RaceDifficultyPrompt from '../levels/RaceDifficultyPrompt.js';
+import TimeLapScreen from '../levels/TimeLapScreen.js';
 
 const keys = { up: 38, left: 37, down: 40, right: 39 };
 
@@ -85,30 +89,163 @@ test('both bot difficulties complete three laps without track or scenery contact
     assert.equal(result.obstacleContacts, 0, `${mode} must avoid the box and cone`);
     if (mode === 'ai') {
       assert.ok(result.seconds <= 17, `hard bot took ${result.seconds}s`);
+      assert.equal(result.lapFrames.length, 3);
+      assert.ok(
+        result.lapFrames.every((frame, index) => index === 0 || frame - result.lapFrames[index - 1] < 345),
+        `hard bot should not circle before the finish: ${result.lapFrames.join(', ')}`,
+      );
     }
   }
 });
 
 test('super easy bot takes a slow detour and completes cleanly', () => {
-  const result = simulateAutumnRace({ mode: 'superEasy', maxFrames: 7000 });
   const easyResult = simulateAutumnRace({ mode: 'hardcoded' });
+  for (let seed = 0; seed < 4; seed += 1) {
+    const result = simulateAutumnRace({ mode: 'superEasy', maxFrames: 7000, seed });
+    const route = createSuperEasyRoute(seed);
+    const loopSection = route.slice(2, 18);
 
-  assert.ok(createSuperEasyRoute().length > createEasyRoute().length);
-  assert.equal(result.completed, true);
-  assert.equal(result.lapsCompleted, 3);
-  assert.equal(result.barrierContacts, 0);
-  assert.equal(result.obstacleContacts, 0);
-  assert.ok(result.seconds > easyResult.seconds * 2);
+    assert.ok(route.length > createEasyRoute().length);
+    assert.equal(result.completed, true, `seed ${seed} should finish three laps`);
+    assert.equal(result.lapsCompleted, 3);
+    assert.equal(result.barrierContacts, 0);
+    assert.equal(result.obstacleContacts, 0);
+    assert.ok(result.seconds > easyResult.seconds * 1.8);
+    assert.ok(
+      route[1].y > createEasyRoute()[1].y,
+      'super easy should stay toward the outside edge of the opening straight',
+    );
+    assert.ok(
+      Math.hypot(loopSection[0].x - loopSection.at(-1).x, loopSection[0].y - loopSection.at(-1).y) < 0.001,
+      'super easy should include a novice-style loop',
+    );
+    assert.deepEqual(createSuperEasyRoute(seed), route, 'the same route seed should produce the same loop');
+  }
+  assert.notDeepEqual(createSuperEasyRoute(0), createSuperEasyRoute(1), 'different seeds should vary loop positions');
 });
 
-test('super easy bot waits before starting so the player gets a head start', () => {
-  const bot = fixture('hardcoded');
-  bot.setMode('superEasy');
+test('only easy modes wait for the player before starting', () => {
+  for (const mode of ['superEasy', 'hardcoded', 'ai']) {
+    const gameEnv = {
+      innerWidth: 643,
+      innerHeight: 360,
+      gameControl: { isPaused: false },
+      container: { isConnected: true },
+      gameObjects: [],
+    };
+    const bot = createKeyboardPlayer(RacingBot, { keypress: keys, gameEnv });
+    const player = createKeyboardPlayer(PlayerCar, { gameEnv });
+    Object.assign(bot, RACING_CAR_PHYSICS);
+    player.speed = 0;
+    bot.setMode(mode);
+    bot.speed = 0;
+    bot.heading = Math.PI / 2;
+    bot.getCenter = () => ({ x: 0.4 * 643 + 18, y: 0.82 * 360 + 18 });
+    gameEnv.gameObjects = [player, bot];
+    bot.pressedKeys = { [keys.up]: true };
+    bot.speed = 0;
+    bot.draw = () => {};
+    bot.collisionChecks = () => {};
+    bot.move = () => {};
+    let drawCount = 0;
+    bot.draw = () => { drawCount += 1; };
 
-  assert.ok(bot.superEasyStartDelayFrames > 0);
-  bot.updateBotControls();
-  assert.equal(bot.superEasyStartDelayFrames, 299);
-  assert.deepEqual(bot.pressedKeys, {});
+    bot.update();
+    assert.equal(drawCount, 1, `${mode} should render while waiting`);
+    if (mode === 'ai') {
+      assert.equal(bot.raceStarted, true, 'hard should start when the setup screen releases the race');
+      assert.ok(bot.speed > 0, 'hard should not wait for the player to move');
+      assert.equal(bot.pressedKeys[keys.up], true);
+    } else {
+      assert.deepEqual(bot.pressedKeys, {}, `${mode} should wait for player movement`);
+      assert.equal(bot.speed, 0, `${mode} should stay stopped before the player`);
+      assert.equal(bot.raceStarted, false);
+    }
+
+    player.speed = 0.2;
+    bot.update();
+    assert.ok(bot.speed > 0, `${mode} should start moving when the player starts`);
+    assert.equal(bot.raceStarted, true);
+
+    player.speed = 0;
+    bot.pressedKeys = {};
+    bot.updateBotControls = () => { bot.pressedKeys = { [keys.up]: true }; };
+    bot.update();
+    assert.ok(bot.speed > 0, `${mode} should keep moving after the player stops`);
+    assert.equal(bot.pressedKeys[keys.up], true);
+  }
+});
+
+test('an obstacle collision does not trigger scripted reverse and normal routing continues', () => {
+  const bot = fixture('hardcoded');
+  bot.raceStarted = true;
+  bot.speed = 2;
+  bot.state = { collisionEvents: ['cone-1'] };
+  bot.draw = () => {};
+  bot.collisionChecks = () => {};
+  bot.move = () => {};
+  let routeWasUsed = false;
+  bot.updateBotControls = () => {
+    routeWasUsed = true;
+    bot.pressedKeys = { [keys.up]: true };
+  };
+
+  bot.update();
+  assert.equal(routeWasUsed, true);
+  assert.equal(bot.pressedKeys[keys.up], true);
+  assert.equal(bot.pressedKeys[keys.down], undefined);
+  assert.equal(bot.speed, 2.2, 'the bot continues forward under shared player physics');
+});
+
+test('a stalled bot continues applying its route controller instead of scripted reverse', () => {
+  const bot = fixture('hardcoded');
+  bot.raceStarted = true;
+  bot.speed = 2;
+  bot.state = { collisionEvents: [] };
+  bot.draw = () => {};
+  bot.collisionChecks = () => {};
+  bot.move = () => {};
+  bot.updateBotControls = () => {
+    bot.pressedKeys = { [keys.up]: true };
+  };
+
+  bot.update();
+
+  assert.equal(bot.pressedKeys[keys.up], true);
+  assert.equal(bot.pressedKeys[keys.down], undefined);
+  assert.equal(bot.speed, 2.2);
+});
+
+test('easy bot performs a full forward 360 spin after cone collision, then resumes its route', () => {
+  const bot = fixture('superEasy');
+  bot.raceStarted = true;
+  bot.state = { collisionEvents: ['cone-1'] };
+  bot.draw = () => {};
+  bot.collisionChecks = () => {};
+  bot.move = function move() {
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
+  };
+  let totalTurn = 0;
+  let normalRouteResumed = false;
+  const updateRouteControls = bot.updateBotControls.bind(bot);
+  bot.updateBotControls = () => {
+    normalRouteResumed = true;
+    updateRouteControls();
+  };
+
+  for (let frame = 0; frame < 180 && !normalRouteResumed; frame += 1) {
+    bot.state.collisionEvents = frame === 0 ? ['cone-1'] : [];
+    const previousHeading = bot.heading;
+    bot.update();
+    const headingChange = ((bot.heading - previousHeading + Math.PI) % (2 * Math.PI) + 2 * Math.PI)
+      % (2 * Math.PI) - Math.PI;
+    totalTurn += Math.max(0, headingChange);
+  }
+
+  assert.ok(totalTurn >= Math.PI * 2, 'the bot should complete a full 360-degree turn');
+  assert.equal(normalRouteResumed, true);
+  assert.equal(bot.spinRecovery, null);
 });
 
 test('waypoints advance when the bot passes them instead of orbiting behind', () => {
@@ -116,6 +253,68 @@ test('waypoints advance when the bot passes them instead of orbiting behind', ()
 
   assert.equal(hasReachedRouteWaypoint({ x: 510, y: 180 }, route, 1, 1000, 360, 20), true);
   assert.equal(hasReachedRouteWaypoint({ x: 300, y: 180 }, route, 1, 1000, 360, 20), false);
+  assert.equal(advanceRouteWaypoint({ x: 950, y: 180 }, route, 1, 1000, 360, 20), 0);
+});
+
+test('AI route progress re-localizes after a small off-course push', () => {
+  const route = [
+    { x: 0.1, y: 0.1 }, { x: 0.4, y: 0.1 }, { x: 0.7, y: 0.1 },
+    { x: 0.9, y: 0.1 }, { x: 0.9, y: 0.5 }, { x: 0.9, y: 0.9 },
+  ];
+
+  assert.equal(recoverRouteWaypoint({ x: 900, y: 100 }, route, 1, 1000, 1000, 20), 3);
+});
+
+test('AI controller re-localizes route progress after a racing collision', () => {
+  const bot = fixture('ai');
+  bot.route = [
+    { x: 0.1, y: 0.1 }, { x: 0.4, y: 0.1 }, { x: 0.7, y: 0.1 },
+    { x: 0.9, y: 0.1 }, { x: 0.9, y: 0.5 }, { x: 0.9, y: 0.9 },
+  ];
+  bot.position = { x: 0.9 * 643 - bot.width / 2, y: 0.1 * 360 - bot.height / 2 };
+  bot.waypointIndex = 1;
+  bot.state = { collisionEvents: ['red-car'] };
+
+  bot.updateBotControls();
+
+  assert.equal(bot.waypointIndex, 4);
+});
+
+test('race winner stops both cars from continuing around the track', () => {
+  const winner = fixture('ai');
+  const opponent = fixture('hardcoded');
+  const screen = Object.create(TimeLapScreen.prototype);
+  Object.assign(screen, {
+    gameEnv: { gameObjects: [winner, opponent], innerWidth: 643, innerHeight: 360 },
+    lapTracker: { update: () => true },
+    winnerLabel: null,
+    showLosingScreen: false,
+    getPlayerLabel: () => 'Hard bot',
+  });
+  winner.getCenter = () => ({ x: 300, y: 300 });
+  opponent.getCenter = () => ({ x: 250, y: 300 });
+  winner.speed = 4;
+  opponent.speed = 5;
+
+  screen.trackLaps();
+
+  assert.equal(screen.winnerLabel, 'Hard bot');
+  assert.equal(winner.raceFinished, true);
+  assert.equal(opponent.raceFinished, true);
+
+  winner.pressedKeys = { [keys.up]: true };
+  winner.velocity = { x: 2, y: 0 };
+  winner.draw = () => {};
+  winner.collisionChecks = () => {};
+  winner.move = () => {};
+  let botControllerCalls = 0;
+  winner.updateBotControls = () => { botControllerCalls += 1; };
+  winner.update();
+
+  assert.equal(winner.speed, 0);
+  assert.deepEqual(winner.pressedKeys, {});
+  assert.deepEqual(winner.velocity, { x: 0, y: 0 });
+  assert.equal(botControllerCalls, 0);
 });
 
 test('AI controller uses the saved route and target speed genes', () => {
@@ -208,7 +407,11 @@ test('race setup pauses until a difficulty is chosen, then starts with that mode
     assert.equal(prompt.element.style.zIndex, '30');
     assert.ok(container.children.includes(prompt.element));
     assert.equal(prompt.easyButton.textContent, 'Easy');
+    assert.equal(prompt.mediumButton.textContent, 'Medium');
     assert.equal(prompt.hardButton.textContent, 'Hard');
+    assert.match(prompt.easyButton.className, /--easy/);
+    assert.match(prompt.mediumButton.className, /--medium/);
+    assert.match(prompt.hardButton.className, /--hard/);
     let movementWasBlocked = false;
     events.get('keydown:true')({
       keyCode: 87,
@@ -223,6 +426,14 @@ test('race setup pauses until a difficulty is chosen, then starts with that mode
     assert.deepEqual(bot.pressedKeys, {});
     assert.deepEqual(bot.velocity, { x: 0, y: 0 });
     assert.equal(prompt.element.removed, true);
+
+    const easyPrompt = new RaceDifficultyPrompt({}, gameEnv);
+    easyPrompt.easyButton.listeners.click();
+    assert.equal(bot.mode, 'superEasy');
+
+    const mediumPrompt = new RaceDifficultyPrompt({}, gameEnv);
+    mediumPrompt.mediumButton.listeners.click();
+    assert.equal(bot.mode, 'hardcoded');
   } finally {
     if (originalDocument === undefined) delete globalThis.document;
     else globalThis.document = originalDocument;
@@ -322,12 +533,24 @@ test('player and bot use the same car physics in both bot modes', () => {
 });
 
 test('genetic training is repeatable for the same seed and completes a simulated three-lap race', () => {
-  const first = evolveAutumnBot({ generations: 3, populationSize: 4, seed: 42 });
-  const second = evolveAutumnBot({ generations: 3, populationSize: 4, seed: 42 });
+  const first = evolveAutumnBot({ generations: 3, populationSize: 4, seed: 42, refine: false });
+  const second = evolveAutumnBot({ generations: 3, populationSize: 4, seed: 42, refine: false });
 
   assert.deepEqual(first, second);
   assert.equal(first.result.completed, true);
   assert.equal(first.result.lapsCompleted, 3);
+});
+
+test('genome refinement never worsens clean race-time fitness', () => {
+  const originalScore = scoreGenome(AUTUMN_BOT_GENOME);
+  const refined = refineAutumnBotGenome(AUTUMN_BOT_GENOME, {
+    offsetSteps: [],
+    speedSteps: [0.12],
+  });
+
+  assert.ok(refined.score >= originalScore);
+  assert.ok(scoreGenome(refined.genome) >= originalScore);
+  assert.throws(() => refineAutumnBotGenome(AUTUMN_BOT_GENOME, { offsetSteps: [0] }), /positive finite steps/);
 });
 
 test('saved offline genome beats the untrained centerline baseline', () => {
@@ -339,6 +562,43 @@ test('saved offline genome avoids both scenery obstacles in three laps', () => {
 
   assert.equal(result.completed, true);
   assert.equal(result.obstacleContacts, 0);
+});
+
+test('AI recovers and completes when deterministic pushes nudge it off its route', () => {
+  const result = simulateAutumnRace({
+    mode: 'ai',
+    genome: AUTUMN_BOT_GENOME,
+    maxFrames: 1800,
+    disturbances: [
+      { frame: 250, dx: 10, dy: -8 },
+      { frame: 620, dx: -9, dy: 10 },
+    ],
+  });
+
+  assert.equal(result.completed, true);
+  assert.equal(result.lapsCompleted, 3);
+  assert.ok(result.barrierContacts >= 0);
+  assert.ok(result.obstacleContacts >= 0);
+  assert.throws(() => simulateAutumnRace({
+    mode: 'ai',
+    genome: AUTUMN_BOT_GENOME,
+    disturbances: [{ frame: 1, dx: NaN, dy: 0 }],
+  }), /finite dx\/dy/);
+});
+
+test('AI fitness rewards faster clean races over slower finishes with contacts', () => {
+  const slowerGenome = {
+    ...AUTUMN_BOT_GENOME,
+    speedFractions: AUTUMN_BOT_GENOME.speedFractions.map((value) => Math.max(0.35, value * 0.75)),
+  };
+  const fastResult = simulateAutumnRace({ mode: 'ai', genome: AUTUMN_BOT_GENOME });
+  const slowResult = simulateAutumnRace({ mode: 'ai', genome: slowerGenome });
+
+  assert.equal(fastResult.completed, true);
+  assert.equal(fastResult.barrierContacts + fastResult.obstacleContacts, 0);
+  assert.equal(slowResult.completed, true);
+  assert.ok(slowResult.seconds > fastResult.seconds);
+  assert.ok(scoreGenome(AUTUMN_BOT_GENOME) > scoreGenome(slowerGenome));
 });
 
 test('genome route and steering controls reject invalid training data', () => {

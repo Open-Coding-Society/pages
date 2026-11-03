@@ -100,6 +100,9 @@ class TimeLapScreen extends GameObject {
       const justFinished = this.lapTracker.update(player, normalizedCenter);
       if (justFinished && !this.winnerLabel) {
         this.winnerLabel = this.getPlayerLabel(player, index);
+        players.forEach((racer) => {
+          racer.raceFinished = true;
+        });
         const loser = players.find((candidate) => candidate !== player);
         const loserName = loser?.spriteData?.name || 'Car';
         if (this.showLosingScreen) {

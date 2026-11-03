@@ -59,6 +59,14 @@ export default class Player extends EnginePlayer {
       super.update();
       return;
     }
+    if (this.raceFinished) {
+      this.pressedKeys = {};
+      this.speed = 0;
+      this.velocity.x = 0;
+      this.velocity.y = 0;
+      super.update();
+      return;
+    }
 
     const { up, down, left, right } = this.keypress;
 
