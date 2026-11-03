@@ -5,6 +5,8 @@ Run from the repository root:
 """
 import io
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -278,6 +280,50 @@ class PathRefreshTest(unittest.TestCase):
                 mock.patch.dict(toolchain_agent.os.environ, {"PATH": "/usr/bin"}):
             toolchain_agent.refresh_path()
             self.assertEqual(toolchain_agent.os.environ["PATH"], "/usr/bin")
+
+
+LAUNCHER = Path(__file__).resolve().parent / "toolchain_agent.sh"
+
+
+class LauncherTest(unittest.TestCase):
+    """toolchain_agent.sh starts the agent, or says how to install Python when it is missing."""
+
+    def run_launcher(self, python3_script, uname="Linux", args=()):
+        with tempfile.TemporaryDirectory() as fake_bin:
+            fakes = {"python3": python3_script, "uname": f'echo "{uname}"'}
+            for name, body in fakes.items():
+                path = Path(fake_bin) / name
+                path.write_text(f"#!/bin/sh\n{body}\n")
+                path.chmod(0o755)
+            # The fakes come first, so they hide any real python3 on this computer.
+            env = {**os.environ, "PATH": f"{fake_bin}:{os.environ['PATH']}"}
+            return subprocess.run(["bash", str(LAUNCHER), *args], env=env,
+                                  capture_output=True, text=True, timeout=30)
+
+    def test_starts_the_agent_and_passes_options_through(self):
+        # A ready python3 passes the version check (-c ...) and then runs the agent.
+        result = self.run_launcher('[ "$1" = -c ] && exit 0; echo "ran: $*"',
+                                   args=("--server", "http://localhost:8585"))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("toolchain_agent.py --server http://localhost:8585", result.stdout)
+
+    def test_missing_python_on_linux_shows_the_apt_command(self):
+        result = self.run_launcher("exit 127")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("sudo apt update && sudo apt install -y python3", result.stdout)
+        self.assertNotIn("ran:", result.stdout)
+
+    def test_missing_python_on_macos_shows_the_developer_tools_command(self):
+        result = self.run_launcher("exit 1", uname="Darwin")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("xcode-select --install", result.stdout)
+
+    def test_too_old_python_counts_as_missing(self):
+        # The version check exits 1 when python3 is older than the agent needs.
+        result = self.run_launcher('[ "$1" = -c ] && exit 1; echo "ran: $*"')
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("needs Python 3.7 or newer", result.stdout)
+        self.assertNotIn("ran:", result.stdout)
 
 
 if __name__ == "__main__":

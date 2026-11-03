@@ -57,6 +57,7 @@ systems/auto-generator-ui
 systems/scraper
 systems/messages:dev
 systems/ui-builder
+systems/lesson-feedback:dev
 systems/test-project
 
 # === FLAT STRUCTURE (legacy/uncategorized) ===

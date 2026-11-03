@@ -359,6 +359,10 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
       </div>
       {% endcomment %}
 
+      {% if page.team_teach %}
+      {% include projects/lesson-feedback/lesson-feedback-submission.html %}
+      {% endif %}
+
       {% if submission_type == "link" or submission_type == "github_issue" %}
       {% if submission_type == "github_issue" %}
         {% assign link_label = "GitHub Issue Link" %}
@@ -510,6 +514,29 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
       // it guaranteed to have executed, matching the pattern already used below for
       // renderCodeRunnerSummaryBlog.
       document.addEventListener('DOMContentLoaded', autoCreateAssignmentIfNeededBlog);
+
+      // Team-taught lessons (team_teach: true): the student rates the lesson in the microblog
+      // panel's Ratings tab, and the submission step is saved before the homework is sent
+      // (_projects/systems/lesson-feedback/). Started after DOMContentLoaded, like the
+      // auto-create above, because window.javaURI comes from the module script below.
+      {% if page.team_teach %}
+      let lessonFeedbackBlog = null;
+      function startLessonFeedbackBlog() {
+        lessonFeedbackBlog ??= import('{{ site.baseurl }}/assets/js/projects/lesson-feedback/lesson-feedback-page.js')
+          .then(({ startLessonFeedback }) => startLessonFeedback({
+            javaURI: window.javaURI, fetchOptions: window.fetchOptions, resolveAssignmentId: ensureAssignmentIdBlog,
+          }));
+        return lessonFeedbackBlog;
+      }
+      document.addEventListener('DOMContentLoaded', startLessonFeedbackBlog);
+      {% endif %}
+
+      async function saveLessonFeedbackFirstBlog() {
+        {% if page.team_teach %}
+        const result = await (await startLessonFeedbackBlog()).beforeSubmit();
+        if (!result.ok) throw new Error(result.message);
+        {% endif %}
+      }
 
       function renderCodeRunnerSummaryBlog() {
         const list = document.getElementById('code-runner-summary-blog');
@@ -743,6 +770,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
           btn.disabled = true;
           showStatusBlog('loading', 'Submitting...');
           try {
+            await saveLessonFeedbackFirstBlog();
             const assignmentId = await ensureAssignmentIdBlog();
             const { uid, personId } = await resolveCurrentUserBlog();
             const content = { type: SUBMISSION_TYPE_BLOG === 'github_issue' ? 'github_issue' : 'link', url: link, notes: description };
@@ -806,6 +834,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
           btn.disabled = true;
           showStatusBlog('loading', 'Uploading...');
           try {
+            await saveLessonFeedbackFirstBlog();
             const assignmentId = await ensureAssignmentIdBlog();
             const { uid, personId } = await resolveCurrentUserBlog();
             // Resolve assignment name for the file upload endpoint
@@ -907,6 +936,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
           }
           showStatusBlog('loading', 'Creating Gist and submitting...');
           try {
+            await saveLessonFeedbackFirstBlog();
             const assignmentId = await ensureAssignmentIdBlog();
             // kinds tells the grader which files are written reflections rather than code.
             const gistUrl = await window.exportToGist(files, { type: 'submission', description: notes || 'Code submission', manifest: { kinds: window.readRunnerKinds() } });

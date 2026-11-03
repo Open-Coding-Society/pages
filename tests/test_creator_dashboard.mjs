@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
-  aiRegradeCandidates, assignmentPageUrl, assignmentsWithTopic, filterCreatorSubmissions, withFrontmatterCourses,
+  aiRegradeCandidates, assignmentPageUrl, assignmentsWithTopic, createCreatorDashboard, filterCreatorSubmissions,
+  withFrontmatterCourses,
 } from "../assets/js/submissions/creator-dashboard.js";
 import { gradeSourceLabel, parseGradeInput } from "../assets/js/submissions/grading.js";
 
@@ -106,4 +107,59 @@ test("grade source comes from Spring's grading state, not from guessing at feedb
   assert.equal(gradeSourceLabel({ grade: 3, grading: { source: "AI" } }), "AI grade");
   // Identical feedback and AI summary used to be read as "AI"; the state is now explicit.
   assert.equal(gradeSourceLabel({ grade: 3, feedback: "x", aiSummary: "x" }), "");
+});
+
+// Just enough DOM for load(): every id resolves to a stub that records its markup and listeners.
+async function loadDashboard({ isTeacher, assignments, openLessonSummary }) {
+  const elements = new Map();
+  globalThis.document = {
+    getElementById(id) {
+      if (!elements.has(id)) {
+        elements.set(id, {
+          id, innerHTML: "", value: "", textContent: "", hidden: true, listeners: {},
+          addEventListener(type, handler) { this.listeners[type] = handler; },
+          scrollIntoView() {},
+        });
+      }
+      return elements.get(id);
+    },
+  };
+  globalThis.window = { matchMedia: () => ({ matches: true }) };
+  const json = (body) => ({ ok: true, json: async () => body });
+  globalThis.fetch = async (url) => json(String(url).includes("assignments") ? assignments : []);
+  const dashboard = createCreatorDashboard({
+    managedAssignmentsUrl: "assignments", managedSubmissionsUrl: "submissions", courseManifestUrl: "manifest",
+    escapeHtml: (value) => String(value), cellTitle: () => "", openLessonSummary,
+  });
+  await dashboard.load("mort", { isTeacher });
+  return elements;
+}
+
+test("teachers get a Lesson Summary for team-taught lessons only", async () => {
+  const opened = [];
+  const elements = await loadDashboard({
+    isTeacher: true,
+    assignments: [{ id: 7, name: "1.02 Variables", teamTeach: true }, { id: 8, name: "Loops", teamTeach: false }],
+    openLessonSummary: (assignment) => opened.push(assignment.id),
+  });
+  const container = elements.get("created-assignments-container");
+
+  assert.match(container.innerHTML, /<th>Lesson feedback<\/th>/);
+  assert.match(container.innerHTML, /data-lesson-summary="7">Lesson Summary</);
+  assert.doesNotMatch(container.innerHTML, /data-lesson-summary="8"/);
+  assert.match(container.innerHTML, /Not team-taught/);
+
+  const button = { dataset: { lessonSummary: "7" } };
+  container.listeners.click({ target: { closest: (selector) => (selector === "[data-lesson-summary]" ? button : null) } });
+  assert.deepEqual(opened, [7]);
+});
+
+test("the teaching team's dashboard has no Lesson Summary", async () => {
+  const elements = await loadDashboard({
+    isTeacher: false,
+    assignments: [{ id: 7, name: "1.02 Variables", teamTeach: true, creatorUids: ["mort"] }],
+    openLessonSummary: () => assert.fail("only teachers open the summary"),
+  });
+
+  assert.doesNotMatch(elements.get("created-assignments-container").innerHTML, /Lesson feedback|data-lesson-summary/);
 });

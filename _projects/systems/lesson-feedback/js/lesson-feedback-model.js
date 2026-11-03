@@ -12,15 +12,13 @@
 export const MIN_RATING = 1;
 export const MAX_RATING = 5;
 export const MAX_TEXT_LENGTH = 1000;
-// Fewer responses than this would let the teaching team guess who wrote a comment.
-export const MIN_RESPONSES_FOR_SUMMARY = 5;
 
-// Draft wording for the PM to approve; `step` is where the rating is first asked.
+// Wording approved by the PM; `step` is where the rating is first asked.
 export const RATINGS = [
-  { key: 'lesson', label: 'Lesson Quality', question: 'How clear and well organized was the lesson?', step: 'lesson' },
-  { key: 'engage', label: 'Presentation/Engagement', question: 'How well did the team present and keep the class engaged?', step: 'lesson' },
-  { key: 'popcorn', label: 'Popcorn Hacks', question: 'How much did the popcorn hacks help you during the lesson?', step: 'lesson' },
-  { key: 'homework', label: 'Homework Hacks', question: 'How well did the homework hacks build on the lesson?', step: 'submission' },
+  { key: 'lesson', label: 'Lesson Quality', question: 'How clear, accurate and well organized was the lesson?', step: 'lesson' },
+  { key: 'engage', label: 'Presentation/Engagement', question: 'How well did the team explain the material and keep the class involved?', step: 'lesson' },
+  { key: 'popcorn', label: 'Popcorn Hacks', question: 'How much did the popcorn hacks help you understand the lesson as it went?', step: 'lesson' },
+  { key: 'homework', label: 'Homework Hacks', question: 'How well did the homework hacks let you practice what the lesson taught?', step: 'submission' },
 ];
 
 export const SCALE_HINT = '1 Poor · 2 Fair · 3 Good · 4 Very good · 5 Excellent';
@@ -142,76 +140,100 @@ function shuffled(items, random) {
   return copy;
 }
 
-const average = (records, key) =>
-  Math.round((records.reduce((total, record) => total + record[key], 0) / records.length) * 100) / 100;
+const average = (records, key) => (records.length
+  ? Math.round((records.reduce((total, record) => total + record[key], 0) / records.length) * 100) / 100
+  : null);
 
-// The Lesson Summary: averages and anonymous comments from complete feedback only.
-// Pros and grows are shuffled separately so a comment cannot be matched to its
-// writer's ratings, their other comment or the order students submitted in.
+// How many students gave each value from MIN_RATING to MAX_RATING (index 0 is a 1).
+function countsOf(records, key) {
+  const counts = new Array(MAX_RATING - MIN_RATING + 1).fill(0);
+  for (const record of records) counts[record[key] - MIN_RATING] += 1;
+  return counts;
+}
+
+// The live Lesson Summary teachers see: averages, rating counts and the comments
+// without names, from complete feedback only. Pros and grows are shuffled separately
+// so a comment cannot be matched to its writer's ratings, their other comment or the
+// order students submitted in. Averages are null before the first response.
 export function summarize(records, random = Math.random) {
   const complete = (records || []).filter(isComplete);
-  const count = complete.length;
-  if (count < MIN_RESPONSES_FOR_SUMMARY) {
-    return { responseCount: count, released: false, averages: null, pros: [], grows: [] };
-  }
-  const averages = Object.fromEntries(RATINGS.map(rating => [rating.key, average(complete, rating.key)]));
   return {
-    responseCount: count,
-    released: true,
-    averages,
+    responseCount: complete.length,
+    averages: Object.fromEntries(RATINGS.map(rating => [rating.key, average(complete, rating.key)])),
+    counts: Object.fromEntries(RATINGS.map(rating => [rating.key, countsOf(complete, rating.key)])),
     pros: shuffled(complete.map(record => record.pros), random),
     grows: shuffled(complete.map(record => record.grows), random),
   };
 }
 
-// --- Storage as microblog posts -------------------------------------------------
+// --- Spring API shapes ----------------------------------------------------------
 //
-// Feedback is kept as a microblog post on the lesson's page (topicPath), with the
-// ratings and text in the post's optional `data` field. `content` is required by
-// Flask, so it holds a fixed label rather than anything the student wrote; the panel
-// must hide these posts from the page feed before any are saved.
+// Spring stores the feedback (mvc/lessonfeedback, /api/lesson-feedback/{assignmentId}).
+// These build its request bodies and turn its responses into the shapes above, so
+// lesson-feedback-api.js stays a thin fetch layer. Responses are checked rather than
+// trusted, so a bad value never reaches a form or a summary.
 
-export const MICROBLOG_KIND = 'lesson-feedback';
-export const MICROBLOG_CONTENT = 'Lesson feedback';
-const DATA_VERSION = 1;
-
-export function toMicroblogPost(feedback, topicPath) {
-  if (isBlank(topicPath)) {
-    throw new FeedbackError('invalid', ['topicPath'], 'A lesson page is required to save feedback');
-  }
-  const current = { ...EMPTY_FEEDBACK, ...(feedback || {}) };
-  return {
-    content: MICROBLOG_CONTENT,
-    topicPath,
-    data: {
-      kind: MICROBLOG_KIND,
-      version: DATA_VERSION,
-      ratings: Object.fromEntries(RATINGS.map(rating => [rating.key, current[rating.key]])),
-      pros: current.pros,
-      grows: current.grows,
-    },
-  };
-}
+export const API_PATH = '/api/lesson-feedback';
 
 const asRating = value => (Number.isInteger(value) && value >= MIN_RATING && value <= MAX_RATING ? value : null);
 const asText = value => (typeof value === 'string' && value.trim() !== '' ? value.trim().slice(0, MAX_TEXT_LENGTH) : null);
+const asTime = value => (Number.isFinite(value) ? value : null);
 
-// Reads feedback back from a microblog post; anything else (an ordinary post, or
-// data this version does not understand) returns null.
-export function fromMicroblogPost(post) {
-  let data = post?.data;
-  if (typeof data === 'string') {
-    try {
-      data = JSON.parse(data);
-    } catch {
-      return null;
-    }
+// The body for PUT .../{step}: only that step's ratings plus pros and grows, so the
+// lesson step never sends homework. Null leaves a saved value as it is.
+export function toStepRequest(step, input) {
+  const request = input || {};
+  const body = Object.fromEntries(ratingsForStep(step).map(rating => [rating.key, request[rating.key] ?? null]));
+  for (const field of TEXT_FIELDS) body[field] = request[field] ?? null;
+  return body;
+}
+
+// Spring's FeedbackView, from GET .../mine and both PUTs. `locked` and `complete` are
+// recomputed from the ratings so they always match what the form shows.
+export function fromFeedbackView(view) {
+  if (!view || typeof view !== 'object') {
+    throw new FeedbackError('invalid', ['response'], 'The server did not send lesson feedback');
   }
-  if (!data || data.kind !== MICROBLOG_KIND || data.version !== DATA_VERSION) return null;
-  const ratings = data.ratings || {};
-  return {
-    ...Object.fromEntries(RATINGS.map(rating => [rating.key, asRating(ratings[rating.key])])),
-    pros: asText(data.pros),
-    grows: asText(data.grows),
+  const source = view.feedback || {};
+  const feedback = {
+    ...Object.fromEntries(RATINGS.map(rating => [rating.key, asRating(source[rating.key])])),
+    pros: asText(source.pros),
+    grows: asText(source.grows),
   };
+  return {
+    assignmentId: Number.isInteger(view.assignmentId) ? view.assignmentId : null,
+    page: typeof view.page === 'string' ? view.page : null,
+    closed: view.closed === true,
+    feedback,
+    locked: lockedFields(feedback),
+    complete: isComplete(feedback),
+    createdAt: asTime(view.createdAt),
+    updatedAt: asTime(view.updatedAt),
+  };
+}
+
+const SUMMARY_AVERAGES = { lesson: 'averageLesson', engage: 'averageEngage', popcorn: 'averagePopcorn', homework: 'averageHomework' };
+
+const SCALE_SIZE = MAX_RATING - MIN_RATING + 1;
+const asCount = value => (Number.isInteger(value) && value >= 0 ? value : 0);
+
+// Spring's Summary, from GET .../summary, in the shape summarize() returns. A summary
+// with responses must carry every average; a bad count reads as 0.
+export function fromSummaryResponse(summary) {
+  const source = summary || {};
+  const responseCount = asCount(source.responseCount);
+  const averages = Object.fromEntries(RATINGS.map(rating => {
+    const value = source[SUMMARY_AVERAGES[rating.key]];
+    return [rating.key, Number.isFinite(value) ? value : null];
+  }));
+  const missing = RATINGS.filter(rating => averages[rating.key] === null).map(rating => rating.key);
+  if (responseCount > 0 && missing.length) {
+    throw new FeedbackError('invalid', missing, `The summary has no average for: ${missing.join(', ')}`);
+  }
+  const counts = Object.fromEntries(RATINGS.map(rating => {
+    const list = Array.isArray(source.counts?.[rating.key]) ? source.counts[rating.key] : [];
+    return [rating.key, Array.from({ length: SCALE_SIZE }, (_, index) => asCount(list[index]))];
+  }));
+  const comments = list => (Array.isArray(list) ? list.filter(text => typeof text === 'string') : []);
+  return { responseCount, averages, counts, pros: comments(source.pros), grows: comments(source.grows) };
 }

@@ -1,0 +1,282 @@
+// Styles for lesson feedback (_projects/systems/lesson-feedback/).
+//
+// The build copies this folder to _sass/projects/lesson-feedback/, and
+// _sass/projects/_all.scss pulls it into the site-wide stylesheet, so every
+// selector is scoped: the Ratings tab under #microblog-ratings-panel, the Teacher
+// Dashboard's summary under .lesson-summary. The submission step inside Submit
+// Assignment keeps the .rating-* styles from _sass/open-coding/lesson-player.scss.
+
+// ---- Ratings tab: the lesson step on the green microblog panel (matches the PM's mockup)
+
+$panel-ink: #ffffff;
+$panel-muted: #d1d5db;
+$panel-line: rgba(255, 255, 255, 0.25);
+$panel-field: rgba(255, 255, 255, 0.08);
+$feedback-accent: #f2c14e;
+$feedback-accent-ink: #1d2a22;
+$focus-ring: #3b82f6;
+
+#microblog-ratings-panel {
+  margin-top: 0.75rem;
+  color: $panel-ink;
+
+  .ocs__stack {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .ocs__text {
+    margin: 0;
+    font-size: 0.92rem;
+    color: $panel-ink;
+  }
+
+  .rating-group {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+  }
+
+  .rating-label {
+    color: $panel-ink;
+    font-weight: 700;
+  }
+
+  .rating-question,
+  .rating-scale-hint,
+  small {
+    color: $panel-muted;
+  }
+
+  .rating-option {
+    position: relative;
+    border: 1px solid $panel-line;
+    border-radius: 8px;
+    background: transparent;
+    color: $panel-ink;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rating-option:has(input:checked) {
+    background: $feedback-accent;
+    border-color: $feedback-accent;
+    color: $feedback-accent-ink;
+  }
+
+  .rating-option:has(input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+
+  .rating-option:focus-within {
+    outline: 2px solid $focus-ring;
+    outline-offset: 2px;
+  }
+
+  .rating-locked-note {
+    color: $feedback-accent;
+  }
+
+  .ocs__label {
+    color: $panel-ink;
+    font-weight: 700;
+  }
+
+  textarea.ocs__input {
+    min-height: 56px;
+    border: 1px solid $panel-line;
+    border-radius: 6px;
+    background: $panel-field;
+    color: $panel-ink;
+    resize: vertical;
+  }
+
+  .ocs__btn.accent.fill {
+    background: $feedback-accent;
+    border-color: $feedback-accent;
+    color: $feedback-accent-ink;
+    font-weight: 700;
+  }
+
+  [aria-invalid="true"] {
+    outline: 2px solid $feedback-accent;
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+}
+
+// ---- Teacher Dashboard: the Lesson Summary chart (lesson-feedback-summary.js)
+//
+// A diverging scale: red for 1-2, gray for the neutral 3, blue for 4-5. The steps
+// passed the dataviz palette checks for each theme (lightness band, chroma, CVD and
+// normal-vision separation); the contrast warning is why every segment has a hover
+// label and the card has a table view. Text inside a fill is white or near-black by
+// the fill's luminance.
+
+$summary-dark: (1: #e66767, 2: #a8403f, 3: #55544f, 4: #2e60a1, 5: #4a92ec);
+$summary-light: (1: #b33433, 2: #e87472, 3: #d9d8d3, 4: #5598e7, 5: #1c5cab);
+$summary-dark-ink: (1: #0b0b0b, 2: #ffffff, 3: #ffffff, 4: #ffffff, 5: #0b0b0b);
+$summary-light-ink: (1: #ffffff, 2: #0b0b0b, 3: #0b0b0b, 4: #0b0b0b, 5: #ffffff);
+
+.lesson-summary {
+  @each $value, $fill in $summary-dark {
+    --lesson-summary-v#{$value}: #{$fill};
+    --lesson-summary-ink-v#{$value}: #{map-get($summary-dark-ink, $value)};
+  }
+
+  &.lesson-summary--light {
+    @each $value, $fill in $summary-light {
+      --lesson-summary-v#{$value}: #{$fill};
+      --lesson-summary-ink-v#{$value}: #{map-get($summary-light-ink, $value)};
+    }
+  }
+
+  @each $value, $fill in $summary-dark {
+    .lesson-summary--v#{$value} {
+      background: var(--lesson-summary-v#{$value});
+
+      b {
+        color: var(--lesson-summary-ink-v#{$value});
+      }
+    }
+  }
+}
+
+.lesson-summary__chart {
+  position: relative;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.lesson-summary__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+}
+
+.lesson-summary__swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.lesson-summary__rows {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.lesson-summary__row {
+  display: grid;
+  // The label column fits the longest label ("Presentation/Engagement") without breaking it.
+  grid-template-columns: max-content minmax(8rem, 1fr) 3rem;
+  align-items: center;
+  gap: 0.75rem;
+
+  @media (max-width: 480px) {
+    grid-template-columns: minmax(0, 1fr) 3rem;
+
+    .lesson-summary__label {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.lesson-summary__label {
+  font-size: 0.9rem;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.lesson-summary__average {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+// The centre line marks the middle of the neutral rating.
+.lesson-summary__track {
+  position: relative;
+  height: 24px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    left: 50%;
+    width: 1px;
+    background: currentColor;
+    opacity: 0.45;
+  }
+}
+
+// Touching segments are separated by a 2px border in the surface color.
+.lesson-summary__segment {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  border-right: 2px solid var(--panel, transparent);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  cursor: default;
+
+  &:first-child {
+    border-radius: 4px 0 0 4px;
+  }
+
+  &:last-of-type {
+    border-right: none;
+    border-radius: 0 4px 4px 0;
+  }
+
+  &:only-of-type {
+    border-radius: 4px;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+.lesson-summary__tooltip {
+  position: absolute;
+  z-index: 2;
+  margin: 0;
+  padding: 0.3rem 0.5rem;
+  transform: translate(-50%, calc(-100% - 6px));
+  border-radius: 6px;
+  background: var(--panel, #0b1220);
+  border: 1px solid rgba(127, 127, 127, 0.5);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.lesson-summary__table summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+// Two classes, to win over the shared .ocs__modal-card width.
+.ocs__modal-card.lesson-summary-modal {
+  // Not min(): Ruby Sass evaluates it itself and rejects the mixed units.
+  width: 720px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}

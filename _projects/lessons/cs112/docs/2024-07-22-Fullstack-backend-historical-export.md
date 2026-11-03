@@ -443,6 +443,10 @@ List 3 requests that would fail on my API and the status code each one returns.
 I will test them in my .http file and tell you where you were wrong.
 ```
 
+## What's Next
+> See the same ideas in Python
+- The [Microblog API](/python/flask/api/microblog) lesson traces a real Flask feature and matches it to these five parts
+
 ## Further Questions
 > Please use the comments below to suggest things to be added
 - Come to office hours if further help is needed

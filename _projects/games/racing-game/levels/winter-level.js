@@ -75,6 +75,7 @@ class GameLevelWinter {
         deceleration: 0.4,
         reverseSpeed: -4,
         boostKey: 70, // F
+        boostLabel: 'F',
         INIT_POSITION: {x: 0.44, y: 0.775},
         direction: { default: 'right' },
         pixels: { height: 1024, width: 1536 },
@@ -102,6 +103,7 @@ class GameLevelWinter {
         deceleration: 0.4,
         reverseSpeed: -4,
         boostKey: 75, // K
+        boostLabel: 'K',
         INIT_POSITION: {x: 0.44, y: 0.805},
         direction: { default: 'right' },
         pixels: { height: 1024, width: 1536 },
@@ -140,8 +142,9 @@ class GameLevelWinter {
     const lap_data = {
       totalLaps: 3,
       finishLine: { x: 0.5, top: 0.764, bottom: 0.864 },
-      checkpoint: { x: 0.5, top: 0.11, bottom: 0.24 },
-      hudPosition: { x: 0.01, y: 0.02 }
+      hudPosition: { x: 0.01, y: 0.02 },
+      showBoostBars: true,
+      usePositionForLapTracking: true
     };
 
     this.classes = [
@@ -290,8 +293,6 @@ class GameLevelWinter {
     this.countdownOverlay?.remove();
     this.countdownOverlay = null;
     delete this.gameEnv.winterRaceStarted;
-    cleanupRacingLevel(this.gameEnv);
-
   }
 }
 
