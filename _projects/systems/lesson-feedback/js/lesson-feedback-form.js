@@ -6,8 +6,9 @@
 // so it has no button or <form> of its own (forms cannot nest).
 //
 // The ratings reuse the paused self-assessment's .rating-* classes in
-// _sass/open-coding/lesson-player.scss; everything else is OCS grammar. All text is
-// set with textContent. The caller saves: this module never fetches.
+// _sass/open-coding/lesson-player.scss (restyled for the green microblog panel in
+// sass/main.scss); everything else is OCS grammar. All text is set with
+// textContent. The caller saves: this module never fetches.
 import {
   FeedbackError, MAX_RATING, MAX_TEXT_LENGTH, MIN_RATING, RATINGS, SCALE_HINT, formFields, mergeStep,
 } from './lesson-feedback-model.js';
@@ -50,7 +51,7 @@ function ratingGroup(rating, idPrefix) {
   group.append(scale);
   group.append(element('div', 'rating-scale-hint', SCALE_HINT));
   if (rating.locked) {
-    group.append(element('small', null, 'Saved at the lesson. Saved ratings can\'t be changed.'));
+    group.append(element('small', 'rating-locked-note', 'Saved at the lesson. Saved ratings can\'t be changed.'));
   }
   return { group, inputs };
 }
@@ -146,6 +147,15 @@ export function createLessonFeedbackForm({ step, saved = null, idPrefix = 'lesso
     status.textContent = text;
   }
 
+  // Brings the student to the first field validate() marked, so a refused submit
+  // shows what is still missing instead of only saying so.
+  function focusFirstInvalid() {
+    const node = Object.values(groups).find(candidate => candidate.getAttribute('aria-invalid') === 'true');
+    if (!node) return;
+    node.scrollIntoView?.({ block: 'center' });
+    (node.matches('textarea') ? node : node.querySelector('input:not(:disabled)'))?.focus();
+  }
+
   // Checks the input against the same rules the server applies; returns
   // { ok: true, input, feedback } or { ok: false, input, error }.
   function validate() {
@@ -171,5 +181,5 @@ export function createLessonFeedbackForm({ step, saved = null, idPrefix = 'lesso
     });
   }
 
-  return { element: root, readInput, validate, showStatus };
+  return { element: root, readInput, validate, showStatus, focusFirstInvalid };
 }

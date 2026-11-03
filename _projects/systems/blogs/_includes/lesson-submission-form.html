@@ -81,6 +81,10 @@
   </div>
   {% endcomment %}
 
+  {% if page.team_teach %}
+  {% include projects/lesson-feedback/lesson-feedback-submission.html %}
+  {% endif %}
+
   {% if submission_type == "link" or submission_type == "github_issue" %}
   {% if submission_type == "github_issue" %}
     {% assign link_label = "GitHub Issue Link" %}

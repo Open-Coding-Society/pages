@@ -68,6 +68,18 @@ CASES = [
         "permalink: /csa/lesson/",
         {"content_url": "csa/lesson"},
     ),
+    (
+        "team-taught page",
+        "navigation/team.md",
+        "team_teach: true",
+        {"team_teach": True},
+    ),
+    (
+        "team_teach written as text is not set",
+        "navigation/bad-team.md",
+        "team_teach: yes please",
+        {"team_teach": None},
+    ),
 ]
 
 
@@ -97,5 +109,14 @@ for description, path, frontmatter, expected in CASES:
     for field, actual in wrong.items():
         print(f"        {field}: expected {expected[field]!r}, got {actual!r}")
 
-print(f"\n{len(CASES) - failures} passed, {failures} failed")
+# teamTeach is always sent, so dropping the flag from a page also clears it in Spring.
+for frontmatter, expected in (("team_teach: true", "true"), ("", "false")):
+    sent = run_case("navigation/payload.md", frontmatter).with_defaults().to_payload()["teamTeach"]
+    if sent == expected:
+        print(f"PASS  payload teamTeach={expected}")
+    else:
+        failures += 1
+        print(f"FAIL  payload teamTeach: expected {expected!r}, got {sent!r}")
+
+print(f"\n{len(CASES) + 2 - failures} passed, {failures} failed")
 raise SystemExit(1 if failures else 0)

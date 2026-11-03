@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
-  EMPTY_FEEDBACK, FeedbackError, MAX_TEXT_LENGTH, MICROBLOG_CONTENT, MICROBLOG_KIND, MIN_RESPONSES_FOR_SUMMARY,
-  formFields, fromMicroblogPost, isComplete, lockedFields, mergeStep, missingFields, ratingsForStep, summarize,
-  toMicroblogPost,
+  EMPTY_FEEDBACK, FeedbackError, MAX_TEXT_LENGTH,
+  formFields, fromFeedbackView, fromSummaryResponse, isComplete, lockedFields, mergeStep, missingFields,
+  ratingsForStep, summarize, toStepRequest,
 } from '../js/lesson-feedback-model.js';
 
 // A fixed-seed generator so shuffles come out the same on every run.
@@ -106,22 +106,39 @@ test('form fields show saved ratings as locked and require the rest at submissio
   assert.equal(submissionStep.grows, '');
 });
 
-test('the summary stays hidden below the minimum and ignores unfinished feedback', () => {
-  const records = Array.from({ length: MIN_RESPONSES_FOR_SUMMARY - 1 }, (_, i) => complete(5, `pros ${i}`, `grows ${i}`));
-  records.push({ ...complete(5), homework: null });
+const NO_COUNTS = [0, 0, 0, 0, 0];
 
-  const summary = summarize(records, seededRandom(1));
+test('before any finished feedback the summary has zero counts and no averages', () => {
+  const summary = summarize([{ ...complete(5), homework: null }], seededRandom(1));
 
-  assert.deepEqual(summary, { responseCount: MIN_RESPONSES_FOR_SUMMARY - 1, released: false, averages: null, pros: [], grows: [] });
+  assert.deepEqual(summary, {
+    responseCount: 0,
+    averages: { lesson: null, engage: null, popcorn: null, homework: null },
+    counts: { lesson: NO_COUNTS, engage: NO_COUNTS, popcorn: NO_COUNTS, homework: NO_COUNTS },
+    pros: [], grows: [],
+  });
 });
 
-test('a released summary averages the ratings and shuffles comments separately', () => {
+test('the summary is live from the first finished response and counts each rating from 1 to 5', () => {
+  const summary = summarize([
+    { lesson: 1, engage: 2, popcorn: 3, homework: 5, pros: 'a', grows: 'b' },
+    { lesson: 1, engage: 2, popcorn: 4, homework: 5, pros: 'c', grows: 'd' },
+    { lesson: 5, engage: 2, popcorn: 3, homework: 5, pros: 'e', grows: 'f' },
+  ], seededRandom(1));
+
+  assert.equal(summary.responseCount, 3);
+  assert.deepEqual(summary.counts, {
+    lesson: [2, 0, 0, 0, 1], engage: [0, 3, 0, 0, 0], popcorn: [0, 0, 2, 1, 0], homework: [0, 0, 0, 0, 3],
+  });
+  assert.equal(summarize([complete(4, 'Clear', 'Slower')]).averages.lesson, 4);
+});
+
+test('the summary averages the ratings and shuffles comments separately', () => {
   const records = Array.from({ length: 8 }, (_, i) =>
     ({ lesson: i % 2 === 0 ? 4 : 5, engage: 3, popcorn: 2, homework: 1, pros: `pros ${i}`, grows: `grows ${i}` }));
 
   const summary = summarize(records, seededRandom(42));
 
-  assert.equal(summary.released, true);
   assert.equal(summary.responseCount, 8);
   assert.deepEqual(summary.averages, { lesson: 4.5, engage: 3, popcorn: 2, homework: 1 });
   const submitted = records.map(record => record.pros);
@@ -132,38 +149,61 @@ test('a released summary averages the ratings and shuffles comments separately',
   assert.equal(JSON.stringify(summary).includes('uid'), false);
 });
 
-test('feedback is stored in a microblog post without the student text in content', () => {
-  const feedback = { ...EMPTY_FEEDBACK, lesson: 4, pros: 'Great demo', grows: 'Slow down' };
+test('a step request sends only that step\'s ratings, so the lesson step never sends homework', () => {
+  const input = { lesson: 4, engage: null, popcorn: 3, homework: 5, pros: 'Clear', grows: '' };
 
-  const post = toMicroblogPost(feedback, '/csp/lessons/loops/');
-
-  assert.equal(post.content, MICROBLOG_CONTENT);
-  assert.equal(post.topicPath, '/csp/lessons/loops/');
-  assert.deepEqual(post.data, {
-    kind: MICROBLOG_KIND,
-    version: 1,
-    ratings: { lesson: 4, engage: null, popcorn: null, homework: null },
-    pros: 'Great demo',
-    grows: 'Slow down',
-  });
-  assert.equal(errorOf(() => toMicroblogPost(feedback, ' ')).kind, 'invalid');
+  assert.deepEqual(toStepRequest('lesson', input), { lesson: 4, engage: null, popcorn: 3, pros: 'Clear', grows: '' });
+  assert.deepEqual(toStepRequest('submission', { homework: 2 }),
+    { lesson: null, engage: null, popcorn: null, homework: 2, pros: null, grows: null });
+  assert.equal(errorOf(() => toStepRequest('review', input)).kind, 'invalid');
 });
 
-test('feedback reads back from a microblog post, including data sent as a JSON string', () => {
-  const feedback = complete(3, 'Clear', 'Shorter hacks');
-  const post = toMicroblogPost(feedback, '/lesson/');
+test('a feedback view from Spring is checked, and its locks come from the saved ratings', () => {
+  const view = fromFeedbackView({
+    assignmentId: 10, page: '/csp/lessons/loops/', closed: false,
+    feedback: { lesson: 4, engage: null, popcorn: 3, homework: null, pros: 'Clear', grows: null },
+    locked: ['homework'], complete: true, createdAt: 1000, updatedAt: 2000,
+  });
 
-  assert.deepEqual(fromMicroblogPost(post), feedback);
-  assert.deepEqual(fromMicroblogPost({ ...post, data: JSON.stringify(post.data) }), feedback);
+  assert.deepEqual(view, {
+    assignmentId: 10, page: '/csp/lessons/loops/', closed: false,
+    feedback: { ...EMPTY_FEEDBACK, lesson: 4, popcorn: 3, pros: 'Clear' },
+    locked: ['lesson', 'popcorn'], complete: false, createdAt: 1000, updatedAt: 2000,
+  });
+  assert.equal(errorOf(() => fromFeedbackView(null)).kind, 'invalid');
 });
 
-test('ordinary posts and unexpected data are not treated as feedback', () => {
-  assert.equal(fromMicroblogPost({ content: 'Nice lesson!' }), null);
-  assert.equal(fromMicroblogPost({ data: '{not json' }), null);
-  assert.equal(fromMicroblogPost({ data: { kind: MICROBLOG_KIND, version: 2 } }), null);
-
-  const tampered = fromMicroblogPost({
-    data: { kind: MICROBLOG_KIND, version: 1, ratings: { lesson: 9, engage: '5', popcorn: 2 }, pros: 42, grows: '  ok ' },
+test('out-of-range or mistyped values from the server are dropped, not shown', () => {
+  const view = fromFeedbackView({
+    closed: 'yes',
+    feedback: { lesson: 9, engage: '5', popcorn: 2, homework: 3.5, pros: 42, grows: '  ok ' },
+    createdAt: 'soon',
   });
-  assert.deepEqual(tampered, { lesson: null, engage: null, popcorn: 2, homework: null, pros: null, grows: 'ok' });
+
+  assert.deepEqual(view.feedback, { lesson: null, engage: null, popcorn: 2, homework: null, pros: null, grows: 'ok' });
+  assert.equal(view.closed, false);
+  assert.equal(view.createdAt, null);
+});
+
+test('a Spring summary becomes the summarize() shape, with bad counts read as 0', () => {
+  assert.deepEqual(fromSummaryResponse({ responseCount: 0, pros: [], grows: [] }), {
+    responseCount: 0,
+    averages: { lesson: null, engage: null, popcorn: null, homework: null },
+    counts: { lesson: NO_COUNTS, engage: NO_COUNTS, popcorn: NO_COUNTS, homework: NO_COUNTS },
+    pros: [], grows: [],
+  });
+
+  const summary = fromSummaryResponse({
+    responseCount: 6, averageLesson: 4.5, averageEngage: 3, averagePopcorn: 2, averageHomework: 1,
+    counts: { lesson: [0, 0, 0, 3, 3], engage: [0, 0, 6, 0, 0], popcorn: [0, 6], homework: [6, -1, 'x', 0, 0, 9] },
+    pros: ['Clear', 7], grows: ['Slower'],
+  });
+  assert.deepEqual(summary, {
+    responseCount: 6, averages: { lesson: 4.5, engage: 3, popcorn: 2, homework: 1 },
+    counts: { lesson: [0, 0, 0, 3, 3], engage: [0, 0, 6, 0, 0], popcorn: [0, 6, 0, 0, 0], homework: [6, 0, 0, 0, 0] },
+    pros: ['Clear'], grows: ['Slower'],
+  });
+
+  const broken = errorOf(() => fromSummaryResponse({ responseCount: 6, averageLesson: 4 }));
+  assert.deepEqual(broken.fields, ['engage', 'popcorn', 'homework']);
 });

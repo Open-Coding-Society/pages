@@ -12,6 +12,8 @@ function stubNode(tag) {
     children: [],
     attributes: {},
     listeners: {},
+    style: {},
+    dataset: {},
     textContent: '',
     append(...nodes) { this.children.push(...nodes); },
     setAttribute(name, value) { this.attributes[name] = String(value); },
@@ -28,7 +30,7 @@ globalThis.document = {
 };
 
 const { createLessonFeedbackForm } = await import('../js/lesson-feedback-form.js');
-const { createLessonSummary } = await import('../js/lesson-feedback-summary.js');
+const { createLessonSummary, divergingSegments } = await import('../js/lesson-feedback-summary.js');
 const { EMPTY_FEEDBACK, summarize } = await import('../js/lesson-feedback-model.js');
 
 function findAll(node, predicate, found = []) {
@@ -120,23 +122,56 @@ test('a standalone lesson form sends its input through onSubmit', () => {
   assert.equal(button.textContent, 'Save feedback');
 });
 
-test('the summary waits for enough responses', () => {
+test('focusFirstInvalid goes to the first field validate() marked', () => {
+  const form = createLessonFeedbackForm({ step: 'submission', saved: { ...EMPTY_FEEDBACK, lesson: 4, engage: 3, popcorn: 2 } });
+  choose(form, 'homework', 5);
+  textarea(form, 'pros').value = 'Clear';
+  const grows = textarea(form, 'grows');
+  let focused = null;
+  grows.matches = selector => selector === 'textarea';
+  grows.focus = () => { focused = grows; };
+
+  form.validate();
+  form.focusFirstInvalid();
+
+  assert.equal(focused, grows);
+});
+
+test('before any finished feedback the summary says so and draws no chart', () => {
   const card = createLessonSummary(summarize([]));
   const text = findAll(card, node => node.className === 'ocs__callout')[0].textContent;
 
-  assert.match(text, /after grading/);
-  assert.match(text, /0 students so far/);
-  assert.equal(findAll(card, node => node.tag === 'table').length, 0);
+  assert.match(text, /No student has finished/);
+  assert.equal(findAll(card, node => node.tag === 'figure').length, 0);
 });
 
-test('the summary shows averages and comments as plain text', () => {
+test('diverging segments put 1-2 left of the centre, split 3 across it, and 4-5 right', () => {
+  // 4 students: one 2, two 3s, one 5. Half the track (50) stands for all 4.
+  assert.deepEqual(divergingSegments([0, 1, 2, 0, 1], 4), [
+    { value: 2, count: 1, left: 25, width: 12.5 },
+    { value: 3, count: 2, left: 37.5, width: 25 },
+    { value: 5, count: 1, left: 62.5, width: 12.5 },
+  ]);
+  assert.deepEqual(divergingSegments([0, 0, 0, 0, 0], 0), []);
+});
+
+test('the summary charts every rating, with a table view and comments as plain text', () => {
   const records = Array.from({ length: 5 }, (_, i) =>
-    ({ lesson: 4, engage: 5, popcorn: 3, homework: 4, pros: `<script>alert(${i})</script>`, grows: `grow ${i}` }));
-  const card = createLessonSummary(summarize(records, () => 0));
+    ({ lesson: 4, engage: 5, popcorn: 3, homework: i === 0 ? 1 : 4, pros: `<script>alert(${i})</script>`, grows: `grow ${i}` }));
+  const card = createLessonSummary(summarize(records, () => 0), { light: true });
+
+  assert.match(card.className, /lesson-summary--light/);
+  const rows = findAll(card, node => node.className === 'lesson-summary__row');
+  assert.equal(rows.length, 4);
+  const homework = findAll(rows[3], node => /lesson-summary__segment/.test(node.className));
+  assert.deepEqual(homework.map(node => node.className.split('--v')[1]), ['1', '4']);
+  assert.equal(homework[0].dataset.tip, 'Homework Hacks · 1 Poor: 1 student (20%)');
+  assert.equal(homework[1].style.width, '40%');
 
   const cells = findAll(card, node => node.tag === 'td').map(node => node.textContent);
-  assert.deepEqual(cells, ['Lesson Quality', '4.00', 'Presentation/Engagement', '5.00', 'Popcorn Hacks', '3.00', 'Homework Hacks', '4.00']);
-  const items = findAll(card, node => node.tag === 'li').map(node => node.textContent);
-  assert.equal(items.length, 10);
-  assert.ok(items.includes('<script>alert(0)</script>'));
+  assert.deepEqual(cells.slice(0, 7), ['Lesson Quality', '0', '0', '0', '5', '0', '4.00']);
+  assert.deepEqual(cells.slice(21), ['Homework Hacks', '1', '0', '0', '4', '0', '3.40']);
+  const comments = findAll(card, node => node.tag === 'li' && !node.children.length).map(node => node.textContent);
+  assert.equal(comments.length, 10);
+  assert.ok(comments.includes('<script>alert(0)</script>'));
 });

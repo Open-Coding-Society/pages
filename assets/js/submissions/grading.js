@@ -19,6 +19,7 @@ export const GRADING_MESSAGES = {
   ASSIGNMENT_NOT_FOUND: "This assignment no longer exists.",
   ASSIGNMENT_CLOSED: "This assignment is closed, so grades are final. Ask your teacher if something needs another look.",
   ASSIGNMENT_FINALIZED: "Assignment closed. Grades are final and copied to the gradebook.",
+  LESSON_FEEDBACK_REQUIRED: "Finish your lesson feedback before you submit this homework.",
   REVIEW_REQUIRES_CLOSE: "Reviews are for closed assignments. Before close, grade or re-grade directly.",
   REVIEW_OPENED: "Review opened. Your teacher will decide it.",
   REVIEW_ALREADY_OPEN: "This submission already has an open review.",
