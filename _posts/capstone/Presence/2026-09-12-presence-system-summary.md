@@ -97,7 +97,7 @@ student, room, time, direction]
         <tbody>
           <tr>
             <td>Phase 1</td>
-            <td>Built a single-input, contact-tap RFID prototype: CrowPi reader, Flask backend, dashboard.</td>
+            <td>Built a single-input, contact-tap RFID prototype: Raspberry Pi RFID reader, Flask backend, dashboard.</td>
             <td>Prove the core read-log-display loop end to end, cheaply, before investing in harder hardware. See <a href="https://github.com/vibha1019/crowpi-attendance/issues/3" target="_blank" rel="noopener">Issue&nbsp;#3</a>.</td>
           </tr>
           <tr>
@@ -194,7 +194,7 @@ student, room, time, direction]
           <thead><tr><th>Reader</th><th>Band</th><th>Status</th></tr></thead>
           <tbody>
             <tr><td>Waveshare PN532 NFC HAT</td><td>HF, 13.56&nbsp;MHz, contact range (a few cm)</td><td>In use now</td></tr>
-            <tr><td>RC522 board (CrowPi built-in, earlier plan)</td><td>HF, 13.56&nbsp;MHz</td><td>Earlier prototype</td></tr>
+            <tr><td>RC522 board (earlier plan)</td><td>HF, 13.56&nbsp;MHz</td><td>Earlier prototype</td></tr>
             <tr><td>UHF doorway reader</td><td>UHF, 902&ndash;928&nbsp;MHz (US)</td><td>Later phases only, not built</td></tr>
           </tbody>
         </table></div>

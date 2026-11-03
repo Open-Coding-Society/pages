@@ -20,6 +20,9 @@ Pages:
   - key: hub
     tab: "Overview"
     url: "/capstone/presence-system/"
+  - key: funding
+    tab: "Funding"
+    url: "/capstone/presence-system/funding/"
   - key: dashboard
     tab: "Live Dashboard"
     url: "/capstone/presence-system/dashboard/"

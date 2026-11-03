@@ -61,6 +61,12 @@
     }
   }
 
+  // Spreadsheets need more height than slides to show their rows
+  .rfid-presence-embed-sheet {
+    aspect-ratio: 4 / 3;
+    background: #ffffff;
+  }
+
   .rfid-presence-table {
     width: 100%;
     border-collapse: collapse;
