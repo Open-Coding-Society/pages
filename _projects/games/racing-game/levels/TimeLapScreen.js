@@ -27,6 +27,8 @@ class TimeLapScreen extends GameObject {
     this.totalLaps = Number.isFinite(data.totalLaps) ? data.totalLaps : 3;
     this.finishLine = data.finishLine;
     this.drawsFinishLine = data.drawFinishLine === true;
+    this.showBoostBars = data.showBoostBars === true;
+    this.usePositionForLapTracking = data.usePositionForLapTracking === true;
     this.hudPosition = data.hudPosition || { x: 0.01, y: 0.02 };
     this.showLosingScreen = data.showLosingScreen !== false;
     this.lapTracker = new LapTracker({
@@ -95,7 +97,12 @@ class TimeLapScreen extends GameObject {
   trackLaps() {
     const players = this.getPlayers();
     players.forEach((player, index) => {
-      const center = player.getCenter();
+      const center = this.usePositionForLapTracking && player.position
+        ? {
+          x: player.position.x + player.width / 2,
+          y: player.position.y + player.height / 2,
+        }
+        : player.getCenter();
       const normalizedCenter = { x: center.x / this.gameEnv.innerWidth, y: center.y / this.gameEnv.innerHeight };
       const justFinished = this.lapTracker.update(player, normalizedCenter);
       if (justFinished && !this.winnerLabel) {
@@ -146,7 +153,7 @@ class TimeLapScreen extends GameObject {
     if (this.drawsFinishLine) {
       this.drawFinishLine(ctx);
     }
-    this.drawBoostBars(ctx);
+    if (this.showBoostBars) this.drawBoostBars(ctx);
     this.drawPanel(ctx);
     if (this.winnerLabel) {
       this.drawBanner(
