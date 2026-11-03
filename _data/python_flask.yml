@@ -17,7 +17,7 @@ Topics:
 
   - title: "Anatomy"
     image: "/backend/flask/anatomy.svg"
-    link: "/python/flask/anatomy"
+    link: "/flask/anatomy"
     alt: "Anatomy of a Flask Application"
     keyPoints:
       - "System files"
