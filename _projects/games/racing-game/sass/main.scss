@@ -52,9 +52,24 @@ $racing-text: #f8fafc;
     font: bold 14px sans-serif;
     cursor: pointer;
 
+    &--easy {
+      border-color: #86efac;
+      background: #166534;
+    }
+
+    &--medium {
+      border-color: #fde047;
+      background: #854d0e;
+    }
+
+    &--hard {
+      border-color: #fca5a5;
+      background: #991b1b;
+    }
+
     &:hover,
     &:focus-visible {
-      background: rgba(250, 204, 21, 0.35);
+      filter: brightness(1.2);
     }
   }
 }

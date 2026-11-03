@@ -48,7 +48,6 @@ const LEGACY_MAX_LATERAL_OFFSET = 0.028;
 const REACH_DISTANCE = 0.025;
 const EASY_TARGET_SPEED = 2.4;
 const SUPER_EASY_TARGET_SPEED = 1.2;
-export const SUPER_EASY_START_DELAY_FRAMES = 300;
 const CAR_SIZE = 360 / 10;
 const BARRIER_SEGMENTS_PER_SECTION = 24;
 const BARRIER_COLLISION_RADIUS = CAR_SIZE * (1 - RACING_CAR_HITBOX.widthPercentage) / 2
@@ -215,13 +214,20 @@ function getObstacleClearance(position, width, height) {
   )));
 }
 
-function addConeDetour(route, includeApproach = true) {
+function addConeDetour(route) {
   const lastPoint = route.at(-1);
+  const detour = [
+    { x: 0.2, y: 0.842 },
+    lastPoint,
+    { x: 0.31, y: 0.825 },
+    { x: 0.38, y: 0.837 },
+  ].map((point) => ({
+    ...point,
+    ...(Number.isFinite(lastPoint.speedFraction) && { speedFraction: lastPoint.speedFraction }),
+  }));
   return [
     ...route.slice(0, -1),
-    ...(includeApproach ? [{ x: 0.2, y: 0.842, speedFraction: lastPoint.speedFraction }] : []),
-    lastPoint,
-    { x: 0.38, y: lastPoint.y, speedFraction: lastPoint.speedFraction },
+    ...detour,
   ];
 }
 
@@ -233,14 +239,28 @@ export function createEasyRoute() {
   ];
 }
 
-export function createSuperEasyRoute() {
-  const route = createEasyRoute();
-  route.splice(1, 0,
-    { x: 0.55, y: 0.86 },
-    { x: 0.44, y: 0.86 },
-    { x: 0.53, y: 0.86 },
-  );
-  return route;
+export function createSuperEasyRoute(seed = 0) {
+  const loopCenterX = 0.58 + ((seed >>> 0) % 2) * 0.01;
+  const loopCenterY = 0.885;
+  const loopRadiusX = 0.022;
+  const loopRadiusY = 0.01;
+  const loopWaypoints = Array.from({ length: 16 }, (_, index) => {
+    const angle = (index / 15) * 2 * Math.PI;
+    return {
+      x: loopCenterX + Math.cos(angle) * loopRadiusX,
+      y: loopCenterY + Math.sin(angle) * loopRadiusY,
+    };
+  });
+
+  return [
+    AUTUMN_TRACK_CENTERLINE[0],
+    { x: 0.55, y: 0.875 },
+    ...loopWaypoints,
+    ...AUTUMN_TRACK_CENTERLINE.slice(2, 5).map((point) => ({ ...point, y: 0.875 })),
+    ...AUTUMN_TRACK_CENTERLINE.slice(5),
+    { x: 0.31, y: 0.825 },
+    { x: 0.36, y: 0.837 },
+  ];
 }
 
 function getSafeSteering({ position, heading, speed, desiredSteer, route, width, height }) {
@@ -348,6 +368,59 @@ export function hasReachedRouteWaypoint(position, route, waypointIndex, width, h
   return (position.x - targetX) * segmentX + (position.y - targetY) * segmentY >= 0;
 }
 
+export function advanceRouteWaypoint(position, route, waypointIndex, width, height, reachDistance) {
+  let nextWaypointIndex = waypointIndex;
+  for (let advances = 0; advances < route.length - 1; advances += 1) {
+    if (!hasReachedRouteWaypoint(
+      position,
+      route,
+      nextWaypointIndex,
+      width,
+      height,
+      reachDistance,
+    )) break;
+    nextWaypointIndex = (nextWaypointIndex + 1) % route.length;
+  }
+  return nextWaypointIndex;
+}
+
+export function recoverRouteWaypoint(position, route, waypointIndex, width, height, recoveryDistance) {
+  const currentTarget = route[waypointIndex];
+  const currentDistance = Math.hypot(
+    currentTarget.x * width - position.x,
+    currentTarget.y * height - position.y,
+  );
+  if (distanceToRoute(position, route, width, height) <= recoveryDistance
+      && currentDistance <= recoveryDistance * 2) {
+    return waypointIndex;
+  }
+
+  let nearest = { distance: Infinity, waypointIndex };
+  for (let offset = -1; offset < Math.min(route.length - 1, 10); offset += 1) {
+    const segmentIndex = (waypointIndex + offset + route.length) % route.length;
+    const start = route[segmentIndex];
+    const end = route[(segmentIndex + 1) % route.length];
+    const startX = start.x * width;
+    const startY = start.y * height;
+    const segmentX = (end.x - start.x) * width;
+    const segmentY = (end.y - start.y) * height;
+    const lengthSquared = segmentX ** 2 + segmentY ** 2;
+    const projection = lengthSquared > 0
+      ? Math.max(0, Math.min(1, ((position.x - startX) * segmentX + (position.y - startY) * segmentY)
+        / lengthSquared))
+      : 0;
+    const distance = Math.hypot(
+      position.x - (startX + segmentX * projection),
+      position.y - (startY + segmentY * projection),
+    );
+    if (distance < nearest.distance) {
+      nearest = { distance, waypointIndex: (segmentIndex + 1) % route.length };
+    }
+  }
+
+  return nearest.distance < currentDistance ? nearest.waypointIndex : waypointIndex;
+}
+
 export function getBotControls({
   position,
   heading,
@@ -391,10 +464,22 @@ export function createInitialGenome() {
   };
 }
 
-export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFrames = 3000 } = {}) {
+export function simulateAutumnRace({
+  mode = 'ai',
+  genome,
+  totalLaps = 3,
+  maxFrames = 3000,
+  seed = 0,
+  disturbances = [],
+} = {}) {
+  if (!Array.isArray(disturbances) || disturbances.some(({ frame, dx, dy }) => (
+    !Number.isInteger(frame) || frame < 0 || !Number.isFinite(dx) || !Number.isFinite(dy)
+  ))) {
+    throw new TypeError('Autumn race disturbances need non-negative frames and finite dx/dy values');
+  }
   const route = mode === 'ai'
     ? createRouteFromGenome(genome)
-    : mode === 'superEasy' ? createSuperEasyRoute() : createEasyRoute();
+    : mode === 'superEasy' ? createSuperEasyRoute(seed) : createEasyRoute();
   const position = { x: 0.4 * 643, y: 0.82 * 360 };
   const car = {};
   const lapTracker = new LapTracker({
@@ -408,25 +493,40 @@ export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFram
   let barrierContacts = 0;
   let obstacleContacts = 0;
   const lapFrames = [];
+  let routeNeedsRecovery = false;
 
   for (let frame = 0; frame < maxFrames; frame += 1) {
     const center = { x: position.x + CAR_SIZE / 2, y: position.y + CAR_SIZE / 2 };
-    if (hasReachedRouteWaypoint(center, route, waypointIndex, 643, 360, REACH_DISTANCE * 360)) {
-      waypointIndex = (waypointIndex + 1) % route.length;
-    }
-
-    const control = mode === 'superEasy' && frame < SUPER_EASY_START_DELAY_FRAMES
-      ? { steer: 0, throttle: 0 }
-      : getBotControls({
-        position: center,
-        heading,
-        speed,
-        waypointIndex,
+    if (mode === 'ai' && routeNeedsRecovery) {
+      waypointIndex = recoverRouteWaypoint(
+        center,
         route,
-        width: 643,
-        height: 360,
-        mode,
-      });
+        waypointIndex,
+        643,
+        360,
+        REACH_DISTANCE * 360 * 1.5,
+      );
+      routeNeedsRecovery = false;
+    }
+    waypointIndex = advanceRouteWaypoint(
+      center,
+      route,
+      waypointIndex,
+      643,
+      360,
+      REACH_DISTANCE * 360,
+    );
+
+    const control = getBotControls({
+      position: center,
+      heading,
+      speed,
+      waypointIndex,
+      route,
+      width: 643,
+      height: 360,
+      mode,
+    });
     if (control.throttle > 0) {
       speed = Math.min(speed + RACING_CAR_PHYSICS.acceleration, RACING_CAR_PHYSICS.maxSpeed);
     } else if (control.throttle < 0) {
@@ -441,6 +541,13 @@ export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFram
     if (speed !== 0) heading += control.steer * getRacingTurnRate(speed) * Math.sign(speed);
     position.x += Math.sin(heading) * speed;
     position.y -= Math.cos(heading) * speed;
+    for (const disturbance of disturbances) {
+      if (disturbance.frame === frame) {
+        position.x += disturbance.dx;
+        position.y += disturbance.dy;
+        if (mode === 'ai') routeNeedsRecovery = true;
+      }
+    }
     position.x = Math.min(Math.max(position.x, 0), 643 - CAR_SIZE);
     position.y = Math.min(Math.max(position.y, 0), 360 - CAR_SIZE);
 
@@ -470,7 +577,7 @@ export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFram
         lapsCompleted: lapTracker.getLapsCompleted(car),
         barrierContacts,
         obstacleContacts,
-        lapFrames,
+        lapFrames: [...lapFrames, frame + 1],
       };
     }
     const lapsCompleted = lapTracker.getLapsCompleted(car);
@@ -489,12 +596,82 @@ export function simulateAutumnRace({ mode = 'ai', genome, totalLaps = 3, maxFram
 }
 
 export function scoreGenome(genome) {
-  const result = simulateAutumnRace({ mode: 'ai', genome, totalLaps: 3, maxFrames: 1500 });
-  const collisionPenalty = result.barrierContacts * BARRIER_CONTACT_PENALTY
-    + result.obstacleContacts * OBSTACLE_CONTACT_PENALTY;
-  if (result.completed && collisionPenalty === 0) return 2_000_000 - result.frames;
-  if (result.completed) return 1_000_000 - result.frames - collisionPenalty;
-  return result.lapsCompleted * 300_000 - result.frames - collisionPenalty;
+  const scenarios = [
+    [],
+    [{ frame: 250, dx: 10, dy: -8 }, { frame: 620, dx: -9, dy: 10 }],
+    [{ frame: 430, dx: -12, dy: -8 }, { frame: 800, dx: 11, dy: 9 }],
+  ];
+  const results = scenarios.map((disturbances) => simulateAutumnRace({
+    mode: 'ai',
+    genome,
+    totalLaps: 3,
+    maxFrames: 1500,
+    disturbances,
+  }));
+  const allCompleteCleanly = results.every((result) => (
+    result.completed && result.barrierContacts === 0 && result.obstacleContacts === 0
+  ));
+  if (allCompleteCleanly) {
+    return 3_000_000 - results.reduce((total, result) => total + result.frames, 0);
+  }
+
+  return results.reduce((total, result) => {
+    const collisionPenalty = result.barrierContacts * BARRIER_CONTACT_PENALTY
+      + result.obstacleContacts * OBSTACLE_CONTACT_PENALTY;
+    const completionScore = result.completed
+      ? 1_000_000 - result.frames
+      : result.lapsCompleted * 300_000 - result.frames;
+    return total + completionScore - collisionPenalty;
+  }, 0);
+}
+
+export function refineAutumnBotGenome(genome, {
+  offsetSteps = [0.08, 0.04, 0.02],
+  speedSteps = [0.12, 0.06, 0.03],
+} = {}) {
+  if (!isValidGenome(genome)) {
+    throw new TypeError('Autumn bot refinement genome has an invalid shape');
+  }
+  for (const [label, steps] of [['offsetSteps', offsetSteps], ['speedSteps', speedSteps]]) {
+    if (!Array.isArray(steps) || steps.some((step) => !Number.isFinite(step) || step <= 0)) {
+      throw new TypeError(`Autumn bot refinement ${label} must contain positive finite steps`);
+    }
+  }
+
+  let best = {
+    ...genome,
+    offsets: [...genome.offsets],
+    speedFractions: [...genome.speedFractions],
+    offsetScale: genome.offsetScale ?? LEGACY_MAX_LATERAL_OFFSET,
+  };
+  let bestScore = scoreGenome(best);
+  const refineValues = (property, steps, minimum, maximum) => {
+    for (const step of steps) {
+      let improved = true;
+      let rounds = 0;
+      while (improved && rounds < 3) {
+        improved = false;
+        rounds += 1;
+        for (let index = 0; index < best[property].length; index += 1) {
+          for (const direction of [-1, 1]) {
+            const values = [...best[property]];
+            values[index] = Math.max(minimum, Math.min(maximum, values[index] + direction * step));
+            const candidate = { ...best, [property]: values };
+            const score = scoreGenome(candidate);
+            if (score > bestScore) {
+              best = candidate;
+              bestScore = score;
+              improved = true;
+            }
+          }
+        }
+      }
+    }
+  };
+
+  refineValues('offsets', offsetSteps, -1, 1);
+  refineValues('speedFractions', speedSteps, 0.35, 1);
+  return { genome: best, score: bestScore };
 }
 
 export function evolveAutumnBot({
@@ -502,10 +679,13 @@ export function evolveAutumnBot({
   populationSize = 48,
   seed = 20261030,
   seedGenomes = [],
+  refine = true,
 } = {}) {
-  if (!Number.isInteger(generations) || generations < 1
-      || !Number.isInteger(populationSize) || populationSize < 4) {
+  if (!Number.isInteger(generations) || generations < 1 || !Number.isInteger(populationSize) || populationSize < 4) {
     throw new RangeError('Training needs generations >= 1 and populationSize >= 4');
+  }
+  if (typeof refine !== 'boolean') {
+    throw new TypeError('Training refine must be a boolean');
   }
   if (!Array.isArray(seedGenomes)) {
     throw new TypeError('Training seedGenomes must be an array');
@@ -587,6 +767,11 @@ export function evolveAutumnBot({
     population = next;
   }
 
+  if (refine) {
+    const refined = refineAutumnBotGenome(best);
+    best = refined.genome;
+    bestScore = refined.score;
+  }
   const result = simulateAutumnRace({ mode: 'ai', genome: best, totalLaps: 3, maxFrames: 1500 });
   return { genome: best, score: bestScore, result, history, seed, generations, populationSize };
 }

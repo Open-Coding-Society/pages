@@ -79,39 +79,35 @@ export default class RaceDifficultyPrompt extends GameObject {
 
     this.easyButton = document.createElement('button');
     this.easyButton.type = 'button';
-    this.easyButton.className = 'racing-difficulty__button';
+    this.easyButton.className = 'racing-difficulty__button racing-difficulty__button--easy';
     this.easyButton.textContent = 'Easy';
-    this.styleButton(this.easyButton, '#166534', '#86efac');
-    this.easyButton.addEventListener('click', () => this.startRace('hardcoded'));
+    this.styleButton(this.easyButton);
+    this.easyButton.addEventListener('click', () => this.startRace('superEasy'));
 
-    this.superEasyButton = document.createElement('button');
-    this.superEasyButton.type = 'button';
-    this.superEasyButton.className = 'racing-difficulty__button';
-    this.superEasyButton.textContent = 'Super Easy';
-    this.styleButton(this.superEasyButton, '#854d0e', '#fde047');
-    this.superEasyButton.addEventListener('click', () => this.startRace('superEasy'));
+    this.mediumButton = document.createElement('button');
+    this.mediumButton.type = 'button';
+    this.mediumButton.className = 'racing-difficulty__button racing-difficulty__button--medium';
+    this.mediumButton.textContent = 'Medium';
+    this.styleButton(this.mediumButton);
+    this.mediumButton.addEventListener('click', () => this.startRace('hardcoded'));
 
     this.hardButton = document.createElement('button');
     this.hardButton.type = 'button';
-    this.hardButton.className = 'racing-difficulty__button';
+    this.hardButton.className = 'racing-difficulty__button racing-difficulty__button--hard';
     this.hardButton.textContent = 'Hard';
-    this.styleButton(this.hardButton, '#1d4ed8', '#93c5fd');
+    this.styleButton(this.hardButton);
     this.hardButton.addEventListener('click', () => this.startRace('ai'));
 
-    buttons.append(this.superEasyButton, this.easyButton, this.hardButton);
+    buttons.append(this.easyButton, this.mediumButton, this.hardButton);
     content.append(title, description, buttons);
     element.appendChild(content);
     return element;
   }
 
-  styleButton(button, backgroundColor, borderColor) {
+  styleButton(button) {
     Object.assign(button.style, {
       minWidth: '120px',
       padding: '12px 20px',
-      border: `1px solid ${borderColor}`,
-      borderRadius: '8px',
-      backgroundColor,
-      color: '#fff',
       fontSize: '16px',
       fontWeight: 'bold',
       cursor: 'pointer',
