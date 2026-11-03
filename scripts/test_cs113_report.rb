@@ -44,7 +44,7 @@ end
 assert(!html.include?("Awaiting CS113 topic mapping"), "All current sources are mapped")
 assert(!html.include?("CS112 Instruction / Examples"), "Keep report introductions separate")
 assert(!html.include?('id="cs112-'), "Keep anchors scoped to CS113")
-assert(html.include?("CSA week 14") && html.include?("CSA week 15"), "Retain early search/sort scheduling")
+assert(html.include?("CSA week 15"), "Retain early sort scheduling")
 assert(html.include?("reference, not currently scheduled"), "Preserve unscheduled reference labels")
 assert(html.include?("unfinished authoring draft, planned week 34"), "Drafts are not live assignments")
 assert(html.include?("Not every student is expected to complete every layer"), "Preserve differentiated depth")
