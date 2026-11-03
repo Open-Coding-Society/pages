@@ -179,6 +179,35 @@ flowchart LR
       <h3 class="ocs__section-title">Funding overview</h3>
       <p class="rfid-presence-about">What's already covered, and the itemized hardware behind the RFID track. Later hardware stages are priced for reference but are not an active funding ask; see the <a href="https://github.com/vibha1019/crowpi-attendance/issues/5" target="_blank" rel="noopener">Research Proposal</a> for why that work is paused.</p>
     </div>
+    <div class="ocs__card" id="pilot-equipment">
+      <h3 class="ocs__section-title">Pilot Equipment (in the room)</h3>
+      <p class="rfid-presence-about">The $700 one-door pilot (about $592 of hardware plus a 10% contingency) has been ordered, and the equipment is in the classroom. If you are picking up this project, this is what each piece is for. The spreadsheet has the full proposal: quantities, prices, store links, and order status.</p>
+      <a class="ocs__btn pill" href="https://docs.google.com/spreadsheets/d/1prCG_1tLLDGuew3H_XxS5xsiD1HVYux3/edit?gid=72123385#gid=72123385" target="_blank" rel="noopener">Open the funding proposal spreadsheet</a>
+      <div class="rfid-presence-table-wrap">
+        <table class="ocs__table rfid-presence-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>What it's for</th>
+              <th>Qty</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Rainy UHF RFID HAT (5.5 dBi antenna)</td><td>The doorway reader. Snaps onto the Raspberry Pi and reads laptop tags from a few feet away, so students don't tap anything.</td><td>1</td></tr>
+            <tr><td>DS3231 real-time clock</td><td>Keeps the Pi's clock accurate after it loses power. Minutes-present numbers are wrong if timestamps drift.</td><td>1 (4-pack, spares included)</td></tr>
+            <tr><td>On-metal UHF laptop tags</td><td>The stickers for real laptops. Ordinary UHF tags stop working on a metal lid; these are built for metal.</td><td>40</td></tr>
+            <tr><td>On-metal tag sample pack (5 sizes)</td><td>For testing which tag size reads best on real laptop lids before tagging the whole class.</td><td>1</td></tr>
+            <tr><td>Practice UHF tags</td><td>Cheap tags for testing read range and angles. Use these, not the on-metal tags, for experiments.</td><td>100</td></tr>
+            <tr><td>Self-destructive tamper UHF tags</td><td>Break if someone peels them off, so a tag can't be handed to a friend. Paper tags, so they may not read well on metal.</td><td>40</td></tr>
+            <tr><td>Light stands, 2-pack</td><td>One holds the reader and antenna at the door, the other holds the face-check camera. No drilling into school walls.</td><td>1 pack</td></tr>
+            <tr><td>Heavy-duty adhesive strips</td><td>Attach the antenna and reader to the stands and the door frame without screws.</td><td>8 sets</td></tr>
+            <tr><td>Logitech MX Brio 4K webcam</td><td>The face-check camera. Plugs into the Mac mini and compares each student's face with their registered photo, so a tag handed to a friend gets caught.</td><td>1</td></tr>
+            <tr><td>Elgato Key Light Neo + Neo Stand</td><td>Even, soft light on faces at the door, the cheapest way to make face matching more accurate. The stand holds the light at face height.</td><td>1 each</td></tr>
+            <tr><td>Reusable cable ties</td><td>Keep the camera cable and power cords tidy and out of the doorway so no one trips.</td><td>100-pack</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
     <div class="ocs__card">
       <h3 class="ocs__section-title">Current Funding Status</h3>
       <div class="rfid-presence-table-wrap">

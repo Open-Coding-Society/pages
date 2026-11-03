@@ -29,6 +29,20 @@
     margin-top: 1rem;
   }
 
+  // Previous/Next pager sits directly above the team card; give it room
+  .ocs__pager {
+    margin-bottom: 1.5rem;
+  }
+
+  // Status badge and View Repo button on one row, spaced apart
+  .rfid-presence-team-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
   // Full-width 16:9 frame for the embedded pitch deck
   .rfid-presence-embed {
     position: relative;
