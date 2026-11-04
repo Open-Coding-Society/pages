@@ -22,7 +22,7 @@ rp_active: pipeline
     <div class="ocs__diagram">
     <pre class="mermaid">%%{init: { "flowchart": { "htmlLabels": false, "diagramPadding": 16 } } }%%
 flowchart LR
-    T(["Student taps laptop tag"]) --> C["CrowPi
+    T(["Student taps laptop tag"]) --> C["Raspberry Pi
 RFID reader"]
     C -- "tap + time" --> F[("Flask API
 + database")]
@@ -41,7 +41,7 @@ Mac Mini"] -. "next: face check" .-> F
     <div class="ocs__diagram">
       <pre class="mermaid">sequenceDiagram
     participant S as Student
-    participant C as CrowPi
+    participant C as Pi reader
     participant F as Flask
     participant DB as Database
     participant D as Dashboard
@@ -61,11 +61,7 @@ Mac Mini"] -. "next: face check" .-> F
   </div>
 
   <div class="ocs__card">
-    <div class="ocs__grid ocs__grid--standard cols-3">
-      <div class="ocs__grid-cell">
-        <img class="ocs__image-frame" src="{{ site.baseurl }}/images/presence-system/crowpi.jpg" alt="The CrowPi tap station: a Raspberry Pi board in a case with a screen, RFID pad at the bottom left">
-        <p class="ocs__description">Tap station: RFID pad at bottom left.</p>
-      </div>
+    <div class="ocs__grid ocs__grid--standard cols-2">
       <div class="ocs__grid-cell">
         <img class="ocs__image-frame" src="{{ site.baseurl }}/images/presence-system/dashboard-before-tap.png" alt="Dashboard with a demo period running and every student marked Not Yet Arrived">
         <p class="ocs__description">Before: period running, nobody has tapped.</p>

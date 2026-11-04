@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg" width="1200" height="400">
-      <title>Where it's going. Now: tap the laptop tag on the CrowPi, working. Next: tap plus a camera face check. Later: walk through the front or back door and a UHF reader reads the laptop tag automatically.</title>
+      <title>Where it's going. Now: tap the laptop tag on the Raspberry Pi reader, working. Next: tap plus a camera face check. Later: walk through the front or back door and a UHF reader reads the laptop tag automatically.</title>
       <rect x="0" width="360" height="400" rx="24" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
       <path d="M0 300 h360 v76 a24 24 0 0 1 -24 24 h-312 a24 24 0 0 1 -24 -24 z" fill="rgb(207, 216, 227)" stroke-width="1px"></path>
       <circle cx="40" cy="44" r="22" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
@@ -21,7 +21,7 @@
       <rect x="160" y="229" width="44" height="36" rx="5" fill="rgb(233, 238, 245)" stroke-width="1px"></rect>
       <rect x="214" y="231" width="76" height="32" rx="4" fill="rgb(127, 196, 165)" stroke-width="1px"></rect>
       <path d="M214 190 q12 14 0 28 M226 182 q20 22 0 44" fill="none" stroke="rgb(91, 134, 214)" stroke-width="5px" stroke-linecap="round"></path>
-      <text x="180" y="350" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="22px" font-weight="600" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Tap on CrowPi</text>
+      <text x="180" y="350" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="22px" font-weight="600" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Tap on Pi reader</text>
       <polygon points="374,180 404,200 374,220" fill="rgb(170, 170, 170)" stroke-width="1px"></polygon>
       <rect x="420" width="360" height="400" rx="24" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
       <path d="M420 300 h360 v76 a24 24 0 0 1 -24 24 h-312 a24 24 0 0 1 -24 -24 z" fill="rgb(207, 216, 227)" stroke-width="1px"></path>

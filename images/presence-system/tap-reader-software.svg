@@ -31,6 +31,6 @@
         <polygon points="616,158 628,166 616,174" fill="rgb(22, 33, 59)" stroke-width="1px"></polygon>
         <polygon points="820,158 832,166 820,174" fill="rgb(22, 33, 59)" stroke-width="1px"></polygon>
         <polygon points="1024,158 1036,166 1024,174" fill="rgb(22, 33, 59)" stroke-width="1px"></polygon>
-        <text x="110" y="252" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">was: CrowPi's reader</text>
+        <text x="110" y="252" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">was: built-in reader</text>
         <text x="110" y="278" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">now: RC522 on a Pi 3</text>
       </svg>
