@@ -1,5 +1,8 @@
 ---
-layout: sprint
+layout: post
+player_page:
+  course: csse
+  kind: home
 show_reading_time: false
 feedback: true
 title: Computer Science and Software Engineering

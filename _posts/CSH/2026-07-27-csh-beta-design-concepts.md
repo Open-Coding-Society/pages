@@ -6,7 +6,6 @@ description: >
   revised PRD, score them in a second decision matrix, and select and
   justify the Beta design.
 courses: {'csh': {'week': 17}}
-assignment: true
 type: capstone
 canonical_id: csh-beta-design-concepts
 author: PLTW Capstone

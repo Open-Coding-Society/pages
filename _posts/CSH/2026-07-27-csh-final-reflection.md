@@ -6,7 +6,6 @@ description: >
   the Capstone, and reflect individually and as a team across both design
   iterations.
 courses: {'csh': {'week': 23}}
-assignment: true
 type: capstone
 canonical_id: csh-final-reflection
 author: PLTW Capstone

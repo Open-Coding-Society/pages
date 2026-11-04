@@ -26,6 +26,11 @@ rp_active: research-4
     <p class="ocs__description">Investigating interval-based change detection, structural gradient matching for illumination/shadow invariance, and lightweight edge-AI vs. cloud-dependent architectures.</p>
   </div>
 
+  <figure class="jv-figure">
+    <img src="{{ '/images/jarvis/jarvis3000-research-4.png' | relative_url }}" alt="Jarvis3000 visual-memory proposal comparing an earlier classroom image with a later image to report moved or missing objects while ignoring lighting changes" width="1774" height="887">
+    <figcaption>Research 4 compares saved room views to report meaningful object changes without treating lighting and shadows as object alerts.</figcaption>
+  </figure>
+
   <!-- Research Question -->
   <h2 class="ocs__section-title">Research Question 4</h2>
   <div class="ocs__card">

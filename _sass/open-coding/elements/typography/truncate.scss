@@ -1,0 +1,20 @@
+// Shared one-line text: keeps text on one line and ends it with "…" when it
+// doesn't fit. Put the full text in a title attribute so hovering shows it.
+// min-width: 0 lets it shrink as a flex item, like the text beside an icon.
+
+.ocs__truncate {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// A touch screen can't hover to show the title, so --hover lets the text wrap
+// there instead of hiding the end of it.
+@media (hover: none) {
+  .ocs__truncate--hover {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+}

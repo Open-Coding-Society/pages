@@ -27,6 +27,53 @@
 }
 
 /* ── Header ── */
+.jv-kanban {
+  // Break out of the reading column while leaving room at both viewport edges.
+  width: unquote("min(1400px, calc(100vw - 3rem))");
+  max-width: none;
+  margin-left: 50%;
+  transform: translateX(-50%);
+
+  .ocs__kanban-board {
+    min-width: 0;
+  }
+
+  .jv-kanban-more > summary {
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--pref-accent-color);
+      outline-offset: 2px;
+    }
+  }
+
+  .jv-kanban-collapse,
+  .jv-kanban-more[open] .jv-kanban-expand {
+    display: none;
+  }
+
+  .jv-kanban-more[open] .jv-kanban-collapse {
+    display: inline;
+  }
+
+  .jv-kanban-extra {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  @media (max-width: 600px) {
+    width: 100%;
+    margin-left: 0;
+    transform: none;
+  }
+}
+
 .jv-header {
   text-align: center;
   margin-bottom: 2.75rem;
@@ -179,6 +226,54 @@
   color: var(--jv-text-muted);
   line-height: 1.4;
   margin: 0;
+}
+
+.jv-decision-card .ocs__status-pill { margin-bottom: 0.35rem; }
+
+/* ── Terminal-style monitor output ── */
+.jv-log {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: var(--jv-text);
+  background: var(--jv-surface);
+  border: 1px solid var(--jv-card-border);
+  border-left: 3px solid var(--jv-accent);
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+  margin: 1rem 0 0;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* ── Screenshot figures (testing evidence) ── */
+.jv-figure-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.jv-figure {
+  margin: 0;
+  background: var(--jv-tag);
+  border: 1px solid var(--jv-card-border);
+  border-radius: 0.75rem;
+  padding: 0.6rem;
+}
+
+.jv-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+.jv-figure figcaption {
+  font-size: 0.75rem;
+  color: var(--jv-text-muted);
+  margin-top: 0.5rem;
+  line-height: 1.4;
 }
 
 /* ── Paper / Patent / Source Cards ── */

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# omake (OCS make): fast test mode wrapper. See scripts/omake/Makefile for details.
+cd "$(dirname "$0")" && exec make --no-print-directory -f scripts/omake/Makefile "$@"

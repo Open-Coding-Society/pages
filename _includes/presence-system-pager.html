@@ -1,0 +1,20 @@
+{%- comment -%} Previous / Next links in story order, from site.data.presence_system_infograph.Pages {%- endcomment -%}
+{%- assign rp_pages = site.data.presence_system_infograph.Pages -%}
+{%- assign rp_last = rp_pages.size | minus: 1 -%}
+{%- for p in rp_pages -%}
+  {%- if p.key == page.rp_active -%}{%- assign rp_index = forloop.index0 -%}{%- endif -%}
+{%- endfor -%}
+{%- assign rp_prev_index = rp_index | minus: 1 -%}
+{%- assign rp_next_index = rp_index | plus: 1 -%}
+<div class="ocs__pager">
+  {%- if rp_index > 0 -%}
+    {%- assign rp_prev = rp_pages[rp_prev_index] %}
+  <a href="{{ rp_prev.url }}" class="ocs__pager-link">&larr; {{ rp_prev.tab }}</a>
+  {%- else %}
+  <span></span>
+  {%- endif -%}
+  {%- if rp_index < rp_last -%}
+    {%- assign rp_next = rp_pages[rp_next_index] %}
+  <a href="{{ rp_next.url }}" class="ocs__pager-link next">{{ rp_next.tab }} &rarr;</a>
+  {%- endif %}
+</div>

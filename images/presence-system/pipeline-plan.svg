@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 240" xmlns="http://www.w3.org/2000/svg" width="1200" height="240">
+        <title>Plan: done through October 11, today's review, camera around October 19, second tap reader, Cycle 1 minutes accuracy, then a classroom pilot.</title>
+        <rect width="1200" height="240" rx="28" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
+        <line x1="100" y1="96" x2="300" y2="96" fill="rgb(0, 0, 0)" stroke="rgb(22, 33, 59)" stroke-width="6px"></line>
+        <line x1="300" y1="96" x2="1100" y2="96" fill="rgb(0, 0, 0)" stroke="rgb(111, 127, 153)" stroke-width="6px" stroke-dasharray="12px, 10px"></line>
+        <circle cx="100" cy="96" r="28" fill="rgb(79, 157, 98)" stroke-width="1px"></circle>
+        <path d="M87 97 l9 9 l17 -19" fill="none" stroke="rgb(255, 255, 255)" stroke-width="6px" stroke-linecap="round" stroke-linejoin="round"></path>
+        <circle cx="300" cy="96" r="32" fill="rgb(59, 111, 212)" stroke-width="1px"></circle>
+        <circle cx="300" cy="96" r="11" fill="rgb(255, 255, 255)" stroke-width="1px"></circle>
+        <circle cx="500" cy="96" r="24" fill="rgb(223, 231, 239)" stroke="rgb(22, 33, 59)" stroke-width="5px"></circle>
+        <circle cx="700" cy="96" r="24" fill="rgb(223, 231, 239)" stroke="rgb(22, 33, 59)" stroke-width="5px"></circle>
+        <circle cx="900" cy="96" r="24" fill="rgb(223, 231, 239)" stroke="rgb(22, 33, 59)" stroke-width="5px"></circle>
+        <circle cx="1100" cy="96" r="24" fill="rgb(223, 231, 239)" stroke="rgb(22, 33, 59)" stroke-width="5px"></circle>
+        <text x="100" y="164" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Done</text>
+        <text x="100" y="194" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Sep – Oct 11</text>
+        <text x="300" y="164" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Today</text>
+        <text x="300" y="194" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Oct 12 review</text>
+        <text x="500" y="164" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Camera</text>
+        <text x="500" y="194" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">~Oct 19, Jarvis</text>
+        <text x="700" y="164" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Second reader</text>
+        <text x="700" y="194" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">ordered</text>
+        <text x="900" y="164" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Cycle 1</text>
+        <text x="900" y="194" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">minutes accuracy</text>
+        <text x="1100" y="164" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Pilot</text>
+        <text x="1100" y="194" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">one classroom</text>
+      </svg>

@@ -1,0 +1,8 @@
+# The team's live sprint board and active frontend repository.
+Board:
+  url: "https://github.com/nathantrieu360/apcspteam/issues"
+  filter: "Assignee"
+  title: "FOPL Kanban"
+
+Repository:
+  url: "https://github.com/FOPL-Team-2026/bb-pages"

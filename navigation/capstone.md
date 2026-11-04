@@ -22,9 +22,11 @@ show_reading_time: false
       <button id="show-csh" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSH</button>
       <button id="show-csa" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSA</button>
       <button id="show-csp" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSP</button>
+      <button id="show-csse" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSSE</button>
       <select id="year-select" class="nc-select" aria-label="Filter projects by school year" style="max-width: 14rem;">
         <option value="2026-2027" selected>2026/2027</option>
         <option value="2025-2026">2025/2026</option>
+        <option value="">All years</option>
       </select>
     </div>
   </div>
@@ -33,7 +35,7 @@ show_reading_time: false
 <div class="ocs__grid">
   <div class="ocs__grid-cell">
     <input id="project-search" type="search" placeholder="Search projects, descriptions, or team members" class="nc-input" />
-    <p id="search-status" class="text-xs text-gray-500" style="margin: 0.25rem 0 0;">Showing all projects.</p>
+    <p id="search-status" role="status" class="text-xs text-gray-500" style="margin: 0.25rem 0 0;">Showing all projects.</p>
   </div>
 </div>
 
@@ -53,12 +55,19 @@ document.addEventListener('DOMContentLoaded', function(){
     all: document.getElementById('show-all'),
     CSA: document.getElementById('show-csa'),
     CSP: document.getElementById('show-csp'),
-    CSH: document.getElementById('show-csh')
+    CSH: document.getElementById('show-csh'),
+    CSSE: document.getElementById('show-csse')
   };
   let currentType = 'all';
   let currentQuery = '';
   const yearSelect = document.getElementById('year-select');
   let currentYear = yearSelect ? yearSelect.value : '';
+  // Old Games links open the complete CSSE catalog, including undated projects.
+  if(new URLSearchParams(window.location.search).get('course') === 'CSSE'){
+    currentType = 'CSSE';
+    if(yearSelect) yearSelect.value = '';
+    currentYear = '';
+  }
 
   const linkMap = {
     "Oasis": {
@@ -118,33 +127,114 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   };
 
-  function normalize(text){ return text.toLowerCase().trim(); }
+  function fold(text){ return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+  function normalize(text){ return fold(text).trim(); }
+  // Read each card's text once, before the links button and pop-up are added to it.
+  const cardText = new Map(cards.map(card=>[card, normalize(card.textContent)]));
   function matchesType(card){ return currentType === 'all' || card.classList.contains(currentType); }
   function matchesYear(card){ return !currentYear || (card.dataset.year || '2025-2026') === currentYear; }
   function matchesSearch(card){
-    const text = normalize(card.textContent);
-    return !currentQuery || text.includes(currentQuery);
+    // Every word has to be in the card, in any order: "veterans chatbot" finds Poway Veterans.
+    return currentQuery.split(/\s+/).every(word=>cardText.get(card).includes(word));
+  }
+  // Highlight each search word in the card's own text with <mark>, like the Topics page.
+  const markSkip = '.capstone-links-button, .capstone-popup, .capstone-card-placeholder, .microblog-unread-badge';
+  function clearMarks(card){
+    card.querySelectorAll('mark[data-search-mark]').forEach(mark=>{
+      const parent = mark.parentNode;
+      mark.replaceWith(mark.textContent);
+      parent.normalize();
+    });
+  }
+  function markWords(card, words){
+    const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while(walker.nextNode()){
+      if(!walker.currentNode.parentElement.closest(markSkip)) nodes.push(walker.currentNode);
+    }
+    nodes.forEach(node=>{
+      const text = node.data;
+      // Fold one character at a time and remember where each folded character came from.
+      let folded = '';
+      const from = [];
+      for(let i = 0; i < text.length; i++){
+        const piece = fold(text[i]);
+        folded += piece;
+        for(let k = 0; k < piece.length; k++) from.push(i);
+      }
+      const ranges = [];
+      words.forEach(word=>{
+        for(let at = folded.indexOf(word); at !== -1; at = folded.indexOf(word, at + 1)){
+          let end = from[at + word.length - 1] + 1;
+          while(end < text.length && !fold(text[end])) end++;
+          ranges.push([from[at], end]);
+        }
+      });
+      if(!ranges.length) return;
+      ranges.sort((a, b)=>a[0] - b[0]);
+      const merged = [];
+      ranges.forEach(([start, end])=>{
+        const last = merged[merged.length - 1];
+        if(last && start <= last[1]) last[1] = Math.max(last[1], end);
+        else merged.push([start, end]);
+      });
+      const pieces = [];
+      let cursor = 0;
+      merged.forEach(([start, end])=>{
+        if(start > cursor) pieces.push(text.slice(cursor, start));
+        const mark = document.createElement('mark');
+        mark.dataset.searchMark = '';
+        mark.textContent = text.slice(start, end);
+        pieces.push(mark);
+        cursor = end;
+      });
+      if(cursor < text.length) pieces.push(text.slice(cursor));
+      node.replaceWith(...pieces);
+    });
   }
   
-  function updateStatus(count){
-  const total = getTotalProjects();
-
-  if(currentQuery){
-    status.textContent = count
-      ? `${count} of ${total} project${total === 1 ? '' : 's'} found for "${currentQuery}".`
-      : `No projects match "${currentQuery}".`;
-  } else {
-    status.textContent = `${total} total project${total === 1 ? '' : 's'}.`;
+  function plural(count, word){ return `${count} ${word}${count === 1 ? '' : 's'}`; }
+  function filterLabel(){
+    const parts = [];
+    if(currentType !== 'all') parts.push(currentType);
+    if(currentYear) parts.push(yearSelect.selectedOptions[0].textContent);
+    return parts.join(', ');
   }
-}
+  function updateStatus(count){
+    const total = getTotalProjects();
+    const label = filterLabel();
+    if(!currentQuery){
+      if(!label) status.textContent = `${plural(total, 'project')}.`;
+      else if(count) status.textContent = `Showing ${count} of ${plural(total, 'project')} (${label}).`;
+      else status.textContent = `No projects in ${label}.`;
+      return;
+    }
+    const query = searchInput.value.trim().replace(/\s+/g, ' ');
+    const where = label ? ` in ${label}` : '';
+    let text = count
+      ? `${plural(count, 'project')} ${count === 1 ? 'matches' : 'match'} "${query}"${where}.`
+      : `No projects match "${query}"${where}.`;
+    // Say when the course or year choice hides matches, so a project never looks missing.
+    const hidden = cards.filter(matchesSearch).length - count;
+    if(hidden){
+      const both = currentType !== 'all' && currentYear;
+      const other = both ? 'other courses or years' : currentYear ? 'other years' : 'other courses';
+      const pick = currentType === 'all' ? 'pick All years' : 'pick All';
+      text += ` ${hidden} ${count ? 'more' : hidden === 1 ? 'match' : 'matches'} in ${other}: ${pick}.`;
+    }
+    status.textContent = text;
+  }
   function getTotalProjects(){
   return cards.length;
 }
   function applyFilters(){
     let count = 0;
+    const words = currentQuery.split(/\s+/).filter(Boolean);
     cards.forEach(card=>{
       const visible = matchesType(card) && matchesSearch(card) && matchesYear(card);
       card.style.display = visible ? '' : 'none';
+      clearMarks(card);
+      if(visible && words.length) markWords(card, words);
       if(visible) count++;
     });
     updateStatus(count);
@@ -163,10 +253,20 @@ document.addEventListener('DOMContentLoaded', function(){
     updateTypeButtons();
     applyFilters();
   }
-  document.getElementById('show-all')?.addEventListener('click', ()=> setTypeFilter('all'));
+  // All shows every project: it clears the year too, not just the course.
+  document.getElementById('show-all')?.addEventListener('click', ()=>{
+    if(yearSelect) yearSelect.value = '';
+    currentYear = '';
+    setTypeFilter('all');
+  });
   document.getElementById('show-csa')?.addEventListener('click', ()=> setTypeFilter('CSA'));
   document.getElementById('show-csp')?.addEventListener('click', ()=> setTypeFilter('CSP'));
   document.getElementById('show-csh')?.addEventListener('click', ()=> setTypeFilter('CSH'));
+  document.getElementById('show-csse')?.addEventListener('click', ()=>{
+    if(yearSelect) yearSelect.value = '';
+    currentYear = '';
+    setTypeFilter('CSSE');
+  });
   yearSelect?.addEventListener('change', event=>{
     currentYear = event.target.value;
     applyFilters();
@@ -254,6 +354,15 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   updateTypeButtons();
   applyFilters();
+  // After Back, a browser can refill the search box and year menu once this script has run.
+  window.addEventListener('pageshow', ()=>{
+    const query = normalize(searchInput.value);
+    const year = yearSelect ? yearSelect.value : '';
+    if(query === currentQuery && year === currentYear) return;
+    currentQuery = query;
+    currentYear = year;
+    applyFilters();
+  });
 });
 </script>
 
@@ -327,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function(){
        </a>
        <div>
            <h3><a href="{% post_url capstone/2026-08-31-submissions-capstone %}">OCS Assignments System</a></h3>
-           <p>Students are extending the OCS assignment lifecycle from creation through submission, analytics, and grading. The system supports inserting rubrics directly into assignments, providing immediate AI evaluation, and assigning student-generated lessons for peer review and grading. After initial automated evaluation, live review sessions follow, allowing students and graders to discuss challenges, successes, and the work. A grader assignment view supports this process by giving graders a place to review submissions, record observations, and provide an overall assessment. The work integrates OCS interfaces with the Java/Spring backend, AWS S3, and AWS RDS/SQL, moving assignment data, student activity, scores, and feedback into a shared system rather than separate tools and spreadsheets.</p>
+           <p>Students are making OCS grading faster and more reliable. The work includes AI grading with a key each user supplies, out of 1 point per assignment, student grades that sit alongside AI grades instead of overwriting them, and admin tools to correct bad submission records. Other pieces are lessons standardized through CRUD operations, data collection for a reworked self-assessment, and teacher and grader screens on the Pages frontend so teachers never need to use the Spring admin views.</p>
            <p>Groups: Assignment Creator Permissions, Submission Analytics, AI Grading</p>
        </div>
    </div>
@@ -367,8 +476,23 @@ document.addEventListener('DOMContentLoaded', function(){
        <h3><a href="{% post_url capstone/Presence/2026-09-12-presence-system-capstone %}">Classroom Presence System</a></h3>
        <p>A design-based research project asking whether classroom presence can be measured with zero teacher effort. Three low-effort inputs, RFID tap, QR scan, and face scan, are evaluated in parallel against a shared presence engine and the bell schedule to track instructional minutes and show who is missing in real time.</p>
        <p>Team: Vibha Mandayam (RFID), Ruta Sirdeshmukh (QR), Kush Shah (Camera)</p>
+       <p>Mentor: {{ site.data.presence_system_infograph.Mentor }}</p>
      </div>
    </div>
+
+
+   <!-- OCS-in-a-Kit -->
+   <div class="ocs__grid-cell CSA" data-year="2026-2027">
+     <a href="{% post_url capstone/OCS-in-a-Kit/2026-10-27-ocs-in-a-kit-capstone %}">
+       <img src="{{ '/images/OCS-Kit-Capstone.png' | relative_url }}" alt="OCS-in-a-Kit" class="ocs__image-frame ocs__image-frame--thumbnail" />
+     </a>
+     <div>
+       <h3><a href="{% post_url capstone/OCS-in-a-Kit/2026-10-27-ocs-in-a-kit-capstone %}">OCS-in-a-Kit</a></h3>
+       <p>Open Coding Society built a full classroom platform with lessons, a code runner, grading, chat, and hall passes, but it was wired to one school, with names, logins, and settings hard coded in. OCS-in-a-Kit turns that into a product any school or organization can run on its own. An admin picks a kit, answers a few questions, and gets a working copy with no coding required. Vanilla is a basic site with accounts and a blog. Education adds a full CS classroom: lessons, code runner, assignments, grading, an AI tutor, and hall pass. Business drops the classroom features for chat, calendar, and an AI chatbot aimed at organizations. Every kit bundles the same three codebases, a Portfolio frontend plus Flask and Spring backends, and admins can turn individual features on or off later without reinstalling.</p>
+       <p>Team: Shayan, Dhyan, Arnav, Harrish, Darshan</p>
+     </div>
+   </div>
+
     <!-- Jarvis Classroom Object Detection -->
     <div class="ocs__grid-cell CSH" data-year="{{ site.data.jarvis_infograph.Year }}" data-frontend-url="{{ site.data.jarvis_infograph.Repo }}">
       <a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">
@@ -432,11 +556,11 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 
    <div class="ocs__grid-cell CSA" data-year="2026-2027">
-       <a href="{% post_url capstone/2026-08-28-toolchain-trail %}">
+       <a href="{{ '/capstone/toolchain-trail/' | relative_url }}">
          <img src="{{ '/images/' | append: site.data.toolchain-trail-capstone.Logo | relative_url }}" alt="{{ site.data.toolchain-trail-capstone.Title }} logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-         <h3><a href="{% post_url capstone/2026-08-28-toolchain-trail %}"></a>{{ site.data.toolchain-trail-capstone.Title }}</h3>
+         <h3><a href="{{ '/capstone/toolchain-trail/' | relative_url }}">{{ site.data.toolchain-trail-capstone.Title }}</a></h3>
          <p>{{ site.data.toolchain-trail-capstone.Overview }}</p>
        </div>
    </div>
@@ -684,14 +808,14 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
     </div>
 
-   <!-- Integra (CSP 26-27) -->
+   <!-- Poway Recovery Center (CSP 26-27) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-09-integra-capstone %}">
-           <img src="/images/capstone/sentri.png" alt="Sentri" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       <a href="{{ '/capstone/poway-recovery-center/' | relative_url }}">
+           <img src="{{ '/images/capstone/poway-recovery-center-logo.png' | relative_url }}" alt="Poway Recovery Center" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url 2026-09-09-integra-capstone %}">Integra</a></h3>
-           <p>An AI-driven recovery ecosystem for the Poway Recovery Center that provides users with access to specialized support programs and meeting schedules at the center while also tracking long-term sobriety milestones through a secure, high-fidelity user profile/dashboard.</p>
+           <h3><a href="{{ '/capstone/poway-recovery-center/' | relative_url }}">Poway Recovery Center</a></h3>
+           <p>Supporting Poway Recovery Center's mission by helping visitors find its recovery community, meetings, resources, and key contacts.</p>
            <p>Team: Adya Shipekar, Anika Seksaria, Jailene Tang</p>
        </div>
    </div>
@@ -822,6 +946,22 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 
 
+   <!-- Unified Social Club (CSP, 2026-2027) -->
+   <div class="ocs__grid-cell CSP"
+        data-year="2026-2027"
+        data-page-url="{{ '/capstone/unified-social-club/' | relative_url }}"
+        data-frontend-url="https://github.com/Unified-Social-Club-CSP/usc-pages"
+        data-backend-url="https://github.com/Unified-Social-Club-CSP/usc-flask">
+       <a href="{{ '/capstone/unified-social-club/' | relative_url }}">
+           <img src="{{ '/images/capstone/unified-social-club.png' | relative_url }}" alt="Unified Social Club 2026–27" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{{ '/capstone/unified-social-club/' | relative_url }}">Unified Social Club</a></h3>
+           <p>Club games for Poway's free social club for adults with special needs: Club Bingo, Club Trivia Live (like Kahoot), and Club Jeopardy, played together at club night or at home, with big print and hands-free Nod to select.</p>
+           <p>Team: Triple T (Chetan Tiduwar, Aaditya Prem, Kashyap Tubati)</p>
+       </div>
+   </div>
+
    <!-- San Diego Rescue Mission (2026-2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/sdrm/' | relative_url }}">
        <a href="{% post_url 2026-09-10-sdrm-capstone %}">
@@ -885,14 +1025,14 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 </div>
 
-   <!-- California Center For The Performing Arts Escondido (CSP, 2026/2027) -->
+   <!-- North County Special Needs Community Foundation (CSP, 2026/2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">
-           <img src="/images/capstone/ccae.jpeg" alt="Cal Center For Arts Escondido Logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       <a href="{% post_url 2026-09-08-ncsncf-capstone %}">
+           <img src="/images/capstone/ncsncf.jpg" alt="North County Special Needs Community Foundation" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">California Center For The Performing Arts Escondido</a></h3>
-           <p>This capstone project involves refurbishing the California Center For The Performing Arts Escondido website to be more streamlined, organized, and less busy. It will also overhaul the search feature to be more intelligent, introduce a dynamic and artistic design, and will replace generic walls of text with something more interactive.</p>
+           <h3><a href="{% post_url 2026-09-08-ncsncf-capstone %}">North County Special Needs Community Foundation</a></h3>
+           <p>This capstone project involves refurbishing the North County Special Needs Community Foundation website to be more streamlined, organized, and professional. It will also overhaul and add new features such as an events backend and will update the Event Calendar to include categories.</p>
            <p>Team: Mateo, Tristan, and Yue (Barbara)</p>
        </div>
    </div>
@@ -909,24 +1049,25 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
+   <!-- PowPAC - Poway Performing Arts Company (CSP, 2026/2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-10-poway-scripps-rotary-capstone %}">
-           <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Rotary_International_Logo.svg" alt="Rotary International Logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       <a href="{% post_url capstone/2026-10-29-powpac-capstone %}">
+           <img src="/images/capstone/powpac-logo.png" alt="PowPAC logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url 2026-09-10-poway-scripps-rotary-capstone %}">Poway Rotary Club</a></h3>
-           <p>Helping the Poway Scripps Rotary Club improve their website. With better organization, search feachures, and UI, we're helping the non-profit club manage the many activities they do to help others.</p>
+           <h3><a href="{% post_url capstone/2026-10-29-powpac-capstone %}">PowPAC - Poway Performing Arts Company</a></h3>
+           <p>Helping PowPAC improve their website with cleaner organization, production galleries, search, and UI, so audiences can find shows, tickets, auditions, and ways to support Poway's community theatre.</p>
            <p>Team: Samarth H, Rigved G, Rohan S</p>
        </div>
    </div>
 
    <!-- Shoreline Project Outreach (CSP, 2026/2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-11-shoreline-volunteer-capstone %}">
-           <img src="/images/capstone/shoreline.jpeg" alt="Shoreline Community Services logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       <a href="{{ '/capstone/shoreline-volunteer/' | relative_url }}">
+           <img src="{{ '/images/capstone/shoreline.jpeg' | relative_url }}" alt="Shoreline Community Services logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url 2026-09-11-shoreline-volunteer-capstone %}">Shoreline Community Services</a></h3>
+           <h3><a href="{{ '/capstone/shoreline-volunteer/' | relative_url }}">Shoreline Community Services</a></h3>
            <p>Extending Shoreline Community Services' outreach through smarter volunteer coordination and easier giving, this capstone project bridges technology and grassroots community care in San Diego.</p>
            <p>Team: Vanshika Keswani, Nitya Kasse, Hsu-Cheng Lin</p>
        </div>
@@ -967,6 +1108,8 @@ document.addEventListener('DOMContentLoaded', function(){
            <p>Team: Akhil, Syown, Leon, Perry, Skandan, Sathwik, Akshajh, Tarun, Samarth</p>
        </div>
    </div>
+
+   {% include capstone-games.html %}
 </div>
 
 <!-- Edit Capstone Modal -->
@@ -1366,5 +1509,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
 })();
 </script>
+
+<!-- A red count on each capstone with new microblog posts for its signed-in author -->
+<script type="module" src="{{ site.baseurl }}/assets/js/capstone-microblog-badges.js"></script>
 
   <!-- markdownlint-enable MD033 MD046 -->

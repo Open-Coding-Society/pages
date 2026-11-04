@@ -124,7 +124,8 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   const initialLang = "{{ include.language }}";
   const autostart = "{{ include.autostart | default: 'false' }}" === "true";
   const defaultCode = JSON.parse(container.dataset.defaultCode || "\"\"");
-  const editorHeight = "{{ include.height }}";
+  const editorHeight = "{{ include.editor_height | default: include.height }}";
+  const outputHeight = "{{ include.output_height }}";
   const storageKey = container.dataset.storageKey;
   const runner = new BaseRunner(container, { storageKey });
 
@@ -141,10 +142,10 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
       styleSelectedText: true
     }
   });
-
   const langSelect = container.querySelector('.languageSelect');
   const fontSizeSelect = container.querySelector('.fontSizeSelect');
   const outputDiv = container.querySelector('.output-content');
+  runner.setOutputHeight('.output-content', outputHeight);
   const execTimeSpan = container.querySelector('.execTime');
   const codeExecutor = new CodeExecutor({
     editor,

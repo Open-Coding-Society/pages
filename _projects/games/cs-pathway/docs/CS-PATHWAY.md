@@ -6,6 +6,27 @@ The CS Pathway Game is an **immersive educational experience** designed to onboa
 
 ## Design Philosophy
 
+### Player Movement and Animation
+
+Every player definition, including the Course Brief Explorer preview, Code Hub,
+and Empathy Epic, uses `ANIMATION_FPS: 8` with GameEngine v1.1. Sprite timing is
+elapsed-time-based and independent of movement and display refresh rate.
+Single-frame avatar directions remain single-frame; this setting does not invent
+additional walking frames.
+
+Keyboard players inherit equal horizontal and vertical speeds from the shared
+`Player`; existing `STEP_FACTOR` values still control movement pace. The compact
+preview no longer makes vertical input slower. Toolchain's `CsPathwayPlayer`
+retains its input re-evaluation, deceleration, and collision handling. Empathy
+Epic retains its equal-axis mouse-following movement. NPC animation rates and
+avatar-selection behavior are unchanged.
+
+Movement remains update-count-based; fixed-timestep movement is a separate
+engine improvement. Edit project sources, then use
+`make -C _projects/games/cs-pathway build` and convert the distributed index with
+`make convert-single NOTEBOOK_FILE="_notebooks/projects/cs-pathway/2026-04-15-cs-pathway.ipynb"`.
+Do not hand-edit distributed JavaScript or generated posts.
+
 ### Learn by Playing, Not Reading
 
 Traditional CS education often begins with walls of text, documentation, and abstract concepts. The CS Pathway Game inverts this by:

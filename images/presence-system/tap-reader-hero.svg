@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg" width="1200" height="600">
+        <title>The finished reader, a Raspberry Pi 3 and RC522 board in a 3D-printed case, mounted on the wall by the classroom door. A student taps the tag on their laptop and the dashboard shows Vibha is present.</title>
+        <defs><clipPath id="tr-hero-clip"><rect width="1200" height="600" rx="28" fill="rgb(0, 0, 0)" stroke-width="1px"></rect></clipPath></defs>
+        <g clip-path="url(#tr-hero-clip)" fill="rgb(0, 0, 0)" stroke-width="1px" font-size="16px" font-weight="400">
+          <rect width="1200" height="600" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
+          <rect y="478" width="1200" height="122" fill="rgb(207, 216, 227)" stroke-width="1px"></rect>
+          <rect y="470" width="1200" height="10" fill="rgb(195, 206, 219)" stroke-width="1px"></rect>
+          <polygon points="138,480 332,480 400,600 70,600" fill="rgb(241, 233, 211)" stroke-width="1px"></polygon>
+          <rect x="118" y="188" width="234" height="292" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+          <rect x="138" y="208" width="194" height="272" fill="rgb(252, 242, 212)" stroke-width="1px"></rect>
+          <polygon points="276,222 332,208 332,480 276,466" fill="rgb(66, 90, 125)" stroke-width="1px"></polygon>
+          <circle cx="288" cy="350" r="5" fill="rgb(223, 231, 239)" stroke-width="1px"></circle>
+          <rect x="175" y="140" width="120" height="36" rx="8" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+          <text x="235" y="165" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="20px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Room 1</text>
+          <rect x="444" y="304" width="124" height="150" rx="20" fill="rgba(22, 33, 59, 0.12)" stroke-width="1px"></rect>
+          <rect x="438" y="296" width="124" height="150" rx="20" fill="rgb(244, 246, 249)" stroke="rgb(22, 33, 59)" stroke-width="3px"></rect>
+          <circle cx="500" cy="360" r="34" fill="rgb(233, 238, 245)" stroke-width="1px"></circle>
+          <path d="M488 346 q12 14 0 28 M478 338 q20 22 0 44" fill="none" stroke="rgb(91, 134, 214)" stroke-width="5px" stroke-linecap="round"></path>
+          <circle cx="500" cy="420" r="7" fill="rgb(127, 196, 165)" stroke-width="1px"></circle>
+          <ellipse cx="765" cy="586" rx="96" ry="10" fill="rgba(22, 33, 59, 0.12)" stroke-width="1px"></ellipse>
+          <g transform="translate(1270 0) scale(-1 1)" fill="rgb(0, 0, 0)" stroke-width="1px" font-size="16px" font-weight="400">
+            <line x1="494" y1="452" x2="470" y2="572" fill="rgb(0, 0, 0)" stroke="rgb(17, 26, 46)" stroke-width="36px" stroke-linecap="round"></line>
+            <line x1="520" y1="452" x2="550" y2="572" fill="rgb(0, 0, 0)" stroke="rgb(38, 53, 90)" stroke-width="36px" stroke-linecap="round"></line>
+            <rect x="442" y="568" width="54" height="22" rx="11" fill="rgb(14, 21, 38)" stroke-width="1px"></rect>
+            <rect x="530" y="568" width="58" height="22" rx="11" fill="rgb(14, 21, 38)" stroke-width="1px"></rect>
+            <line x1="476" y1="330" x2="464" y2="424" fill="rgb(0, 0, 0)" stroke="rgb(201, 143, 62)" stroke-width="28px" stroke-linecap="round"></line>
+            <circle cx="463" cy="432" r="11" fill="rgb(168, 113, 79)" stroke-width="1px"></circle>
+            <rect x="460" y="300" width="96" height="172" rx="46" fill="rgb(224, 166, 79)" stroke-width="1px"></rect>
+            <rect x="496" y="278" width="22" height="28" fill="rgb(196, 138, 102)" stroke-width="1px"></rect>
+            <circle cx="498" cy="246" r="38" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+            <circle cx="510" cy="254" r="33" fill="rgb(196, 138, 102)" stroke-width="1px"></circle>
+            <circle cx="500" cy="260" r="6" fill="rgb(168, 113, 79)" stroke-width="1px"></circle>
+            <circle cx="528" cy="250" r="3.5" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+            <line x1="532" y1="334" x2="640" y2="384" fill="rgb(0, 0, 0)" stroke="rgb(201, 143, 62)" stroke-width="28px" stroke-linecap="round"></line>
+            <g transform="translate(40 -12) rotate(-8 680 380)" fill="rgb(0, 0, 0)" stroke-width="1px" font-size="16px" font-weight="400">
+              <rect x="600" y="340" width="150" height="92" rx="8" fill="rgb(185, 196, 211)" stroke-width="1px"></rect>
+              <rect x="600" y="424" width="150" height="8" rx="3" fill="rgb(131, 146, 169)" stroke-width="1px"></rect>
+              <rect x="718" y="352" width="24" height="24" rx="5" fill="rgb(59, 111, 212)" stroke-width="1px"></rect>
+              <circle cx="730" cy="364" r="5" fill="rgb(255, 255, 255)" stroke-width="1px"></circle>
+            </g>
+            <circle cx="645" cy="386" r="12" fill="rgb(196, 138, 102)" stroke-width="1px"></circle>
+          </g>
+          <circle cx="500" cy="258" r="24" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+          <text x="500" y="267" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="24px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">1</text>
+          <text x="534" y="267" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Tap</text>
+          <line x1="562" y1="300" x2="742" y2="148" fill="rgb(0, 0, 0)" stroke="rgb(22, 33, 59)" stroke-width="4px" stroke-dasharray="10px, 8px"></line>
+          <polygon points="752,140 734,145 744,159" fill="rgb(22, 33, 59)" stroke-width="1px"></polygon>
+          <circle cx="640" cy="214" r="24" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+          <text x="640" y="223" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="24px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">2</text>
+          <text x="608" y="222" text-anchor="end" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Pi 3 sends it</text>
+          <rect x="764" y="42" width="400" height="104" rx="20" fill="rgba(22, 33, 59, 0.12)" stroke-width="1px"></rect>
+          <rect x="760" y="36" width="400" height="104" rx="20" fill="rgb(255, 255, 255)" stroke-width="1px"></rect>
+          <circle cx="820" cy="88" r="30" fill="rgb(79, 157, 98)" stroke-width="1px"></circle>
+          <path d="M806 89 l10 10 l19 -21" fill="none" stroke="rgb(255, 255, 255)" stroke-width="6px" stroke-linecap="round" stroke-linejoin="round"></path>
+          <text x="866" y="82" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="30px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Vibha is present</text>
+          <text x="866" y="114" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="22px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Room 1, 8:02 AM</text>
+          <circle cx="720" cy="88" r="24" fill="rgb(22, 33, 59)" stroke-width="1px"></circle>
+          <text x="720" y="97" text-anchor="middle" fill="rgb(255, 255, 255)" stroke-width="1px" font-size="24px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">3</text>
+          <text x="500" y="500" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="22px" font-weight="600" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Pi 3 + RC522</text>
+          <text x="500" y="526" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">3D-printed case</text>
+        </g>
+      </svg>

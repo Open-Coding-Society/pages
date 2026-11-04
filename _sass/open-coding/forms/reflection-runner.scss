@@ -1,0 +1,35 @@
+/**
+ * Reflection Runner Styles
+ * Written-answer box; the container, challenge box and control bars come from runner-base
+ * through .code-runner-container, so only the plain answer textarea is styled here.
+ */
+
+@import "runner-base";
+
+.reflection-runner-container {
+  // Same panel look as the code editor, but prose: body font, wrapping, no gutter.
+  .editor-textarea {
+    @include input-panel;
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 120px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: var(--pref-accent-color);
+    }
+  }
+
+  .status-text {
+    margin-left: auto;
+  }
+}

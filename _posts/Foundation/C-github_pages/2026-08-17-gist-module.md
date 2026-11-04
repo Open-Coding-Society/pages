@@ -229,7 +229,7 @@ For features built around code runners. It imports nothing at all.
 
 ```js
 import {
-  readRunners, writeRunners, unsavedRunners, listRunners, readRunner
+  readRunners, readRunnerKinds, writeRunners, unsavedRunners, listRunners, readRunner
 } from '/assets/js/runner-io.js';
 ```
 
@@ -239,10 +239,15 @@ import {
 | `unsavedRunners()` | runners whose code has not been saved with 💾 |
 | `readRunner(el)` | one runner's saved code, or `null` |
 | `readRunners(opts?)` | all saved work, as a bundle |
+| `readRunnerKinds()` | `{ file: "code" \| "reflection" }` for that bundle, sent as the manifest's `kinds` |
 | `writeRunners(files)` | loads code **into** runners; returns the ids written |
 
 `readRunners()` prepends each challenge prompt so a bundle is readable away from
 the lesson. Pass `{ includeQuestion: false }` for bare code.
+
+Reflection runners (`_includes/runners/reflection.html`) are written-answer boxes that
+share the `code-runner-container` class with `data-runner-kind="reflection"`. They are
+listed, checked and bundled like code runners; their answer becomes `<runner_id>.md`.
 
 `writeRunners()` matches files to runners by id — `main.java` fills the runner
 whose `runner_id` is `main` — and writes to the same key the runner reads from,

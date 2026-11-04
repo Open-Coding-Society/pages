@@ -8,6 +8,7 @@
 import { javaURI } from '/assets/js/api/config.js';
 import { readRunners, unsavedRunners } from '/assets/js/runner-io.js';
 import { exportToGist } from '/assets/js/gist.js';
+import { appendGistSettingsLink } from './gist-connection-errors.js';
 
 (function () {
 
@@ -396,6 +397,7 @@ import { exportToGist } from '/assets/js/gist.js';
       } catch (e) {
         console.error(e);
         typeDialog(`⚠ ${e.message || 'Failed to create gist. Try again or contact teacher.'}`);
+        appendGistSettingsLink(widget, e);
         exportBtn.disabled = false;
         exportBtn.textContent = '✦ EXPORT';
       }

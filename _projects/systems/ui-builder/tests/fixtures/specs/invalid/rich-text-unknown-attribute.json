@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "Rich text with an unknown attribute", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-unkattr1",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-unkattr1",
+              "type": "text",
+              "settings": {
+                "body": "<b one>Important</b>"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

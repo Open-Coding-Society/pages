@@ -1,0 +1,13 @@
+{
+  "files": [
+    { "source": "layouts", "destination": "_layouts" },
+    { "source": "_includes", "destination": "_includes" },
+    { "source": "js/lesson-completion.js", "destination": "assets/js/lesson-completion.js" },
+    { "source": "js/lesson-completion-bigsix.js", "destination": "assets/js/lesson-completion-bigsix.js" },
+    { "source": "js/lessonbase.js", "destination": "assets/js/lessonbase.js" },
+    { "source": "js/lessonbasecapture.js", "destination": "assets/js/lessonbasecapture.js" },
+    { "source": "js/post-search.js", "destination": "assets/js/blogs/post-search.js" },
+    { "source": "sass/blogs.scss", "destination": "_sass/open-coding/blogs.scss" },
+    { "source": "sass/lesson-player.scss", "destination": "_sass/open-coding/lesson-player.scss" }
+  ]
+}

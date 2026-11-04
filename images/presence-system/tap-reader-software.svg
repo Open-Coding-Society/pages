@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 330" xmlns="http://www.w3.org/2000/svg" width="1200" height="330">
+        <title>Software flow: the RC522 reads the card ID, the mfrc522 Python library passes it to reader.py, which posts the tap to the presence API, Flask records it, and the dashboard shows Present. Only the reader hardware changes; the library, reader.py, the API, Flask and the dashboard stay the same.</title>
+        <rect width="1200" height="330" rx="28" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
+        <rect x="22" y="38" width="176" height="44" rx="22" fill="color(srgb 0.87702 0.909647 0.97302)" stroke-width="1px"></rect>
+        <text x="110" y="67" text-anchor="middle" fill="rgb(59, 111, 212)" stroke-width="1px" font-size="20px" font-weight="800" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">New hardware</text>
+        <rect x="222" y="38" width="956" height="44" rx="22" fill="color(srgb 0.889569 0.93851 0.90149)" stroke-width="1px"></rect>
+        <circle cx="250" cy="60" r="14" fill="rgb(79, 157, 98)" stroke-width="1px"></circle>
+        <path d="M243 60 l5 5 l9 -10" fill="none" stroke="rgb(255, 255, 255)" stroke-width="4px" stroke-linecap="round" stroke-linejoin="round"></path>
+        <text x="274" y="67" fill="rgb(47, 107, 64)" stroke-width="1px" font-size="20px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Unchanged: same library, same reader.py, same backend and dashboard</text>
+        <rect x="22" y="118" width="176" height="96" rx="16" fill="rgb(255, 255, 255)" stroke="rgb(59, 111, 212)" stroke-width="4px" stroke-dasharray="10px, 6px"></rect>
+        <rect x="226" y="118" width="176" height="96" rx="16" fill="rgb(255, 255, 255)" stroke-width="1px"></rect>
+        <rect x="430" y="118" width="176" height="96" rx="16" fill="rgb(255, 255, 255)" stroke-width="1px"></rect>
+        <rect x="634" y="118" width="176" height="96" rx="16" fill="rgb(255, 255, 255)" stroke-width="1px"></rect>
+        <rect x="838" y="118" width="176" height="96" rx="16" fill="rgb(255, 255, 255)" stroke-width="1px"></rect>
+        <rect x="1042" y="118" width="136" height="96" rx="16" fill="rgb(255, 255, 255)" stroke-width="1px"></rect>
+        <text x="110" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="24px" font-weight="800" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">RC522</text>
+        <text x="110" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="18px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">reads card ID</text>
+        <text x="314" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="24px" font-weight="800" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">mfrc522</text>
+        <text x="314" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="18px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Python library</text>
+        <text x="518" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="24px" font-weight="800" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">reader.py</text>
+        <text x="518" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="18px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">same script</text>
+        <text x="722" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="24px" font-weight="800" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">POST tap</text>
+        <text x="722" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="18px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">presence API</text>
+        <text x="926" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="24px" font-weight="800" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Flask</text>
+        <text x="926" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="18px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">records it</text>
+        <text x="1110" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="24px" font-weight="800" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Dashboard</text>
+        <text x="1110" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="18px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Present</text>
+        <polygon points="208,158 220,166 208,174" fill="rgb(22, 33, 59)" stroke-width="1px"></polygon>
+        <polygon points="412,158 424,166 412,174" fill="rgb(22, 33, 59)" stroke-width="1px"></polygon>
+        <polygon points="616,158 628,166 616,174" fill="rgb(22, 33, 59)" stroke-width="1px"></polygon>
+        <polygon points="820,158 832,166 820,174" fill="rgb(22, 33, 59)" stroke-width="1px"></polygon>
+        <polygon points="1024,158 1036,166 1024,174" fill="rgb(22, 33, 59)" stroke-width="1px"></polygon>
+        <text x="110" y="252" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">was: CrowPi's reader</text>
+        <text x="110" y="278" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">now: RC522 on a Pi 3</text>
+      </svg>

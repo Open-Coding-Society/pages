@@ -50,7 +50,16 @@ class Player extends Character {
         window.addEventListener('keyup', this._boundHandleKeyUp);
     }
 
-    handleKeyDown({ keyCode }) {
+    handleKeyDown(event) {
+        const { keyCode, target } = event;
+        const editing = target?.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target?.tagName || '');
+        // Movement arrows belong to the game, not page scrolling. Preserve
+        // editing, browser shortcuts, and inactive-page navigation.
+        if (keyCode >= 37 && keyCode <= 40 && Object.values(this.keypress).includes(keyCode) &&
+            !editing && !event.altKey && !event.ctrlKey && !event.metaKey &&
+            !this.gameEnv?.gameControl?.isPaused && this.gameEnv?.container?.isConnected !== false) {
+            event.preventDefault();
+        }
         // capture the pressed key in the active keys array
         this.pressedKeys[keyCode] = true;
         // set the velocity and direction based on the newly pressed key
@@ -131,6 +140,15 @@ class Player extends Character {
             this.direction = "upRight";
         } else if (this.pressedKeys[this.keypress.right] && this.pressedKeys[this.keypress.down]) {
             this.direction = "downRight";
+        }
+    }
+
+    resize() {
+        super.resize();
+        // Preserve STEP_FACTOR's horizontal pace without slowing tall/narrow viewport movement.
+        this.yVelocity = this.xVelocity;
+        if (this.pressedKeys && !this.gravity) {
+            this.updateVelocity();
         }
     }
 

@@ -6,7 +6,6 @@ description: >
   root-cause the N@tM panel and Sprint 3 issues, and revise your problem
   statement with post-Alpha evidence.
 courses: {'csh': {'week': 13}}
-assignment: true
 type: capstone
 canonical_id: csh-redefine-problem
 author: PLTW Capstone

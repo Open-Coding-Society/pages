@@ -1,0 +1,98 @@
+# Defaults for the kanban board (_includes/ocs_kanban_board.html). The script,
+# assets/js/kanban-board.js, reads everything here; nothing about columns or
+# wording is written into it. A capstone changes its own board with a
+# "columns" list in its page data: see "Kanban board" in
+# _sass/open-coding/README.md.
+
+# The stages a board's columns are grouped into.
+#   key         names the stage. backlog, todo, doing, review and done also pick
+#               the color of the line across the column's top.
+#   label       the column's name on the page. A status with this name joins
+#               the stage too, whatever its words.
+#   words       a status with one of these words joins this stage ("📋 To Do"
+#               has "to do"; "block" also matches "Blocked"). A status with words
+#               from two stages ("Waiting for review") joins the one listed
+#               later. A status with none keeps a column of its own name.
+#   collapsed   the column starts hidden behind a toggle.
+#   board_name  the column shows the board's own name for it ("Parking Lot")
+#               when only one of the board's statuses is in it.
+#   done        cards here are finished: they show the day they shipped, newest first.
+stages:
+  - key: backlog
+    label: Backlog
+    words: [backlog, parking, idea, planning, icebox, someday, triage, new]
+    collapsed: true
+    board_name: true
+  - key: todo
+    label: To do
+    words: [to do, todo, ready, next, planned, sprint]
+  - key: doing
+    label: In progress
+    words: [progress, doing, active, wip, building, block, hold, wait, stuck]
+  - key: review
+    label: In review
+    words: [review, qa, testing]
+  - key: done
+    label: Done
+    words: [done, shipped, complete, closed, merged, released, deployed, finished, resolved]
+    done: true
+
+# Options of the filter field that belong to the whole team: they get no button
+# of their own, and their cards show under every button.
+shared: [everyone, all, whole team, shared]
+
+# The board's field names. "filter" is set per capstone, in the include.
+fields:
+  status: Status
+  people: People
+  shipped: Shipped
+
+# Single-select fields a card shows as "Name: value", when the board has them.
+card_fields: [Priority, Topic]
+
+# A repository's issues as a board (a url ending in /issues): the stage an
+# issue joins when none of its labels names a stage.
+issues:
+  closed: done
+  assigned: doing
+  open: todo
+
+# Cards a column shows before "+N more".
+per_column: 5
+
+# Everything the board says. {n}, {done}, {total}, {date}, {time}, {name},
+# {value}, {title} and {repo} are filled in.
+text:
+  title: Project board
+  issues_title: "{repo} — issues"
+  open: Open on GitHub
+  noscript: Turn on JavaScript to see the board here, or open it on GitHub.
+  loading: Loading the board from GitHub…
+  untitled: Untitled card
+  no_status: No status
+  all: All
+  empty: Nothing here
+  more: "+{n} more"
+  less: Show less
+  toggle: "{name} ({n})"
+  collapsed_columns: More columns
+  one_card: 1 card
+  cards: "{n} cards"
+  last_change: "last change {date}"
+  card_field: "{name}: {value}"
+  checklist: "☑ {done}/{total}"
+  checklist_title: "Checklist: {done} of {total} done"
+  pr_open: "PR #{n}"
+  pr_merged: "PR #{n} ✓"
+  pr_draft: "PR #{n} draft"
+  pr_closed: "PR #{n} closed"
+  pr_title: "Pull request #{n}: {title}"
+  not_a_board: This isn't the address of a GitHub project board.
+  personal: GitHub shows a personal board's cards only to people signed in to GitHub, so only boards owned by an organization can be shown here.
+  missing: This board is private or the link is wrong. Only public boards can be shown here.
+  gone: GitHub no longer shows this board publicly.
+  auth: GitHub shows this board's cards only to people signed in to GitHub.
+  limit: GitHub's hourly limit for visitors on this network was reached.
+  resets: "It resets at {time}."
+  no_answer: GitHub didn't answer.
+  saved: "Showing the copy saved {time}."

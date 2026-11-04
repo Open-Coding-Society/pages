@@ -2,6 +2,17 @@
 Title: "OCS Communication Systems"
 Description: "Students are extending the OCS communication system with chat, announcements, assignment discussions, direct messaging, calendar integration, and reusable presentation components. The work includes maintaining the real-time WebSocket service and connecting these features to the existing course site, backend APIs, security, and data model. Students will also develop the OCS SASS grammar—a small, purpose-built styling system for consistent, responsive, reusable components across the OCS GitHub Pages ecosystem."
 
+# The team's GitHub project board, shown live under the header (_includes/ocs_kanban_board.html)
+Board:
+  url: "https://github.com/orgs/UGRC-CSA/projects/1"
+  filter: "Team"
+  # Our board's note columns hold notes about the team, not work.
+  columns:
+    - status: "Team Map"
+      hidden: true
+    - status: "Reflections"
+      hidden: true
+
 Topics:
   - title: "Class Announcements"
     image: "csa-chat/announcement-chat.png"
@@ -32,9 +43,9 @@ Topics:
       - "Verified end to end against a real Spring instance, not a mock"
     status: "Shipped"
     team:
-      - "Samarth"
-      - "Akshajh"
-      - "Tarun"
+      - "Akhil"
+      - "Skandan"
+      - "Sathwik"
 
   - title: "Per-Week Chat"
     image: "csa-chat/week-chat.png"
@@ -65,9 +76,9 @@ Topics:
       - "Works today with no backend, so the UI can be reviewed and polished in parallel with the deploy"
     status: "Shipped"
     team:
-      - "Samarth"
-      - "Akshajh"
-      - "Tarun"
+      - "Akhil"
+      - "Skandan"
+      - "Sathwik"
 
   - title: "Assignment Threads"
     phase: "Next Up"
@@ -131,12 +142,15 @@ Topics:
       - "Tarun"
 
   - title: "Direct Messages"
+    image: "csa-chat/direct-messages.png"
+    alt: "Direct messages get their own backend domain rather than being squeezed into two-person Groups"
+    caption: "Direct messages get their own private backend domain instead of being squeezed into a two-person group. The conversation is stored in JPA so only the matched participants can read it, and sender identity comes from the authenticated STOMP principal rather than a client-supplied name."
     phase: "Design Settled"
     link: "https://github.com/UGRC-CSA/Pages/issues/27"
     linkLabel: "Read the DM Design (#27)"
     subtitle: "1:1 conversations with a real security boundary"
     keyPoints:
-      - "Design settled in issue #27, nothing built yet"
+      - "Design settled in issue #27, built and deployed"
       - "Its own backend domain at mvc/directmessages/, not two-person Groups"
       - "GroupsApiController / GroupChatApiController ship with membership checks commented out: right for a class chat where everyone can read everything, wrong for a DM"
       - "Two entities: DirectMessageConversation (participantA, participantB, unique and canonicalized so A.id < B.id) and DirectMessage (conversation, sender, body, sentAt)"
@@ -155,7 +169,7 @@ Topics:
       - "SecurityContextHolder identity"
       - "STOMP Principal for sender identity"
       - "_includes/dm_chat.html"
-    description: "Direct messages get their own backend domain rather than being squeezed into two-person Groups. Group chat ships with membership checks commented out — the right call for a class feed where everyone reads everything, and the wrong one for a private conversation. DMs are stored in the database through JPA rather than the S3 JSONL files group chat uses, so \"only these two people\" is enforced in the query, and sender identity comes off the STOMP Principal instead of whatever the client claims."
+    description: "Direct messages get their own secure backend domain instead of being squeezed into a shared group chat. Private conversations stay isolated by design: only the two participants can read them, sender identity comes from the authenticated user, and the conversation is stored in the database rather than in the class-wide JSONL feed."
     impact:
       - "Private conversation gets a real, enforced security boundary rather than a commented-out one"
       - "Canonicalized participant pairs mean one conversation per pair, not two"

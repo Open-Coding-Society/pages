@@ -1,0 +1,47 @@
+// UI Builder editor and canvas chrome. Everything is scoped under .ui-builder (the editor
+// page) or .ui-builder-canvas (the canvas page), because project sass is imported site-wide.
+// Published pages and the gallery use only the shared ocs__ grammar; the two rules below for them
+// undo a site-wide leak and fit the grammar's badge into the viewer's one-line bar.
+//
+// The grammar draws every control, card, field, modal and pill the editor uses; these partials
+// only add what an editing app needs and a document page doesn't: the three-pane layout, the
+// scaled canvas frame, the flat outline tree, the menu, the canvas's selection outlines and the
+// code view's scrolling pane.
+// Each rule says why the grammar can't do it. Colours come from theme tokens only.
+// Ruby Sass 3.7: no min()/max() (Sass would try to compute them), no / division.
+
+$uib-wide: 1440px;
+$uib-phone: 767px;
+
+@import "shell";
+@import "outline";
+@import "inspector";
+@import "dialogs";
+@import "start";
+@import "canvas";
+@import "code";
+
+// Two unscoped site rules reach every h1: the calendar system's sass hides it and the
+// documentation styles make it green and glowing. A builder page shows its own title in the
+// theme's text color, in the viewer, the editor's canvas and the template thumbnails alike, and
+// so does the gallery (its title is the page's only heading).
+[data-ui-page] h1,
+[data-ui-gallery] h1 {
+  display: block;
+  color: var(--pref-text-color);
+  text-shadow: none;
+}
+
+// The grammar's badge keeps a bottom margin for sitting above a title; in the viewer's one-line
+// bar it would ride above the middle of the row it shares with "Made by", Edit and Report.
+[data-ui-viewer-bar] .ocs__badge {
+  margin-bottom: 0;
+}
+
+// Last on purpose: [hidden] (and the site's .hidden) must win over any rule above and over the
+// grammar's own display rules (ocs__btn, ocs__stack, ocs__modal-actions) inside the builder.
+.ui-builder [hidden],
+.ui-builder .hidden,
+.ui-builder-canvas [hidden] {
+  display: none !important;
+}

@@ -1,0 +1,131 @@
+// The inspector's fields. ocs__field lays each one out; these rules add what a form of
+// generated widgets needs: issue lines, required marks, repeatable rows and the API checks.
+
+.ui-builder-inspector .ocs__stack {
+  gap: 0.85rem;
+}
+
+// Fields sit on the builder's panels. Preset themes paint every input the panel color with a
+// border near 1.3:1 and take away the grammar's focus border (user-preferences.js, !important), so
+// a field vanished into its pane. A ring the theme doesn't set keeps each field, and focus, in view.
+.ui-builder .ocs__input {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pref-text-color) 40%, var(--panel));
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--pref-accent-color);
+  }
+}
+
+// The title row of the selected part: its icon beside the name.
+.ui-builder-node-title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+// Inline problems, in a <strong> because preset themes recolor span, div and p. The words keep
+// the text color (most presets' accent is under 4.5:1 on their panels); the accent bar marks them.
+.ui-builder-issue {
+  display: block;
+  padding-left: 0.5rem;
+  border-left: 3px solid var(--pref-accent-color);
+  color: var(--pref-text-color);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+// The text color, as the issue lines: the accent is under 4.5:1 on most presets' panels.
+.ui-builder-required {
+  color: var(--pref-text-color);
+  text-decoration: none;
+}
+
+// Code and tables are typed by column; a monospace face keeps the "|" lined up. Two classes to
+// win over the grammar's textarea.ocs__input font, and no contextual alternates: in the body
+// font Inter, "5x0" showed as "5×0" and "-->" as an arrow.
+.ocs__input.ui-builder-mono {
+  font-family: 'Source Code Pro', ui-monospace, monospace;
+  font-size: 0.85rem;
+  font-variant-ligatures: none;
+}
+
+// Fieldsets group a list or the API settings; the browser default frame and padding don't fit.
+.ui-builder-list,
+.ui-builder-api {
+  min-width: 0;
+  margin: 0;
+  padding: 0.6rem 0.75rem 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.6rem;
+
+  > legend {
+    padding: 0 0.35rem;
+  }
+}
+
+.ui-builder-rows {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0 0 0.6rem;
+  padding: 0;
+  list-style: none;
+}
+
+// One repeatable row: its fields, then its move and remove buttons.
+.ui-builder-item {
+  display: grid;
+  gap: 0.4rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--ui-border);
+
+  &:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  > fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+}
+
+.ui-builder .ui-builder-item-tools {
+  gap: 0.25rem;
+}
+
+// The API doctor's lines: one finding each, with its icon.
+.ui-builder-checks {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+
+  i {
+    color: var(--pref-accent-color);
+  }
+}
+
+.ui-builder-checks:empty {
+  display: none;
+}
+
+// Image tips (GitHub raw links, Drive) beside the field they explain.
+.ui-builder-tip {
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--pref-accent-color);
+}
+
+// Delete sits apart from every other button, with room above it.
+.ui-builder-danger {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--ui-border);
+}
+
+// The rich-text composer fills the field like the inputs around it.
+.ui-builder-rich .rt-composer {
+  width: 100%;
+}

@@ -8,6 +8,11 @@
     <p class="comms-description">{{ data.Description }}</p>
   </div>
 
+  <!-- Sprint Board: live from the team's GitHub project -->
+  {% if data.Board %}
+  {% include ocs_kanban_board.html url=data.Board.url filter=data.Board.filter columns=data.Board.columns %}
+  {% endif %}
+
   <!-- Project Cards -->
   {% for topic in data.Topics %}
   {% if topic.link contains '://' %}

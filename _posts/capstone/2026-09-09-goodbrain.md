@@ -4,9 +4,22 @@ toc: false
 layout: post
 title: My Good Brain
 permalink: /capstone/goodbrain/
+microblog: true
 ---
 
+My Good Brain is a 501(c)(3) nonprofit organization that promotes mental wellness, social-emotional learning, and healthy coping strategies for school-aged youth and adolescents through art, play, and psychology
+
+**Location**: Arts District Liberty Station (San Diego, CA) – features a creative studio, office, and community space.
+
+**Founder & Leadership**: Founded by Dr. Danessa Mayo, a licensed clinical psychologist and visual artist.
+
 Team: Rashi, Aashni, and Kelervia
+
+<!-- Sprint Board: live from the team's GitHub project -->
+{% assign mgb_data = site.data.mygoodbrain %}
+{% if mgb_data.Board %}
+{% include ocs_kanban_board.html url=mgb_data.Board.url %}
+{% endif %}
 
 <!-- Hero Header Block (2-Column Grid Layout matching reference) -->
 <div class="ocs__grid ocs__grid--standard cols-1 mb-4">

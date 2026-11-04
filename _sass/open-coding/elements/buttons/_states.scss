@@ -20,6 +20,19 @@
     @include disabled;
 }
 
+// Native disabled buttons should keep the same visual state as disabled button classes.
+.ocs__btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+
+    &:hover,
+    &:active {
+        opacity: 0.5;
+        transform: none;
+    }
+}
+
 // If you want to make buttons disabled
 .primary.disabled,
 .secondary.disabled,

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg" width="1200" height="300">
+        <title>One 66-minute class period. The student arrives 12 minutes late and is out for 17 minutes mid-class, but roll call still records Present.</title>
+        <rect width="1200" height="300" rx="28" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
+        <text x="120" y="58" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">One class period</text>
+        <rect x="120" y="112" width="740" height="44" rx="22" fill="rgb(195, 206, 219)" stroke-width="1px"></rect>
+        <rect x="254" y="112" width="202" height="44" rx="22" fill="rgb(79, 120, 184)" stroke-width="1px"></rect>
+        <rect x="647" y="112" width="213" height="44" rx="22" fill="rgb(79, 120, 184)" stroke-width="1px"></rect>
+        <rect x="122" y="114" width="130" height="40" rx="20" fill="none" stroke="rgb(200, 85, 61)" stroke-width="3px" stroke-dasharray="8px, 6px"></rect>
+        <rect x="458" y="114" width="187" height="40" rx="20" fill="none" stroke="rgb(200, 85, 61)" stroke-width="3px" stroke-dasharray="8px, 6px"></rect>
+        <text x="187" y="100" text-anchor="middle" fill="rgb(200, 85, 61)" stroke-width="1px" font-size="22px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">12 min late</text>
+        <text x="551" y="100" text-anchor="middle" fill="rgb(200, 85, 61)" stroke-width="1px" font-size="22px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">17 min out</text>
+        <text x="120" y="188" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">8:35</text>
+        <text x="860" y="188" text-anchor="end" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">9:41</text>
+        <rect x="904" y="66" width="260" height="168" rx="18" fill="rgba(22, 33, 59, 0.12)" stroke-width="1px"></rect>
+        <rect x="900" y="60" width="260" height="168" rx="18" fill="rgb(255, 255, 255)" stroke-width="1px"></rect>
+        <text x="926" y="104" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="30px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Roll call</text>
+        <rect x="926" y="120" width="208" height="3" fill="rgb(195, 206, 219)" stroke-width="1px"></rect>
+        <text x="926" y="176" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="22px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Vibha</text>
+        <text x="1094" y="176" text-anchor="end" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="22px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Present</text>
+        <circle cx="1126" cy="168" r="17" fill="rgb(79, 157, 98)" stroke-width="1px"></circle>
+        <path d="M1118 168 l6 6 l11 -12" fill="none" stroke="rgb(255, 255, 255)" stroke-width="4px" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>

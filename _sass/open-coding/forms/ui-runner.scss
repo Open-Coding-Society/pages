@@ -6,6 +6,20 @@
 @import "runner-base";
 @import "../mixins/panel"; // For $panel-* variables
 
+.ui-runner--sized {
+  height: var(--runner-output-height, auto);
+  min-height: var(--runner-output-height, 0);
+  max-height: var(--runner-output-height, none);
+  overflow: auto;
+}
+
+.ui-runner-source--sized pre {
+  height: var(--runner-editor-height, auto);
+  min-height: var(--runner-editor-height, 0);
+  max-height: var(--runner-editor-height, none);
+  overflow: auto;
+}
+
 .ui-runner-container {
   @include runner-base;
 

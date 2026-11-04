@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 470" xmlns="http://www.w3.org/2000/svg" width="1200" height="470">
+        <title>Exploded view of the reader, top to bottom: 3D-printed case lid, RC522 RFID board, Raspberry Pi 3, 3D-printed case base.</title>
+        <rect width="1200" height="470" rx="28" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
+        <line x1="250" y1="70" x2="250" y2="430" fill="rgb(0, 0, 0)" stroke="rgb(111, 127, 153)" stroke-width="2px" stroke-dasharray="6px, 6px"></line>
+        <line x1="550" y1="70" x2="550" y2="430" fill="rgb(0, 0, 0)" stroke="rgb(111, 127, 153)" stroke-width="2px" stroke-dasharray="6px, 6px"></line>
+        <rect x="220" y="40" width="360" height="62" rx="16" fill="rgb(244, 246, 249)" stroke="rgb(22, 33, 59)" stroke-width="3px"></rect>
+        <circle cx="400" cy="71" r="22" fill="rgb(233, 238, 245)" stroke-width="1px"></circle>
+        <path d="M394 62 q8 9 0 18 M386 56 q14 15 0 30" fill="none" stroke="rgb(91, 134, 214)" stroke-width="5px" stroke-linecap="round"></path>
+        <rect x="250" y="140" width="300" height="80" rx="6" fill="rgb(47, 106, 168)" stroke-width="1px"></rect>
+        <rect x="268" y="152" width="200" height="56" rx="10" fill="none" stroke="rgba(255, 255, 255, 0.75)" stroke-width="3px"></rect>
+        <rect x="280" y="162" width="176" height="36" rx="8" fill="none" stroke="rgba(255, 255, 255, 0.75)" stroke-width="3px"></rect>
+        <rect x="480" y="166" width="26" height="26" rx="3" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+        <g fill="rgb(217, 180, 90)" stroke-width="1px" font-size="16px" font-weight="400"><circle cx="528" cy="150" r="4" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="528" cy="160" r="4" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="528" cy="170" r="4" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="528" cy="180" r="4" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="528" cy="190" r="4" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="528" cy="200" r="4" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="528" cy="210" r="4" fill="rgb(217, 180, 90)" stroke-width="1px"></circle></g>
+        <rect x="230" y="250" width="340" height="100" rx="8" fill="rgb(63, 143, 94)" stroke-width="1px"></rect>
+        <g fill="rgb(217, 180, 90)" stroke-width="1px" font-size="16px" font-weight="400"><circle cx="262" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="276" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="290" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="304" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="318" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="332" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="346" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="360" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="374" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="388" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="402" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="416" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="430" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="444" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="458" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="472" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="486" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="500" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="514" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle><circle cx="528" cy="262" r="3.5" fill="rgb(217, 180, 90)" stroke-width="1px"></circle></g>
+        <rect x="360" y="290" width="44" height="44" rx="4" fill="rgb(22, 33, 59)" stroke-width="1px"></rect>
+        <rect x="530" y="282" width="52" height="26" rx="3" fill="rgb(185, 196, 211)" stroke-width="1px"></rect>
+        <rect x="530" y="316" width="52" height="26" rx="3" fill="rgb(185, 196, 211)" stroke-width="1px"></rect>
+        <rect x="220" y="380" width="360" height="56" rx="12" fill="rgb(244, 246, 249)" stroke="rgb(22, 33, 59)" stroke-width="3px"></rect>
+        <rect x="236" y="380" width="328" height="34" rx="6" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
+        <line x1="590" y1="71" x2="680" y2="71" fill="rgb(0, 0, 0)" stroke="rgb(22, 33, 59)" stroke-width="2px"></line>
+        <text x="696" y="68" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Case lid</text>
+        <text x="696" y="96" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">3D printed by Shay</text>
+        <line x1="560" y1="180" x2="680" y2="180" fill="rgb(0, 0, 0)" stroke="rgb(22, 33, 59)" stroke-width="2px"></line>
+        <text x="696" y="177" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">RC522 RFID board</text>
+        <text x="696" y="205" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">13.56 MHz, reads the tag</text>
+        <line x1="590" y1="300" x2="680" y2="300" fill="rgb(0, 0, 0)" stroke="rgb(22, 33, 59)" stroke-width="2px"></line>
+        <text x="696" y="297" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Raspberry Pi 3</text>
+        <text x="696" y="325" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">runs reader.py</text>
+        <line x1="590" y1="408" x2="680" y2="408" fill="rgb(0, 0, 0)" stroke="rgb(22, 33, 59)" stroke-width="2px"></line>
+        <text x="696" y="405" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="26px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Case base</text>
+        <text x="696" y="433" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">3D printed by Shay</text>
+      </svg>

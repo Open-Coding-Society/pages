@@ -5,7 +5,6 @@ description: >
   Author a Product Requirements Document with quantifiable target metrics and
   conduct a patent / open-source license search before building anything.
 courses: {'csh': {'week': 2}}
-assignment: true
 type: capstone
 canonical_id: csh-prd-ethics
 author: PLTW Capstone

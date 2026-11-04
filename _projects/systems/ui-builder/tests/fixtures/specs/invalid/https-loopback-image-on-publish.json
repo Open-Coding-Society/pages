@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "A picture on the team's own computer", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-lpimage1",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-lpimage1",
+              "type": "image",
+              "settings": { "src": "https://127.0.0.1:8443/images/team.png", "alt": "Our team", "caption": "", "fit": "contain" },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

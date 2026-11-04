@@ -6,7 +6,6 @@ description: >
   pass a Preliminary Design Review, and construct a working Minimum Viable
   Product against your Sprint 1 PRD targets.
 courses: {'csh': {'week': 8}}
-assignment: true
 type: capstone
 canonical_id: csh-mvp-construction
 author: PLTW Capstone

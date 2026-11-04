@@ -56,6 +56,18 @@
   .levelSelect {
     @include select-control();
     min-width: 120px;
+    max-width: 200px;
+  }
+
+  .engineVersionSelect {
+    @include select-control();
+    min-width: 110px;
+    max-width: 170px;
+
+    @media (max-width: 768px) {
+      min-width: 110px;
+      max-width: 170px;
+    }
   }
 
   // Game status indicator

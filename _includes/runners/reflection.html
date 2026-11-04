@@ -1,0 +1,119 @@
+{% comment %}
+  Reusable Reflection Runner: a written-answer box that looks like the code runner.
+  code-runner-container lets runner-io.js list, check and bundle it with the code runners, so the
+  lesson's Submit Code sends the answer in the same Gist; data-runner-kind marks it as prose.
+
+  Usage: include runners/reflection.html runner_id="loops-why" question="Why use a loop here?"
+    runner_id         - unique on the page; becomes the answer's file name in the Gist
+    question          - the reflection question shown above the box
+    reflection_number - optional number for the "Reflection #N" title
+    height            - optional answer box height (default 180px)
+{% endcomment %}
+{% assign reflection_bundled = false %}
+{% if page.assignment and page.assignment_submission_type == "code" %}{% assign reflection_bundled = true %}{% endif %}
+<div class="code-runner-container reflection-runner-container"
+  id="runner-{{ include.runner_id }}"
+  data-runner-id="{{ include.runner_id }}"
+  data-runner-kind="reflection"
+  data-bundled="{{ reflection_bundled }}"
+  data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+  {% capture reflection_title %}Reflection {% if include.reflection_number %}#{{ include.reflection_number }}{% endif %}{% endcapture %}
+  {% include runners/fragments/challenge-box.html title=reflection_title challenge=include.question %}
+
+  {% capture reflection_top_controls %}
+      <button type="button" class="ocs__btn utility submit" data-hook="submit" title="Submit Answer" aria-label="Submit Answer"></button>
+      <button type="button" class="ocs__btn utility copy" data-hook="copy" title="Copy Answer" aria-label="Copy Answer"></button>
+      <button type="button" class="ocs__btn utility clear" data-hook="clear" title="Clear Answer" aria-label="Clear Answer"></button>
+  {% endcapture %}
+  {% capture reflection_bottom_controls %}
+      <span class="wordCount">Words: 0</span>
+      <span class="charCount">Characters: 0</span>
+      <span class="status-text" role="status" aria-live="polite"></span>
+  {% endcapture %}
+  {% include runners/fragments/editor-container.html
+     top_controls=reflection_top_controls
+     bottom_controls=reflection_bottom_controls
+  %}
+</div>
+
+<script type="module">
+import { BaseRunner } from '{{site.baseurl}}/assets/js/pages/runners/index.js';
+
+(function() {
+  const container = document.getElementById('runner-{{ include.runner_id }}');
+  if (!container) return;
+
+  // The submitted answer lives under storageKey, the key runner-io.js reads, so only a
+  // submitted answer is bundled. Unsubmitted typing is kept separately as a draft, so a
+  // refresh never wipes it and never sends half-finished text.
+  const storageKey = container.dataset.storageKey;
+  const draftKey = `${storageKey}_draft`;
+  const bundled = container.dataset.bundled === 'true';
+  const runner = new BaseRunner(container, { storageKey });
+  runner.initializeEditor({ plainText: true });
+
+  const textarea = container.querySelector('.editor-textarea');
+  textarea.placeholder = 'Write your answer in full sentences...';
+  textarea.spellcheck = true;
+  textarea.setAttribute('aria-label', container.querySelector('.challenge-box h3')?.textContent.trim() || 'Reflection answer');
+  textarea.style.height = "{{ include.height | default: '180px' }}";
+  const wordCount = container.querySelector('.wordCount');
+
+  const draft = localStorage.getItem(draftKey);
+  if (draft !== null) runner.setValue(draft);
+
+  function submittedAnswer() {
+    return (localStorage.getItem(storageKey) || '').trim();
+  }
+
+  function showState() {
+    const answer = runner.getValue().trim();
+    const words = answer ? answer.split(/\s+/).length : 0;
+    wordCount.textContent = `Words: ${words}`;
+    if (!submittedAnswer()) {
+      runner.updateStatus(answer ? 'Draft saved on this device, not submitted yet' : '');
+    } else if (submittedAnswer() !== answer) {
+      runner.updateStatus('Changed since you submitted. Click Submit to update your answer.');
+    } else {
+      runner.updateStatus(bundled
+        ? '✔ Submitted. Sent with your code when you click Submit Code at the bottom of the page.'
+        : '✔ Submitted. Saved on this device.');
+    }
+  }
+
+  runner.onCodeChange((value) => {
+    localStorage.setItem(draftKey, value);
+    showState();
+  });
+
+  runner.bindButton('', (event, button) => {
+    const answer = runner.getValue().trim();
+    if (!answer) {
+      runner.updateStatus('⚠️ Write an answer before submitting.');
+      textarea.focus();
+      return;
+    }
+    try {
+      runner.saveToStorage(answer);
+      localStorage.removeItem(draftKey);
+    } catch (error) {
+      console.error(`Reflection ${container.id}: answer could not be saved`, error);
+      runner.updateStatus(`❌ Could not save your answer: ${error.message}`);
+      return;
+    }
+    runner.flashButton(button, '✔');
+    showState();
+  }, 'submit');
+
+  runner.bindEditorButtons({
+    resetValue: '',
+    copyFeedback: '✔',
+    onClear: () => {
+      localStorage.removeItem(draftKey);
+      showState();
+    },
+  });
+
+  showState();
+})();
+</script>

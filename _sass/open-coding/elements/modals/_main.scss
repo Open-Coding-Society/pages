@@ -1,0 +1,76 @@
+// Fixed-position modal overlay: a full-viewport backdrop centering a
+// single content card, with a close control pinned to the card's corner
+// (or inside .ocs__modal-header, for a modal with a title bar). How a
+// consuming page shows/hides the overlay (a "hidden"/"open" class, an
+// aria-hidden attribute, etc.) stays page-specific -- this only styles
+// the chrome once it's visible, the same way .ocs__card doesn't care how
+// it's shown either.
+
+.ocs__modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.ocs__modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 32rem;
+  max-height: 90vh;
+  overflow: auto;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  background: var(--panel);
+  border: 1px solid var(--ui-border);
+}
+
+// Pages pair this with .ocs__card for the panel look; .ocs__card's own
+// margin-bottom doesn't belong on a modal dialog. Compounded with
+// .ocs__card so this reliably outranks its bottom margin regardless of
+// SCSS import order (ocs__card is compiled in a separate, later-loading
+// stylesheet entry point, _sass/minima/custom-styles.scss, so a
+// same-specificity bare override here isn't reliable).
+.ocs__card.ocs__modal-card {
+  margin-bottom: 0;
+}
+
+// Positioning only -- pair with ocs__btn ocs__btn--icon (small) for the
+// visual close-button treatment.
+.ocs__modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+}
+
+// Optional title-bar row for a modal whose close control sits in a header
+// instead of floating over the card. See .ocs__card-header for the plain
+// (non-modal) version of the same row.
+.ocs__modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.ocs__modal-title {
+  margin: 0;
+}
+
+.ocs__modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--ui-border);
+}

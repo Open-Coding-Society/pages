@@ -1,0 +1,867 @@
+<!-- Class Announcement Chat: always-open WebSocket chat for the whole course. -->
+<!-- One group per course, e.g. "csa-announcements", "csp-announcements". -->
+<!-- Reuses the same STOMP/SockJS backend as _includes/lesson_chat.html and the -->
+<!-- Messages page's group chats (Open-Coding-Society/spring's /api/groups + -->
+<!-- /ws-chat). The group is created automatically on first use if it doesn't -->
+<!-- exist yet, so no manual DB seeding is required. -->
+<!-- -->
+<!-- Signed-out visitors still get the full UI: the chat drops into a local -->
+<!-- "preview" mode backed by localStorage, so the feature is visible and -->
+<!-- testable without a login. -->
+<!-- -->
+<!-- Calendar: a strip of this school week sits above the messages, anyone -->
+<!-- signed in adds events with the /event slash command, and announcements -->
+<!-- that carry events show event cards. See assets/js/chat/calendar/calendar-announcements.js. -->
+
+<section id="announcementChat" class="announcement-chat" data-course="{{ page.course }}" aria-labelledby="announcementChatTitle">
+  <div class="chat-header">
+    <div class="chat-heading">
+      <a class="chat-badge" href="{{ '/student/calendar' | relative_url }}" aria-label="Open OCS calendar" title="Open OCS calendar"><i class="fas fa-calendar" aria-hidden="true"></i></a>
+      <div class="chat-heading-text">
+        <h2 class="chat-title" id="announcementChatTitle">{{ page.course | upcase }} Announcements</h2>
+        <p class="chat-subtitle">Class-wide chat for this course — announcements and questions.</p>
+      </div>
+    </div>
+    <span class="chat-status-pill" id="announcementChatStatusPill">
+      <span class="chat-status-dot" aria-hidden="true"></span>
+      <span class="chat-status" id="announcementChatStatus">loading…</span>
+    </span>
+  </div>
+
+  <div class="chat-body">
+    <p class="chat-preview-note" id="announcementChatNote" hidden>
+      <i class="fas fa-flask" aria-hidden="true"></i><span id="announcementChatNoteText"></span>
+    </p>
+    <div class="announcement-chat-calendar" data-hook="calendar"></div>
+    <div class="chat-messages" id="announcementChatMessages" role="log" aria-live="polite">
+      <div class="chat-empty" id="announcementChatEmpty">
+        <i class="fas fa-bullhorn" aria-hidden="true"></i>
+        <p class="chat-empty-title">No announcements yet</p>
+        <span class="chat-empty-hint">Class-wide messages will appear here.</span>
+      </div>
+    </div>
+    <div class="announcement-chat-command" data-hook="command"></div>
+    <form class="chat-form" id="announcementChatForm" autocomplete="off">
+      <button class="chat-send dm-cancel-edit" id="announcementChatCancelEdit" type="button" hidden>Cancel</button>
+      <button class="chat-send" id="announcementChatSend" type="submit" disabled>
+        <i class="fas fa-paper-plane" aria-hidden="true"></i><span>Send</span>
+      </button>
+    </form>
+    <p class="dm-form-status" id="announcementChatFormStatus" role="alert" hidden></p>
+  </div>
+</section>
+
+{% assign announcement_school_calendar = site.data.school_calendar %}
+<script id="announcementChatSchoolCalendar" type="application/json">
+{
+  "schoolYear": {{ announcement_school_calendar.school_year | jsonify }},
+  "weeks": {
+    {% for week in announcement_school_calendar.weeks %}
+    "{{ week[0] }}": {
+      "monday": {{ week[1].monday | jsonify }},
+      "friday": {{ week[1].friday | jsonify }},
+      "holidays": {{ week[1].holidays | default: nil | jsonify }},
+      "holidayAdjustment": {{ week[1].holiday_adjustment | default: nil | jsonify }},
+      "skipWeek": {{ week[1].skip_week | default: false | jsonify }},
+      "theme": {{ week[1].theme | default: nil | jsonify }},
+      "notes": {{ week[1].notes | default: nil | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  }
+}
+</script>
+
+<script type="module">
+  import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+  import { createRichComposer, renderDeletedMessage, renderRichMessage } from '{{site.baseurl}}/assets/js/chat/rich-text.js';
+  import { attachAnnouncementCalendar } from '{{site.baseurl}}/assets/js/chat/calendar/calendar-announcements.js';
+
+  const COURSE = {{ page.course | jsonify }};
+  const GROUP_NAME = `${COURSE}-announcements`;
+  const CHAT_SOCKET_PORT = 8589;
+  const PREVIEW_KEY = `ocs-chat-preview:${GROUP_NAME}`;
+  const PREVIEW_LIMIT = 100;
+
+  const SOCKJS_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js';
+  const STOMP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js';
+
+  // Shared with the calendar and Messages: load the chat libraries once per page,
+  // and only when a chat actually needs a live connection.
+  function loadScriptOnce(src) {
+    window.__ocsChatScripts = window.__ocsChatScripts || {};
+    if (!window.__ocsChatScripts[src]) {
+      window.__ocsChatScripts[src] = new Promise((resolve, reject) => {
+        const el = document.createElement('script');
+        el.src = src;
+        el.onload = resolve;
+        el.onerror = () => reject(new Error(`failed to load ${src}`));
+        document.head.appendChild(el);
+      });
+    }
+    return window.__ocsChatScripts[src];
+  }
+
+  async function loadChatLibraries() {
+    await loadScriptOnce(SOCKJS_SRC);
+    await loadScriptOnce(STOMP_SRC);
+  }
+
+  function buildChatSocketEndpoint() {
+    const uri = new URL(javaURI);
+    if (uri.hostname === 'localhost' || uri.hostname === '127.0.0.1') {
+      return `${uri.protocol}//${uri.hostname}:${CHAT_SOCKET_PORT}/ws-chat`;
+    }
+    return javaURI + '/ws-chat';
+  }
+
+  const state = {
+    backboneGroupId: null,
+    stompClient: null,
+    subscription: null,
+    connected: false,
+    initialized: false,
+    mode: 'live', // 'live' once connected to the backend, 'preview' when local-only
+    currentUserDisplayName: 'You',
+    currentUserPfp: null,
+    seenKeys: new Set(),
+    messageMap: new Map(),
+    editingMessageId: null,
+    editingMessage: null,
+    editInProgress: false,
+    deletingMessageIds: new Set(),
+    // Cursors used to group the log by day and by consecutive sender
+    lastDayKey: null,
+    lastSender: null,
+    lastTime: 0,
+  };
+
+  const statusEl = document.getElementById('announcementChatStatus');
+  const statusPillEl = document.getElementById('announcementChatStatusPill');
+  const noteEl = document.getElementById('announcementChatNote');
+  const noteTextEl = document.getElementById('announcementChatNoteText');
+  const messagesEl = document.getElementById('announcementChatMessages');
+  const sendBtn = document.getElementById('announcementChatSend');
+  const cancelEditBtn = document.getElementById('announcementChatCancelEdit');
+  const formStatusEl = document.getElementById('announcementChatFormStatus');
+  const formEl = document.getElementById('announcementChatForm');
+
+  const composer = createRichComposer({
+    placeholder: 'Message the class…',
+    maxLength: 2000,
+    onSubmit: submitMessage,
+  });
+  formEl.classList.add('chat-form--rich');
+  formEl.insertBefore(composer.element, cancelEditBtn);
+
+  const calendar = attachAnnouncementCalendar({
+    root: document.getElementById('announcementChat'),
+    messagesEl,
+    composer,
+    course: COURSE,
+    schoolCalendar: JSON.parse(document.getElementById('announcementChatSchoolCalendar').textContent),
+    calendarUrl: '{{site.baseurl}}/student/calendar',
+    javaURI,
+    fetchOptions,
+    onSubmit: submitMessage,
+  });
+
+  function setStatus(text, tone) {
+    statusEl.textContent = text;
+    statusPillEl.classList.remove('is-live', 'is-preview', 'is-error');
+    if (tone) statusPillEl.classList.add(tone);
+  }
+
+  function showNote(text) {
+    noteTextEl.textContent = text;
+    noteEl.hidden = false;
+  }
+
+  function setComposerEnabled(enabled) {
+    composer.setEnabled(enabled && !state.editInProgress);
+    sendBtn.disabled = !enabled || state.editInProgress;
+    cancelEditBtn.hidden = !state.editingMessageId;
+    cancelEditBtn.disabled = state.editInProgress;
+    const icon = sendBtn.querySelector('i');
+    const label = sendBtn.querySelector('span');
+    if (icon) icon.className = state.editingMessageId ? 'fas fa-save' : 'fas fa-paper-plane';
+    if (label) label.textContent = state.editingMessageId ? 'Save' : 'Send';
+  }
+
+  function showFormMessage(message) {
+    formStatusEl.textContent = message;
+    formStatusEl.hidden = !message;
+  }
+
+  function resetEditState() {
+    state.editingMessageId = null;
+    state.editingMessage = null;
+    state.editInProgress = false;
+    composer.clear();
+    showFormMessage('');
+    setComposerEnabled(true);
+  }
+
+  function beginEditMessage(message) {
+    if (state.editInProgress || !message || !message.id || message.deleted
+      || message.sender !== state.currentUserDisplayName) return;
+    state.editingMessageId = message.id;
+    state.editingMessage = message;
+    composer.clear();
+    composer.setHTML(message.message || '');
+    showFormMessage('');
+    setComposerEnabled(true);
+    composer.focus();
+  }
+
+  composer.element.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && state.editingMessageId && !state.editInProgress) {
+      event.preventDefault();
+      resetEditState();
+    }
+  });
+  cancelEditBtn.addEventListener('click', resetEditState);
+
+  function updateMessageBody(messageId, message) {
+    const key = String(messageId ?? '');
+    if (!key) return;
+    const stored = state.messageMap.get(key);
+    if (stored?.deleted) return;
+
+    const row = messagesEl.querySelector(`[data-message-id="${CSS.escape(key)}"]`);
+    if (row) {
+      const bodyTarget = row.querySelector('.chat-msg-body');
+      if (bodyTarget) {
+        bodyTarget.innerHTML = '';
+        const { html } = calendar.splitMessage(message || '');
+        renderRichMessage(bodyTarget, html);
+      }
+      const meta = row.querySelector('.chat-msg-meta');
+      if (meta && !meta.querySelector('.chat-msg-edited')) {
+        const editedEl = document.createElement('span');
+        editedEl.className = 'chat-msg-edited';
+        editedEl.textContent = '(edited)';
+        meta.appendChild(editedEl);
+      }
+    }
+
+    if (stored) {
+      stored.message = message ?? stored.message;
+      stored.edited = true;
+    }
+  }
+
+  function markMessageDeleted(messageId) {
+    const key = String(messageId ?? '');
+    if (!key) return;
+
+    const stored = state.messageMap.get(key);
+    if (stored) {
+      stored.message = '';
+      stored.deleted = true;
+    }
+    const row = messagesEl.querySelector(`[data-message-id="${CSS.escape(key)}"]`);
+    if (!row) return;
+
+    const bodyTarget = row.querySelector('.chat-msg-body');
+    if (bodyTarget) renderDeletedMessage(bodyTarget);
+    row.classList.add('is-deleted');
+    row.querySelector('.chat-msg-actions')?.remove();
+    if (state.editingMessageId === key && !state.editInProgress) resetEditState();
+  }
+
+  // An open /event command is sent even with an empty message: the calendar
+  // module creates the event first and hands back the text + event marker.
+  let submitting = false;
+  async function submitMessage() {
+    if (submitting || composer.isOverLimit()) return;
+    if (state.editInProgress) return;
+
+    if (state.editingMessageId) {
+      if (composer.isEmpty()) return;
+      state.editInProgress = true;
+      showFormMessage('');
+      setComposerEnabled(true);
+      const ok = await editMessage(state.editingMessageId, composer.getHTML());
+      if (ok) {
+        resetEditState();
+      } else if (state.messageMap.get(String(state.editingMessageId))?.deleted) {
+        // The message was deleted while the save was in flight.
+        resetEditState();
+        showFormMessage('That message was deleted, so your edit was not saved.');
+      } else {
+        state.editInProgress = false;
+        setComposerEnabled(true);
+        showFormMessage('Could not save the edited message. Please try again.');
+      }
+      return;
+    }
+
+    submitting = true;
+    try {
+      const html = await calendar.prepareMessage(composer.isEmpty() ? '' : composer.getHTML());
+      if (html === null) return;
+      showFormMessage('');
+      if (await sendMessage(html)) {
+        composer.clear();
+        calendar.reset();
+      } else {
+        showFormMessage('Could not send the message. Please try again.');
+      }
+    } finally {
+      submitting = false;
+    }
+  }
+
+  function parseDate(isoString) {
+    if (!isoString) return null;
+    const date = new Date(isoString);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+
+  function dayKey(date) {
+    return String(startOfDay(date));
+  }
+
+  // "Today" / "Yesterday" / "Mon, Aug 24" — the separator between day groups.
+  function dayLabel(date) {
+    const diff = Math.round((startOfDay(new Date()) - startOfDay(date)) / 86400000);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    return date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  }
+
+  function formatTime(date) {
+    return date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function initialsFor(name) {
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    if (parts.length === 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  // Stable per-sender tint so the same person keeps the same avatar color.
+  function tintFor(name) {
+    const text = String(name || '');
+    let hash = 0;
+    for (let i = 0; i < text.length; i += 1) hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
+    return `tint-${(hash % 5) + 1}`;
+  }
+
+  // Person.pfp is either a path/URL (seeded accounts, e.g. "/images/toby.png")
+  // or raw base64 image data (uploaded photos) with no "data:" prefix of its own.
+  function pfpSrc(pfp) {
+    if (!pfp) return null;
+    if (/^(https?:)?\/\//.test(pfp) || pfp.startsWith('/') || pfp.startsWith('data:')) return pfp;
+    return `data:image/png;base64,${pfp}`;
+  }
+
+  // Renders a real photo when one is available, falling back to the tinted
+  // initials circle (and back again if the image URL 404s).
+  function buildAvatar(pfp, initials, isSelf, tintClass) {
+    const avatar = document.createElement('span');
+    avatar.className = ['chat-avatar', isSelf ? '' : tintClass].filter(Boolean).join(' ');
+    avatar.setAttribute('aria-hidden', 'true');
+    const src = pfpSrc(pfp);
+    if (src) {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = '';
+      img.loading = 'lazy';
+      img.addEventListener('error', () => { img.remove(); avatar.textContent = initials; }, { once: true });
+      avatar.appendChild(img);
+    } else {
+      avatar.textContent = initials;
+    }
+    return avatar;
+  }
+
+  function clearEmpty() {
+    const empty = document.getElementById('announcementChatEmpty');
+    if (empty) empty.remove();
+  }
+
+  function appendMessage(entry) {
+    const { id, sender, message, date } = entry;
+    const isDeleted = Boolean(entry.deleted);
+    clearEmpty();
+
+    const isEdited = Boolean(entry.edited);
+    const messageId = id != null ? String(id) : null;
+    if (messageId) {
+      state.messageMap.set(messageId, {
+        id: messageId, sender, message: isDeleted ? '' : message, date, deleted: isDeleted, edited: isEdited,
+      });
+    }
+
+    const isSelf = sender === state.currentUserDisplayName;
+    const who = isSelf ? 'You' : (sender || 'Unknown');
+    const when = parseDate(date);
+
+    // Keep the log pinned to the bottom only if the reader is already there,
+    // so scrolling back through history isn't yanked away by a new message.
+    const wasAtBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 40;
+
+    let continued;
+    if (when) {
+      const key = dayKey(when);
+      if (key !== state.lastDayKey) {
+        const separator = document.createElement('div');
+        separator.className = 'chat-day';
+        separator.setAttribute('role', 'separator');
+        separator.textContent = dayLabel(when);
+        messagesEl.appendChild(separator);
+        state.lastDayKey = key;
+        state.lastSender = null;
+      }
+      continued = who === state.lastSender && (when.getTime() - state.lastTime) < 5 * 60 * 1000;
+      state.lastTime = when.getTime();
+    } else {
+      continued = who === state.lastSender;
+    }
+
+    const row = document.createElement('div');
+    row.className = ['chat-msg', isSelf ? 'is-self' : '', continued ? 'is-continued' : '', isDeleted ? 'is-deleted' : '']
+      .filter(Boolean).join(' ');
+    if (messageId) row.dataset.messageId = messageId;
+
+    const avatar = buildAvatar(
+      isSelf ? state.currentUserPfp : null,
+      initialsFor(isSelf ? (state.currentUserDisplayName || 'You') : who),
+      isSelf,
+      tintFor(who),
+    );
+
+    const main = document.createElement('div');
+    main.className = 'chat-msg-main';
+
+    const meta = document.createElement('div');
+    meta.className = 'chat-msg-meta';
+    const senderEl = document.createElement('span');
+    senderEl.className = 'chat-msg-sender';
+    senderEl.textContent = who;
+    meta.appendChild(senderEl);
+    if (when) {
+      const timeEl = document.createElement('span');
+      timeEl.className = 'chat-msg-time';
+      timeEl.textContent = formatTime(when);
+      meta.appendChild(timeEl);
+    }
+    if (isEdited && !isDeleted) {
+      const editedEl = document.createElement('span');
+      editedEl.className = 'chat-msg-edited';
+      editedEl.textContent = '(edited)';
+      meta.appendChild(editedEl);
+    }
+
+    let actions;
+    if (isSelf && !isDeleted && messageId) {
+      actions = document.createElement('div');
+      actions.className = 'chat-msg-actions';
+
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'chat-msg-action';
+      editBtn.setAttribute('aria-label', 'Edit message');
+      editBtn.title = 'Edit message';
+      editBtn.innerHTML = '<i class="fas fa-pen" aria-hidden="true"></i>';
+      editBtn.addEventListener('click', () => beginEditMessage({ ...state.messageMap.get(messageId), id: messageId, sender }));
+      actions.appendChild(editBtn);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'chat-msg-action';
+      deleteBtn.setAttribute('aria-label', 'Delete message');
+      deleteBtn.title = 'Delete message';
+      deleteBtn.innerHTML = '<i class="fas fa-trash" aria-hidden="true"></i>';
+      deleteBtn.addEventListener('click', () => {
+        if (state.editInProgress) {
+          showFormMessage('Wait for the current edit to finish before deleting a message.');
+          return;
+        }
+        deleteBtn.disabled = true;
+        deleteMessage(messageId).finally(() => { deleteBtn.disabled = false; });
+      });
+      actions.appendChild(deleteBtn);
+    }
+
+    const body = document.createElement('span');
+    body.className = 'chat-msg-body';
+    let events = [];
+    if (isDeleted) {
+      renderDeletedMessage(body);
+    } else {
+      const split = calendar.splitMessage(message);
+      renderRichMessage(body, split.html);
+      events = split.events;
+    }
+
+    main.append(meta, body);
+    calendar.attachEvents(row, main, events);
+    if (actions) main.appendChild(actions);
+    row.append(avatar, main);
+    messagesEl.appendChild(row);
+
+    state.lastSender = who;
+    if (wasAtBottom) messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function appendSystem(text) {
+    clearEmpty();
+    const el = document.createElement('p');
+    el.className = 'chat-system';
+    el.textContent = text;
+    messagesEl.appendChild(el);
+    state.lastSender = null;
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function eventKey(event) {
+    return [event?.sender || '', event?.date || '', event?.message || ''].join('|');
+  }
+
+  /* ── Local preview mode ─────────────────────────────────────────────
+     Used when nobody is signed in (or the backbone is unreachable) so the
+     announcements panel stays visible and usable. Messages are kept in
+     localStorage for this browser only. */
+
+  function readPreviewMessages() {
+    try {
+      const raw = window.localStorage.getItem(PREVIEW_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      console.warn('Announcement chat: preview history unavailable', err);
+      return [];
+    }
+  }
+
+  function writePreviewMessage(entry) {
+    try {
+      const messages = readPreviewMessages();
+      messages.push(entry);
+      window.localStorage.setItem(PREVIEW_KEY, JSON.stringify(messages.slice(-PREVIEW_LIMIT)));
+    } catch (err) {
+      console.warn('Announcement chat: could not save preview message', err);
+    }
+  }
+
+  function updatePreviewMessage(id, patch) {
+    try {
+      const messages = readPreviewMessages();
+      const idx = messages.findIndex((m) => m.id === id);
+      if (idx === -1) return;
+      messages[idx] = { ...messages[idx], ...patch };
+      window.localStorage.setItem(PREVIEW_KEY, JSON.stringify(messages));
+    } catch (err) {
+      console.warn('Announcement chat: could not update preview message', err);
+    }
+  }
+
+  function enterPreviewMode(reason) {
+    state.mode = 'preview';
+    calendar.start('preview');
+    state.currentUserDisplayName = 'You';
+    setStatus('preview', 'is-preview');
+    showNote(`${reason} This is a local preview — messages stay in this browser and are not sent to the class.`);
+
+    readPreviewMessages().forEach((msg) => {
+      const key = eventKey(msg);
+      if (state.seenKeys.has(key)) return;
+      state.seenKeys.add(key);
+      appendMessage(msg);
+    });
+
+    setComposerEnabled(true);
+  }
+
+  async function resolveCurrentUser() {
+    try {
+      const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
+      if (!res.ok) { console.warn('Announcement chat: /api/id HTTP', res.status); return false; }
+      const user = await res.json();
+      const name = user?.name || user?.uid || user?.github;
+      if (!name) return false;
+      state.currentUserDisplayName = name;
+      await fetchCurrentUserPfp();
+      return true;
+    } catch (err) {
+      console.warn('Announcement chat: user lookup failed', err);
+      return false;
+    }
+  }
+
+  // Separate from resolveCurrentUser (which goes through Flask): group chat
+  // has no Person record for the sender of someone else's message, only a
+  // plain name string, so a real photo is only ever possible for the reader's
+  // own messages -- fetched here, straight from Spring, since Flask's /api/id
+  // doesn't return one. Best-effort: initials stay the fallback on failure.
+  async function fetchCurrentUserPfp() {
+    try {
+      const res = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+      if (!res.ok) return;
+      const person = await res.json();
+      if (person?.pfp) state.currentUserPfp = person.pfp;
+    } catch (err) {
+      console.warn('Announcement chat: pfp lookup failed', err);
+    }
+  }
+
+  async function createGroup() {
+    const res = await fetch(`${javaURI}/api/groups`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({ name: GROUP_NAME, period: '', course: COURSE, memberIds: [] }),
+    });
+    if (res.status === 201) {
+      const body = await res.json();
+      return Number(body?.id) || null;
+    }
+    // 409 = someone else created it a moment ago; fall through to re-search.
+    return null;
+  }
+
+  async function resolveBackboneGroup() {
+    const cacheKey = `__announcementChatGroupId_${COURSE}`;
+    if (window[cacheKey]) { state.backboneGroupId = window[cacheKey]; return true; }
+
+    const url = `${javaURI}/api/groups/search?name=${encodeURIComponent(GROUP_NAME)}`;
+    let res;
+    try { res = await fetch(url, fetchOptions); }
+    catch (err) { console.warn('Announcement chat: group lookup network error', err); return false; }
+    if (!res.ok) { console.warn('Announcement chat: group lookup HTTP', res.status); return false; }
+
+    let body;
+    try { body = await res.json(); }
+    catch (err) { console.warn('Announcement chat: group lookup non-JSON response', err); return false; }
+
+    let match = Array.isArray(body) ? body.find((g) => (g?.name || '') === GROUP_NAME) : body;
+
+    if (!match) {
+      const createdId = await createGroup();
+      if (createdId) {
+        state.backboneGroupId = createdId;
+        window[cacheKey] = createdId;
+        return true;
+      }
+      // Someone else beat us to creating it — re-search once.
+      try {
+        const retryRes = await fetch(url, fetchOptions);
+        if (retryRes.ok) {
+          const retryBody = await retryRes.json();
+          match = Array.isArray(retryBody) ? retryBody.find((g) => (g?.name || '') === GROUP_NAME) : retryBody;
+        }
+      } catch (err) { /* ignore, handled below */ }
+    }
+
+    const id = Number(match?.id);
+    if (!id) { console.warn('Announcement chat: could not resolve or create group', GROUP_NAME); return false; }
+    state.backboneGroupId = id;
+    window[cacheKey] = id;
+    return true;
+  }
+
+  async function loadHistory() {
+    if (!state.backboneGroupId) return;
+    try {
+      const res = await fetch(`${javaURI}/api/groups/chat/${state.backboneGroupId}/messages`, fetchOptions);
+      if (!res.ok) { console.warn('Announcement chat: history HTTP', res.status); return; }
+      const messages = await res.json();
+      // Spring calls a saved message's sender `author`; the socket frame calls it `sender`.
+      (messages || []).forEach((msg) => {
+        const key = eventKey({ sender: msg.author, date: msg.date, message: msg.message });
+        if (state.seenKeys.has(key)) return;
+        state.seenKeys.add(key);
+        appendMessage({ id: msg.id, sender: msg.author, message: msg.message, date: msg.date, edited: msg.edited });
+      });
+    } catch (err) {
+      console.warn('Announcement chat: history load failed', err);
+    }
+  }
+
+  function handleIncoming(event) {
+    if (!event) return;
+    if (event.context === 'deleteMessageServer') {
+      markMessageDeleted(event.messageId);
+      return;
+    }
+    if (event.context === 'editMessageServer') {
+      updateMessageBody(event.messageId, event.message);
+      return;
+    }
+    if (event.context !== 'sendMessageServer') return;
+    const key = eventKey(event);
+    if (state.seenKeys.has(key)) return;
+    state.seenKeys.add(key);
+    appendMessage({ id: event.messageId, sender: event.sender, message: event.message, date: event.date });
+  }
+
+  function connect() {
+    return new Promise((resolve) => {
+      if (state.connected) return resolve(true);
+      if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') { return resolve(false); }
+      setStatus('connecting…');
+      const socket = new SockJS(buildChatSocketEndpoint());
+      const client = Stomp.over(socket);
+      client.debug = null;
+      state.stompClient = client;
+
+      client.connect({}, () => {
+        state.connected = true;
+        setStatus('connected', 'is-live');
+        state.subscription = client.subscribe(`/topic/group/${state.backboneGroupId}`, (frame) => {
+          try { handleIncoming(JSON.parse(frame.body)); }
+          catch (err) { console.warn('Announcement chat: bad frame', err); }
+        });
+        resolve(true);
+      }, (err) => {
+        console.warn('Announcement chat: connection failed', err);
+        state.connected = false;
+        resolve(false);
+      });
+
+      socket.onclose = () => {
+        if (!state.connected) return;
+        state.connected = false;
+        setStatus('disconnected', 'is-error');
+        setComposerEnabled(false);
+      };
+    });
+  }
+
+  // Posted over HTTP, like the Messages page: Spring takes the sender from the
+  // login cookie, which the socket's sendMessage can't read. The saved message
+  // comes back to every reader, this one included, on the group topic.
+  async function sendMessage(text) {
+    if (state.mode === 'preview') {
+      const entry = { id: crypto.randomUUID(), sender: state.currentUserDisplayName || 'You', message: text, date: new Date().toISOString() };
+      state.seenKeys.add(eventKey(entry));
+      writePreviewMessage(entry);
+      appendMessage(entry);
+      return true;
+    }
+
+    if (!state.backboneGroupId) return false;
+    try {
+      const res = await fetch(`${javaURI}/api/groups/chat/${state.backboneGroupId}/messages`, {
+        ...fetchOptions, method: 'POST', body: JSON.stringify({ message: text, image: null }),
+      });
+      if (!res.ok) { console.warn('Announcement chat: send HTTP', res.status); return false; }
+      return true;
+    } catch (err) {
+      console.error('Announcement chat: send failed', err);
+      return false;
+    }
+  }
+
+  async function editMessage(messageId, newMessage) {
+    if (!messageId) return false;
+
+    if (state.mode === 'preview') {
+      updateMessageBody(messageId, newMessage);
+      updatePreviewMessage(messageId, { message: newMessage });
+      return true;
+    }
+
+    if (!state.backboneGroupId) return false;
+    try {
+      const res = await fetch(
+        `${javaURI}/api/groups/chat/${state.backboneGroupId}/messages/${encodeURIComponent(messageId)}`,
+        { ...fetchOptions, method: 'PATCH', body: JSON.stringify({ message: newMessage }) },
+      );
+      if (!res.ok) { console.warn('Announcement chat: edit HTTP', res.status); return false; }
+      updateMessageBody(messageId, newMessage);
+      return true;
+    } catch (err) {
+      console.error('Announcement chat: edit failed', err);
+      return false;
+    }
+  }
+
+  async function deleteMessage(messageId) {
+    if (!messageId || state.editInProgress) return false;
+    const key = String(messageId);
+    const message = state.messageMap.get(key);
+    if (!message || message.deleted || message.sender !== state.currentUserDisplayName
+      || state.deletingMessageIds.has(key)) return false;
+
+    if (state.mode === 'preview') {
+      markMessageDeleted(key);
+      updatePreviewMessage(key, { deleted: true, message: '' });
+      return true;
+    }
+
+    if (!state.backboneGroupId) return false;
+    state.deletingMessageIds.add(key);
+    showFormMessage('');
+    try {
+      const res = await fetch(
+        `${javaURI}/api/groups/chat/${state.backboneGroupId}/messages/${encodeURIComponent(key)}`,
+        { ...fetchOptions, method: 'DELETE' },
+      );
+      if (!res.ok) {
+        console.warn('Announcement chat: delete HTTP', res.status);
+        showFormMessage('Could not delete the message. Please try again.');
+        return false;
+      }
+      markMessageDeleted(key);
+      return true;
+    } catch (err) {
+      console.error('Announcement chat: delete failed', err);
+      showFormMessage('Could not delete the message. Please try again.');
+      return false;
+    } finally {
+      state.deletingMessageIds.delete(key);
+    }
+  }
+
+  async function init() {
+    if (state.initialized) return;
+    state.initialized = true;
+    setStatus('loading…');
+
+    const signedIn = await resolveCurrentUser();
+    if (!signedIn) {
+      enterPreviewMode('You are not signed in.');
+      return;
+    }
+
+    const ok = await resolveBackboneGroup();
+    if (!ok) {
+      enterPreviewMode('The class chat service is unreachable.');
+      return;
+    }
+
+    await calendar.start('live');
+    await loadHistory();
+
+    try { await loadChatLibraries(); }
+    catch (err) { console.warn('Announcement chat: library load failed', err); }
+
+    const connected = await connect();
+    if (connected) {
+      state.mode = 'live';
+      setComposerEnabled(true);
+    } else {
+      appendSystem('Live updates are unavailable right now.');
+      enterPreviewMode('The class chat service is unreachable.');
+    }
+  }
+
+  formEl.addEventListener('submit', (e) => {
+    e.preventDefault();
+    submitMessage();
+  });
+
+  window.addEventListener('beforeunload', () => {
+    try {
+      if (state.subscription) state.subscription.unsubscribe();
+      if (state.stompClient && state.connected) state.stompClient.disconnect();
+    } catch (_) { /* ignore */ }
+  });
+
+  init();
+</script>

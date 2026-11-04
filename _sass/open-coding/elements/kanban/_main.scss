@@ -1,0 +1,7 @@
+// Kanban element: a board of stage columns holding link cards. A page adds one
+// with _includes/ocs_kanban_board.html, and assets/js/kanban-board.js builds
+// the markup. The filters, counts and backlog toggle around it are existing
+// OCS elements (ocs__links, ocs__btn, ocs__status-pill, ocs__toggle); this
+// element is only the part they can't express.
+@import "tokens";
+@import "common";

@@ -6,7 +6,6 @@ description: >
   data against the revised PRD, and run a comparative analysis against the
   Alpha prototype.
 courses: {'csh': {'week': 21}}
-assignment: true
 type: capstone
 canonical_id: csh-comparative-testing
 author: PLTW Capstone

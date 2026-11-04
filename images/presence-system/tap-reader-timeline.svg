@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 250" xmlns="http://www.w3.org/2000/svg" width="1200" height="250">
+        <title>Build timeline: RC522 ordered (done), parts arrive, wire it and read a first card, reader.py integration, Shay prints the case, assembly, mount by the door and test, classroom pilot.</title>
+        <rect width="1200" height="250" rx="28" fill="rgb(223, 231, 239)" stroke-width="1px"></rect>
+        <line x1="75" y1="96" x2="1125" y2="96" fill="rgb(0, 0, 0)" stroke="rgb(111, 127, 153)" stroke-width="6px" stroke-dasharray="12px, 10px"></line>
+        <circle cx="75" cy="96" r="28" fill="rgb(79, 157, 98)" stroke-width="1px"></circle>
+        <path d="M62 97 l9 9 l17 -19" fill="none" stroke="rgb(255, 255, 255)" stroke-width="6px" stroke-linecap="round" stroke-linejoin="round"></path>
+        <circle cx="225" cy="96" r="22" fill="rgb(223, 231, 239)" stroke="rgb(22, 33, 59)" stroke-width="5px"></circle>
+        <circle cx="375" cy="96" r="22" fill="rgb(223, 231, 239)" stroke="rgb(22, 33, 59)" stroke-width="5px"></circle>
+        <circle cx="525" cy="96" r="22" fill="rgb(223, 231, 239)" stroke="rgb(22, 33, 59)" stroke-width="5px"></circle>
+        <circle cx="675" cy="96" r="22" fill="rgb(223, 231, 239)" stroke="rgb(22, 33, 59)" stroke-width="5px"></circle>
+        <circle cx="825" cy="96" r="22" fill="rgb(223, 231, 239)" stroke="rgb(22, 33, 59)" stroke-width="5px"></circle>
+        <circle cx="975" cy="96" r="22" fill="rgb(223, 231, 239)" stroke="rgb(22, 33, 59)" stroke-width="5px"></circle>
+        <circle cx="1125" cy="96" r="22" fill="rgb(223, 231, 239)" stroke="rgb(22, 33, 59)" stroke-width="5px"></circle>
+        <text x="75" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="20px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Ordered</text>
+        <text x="75" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">RC522 kit</text>
+        <text x="225" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="20px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Parts arrive</text>
+        <text x="375" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="20px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">First read</text>
+        <text x="375" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">wire + test card</text>
+        <text x="525" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="20px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">reader.py</text>
+        <text x="525" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">integration</text>
+        <text x="675" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="20px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Case</text>
+        <text x="675" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">printed by Shay</text>
+        <text x="825" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="20px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Assembly</text>
+        <text x="825" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">with Shay</text>
+        <text x="975" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="20px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Mount + test</text>
+        <text x="975" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">by the door</text>
+        <text x="1125" y="160" text-anchor="middle" fill="rgb(22, 33, 59)" stroke-width="1px" font-size="20px" font-weight="700" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">Pilot</text>
+        <text x="1125" y="188" text-anchor="middle" fill="rgb(90, 103, 125)" stroke-width="1px" font-size="20px" font-weight="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">one classroom</text>
+      </svg>

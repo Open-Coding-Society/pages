@@ -1,5 +1,6 @@
 ---
 layout: post
+courses: {'csp': {'week': 11}}
 title: Plagiarism TDD Google Form
 description: Google Form Design Plans for TDD
 author: John Mortensen

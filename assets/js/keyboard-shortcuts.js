@@ -200,11 +200,17 @@ class KeyboardShortcutsManager {
     }
 }
 
+// Some layouts include this file through more than one shared template.
+// Keep one manager per page so shortcuts and the help overlay are not duplicated.
+function initializeKeyboardShortcuts() {
+    if (!window.__ocsKeyboardShortcutsManager) {
+        window.__ocsKeyboardShortcutsManager = new KeyboardShortcutsManager();
+    }
+}
+
 // Initialize the manager when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        new KeyboardShortcutsManager();
-    });
+    document.addEventListener('DOMContentLoaded', initializeKeyboardShortcuts);
 } else {
-    new KeyboardShortcutsManager();
+    initializeKeyboardShortcuts();
 }

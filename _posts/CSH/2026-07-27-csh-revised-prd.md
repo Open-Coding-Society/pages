@@ -6,7 +6,6 @@ description: >
   justify each change against your FMEA and stakeholder feedback, and peer
   review the revised PRD with another team.
 courses: {'csh': {'week': 15}}
-assignment: true
 type: capstone
 canonical_id: csh-revised-prd
 author: PLTW Capstone

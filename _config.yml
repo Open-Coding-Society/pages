@@ -22,11 +22,18 @@ github_username: open-coding-society
 github_repo: "pages"
 baseurl: ""
 future: true
+default_course: csse
 
 # Single source of truth for the Google OAuth client id -- assets/js/api/config.js's
 # GOOGLE_CLIENT_ID and login.md's #g_id_onload data-client_id both pull from this at
 # build time via Liquid, so the two can never drift out of sync with each other again.
 google_client_id: "65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com"
+
+# Whether this site runs Spring next to Flask: true for OCS for Education (Flask + Spring),
+# false for OCS for Business (Flask only). assets/js/api/config.js's springEnabled and the
+# profile layout read it at build time, so login, logout, the navbar's DM bell and /profile
+# use Flask alone when it is false. See _projects/systems/profile/README.md.
+spring: true
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts
 # This prevents double-regeneration when saving notebooks/docx files
@@ -131,7 +138,17 @@ minima:
     - { platform: x, user_url: "https://x.com/Open_Coding" }
     - { platform: youtube, user_url: "https://www.youtube.com/@OpenCodingSociety" } 
   nav_pages:
-    - navigation/blog.md
-    - navigation/courses.md
+    - navigation/course.md
     - navigation/capstone.md
-    - navigation/search.md
+    - navigation/topics.md
+exclude:
+# Jekyll defaults
+  - vendor
+# Custom excludes
+  - Makefile
+  - _notebooks
+  - _docx
+  - _projects
+  - venv
+  - blueprints_capstone
+# Note: / auto-excluded by Jekyll (underscore prefix)

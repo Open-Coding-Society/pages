@@ -1,0 +1,110 @@
+{%- comment -%}
+  Every post on the site as a card. Used by _layouts/blogs.html and by each
+  course's Blogs page in the lesson player (_includes/player-pages/blogs.html).
+  A page can set post_filter to show only the posts with that flag, the way
+  /gamebuilder/docs/ does, and post_search: true to put a search bar over the
+  cards. A host can pass the same search as search=true, and course=<course>
+  to list only that course's posts. Test: bundle exec ruby scripts/test_blog_catalog.rb
+{%- endcomment -%}
+{%- assign catalog_search = include.search | default: page.post_search -%}
+
+<!-- Get all posts -->
+{% assign rawposts = site.posts %}
+{% if page.post_filter %}
+  {% assign rawposts = rawposts | where_exp: "post", "post[page.post_filter] == true" %}
+{% endif %}
+{%- if include.course -%}
+  {%- comment -%}
+    A course's posts are the ones whose courses names that course and no
+    other, the rule the course player uses for its own lessons. A post for
+    several courses still shows, through the one-course copy that
+    scripts/split_multi_course_files.py makes of it.
+  {%- endcomment -%}
+  {%- assign coursePosts = "" | split: "" -%}
+  {%- for post in rawposts -%}
+    {%- if post.courses[include.course] and post.courses.size == 1 -%}
+      {%- assign coursePosts = coursePosts | push: post -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- assign rawposts = coursePosts -%}
+{%- endif %}
+
+<!-- Hide posts if front matter flag hide:true -->
+{% assign posts = '' | split:'' %}
+{% for post in rawposts %}
+  {% if post.hide != true %}
+    {% assign posts = posts | push: post %}
+  {% endif %}
+{% endfor %}
+
+<!-- Sort posts by rank, then date, put posts with "sticky_posts: 1" front matter at the top -->
+{% assign grouped_posts = posts | group_by: "sticky_rank" | sort: "name", "last" %}
+{% assign sticky_posts = '' | split:'' %}
+{% assign non_sticky_posts = '' | split:'' %}
+<!-- Split posts into sticky and non-sticky -->
+{% for gp in grouped_posts %}
+  {%- if gp.name == "" -%}
+    {% assign non_sticky_posts = gp.items | sort: "date" | reverse %}
+  {%- else %}
+    {% assign sticky_posts = sticky_posts | concat: gp.items %}
+  {%- endif %}
+{% endfor %}
+
+<!-- Generate Card for each Post -->
+{% assign sticky_posts = sticky_posts | sort: "sticky_rank", "last" %}
+{% assign posts = sticky_posts | concat: non_sticky_posts %}
+{%- if posts.size > 0 -%}
+  {%- if page.list_title -%}
+    <h2 class="post-list-heading">{{ page.list_title }}</h2>
+  {%- endif -%}
+  {%- if catalog_search -%}
+  {%- comment -%}
+    The search bar, from OCS components with no CSS of its own. ocs__split
+    sets the field beside Clear Search and stacks them on phones; size="1"
+    lets the split decide the field's width, because any size wide enough to
+    look like a bar overflows a 320px phone in Safari. The count gets its own
+    line: text that wrapped beside the button would make the split stretch
+    the field to the taller row. The field and button stay disabled until
+    assets/js/blogs/post-search.js runs. It highlights matches with <mark> in
+    each card's title link and description, the elements post_list_image_card.html
+    marks data-post-search-field while catalog_search is on.
+  {%- endcomment %}
+  <p class="ocs__split" role="search" aria-label="Search {{ page.title | escape }}" data-post-search>
+    <input class="ocs__input" type="search" size="1" placeholder="Search titles &amp; descriptions" aria-label="Search titles and descriptions" autocomplete="off" disabled data-post-search-input>
+    <span class="ocs__links">
+      <button class="ocs__btn medium accent" type="button" disabled data-post-search-clear>Clear Search</button>
+    </span>
+  </p>
+  <p role="status" aria-live="polite" data-post-search-status></p>
+  {%- endif -%}
+  <ul class="post-list">
+    {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+    {% assign seen_ids = "" | split: "" %}
+    {%- for post in posts -%}
+      {% assign post_id = post.canonical_id | default: post.id %}
+      {% unless seen_ids contains post_id or post.title contains "_content" %}
+        <li{% if catalog_search %} data-post-search-card data-post-search-text="{{ post.title | strip_html | escape }} {{ post.description | strip_html | escape }}"{% endif %}>
+          {%- include post_list_image_card.html -%}
+        </li>
+        {% assign seen_ids = seen_ids | push: post_id %}
+      {% endunless %}
+    {%- endfor -%}
+  </ul>
+  {%- if catalog_search %}
+  <script type="module">
+    import { createPostSearch } from {{ "/assets/js/blogs/post-search.js" | relative_url | jsonify }};
+
+    const bar = document.querySelector('[data-post-search]');
+    createPostSearch({
+      input: bar.querySelector('[data-post-search-input]'),
+      clear: bar.querySelector('[data-post-search-clear]'),
+      status: document.querySelector('[data-post-search-status]'),
+      cards: [...document.querySelectorAll('[data-post-search-card]')],
+    });
+  </script>
+  {%- endif %}
+{%- elsif include.course -%}
+  <p>No posts for this class yet.</p>
+{%- elsif page.post_filter -%}
+  <p>No documentation is available yet.</p>
+{%- endif -%}

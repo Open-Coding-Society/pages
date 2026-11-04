@@ -1,0 +1,32 @@
+.gist-connection {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  background: var(--panel);
+  h2 { margin-top: 0; }
+  label { display: block; margin-bottom: 0.5rem; }
+  input { width: 100%; max-width: 36rem; }
+  p { line-height: 1.5; }
+  .gist-connection-instructions {
+    margin-bottom: 1.25rem;
+    summary { cursor: pointer; font-weight: 600; }
+    ol { padding-left: 1.5rem; line-height: 1.6; }
+    li + li { margin-top: 0.5rem; }
+  }
+  #gist-connection-state[data-connected="true"] {
+    color: var(--status-indicator-success-color, #28a745);
+    font-size: 1.2rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  .gist-connection-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .gist-connection-note, #gist-connection-help { font-size: 0.9rem; }
+  [hidden] { display: none !important; }
+}
+.gist-settings-link {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--pref-accent-color);
+  text-decoration: underline;
+}

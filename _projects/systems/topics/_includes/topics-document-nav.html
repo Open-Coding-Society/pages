@@ -1,0 +1,7 @@
+<nav class="topics-document-nav ocs__container" aria-label="Topics document navigation">
+  <a class="ocs__btn small" href="{{ '/topics/' | relative_url }}" data-topics-return>Topics</a>
+  {% for category in page.categories %}
+  <a class="ocs__btn pill small" href="{{ '/topics/' | relative_url }}?category={{ category | downcase | url_encode }}">{{ category | escape }}</a>
+  {% endfor %}
+  <a class="ocs__btn small" href="{{ page.topics_original_url | relative_url }}">Open original context</a>
+</nav>

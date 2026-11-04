@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "An html key", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-htmlkey01",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-htmlkey01",
+              "type": "text",
+              "settings": {
+                "body": "Some text.",
+                "html": "<img src=x onerror=alert(1)>"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

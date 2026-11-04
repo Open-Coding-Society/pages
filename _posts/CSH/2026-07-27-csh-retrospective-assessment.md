@@ -5,7 +5,6 @@ description: >
   Reflect on Sprint 1, self-assess against the Sprint 1 Assessment Matrix,
   gather peer and teacher feedback, and set knowledge goals for Sprint 2.
 courses: {'csh': {'week': 4}}
-assignment: true
 type: capstone
 canonical_id: csh-retrospective-assessment
 author: PLTW Capstone

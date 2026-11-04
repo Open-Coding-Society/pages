@@ -1,0 +1,12 @@
+# Extra Jekyll config layered on _config.yml only by ./omake (see scripts/omake/Makefile).
+# make, make dev and the deployed site never load this file.
+
+# Keep the site's generated plugins and add the omake-only ones.
+plugins_dir:
+  - _plugins
+  - scripts/omake/plugins
+
+# Includes that only read site-wide data, so one render can be reused on every page.
+# The header scans all site.pages on each of ~800 pages (about half the build time).
+omake_cached_includes:
+  - themes/minima/header.html

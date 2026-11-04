@@ -248,6 +248,14 @@ class PersistentProfile {
             },
             completedAt: null,
           },
+          'toolchain-trail': {
+            progress: {
+              stations: {},
+              activeStationId: null,
+              score: 0,
+            },
+            completedAt: null,
+          },
         },
       };
 
@@ -332,6 +340,7 @@ class PersistentProfile {
       const identityForge = gameProfile['identity-forge'] || { preferences: {}, progress: {} };
       const wayfindingWorld = gameProfile['wayfinding-world'] || { preferences: {}, progress: {} };
       const missionTooling = gameProfile['mission-tooling'] || { progress: {} };
+      const toolchainTrail = gameProfile['toolchain-trail'] || { progress: {} };
 
       return {
         // Metadata
@@ -364,6 +373,11 @@ class PersistentProfile {
         missionProgressCount: missionTooling.progress?.missionProgressCount || 0,
         missionScore: missionTooling.progress?.missionScore || 0.55,
         missionCompletedStations: missionTooling.progress?.missionCompletedStations || [],
+        // Toolchain Trail (Level 2)
+        toolchainStations: toolchainTrail.progress?.stations || {},
+        toolchainActiveStationId: toolchainTrail.progress?.activeStationId || null,
+        toolchainScore: toolchainTrail.progress?.score || 0,
+        toolchainTrailCompletedAt: toolchainTrail.completedAt || null,
       };
     } catch (error) {
       console.error('PersistentProfile: getFlatProfile failed', error);

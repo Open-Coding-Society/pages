@@ -1,0 +1,146 @@
+// Racing game HUD controls (created by levels/TimeLapScreen.js and levels/RestartPrompt.js).
+// Positions are set from JS because they follow the game canvas; everything else lives here.
+
+$racing-panel-bg: rgba(15, 23, 42, 0.92);
+$racing-accent: #facc15;
+$racing-text: #f8fafc;
+
+.racing-difficulty {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.82);
+  color: $racing-text;
+
+  &__content {
+    width: min(100%, 420px);
+    padding: 24px;
+    border: 2px solid $racing-accent;
+    border-radius: 8px;
+    background: $racing-panel-bg;
+    text-align: center;
+  }
+
+  h2 {
+    margin: 0 0 8px;
+    color: $racing-accent;
+    font: bold 24px sans-serif;
+  }
+
+  p {
+    margin: 0 0 20px;
+    font: 14px sans-serif;
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  &__button {
+    min-width: 100px;
+    padding: 8px 16px;
+    border: 1px solid $racing-accent;
+    border-radius: 4px;
+    background: rgba(250, 204, 21, 0.15);
+    color: $racing-text;
+    font: bold 14px sans-serif;
+    cursor: pointer;
+
+    &--easy {
+      border-color: #86efac;
+      background: #166534;
+    }
+
+    &--medium {
+      border-color: #fde047;
+      background: #854d0e;
+    }
+
+    &--hard {
+      border-color: #fca5a5;
+      background: #991b1b;
+    }
+
+    &:hover,
+    &:focus-visible {
+      filter: brightness(1.2);
+    }
+  }
+}
+
+.racing-hud-restart {
+  position: absolute;
+  z-index: 20;
+  // JS sets left to the HUD box's right edge, so shift the button back inside it.
+  transform: translateX(-100%);
+  padding: 1px 6px;
+  border: 1px solid $racing-accent;
+  border-radius: 4px;
+  background: rgba(250, 204, 21, 0.15);
+  color: $racing-text;
+  font: bold 11px sans-serif;
+  line-height: 1.4;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(250, 204, 21, 0.35);
+  }
+}
+
+.racing-restart-prompt {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 30;
+  transform: translate(-50%, -50%);
+  padding: 16px 20px;
+  border: 2px solid $racing-accent;
+  border-radius: 8px;
+  background: $racing-panel-bg;
+  color: $racing-text;
+  font-family: sans-serif;
+  text-align: center;
+
+  &[hidden] {
+    display: none;
+  }
+
+  &__question {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  &__yes,
+  &__no {
+    padding: 6px 14px;
+    border-radius: 4px;
+    font: bold 13px sans-serif;
+    cursor: pointer;
+  }
+
+  &__yes {
+    border: 1px solid #f87171;
+    background: #b91c1c;
+    color: $racing-text;
+  }
+
+  &__no {
+    border: 1px solid $racing-text;
+    background: transparent;
+    color: $racing-text;
+  }
+}

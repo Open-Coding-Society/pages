@@ -1,0 +1,23 @@
+{% assign games = site.posts | where: "game_directory", true | where_exp: "game", "game.exclude_from_games != true" | sort: "game_order" %}
+{% for game in games %}
+  <div class="ocs__grid-cell CSSE" data-year="{{ game.school_year | default: '' | escape }}" data-page-url="{{ game.url | relative_url }}">
+    {% assign game_image = game.image %}
+    {% unless game_image %}
+      {% assign project_path = game.path | split: '/' %}
+      {% assign project_name = project_path[2] %}
+      {% assign favicon_path = '/images/projects/' | append: project_name | append: '/favicon.png' %}
+      {% assign favicon_file = site.static_files | where: 'path', favicon_path | first %}
+      {% if favicon_file %}{% assign game_image = favicon_path %}{% endif %}
+    {% endunless %}
+    {% if game_image %}
+    <a href="{{ game.url | relative_url }}">
+      <img class="ocs__image-frame ocs__image-frame--thumbnail" src="{{ game_image | relative_url }}" alt="{{ game.title | escape }}">
+    </a>
+    {% endif %}
+    <div>
+      <h3><a href="{{ game.url | relative_url }}">{{ game.title | escape }}</a></h3>
+      {% if game.description %}<p>{{ game.description | escape }}</p>{% endif %}
+      {% if game.author %}<p>Team: {{ game.author | escape }}</p>{% endif %}
+    </div>
+  </div>
+{% endfor %}

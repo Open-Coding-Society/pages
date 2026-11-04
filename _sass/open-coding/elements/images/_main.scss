@@ -21,7 +21,8 @@ img.ocs__image-frame {
     padding: 0;
 }
 
-.ocs__image-frame--cover > img {
+.ocs__image-frame--cover > img,
+.ocs__image-frame--cover > video {
     display: block;
     width: 100%;
     height: 100%;

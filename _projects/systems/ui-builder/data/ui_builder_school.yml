@@ -1,0 +1,172 @@
+# UI Builder school pack: course data, school-only blocks, CSP templates and school wording.
+# Published to _data/ui_builder_school.yml and merged over ui_builder.yml: blocks and text
+# deep-merge (this file wins), templates and page_fields are appended.
+# Course titles come from site.data[code].course.title, the same way Profile reads them.
+course_codes: [csse, csp, csa, csh]
+
+page_fields:
+  - { id: course, type: course, label: Course, help: Puts the page in that course's gallery. }
+
+blocks:
+  announcements:
+    label: Class announcements
+    help: The latest announcements from a course's announcement channel.
+    code_note: "Only a comment in the page file. On the live page, the viewer shows your course's announcements chat from Messages."
+    icon: fa-bullhorn
+    category: comms
+    live: true
+    needs: spring
+    fields:
+      - { id: course, type: course, label: Course, required: true }
+      - { id: title, type: text, label: Title, max: 80 }
+      - { id: limit, type: number, label: How many announcements, min: 1, max: 20, default: 5 }
+  calendar:
+    label: Class calendar
+    help: The class calendar for a course. Visitors who aren't signed in see the school week.
+    code_note: "An include of the course calendar card (ocs_calendar_card.html) for one course. Jekyll fills it in when the site builds."
+    icon: fa-calendar-days
+    category: comms
+    live: true
+    needs: spring
+    fields:
+      - { id: course, type: course, label: Course, help: Leave empty to use the page's course. }
+      - { id: title, type: text, label: Title, max: 80 }
+
+templates:
+  - key: team_project
+    label: Team project
+    help: Your team's page with the plan, the board, team chat and the class calendar.
+    page:
+      schemaVersion: 1
+      kind: ocs-ui-page
+      page: { title: Our team project, description: What our team is building., byline: "", course: csp, width: contained, image: "" }
+      sections:
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: hero
+                  settings:
+                    badge: Team project
+                    title: Our team project
+                    lead: The problem we're solving, who it's for, and how far along we are.
+        - type: columns
+          settings: { layout: sidebar_right }
+          cells:
+            - blocks:
+                - type: heading
+                  settings: { text: Our plan, level: "2", subtitle: "" }
+                - type: text
+                  settings: { body: "What we're building this sprint." }
+                - type: kanban
+                  settings: { url: "", filter: "", title: Our board }
+            - blocks:
+                - type: chat
+                  settings: { group: null, title: Team chat }
+                - type: message_me
+                  settings: { label: Message us, note: Questions about our project? }
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: calendar
+                  settings: { course: "", title: Class calendar }
+  - key: natm_booth
+    label: Showcase booth (N@tM)
+    help: A page for Night at the Museum visitors, with a demo, your team, live data and feedback.
+    page:
+      schemaVersion: 1
+      kind: ocs-ui-page
+      page: { title: Our showcase booth, description: Try our project at Night at the Museum., byline: "", course: csp, width: contained, image: "" }
+      sections:
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: hero
+                  settings:
+                    badge: Night at the Museum
+                    title: Our showcase booth
+                    lead: One sentence a visitor can understand in five seconds.
+                    links:
+                      - { label: Try it, url: "https://example.com" }
+                - type: heading
+                  settings: { text: Our project, level: "2", subtitle: "" }
+                - type: video
+                  settings: { url: "", title: Two-minute demo, caption: "" }
+        - type: columns
+          settings: { layout: halves }
+          cells:
+            - blocks:
+                - type: team
+                  settings:
+                    title: Our team
+                    items:
+                      - { name: Ada, role: Scrum Master, url: "" }
+                      - { name: Grace, role: Integrator, url: "" }
+            - blocks:
+                - type: api_data
+                  settings:
+                    title: Live from our backend
+                    view: list
+                    limit: 5
+                    source:
+                      url: ""
+                      list_path: ""
+                      title_path: ""
+                      text_path: ""
+                      image_path: ""
+                      link_path: ""
+                      value_path: ""
+                      label_path: ""
+                      snapshot: { items: [], fetched_at: 0, from_loopback: false }
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: feedback
+                  settings: { title: Leave us feedback, prompt: What should we build next? }
+  - key: nonprofit_project
+    label: Non-profit project
+    help: The problem, your partner, your prototype and feedback.
+    page:
+      schemaVersion: 1
+      kind: ocs-ui-page
+      page: { title: Our non-profit project, description: How our app helps our partner., byline: "", course: csp, width: contained, image: "" }
+      sections:
+        - type: stack
+          settings: {}
+          cells:
+            - blocks:
+                - type: hero
+                  settings: { badge: Non-profit partner, title: Our non-profit project, lead: Who our partner is and what they need. }
+                - type: heading
+                  settings: { text: The problem, level: "2", subtitle: "" }
+                - type: text
+                  settings: { body: What is hard for our partner today, in their words. }
+                - type: card
+                  settings: { title: Our partner, body: Who they serve and how we work with them., links: [] }
+                - type: link_cards
+                  settings:
+                    items:
+                      - { kicker: Prototype, title: Try our prototype, text: What to click first., url: "https://example.com" }
+                - type: feedback
+                  settings: { title: Feedback, prompt: Would this help you? }
+
+text:
+  blocks:
+    sample_announcements: "Announcements for {course} show here on the published page."
+    sample_calendar: The class calendar shows here on the published page.
+  view:
+    attribution: Student page
+    made_by: "Made by {name}"
+    made_by_group: "Made by {name} ({group})"
+    report: Report this page
+    report_body: "This student page may need a teacher's attention: {url}"
+    report_subject: A student page to check
+    guest_comms: Team chat is for OCS members. Leave feedback below instead.
+  teacher:
+    class_pages: Class pages
+    approve_public: Approve for everyone
+    public_requested: Asked to be public
+    bulk_public: "Make every published {course} page public until…"

@@ -1,15 +1,17 @@
 ---
-layout: post
-title: CS Pathway Games
-description: Games and interactive projects available through the Open Coding Society CS Pathway.
+layout: opencs
+title: CSSE Capstone
+description: CSSE games and interactive capstone projects.
 permalink: /cs-pathway/games/
 hide: true
 toc: false
 ---
 
-{% include projects/cs-pathway/cs-pathway-menu.html %}
-
-<div class="ocs__container games-directory">
-  <h2 class="ocs__section-title">Games &amp; Interactive Projects</h2>
-  {% include games-directory.html %}
+<div class="ocs__container">
+  <h2 class="ocs__section-title">CSSE Capstone</h2>
+  <p>Games and interactive projects are now part of Capstone.</p>
+  <a class="ocs__btn accent fill" href="{{ '/capstone/?course=CSSE' | relative_url }}">Explore CSSE capstones</a>
 </div>
+<script>
+  window.location.replace({{ '/capstone/?course=CSSE' | relative_url | jsonify }});
+</script>

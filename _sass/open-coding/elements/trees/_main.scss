@@ -1,0 +1,14 @@
+// Shared tree element: rows nested under the row above them.
+// .ocs__tree indents its children one level and draws a guide line down the
+// left, under the icon or chevron of the row above. Nest one per level.
+
+.ocs__tree {
+  margin-left: $spacing-sm;
+  border-left: 1px solid color-mix(in srgb, var(--pref-accent-color) 40%, var(--panel));
+}
+
+// Spaces a child with no padding of its own (text, a link, or an ocs__links
+// group) off the guide line. Rows that already have padding don't need it.
+.ocs__tree-item {
+  padding: $spacing-xxxs 0 $spacing-xxxs $spacing-sm;
+}

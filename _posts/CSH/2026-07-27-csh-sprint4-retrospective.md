@@ -6,7 +6,6 @@ description: >
   technical ownership heading into the Sprint 5 build, and set knowledge
   goals for the rest of the second iteration.
 courses: {'csh': {'week': 16}}
-assignment: true
 type: capstone
 canonical_id: csh-sprint4-retrospective
 author: PLTW Capstone

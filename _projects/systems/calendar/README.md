@@ -59,7 +59,8 @@ The calendar JavaScript modules are loaded via `_includes/calendar.html` in this
 
 **`_includes/calendar.html` is NOT part of this project:**
 - It's the **interface layer** between sprint pages and the calendar system
-- Lives in `_includes/` (standard Jekyll location for reusable components)
+- Source lives in [courses/_includes/calendar.html](../courses/_includes/calendar.html);
+  the courses manifest publishes it to `_includes/calendar.html`
 - Used by `_layouts/sprint.html` to provide "Sync to Calendar" UI
 - Loads deployed calendar JS modules from `assets/js/projects/calendar/`
 - **Belongs to the courses/sprint system** - it's a consumer of this calendar API
@@ -86,6 +87,11 @@ For detailed module documentation, see [ARCHITECTURE.md](docs/ARCHITECTURE.md).
 - Group assignment and filtering
 - Break day management
 - Recurring event support
+- Linked docs: an event's **Linked Doc** field picks a site doc (from the Topics catalog, `site.data.topics_catalog`) or takes any web link
+  - Spring's `CalendarEvent` has no doc column, so the link is the description's last line, `Linked doc: <url>` ([CalendarDocLinks.js](js/CalendarDocLinks.js)); sprint-synced lesson URLs in a description count as the linked doc
+  - Every doc page (Blogs `post.html`) has an **Add to Calendar** button that opens `/student/calendar?doc=<url>&title=<title>` with the Add New Event modal filled in
+  - Edits always send a `period` (the backend requires one); events with no course are saved as `Personal`, which the calendar treats as no course
+  - Test: `node --test tests/calendar_doc_links.test.mjs`
 
 ### Issue Tracking
 - GitHub-style issue creation and management

@@ -63,6 +63,9 @@ show_reading_time: false
 
 <script type="module">
     import { javaURI, pythonURI, fetchOptions, GOOGLE_CLIENT_ID } from '{{site.baseurl}}/assets/js/api/config.js';
+    // Same rule as Spring's Person.checkPassword(). Flask saves the reset first and Spring is
+    // synced after, so a password Spring rejects would leave the two with different passwords.
+    import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
 
     // ---- Support topic navigation ----
     window.openSupportTopic = function(topic) {
@@ -95,6 +98,8 @@ show_reading_time: false
         document.getElementById('resetUid').value = '';
         document.getElementById('resetNewPassword').value = '';
         document.getElementById('resetConfirmPassword').value = '';
+        // Setting .value doesn't fire 'input', so refresh the checklist and match message by hand.
+        document.getElementById('resetNewPassword').dispatchEvent(new Event('input'));
         document.getElementById('reset-message').textContent = '';
         document.getElementById('reset-oauth-status').innerHTML = '';
         document.getElementById('reset-ticket-row').style.display = 'none';
@@ -239,10 +244,10 @@ show_reading_time: false
             return true;
         }
 
-        if (password.length < 8) {
+        if (!meetsSpringPasswordRules(password)) {
             confirmField.classList.add('password-length');
             messageDiv.classList.add('error');
-            messageDiv.textContent = '✗ Passwords must be at least 8 characters long';
+            messageDiv.textContent = `✗ ${SPRING_PASSWORD_RULES}`;
             return false;
         }
 
@@ -264,9 +269,9 @@ show_reading_time: false
         const confirmPassword = document.getElementById('resetConfirmPassword').value;
         const validationMessage = document.getElementById('reset-password-validation-message');
 
-        if (password.length < 8) {
+        if (!meetsSpringPasswordRules(password)) {
             validationMessage.classList.add('error');
-            validationMessage.textContent = 'Password must be at least 8 characters long.';
+            validationMessage.textContent = SPRING_PASSWORD_RULES;
             return;
         }
         if (password !== confirmPassword) {
@@ -335,6 +340,7 @@ show_reading_time: false
     window.addEventListener('load', function() {
         const resetPasswordField = document.getElementById('resetNewPassword');
         const resetConfirmPasswordField = document.getElementById('resetConfirmPassword');
+        attachPasswordChecklist(resetPasswordField);
         if (resetPasswordField && resetConfirmPasswordField) {
             resetPasswordField.addEventListener('input', validateResetForm);
             resetConfirmPasswordField.addEventListener('input', validateResetForm);
@@ -350,3 +356,5 @@ show_reading_time: false
         }
     });
 </script>
+
+<script type="module" src="{{site.baseurl}}/assets/js/api/passwordFields.js"></script>

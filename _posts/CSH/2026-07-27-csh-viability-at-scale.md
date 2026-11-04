@@ -6,7 +6,6 @@ description: >
   compliance considerations, and lock a revised timeline for the Beta build
   and test.
 courses: {'csh': {'week': 19}}
-assignment: true
 type: capstone
 canonical_id: csh-viability-at-scale
 author: PLTW Capstone

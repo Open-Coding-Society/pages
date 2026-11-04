@@ -1,0 +1,110 @@
+# OCS Assignments System (Submissions) Capstone Infographic
+Badge: "OCS Capstones › Submissions"
+Title: "OCS Assignments System"
+Description: "The goal right now is to make grading faster and more trustworthy, and to let teachers do everything they need from the Pages frontend without digging into the Spring admin views. Below are the six things we're focused on, who's working on what, and the design notes we're working from."
+
+# The team's GitHub project board, shown live under the header (_includes/ocs_kanban_board.html)
+Board:
+  url: "https://github.com/orgs/AAApages/projects/1/views/1"
+
+# Numbered in order; the workstream tags below refer to these numbers
+Priorities:
+  title: "Current priorities"
+  items:
+    - title: "Faster grading with your own AI key"
+      description: "Graders add their own Gemini key so AI grading isn't stuck waiting on one shared key."
+      owner: "Owner: <b>Aditya</b>"
+    - title: "Fix, build, and standardize lessons with CRUD"
+      description: "Add and delete operations so lessons can be cleaned up and kept consistent, instead of being patched one by one."
+      owner: "Owners: <b>Rishabh</b> (CSSE lesson) &middot; <b>Aneesh</b> (Units 1 + 2)"
+    - title: "Grading corrections from the admin page"
+      description: "Example: a CSSE object literals lesson had a nested conditionals permalink, and that wrong link got saved in the database. Resubmitting doesn't fix the record because the submission process never updates it, so admins need a way to correct it from the admin page."
+      owner: "Owners: <b>William + Nick</b> &middot; <b>Katherine + Bridget</b>"
+    - title: "Data collection for self-assessment"
+      description: "Collecting the data that self-assessment will be built on before it goes back into OCS."
+      owner: "Owner: <b>Jacob</b>"
+    - title: "Using OCS AI"
+      description: "Deciding whether grading goes through an OCS AI API or another option."
+      owner: "Owner: <b>Whole team</b> &middot; approach still being decided"
+    - title: "Aaryav's <code>omake</code>"
+      description: "Speeding up make run time. This is on the agenda for the second mentor meeting."
+      owner: "Owner: <b>Aaryav</b>"
+
+# Who's working on what
+Topics:
+  - title: "AI Grading with Your Own Key"
+    team:
+      - "Aditya"
+    tech:
+      - "#1 Faster grading"
+      - "#5 OCS AI"
+    description: "Letting each assignment be AI-graded with a key the user uploads from Gemini or Claude. Every assignment's AI grade is out of 1 point."
+    link: "/capstone/work-submission-grading/"
+    linkLabel: "View project →"
+
+  - title: "Student Grades Alongside AI Grades + Make Run Time"
+    team:
+      - "Aaryav"
+    tech:
+      - "#6 omake"
+    description: "Letting a student grade go in next to the AI grade without overwriting it. Separately, cutting down make run time with <code>omake</code>."
+
+  - title: "Kanban, Admin Dashboard + Student Success Insights"
+    team:
+      - "Katherine"
+      - "Bridget"
+    tech:
+      - "#3 Corrections"
+    description: "Keeping the Kanban board and this capstone page up to date, organizing the admin dashboard and the Spring backend behind it, and building Student Success Insights."
+    link: "/capstone/analytics_selfassessment/"
+    linkLabel: "View project →"
+
+  - title: "Admin Dashboard: Assignments by Year"
+    team:
+      - "William"
+      - "Nick"
+    tech:
+      - "#3 Corrections"
+    description: "Organizing assignments by year in the admin dashboard. There are about 20 pages of assignments from several years, so the focus is on making them easy to find and fix."
+
+  - title: "Unit 1 + 2 Teaching"
+    team:
+      - "Aneesh"
+    tech:
+      - "#2 Lessons"
+    description: "Units 1 and 2 still need to be taught. This means working out the schedule and trying a new way of teaching lessons to get more engagement. Right now the focus is the homework for Mort's data structures lesson."
+
+  - title: "Self-Assessment Rework"
+    team:
+      - "Jacob"
+    tech:
+      - "#4 Self-assessment"
+    description: "Taking self-grading out for now and reworking it, using the data being collected, before it goes back into OCS."
+    link: "/capstone/analytics_selfassessment/"
+    linkLabel: "View project →"
+
+# Design notes
+Sections:
+  - title: "Spring backend"
+    subtitle: "Design notes"
+    items:
+      - "The \"view grades\" page in Spring has gotten huge. Teachers would be better served by a teacher view on the frontend."
+      - "Leave the legacy pages in place rather than ripping them out."
+      - "Grading still needs a proper design before more gets built on it."
+      - "The assignment tracker spans about 20 pages across several years. Starting from scratch would be cleaner but is too much work, so we're improving what's there."
+      - "AI grading uses a rubric out of 1 point."
+      - "Add only the CRUD operations admins actually need, not every possible one."
+
+  - title: "Pages frontend"
+    subtitle: "Design notes"
+    items:
+      - "Submission screens for both graders and teachers."
+      - "Teachers should only ever need the frontend to do their work."
+      - "That includes starting AI grading from the frontend."
+
+  - title: "How we're working"
+    subtitle: "Design notes"
+    items:
+      - "PRs should remove sharp edges, not add band-aids."
+      - "An AI grade and a student or grader grade should sit side by side. Neither one overwrites the other."
+      - "Fix bad data at the source. If a record is wrong, there should be an admin way to correct it."

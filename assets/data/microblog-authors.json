@@ -1,0 +1,19 @@
+---
+layout: null
+---
+{%- comment -%}
+  Every page whose front matter lists `authors:` (login uids), for the microblog
+  notification badges (assets/js/api/microblog-notifications.js). Built once
+  here instead of in the header, which would loop over every post on every page.
+{%- endcomment -%}
+{%- assign microblog_documents = site.pages | concat: site.posts -%}
+[
+{%- assign first_page = true -%}
+{%- for document in microblog_documents -%}
+  {%- if document.authors and document.microblog -%}
+    {%- unless first_page -%},{%- endunless -%}
+    {%- assign first_page = false -%}
+    {"path": {{ document.permalink | default: document.url | jsonify }}, "title": {{ document.title | jsonify }}, "authors": {{ document.authors | jsonify }}}
+  {%- endif -%}
+{%- endfor -%}
+]

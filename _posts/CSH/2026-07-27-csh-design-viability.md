@@ -6,7 +6,6 @@ description: >
   feasibility, source real vendor/material costs, and lock in a build-and-test
   timeline before construction begins.
 courses: {'csh': {'week': 7}}
-assignment: true
 type: capstone
 canonical_id: csh-design-viability
 author: PLTW Capstone

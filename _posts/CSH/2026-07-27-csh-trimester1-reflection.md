@@ -6,7 +6,6 @@ description: >
   individually and as a team on Sprints 1-3, and finalize the Sprint 1-3
   engineering portfolio ahead of the N@tM showcase.
 courses: {'csh': {'week': 11}}
-assignment: true
 type: capstone
 canonical_id: csh-trimester1-reflection
 author: PLTW Capstone

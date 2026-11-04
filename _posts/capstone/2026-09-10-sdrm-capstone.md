@@ -6,6 +6,12 @@ title: San Diego Rescue Mission — Website Improvement
 permalink: /capstone/sdrm/
 ---
 
+<!-- Sprint Board: live from the team's GitHub project -->
+{% assign sdrm_data = site.data.sdrm %}
+{% if sdrm_data.Board %}
+{% include ocs_kanban_board.html url=sdrm_data.Board.url %}
+{% endif %}
+
 > **San Diego Rescue Mission — Website Improvement.** A redesigned site that helps residents in crisis find the right service fast, shows donors exactly what their gift provides, and gives volunteers a clear view of open opportunities. **Status: In Planning.** Team: Aarav Nadar (Scrum Master), Ryden Bercovitch (Technologist/Developer).
 
 <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">

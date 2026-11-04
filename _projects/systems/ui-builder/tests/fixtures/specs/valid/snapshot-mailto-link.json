@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "A saved copy with an email link", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-mailto01",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-mailto01",
+              "type": "api_data",
+              "settings": {
+                "source": {
+                  "url": "https://flask.opencodingsociety.com/api/users",
+                  "list_path": "",
+                  "title_path": "name",
+                  "text_path": "",
+                  "image_path": "",
+                  "link_path": "contact",
+                  "value_path": "",
+                  "label_path": "",
+                  "snapshot": {
+                    "items": [
+                      { "title": "Ada", "text": "", "image": "", "link": "mailto:ada@example.com", "value": "", "label": "" }
+                    ],
+                    "fetched_at": 1793206800000,
+                    "from_loopback": false
+                  }
+                },
+                "title": "Write to us",
+                "view": "list",
+                "limit": 12
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

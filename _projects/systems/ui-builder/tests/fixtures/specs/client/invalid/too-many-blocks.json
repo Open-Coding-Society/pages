@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": {
+    "title": "Bad page",
+    "description": "",
+    "byline": "",
+    "course": "",
+    "width": "contained",
+    "image": ""
+  },
+  "sections": [
+    {
+      "id": "s-aaaaaa",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-div001",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div002",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div003",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div004",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div005",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div006",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div007",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div008",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div009",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div010",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div011",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div012",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div013",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div014",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div015",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div016",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div017",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div018",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div019",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div020",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div021",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div022",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div023",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div024",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div025",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div026",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div027",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div028",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div029",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div030",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div031",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div032",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div033",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div034",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div035",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div036",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div037",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div038",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div039",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div040",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div041",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div042",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div043",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div044",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div045",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div046",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div047",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div048",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div049",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div050",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            },
+            {
+              "id": "b-div051",
+              "type": "divider",
+              "settings": {},
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

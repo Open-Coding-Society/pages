@@ -1,6 +1,5 @@
 ---
 layout: post
-assignment: true
 courses: {'csse': {'week': 0}}
 title: Home Page Game Feedback
 description: >

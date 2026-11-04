@@ -238,6 +238,9 @@ stages:
       - "Problem framing"
 
   - slug: phase-1
+    progressUpdates:
+      - label: "Phase 1 updates (10/12)"
+        url: "/capstone/ocs-intelligence/phase-1/updates/2026-10-12/"
     title: "Phase 1 — Build the rack, run inference, open the stream"
     navLabel: "Rack, inference & access"
     navKicker: "Phase 1"

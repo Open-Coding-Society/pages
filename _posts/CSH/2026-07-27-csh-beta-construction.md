@@ -5,7 +5,6 @@ description: >
   Build the production-grade Beta prototype, fully integrate all
   sub-systems, and log build results against the revised PRD.
 courses: {'csh': {'week': 20}}
-assignment: true
 type: capstone
 canonical_id: csh-beta-construction
 author: PLTW Capstone

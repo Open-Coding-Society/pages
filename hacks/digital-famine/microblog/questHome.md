@@ -69,7 +69,7 @@ The system is now defunct, as humans took to the stars. We'll have the reestabli
 
     // create an array with nodes
     var nodes = new vis.DataSet([
-        {id: 1, label: 'API blog', url: '{{ base.siteurl }}/digital-famine/microblog/api/', title: 'Open Node 1',
+        {id: 1, label: 'API blog', url: '{{ site.baseurl }}/python/flask/api/microblog', title: 'Open Node 1',
          image: defaultImgUrl,
          longTitle: 'Comm Relay Alpha',
          description: 'Primary uplink relay. Repairs required to restore long-range comms.',

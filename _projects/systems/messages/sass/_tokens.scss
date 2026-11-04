@@ -1,0 +1,80 @@
+// Tokens and mixins for /dm.
+//
+// Every rule in this folder is compiled into the site-wide stylesheet via
+// _sass/projects/_all.scss, so all of it stays under `.dm`.
+//
+// Colours are aliased from the site palette (_sass/open-coding/theme/legacy/) rather
+// than pinned here, so /dm follows the site theme. Swapping the page to its own
+// palette means editing only this block.
+
+@mixin dm-below($width) {
+  @media (max-width: $width) {
+    @content;
+  }
+}
+
+// One ring, used on every focusable thing in the page.
+@mixin dm-focus-ring($offset: 2px) {
+  &:focus-visible {
+    outline: 2px solid var(--dm-accent);
+    outline-offset: $offset;
+  }
+}
+
+.dm {
+  // Ink and paper. These point at the custom properties root-color-map.scss publishes
+  // on :root, rather than at the SCSS variables behind them, so the page follows the
+  // site palette without this file restating it -- and without a second copy of that
+  // :root block landing in the compiled CSS.
+  --dm-bg: var(--background);
+  --dm-ink: var(--text);
+  --dm-muted: var(--text-muted);
+  // 55%, not less: this carries the timestamps, labels and hints, which are the
+  // smallest text on the page. Over the site's #121212 that lands near 5.6:1, where
+  // 45% measured 4.1:1 and missed AA for small text.
+  --dm-faint: color-mix(in srgb, var(--text) 55%, transparent);
+  // The user themes (assets/js/user-preferences.js) rewrite --background, --text,
+  // --text-muted and --bg-3 on :root, so everything above follows a theme for free.
+  // They do NOT rewrite --accent -- they publish the chosen accent as
+  // --pref-accent-color instead -- so this has to ask for that first or /dm keeps the
+  // stock blue while the rest of the page turns Cyberpunk pink.
+  --dm-accent: var(--pref-accent-color, var(--accent));
+
+  // Not themed on purpose: a destructive action should stay red whatever the palette.
+  --dm-alert: var(--red);
+
+  // Two weights of line, deliberately. --dm-rule is a decorative divider between rows
+  // and sections. --dm-edge is the visible boundary of a control (inputs, buttons,
+  // the composer) and so is held at ~3.5:1 for WCAG 1.4.11; $bg-3, which this used at
+  // first, measured 1.3:1 and read as no border at all.
+  --dm-rule: color-mix(in srgb, var(--text) 14%, transparent);
+  --dm-rule-strong: color-mix(in srgb, var(--text) 40%, transparent);
+  --dm-wash: color-mix(in srgb, var(--text) 3%, transparent);
+
+  // One family, matching the rest of the site: `body` is set to 'JetBrains Mono',
+  // monospace, so everything here is monospace too rather than importing a typeface
+  // of its own. Source Code Pro sits next in the stack because the site's <head>
+  // actually loads it and JetBrains Mono is not loaded anywhere -- without it this
+  // drops straight to Consolas. Hierarchy comes from size, weight and letter-spacing.
+  // A theme sets body's font with !important, but `.dm` declares its own font and so
+  // would ignore it. Asking for --pref-font-family first keeps /dm in step with a
+  // chosen theme, and falls back to the site's monospace when no theme is active.
+  --dm-font: var(--pref-font-family, 'JetBrains Mono', 'Source Code Pro', ui-monospace, Consolas, monospace);
+
+  // A readable measure for message text: 60-70 characters.
+  --dm-measure: 66ch;
+
+  // Spacing, aliased from the shared scale so /dm keeps the site's rhythm.
+  --dm-space-xs: #{$spacing-xxs};
+  --dm-space-sm: #{$spacing-sm};
+  --dm-space-md: #{$spacing-md};
+  --dm-space-lg: #{$spacing-lg};
+  --dm-space-xl: #{$spacing-xl};
+
+  --dm-radius: #{$radius-xs};
+  --dm-radius-sm: #{$radius-xxs};
+
+  // How tall the two scrolling panes are. Clamped so the page still works on a
+  // short laptop screen and does not stretch absurdly on a tall monitor.
+  --dm-shell-height: clamp(30rem, calc(100dvh - 15rem), 54rem);
+}

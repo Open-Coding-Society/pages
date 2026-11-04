@@ -7,35 +7,37 @@ active_tab: calendar
 ---
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css">
 
-<div class="calendar-dashboard-tabs" role="tablist" aria-label="Calendar Dashboard Tabs">
-    <button type="button" class="dashboard-tab-btn active" data-dashboard-tab="calendar" role="tab" aria-selected="true">Calendar</button>
-    <button type="button" class="dashboard-tab-btn" data-dashboard-tab="cs-pathway" role="tab" aria-selected="false">CS Pathway</button>
-    <button type="button" class="dashboard-tab-btn" data-dashboard-tab="issues" role="tab" aria-selected="false">Issues</button>
-    <button type="button" class="dashboard-tab-btn" data-dashboard-tab="threads" role="tab" aria-selected="false">Threads</button>
+<div class="ocs__calendar-v2-page">
+
+<div class="ocs__calendar-v2-tabs calendar-dashboard-tabs" role="tablist" aria-label="Calendar Dashboard Tabs">
+    <button type="button" class="ocs__calendar-v2-tab-btn dashboard-tab-btn active" data-dashboard-tab="calendar" role="tab" aria-selected="true">Calendar</button>
+    <button type="button" class="ocs__calendar-v2-tab-btn dashboard-tab-btn" data-dashboard-tab="cs-pathway" role="tab" aria-selected="false">CS Pathway</button>
+    <button type="button" class="ocs__calendar-v2-tab-btn dashboard-tab-btn" data-dashboard-tab="issues" role="tab" aria-selected="false">Issues</button>
+    <button type="button" class="ocs__calendar-v2-tab-btn dashboard-tab-btn" data-dashboard-tab="threads" role="tab" aria-selected="false">Threads</button>
 </div>
 
-<section id="dashboard-panel-calendar" class="dashboard-panel" role="tabpanel" aria-label="Calendar Panel">
+<section id="dashboard-panel-calendar" class="ocs__calendar-v2-panel dashboard-panel" role="tabpanel" aria-label="Calendar Panel">
     <!-- FullCalendar Container -->
-    <div id="calendar-auth-banner" class="calendar-auth-banner">
+    <div id="calendar-auth-banner" class="ocs__calendar-v2-auth-banner calendar-auth-banner">
         <i class="fas fa-exclamation-triangle calendar-auth-banner-icon"></i>
         <span>Your session has expired. <a href="{{site.baseurl}}/login" class="calendar-auth-banner-link">Log in again</a> to view and manage your calendar events.</span>
     </div>
-    <p class="calendar-private-note">When you are signed in, the calendar shows your account's events. Use the <strong>CS Pathway</strong> tab or source filter for game tasks synced from your pathway start date (stored per user in Spring).</p>
-    <div class="calendar-source-chips" role="group" aria-label="Calendar source filters">
-        <button type="button" class="calendar-source-chip active" data-source-filter="all">All</button>
-        <button type="button" class="calendar-source-chip" data-source-filter="events">Events</button>
-        <button type="button" class="calendar-source-chip" data-source-filter="cs-pathway">CS Pathway</button>
-        <button type="button" class="calendar-source-chip" data-source-filter="issues">Issues</button>
-        <button type="button" class="calendar-source-chip" data-source-filter="breaks">Breaks</button>
+    <p class="ocs__text calendar-private-note">When you are signed in, the calendar shows your account's events. Use the <strong>CS Pathway</strong> tab or source filter for game tasks synced from your pathway start date (stored per user in Spring).</p>
+    <div class="ocs__calendar-v2-chips calendar-source-chips" role="group" aria-label="Calendar source filters">
+        <button type="button" class="ocs__calendar-v2-chip calendar-source-chip active" data-source-filter="all">All</button>
+        <button type="button" class="ocs__calendar-v2-chip calendar-source-chip" data-source-filter="events">Events</button>
+        <button type="button" class="ocs__calendar-v2-chip calendar-source-chip" data-source-filter="cs-pathway">CS Pathway</button>
+        <button type="button" class="ocs__calendar-v2-chip calendar-source-chip" data-source-filter="issues">Issues</button>
+        <button type="button" class="ocs__calendar-v2-chip calendar-source-chip" data-source-filter="breaks">Breaks</button>
     </div>
     <div class="calendar-controls-row">
         <label class="filter-field" for="calendar-filter-query">
-            <span class="filter-label">Search</span>
-            <input id="calendar-filter-query" type="search" placeholder="Search events, issues, or breaks" />
+            <span class="ocs__label filter-label">Search</span>
+            <input id="calendar-filter-query" type="search" class="ocs__input" placeholder="Search events, issues, or breaks" />
         </label>
         <label class="filter-field" for="calendar-filter-source">
-            <span class="filter-label">Source</span>
-            <select id="calendar-filter-source">
+            <span class="ocs__label filter-label">Source</span>
+            <select id="calendar-filter-source" class="ocs__input">
                 <option value="all">All sources</option>
                 <option value="events">Events</option>
                 <option value="cs-pathway">CS Pathway (game tasks)</option>
@@ -44,8 +46,8 @@ active_tab: calendar
             </select>
         </label>
         <label class="filter-field" for="calendar-filter-type">
-            <span class="filter-label">Type</span>
-            <select id="calendar-filter-type">
+            <span class="ocs__label filter-label">Type</span>
+            <select id="calendar-filter-type" class="ocs__input">
             <option value="">All types</option>
             <option value="event">Event</option>
             <option value="appointment">Appointment</option>
@@ -54,87 +56,90 @@ active_tab: calendar
             </select>
         </label>
         <label class="filter-field" for="calendar-filter-group">
-            <span class="filter-label">Group</span>
-            <select id="calendar-filter-group">
+            <span class="ocs__label filter-label">Group</span>
+            <select id="calendar-filter-group" class="ocs__input">
                 <option value="">All groups</option>
                 <option value="cs pathway">CS Pathway</option>
             </select>
         </label>
         <label class="filter-field filter-field--date" for="calendar-filter-start">
-            <span class="filter-label">Start date</span>
-            <input id="calendar-filter-start" type="date" title="Filter from date" />
+            <span class="ocs__label filter-label">Start date</span>
+            <input id="calendar-filter-start" type="date" class="ocs__input" title="Filter from date" />
         </label>
         <label class="filter-field filter-field--date" for="calendar-filter-end">
-            <span class="filter-label">End date</span>
-            <input id="calendar-filter-end" type="date" title="Filter to date" />
+            <span class="ocs__label filter-label">End date</span>
+            <input id="calendar-filter-end" type="date" class="ocs__input" title="Filter to date" />
         </label>
     </div>
     <div id="calendar" class="calendar-stage"></div>
 </section>
 
-<section id="dashboard-panel-cs-pathway" class="dashboard-panel hidden" role="tabpanel" aria-label="CS Pathway Tasks Panel">
-    <div class="calendar-cs-pathway-panel">
+<section id="dashboard-panel-cs-pathway" class="ocs__calendar-v2-panel dashboard-panel hidden" role="tabpanel" aria-label="CS Pathway Tasks Panel">
+    <div class="ocs__card ocs__calendar-v2-cs-pathway-panel calendar-cs-pathway-panel">
         <div class="calendar-cs-pathway-header">
-            <h2 class="calendar-cs-pathway-title">CS Pathway learning timeline</h2>
-            <p class="calendar-cs-pathway-subtitle">Personal game tasks from the CS Pathway quest. Only your account can see these on the calendar (Spring <code>calendar_events.individual</code> = your GitHub ID).</p>
+            <h2 class="ocs__section-title ocs__calendar-v2-cs-pathway-title calendar-cs-pathway-title">CS Pathway learning timeline</h2>
+            <p class="ocs__text calendar-cs-pathway-subtitle">Personal game tasks from the CS Pathway quest. Only your account can see these on the calendar (Spring <code>calendar_events.individual</code> = your GitHub ID).</p>
         </div>
-        <p id="cs-pathway-empty" class="calendar-cs-pathway-empty hidden">No CS Pathway tasks yet. Log in, play the pathway game, and complete Identity Terminal or Course Enlistment to auto-publish your timeline.</p>
+        <p id="cs-pathway-empty" class="ocs__text calendar-cs-pathway-empty hidden">No CS Pathway tasks yet. Log in, play the pathway game, and complete Identity Terminal or Course Enlistment to auto-publish your timeline.</p>
         <ul id="cs-pathway-task-list" class="calendar-cs-pathway-task-list" aria-live="polite"></ul>
-        <div class="calendar-cs-pathway-actions">
+        <div class="ocs__calendar-v2-btn-row calendar-cs-pathway-actions">
+            <!-- Buttons keep the shared calendar-issue-action-btn class/styling unchanged: it's reused by out-of-scope Issues/Threads content and reassigned dynamically for toasts, so it isn't converted here. See PR description. -->
             <button type="button" id="cs-pathway-show-calendar" class="calendar-issue-action-btn primary">Show on calendar</button>
             <button type="button" id="cs-pathway-clear-filters" class="calendar-issue-action-btn secondary">Show all events</button>
         </div>
     </div>
 </section>
 
-<section id="dashboard-panel-issues" class="dashboard-panel hidden" role="tabpanel" aria-label="Issues Panel">
-    <div id="calendar-issues-panel" class="calendar-issues-panel">
-        <div class="calendar-issues-header">
+<section id="dashboard-panel-issues" class="ocs__calendar-v2-panel dashboard-panel hidden" role="tabpanel" aria-label="Issues Panel">
+    <div id="calendar-issues-panel" class="ocs__card ocs__calendar-v2-issues-panel calendar-issues-panel">
+        <div class="ocs__card-header ocs__calendar-v2-panel-header calendar-issues-header">
             <div>
-                <h2 class="calendar-issues-title">Issues</h2>
-                <p class="calendar-issues-subtitle">GitHub-inspired issue tracking synced with calendar dates and event context.</p>
+                <h2 class="ocs__section-title calendar-issues-title">Issues</h2>
+                <p class="ocs__text calendar-issues-subtitle">GitHub-inspired issue tracking synced with calendar dates and event context.</p>
             </div>
+            <!-- calendar-issue-action-btn left unchanged, see note above -->
             <button id="issues-new-btn" class="calendar-issue-action-btn primary" type="button">New Issue</button>
         </div>
 
         <div class="issues-controls-row">
-            <input id="issues-filter-query" type="search" placeholder="Search title, description, tags" />
-            <select id="issues-filter-status">
+            <input id="issues-filter-query" type="search" class="ocs__input" placeholder="Search title, description, tags" />
+            <select id="issues-filter-status" class="ocs__input">
                 <option value="">All statuses</option>
                 <option value="open">Open</option>
                 <option value="in-progress">In Progress</option>
                 <option value="blocked">Blocked</option>
                 <option value="done">Done</option>
             </select>
-            <select id="issues-filter-priority">
+            <select id="issues-filter-priority" class="ocs__input">
                 <option value="">All priorities</option>
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
             </select>
-            <input id="issues-filter-author" type="search" placeholder="Filter by author" />
-            <input id="issues-filter-tags" type="search" placeholder="Filter by tags" />
-            <select id="issues-filter-group" class="filter-field">
+            <input id="issues-filter-author" type="search" class="ocs__input" placeholder="Filter by author" />
+            <input id="issues-filter-tags" type="search" class="ocs__input" placeholder="Filter by tags" />
+            <select id="issues-filter-group" class="ocs__input filter-field">
                 <option value="">All groups</option>
             </select>
             <label class="filter-field filter-field--date" for="issues-filter-date">
-                <span class="filter-label">Due date</span>
-                <input id="issues-filter-date" type="date" title="Filter by due date" />
+                <span class="ocs__label filter-label">Due date</span>
+                <input id="issues-filter-date" type="date" class="ocs__input" title="Filter by due date" />
             </label>
             <label class="filter-field filter-field--date" for="issues-filter-start">
-                <span class="filter-label">Created after</span>
-                <input id="issues-filter-start" type="date" title="Created on or after" />
+                <span class="ocs__label filter-label">Created after</span>
+                <input id="issues-filter-start" type="date" class="ocs__input" title="Created on or after" />
             </label>
             <label class="filter-field filter-field--date" for="issues-filter-end">
-                <span class="filter-label">Created before</span>
-                <input id="issues-filter-end" type="date" title="Created on or before" />
+                <span class="ocs__label filter-label">Created before</span>
+                <input id="issues-filter-end" type="date" class="ocs__input" title="Created on or before" />
             </label>
         </div>
 
-        <div class="issues-subtabs" role="tablist" aria-label="Issue Views">
-            <button type="button" class="issues-subtab-btn active" data-issues-subtab="create" role="tab" aria-selected="true">Create / Edit</button>
-            <button type="button" class="issues-subtab-btn" data-issues-subtab="list" role="tab" aria-selected="false">List</button>
-            <button type="button" class="issues-subtab-btn" data-issues-subtab="kanban" role="tab" aria-selected="false">Kanban</button>
+        <!-- Issues subtabs bar: chrome converted. The three subpanels below (Create/Edit form, List, Kanban) are out of scope -- deep bespoke feature content, left exactly as-is. See PR description. -->
+        <div class="ocs__calendar-v2-tabs issues-subtabs" role="tablist" aria-label="Issue Views">
+            <button type="button" class="ocs__calendar-v2-tab-btn issues-subtab-btn active" data-issues-subtab="create" role="tab" aria-selected="true">Create / Edit</button>
+            <button type="button" class="ocs__calendar-v2-tab-btn issues-subtab-btn" data-issues-subtab="list" role="tab" aria-selected="false">List</button>
+            <button type="button" class="ocs__calendar-v2-tab-btn issues-subtab-btn" data-issues-subtab="kanban" role="tab" aria-selected="false">Kanban</button>
         </div>
 
         <div id="issues-subpanel-create" class="issues-subpanel">
@@ -219,43 +224,43 @@ active_tab: calendar
     </div>
 </section>
 
-<section id="dashboard-panel-threads" class="dashboard-panel hidden" role="tabpanel" aria-label="Message Threads Panel">
-    <div id="calendar-threads-panel" class="calendar-issues-panel">
-        <div class="calendar-issues-header">
+<section id="dashboard-panel-threads" class="ocs__calendar-v2-panel dashboard-panel hidden" role="tabpanel" aria-label="Message Threads Panel">
+    <div id="calendar-threads-panel" class="ocs__card ocs__calendar-v2-issues-panel calendar-issues-panel">
+        <div class="ocs__card-header ocs__calendar-v2-panel-header calendar-issues-header">
             <div>
-                <h2 class="calendar-issues-title">Issue Threads</h2>
-                <p class="calendar-issues-subtitle">Replies, suggestions, and follow-ups attached directly to issues.</p>
+                <h2 class="ocs__section-title calendar-issues-title">Issue Threads</h2>
+                <p class="ocs__text calendar-issues-subtitle">Replies, suggestions, and follow-ups attached directly to issues.</p>
             </div>
         </div>
 
         <div class="issues-controls-row">
-            <input id="threads-filter-query" type="search" placeholder="Search issue title or reply text" />
-            <input id="threads-filter-channel" type="search" placeholder="Filter by issue" />
-            <input id="threads-filter-author" type="search" placeholder="Filter by author" />
+            <input id="threads-filter-query" type="search" class="ocs__input" placeholder="Search issue title or reply text" />
+            <input id="threads-filter-channel" type="search" class="ocs__input" placeholder="Filter by issue" />
+            <input id="threads-filter-author" type="search" class="ocs__input" placeholder="Filter by author" />
             <label class="filter-field filter-field--date" for="threads-filter-start">
-                <span class="filter-label">From time</span>
-                <input id="threads-filter-start" type="datetime-local" title="From timestamp" />
+                <span class="ocs__label filter-label">From time</span>
+                <input id="threads-filter-start" type="datetime-local" class="ocs__input" title="From timestamp" />
             </label>
             <label class="filter-field filter-field--date" for="threads-filter-end">
-                <span class="filter-label">To time</span>
-                <input id="threads-filter-end" type="datetime-local" title="To timestamp" />
+                <span class="ocs__label filter-label">To time</span>
+                <input id="threads-filter-end" type="datetime-local" class="ocs__input" title="To timestamp" />
             </label>
             <label class="calendar-issue-filter-toggle">
                 <input id="threads-filter-only-threads" type="checkbox" />
                 <span>With replies only</span>
             </label>
-            <input id="threads-filter-limit" type="number" min="1" max="500" value="100" />
+            <input id="threads-filter-limit" type="number" class="ocs__input" min="1" max="500" value="100" />
         </div>
 
         <div id="threads-list" class="issues-list"></div>
     </div>
 </section>
 <!-- Modal -->
-<div id="eventModal" class="calendar-event-modal">
-    <div class="calendar-event-modal-content modal-content">
-        <span class="calendar-event-modal-close" id="closeModal">&times;</span>
+<div id="eventModal" class="ocs__modal ocs__calendar-v2-modal calendar-event-modal">
+    <div class="ocs__card ocs__modal-card ocs__calendar-v2-modal-content calendar-event-modal-content modal-content">
+        <span class="ocs__modal-close ocs__calendar-v2-modal-close calendar-event-modal-close" id="closeModal">&times;</span>
         <div class="calendar-event-modal-body">
-            <h2 id="eventTitle" class="calendar-event-modal-title"></h2>
+            <h2 id="eventTitle" class="ocs__section-title ocs__modal-title calendar-event-modal-title"></h2>
             <label for="editEventType" class="calendar-event-modal-label">Type:</label>
             <select id="editEventType" disabled class="calendar-event-modal-field">
                 <option value="event">Event</option>
@@ -268,6 +273,14 @@ active_tab: calendar
             <p id="editTitle" contentEditable='false' class="calendar-event-modal-field calendar-event-modal-display"></p>
             <label for="editDescription" class="calendar-event-modal-label">Description:</label>
             <p id="editDescription" contentEditable='false' class="calendar-event-modal-field calendar-event-modal-display calendar-event-modal-description"></p>
+            <label for="editDocUrl" class="calendar-event-modal-label">Linked Doc:</label>
+            <!-- No whitespace inside: .calendar-event-modal-display is pre-wrap -->
+            <p id="editDocDisplay" class="calendar-event-modal-field calendar-event-modal-display"><a id="editDocLink" class="calendar-event-modal-doc-link" target="_blank" rel="noopener"></a><span id="editDocEmpty" class="calendar-event-modal-doc-empty">No doc linked</span></p>
+            <input type="text" id="editDocUrl" list="calendar-doc-options" class="calendar-event-modal-field issue-form-date-hidden" placeholder="Search docs or paste a link" autocomplete="off">
+            <datalist id="calendar-doc-options">
+                {% for doc in site.data.topics_catalog %}<option value="{{ doc.url | relative_url | escape }}">{{ doc.title | escape }}</option>
+                {% endfor %}
+            </datalist>
             <label for="editPriority" class="calendar-event-modal-label">Priority:</label>
             <select id="editPriority" disabled class="calendar-event-modal-field">
                 <option value="P0">P0 - Critical</option>
@@ -281,7 +294,7 @@ active_tab: calendar
                 <!-- Options populated dynamically from user's groups -->
             </select>
         </div>
-        <div class="calendar-event-modal-actions modal-actions">
+        <div class="ocs__modal-actions calendar-event-modal-actions modal-actions">
             <button id="saveButton" class="calendar-event-modal-button primary hidden">Save Changes</button>
             <button id="makeBreakButton" class="calendar-event-modal-button warning hidden">Make Break</button>
             <button id="deleteButton" class="calendar-event-modal-button danger">Delete Event</button>
@@ -290,11 +303,11 @@ active_tab: calendar
     </div>
 </div>
 
-<div id="issueModal" class="issue-modal" aria-hidden="true" role="dialog" aria-label="Issue Details">
-    <div class="issue-modal-content">
-        <div class="issue-modal-header">
-            <h3 id="issue-modal-title" class="issue-modal-title">Issue</h3>
-            <button id="issue-modal-close" class="issue-modal-close" type="button" aria-label="Close Issue Modal">&times;</button>
+<div id="issueModal" class="ocs__modal ocs__calendar-v2-modal issue-modal" aria-hidden="true" role="dialog" aria-label="Issue Details">
+    <div class="ocs__card ocs__modal-card ocs__calendar-v2-modal-content issue-modal-content">
+        <div class="ocs__modal-header issue-modal-header">
+            <h3 id="issue-modal-title" class="ocs__modal-title issue-modal-title">Issue</h3>
+            <button id="issue-modal-close" class="ocs__calendar-v2-modal-close issue-modal-close" type="button" aria-label="Close Issue Modal">&times;</button>
         </div>
         <div id="issue-modal-meta" class="issue-modal-meta"></div>
         <div id="issue-modal-description" class="issue-markdown-preview issue-modal-description"></div>
@@ -311,7 +324,7 @@ active_tab: calendar
                 <button id="issue-comment-submit" type="button" class="calendar-issue-action-btn primary">Post Reply</button>
             </div>
         </div>
-        <div class="issue-modal-actions">
+        <div class="ocs__modal-actions issue-modal-actions">
             <button id="issue-modal-copy-link" type="button" class="calendar-issue-action-btn secondary">Copy Link</button>
             <button id="issue-modal-star" type="button" class="calendar-issue-action-btn secondary">Star</button>
             <button id="issue-modal-edit" type="button" class="calendar-issue-action-btn secondary">Edit</button>
@@ -321,19 +334,21 @@ active_tab: calendar
 </div>
 
 <!-- Reply Modal (for nested replies) -->
-<div id="replyModal" class="reply-modal" aria-hidden="true" role="dialog" aria-label="Reply to Comment">
-    <div class="reply-modal-content">
-        <div class="reply-modal-header">
-            <h4 id="reply-modal-title">Reply</h4>
-            <button id="reply-modal-close" class="reply-modal-close" type="button" aria-label="Close Reply Modal">&times;</button>
+<div id="replyModal" class="ocs__modal ocs__calendar-v2-modal ocs__calendar-v2-reply-modal reply-modal" aria-hidden="true" role="dialog" aria-label="Reply to Comment">
+    <div class="ocs__card ocs__modal-card ocs__calendar-v2-modal-content reply-modal-content">
+        <div class="ocs__modal-header reply-modal-header">
+            <h4 id="reply-modal-title" class="ocs__modal-title">Reply</h4>
+            <button id="reply-modal-close" class="ocs__calendar-v2-modal-close reply-modal-close" type="button" aria-label="Close Reply Modal">&times;</button>
         </div>
         <div id="reply-parent-preview" class="reply-parent-preview"></div>
         <textarea id="reply-modal-text" placeholder="Write your reply"></textarea>
-        <div class="reply-modal-actions">
+        <div class="ocs__modal-actions reply-modal-actions">
             <button id="reply-modal-submit" class="calendar-issue-action-btn primary" type="button">Post Reply</button>
             <button id="reply-modal-cancel" class="calendar-issue-action-btn secondary" type="button">Cancel</button>
         </div>
     </div>
+</div>
+
 </div>
 
 <!-- FullCalendar JS -->
@@ -342,6 +357,7 @@ active_tab: calendar
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 <script type="module">
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { normalizeDocUrl, splitLinkedDoc, joinLinkedDoc, readDocLaunchParams } from '{{site.baseurl}}/assets/js/projects/calendar/CalendarDocLinks.js';
 
     // ─── Auth helpers ───────────────────────────────────────────────
     let javaAuthenticated = true;
@@ -421,6 +437,12 @@ active_tab: calendar
         const groupText = String(event.groupName || ext.groupName || '').toLowerCase();
         const periodText = String(event.period || ext.period || '').toLowerCase();
         return titleText.includes('cs pathway') || groupText === 'cs pathway' || periodText === 'cs pathway';
+    }
+
+    // Spring rejects an edit without a period, so events with no course are saved as "Personal".
+    const PERSONAL_EVENT_PERIOD = 'Personal';
+    function getEventCourse(period) {
+        return period && period !== PERSONAL_EVENT_PERIOD ? period : null;
     }
 
     function getCsPathwayEvents() {
@@ -946,6 +968,40 @@ active_tab: calendar
             return (b.extendedProps && b.extendedProps.breakName) || b.breakName || b.title || null;
         }
 
+        // ── Event modal: linked doc + group ─────────────────────────
+        const docOptions = Array.from(document.querySelectorAll('#calendar-doc-options option'));
+        const docTitlesByUrl = new Map(docOptions.map(option => [normalizeDocUrl(option.value, window.location.origin), option.textContent.trim()]));
+        const docUrlsByTitle = new Map(docOptions.map(option => [option.textContent.trim().toLowerCase(), option.value]));
+
+        function showLinkedDoc(docUrl) {
+            const link = document.getElementById('editDocLink');
+            link.href = docUrl || '#';
+            link.textContent = docUrl ? (docTitlesByUrl.get(docUrl) || docUrl) : '';
+            link.style.display = docUrl ? 'inline' : 'none';
+            document.getElementById('editDocEmpty').style.display = docUrl ? 'none' : 'inline';
+            document.getElementById('editDocUrl').value = docUrl || '';
+        }
+        function setDocFieldEditable(editable) {
+            document.getElementById('editDocDisplay').style.display = editable ? 'none' : 'block';
+            document.getElementById('editDocUrl').style.display = editable ? 'block' : 'none';
+        }
+        // Accepts a doc picked from the list, a pasted link, or a doc title typed in full.
+        // Returns '' for no doc and null for text that is not a link.
+        function readDocInput() {
+            const value = document.getElementById('editDocUrl').value.trim();
+            if (!value) return '';
+            const pickedUrl = docUrlsByTitle.get(value.toLowerCase()) || value;
+            return normalizeDocUrl(pickedUrl, window.location.origin) || null;
+        }
+        // An event may belong to a group the user isn't in; keep it selectable so saving doesn't clear it.
+        function selectEventGroup(groupName) {
+            const select = document.getElementById('editGroupName');
+            if (groupName && !Array.from(select.options).some(option => option.value === groupName)) {
+                select.add(new Option(groupName, groupName));
+            }
+            select.value = groupName || '';
+        }
+
         // ── fetch events + breaks ───────────────────────────────────
         function request() {
             return fetch(`${javaURI}/api/calendar/events`, fetchOptions)
@@ -1358,14 +1414,14 @@ active_tab: calendar
                                     isCsPathway: csPathway,
                                     // Group-based fields
                                     groupName: event.groupName || '',
-                                    period: event.period || null,   // course name (CSA/CSP/CSSE) from sprint sync
+                                    period: getEventCourse(event.period),   // course name (CSA/CSP/CSSE) from sprint sync
                                     classNames: [`priority-${priority.toLowerCase()}`].concat(csPathway ? ['fc-event-cs-pathway'] : []),
                                     extendedProps: {
                                         type: event.type || 'event',
                                         groupName: event.groupName || '',
                                         individual: event.individual || '',
                                         description: event.description,
-                                        period: event.period || null,
+                                        period: getEventCourse(event.period),
                                         priority: priority,
                                         isCsPathway: csPathway,
                                         source: csPathway ? 'cs-pathway' : (event.type || 'event')
@@ -1689,20 +1745,22 @@ active_tab: calendar
                             return;
                         }
                     }
-                    document.getElementById("saveButton").style.display = "none";
+                    leaveEditMode();
                     document.getElementById("makeBreakButton").style.display = "none";
-                    document.getElementById('eventTitle').textContent = isBreak
+                    const displayTitle = isBreak
                         ? ((currentEvent.extendedProps && currentEvent.extendedProps.breakName) || currentEvent.breakName || currentEvent.title)
                         : currentEvent.title;
-                    document.getElementById('editDescription').innerHTML = slackToHtml(currentEvent.extendedProps.description || "");
+                    document.getElementById('eventTitle').textContent = displayTitle;
+                    // Edit mode reads the title from this field, so it must hold the event's title
+                    document.getElementById('editTitle').textContent = displayTitle;
+                    const { body, docUrl } = splitLinkedDoc(currentEvent.extendedProps.description, window.location.origin);
+                    document.getElementById('editDescription').innerHTML = slackToHtml(body);
+                    showLinkedDoc(docUrl);
                     document.getElementById('editDateDisplay').textContent = formatDisplayDate(currentEvent.start);
                     document.getElementById('editDate').value = formatDate(currentEvent.start);
                     document.getElementById("editPriority").value = currentEvent.extendedProps.priority || "P2";
-                    document.getElementById("editPriority").disabled = true;
                     document.getElementById("editEventType").value = currentEvent.extendedProps.type || "event";
-                    document.getElementById("editEventType").disabled = true;
-                    document.getElementById("editGroupName").value = currentEvent.extendedProps.groupName || "";
-                    document.getElementById("editGroupName").disabled = true;
+                    selectEventGroup(currentEvent.extendedProps.groupName);
                     document.getElementById("eventModal")?.classList.add('open');
                     document.getElementById("eventModal").dataset.isIssue = isIssue ? "true" : "false";
                     const isSchoolHoliday = currentEvent.extendedProps && currentEvent.extendedProps.isSchoolHoliday === true;
@@ -1746,78 +1804,7 @@ active_tab: calendar
                         alert(`There is already a break on ${formatDisplayDate(info.date)}`);
                         return;
                     }
-                    isAddingNewEvent = true;
-                    document.getElementById("eventTitle").textContent = "Add New Event";
-                    document.getElementById("editTitle").innerHTML = "";
-                    document.getElementById("editDescription").innerHTML = "";
-                    document.getElementById("editDescription").contentEditable = true;
-                    document.getElementById("editTitle").contentEditable = true;
-                    document.getElementById("editPriority").disabled = false;
-                    document.getElementById("editPriority").value = "P2";
-                    document.getElementById("editEventType").disabled = false;
-                    document.getElementById("editEventType").value = "event";
-                    document.getElementById("editGroupName").disabled = false;
-                    document.getElementById("editGroupName").value = "";
-                    document.getElementById('editDateDisplay').textContent = formatDisplayDate(info.date);
-                    document.getElementById('editDate').value = selectedDate;
-                    document.getElementById("eventModal")?.classList.add('open');
-                    document.getElementById("deleteButton").style.display = "none";
-                    document.getElementById("editButton").style.display = "none";
-                    document.getElementById("saveButton").style.display = "inline-block";
-                    document.getElementById("makeBreakButton").style.display = "inline-block";
-                    document.getElementById("saveButton").onclick = function () {
-                        const updatedTitle = document.getElementById("editTitle").innerHTML.trim();
-                        const updatedDescription = document.getElementById("editDescription").innerHTML;
-                        const updatedDate = document.getElementById("editDate").value;
-                        const updatedPriority = document.getElementById("editPriority").value;
-                        const selectedType = document.getElementById("editEventType").value;
-                        const selectedGroup = document.getElementById("editGroupName").value;
-
-                        if (!updatedTitle || !updatedDescription || !updatedDate) {
-                            alert("Title, Description, and Date cannot be empty!");
-                            return;
-                        }
-                        // Group selection is optional; allow events without group
-
-                        const currentUserName = (window.user && window.user.name) ? window.user.name : '';
-                        // Derive period (course) from the selected group so backend validation passes
-                        let derivedPeriod = '';
-                        const matchedGroup = userGroups.find(g => g.name === selectedGroup);
-                        if (matchedGroup && matchedGroup.course) derivedPeriod = matchedGroup.course.toUpperCase();
-                        // Embed priority prefix in title for persistence
-                        let titleToSave = updatedTitle;
-                        if (updatedPriority && !/^\[P[0-3]\]/.test(titleToSave)) {
-                            titleToSave = `[${updatedPriority}] ${titleToSave}`;
-                        }
-                        const newEventPayload = {
-                            title: titleToSave,
-                            description: updatedDescription,
-                            date: updatedDate,
-                            priority: updatedPriority,
-                            groupName: selectedGroup,
-                            period: derivedPeriod,
-                            type: selectedType,
-                            individual: selectedType === 'appointment' ? currentUserName : ''
-                        };
-                        document.getElementById("eventModal")?.classList.remove('open');
-                        fetch(`${javaURI}/api/calendar/add_event`, {
-                            ...fetchOptions,
-                            method: "POST",
-                            body: JSON.stringify(newEventPayload),
-                        })
-                        .then(response => {
-                            if (handleAuthError(response)) { alert("You must be logged in to add events."); return; }
-                            if (!response.ok) throw new Error(`Failed to add event: ${response.status}`);
-                            return response.json();
-                        })
-                        .then(data => { if (data) handleRequest(); })
-                        .catch(error => {
-                            if (!handleFetchError(error)) {
-                                console.error("Error adding event:", error);
-                                alert("Failed to save event.\n\n" + error.message);
-                            }
-                        });
-                    };
+                    openAddEventModal(info.date);
                 }
             });
             calendar.render();
@@ -1838,16 +1825,21 @@ active_tab: calendar
         }
 
         // ── Modal close / escape / outside-click ────────────────────
-        function closeModal() {
+        // Back to read-only view; the modal stays open.
+        function leaveEditMode() {
             document.getElementById('editDateDisplay').style.display = 'block';
             document.getElementById('editDate').style.display = 'none';
             document.getElementById("saveButton").style.display = "none";
-            document.getElementById("eventModal")?.classList.remove('open');
             document.getElementById("editTitle").contentEditable = false;
             document.getElementById("editDescription").contentEditable = false;
             document.getElementById("editPriority").disabled = true;
             document.getElementById("editEventType").disabled = true;
             document.getElementById("editGroupName").disabled = true;
+            setDocFieldEditable(false);
+        }
+        function closeModal() {
+            leaveEditMode();
+            document.getElementById("eventModal")?.classList.remove('open');
         }
         document.getElementById("closeModal").onclick = closeModal;
         document.addEventListener('keydown', e => {
@@ -1862,90 +1854,170 @@ active_tab: calendar
             if (e.target === document.getElementById("eventModal")) closeModal();
         };
 
-        // ── Save (edit existing) ────────────────────────────────────
-        document.getElementById("saveButton").onclick = function () {
+        // ── Add New Event modal ─────────────────────────────────────
+        // Used by a date click and by "Add to Calendar" on a doc page (pickDate lets the user choose the day).
+        function openAddEventModal(date, { title = '', docUrl = '', pickDate = false } = {}) {
+            isAddingNewEvent = true;
+            currentEvent = null;
+            const modal = document.getElementById("eventModal");
+            modal.dataset.isBreak = "false";
+            modal.dataset.isIssue = "false";
+            document.getElementById("eventTitle").textContent = "Add New Event";
+            document.getElementById("editTitle").textContent = title;
+            document.getElementById("editDescription").innerHTML = "";
+            document.getElementById("editDescription").contentEditable = true;
+            document.getElementById("editTitle").contentEditable = true;
+            document.getElementById("editPriority").disabled = false;
+            document.getElementById("editPriority").value = "P2";
+            document.getElementById("editEventType").disabled = false;
+            document.getElementById("editEventType").value = "event";
+            document.getElementById("editGroupName").disabled = false;
+            selectEventGroup('');
+            showLinkedDoc(docUrl);
+            setDocFieldEditable(true);
+            document.getElementById('editDateDisplay').textContent = formatDisplayDate(date);
+            document.getElementById('editDate').value = formatDate(date);
+            document.getElementById('editDateDisplay').style.display = pickDate ? 'none' : 'block';
+            document.getElementById('editDate').style.display = pickDate ? 'block' : 'none';
+            modal.classList.add('open');
+            document.getElementById("deleteButton").style.display = "none";
+            document.getElementById("editButton").style.display = "none";
+            document.getElementById("saveButton").style.display = "inline-block";
+            document.getElementById("makeBreakButton").style.display = pickDate ? "none" : "inline-block";
+        }
+
+        // A doc page links here with ?doc=<url>&title=<title> to start an event for that doc.
+        function openAddEventFromDocLink() {
+            const launch = readDocLaunchParams(window.location.search, window.location.origin);
+            if (!launch) return;
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.delete('doc');
+            nextUrl.searchParams.delete('title');
+            window.history.replaceState({}, '', nextUrl.toString());
+            if (!javaAuthenticated || ((!window.user || !window.user.uid) && !currentPersonId)) {
+                alert('You must be logged in to create events. Please log in and try again.');
+                return;
+            }
+            switchDashboardTab('calendar');
+            openAddEventModal(new Date(), { title: launch.title, docUrl: launch.docUrl, pickDate: true });
+        }
+
+        // Priority is embedded in the title so it persists even if the backend
+        // doesn't store it separately (sprint-synced events look like "[P1] 📚 Title - CSA").
+        function withPriorityPrefix(title, priority) {
+            return priority && !/^\[P[0-3]\]/.test(title) ? `[${priority}] ${title}` : title;
+        }
+        // The backend validates period, so derive the course from the chosen group.
+        function getGroupCourse(groupName) {
+            const matchedGroup = userGroups.find(g => g.name === groupName);
+            return matchedGroup && matchedGroup.course ? matchedGroup.course.toUpperCase() : '';
+        }
+
+        // ── Save ────────────────────────────────────────────────────
+        // Reads the modal and validates it; alerts and returns null when something is missing.
+        function readEventForm({ requireDate }) {
+            const docUrl = readDocInput();
+            if (docUrl === null) {
+                alert("Linked Doc must be a doc from the list or a web link (https://...).");
+                return null;
+            }
+            const form = {
+                title: document.getElementById("editTitle").textContent.trim(),
+                description: joinLinkedDoc(document.getElementById("editDescription").innerHTML, docUrl),
+                date: document.getElementById("editDate").value,
+                priority: document.getElementById("editPriority").value,
+                type: document.getElementById("editEventType").value,
+                groupName: document.getElementById("editGroupName").value
+            };
+            if (!form.title || !form.description.trim() || (requireDate && !form.date)) {
+                alert(requireDate ? "Title, Description, and Date cannot be empty!" : "Title and Description cannot be empty!");
+                return null;
+            }
+            return form;
+        }
+
+        function saveNewEvent() {
+            const form = readEventForm({ requireDate: true });
+            if (!form) return;
+            const currentUserName = (window.user && window.user.name) ? window.user.name : '';
+            const newEventPayload = {
+                title: withPriorityPrefix(form.title, form.priority),
+                description: form.description,
+                date: form.date,
+                priority: form.priority,
+                groupName: form.groupName,
+                period: getGroupCourse(form.groupName),
+                type: form.type,
+                individual: form.type === 'appointment' ? currentUserName : ''
+            };
+            closeModal();
+            fetch(`${javaURI}/api/calendar/add_event`, {
+                ...fetchOptions,
+                method: "POST",
+                body: JSON.stringify(newEventPayload),
+            })
+            .then(response => {
+                if (handleAuthError(response)) { alert("You must be logged in to add events."); return; }
+                if (!response.ok) throw new Error(`Failed to add event: ${response.status}`);
+                return response.json();
+            })
+            .then(data => { if (data) handleRequest(); })
+            .catch(error => {
+                if (!handleFetchError(error)) {
+                    console.error("Error adding event:", error);
+                    alert("Failed to save event.\n\n" + error.message);
+                }
+            });
+        }
+
+        function saveEventChanges() {
+            if (!currentEvent) return;
             const isBreak = document.getElementById("eventModal").dataset.isBreak === "true";
-            const updatedTitle = document.getElementById("editTitle").innerHTML.trim();
-            const updatedDescription = document.getElementById("editDescription").innerHTML;
-            // Reset UI
-            document.getElementById("saveButton").style.display = "none";
-            document.getElementById('editDateDisplay').style.display = 'block';
-            document.getElementById('editDate').style.display = 'none';
-            document.getElementById("editDescription").contentEditable = false;
-            document.getElementById("editTitle").contentEditable = false;
-            document.getElementById("editPriority").disabled = true;
-            document.getElementById("editEventType").disabled = true;
-            document.getElementById("editGroupName").disabled = true;
-            if (!updatedTitle || !updatedDescription) { alert("Title and Description cannot be empty!"); return; }
+            const form = readEventForm({ requireDate: !isBreak });
+            if (!form) return;
+            leaveEditMode();
 
             if (isBreak) {
                 const id = currentEvent.id;
                 fetch(`${javaURI}/api/calendar/breaks/${id}`, {
                     ...fetchOptions, method: "PUT",
-                    body: JSON.stringify({ name: updatedTitle, description: updatedDescription }),
+                    body: JSON.stringify({ name: form.title, description: form.description }),
                 })
                 .then(r => { if (handleAuthError(r)) return; if (!r.ok) throw new Error(`Failed: ${r.status}`); return r.json(); })
                 .then(d => { if (!d) return; document.getElementById("eventModal")?.classList.remove('open'); handleRequest(); })
                 .catch(e => { if (!handleFetchError(e)) { console.error(e); alert("Failed to update break.\n\n" + e.message); } });
-            } else {
-                const updatedPriority = document.getElementById("editPriority").value;
-                const updatedDate = document.getElementById("editDate").value;
-                document.getElementById('editDateDisplay').textContent = formatDisplayDate(new Date(updatedDate));
-                if (!updatedDate) { alert("Date cannot be empty!"); return; }
-                if (isAddingNewEvent) {
-                    const addGroupVal = document.getElementById("editGroupName").value;
-                    let addPeriod = '';
-                    if (addGroupVal) {
-                        const mg = userGroups.find(g => g.name === addGroupVal);
-                        if (mg && mg.course) addPeriod = mg.course.toUpperCase();
-                    }
-                    // Embed priority prefix in title for persistence
-                    let addTitle = updatedTitle;
-                    if (updatedPriority && !/^\[P[0-3]\]/.test(addTitle)) {
-                        addTitle = `[${updatedPriority}] ${addTitle}`;
-                    }
-                    const payload = { title: addTitle, description: updatedDescription, date: updatedDate, priority: updatedPriority, groupName: addGroupVal, period: addPeriod };
-                    fetch(`${javaURI}/api/calendar/add_event`, {
-                        ...fetchOptions, method: "POST", body: JSON.stringify(payload),
-                    })
-                    .then(r => { if (handleAuthError(r)) return; if (!r.ok) throw new Error(`Failed: ${r.status}`); return r.json(); })
-                    .then(d => { if (!d) return; document.getElementById("eventModal")?.classList.remove('open'); handleRequest(); })
-                    .catch(e => { if (!handleFetchError(e)) { console.error(e); alert("Failed to add event.\n\n" + e.message); } });
-                } else {
-                    // Derive period (course) from the selected group so backend validation passes
-                    const editGroupVal = document.getElementById("editGroupName").value;
-                    let derivedPeriod = currentEvent.extendedProps?.period || '';
-                    if (editGroupVal) {
-                        const matchedGroup = userGroups.find(g => g.name === editGroupVal);
-                        if (matchedGroup && matchedGroup.course) derivedPeriod = matchedGroup.course.toUpperCase();
-                    }
-                    // Re-embed priority prefix in title so it persists even if backend
-                    // doesn't store priority as a separate field (sprint-synced events
-                    // carry priority in the title like "[P1] 📚 Title - CSA").
-                    let titleToSave = updatedTitle;
-                    if (updatedPriority && !/^\[P[0-3]\]/.test(titleToSave)) {
-                        titleToSave = `[${updatedPriority}] ${titleToSave}`;
-                    }
-                    const payload = {
-                        newTitle: titleToSave, description: updatedDescription, date: updatedDate,
-                        priority: updatedPriority, type: document.getElementById("editEventType").value,
-                        groupName: editGroupVal,
-                        period: derivedPeriod,
-                        individual: currentEvent.extendedProps?.individual || ''
-                    };
-                    const id = currentEvent.id;
-                    fetch(`${javaURI}/api/calendar/edit/${id}`, {
-                        ...fetchOptions, method: "PUT", body: JSON.stringify(payload),
-                    })
-                    .then(r => { if (handleAuthError(r)) return; if (!r.ok) throw new Error(`Failed: ${r.status}`); return r.text(); })
-                    .then(d => { if (d === undefined) return; document.getElementById("eventModal")?.classList.remove('open'); handleRequest(); })
-                    .catch(e => { if (!handleFetchError(e)) { console.error(e); alert("Failed to update event.\n\n" + e.message); } });
-                }
+                return;
             }
+
+            const payload = {
+                newTitle: withPriorityPrefix(form.title, form.priority), description: form.description, date: form.date,
+                priority: form.priority, type: form.type,
+                groupName: form.groupName,
+                period: getGroupCourse(form.groupName) || currentEvent.extendedProps?.period || PERSONAL_EVENT_PERIOD,
+                individual: currentEvent.extendedProps?.individual || ''
+            };
+            const id = currentEvent.id;
+            fetch(`${javaURI}/api/calendar/edit/${id}`, {
+                ...fetchOptions, method: "PUT", body: JSON.stringify(payload),
+            })
+            .then(r => {
+                if (handleAuthError(r)) return;
+                if (!r.ok) return r.text().then(t => { throw new Error(`Failed: ${r.status} - ${t}`); });
+                return r.text();
+            })
+            .then(d => { if (d === undefined) return; document.getElementById("eventModal")?.classList.remove('open'); handleRequest(); })
+            .catch(e => { if (!handleFetchError(e)) { console.error(e); alert("Failed to update event.\n\n" + e.message); } });
+        }
+
+        // One handler for both flows; a date click no longer replaces it.
+        document.getElementById("saveButton").onclick = function () {
+            if (isAddingNewEvent) saveNewEvent();
+            else saveEventChanges();
         };
 
         // ── Edit button ─────────────────────────────────────────────
         document.getElementById("editButton").onclick = function () {
+            if (!currentEvent) return;
             const isBreak = document.getElementById("eventModal").dataset.isBreak === "true";
             document.getElementById('editDateDisplay').style.display = 'none';
             document.getElementById('editDate').style.display = isBreak ? 'none' : 'block';
@@ -1959,7 +2031,10 @@ active_tab: calendar
                 document.getElementById("editEventType").disabled = false;
                 document.getElementById("editGroupName").disabled = false;
             }
-            document.getElementById("editDescription").innerHTML = currentEvent.extendedProps.description || "";
+            setDocFieldEditable(true);
+            // Edit the raw text; the linked doc has its own field
+            document.getElementById("editDescription").innerHTML = splitLinkedDoc(currentEvent.extendedProps.description, window.location.origin).body;
+            document.getElementById("editTitle").focus();
         };
 
         // ── Delete button ───────────────────────────────────────────
@@ -2657,11 +2732,13 @@ active_tab: calendar
                         opt.textContent = label;
                         issuesFilter.appendChild(opt);
                     }
-                    // Also populate the event modal's group select so events can be assigned
+                    // Also populate the event modal's group select so events can be assigned.
+                    // Events store the group *name*, so use it as the value and skip groups already listed.
                     const editGroupSelect = document.getElementById('editGroupName');
-                    if (editGroupSelect) {
+                    const groupName = String(group.name || '');
+                    if (editGroupSelect && groupName && !Array.from(editGroupSelect.options).some(o => o.value === groupName)) {
                         const opt2 = document.createElement('option');
-                        opt2.value = value;
+                        opt2.value = groupName;
                         opt2.textContent = label;
                         editGroupSelect.appendChild(opt2);
                     }
@@ -2721,6 +2798,7 @@ active_tab: calendar
         await populateGroupsSelect();
         console.debug('populateGroupsSelect complete, groups loaded:', window.allGroupsById);
         await handleRequest();
+        openAddEventFromDocLink();
         await autoStarIssuesForUserGroups();
         renderThreadsPanel();
     });

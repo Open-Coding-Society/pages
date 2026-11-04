@@ -1229,6 +1229,22 @@ td:has(> img[src*="logo.png"]) {
   min-height: 110px;
 }
 
+// Edit-only inputs (date, linked doc) start hidden; the modal script shows them in edit mode.
+.issue-form-date-hidden {
+  display: none;
+}
+
+.calendar-event-modal-doc-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+
+.calendar-event-modal-doc-empty {
+  color: var(--text-muted);
+}
+
 .calendar-event-modal-close {
   position: absolute;
   top: 12px;

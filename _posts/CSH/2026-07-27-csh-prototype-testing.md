@@ -6,7 +6,6 @@ description: >
   Capstone, define your testing criteria and procedure, run physical
   testing, and cycle through a Critical Design Review before re-testing.
 courses: {'csh': {'week': 9}}
-assignment: true
 type: capstone
 canonical_id: csh-prototype-testing
 author: PLTW Capstone

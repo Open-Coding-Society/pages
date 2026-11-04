@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": {
+    "title": "Bad page",
+    "description": "",
+    "byline": "",
+    "course": "",
+    "width": "contained",
+    "image": ""
+  },
+  "sections": [
+    {
+      "id": "s-aaaaaa",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-text01",
+              "type": "text",
+              "settings": {
+                "body": "<a href=\"javascript:alert(1)\">Click</a>"
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -25,10 +25,12 @@ games/red-riding
 games/spline-barriers
 games/tag-game-multiplayer
 games/voidstriker
+games/racing-game:dev
 
 # Lessons
 lessons/ap-frq-simulator
 lessons/cpt-concepts
+lessons/flask:dev
 lessons/game-lessons
 lessons/parallelAndComputinglesson
 lessons/robot-logic-game
@@ -36,15 +38,26 @@ lessons/sass
 lessons/python
 lessons/javascript
 lessons/java
+lessons/cs112
+lessons/cs113
+lessons/csa1
+lessons/csa2
+lessons/ds2
 
 # Systems
 systems/ai-ab-engine
 systems/calendar
+systems/profile:dev
+systems/blogs:dev
+systems/topics:dev
 systems/courses:dev
+systems/gamebuilder:dev
 systems/auto-generator
 systems/auto-generator-ui
 systems/scraper
-systems/student-management-groups
+systems/messages:dev
+systems/ui-builder
+systems/lesson-feedback:dev
 systems/test-project
 
 # === FLAT STRUCTURE (legacy/uncategorized) ===

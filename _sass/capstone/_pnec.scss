@@ -1,0 +1,75 @@
+// Scope the capstone composition; shared OCS components and other pages stay intact.
+.pnec-capstone {
+  color: var(--pref-text-color);
+  font-size: clamp(18px, 1.125rem, 24px);
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+
+  h2, h3 { color: inherit; line-height: 1.25; }
+  h2 { margin: 0 0 1.25rem; font-size: clamp(26px, calc(1.3rem + 1vw), 38px); }
+  h3 { margin: 0 0 1rem; font-size: clamp(22px, 1.375rem, 30px); }
+  p { margin: 0 0 1.25rem; }
+  a { color: var(--pref-accent-color); text-underline-offset: 0.2em; }
+  a:focus-visible { outline: 3px solid var(--pref-accent-color); outline-offset: 5px; }
+  [id] { scroll-margin-top: 6rem; }
+
+  &__intro { padding: 1.5rem 0 2.5rem; }
+  &__intro h2 { font-size: clamp(2rem, calc(1.5rem + 2vw), 3.3rem); max-width: 22ch; }
+  &__lead { max-width: 70ch; font-size: clamp(20px, 1.25rem, 28px); }
+  &__eyebrow {
+    color: var(--pref-accent-color);
+    font-size: clamp(13px, 0.85rem, 18px);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  &__links { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; }
+  &__links .ocs__btn {
+    min-height: 44px;
+    max-width: 100%;
+    padding: 0.8rem 1.2rem;
+    border: 1px solid var(--pref-accent-color);
+    background: var(--pref-accent-color);
+    color: var(--pref-bg-color);
+    font-size: clamp(16px, 1rem, 22px);
+    white-space: normal;
+    text-align: center;
+  }
+  &__board.ocs__card {
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    border: 1px solid var(--pref-accent-color);
+    border-left-width: 5px;
+    margin: 0 0 3rem;
+  }
+  &__note { margin: 1.5rem 0 0; font-size: clamp(15px, 0.95rem, 21px); }
+  &__section { margin: 0; padding: 2.5rem 0; border-top: 1px solid var(--ui-border); }
+  &__summary-grid, &__features, &__team, &__lifecycle { display: grid; gap: 1.5rem; margin-top: 2rem; }
+  &__summary-grid, &__features, &__lifecycle { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  &__team { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  &__panel, &__feature {
+    min-width: 0;
+    padding: clamp(1.5rem, 2.5vw, 2rem);
+    border: 1px solid var(--ui-border);
+    border-radius: 1rem;
+    background: var(--panel);
+  }
+  &__feature { display: flex; flex-direction: column; gap: 0.5rem; }
+  &__feature > p { flex: 1; }
+  &__acceptance {
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--ui-border);
+    font-size: clamp(16px, 1rem, 22px);
+  }
+  &__acceptance p, &__panel p:last-child { margin-bottom: 0; }
+  &__foundation { display: flex; flex-wrap: wrap; gap: 0.75rem; list-style: none; margin: 1.5rem 0 2rem; padding: 0; }
+  &__foundation li { padding: 0.5rem 1rem; border: 1px solid var(--ui-border); border-radius: 0.5rem; }
+  &__subheading { margin-top: 2.5rem; }
+  &__process { margin: 1.5rem 0 0; padding-left: 1.5rem; }
+  &__process li { padding: 0.5rem 0 1rem 0.5rem; }
+  &__process h3 { margin-bottom: 0.75rem; }
+
+  @media (max-width: 800px) {
+    &__summary-grid, &__features, &__team, &__lifecycle { grid-template-columns: minmax(0, 1fr); }
+    &__section { padding: 2rem 0; }
+  }
+}

@@ -43,7 +43,7 @@ layout: opencs
     {% if page.categories.size > 0 %}
       Categories:
       {% for category in page.categories %}
-        <a class="category-tags-link" href="{{site.baseurl}}/search/#{{category|slugize}}">{{category}}</a>{% unless forloop.last %}&nbsp;{% endunless %}
+        <a class="category-tags-link" href="{{ '/topics/' | relative_url }}?category={{ category | downcase | url_encode }}">{{ category | escape }}</a>{% unless forloop.last %}&nbsp;{% endunless %}
       {% endfor %}
     {% endif %}
 
@@ -207,4 +207,3 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("resize", activateOnScroll, { passive: true });
 });
 </script>
-

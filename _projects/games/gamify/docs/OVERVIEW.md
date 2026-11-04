@@ -137,6 +137,20 @@ _posts/projects/gamify/
 
 ## Notes
 
+### Player movement and animation
+
+All reference-game players (including both End players and the Star Wars level)
+use GameEngine v1.1's equal-axis movement and `ANIMATION_FPS: 8`. `STEP_FACTOR`
+still controls width-based movement pace; reducing canvas height no longer slows
+vertical input. Sprite frames advance by elapsed time, separately from movement.
+
+NPC animation rates are intentionally unchanged. Gravity in the Water level and
+existing controls, collision behavior, and sprite directions are preserved.
+Movement is still update-count-based, so this is not yet a fixed-timestep engine.
+
+After editing these sources, publish them with
+`make -C _projects/games/gamify build`. Do not edit distributed level files.
+
 This OVERVIEW is the baseline introduction to the build system concepts. Real-world, deeper references belong in the cs-pathway docs.
 
 For an example of lightweight team documentation, see the sample GameLevelWater write-up:

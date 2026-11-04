@@ -53,6 +53,14 @@ year: 2026-2027
   {% endfor %}
 </nav>
 
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Progress updates</h3>
+    <ul>
+      {% for update in stage.progressUpdates %}
+      <li><a href="{{ update.url | relative_url }}">{{ update.label }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
 
   {% if stage.showDonation %}
   {% assign gift = data.donation %}

@@ -117,7 +117,7 @@
   box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
 }
 .nc-textarea { min-height: 90px; resize: vertical; line-height: 1.5; }
-.nc-select option { background: #0d1117; }
+.nc-select option { background: var(--pref-bg-color, #0d1117); }
 
 .nc-help {
   font-size: 0.78rem;

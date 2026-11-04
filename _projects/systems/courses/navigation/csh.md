@@ -1,5 +1,8 @@
 ---
-layout: sprint
+layout: post
+player_page:
+  course: csh
+  kind: home
 show_reading_time: false
 feedback: true
 title: Computer Science Honors

@@ -59,7 +59,7 @@ class GameLevelEnd {
         src: sprite_src_steve,
         SCALE_FACTOR: CHILLGUY_SCALE_FACTOR,
         STEP_FACTOR: 1000,
-        ANIMATION_RATE: 25,
+        ANIMATION_FPS: 8,
         
         INIT_POSITION: { x: width/16, y: height/2 },
         pixels: {height: 256, width: 128},
@@ -90,7 +90,7 @@ class GameLevelEnd {
         src: sprite_src_alex,
         SCALE_FACTOR: alex_SCALE_FACTOR,
         STEP_FACTOR: 1000,
-        ANIMATION_RATE: 25,
+        ANIMATION_FPS: 8,
         
         INIT_POSITION: { x: 0, y: height/2 },
         pixels: {height: 256, width: 128},

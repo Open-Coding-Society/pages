@@ -1,22 +1,16 @@
-import glob
 import html as html_lib
-from nbconvert import MarkdownExporter
-from nbconvert.utils.exceptions import ConversionException
 import os
-import nbformat
 import yaml
 import sys
 import subprocess
+import argparse
+import json
+from pathlib import Path
+from functools import lru_cache
 from hashlib import sha256
 import concurrent.futures, traceback, re
 from dataclasses import dataclass, asdict
 from typing import Any, Optional
-
-if __name__ == "__main__":
-    from progress_bar import ProgressBar
-else:
-    from scripts.progress_bar import ProgressBar
-
 
 ###########################################
 ### Section for Constants and Patterns  ###
@@ -28,7 +22,7 @@ SIDE-BY-SIDE RUNNER LEGEND (Container Panel Composition)
 =============================================================
 
 Supported cell directives for side-by-side layout:
-- CODE_RUNNER (python/javascript/java comment marker)
+- CODE_RUNNER (python/javascript/java comment marker, or an HTML comment in a %%html cell)
 - UI_RUNNER   (HTML comment marker)
 - GAME_RUNNER (javascript comment marker)
 
@@ -48,6 +42,7 @@ Pairing behavior:
 
 Examples:
 - // CODE_RUNNER: Challenge text | panel: demo, slot: left, ratio: 35-65
+- <!-- CODE_RUNNER: Challenge text | autostart: true -->   (first line of the cell is %%html)
 - <!-- UI_RUNNER: Notes | panel: demo, slot: left -->
 - // GAME_RUNNER: Arcade mode | panel: demo, slot: right, layout: row
 
@@ -57,13 +52,25 @@ Real pair example (Cookie Clicker):
 
 Runner options:
 - autostart: true|false  Auto-runs the game when the runner initializes. Default: false.
+- editor_height: <css-size> Editor height (or the UI_RUNNER source disclosure height).
+- output_height: <css-size> Output viewport height for every runner.
+- height: <css-size>        Legacy editor height for CODE/UI/PSEUDOCODE runners;
+                           legacy canvas height for GAME_RUNNER.
+- Explicit editor_height/output_height take precedence over the corresponding legacy height.
 
 UI-runner specific options:
 - show_code: true|false  Show the HTML/CSS/JS source in a disclosure above the rendered UI.
 - show_source: true|false Alias for show_code.
 
+HTML code-runner specific options (%%html cells with a CODE_RUNNER comment):
+- Students edit plain HTML (no JavaScript strings), and Run renders it into the page.
+- height: <css-size>        Editor height. Default: 300px.
+- output_height: <css-size> Rendered output height. Default: the UI runner's 400px minimum.
+
 Game-runner specific options:
-- hide_edit, width, height, editor_height
+- hide_edit, width, editor_height
+- height: <css-size>        Game canvas height. Default: 580px.
+- output_height: <css-size> Game canvas height, overriding legacy height.
 
 Notes on CodeFence and MermaidGraph:
 - Plain markdown code fences and Mermaid markdown are not panel-aware by default.
@@ -74,12 +81,17 @@ Notes on CodeFence and MermaidGraph:
 notebook_directory = "_notebooks"
 destination_directory = "_posts"
 mermaid_output_directory = "assets/mermaid"
+repository_root = Path(__file__).resolve().parent.parent
+cache_directory = ".notebook-conversion-cache"
+project_index_date = "2026-04-15"
+project_navigation_date = "2026-09-12"
 
 # Comment patterns for different languages
 CODE_RUNNER_PATTERNS = {
     'javascript': r'^//\s*CODE_RUNNER:\s*(.+)$',
     'python': r'^#\s*CODE_RUNNER:\s*(.+)$',
     'java': r'^//\s*CODE_RUNNER:\s*(.+)$',
+    'html': r'^<!--\s*CODE_RUNNER:\s*(.+)\s*-->$',
 }
 
 # UI_RUNNER pattern for HTML cells
@@ -90,6 +102,18 @@ GAME_RUNNER_PATTERN = r'^//\s*GAME_RUNNER:\s*(.+)$'
 
 # PSEUDOCODE_RUNNER pattern for Pseudocode examples (raw or code cells)
 PSEUDOCODE_RUNNER_PATTERN = r'^//\s*PSEUDOCODE_RUNNER:\s*(.+)$'
+
+# REFLECTION_RUNNER pattern: first line of a markdown cell, replaced by a written-answer box
+# (_includes/runners/reflection.html) whose answer is submitted with the code runners' Gist.
+#   <!-- REFLECTION_RUNNER: Why did you use a loop here? | id: loops-why -->
+REFLECTION_RUNNER_PATTERN = r'^<!--\s*REFLECTION_RUNNER:\s*(.+?)\s*-->$'
+
+# MCQ_RUNNER pattern: first line of a markdown cell, followed by the questions as a JSON array in a
+# ```json fence. Replaced by _includes/runners/mcq.html, whose answers go in the same Gist.
+#   <!-- MCQ_RUNNER: MCQ 1.09 | id: method-signatures-mcq -->
+MCQ_RUNNER_PATTERN = r'^<!--\s*MCQ_RUNNER:\s*(.+?)\s*-->$'
+MCQ_QUESTIONS_PATTERN = r'^```json\s*\n(.*?)\n```\s*(.*)$'
+MCQ_MAX_CHOICES = 4
 
 
 #########################################
@@ -116,6 +140,10 @@ def detect_cell_language(cell):
     # JavaScript: first line is %%js magic command
     if lines and lines[0].strip().startswith('%%js'):
         return 'javascript'
+
+    # HTML: first line is %%html magic command
+    if lines and lines[0].strip().startswith('%%html'):
+        return 'html'
 
     # Java: last non-whitespace line matches ClassName.main(null);
     # Find last non-empty line
@@ -260,6 +288,12 @@ class CodeRunner:
 
     def liquid_lines(self, code_fence_lines: list[str], code_runner_count: int) -> list[str]:
         """Render Jekyll Liquid captures/includes for embedding the code runner widget."""
+        include = 'runners/code.html'
+        if self.language == 'html':
+            include = 'runners/html.html'
+            # The notebook's kernel language labels every fence; this cell is HTML.
+            code_fence_lines = ['```html', *code_fence_lines[1:]]
+
         lines = [
             '',
             '{% capture challenge' + str(code_runner_count) + ' %}',
@@ -274,7 +308,7 @@ class CodeRunner:
             *code_fence_lines,
             '{% endcapture %}',
             '',
-            '{% include runners/code.html',
+            '{% include ' + include,
             '   runner_id="' + self.runner_id + '"',
             '   language="' + self.language + '"',
             '   challenge=challenge' + str(code_runner_count),
@@ -284,6 +318,8 @@ class CodeRunner:
 
         if self.options.get('autostart') or self.options.get('auto_start'):
             lines.append('   autostart="true"')
+
+        lines.extend(runner_height_options(self.options))
 
         lines.extend(['%}', ''])
         return lines
@@ -428,16 +464,32 @@ class UiRunner:
             source = self.html
             if self.script.strip():
                 source += f'\n<script>\n{self.script}\n</script>'
+            editor_height = self.options.get('editor_height') or self.options.get('height')
+            source_style = (
+                ' style="--runner-editor-height: '
+                + html_lib.escape(str(editor_height), quote=True) + ';"'
+                if editor_height else ''
+            )
             lines.extend([
-                '<details class="ui-runner-source">',
+                '<details class="ui-runner-source'
+                + (' ui-runner-source--sized' if editor_height else '')
+                + '"' + source_style + '>',
                 '<summary>View example code</summary>',
                 '<pre><code class="language-html">' + html_lib.escape(source.strip()) + '</code></pre>',
                 '</details>',
                 '',
             ])
 
+        output_height = self.options.get('output_height')
+        output_style = (
+            ' style="--runner-output-height: '
+            + html_lib.escape(str(output_height), quote=True) + ';"'
+            if output_height else ''
+        )
         lines.extend([
-            '<div class="ui-runner">',
+            '<div class="ui-runner'
+            + (' ui-runner--sized' if output_height else '')
+            + '"' + output_style + '>',
             self.html,
             '<script>',
             '(function() {',
@@ -577,10 +629,7 @@ class GameRunner:
             lines.append('   autostart="true"')
         if self.options.get('width'):
             lines.append(f'   width="{self.options["width"]}"')
-        if self.options.get('height'):
-            lines.append(f'   height="{self.options["height"]}"')
-        if self.options.get('editor_height'):
-            lines.append(f'   editor_height="{self.options["editor_height"]}"')
+        lines.extend(runner_height_options(self.options))
 
         lines.extend(['%}', ''])
         return lines
@@ -712,11 +761,19 @@ class PseudocodeRunner:
             '   code=code' + str(code_runner_count),
         ]
 
-        if self.options.get('height'):
-            lines.append(f'   height="{self.options["height"]}"')
+        lines.extend(runner_height_options(self.options))
 
         lines.extend(['%}', ''])
         return lines
+
+
+def runner_height_options(options: dict[str, Any]) -> list[str]:
+    """Forward explicit and legacy dimensions without changing runner-specific defaults."""
+    return [
+        f'   {option}="{options[option]}"'
+        for option in ('height', 'editor_height', 'output_height')
+        if options.get(option)
+    ]
 
 
 @dataclass
@@ -783,11 +840,9 @@ class MermaidGraph:
 
 def error_cleanup(notebook_file):
     """Delete generated markdown output for a notebook when conversion fails."""
-    destination_file = os.path.basename(notebook_file).replace(".ipynb", "_IPYNB_2_.md")
-    destination_path = os.path.join(destination_directory, destination_file)
-
-    if os.path.exists(destination_path):
-        os.remove(destination_path)
+    destination_path = Path(get_relative_output_path(notebook_file))
+    destination_path.unlink(missing_ok=True)
+    cache_path(destination_path).unlink(missing_ok=True)
 
 
 def extract_front_matter(notebook_file, cell):
@@ -799,19 +854,81 @@ def extract_front_matter(notebook_file, cell):
         try:
             front_matter = yaml.safe_load(source.split("---", 2)[1])
         except yaml.YAMLError as e:
-            print(f"Error parsing YAML front matter: {e}")
-            error_cleanup(notebook_file)
-            sys.exit(1)
+            raise ValueError(f"Invalid YAML front matter in {notebook_file}: {e}") from e
+        if not isinstance(front_matter, dict):
+            raise ValueError(f"Front matter in {notebook_file} must be a mapping")
     return front_matter
 
 
 def get_relative_output_path(notebook_file):
-    """Map a notebook path to the mirrored markdown output path under _posts."""
-    relative_path = os.path.relpath(notebook_file, notebook_directory)
+    """Map legacy and project sources to their existing published filenames."""
+    source = Path(notebook_file).resolve()
+    legacy_root = (repository_root / notebook_directory).resolve()
+    projects_root = (repository_root / "_projects").resolve()
+    posts_root = (repository_root / destination_directory).resolve()
+    if source.suffix != ".ipynb":
+        raise ValueError(f"Expected an .ipynb source: {notebook_file}")
 
-    markdown_filename = relative_path.replace(".ipynb", "_IPYNB_2_.md")
+    if source.is_relative_to(legacy_root):
+        relative = source.relative_to(legacy_root)
+    elif source.is_relative_to(projects_root):
+        parts = source.relative_to(projects_root).parts
+        # Templates support flat projects as well as category/project directories.
+        if len(parts) == 2 and parts[1] == "index.ipynb":
+            relative = Path("projects", parts[0], f"{project_index_date}-{parts[0]}.ipynb")
+        elif len(parts) == 3 and parts[2] == "index.ipynb" and parts[1] not in ("notebooks", "navigation"):
+            relative = Path("projects", parts[1], f"{project_index_date}-{parts[1]}.ipynb")
+        elif len(parts) in (3, 4) and parts[-2] in ("notebooks", "navigation"):
+            filename = parts[-1]
+            if parts[-2] == "navigation":
+                filename = f"{project_navigation_date}-{filename}"
+            relative = Path("projects", parts[-3], filename)
+        else:
+            raise ValueError(f"Unsupported project notebook location: {notebook_file}")
+    else:
+        raise ValueError(f"Notebook must be inside _notebooks or a registered project: {notebook_file}")
 
-    return os.path.join(destination_directory, markdown_filename)
+    output = (posts_root / relative.with_name(f"{relative.stem}_IPYNB_2_.md")).resolve()
+    if not output.is_relative_to(posts_root):
+        raise ValueError(f"Notebook output escapes _posts: {notebook_file}")
+    return str(output)
+
+
+def cache_path(output):
+    key = sha256(str(output).encode("utf-8")).hexdigest()
+    return repository_root / cache_directory / f"{key}.json"
+
+
+def conversion_fingerprint(source):
+    return {
+        "source": str(Path(source).resolve()),
+        "source_hash": sha256(Path(source).read_bytes()).hexdigest(),
+        "converter_hash": sha256(Path(__file__).read_bytes()).hexdigest(),
+    }
+
+
+def output_signature(output):
+    stat = output.stat()
+    return {"size": stat.st_size, "mtime_ns": stat.st_mtime_ns}
+
+
+def needs_conversion(source, force=False):
+    output = Path(get_relative_output_path(source))
+    stamp = cache_path(output)
+    if force or not output.is_file() or not stamp.is_file():
+        return True
+    try:
+        cached = json.loads(stamp.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        print(f"Invalid conversion cache {stamp}; rebuilding {source}: {e}", file=sys.stderr)
+        return True
+    return cached != {**conversion_fingerprint(source), "output": output_signature(output)}
+
+
+@lru_cache(maxsize=1)
+def markdown_exporter():
+    from nbconvert import MarkdownExporter
+    return MarkdownExporter()
 
 
 def fix_js_code_blocks(markdown):
@@ -914,6 +1031,10 @@ def process_ui_runner_cells(notebook, permalink):
     processed_cells = []
     
     for cell in notebook.cells:
+        if 'code_runner' in cell.get('metadata', {}):
+            # A %%html cell with a CODE_RUNNER comment is already an editable HTML runner.
+            processed_cells.append(cell)
+            continue
         if cell.cell_type == 'raw' or (cell.cell_type == 'code' and cell.source.strip().startswith('%%html')):
             runner = UiRunner.from_cell(cell, permalink, runner_index)
 
@@ -975,6 +1096,22 @@ def process_pseudocode_runner_cells(notebook, permalink):
     return notebook
 
 
+def fenced_block_owners(notebook):
+    """The code cell behind each fenced block of the exported Markdown, in page order.
+
+    A fence written inside a markdown cell has no code cell (None). Without those entries it
+    would take the next code cell's runner, and every later runner would land one block early.
+    """
+    owners = []
+    for cell in notebook.cells:
+        if cell.cell_type == 'code':
+            owners.append(cell)
+        elif cell.cell_type == 'markdown':
+            fence_lines = sum(1 for line in cell.source.split('\n') if line.startswith('```'))
+            owners.extend([None] * (fence_lines // 2))
+    return owners
+
+
 def inject_code_runners(markdown, notebook, front_matter=None):
     """Inject code-runner includes after code blocks with metadata
     
@@ -989,7 +1126,7 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     lesson_key = _build_lesson_key(front_matter)
 
     ui_runner_cells, ui_runner_ids = UiRunner.collect_cells_and_source_ids(notebook)
-    code_cells = [cell for cell in notebook.cells if cell.cell_type == 'code']
+    fence_owners = fenced_block_owners(notebook)
     raw_cells = [cell for cell in notebook.cells if cell.cell_type == 'raw']
     
     # Create a mapping of cell order for proper injection
@@ -1195,7 +1332,7 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                 code_block_content.append(line)
                 
                 # Check if this corresponds to a code cell with runner metadata
-                code_cell = code_cells[code_cell_count] if code_cell_count < len(code_cells) else None
+                code_cell = fence_owners[code_cell_count] if code_cell_count < len(fence_owners) else None
                 
                 code_cell_count += 1
                 
@@ -1266,6 +1403,116 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     return '\n'.join(result)
 
 
+def split_marker_options(content: str) -> tuple[str, dict[str, str]]:
+    """Split "text | key: value, key: value" from a runner marker into text and options."""
+    if '|' not in content:
+        return content.strip(), {}
+    text, options_str = content.split('|', 1)
+    options = {}
+    for option in options_str.split(','):
+        if ':' in option:
+            key, value = option.split(':', 1)
+            options[key.strip()] = value.strip()
+    return text.strip(), options
+
+
+def reflection_runner_liquid(question: str, runner_id: str, number: int) -> str:
+    """The Liquid that embeds one reflection runner, mirroring the code runner's capture/include."""
+    return (
+        '{% capture reflection' + str(number) + ' %}' + question + '{% endcapture %}\n'
+        '{% include runners/reflection.html runner_id="' + runner_id + '" question=reflection'
+        + str(number) + ' reflection_number="' + str(number) + '" %}'
+    )
+
+
+def process_reflection_runner_cells(notebook, permalink):
+    """Replace <!-- REFLECTION_RUNNER: question | id: ... --> markdown cells with reflection runners."""
+    number = 0
+    seen_ids = set()
+    for cell in notebook.cells:
+        if cell.cell_type != 'markdown':
+            continue
+        lines = cell.source.strip().split('\n')
+        match = re.match(REFLECTION_RUNNER_PATTERN, lines[0].strip(), re.IGNORECASE)
+        if not match:
+            continue
+        question, options = split_marker_options(match.group(1))
+        if not question:
+            raise ValueError('A REFLECTION_RUNNER marker needs the question text: <!-- REFLECTION_RUNNER: question | id: name -->')
+        number += 1
+        # The id names the answer's file in the Gist, so it is kept to filename-safe characters.
+        runner_id = options.get('id') or generate_runner_id(permalink, f'reflection-{number}')
+        runner_id = re.sub(r'[^A-Za-z0-9_-]', '-', runner_id)
+        if runner_id in seen_ids:
+            raise ValueError(f'Duplicate REFLECTION_RUNNER id "{runner_id}" in one notebook.')
+        seen_ids.add(runner_id)
+        # Any text after the marker stays in the lesson, as context shown after the box.
+        rest = '\n'.join(lines[1:]).strip()
+        cell['source'] = reflection_runner_liquid(question, runner_id, number) + (f'\n\n{rest}' if rest else '')
+    return notebook
+
+
+def validate_mcq_questions(questions, title: str) -> None:
+    """Fail the conversion on a malformed question, which would otherwise break only in the browser."""
+    if not isinstance(questions, list) or not questions:
+        raise ValueError(f'MCQ_RUNNER "{title}" needs a JSON array of questions.')
+    for number, item in enumerate(questions, start=1):
+        choices = item.get('choices') if isinstance(item, dict) else None
+        if not isinstance(choices, list) or not 2 <= len(choices) <= MCQ_MAX_CHOICES:
+            raise ValueError(f'MCQ_RUNNER "{title}" question {number} needs 2 to {MCQ_MAX_CHOICES} choices.')
+        if not isinstance(item.get('q'), str) or not item['q'].strip():
+            raise ValueError(f'MCQ_RUNNER "{title}" question {number} needs its "q" text.')
+        answer = item.get('answer')
+        if type(answer) is not int or not 0 <= answer < len(choices):
+            raise ValueError(f'MCQ_RUNNER "{title}" question {number} needs "answer", the index of the right choice.')
+
+
+def mcq_runner_liquid(title: str, questions: list, runner_id: str, number: int) -> str:
+    """The Liquid that embeds one MCQ runner, with its questions as one-line JSON."""
+    # Escaping < keeps question text from closing the page's <script> tag; raw keeps Liquid off code.
+    questions_json = json.dumps(questions, ensure_ascii=False, separators=(',', ':')).replace('<', '\\u003c')
+    return (
+        '{% capture mcq_title' + str(number) + ' %}' + title + '{% endcapture %}\n'
+        '{% capture mcq_questions' + str(number) + ' %}{% raw %}' + questions_json + '{% endraw %}{% endcapture %}\n'
+        '{% include runners/mcq.html runner_id="' + runner_id + '" title=mcq_title' + str(number)
+        + ' questions=mcq_questions' + str(number) + ' %}'
+    )
+
+
+def process_mcq_runner_cells(notebook, permalink):
+    """Replace <!-- MCQ_RUNNER: title | id: ... --> markdown cells with MCQ runners."""
+    number = 0
+    seen_ids = set()
+    for cell in notebook.cells:
+        if cell.cell_type != 'markdown':
+            continue
+        marker, _, body = cell.source.strip().partition('\n')
+        match = re.match(MCQ_RUNNER_PATTERN, marker.strip(), re.IGNORECASE)
+        if not match:
+            continue
+        title, options = split_marker_options(match.group(1))
+        if not title:
+            raise ValueError('An MCQ_RUNNER marker needs a title: <!-- MCQ_RUNNER: title | id: name -->')
+        fenced = re.match(MCQ_QUESTIONS_PATTERN, body.strip(), re.DOTALL)
+        if not fenced:
+            raise ValueError(f'MCQ_RUNNER "{title}" needs its questions in a ```json fence after the marker.')
+        try:
+            questions = json.loads(fenced.group(1))
+        except json.JSONDecodeError as error:
+            raise ValueError(f'MCQ_RUNNER "{title}" has invalid JSON: {error}') from error
+        validate_mcq_questions(questions, title)
+        number += 1
+        # The id names the answers' file in the Gist, so it is kept to filename-safe characters.
+        runner_id = options.get('id') or generate_runner_id(permalink, f'mcq-{number}')
+        runner_id = re.sub(r'[^A-Za-z0-9_-]', '-', runner_id)
+        if runner_id in seen_ids:
+            raise ValueError(f'Duplicate MCQ_RUNNER id "{runner_id}" in one notebook.')
+        seen_ids.add(runner_id)
+        rest = fenced.group(2).strip()
+        cell['source'] = mcq_runner_liquid(title, questions, runner_id, number) + (f'\n\n{rest}' if rest else '')
+    return notebook
+
+
 def process_custom_cells(notebook, permalink):
     """Main custom-cell orchestration pipeline for ID assignment and runner extraction."""
     notebook = assign_custom_cell_ids(notebook, permalink)
@@ -1273,14 +1520,20 @@ def process_custom_cells(notebook, permalink):
     notebook = process_ui_runner_cells(notebook, permalink)
     notebook = process_game_runner_cells(notebook, permalink)
     notebook = process_pseudocode_runner_cells(notebook, permalink)
+    notebook = process_reflection_runner_cells(notebook, permalink)
+    notebook = process_mcq_runner_cells(notebook, permalink)
     return notebook
 
 
 # Function to convert the notebook to Markdown with front matter
 def convert_notebook_to_markdown_with_front_matter(notebook_file):
     """Convert one notebook into markdown and prepend YAML front matter."""
+    import nbformat
+
     with open(notebook_file, "r", encoding="utf-8") as file:
         notebook = nbformat.read(file, as_version=nbformat.NO_CONVERT)
+        if not notebook.cells:
+            raise ValueError(f"Notebook has no front matter cell: {notebook_file}")
         front_matter = extract_front_matter(notebook_file, notebook.cells[0])
 
         # Get permalink for runner_id generation
@@ -1293,7 +1546,7 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
         
         mermaid_graph = MermaidGraph(mermaid_output_directory)
         mermaid_graph.process_cells(notebook)
-        exporter = MarkdownExporter()
+        exporter = markdown_exporter()
         markdown, _ = exporter.from_notebook_node(notebook)
         markdown = fix_js_code_blocks(markdown) # Fix JS code blocks
         
@@ -1308,74 +1561,131 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
         markdown_with_front_matter = front_matter_content + markdown
         destination_path = get_relative_output_path(notebook_file)
         ensure_directory_exists(destination_path)
-        with open(destination_path, "w", encoding="utf-8") as file:
-            file.write(markdown_with_front_matter)
+        output = Path(destination_path)
+        # Avoid a Jekyll rebuild when a source edit does not change published content.
+        if not output.is_file() or output.read_text(encoding="utf-8") != markdown_with_front_matter:
+            temporary = output.with_name(f".{output.name}.{os.getpid()}.tmp")
+            try:
+                temporary.write_text(markdown_with_front_matter, encoding="utf-8")
+                temporary.replace(output)
+            finally:
+                temporary.unlink(missing_ok=True)
 
 
 # Function to convert the Jupyter Notebook files to Markdown
-def convert_single_notebook(notebook_file):
-    """Convert one notebook and fail fast on conversion exceptions."""
+def convert_single_notebook(notebook_file, force=False):
+    """Convert a changed source, record freshness, and propagate failures."""
+    fingerprint = conversion_fingerprint(notebook_file)
+    if not needs_conversion(notebook_file, force=force):
+        return False
     try:
         convert_notebook_to_markdown_with_front_matter(notebook_file)
-    except ConversionException as e:
-        print(f"Conversion error for {notebook_file}: {str(e)}")
+    except Exception:
+        # A failed source must not leave a stale, apparently successful published lesson.
         error_cleanup(notebook_file)
-        sys.exit(1)
+        raise
+    output = Path(get_relative_output_path(notebook_file))
+    stamp = cache_path(output)
+    stamp.parent.mkdir(parents=True, exist_ok=True)
+    stamp.write_text(json.dumps({**fingerprint, "output": output_signature(output)}), encoding="utf-8")
+    return True
 
 
-def process_notebook(notebook_file):
-    """Process one notebook with broad exception handling for batch execution."""
-    try:
-        convert_single_notebook(notebook_file)
-    except ConversionException as e:
-        print(f"Conversion error for {notebook_file}: {str(e)}")
-        error_cleanup(notebook_file)
-    except Exception as e:
-        print(f"Unexpected error for {notebook_file}: {traceback.format_exc()}")
+def process_notebook(notebook_file, force=False):
+    """Worker entry point; errors are collected by the batch caller."""
+    return convert_single_notebook(notebook_file, force=force)
 
 
-def convert_notebooks():
-    """Convert all notebooks in parallel while reporting progress."""
-    maxCores = os.cpu_count()  # get the number of cores available on the system
+def configure_conversion_worker(root, index_date, navigation_date):
+    global repository_root, project_index_date, project_navigation_date
+    repository_root = Path(root)
+    project_index_date = index_date
+    project_navigation_date = navigation_date
 
-    notebook_files = glob.glob(f"{notebook_directory}/**/*.ipynb", recursive=True)
 
-    # create progress bar
-    convertBar = ProgressBar(
-        userInfo="Notebook conversion progress:", total=(len(notebook_files))
-    )
+def convert_notebooks(notebook_files=None, force=False, jobs=4):
+    """Convert a batch in one invocation, skipping unchanged published lessons."""
+    if jobs < 1:
+        raise ValueError("Conversion jobs must be at least 1")
+    if notebook_files is None:
+        legacy = repository_root / notebook_directory
+        notebook_files = [
+            str(source) for source in sorted(legacy.rglob("*.ipynb"))
+            if not source.is_relative_to(legacy / "projects")
+        ]
+    notebook_files = list(dict.fromkeys(str(Path(source).resolve()) for source in notebook_files))
+    outputs = {}
+    pending = []
+    for source in notebook_files:
+        output = get_relative_output_path(source)
+        if output in outputs:
+            raise ValueError(f"Sources share output {output}: {outputs[output]} and {source}")
+        outputs[output] = source
+        if needs_conversion(source, force=force):
+            pending.append(source)
 
-    with concurrent.futures.ProcessPoolExecutor(max_workers=maxCores) as executor:
-        futures = {
-            executor.submit(process_notebook, notebook_file): notebook_file
-            for notebook_file in notebook_files
-        }
-
-        for future in concurrent.futures.as_completed(futures):
-            notebook_file = futures[future]
+    failures = []
+    converted = 0
+    if jobs == 1 or len(pending) <= 1:
+        for source in pending:
             try:
-                future.result()
+                converted += convert_single_notebook(source, force=force)
             except Exception as e:
-                print(
-                    f"Error occurred during notebook processing: {notebook_file}\n{traceback.format_exc()}"
-                )
-            finally:
-                rel_path = os.path.relpath(notebook_file, notebook_directory)
-                convertBar.set_suffix(rel_path)
-                convertBar.continue_progress()
+                failures.append(f"{source}: {e}")
+                traceback.print_exc()
+    else:
+        with concurrent.futures.ProcessPoolExecutor(
+            max_workers=min(jobs, len(pending)),
+            initializer=configure_conversion_worker,
+            initargs=(str(repository_root), project_index_date, project_navigation_date),
+        ) as executor:
+            futures = {executor.submit(process_notebook, source, force): source for source in pending}
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    converted += future.result()
+                except Exception as e:
+                    failures.append(f"{futures[future]}: {e}")
+                    traceback.print_exc()
+    print(f"Notebooks: {converted} converted, {len(notebook_files) - len(pending)} unchanged, {len(failures)} failed")
+    if failures:
+        raise RuntimeError("Notebook conversion failed:\n" + "\n".join(failures))
+    return converted
 
-    convertBar.end_progress()
+
+def project_notebooks(project):
+    project = Path(project).resolve()
+    projects_root = (repository_root / "_projects").resolve()
+    if not project.is_relative_to(projects_root) or len(project.relative_to(projects_root).parts) not in (1, 2):
+        raise ValueError(f"Expected _projects/project or _projects/category/project: {project}")
+    if not project.is_dir():
+        raise ValueError(f"Project directory does not exist: {project}")
+    if (project / "index.ipynb").is_file() and (project / "index.md").is_file():
+        raise ValueError(f"Project has both index.ipynb and index.md: {project}")
+    return (
+        list(project.glob("index.ipynb"))
+        + sorted((project / "notebooks").glob("*.ipynb"))
+        + sorted((project / "navigation").glob("*.ipynb"))
+    )
 
 
 if __name__ == "__main__":
-    # Check if a specific file was passed as an argument
-    if len(sys.argv) > 1:
-        notebook_file = sys.argv[1]
-        if os.path.exists(notebook_file):
-            print(f"Converting single notebook: {notebook_file}")
-            convert_single_notebook(notebook_file)
-        else:
-            print(f"Error: File not found: {notebook_file}")
-            sys.exit(1)
-    else:
-        convert_notebooks()
+    parser = argparse.ArgumentParser(description="Incrementally publish legacy or project notebooks to _posts.")
+    parser.add_argument("notebooks", nargs="*", help="One or more source notebooks")
+    parser.add_argument("--project", help="Convert the index, lessons, and navigation of one project")
+    parser.add_argument("--force", action="store_true", help="Reconvert even when unchanged")
+    parser.add_argument("--jobs", type=int, default=4, help="Maximum conversion workers (default: 4)")
+    parser.add_argument("--index-date", default=project_index_date)
+    parser.add_argument("--navigation-date", default=project_navigation_date)
+    args = parser.parse_args()
+    project_index_date = args.index_date
+    project_navigation_date = args.navigation_date
+    try:
+        sources = args.notebooks or None
+        if args.project:
+            if args.notebooks:
+                parser.error("Use either --project or explicit notebook paths, not both")
+            sources = project_notebooks(args.project)
+        convert_notebooks(sources, force=args.force, jobs=args.jobs)
+    except (ValueError, RuntimeError, OSError) as e:
+        print(f"Notebook conversion error: {e}", file=sys.stderr)
+        sys.exit(1)

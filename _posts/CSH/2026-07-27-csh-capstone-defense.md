@@ -6,7 +6,6 @@ description: >
   multimedia display, and deliver the Capstone defense to an external panel
   of judges.
 courses: {'csh': {'week': 24}}
-assignment: true
 type: capstone
 canonical_id: csh-capstone-defense
 author: PLTW Capstone

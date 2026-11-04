@@ -1,0 +1,12 @@
+{% comment %}
+  The microblog panel's Ratings tab on pages with assignment: true and team_teach: true
+  (_includes/microblog_foundation.html includes it): the lesson step of lesson feedback.
+  Teachers read the Lesson Summary on the Teacher Dashboard (/submissions), not here.
+  Published to _includes/projects/lesson-feedback/; source: _projects/systems/lesson-feedback/navigation/.
+  lesson-feedback-page.js fills the mount once it knows who is signed in.
+{% endcomment %}
+<div class="lesson-feedback-panel" data-lesson-feedback="lesson">
+  <div class="ocs__loading">
+    <div class="ocs__spinner"></div>
+  </div>
+</div>
