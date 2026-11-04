@@ -11,7 +11,7 @@ year: "2026-2027"
 > [Unified Social Club](https://www.unifiedsocialclub.com/) gives adults with special needs in Poway a free, safe place to make friends: board and card games, arts and crafts, karaoke, and sports at the Mickey Cafagna Community Center (13094 Civic Center Dr, Poway). Games are the heart of every club night, so Team Triple T is building three club games members can play together on the big screen or on their own phones.
 
 {% assign usc_board = site.data.unified_social_club.Board %}
-{% include ocs_kanban_board.html url=usc_board.url filter=usc_board.filter %}
+{% include ocs_kanban_board.html url=usc_board.url filter=usc_board.filter columns=usc_board.columns %}
 
 <div class="ocs__links ocs__links--wide">
     <a class="ocs__btn alert-green fill large" href="https://github.com/Unified-Social-Club-CSP/usc-pages/issues/1" target="_blank" rel="noopener noreferrer">Open Sprint Plan</a>
@@ -174,7 +174,7 @@ erDiagram
 <br>
 
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn alert-green fill" href="https://github.com/orgs/Unified-Social-Club-CSP/projects/1" target="_blank" rel="noopener noreferrer">View Kanban</a>
+    <a class="ocs__btn alert-green fill" href="https://github.com/orgs/Unified-Social-Club-CSP/projects/2" target="_blank" rel="noopener noreferrer">View Kanban</a>
     <a class="ocs__btn" href="https://github.com/Unified-Social-Club-CSP/usc-pages" target="_blank" rel="noopener noreferrer">Frontend Repository</a>
     <a class="ocs__btn" href="https://github.com/Unified-Social-Club-CSP/usc-flask" target="_blank" rel="noopener noreferrer">Backend Repository</a>
 </div>
