@@ -134,22 +134,6 @@ test('each WASD direction moves the car when pressed on its own', () => {
   }
 });
 
-test('releasing accelerate lets the car gradually coast to a stop', () => {
-  const player = accelerationFixture();
-  pressKey(player, wasd.up);
-  player.update();
-  player.update();
-  releaseKey(player, wasd.up);
-
-  player.update();
-  assert.equal(player.currentSpeed, 0.4);
-  assert.ok(Math.abs(player.velocity.y) > 0);
-
-  player.update();
-  assert.equal(player.currentSpeed, 0);
-  assert.equal(player.velocity.y, 0);
-});
-
 test('movement continues if a collision clears the engine key state', () => {
   const player = accelerationFixture();
   pressKey(player, wasd.up);

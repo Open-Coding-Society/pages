@@ -15,6 +15,11 @@ Unassigned arrows, typing fields, browser shortcuts, and paused/detached games
 retain their browser defaults. This cancels the default browser action, not
 event propagation or the engine's existing movement handling.
 
+`essentials/PlayerDriver.js` extends `Player` with throttle, braking, coasting,
+reverse, and steering controls. It accepts optional `data.driverPhysics`
+overrides; specialized games can also override the physics values after
+construction.
+
 Games can still override `handleKeyDown` and call `super.handleKeyDown(event)`.
 For example, RacingPlayer additionally rejects movement input during typing,
 shortcuts, pauses, or after its container is detached. Those guards remain in
