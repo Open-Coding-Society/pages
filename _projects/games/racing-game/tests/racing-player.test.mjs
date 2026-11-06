@@ -170,14 +170,20 @@ test('winter cars use acceleration, reverse-speed, and individual boost keys', (
   assert.equal(winterLevel.classes.at(-1).data.usePositionForLapTracking, true);
 });
 
+test('the alternate Autumn level supplies valid lap-tracking gates', async () => {
+  const { default: GameLevelAutumn } = await import('../levels/autumn-level-copy.js');
+  const level = new GameLevelAutumn({ path: '' });
+  const lapData = level.classes.find(({ class: ObjectType }) => ObjectType === TimeLapScreen).data;
+  assert.doesNotThrow(() => new LapTracker(lapData));
+});
+
 test('Winter counts each car crossing the finish line, including after an icicle slowdown', () => {
+  const level = new GameLevelWinter({ path: '' });
+  const lapData = level.classes.find(({ class: ObjectType }) => ObjectType === TimeLapScreen).data;
   const screen = Object.create(TimeLapScreen.prototype);
   screen.gameEnv = { innerWidth: 1000, innerHeight: 1000, gameObjects: [] };
   screen.usePositionForLapTracking = true;
-  screen.lapTracker = new LapTracker({
-    finishLine: { x: 0.5, top: 0.764, bottom: 0.864 },
-    totalLaps: 3,
-  });
+  screen.lapTracker = new LapTracker(lapData);
   screen.winnerLabel = null;
   screen.raceStarted = false;
 
@@ -190,8 +196,8 @@ test('Winter counts each car crossing the finish line, including after an icicle
     { x: 0.45, y: 0.8 },
     { x: 0.55, y: 0.8 },
     { x: 0.9, y: 0.5 },
-    { x: 0.55, y: 0.2 },
-    { x: 0.45, y: 0.2 },
+    { x: 0.55, y: 0.245 },
+    { x: 0.45, y: 0.245 },
     { x: 0.1, y: 0.5 },
     { x: 0.45, y: 0.8 },
     { x: 0.55, y: 0.8 },
