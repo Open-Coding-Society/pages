@@ -77,6 +77,7 @@ export default class PlayerPlatformer extends Player {
       return;
     }
 
+    this.updateController();
     this.updateVelocity();
     this.updateDirection();
 

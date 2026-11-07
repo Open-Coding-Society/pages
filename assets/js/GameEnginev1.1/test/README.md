@@ -9,6 +9,42 @@ node --import ./assets/js/GameEnginev1.1/test/register-assets.mjs --test assets/
 
 ## Shared behavior
 
+`Character` owns the optional behavior-controller contract:
+`setController({ update(character) { ... } })`, `updateController()`, and
+`applyControlActions({ up, down, left, right })`. Actions are boolean snapshots;
+omitted actions release their controls. The engine adapts actions to the
+existing key mapping without synthesizing DOM keyboard events. RPG, Driver,
+and Platformer interpret the same actions using their own movement rules.
+Controllers run once before movement, do not advance while paused, and own
+input until `setController(null)` restores keyboard control. With no controller,
+existing input behavior is unchanged.
+
+```javascript
+player.setController({
+  update(character) {
+    character.applyControlActions({ right: true });
+  },
+});
+// Later, release the bot's controls and accept keyboard input again.
+player.setController(null);
+```
+
+For Player, right means moving right; for PlayerDriver, it means steering
+right; for PlayerPlatformer, it means running right. Navigation and patrol
+policies choose these actions; they do not replace movement or collision rules.
+The low-level Character hook also accepts behaviors that manipulate its velocity
+directly; the action-to-key adapter requires a Player's key mapping and movement
+methods.
+
+RacingBot is the first example: its controller invokes the Autumn route policy.
+Race-start waiting, finish rules, and spin recovery remain game-owned.
+`AutumnBotGenetics.js` also contains offline training, simulation, and track
+geometry; its length is not the size of the shared bot API. Those algorithms
+remain outside Character. NPC patrols can adopt the same controller hook
+without requiring a bot subclass; custom update loops must call
+`updateController()` before their movement, avoiding a second invocation in
+the parent update.
+
 `essentials/Player.js` already accepts `data.keypress` for remapping. It also
 prevents browser scrolling for movement arrows assigned to that player.
 Unassigned arrows, typing fields, browser shortcuts, and paused/detached games

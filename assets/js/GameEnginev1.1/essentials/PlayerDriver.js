@@ -44,6 +44,7 @@ export default class PlayerDriver extends Player {
       return;
     }
 
+    this.updateController();
     const { up, down, left, right } = this.keypress;
 
     if (this.pressedKeys[up]) {
@@ -71,6 +72,6 @@ export default class PlayerDriver extends Player {
     this.velocity.y = this.speed === 0 ? 0 : -Math.cos(this.heading) * this.speed;
     this.moved = this.speed !== 0;
 
-    super.update();
+    super.update(false);
   }
 }

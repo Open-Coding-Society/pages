@@ -56,6 +56,13 @@ export default class RacingBot extends PlayerCar {
     this.route = mode === 'ai'
       ? createRouteFromGenome(AUTUMN_BOT_GENOME)
       : mode === 'superEasy' ? createSuperEasyRoute(this.routeSeed) : createEasyRoute();
+    this.setController({
+      update: (character) => {
+        if (character.raceStarted && !character.raceFinished && !character.spinRecovery) {
+          character.updateBotControls();
+        }
+      },
+    });
   }
 
   updateBotControls() {
@@ -80,7 +87,7 @@ export default class RacingBot extends PlayerCar {
       reachDistance,
     );
 
-    // Convert steering and throttle decisions into the same key state used by PlayerCar.
+    // The engine maps semantic actions to this car's configured controls.
     const control = getBotControls({
       position: center,
       heading: this.heading,
@@ -91,12 +98,12 @@ export default class RacingBot extends PlayerCar {
       height: this.gameEnv.innerHeight,
       mode: this.mode,
     });
-    const { up, down, left, right } = this.keypress;
-    this.pressedKeys = {};
-    if (control.steer > 0) this.pressedKeys[right] = true;
-    if (control.steer < 0) this.pressedKeys[left] = true;
-    if (control.throttle > 0) this.pressedKeys[up] = true;
-    if (control.throttle < 0) this.pressedKeys[down] = true;
+    this.applyControlActions({
+      right: control.steer > 0,
+      left: control.steer < 0,
+      up: control.throttle > 0,
+      down: control.throttle < 0,
+    });
   }
 
   updateSpinRecoveryControls() {
@@ -167,7 +174,6 @@ export default class RacingBot extends PlayerCar {
       return;
     }
 
-    this.updateBotControls();
     super.update();
   }
 
