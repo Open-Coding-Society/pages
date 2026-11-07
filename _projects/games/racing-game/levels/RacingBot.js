@@ -46,6 +46,7 @@ export default class RacingBot extends PlayerCar {
       throw new RangeError(`Unknown racing bot mode: ${mode}`);
     }
 
+    // Reset navigation when switching difficulty so the bot starts on its new route.
     this.mode = mode;
     this.controlLabel = settings.label;
     this.waypointIndex = 1;
@@ -79,6 +80,7 @@ export default class RacingBot extends PlayerCar {
       reachDistance,
     );
 
+    // Convert steering and throttle decisions into the same key state used by PlayerCar.
     const control = getBotControls({
       position: center,
       heading: this.heading,

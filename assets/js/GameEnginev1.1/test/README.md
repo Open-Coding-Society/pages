@@ -4,7 +4,7 @@ Run from the repository root with Node.js 22.15+ (or a current LTS).
 No npm dependencies, browser, or site build are needed:
 
 ```sh
-node --import ./assets/js/GameEnginev1.1/test/register-assets.mjs --test assets/js/GameEnginev1.1/test/*.test.mjs _projects/games/racing-game/tests/racing-player.test.mjs
+node --import ./assets/js/GameEnginev1.1/test/register-assets.mjs --test assets/js/GameEnginev1.1/test/*.test.mjs _projects/games/racing-game/tests/racing-player.test.mjs _projects/games/platformer/tests/*.test.mjs
 ```
 
 ## Shared behavior
@@ -14,6 +14,33 @@ prevents browser scrolling for movement arrows assigned to that player.
 Unassigned arrows, typing fields, browser shortcuts, and paused/detached games
 retain their browser defaults. This cancels the default browser action, not
 event propagation or the engine's existing movement handling.
+
+`essentials/PlayerDriver.js` extends `Player` with throttle, braking, coasting,
+reverse, and steering controls. It accepts optional `data.driverPhysics`
+overrides; specialized games can also override the physics values after
+construction.
+
+`essentials/PlayerPlatformer.js` is a starter for side-view movement: mapped
+left/right keys move horizontally, up jumps once per press while supported,
+and gravity applies even when moving. Down does not fly or crouch. It keeps
+`Player.js` unchanged and disables its legacy gravity pass.
+
+The platformer game extends it in
+`_projects/games/platformer/levels/PlatformerPlayer.js`, using the engine's
+inherited circular collision detector, with platform contact responses,
+jump sound, and debug overlay local. There is no separate rectangular detector
+or rectangular support probe in the example. A new
+game must supply support/collision handling: override `hasSupport()` when
+needed, position the player on landing, then call `land()`; on an underside
+contact, position the player below the platform and call `hitCeiling()`.
+Override `onJump()` for sound or effects. Positive `verticalVelocity` means
+upward; `gravityAcceleration` and `jumpVelocity` are configurable through data.
+Physics retains the existing game's per-update units, not seconds.
+
+Student extension points include animation states, crouching, jump height,
+and platform contact responses using the shared engine detector. Keep game-specific assets and
+effects out of the engine, and test landings, ceilings, walking off edges,
+and held/released jump keys before changing collision behavior.
 
 Games can still override `handleKeyDown` and call `super.handleKeyDown(event)`.
 For example, RacingPlayer additionally rejects movement input during typing,
