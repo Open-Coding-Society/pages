@@ -18,7 +18,6 @@ export function startNavbarLogin({ session, spring, baseurl, pythonURI, fetchOpt
         waitForElement('#loginArea', 20, 100).then(loginArea => {
             session.currentUser()
                 .then(data => {
-                    console.log("Credentials data:", data); // Debugging line
                     window.user = data;
                     if (data) syncThemeOwner(data.uid);
                     if (data) { // Update the login area based on the data
@@ -193,9 +192,7 @@ export function courseNavigation({ baseurl, pythonURI, fetchOptions, courseEntry
             }
 
             const data = await response.json();
-            console.log("Course data:", data);
             const classes = data.class || [];
-            console.log("User classes:", classes);
 
             updateCourseEntry(links, classes);
 

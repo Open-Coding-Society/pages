@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
+import { inspect } from 'node:util';
 import vm from 'node:vm';
 import { FlaskSession, SpringSession } from '../js/session.js';
 import { fakeBackend, refuse, unreachable } from './fake-backend.mjs';
@@ -15,7 +16,6 @@ const { FormatConverter } = await import('../../../../assets/js/pages/dashboard/
 // browser (Node's vm still lets one through when the value is a function).
 const source = `'use strict';\n${readFileSync(new URL('../js/navbar-login.js', import.meta.url), 'utf8').replace(/^export /gm, '')}`;
 const ada = { uid: 'adalovelace', name: 'Ada Lovelace', roles: [{ name: 'Student' }] };
-const quiet = { log() {}, warn() {}, error() {} };
 
 // The parts of the site header the navbar touches: #loginArea (whose account menu button shows
 // the name, as the browser would parse it), the .trigger nav and its course link.
@@ -44,34 +44,44 @@ function fakePage() {
 }
 
 // Starts the navbar the way the site header does, loads the page, and waits for it to settle.
-// `preferences` is Spring's answer to the theme request (without it, a 404), and `saved` is what
-// this browser's localStorage already holds.
-async function startNavbar({ session, spring = null, preferences, saved = {} }) {
+// `preferences` is Spring's answer to the theme request (without it, a 404), `saved` is what this
+// browser's localStorage already holds, and `classes` is Flask's list of the student's classes.
+// Everything printed to the console while the navbar starts is kept in `printed`: the navbar's
+// own logs, and those of the session it was given, which runs outside the vm.
+async function startNavbar({ session, spring = null, preferences, saved = {}, classes = [] }) {
   const page = fakePage();
   const theme = { applied: [], resets: 0, applyPreferences(prefs) { this.applied.push(prefs); }, resetPreferences() { this.resets += 1; } };
   const window = { location: { href: 'https://site.test/preview/' }, SitePreferences: theme };
   const fetched = [];
   const storage = new Map(Object.entries(saved));
   const returns = [];
+  const printed = [];
+  const print = (...args) => printed.push(args.map((arg) => (typeof arg === 'string' ? arg : inspect(arg, { depth: null }))).join(' '));
   const context = vm.createContext({
-    document: page.document, window, console: quiet, setTimeout,
+    document: page.document, window, console: { log: print, info: print, debug: print, warn: print, error: print }, setTimeout,
     localStorage: { getItem: (key) => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value), removeItem: (key) => storage.delete(key) },
     fetch: async (url, options) => {
       fetched.push({ url, options });
-      if (url.endsWith('/api/user/class')) return { ok: true, json: async () => ({ class: [] }) };
+      if (url.endsWith('/api/user/class')) return { ok: true, json: async () => ({ class: classes }) };
       if (url.endsWith('/api/user/preferences') && preferences) return { ok: true, json: async () => preferences };
       return { ok: false, status: 404 };
     },
   });
-  vm.runInContext(source, context);
-  context.startNavbarLogin({
-    session, spring, baseurl: '/preview', pythonURI: 'http://flask.test', fetchOptions: {},
-    addLoginReturn: (...args) => returns.push(args), FormatConverter,
-    courseEntry: { savedCourse: () => null, selectEntryCourse: (classes, saved, fallback) => fallback, courseEntryUrl: (base, course) => `${base}/navigation/courses/${course}/` },
-  });
-  for (const listener of page.listeners.DOMContentLoaded) listener();
-  await new Promise((resolve) => setTimeout(resolve));
-  return { ...page, window, fetched, storage, returns };
+  const realConsole = { log: console.log, info: console.info, debug: console.debug, warn: console.warn, error: console.error };
+  Object.assign(console, { log: print, info: print, debug: print, warn: print, error: print });
+  try {
+    vm.runInContext(source, context);
+    context.startNavbarLogin({
+      session, spring, baseurl: '/preview', pythonURI: 'http://flask.test', fetchOptions: {},
+      addLoginReturn: (...args) => returns.push(args), FormatConverter,
+      courseEntry: { savedCourse: () => null, selectEntryCourse: (classes, saved, fallback) => fallback, courseEntryUrl: (base, course) => `${base}/navigation/courses/${course}/` },
+    });
+    for (const listener of page.listeners.DOMContentLoaded) listener();
+    await new Promise((resolve) => setTimeout(resolve));
+  } finally {
+    Object.assign(console, realConsole);
+  }
+  return { ...page, window, fetched, storage, returns, printed };
 }
 
 const springBackend = { baseUrl: 'http://spring.test', fetchOptions: { credentials: 'include' } };
@@ -88,6 +98,24 @@ test('a Flask-only navbar shows the account menu and never asks Spring', async (
   assert.deepEqual(menu.added, []);
   assert.deepEqual(flask.calls, ['GET /api/id']);
   assert.deepEqual(fetched.map(({ url }) => url), ['http://flask.test/api/user/class']);
+});
+
+// The navbar runs on every page, so anything it prints shows in the console of every page a student
+// opens while signed in.
+test("the navbar never prints the student's account or classes to the console", async () => {
+  const account = { ...ada, email: 'ada@school.test', sid: '9100100' };
+  const flask = () => fakeBackend({ 'GET /api/id': account });
+  const sites = [
+    { session: new FlaskSession({ flask: flask() }), spring: null },
+    { session: new SpringSession({ flask: flask(), spring: fakeBackend({ 'GET /api/person/get': { id: 42, email: 'ada@school.test' } }) }), spring: springBackend },
+  ];
+  for (const { session, spring } of sites) {
+    const { printed, window } = await startNavbar({ session, spring, classes: ['csa-period-3'] });
+    assert.equal(window.user?.uid, 'adalovelace', 'the navbar should have signed in, or this test proves nothing');
+    for (const detail of ['adalovelace', 'Ada Lovelace', 'ada@school.test', '9100100', 'csa-period-3']) {
+      assert.equal(printed.some((line) => line.includes(detail)), false, `the console shows ${detail}:\n${printed.join('\n')}`);
+    }
+  }
 });
 
 test('the navbar warns in the account menu when Spring has not signed this browser in', async () => {
