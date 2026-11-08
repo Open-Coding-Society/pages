@@ -149,11 +149,13 @@
         },
         
         /**
-         * Update button after completion
+         * Update the lesson's buttons after completion. Each button carries its lesson's id,
+         * so match the buttons themselves: on FRQ pages the first element with that id is
+         * the button, which has no .mark-complete-btn inside it.
          */
         markButtonAsCompleted: function(lessonId) {
-            const button = document.querySelector(`[data-lesson-id="${lessonId}"], [data-lesson="${lessonId}"]`)?.querySelector('.mark-complete-btn');
-            if (button) {
+            document.querySelectorAll('.mark-complete-btn').forEach(button => {
+                if (button.dataset.lessonId !== lessonId) return;
                 button.classList.add('completed');
                 button.style.backgroundColor = '#6b7280';
                 button.style.cursor = 'not-allowed';
@@ -164,7 +166,7 @@
                     Lesson Completed
                 `;
                 button.disabled = true;
-            }
+            });
         },
         
         /**

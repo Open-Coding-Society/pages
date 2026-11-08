@@ -128,6 +128,17 @@ test('an FRQ page saves its completion in the browser and sends no request', asy
   assert.match(savedButton.innerHTML, /Lesson Completed/);
 });
 
+test('the FRQ button says Lesson Completed as soon as it is clicked, without a reload', () => {
+  const page = openPage('/csa/frqs/2016/3', lessonScript);
+  const button = page.pageContent.querySelector('.mark-complete-btn');
+
+  button.click();
+
+  assert.equal(button.disabled, true, 'a completed lesson cannot be marked again');
+  assert.match(button.innerHTML, /Lesson Completed/);
+  assert.doesNotMatch(button.innerHTML, /Mark Lesson Complete/);
+});
+
 test('a Big Six lesson marks its module done for the hub and sends no request', async () => {
   const page = openPage('/bigsix/frontend_lesson', bigSixScript);
   const button = page.body.querySelector('.mark-complete-btn');

@@ -187,6 +187,7 @@ these layers.
   ranges, `?q=` state and search bar states.
 - `node --test tests/mark_complete_button.test.mjs`: the "Mark Lesson Complete"
   buttons save completion in the browser (and the Big Six hub's keys) and send
-  no request, since Flask and Spring have no `/api/lessons/complete` route.
+  no request, since Flask and Spring have no `/api/lessons/complete` route. The
+  FRQ button says "Lesson Completed" as soon as it is clicked.
 - Jekyll/Ruby-Sass builds and browser checks cover published document and reader
   views; interactive services also depend on their backend/runtime availability.
