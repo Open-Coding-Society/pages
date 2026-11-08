@@ -13,6 +13,11 @@ export class FlaskSession {
     return false;
   }
 
+  // Whether signing up this account also creates a Spring account.
+  createsSpringAccount(account) {
+    return false;
+  }
+
   // Creates the account in Flask. Resolves { flask: true, spring }, where spring is null here and,
   // in SpringSession, a promise of Spring's own result, so the page can show Flask's result first.
   // Rejects with a BackendError whose message is what to show (status 0: Flask is unreachable).
@@ -67,11 +72,17 @@ export class SpringSession extends FlaskSession {
     return true;
   }
 
+  // A guest never gets a Spring account: it would be a full account.
+  createsSpringAccount(account) {
+    return account.accountType !== 'guest';
+  }
+
   // After Flask accepts the account, creates it in Spring as well. `spring` is a promise of
   // { created, error } that never rejects; error is Spring's own text, "HTTP <status>", or
   // "Spring server unreachable".
   async signUp(account) {
     const result = await super.signUp(account);
+    if (!this.createsSpringAccount(account)) return result;
     return { ...result, spring: this.#createSpringAccount(account) };
   }
 

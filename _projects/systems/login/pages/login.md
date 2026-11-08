@@ -139,14 +139,17 @@ show_reading_time: false
 </div>
 
 <script type="module">
-    import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, springEnabled } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, springEnabled } from '{{site.baseurl}}/assets/js/api/config.js';
     import { loginReturnPath } from '{{site.baseurl}}/assets/js/api/login-return.js';
     import { reverifyNeeded, staffMustVerify, reverify } from '{{site.baseurl}}/assets/js/api/reverify.js';
     import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
+    import { createBackends } from '{{site.baseurl}}/assets/js/login/backend.js';
+    import { createSession } from '{{site.baseurl}}/assets/js/login/session.js';
     import { startLoginPage } from '{{site.baseurl}}/assets/js/login/login-page.js';
 
     startLoginPage({
-        login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, springEnabled, loginReturnPath,
+        session: createSession(createBackends({ pythonURI, javaURI, fetchOptions, springEnabled })),
+        pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, loginReturnPath,
         reverifyNeeded, staffMustVerify, reverify,
         SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist,
         baseurl: {{ site.baseurl | jsonify }},

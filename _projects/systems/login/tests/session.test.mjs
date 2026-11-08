@@ -129,3 +129,15 @@ test('createSession picks the class from the spring backend', () => {
   assert.equal(createSession({ flask, spring: null }) instanceof SpringSession, false);
   assert.ok(createSession({ flask, spring: fakeBackend() }) instanceof SpringSession);
 });
+
+test('a guest gets no Spring account, even on a site with Spring', async () => {
+  const flask = fakeBackend({ 'POST /api/user': { uid: 'guest1' } });
+  const spring = fakeBackend();
+  const session = new SpringSession({ flask, spring });
+  assert.equal(session.createsSpringAccount({ accountType: 'student' }), true);
+  assert.equal(session.createsSpringAccount({ accountType: 'guest' }), false);
+  assert.equal(new FlaskSession({ flask }).createsSpringAccount({ accountType: 'student' }), false);
+  const created = await session.signUp({ ...account, accountType: 'guest' });
+  assert.equal(created.spring, null);
+  assert.deepEqual(spring.calls, []);
+});

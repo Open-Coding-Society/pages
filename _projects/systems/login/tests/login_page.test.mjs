@@ -18,3 +18,11 @@ test('login page starts from one module', () => {
 test('login page module has no Liquid, since published scripts are not rendered', () => {
   assert.doesNotMatch(read('js/login-page.js'), /\{\{|\{%/);
 });
+
+test('the login page never checks springEnabled', () => {
+  assert.doesNotMatch(read('js/login-page.js'), /springEnabled/);
+});
+
+test('the login page signs up, in and out only through the session', () => {
+  assert.doesNotMatch(read('js/login-page.js'), /\/api\/authenticate|\/api\/person\/|\/authenticate`|\/api\/user`/);
+});
