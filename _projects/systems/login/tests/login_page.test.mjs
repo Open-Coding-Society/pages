@@ -21,6 +21,10 @@ test("login page takes baseurl from config.js, like the header's starter", () =>
   const page = read('pages/login.md');
   assert.match(page, /import \{[^}]*\bbaseurl\b[^}]*\} from '\{\{ ?site\.baseurl ?\}\}\/assets\/js\/api\/config\.js'/);
   assert.doesNotMatch(page, /jsonify/);
+  const start = page.indexOf('startLoginPage({');
+  const call = page.slice(start, page.indexOf('});', start));
+  assert.match(call, /[\s,{]baseurl\s*,/, 'startLoginPage should get the baseurl imported from config.js');
+  assert.doesNotMatch(call, /baseurl\s*:/);
 });
 
 test('login page module has no Liquid, since published scripts are not rendered', () => {

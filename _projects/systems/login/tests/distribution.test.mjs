@@ -56,17 +56,27 @@ test('every published login file is git-ignored so copies are never committed', 
   }
 });
 
+// A page's import fails to link if the name isn't exported where it points, so check both ways:
+// each Login export comes from the path the system publishes it to, and a page asks a Login
+// script only for names that script exports.
 test('pages import each Login export from the path the system publishes it to', () => {
   const publishedAt = new Map();
+  const exportsAt = new Map();
   for (const { source, destination } of distribution().filter((entry) => entry.source.endsWith('.js'))) {
     const code = readFileSync(new URL(source, system), 'utf8');
-    for (const [, name] of code.matchAll(/^export (?:async )?(?:function|class|const) (\w+)/gm)) publishedAt.set(name, destination);
+    const names = [...code.matchAll(/^export (?:async )?(?:function|class|const) (\w+)/gm)].map((match) => match[1]);
+    for (const name of names) publishedAt.set(name, destination);
+    exportsAt.set(destination, new Set(names));
   }
   for (const importer of IMPORTERS) {
     const page = readFileSync(new URL(importer, root), 'utf8');
-    for (const [, names, path] of page.matchAll(/import \{([^}]*)\} from '\{\{ ?site\.baseurl ?\}\}\/([^']+)'/g)) {
-      for (const name of names.split(',').map((part) => part.trim()).filter((part) => publishedAt.has(part))) {
-        assert.equal(path, publishedAt.get(name), `${importer} imports ${name} from ${path}`);
+    const imports = [...page.matchAll(/import \{([^}]*)\} from (['"])\{\{ ?site\.baseurl ?\}\}\/([^'"]+)\2/g)];
+    assert.ok(imports.some(([, , , path]) => exportsAt.has(path)), `${importer} imports no Login script, so it doesn't belong in IMPORTERS`);
+    for (const [, list, , path] of imports) {
+      const names = list.split(',').map((part) => part.trim().split(/\s+as\s+/)[0]).filter(Boolean);
+      for (const name of names) {
+        if (exportsAt.has(path)) assert.ok(exportsAt.get(path).has(name), `${importer} imports ${name} from ${path}, which doesn't export it`);
+        if (publishedAt.has(name)) assert.equal(path, publishedAt.get(name), `${importer} imports ${name} from ${path}`);
       }
     }
   }

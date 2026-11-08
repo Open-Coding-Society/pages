@@ -61,8 +61,9 @@ test('sign-up and sign-in send the account and the credentials to both backends 
   const student = { ...account, accountType: 'student', idToken: 'google-id-token' };
   await (await session.signUp(student)).spring;
   await session.signIn('adalovelace', 'secret-Password-1');
-  assert.deepEqual(flask.bodies['POST /api/user'], student);
-  assert.deepEqual(spring.bodies['POST /api/person/create'], student);
+  const sent = { name: 'Ada Lovelace', uid: 'adalovelace', password: 'secret-Password-1', accountType: 'student', idToken: 'google-id-token' };
+  assert.deepEqual(flask.bodies['POST /api/user'], sent);
+  assert.deepEqual(spring.bodies['POST /api/person/create'], sent);
   const credentials = { uid: 'adalovelace', password: 'secret-Password-1' };
   assert.deepEqual(flask.bodies['POST /api/authenticate'], credentials);
   assert.deepEqual(spring.bodies['POST /authenticate'], credentials);

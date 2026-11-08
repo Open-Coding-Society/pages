@@ -5,11 +5,14 @@ import vm from 'node:vm';
 import { FlaskSession, SpringSession } from '../js/session.js';
 import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules } from '../js/password-rules.js';
 import { reverifyNeeded, staffMustVerify } from '../js/reverify.js';
+import { loginReturnPath } from '../../../../assets/js/api/login-return.js';
 import { fakeBackend, refuse, unreachable } from './fake-backend.mjs';
 
 // /login as a visitor uses it: login-page.js imports nothing, so it runs in a vm whose globals are
-// a fake page, and the real session classes talk to fake backends.
-const source = readFileSync(new URL('../js/login-page.js', import.meta.url), 'utf8').replace(/^export /gm, '');
+// a fake page, and the real session classes talk to fake backends. A module is strict, so the vm
+// runs it in strict mode too (Node's vm still lets an undeclared write through when the value is a
+// function).
+const source = `'use strict';\n${readFileSync(new URL('../js/login-page.js', import.meta.url), 'utf8').replace(/^export /gm, '')}`;
 const quiet = { log() {}, warn() {}, error() {} };
 const LOGIN_URL = 'https://site.test/preview/login';
 
@@ -36,40 +39,41 @@ function fakeElement() {
   };
 }
 
-function startPage({ session, returnPath = null }) {
+function startPage({ session, referrer = '' }) {
   const elements = new Map();
   const element = (id) => elements.get(id) ?? elements.set(id, fakeElement()).get(id);
   const link = () => ({ href: '', textContent: '', listeners: {}, addEventListener(type, listener) { this.listeners[type] = listener; } });
+  // The page gets a window object of its own, apart from the vm's global, and the tests call the
+  // functions the markup calls on it: a page that dropped `window.` from one would fail here.
+  const window = { location: { href: LOGIN_URL }, addEventListener() {} };
   const context = vm.createContext({
-    document: { referrer: '', getElementById: element, querySelector: () => element('signup-button'), createElement: link },
-    location: { href: LOGIN_URL },
-    console: quiet, atob, addEventListener() {},
+    document: { referrer, getElementById: element, querySelector: () => element('signup-button'), createElement: link },
+    window, console: quiet, atob,
     alert: (text) => { throw new Error(`The page alerted: ${text}`); },
     setTimeout: (callback) => { callback(); return 0; }, clearTimeout() {},
     fetch: async () => ({ ok: false, status: 404 }), // no Guest Window is open
   });
-  context.window = context;
   vm.runInContext(source, context);
   context.startLoginPage({
     session, pythonURI: 'http://flask.test', javaURI: 'http://spring.test', fetchOptions: {}, GOOGLE_CLIENT_ID: 'client-id',
-    loginReturnPath: () => returnPath, reverifyNeeded, staffMustVerify, reverify: async () => ({ ok: true, message: '' }),
+    loginReturnPath, reverifyNeeded, staffMustVerify, reverify: async () => ({ ok: true, message: '' }),
     SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist() {},
     baseurl: '/preview',
   });
   const settle = () => new Promise((resolve) => setImmediate(resolve));
   return {
-    element, context, settle,
+    element, window, settle,
     async signIn() {
       element('uid').value = 'adalovelace';
       element('password').value = 'secret-Password-1';
-      context.loginBoth();
+      window.loginBoth();
       await settle();
     },
     async signUp(role) {
       const fields = { name: 'Ada Lovelace', signupUid: 'adalovelace', signupSid: '1234567', signupSchool: 'Del Norte', signupEmail: 'ada@example.com', signupPassword: 'Secret-Password-1!', confirmPassword: 'Secret-Password-1!', signupRole: role };
       for (const [id, value] of Object.entries(fields)) element(id).value = value;
       element('signupRole').dispatch('change');
-      context.handleSignupSubmit({ preventDefault() {} });
+      window.handleSignupSubmit({ preventDefault() {} });
       await settle();
     },
   };
@@ -82,27 +86,31 @@ test('a Flask-only site hides the Spring status and signs in to /profile', async
   const page = startPage({ session: new FlaskSession({ flask: signedIn() }) });
   assert.equal(page.element('springStatus').style.display, 'none');
   await page.signIn();
-  assert.equal(page.context.location.href, '/preview/profile');
+  assert.equal(page.window.location.href, '/preview/profile');
 });
 
-test('signing in returns to the page the visitor came from', async () => {
-  const page = startPage({ session: new SpringSession({ flask: signedIn(), spring: springAccepts() }), returnPath: '/preview/topics/' });
+test('signing in returns to the page the visitor came from, if it is on this site', async () => {
+  const page = startPage({ session: new SpringSession({ flask: signedIn(), spring: springAccepts() }), referrer: 'https://site.test/preview/topics/' });
   assert.notEqual(page.element('springStatus').style.display, 'none');
   await page.signIn();
-  assert.equal(page.context.location.href, '/preview/topics/');
+  assert.equal(page.window.location.href, '/preview/topics/');
+  // A page outside the site's baseurl is no return path, so the visitor goes to /profile.
+  const elsewhere = startPage({ session: new FlaskSession({ flask: signedIn() }), referrer: 'https://site.test/other/' });
+  await elsewhere.signIn();
+  assert.equal(elsewhere.window.location.href, '/preview/profile');
 });
 
 test('a guest goes to the home page, since guests have no profile', async () => {
   const page = startPage({ session: new FlaskSession({ flask: signedIn({ user: { limited: true } }) }) });
   await page.signIn();
-  assert.equal(page.context.location.href, '/preview/');
+  assert.equal(page.window.location.href, '/preview/');
 });
 
 test('when only Spring refuses, the page stays and says what will not work', async () => {
   const spring = fakeBackend({ 'POST /authenticate': refuse(401) });
   const page = startPage({ session: new SpringSession({ flask: signedIn(), spring }) });
   await page.signIn();
-  assert.equal(page.context.location.href, LOGIN_URL);
+  assert.equal(page.window.location.href, LOGIN_URL);
   const message = page.element('message');
   assert.match(message.textContent, /^Signed in to Flask, but the Spring server rejected this login, so DMs, calendar and announcements will not work\./);
   const links = message.children.filter((node) => typeof node !== 'string').map(({ href, textContent }) => [textContent, href]);
@@ -119,7 +127,7 @@ test('a refused or failed sign-in shows the same words as before', async () => {
     const page = startPage({ session: new FlaskSession({ flask: signedIn(answer) }) });
     await page.signIn();
     assert.equal(page.element('message').textContent, words);
-    assert.equal(page.context.location.href, LOGIN_URL);
+    assert.equal(page.window.location.href, LOGIN_URL);
   }
 });
 
@@ -127,10 +135,10 @@ test('a student whose verification lapsed verifies with Google before going on',
   const page = startPage({ session: new FlaskSession({ flask: signedIn({ user: { verification_required: true, verified_by_google: true } }) }) });
   await page.signIn();
   assert.equal(page.element('reverify').style.display, 'block');
-  assert.equal(page.context.location.href, LOGIN_URL);
-  page.context.handleGoogleSignIn({ credential: 'google-id-token' });
+  assert.equal(page.window.location.href, LOGIN_URL);
+  page.window.handleGoogleSignIn({ credential: 'google-id-token' });
   await page.settle();
-  assert.equal(page.context.location.href, '/preview/profile');
+  assert.equal(page.window.location.href, '/preview/profile');
 });
 
 test("a mentor whose verification lapsed is told to ask staff, and can continue", async () => {
@@ -139,7 +147,7 @@ test("a mentor whose verification lapsed is told to ask staff, and can continue"
   const message = page.element('message');
   assert.equal(message.textContent, 'Your verification has lapsed. Ask your Teacher or Admin to verify your account. Continue');
   message.children[1].listeners.click({ preventDefault() {} });
-  assert.equal(page.context.location.href, '/preview/profile');
+  assert.equal(page.window.location.href, '/preview/profile');
 });
 
 test('sign-up on a Flask-only site shows Flask\'s result alone', async () => {
@@ -184,12 +192,12 @@ test('a student signs up only after Google confirms a school email', async () =>
   const page = startPage({ session: new FlaskSession({ flask }) });
   await page.signUp('student');
   assert.equal(page.element('oauth-verification').style.display, 'block');
-  page.context.handleGoogleSignIn({ credential: googleToken('ada@gmail.com') });
+  page.window.handleGoogleSignIn({ credential: googleToken('ada@gmail.com') });
   await page.settle();
   assert.match(page.element('oauth-status').innerHTML, /You must use your school email address/);
   assert.deepEqual(flask.calls, []);
   const token = googleToken('ada@stu.powayusd.com');
-  page.context.handleGoogleSignIn({ credential: token });
+  page.window.handleGoogleSignIn({ credential: token });
   await page.settle();
   assert.equal(page.element('overallStatus').textContent, '🎉 Account created! You can now login.');
   assert.deepEqual({ ...flask.bodies['POST /api/user'] }, { name: 'Ada Lovelace', uid: 'adalovelace', sid: '1234567', school: 'Del Norte', email: 'ada@example.com', password: 'Secret-Password-1!', accountType: 'student', idToken: token });

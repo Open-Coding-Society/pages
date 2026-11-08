@@ -35,8 +35,9 @@ test('course aliases normalize and invalid selections cannot form a URL', () => 
 test('header routes guests and enrolled users directly without rewriting unrelated links', async () => {
   const source = readFileSync(new URL('../../login/js/navbar-login.js', import.meta.url), 'utf8');
   // The header starts the navbar, which sets the course link as soon as it loads; the session never
-  // answers here, so only that load-time update runs.
-  const routing = `${source.replace(/^export /gm, '')}
+  // answers here, so only that load-time update runs. A module is strict, so the vm runs the navbar
+  // in strict mode too, as the browser does.
+  const routing = `'use strict';\n${source.replace(/^export /gm, '')}
     const courseEntry = { savedCourse, selectEntryCourse, courseEntryUrl };
     startNavbarLogin({ session: { currentUser: () => new Promise(() => {}) }, spring: null, baseurl, pythonURI, fetchOptions, addLoginReturn() {}, courseEntry });
     const { updateNavigation } = courseNavigation({ baseurl, pythonURI, fetchOptions, courseEntry });`;
