@@ -34,9 +34,12 @@ test('course aliases normalize and invalid selections cannot form a URL', () => 
 
 test('header routes guests and enrolled users directly without rewriting unrelated links', async () => {
   const source = readFileSync(new URL('../../login/js/navbar-login.js', import.meta.url), 'utf8');
+  // The header starts the navbar, which sets the course link as soon as it loads; the session never
+  // answers here, so only that load-time update runs.
   const routing = `${source.replace(/^export /gm, '')}
-    const { updateNavigation, updateCourseEntry } = courseNavigation({ baseurl, pythonURI, fetchOptions, courseEntry: { savedCourse, selectEntryCourse, courseEntryUrl } });
-    updateCourseEntry(document.querySelectorAll('[data-course-entry]'));`;
+    const courseEntry = { savedCourse, selectEntryCourse, courseEntryUrl };
+    startNavbarLogin({ session: { currentUser: () => new Promise(() => {}) }, spring: null, baseurl, pythonURI, fetchOptions, addLoginReturn() {}, courseEntry });
+    const { updateNavigation } = courseNavigation({ baseurl, pythonURI, fetchOptions, courseEntry });`;
   const courseLink = { dataset: { defaultCourse: 'csse' }, href: '', textContent: '' };
   const trigger = { querySelectorAll: selector => {
     assert.equal(selector, '[data-course-entry]');
@@ -46,6 +49,7 @@ test('header routes guests and enrolled users directly without rewriting unrelat
   let classes = ['CSA'];
   const context = vm.createContext({
     document: {
+      addEventListener() {},
       querySelector: () => trigger,
       querySelectorAll: () => [courseLink],
     },

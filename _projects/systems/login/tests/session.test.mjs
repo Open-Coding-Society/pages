@@ -1,27 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { BackendError } from '../js/backend.js';
 import { FlaskSession, SpringSession, createSession } from '../js/session.js';
+import { fakeBackend, refuse, unreachable } from './fake-backend.mjs';
 
-// A fake backend: `answers` maps "METHOD /path" to a value to resolve, or to a function that
-// throws. Every request is recorded as "METHOD /path", and its body in `bodies` under that key.
-function fakeBackend(answers = {}) {
-  const calls = [];
-  const bodies = {};
-  return {
-    calls,
-    bodies,
-    async request(path, { method = 'GET', body } = {}) {
-      const key = `${method} ${path}`;
-      calls.push(key);
-      if (body !== undefined) bodies[key] = body;
-      const answer = answers[key];
-      return typeof answer === 'function' ? answer() : answer ?? null;
-    },
-  };
-}
-const refuse = (status, body = null, method = 'POST', path = '/') => () => { throw new BackendError({ status, method, path, body }); };
-const unreachable = () => () => { throw new BackendError({ status: 0, method: 'GET', path: '/', cause: new TypeError('Failed to fetch') }); };
 const springMustNotBeCalled = { request: async (path) => { throw new Error(`Spring was called: ${path}`); } };
 const account = { name: 'Ada Lovelace', uid: 'adalovelace', password: 'secret-Password-1' };
 
