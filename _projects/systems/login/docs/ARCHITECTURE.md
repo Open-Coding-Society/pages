@@ -88,8 +88,8 @@ the account in Flask (`POST /api/user`), then Spring (`POST /api/person/create`)
 ## Changing `spring`
 
 Each starter reads `springEnabled` from `config.js` when the page runs, never through
-Liquid, and passes it to `createBackends`; the page and navbar modules only see the
-session. `config.js` has `regenerate: true` in its front matter, so an incremental build
+Liquid, and passes it to `createBackends`. `login-page.js` sees only the session, and
+`navbar-login.js` also gets `spring`, the Spring backend or `null`, for the theme sync. `config.js` has `regenerate: true` in its front matter, so an incremental build
 picks up a change to `spring` in `_config.yml`.
 
 ## Old checkouts
@@ -111,7 +111,9 @@ copies.
   where each sign-in goes, what the page says when only Spring refuses, the error texts,
   re-verification, the staff notice, and every sign-up outcome.
 - `tests/navbar.test.mjs`: the navbar on a fake page: the account menu, the Spring sign-in
-  warning (never on a Flask-only site or for a guest), and the Login link.
+  warning (never on a Flask-only site, for a guest, or when Spring can't be reached), the
+  student's theme from Spring (with the dashboard's `FormatConverter`), the return path on
+  login links, and the Login link.
 - `tests/imports.test.mjs`: every import (named, bare or dynamic) is a `./` path to a file
   published beside the importer, importing the navbar script starts nothing, logout waits
   for the session to sign out, and the navbar never reads `springEnabled`.
@@ -122,5 +124,6 @@ copies.
   Spring fails, still signs out of Spring when Flask refuses, and gives a guest no Spring
   account.
 - Outside this folder, Courses' `course_entry.test.mjs` starts the navbar for its course
-  link, and `tests/microblog_review.test.mjs` is the only test that runs
-  `js/password-rules.js`.
+  link, and `tests/microblog_review.test.mjs` checks the review page's guest passwords
+  against `js/password-rules.js` (`signin_signup.test.mjs` runs the same rules through
+  sign-up).

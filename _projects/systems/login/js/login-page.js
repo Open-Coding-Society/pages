@@ -1,5 +1,6 @@
 // The /login page: sign-in, sign-up and Google re-verification. `session` is a FlaskSession, or a
-// SpringSession on a site that also runs Spring, so the page never asks which backends it has.
+// SpringSession on a site that also runs Spring, so the page asks the session (usesSpring,
+// createsSpringAccount) and never reads the site's spring setting itself.
 // It is published to assets/js/login/, so the page's starter passes in every shared helper.
 export function startLoginPage({
     session, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, loginReturnPath,

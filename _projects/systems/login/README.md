@@ -30,13 +30,20 @@ In dual login, Flask's step must work. If only Spring's step fails, sign-up and 
 still work in Flask, and the login page warns that DMs, calendar and announcements
 won't; at sign-in it also offers Continue anyway.
 
-In this system the setting decides whether sign-up, sign-in and logout use Spring,
-and whether the navbar checks the Spring sign-in and loads the student's theme from
-Spring. Outside it, it covers Profile, the navbar's DM bell (its unread count), the
-Courses calendar card, the UI Builder, and chats embedded with Messages'
-`conversation-embed.js`. `/dm`, `/student/calendar` and the announcement chats don't
-read it yet, and some links still lead to them: Profile's Reset password and Skill
-Passport, and the toolkit sidebar's View Grades, Calendar and Bathroom Pass.
+On `/login`, `/logout` and in the navbar, the setting decides whether sign-up,
+sign-in and logout use Spring, and whether the navbar checks the Spring sign-in and
+loads the student's theme from Spring. `/signup` and `/guestlogin` don't read it yet,
+so they call Spring even with `spring: false`. Outside this system it covers Profile,
+the navbar's DM bell (its unread count), the Courses calendar card, the UI Builder, and
+chats embedded with Messages' `conversation-embed.js`.
+
+Many pages that use Spring don't read it yet, such as `/dm`, `/student/calendar` and
+the announcement chats, and some links still lead to pages that call Spring: Profile's
+Reset password (`/support`) and Skill Passport (`/analytics-dashboard`), and the
+toolkit sidebar's View Grades, Calendar and Bathroom Pass. The site's analytics
+tracker (`assets/js/ocs-analytics-tracker.js`, which `_includes/head-custom.html` loads
+on most pages, `/login` and `/logout` included) also sends to Spring once a visitor
+clicks or types, whatever the setting.
 
 What Profile does in each is in the [Profile README](../profile/README.md#flask-only-or-flask--spring).
 
@@ -67,7 +74,7 @@ browser can't pair the new header with a cached copy of the old `login.js`.
 
 ## Sessions
 
-Sign-up, sign-in, logout and the signed-in user are two classes in `js/session.js`:
+Two classes in `js/session.js` handle sign-up, sign-in, logout and the signed-in user:
 
 - `FlaskSession` is the core every site has. It does each step on Flask.
 - `SpringSession extends FlaskSession` for sites that also run Spring. Sign-up and
@@ -81,7 +88,8 @@ A starter builds them with `createSession(createBackends({ pythonURI, javaURI, f
 springEnabled }))`: `createBackends` makes a Spring backend only when `springEnabled` is
 true, and `createSession` picks `SpringSession` only when there is one. So only the
 starters read `springEnabled`, and `login-page.js` and `navbar-login.js` ask
-`session.usesSpring` instead.
+`session.usesSpring` instead. The navbar's theme sync also uses the Spring backend the
+header passes it, which is `null` on a Flask-only site.
 
 ## Imports
 
@@ -100,8 +108,9 @@ module may import only a file this system publishes beside it;
 node --test _projects/systems/login/tests/*.test.mjs
 ```
 
-The `tests/login_*.test.mjs` files at the repo root run the same tests with the rest of
-`node --test tests/*.test.mjs`. Two tests outside this folder also run Login code:
+The one-line `tests/login_*.test.mjs` wrappers at the repo root run the same tests with
+the rest of `node --test tests/*.test.mjs` (`tests/login_return.test.mjs` isn't one of
+them; it tests `assets/js/api/login-return.js`). Two tests outside this folder also run Login code:
 Courses' `course_entry.test.mjs` starts the navbar for its course link, and
 `tests/microblog_review.test.mjs` checks the review page's guest passwords against
 `js/password-rules.js`.
