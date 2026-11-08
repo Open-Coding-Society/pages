@@ -13,7 +13,8 @@ const modules = readdirSync(new URL('js/', system)).filter((name) => name.endsWi
 test('login modules import only ./ paths published beside them', () => {
   for (const source of modules) {
     const code = readFileSync(new URL(source, system), 'utf8');
-    const specifiers = [...code.matchAll(/(?:from\s+|import\s*\()\s*['"]([^'"]+)['"]/g)].map((match) => match[1]);
+    // Named (`from '…'`), bare (`import '…'`) and dynamic (`import('…')`) imports.
+    const specifiers = [...code.matchAll(/\b(?:from|import)\s*\(?\s*['"]([^'"]+)['"]/g)].map((match) => match[1]);
     for (const specifier of specifiers) {
       assert.ok(specifier.startsWith('./'), `${source} imports ${specifier}`);
       const target = posix.join(posix.dirname(published.get(source)), specifier);
@@ -27,11 +28,12 @@ test('importing the navbar script does nothing until it is started', async () =>
   assert.equal(typeof navbar.startNavbarLogin, 'function');
 });
 
-test('logout signs out through the session', async () => {
+// /logout redirects to /login as soon as handleLogout resolves, so it must wait for the sign-out.
+test('logout signs out through the session and waits for it', async () => {
   const { handleLogout } = await import('../js/logout.js');
-  const signedOut = [];
-  await handleLogout({ signOut: async () => { signedOut.push('signOut'); } });
-  assert.deepEqual(signedOut, ['signOut']);
+  const steps = [];
+  await handleLogout({ signOut: async () => { await new Promise((resolve) => setTimeout(resolve)); steps.push('signed out'); } });
+  assert.deepEqual(steps, ['signed out']);
 });
 
 test('the navbar never checks springEnabled; it asks the session', () => {

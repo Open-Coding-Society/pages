@@ -4,14 +4,17 @@ import { BackendError } from '../js/backend.js';
 import { FlaskSession, SpringSession, createSession } from '../js/session.js';
 
 // A fake backend: `answers` maps "METHOD /path" to a value to resolve, or to a function that
-// throws. Every request is recorded as "METHOD /path".
+// throws. Every request is recorded as "METHOD /path", and its body in `bodies` under that key.
 function fakeBackend(answers = {}) {
   const calls = [];
+  const bodies = {};
   return {
     calls,
-    async request(path, { method = 'GET' } = {}) {
+    bodies,
+    async request(path, { method = 'GET', body } = {}) {
       const key = `${method} ${path}`;
       calls.push(key);
+      if (body !== undefined) bodies[key] = body;
       const answer = answers[key];
       return typeof answer === 'function' ? answer() : answer ?? null;
     },
@@ -59,6 +62,29 @@ test('signIn signs in to Spring and reads the Spring account', async () => {
   const spring = fakeBackend({ 'POST /authenticate': 'Authenticated', 'GET /api/person/get': { id: 42 } });
   assert.equal((await new SpringSession({ flask, spring }).signIn('adalovelace', 'pw')).spring, true);
   assert.deepEqual(spring.calls, ['POST /authenticate', 'GET /api/person/get']);
+});
+
+// Spring can accept the password and still not keep the browser signed in (its cookie dropped),
+// which the account read catches.
+test('signIn reports Spring as refused when the Spring account read fails', async () => {
+  const flask = fakeBackend({ 'POST /api/authenticate': { message: 'signed in' } });
+  const spring = fakeBackend({ 'POST /authenticate': 'Authenticated', 'GET /api/person/get': refuse(401, null, 'GET', '/api/person/get') });
+  const result = await new SpringSession({ flask, spring }).signIn('adalovelace', 'pw');
+  assert.deepEqual(result, { flask: { message: 'signed in' }, spring: false });
+});
+
+test('sign-up and sign-in send the account and the credentials to both backends unchanged', async () => {
+  const flask = fakeBackend({ 'POST /api/user': { uid: 'adalovelace' }, 'POST /api/authenticate': { message: 'signed in' } });
+  const spring = fakeBackend({ 'POST /authenticate': 'Authenticated', 'GET /api/person/get': { id: 42 } });
+  const session = new SpringSession({ flask, spring });
+  const student = { ...account, accountType: 'student', idToken: 'google-id-token' };
+  await (await session.signUp(student)).spring;
+  await session.signIn('adalovelace', 'secret-Password-1');
+  assert.deepEqual(flask.bodies['POST /api/user'], student);
+  assert.deepEqual(spring.bodies['POST /api/person/create'], student);
+  const credentials = { uid: 'adalovelace', password: 'secret-Password-1' };
+  assert.deepEqual(flask.bodies['POST /api/authenticate'], credentials);
+  assert.deepEqual(spring.bodies['POST /authenticate'], credentials);
 });
 
 test("signUp rejects with Flask's own message, or names the status", async () => {
@@ -109,6 +135,15 @@ test('signOut still signs out of Flask when Spring is down', async () => {
   await new SpringSession({ flask, spring }).signOut();
   assert.deepEqual(flask.calls, ['DELETE /api/authenticate']);
   assert.deepEqual(spring.calls, ['POST /api/logout']);
+});
+
+// An expired Flask cookie makes DELETE /api/authenticate answer 401, and logout must still finish.
+test('signOut still signs out of Spring when Flask refuses or is unreachable', async () => {
+  for (const flaskAnswer of [refuse(401, null, 'DELETE', '/api/authenticate'), unreachable()]) {
+    const spring = fakeBackend();
+    await new SpringSession({ flask: fakeBackend({ 'DELETE /api/authenticate': flaskAnswer }), spring }).signOut();
+    assert.deepEqual(spring.calls, ['POST /api/logout']);
+  }
 });
 
 test('currentUser resolves null when signed out or unreachable', async () => {
