@@ -12,7 +12,6 @@ export function startLoginPage({
     const returnPath = loginReturnPath(window.location.href, document.referrer, baseurl);
 
     let signupFormData = {};
-    let verifiedSchoolEmail = null;
     let validationTimeout = null;
 
     // Password validation with debouncing (1.5 second delay)
@@ -85,7 +84,7 @@ export function startLoginPage({
     }
 
     // Backend status management
-    function updateBackendStatus(backend, status, message = '') {
+    function updateBackendStatus(backend, status) {
         const element = document.getElementById(`${backend}Status`);
         const icon = element.querySelector('.status-icon');
         const text = element.querySelector('.status-text');
@@ -125,7 +124,7 @@ export function startLoginPage({
         overallEl.classList.remove('hidden', 'success', 'partial', 'error');
 
         // A Flask-only site (spring: false in _config.yml), or a guest, creates the account in Flask alone.
-        if (!usesSpring()) {
+        if (!signupCreatesSpringAccount()) {
             overallEl.classList.add(flaskSuccess ? 'success' : 'error');
             overallEl.textContent = flaskSuccess
                 ? '🎉 Account created! You can now login.'
@@ -154,7 +153,7 @@ export function startLoginPage({
     }
 
     // Whether this sign-up also creates a Spring account: never on a Flask-only site, or for a guest.
-    function usesSpring() {
+    function signupCreatesSpringAccount() {
         return session.createsSpringAccount(signupFormData);
     }
 
@@ -292,7 +291,6 @@ export function startLoginPage({
                 showOAuthStatus('❌ You must use your school email address ending with @stu.powayusd.com or @powayusd.com', true);
                 return;
             }
-            verifiedSchoolEmail = email;
             signupFormData.idToken = response.credential;
             showOAuthStatus(`✅ School email verified: ${email}`);
 
@@ -418,14 +416,14 @@ export function startLoginPage({
         link.textContent = label;
         return link;
     }
-    window.signup = async function () {
+    async function signup() {
         const signupButton = document.querySelector(".signup-card button");
         // Disable the button and change its color
         signupButton.disabled = true;
         signupButton.classList.add("disabled");
         // Reset status indicators
         updateBackendStatus('flask', 'pending');
-        if (usesSpring()) updateBackendStatus('spring', 'pending');
+        if (signupCreatesSpringAccount()) updateBackendStatus('spring', 'pending');
         document.getElementById('overallStatus').classList.add('hidden');
 
         const data = signupFormData && Object.keys(signupFormData).length > 0 ? signupFormData : {
