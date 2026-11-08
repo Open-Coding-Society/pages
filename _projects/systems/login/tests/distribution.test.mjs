@@ -26,7 +26,6 @@ const PUBLISHED_PATHS = [
 const IMPORTERS = [
   '_includes/themes/minima/header.html',
   '_includes/microblog_foundation.html',
-  '_layouts/aesthetihawk.html',
   'navigation/authentication/support.md',
   '_projects/systems/login/pages/login.md',
   '_projects/systems/login/pages/logout.md',
