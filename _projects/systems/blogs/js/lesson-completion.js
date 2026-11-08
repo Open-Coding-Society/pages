@@ -34,8 +34,9 @@
          * Add "Mark as Complete" buttons to lessons
          */
         addCompleteButtons: function() {
-            // Find lesson containers
-            const lessons = document.querySelectorAll('[data-lesson], .lesson-content, .frq-container, .page-content');
+            // Find lesson containers. Not [data-lesson]: on the quest module pages those are
+            // the lesson cards, which show the quest's own progress.
+            const lessons = document.querySelectorAll('.lesson-content, .frq-container, .page-content');
             
             lessons.forEach(lesson => {
                 // Skip if button already exists

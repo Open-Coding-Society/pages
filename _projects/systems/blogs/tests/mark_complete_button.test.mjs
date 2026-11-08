@@ -79,9 +79,10 @@ class FakeElement {
   }
 }
 
-function openPage(pathname, script, storage = new Map()) {
+function openPage(pathname, script, storage = new Map(), addContent = () => {}) {
   const body = new FakeElement('body');
   const pageContent = body.appendChild(new FakeElement('main', { className: 'page-content' }));
+  addContent(pageContent);
   const documentListeners = {};
   const requests = [];
   const page = {
@@ -164,6 +165,16 @@ test('a completed button keeps its color when the mouse moves over it and away',
   assert.equal(savedButton.style.backgroundColor, completedColor);
   savedButton.dispatch('mouseleave');
   assert.equal(savedButton.style.backgroundColor, completedColor);
+});
+
+test('a quest module page gets no Mark Lesson Complete button on its lesson cards', () => {
+  const page = openPage('/cs-portfolio-quest/backend/', lessonScript, new Map(), (pageContent) => {
+    for (const lesson of ['1', '2', '3', '4']) {
+      pageContent.appendChild(new FakeElement('div', { className: 'lesson', dataset: { lesson } }));
+    }
+  });
+
+  assert.deepEqual(page.body.querySelectorAll('.mark-complete-btn'), []);
 });
 
 test('a Big Six lesson marks its module done for the hub and sends no request', async () => {
