@@ -193,3 +193,24 @@ test('a Big Six lesson marks its module done for the hub and sends no request', 
   assert.equal(button.disabled, true);
   assert.match(button.innerHTML, /Lesson Completed/);
 });
+
+test('a completed Big Six button keeps its color when the mouse moves over it and away', () => {
+  const page = openPage('/bigsix/frontend_lesson', bigSixScript);
+  const button = page.body.querySelector('.mark-complete-btn');
+  button.dispatch('mouseenter');
+  button.click();
+  const completedColor = button.style.backgroundColor;
+
+  button.dispatch('mouseleave');
+  assert.equal(button.style.backgroundColor, completedColor);
+  assert.equal(button.style.transform, 'scale(1)', 'the button shrinks back from its hover size');
+  button.dispatch('mouseenter');
+  assert.equal(button.style.backgroundColor, completedColor);
+
+  const reopened = openPage('/bigsix/frontend_lesson', bigSixScript, page.storage);
+  const savedButton = reopened.body.querySelector('.mark-complete-btn');
+  savedButton.dispatch('mouseenter');
+  assert.equal(savedButton.style.backgroundColor, completedColor);
+  savedButton.dispatch('mouseleave');
+  assert.equal(savedButton.style.backgroundColor, completedColor);
+});

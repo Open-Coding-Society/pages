@@ -76,14 +76,16 @@
                 fontFamily: 'system-ui, sans-serif'
             });
             
-            // Add hover effect
+            // Add hover effect. A completed (disabled) button can still get
+            // mouseenter and mouseleave, so leave its gray color alone.
             button.addEventListener('mouseenter', () => {
+                if (button.disabled) return;
                 button.style.backgroundColor = '#059669';
                 button.style.transform = 'scale(1.05)';
                 button.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)';
             });
             button.addEventListener('mouseleave', () => {
-                button.style.backgroundColor = '#10b981';
+                if (!button.disabled) button.style.backgroundColor = '#10b981';
                 button.style.transform = 'scale(1)';
                 button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
             });
