@@ -50,7 +50,7 @@ git-ignored, and `make` (or `make dev`) writes them again from here.
 | `pages/guestlogin.md` | `navigation/authentication/guestlogin.md` | `/guestlogin`, sign-in and guest sign-up |
 | `pages/logout.md` | `navigation/authentication/logout.md` | `/logout` |
 | `js/login-page.js` | `assets/js/login/login-page.js` | the `/login` page's script, `startLoginPage` |
-| `js/navbar-login.js` | `assets/js/api/login.js` | the navbar's signed-in state, `startNavbarLogin`, started by the site header |
+| `js/navbar-login.js` | `assets/js/login/navbar-login.js` | the navbar's signed-in state, `startNavbarLogin`, started by the site header |
 | `js/session.js` | `assets/js/login/session.js` | `FlaskSession`, `SpringSession` and `createSession` |
 | `js/backend.js` | `assets/js/login/backend.js` | `Backend`, `BackendError` and `createBackends` |
 | `js/logout.js` | `assets/js/api/logout.js` | `handleLogout` |
@@ -58,8 +58,10 @@ git-ignored, and `make` (or `make dev`) writes them again from here.
 | `js/password-fields.js` | `assets/js/api/passwordFields.js` | Show/Hide and the Caps Lock hint on password fields |
 | `js/reverify.js` | `assets/js/api/reverify.js` | re-verifying a student's school email with Google |
 
-The scripts keep their old published paths because pages, layouts and other systems
-load them by those paths.
+The scripts that existed before keep their old paths in `assets/js/api/`, except the
+navbar's. It used to run as soon as it loaded and now waits for the header to start
+it, so it moved to `assets/js/login/` with the new modules: a new path means a
+browser can't pair the new header with a cached copy of the old `login.js`.
 
 ## Sessions
 

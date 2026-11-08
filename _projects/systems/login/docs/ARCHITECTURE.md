@@ -20,7 +20,7 @@ it. `distribution.json` maps each source to the path the site loads it from, and
 | `pages/guestlogin.md` | `navigation/authentication/guestlogin.md` (`/guestlogin`) |
 | `pages/logout.md` | `navigation/authentication/logout.md` (`/logout`) |
 | `js/login-page.js` | `assets/js/login/login-page.js` |
-| `js/navbar-login.js` | `assets/js/api/login.js` |
+| `js/navbar-login.js` | `assets/js/login/navbar-login.js` |
 | `js/session.js` | `assets/js/login/session.js` |
 | `js/backend.js` | `assets/js/login/backend.js` |
 | `js/logout.js` | `assets/js/api/logout.js` |
@@ -37,7 +37,7 @@ and passes them to the module's start function.
 | Where | Starter imports | Calls |
 |---|---|---|
 | `/login` (`pages/login.md`) | `config.js`, `login-return.js`, `reverify.js`, `passwordRules.js`, `backend.js`, `session.js`, `login-page.js` | `startLoginPage({ session, ..., baseurl })` |
-| every page, from the site header (`_includes/themes/minima/header.html`) | `config.js`, `login-return.js`, `course-entry.js`, the dashboard's `preferences.js`, `backend.js`, `session.js`, `login.js` | `startNavbarLogin({ session, spring, ..., courseEntry })` |
+| every page, from the site header (`_includes/themes/minima/header.html`) | `config.js`, `login-return.js`, `course-entry.js`, the dashboard's `preferences.js`, `backend.js`, `session.js`, `navbar-login.js` | `startNavbarLogin({ session, spring, ..., courseEntry })` |
 | `/logout` (`pages/logout.md`) and the aesthetihawk layout | `config.js`, `backend.js`, `session.js`, `logout.js` | `handleLogout(session)` |
 
 Each starter builds the session with `createSession(createBackends({ pythonURI, javaURI,

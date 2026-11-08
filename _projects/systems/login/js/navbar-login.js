@@ -1,7 +1,7 @@
 // The navbar's signed-in state: the account menu, the Spring sign-in warning and the student's
 // theme. `session` is a FlaskSession, or a SpringSession on a site that also runs Spring, and
-// `spring` is the Spring backend or null. The site header's starter passes these and the helpers
-// this needs, since the script is published to assets/js/api/ apart from the other scripts.
+// `spring` is the Spring backend or null. It is published to assets/js/login/, so the site header's
+// starter passes these and every shared helper it needs.
 export function startNavbarLogin({ session, spring, baseurl, pythonURI, fetchOptions, addLoginReturn, FormatConverter, courseEntry }) {
     const { updateNavigation, updateCourseEntry } = courseNavigation({ baseurl, pythonURI, fetchOptions, courseEntry });
 

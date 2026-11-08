@@ -100,7 +100,6 @@ images/projects/
 /navigation/authentication/logout.md
 /navigation/authentication/guestlogin.md
 /navigation/signup.md
-/assets/js/api/login.js
 /assets/js/api/logout.js
 /assets/js/api/passwordRules.js
 /assets/js/api/passwordFields.js
