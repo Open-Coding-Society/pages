@@ -15,6 +15,14 @@ test('login page starts from one module', () => {
   assert.doesNotMatch(page, /\bfunction\b/, 'the page should keep no functions of its own');
 });
 
+// `{{ site.baseurl | jsonify }}` renders null on a site whose _config.yml has no baseurl, and the
+// page's redirects then go to /null/profile; config.js's baseurl is "" there, as the header uses.
+test("login page takes baseurl from config.js, like the header's starter", () => {
+  const page = read('pages/login.md');
+  assert.match(page, /import \{[^}]*\bbaseurl\b[^}]*\} from '\{\{ ?site\.baseurl ?\}\}\/assets\/js\/api\/config\.js'/);
+  assert.doesNotMatch(page, /jsonify/);
+});
+
 test('login page module has no Liquid, since published scripts are not rendered', () => {
   assert.doesNotMatch(read('js/login-page.js'), /\{\{|\{%/);
 });

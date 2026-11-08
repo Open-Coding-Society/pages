@@ -139,7 +139,7 @@ show_reading_time: false
 </div>
 
 <script type="module">
-    import { pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, springEnabled } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { baseurl, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, springEnabled } from '{{site.baseurl}}/assets/js/api/config.js';
     import { loginReturnPath } from '{{site.baseurl}}/assets/js/api/login-return.js';
     import { reverifyNeeded, staffMustVerify, reverify } from '{{site.baseurl}}/assets/js/api/reverify.js';
     import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
@@ -152,7 +152,7 @@ show_reading_time: false
         pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, loginReturnPath,
         reverifyNeeded, staffMustVerify, reverify,
         SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist,
-        baseurl: {{ site.baseurl | jsonify }},
+        baseurl,
     });
 </script>
 
