@@ -41,8 +41,14 @@ class FakeElement {
     (this.listeners[type] ||= []).push(listener);
   }
 
+  // Like a browser: a disabled button gets no click, but it still gets mouseenter and mouseleave.
+  dispatch(type) {
+    if (type === 'click' && this.disabled) return;
+    for (const listener of this.listeners[type] || []) listener({ preventDefault() {}, target: this });
+  }
+
   click() {
-    for (const listener of this.listeners.click || []) listener({ preventDefault() {}, target: this });
+    this.dispatch('click');
   }
 
   matches(selectors) {
@@ -137,6 +143,27 @@ test('the FRQ button says Lesson Completed as soon as it is clicked, without a r
   assert.equal(button.disabled, true, 'a completed lesson cannot be marked again');
   assert.match(button.innerHTML, /Lesson Completed/);
   assert.doesNotMatch(button.innerHTML, /Mark Lesson Complete/);
+});
+
+test('a completed button keeps its color when the mouse moves over it and away', () => {
+  const page = openPage('/csa/frqs/2016/3', lessonScript);
+  const button = page.pageContent.querySelector('.mark-complete-btn');
+  button.dispatch('mouseenter');
+  button.click();
+  const completedColor = button.style.backgroundColor;
+
+  button.dispatch('mouseleave');
+  assert.equal(button.style.backgroundColor, completedColor);
+  assert.equal(button.style.transform, 'scale(1)', 'the button shrinks back from its hover size');
+  button.dispatch('mouseenter');
+  assert.equal(button.style.backgroundColor, completedColor);
+
+  const reopened = openPage('/csa/frqs/2016/3', lessonScript, page.storage);
+  const savedButton = reopened.pageContent.querySelector('.mark-complete-btn');
+  savedButton.dispatch('mouseenter');
+  assert.equal(savedButton.style.backgroundColor, completedColor);
+  savedButton.dispatch('mouseleave');
+  assert.equal(savedButton.style.backgroundColor, completedColor);
 });
 
 test('a Big Six lesson marks its module done for the hub and sends no request', async () => {
