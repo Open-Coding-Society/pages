@@ -1,7 +1,8 @@
 // The navbar's signed-in state: the account menu, the Spring sign-in warning and the student's
-// theme. The site header's starter passes in config.js's values and the helpers this needs, since
-// the script is published to assets/js/api/ apart from the Courses and dashboard scripts.
-export function startNavbarLogin({ baseurl, pythonURI, javaURI, fetchOptions, springEnabled, addLoginReturn, FormatConverter, courseEntry }) {
+// theme. `session` is a FlaskSession, or a SpringSession on a site that also runs Spring, and
+// `spring` is the Spring backend or null. The site header's starter passes these and the helpers
+// this needs, since the script is published to assets/js/api/ apart from the other scripts.
+export function startNavbarLogin({ session, spring, baseurl, pythonURI, fetchOptions, addLoginReturn, FormatConverter, courseEntry }) {
     const { updateNavigation, updateCourseEntry } = courseNavigation({ baseurl, pythonURI, fetchOptions, courseEntry });
 
     console.log("login.js loaded");
@@ -15,7 +16,7 @@ export function startNavbarLogin({ baseurl, pythonURI, javaURI, fetchOptions, sp
     document.addEventListener('DOMContentLoaded', function () {
         console.log("Base URL:", baseurl); // Debugging line
         waitForElement('#loginArea', 20, 100).then(loginArea => {
-            getCredentials(baseurl)
+            session.currentUser()
                 .then(data => {
                     console.log("Credentials data:", data); // Debugging line
                     window.user = data;
@@ -112,11 +113,11 @@ export function startNavbarLogin({ baseurl, pythonURI, javaURI, fetchOptions, sp
     // password), so flag that in the account menu instead of letting those features 401 silently.
     // A Flask-only site (spring: false in _config.yml) has no Spring login to check.
     function warnIfSpringSignedOut(loginArea) {
-        if (!springEnabled) return;
-        fetch(`${javaURI}/api/person/get`, fetchOptions)
-            .then(response => {
-                if (response.ok) return;
-                console.warn("Signed in to Flask but not Spring: HTTP " + response.status);
+        if (!session.usesSpring) return;
+        session.springSignedIn()
+            .then(signedIn => {
+                if (signedIn) return;
+                console.warn("Signed in to Flask but not Spring");
                 const button = loginArea.querySelector('.dropbtn');
                 const menu = loginArea.querySelector('.dropdown-content');
                 if (!button || !menu) return;
@@ -135,9 +136,9 @@ export function startNavbarLogin({ baseurl, pythonURI, javaURI, fetchOptions, sp
     // on every page right away, not only after they open the dashboard.
     async function syncThemeOwner(uid) {
         const previousOwner = localStorage.getItem('sitePreferencesOwner');
-        if (!springEnabled || !uid || previousOwner === uid) return;
+        if (!spring || !uid || previousOwner === uid) return;
         try {
-            const response = await fetch(`${javaURI}/api/user/preferences`, fetchOptions);
+            const response = await fetch(`${spring.baseUrl}/api/user/preferences`, spring.fetchOptions);
             if (!response.ok) return;
             const data = await response.json();
             const prefs = data?.id ? FormatConverter.toFrontend(data) : null;
@@ -155,28 +156,6 @@ export function startNavbarLogin({ baseurl, pythonURI, javaURI, fetchOptions, sp
         } catch (error) {
             console.error('Theme sync error:', error);
         }
-    }
-
-    function getCredentials(baseurl) {
-        const URL = pythonURI + '/api/id';
-        return fetch(URL, fetchOptions)
-            .then(response => {
-                if (!response.ok) {
-                    console.warn("HTTP status code: " + response.status);
-                    return null;
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data === null) return null;
-                console.log("User data:", data);
-                return data;
-            })
-            .catch(err => {
-                console.error("Fetch error: ", err);
-                // Return null instead of throwing to handle the error gracefully
-                return null;
-            });
     }
 
     updateCourseEntry(document.querySelectorAll('[data-course-entry]'));

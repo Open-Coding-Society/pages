@@ -60,6 +60,8 @@
 <script type="module">
     // tmport handlelogout from external file and attach to window for onclick usage
     import { pythonURI, javaURI, fetchOptions, springEnabled } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { createBackends } from '{{site.baseurl}}/assets/js/login/backend.js';
+    import { createSession } from '{{site.baseurl}}/assets/js/login/session.js';
     import { handleLogout } from '{{site.baseurl}}/assets/js/api/logout.js';
-    window.handleLogout = () => handleLogout({ pythonURI, javaURI, fetchOptions, springEnabled });
+    window.handleLogout = () => handleLogout(createSession(createBackends({ pythonURI, javaURI, fetchOptions, springEnabled })));
 </script>

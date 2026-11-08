@@ -27,19 +27,15 @@ test('importing the navbar script does nothing until it is started', async () =>
   assert.equal(typeof navbar.startNavbarLogin, 'function');
 });
 
-test('logout signs out of Flask, and of Spring only when the site has it', async () => {
+test('logout signs out through the session', async () => {
   const { handleLogout } = await import('../js/logout.js');
-  const realFetch = globalThis.fetch;
-  const calls = [];
-  globalThis.fetch = async (url, options) => { calls.push(`${options.method} ${url}`); return { ok: true }; };
-  try {
-    const backends = { pythonURI: 'http://flask.test', javaURI: 'http://spring.test', fetchOptions: { credentials: 'include' } };
-    await handleLogout({ ...backends, springEnabled: false });
-    assert.deepEqual(calls, ['DELETE http://flask.test/api/authenticate']);
-    calls.length = 0;
-    await handleLogout({ ...backends, springEnabled: true });
-    assert.deepEqual(calls, ['DELETE http://flask.test/api/authenticate', 'POST http://spring.test/api/logout']);
-  } finally {
-    globalThis.fetch = realFetch;
-  }
+  const signedOut = [];
+  await handleLogout({ signOut: async () => { signedOut.push('signOut'); } });
+  assert.deepEqual(signedOut, ['signOut']);
+});
+
+test('the navbar never checks springEnabled; it asks the session', () => {
+  const navbar = readFileSync(new URL('js/navbar-login.js', system), 'utf8');
+  assert.doesNotMatch(navbar, /springEnabled/);
+  assert.match(navbar, /session\.usesSpring/);
 });

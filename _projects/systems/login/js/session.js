@@ -50,10 +50,12 @@ export class FlaskSession {
     }
   }
 
-  // The signed-in user, or null when nobody is signed in or Flask can't be reached.
+  // The signed-in user, or null when nobody is signed in, Flask can't be reached, or the answer
+  // isn't a user (a proxy's error page, for example).
   async currentUser() {
     try {
-      return await this.flask.request('/api/id');
+      const user = await this.flask.request('/api/id');
+      return isObject(user) ? user : null;
     } catch (error) {
       if (error.status) console.warn('HTTP status code: ' + error.status);
       else console.error('Fetch error: ', error);

@@ -141,3 +141,8 @@ test('a guest gets no Spring account, even on a site with Spring', async () => {
   assert.equal(created.spring, null);
   assert.deepEqual(spring.calls, []);
 });
+
+test('currentUser resolves null when Flask answers something other than a user', async () => {
+  assert.equal(await new FlaskSession({ flask: fakeBackend({ 'GET /api/id': '<html>proxy page</html>' }) }).currentUser(), null);
+  assert.equal(await new FlaskSession({ flask: fakeBackend({ 'GET /api/id': null }) }).currentUser(), null);
+});
