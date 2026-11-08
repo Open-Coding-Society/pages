@@ -38,7 +38,7 @@ and passes them to the module's start function.
 |---|---|---|
 | `/login` (`pages/login.md`) | `config.js`, `login-return.js`, `reverify.js`, `passwordRules.js`, `backend.js`, `session.js`, `login-page.js` | `startLoginPage({ session, ..., baseurl })` |
 | every page, from the site header (`_includes/themes/minima/header.html`) | `config.js`, `login-return.js`, `course-entry.js`, the dashboard's `preferences.js`, `backend.js`, `session.js`, `navbar-login.js` | `startNavbarLogin({ session, spring, ..., courseEntry })` |
-| `/logout` (`pages/logout.md`) and the aesthetihawk layout | `config.js`, `backend.js`, `session.js`, `logout.js` | `handleLogout(session)` |
+| `/logout` (`pages/logout.md`) | `config.js`, `backend.js`, `session.js`, `logout.js` | `handleLogout(session)` |
 
 Each starter builds the session with `createSession(createBackends({ pythonURI, javaURI,
 fetchOptions, springEnabled }))`. That gives a `FlaskSession` on a Flask-only site and a
@@ -50,10 +50,12 @@ fetchOptions, springEnabled }))`. That gives a `FlaskSession` on a Flask-only si
 
 ## Sessions
 
-`FlaskSession` is the core; `SpringSession extends FlaskSession` and runs Spring's step
-after `super`. Every request goes through a `Backend`, which resolves to JSON, `null` or
-text and rejects with a `BackendError` that has the HTTP status (0 when the server can't
-be reached) and the parsed answer.
+`FlaskSession` is the core; `SpringSession extends FlaskSession`. Its sign-up and logout
+run Spring's step after `super`, and its sign-in signs in to both backends at the same
+time. Every request goes through a `Backend`, which resolves to JSON, `null` or text and
+rejects with a `BackendError` that has the HTTP status (0 when no answer arrived: the
+server couldn't be reached, or the connection dropped while the answer was read) and the
+parsed answer.
 
 | Method | `FlaskSession` | `SpringSession` adds |
 |---|---|---|
@@ -85,9 +87,10 @@ the account in Flask (`POST /api/user`), then Spring (`POST /api/person/create`)
 
 ## Changing `spring`
 
-The modules read `springEnabled` when they run, never Liquid. `config.js` has
-`regenerate: true` in its front matter, so an incremental build picks up a change to
-`spring` in `_config.yml`.
+Each starter reads `springEnabled` from `config.js` when the page runs, never through
+Liquid, and passes it to `createBackends`; the page and navbar modules only see the
+session. `config.js` has `regenerate: true` in its front matter, so an incremental build
+picks up a change to `spring` in `_config.yml`.
 
 ## Old checkouts
 
@@ -98,15 +101,26 @@ copies.
 
 ## Tests
 
-- `tests/distribution.test.mjs`: every file the site loads is published by its old path,
-  every source exists, and every published copy is git-ignored.
-- `tests/login_page.test.mjs`: `/login` has one starter that calls `startLoginPage`, and
-  `login-page.js` has no Liquid, never reads `springEnabled`, and signs up, in and out
-  only through the session.
-- `tests/imports.test.mjs`: every import is a `./` path to a file published beside the
-  importer, importing the navbar script starts nothing, logout signs out through the
-  session, and the navbar never reads `springEnabled`.
-- `tests/backend.test.mjs`: requests, answers and `BackendError`.
-- `tests/session.test.mjs`: `FlaskSession` never calls Spring; `SpringSession` keeps the
-  Flask account and sign-in when Spring fails, and gives a guest no Spring account.
-- Courses' `course_entry.test.mjs` runs `courseNavigation` for the navbar's course link.
+- `tests/distribution.test.mjs`: every file is published where the site loads it, every
+  source exists, every published copy is git-ignored, and every page imports each Login
+  export from the path the system publishes it to.
+- `tests/login_page.test.mjs`: `/login` has one starter that calls `startLoginPage` and
+  takes `baseurl` from `config.js`, and `login-page.js` has no Liquid, never reads
+  `springEnabled`, and signs up, in and out only through the session.
+- `tests/signin_signup.test.mjs`: `/login` on a fake page with the real session classes:
+  where each sign-in goes, what the page says when only Spring refuses, the error texts,
+  re-verification, the staff notice, and every sign-up outcome.
+- `tests/navbar.test.mjs`: the navbar on a fake page: the account menu, the Spring sign-in
+  warning (never on a Flask-only site or for a guest), and the Login link.
+- `tests/imports.test.mjs`: every import (named, bare or dynamic) is a `./` path to a file
+  published beside the importer, importing the navbar script starts nothing, logout waits
+  for the session to sign out, and the navbar never reads `springEnabled`.
+- `tests/backend.test.mjs`: requests, answers and `BackendError`, including an answer cut
+  off while it is read.
+- `tests/session.test.mjs`: `FlaskSession` never calls Spring; `SpringSession` sends both
+  backends the same account and credentials, keeps the Flask account and sign-in when
+  Spring fails, still signs out of Spring when Flask refuses, and gives a guest no Spring
+  account.
+- Outside this folder, Courses' `course_entry.test.mjs` starts the navbar for its course
+  link, and `tests/microblog_review.test.mjs` is the only test that runs
+  `js/password-rules.js`.

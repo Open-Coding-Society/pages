@@ -30,11 +30,13 @@ In dual login, Flask's step must work. If only Spring's step fails, sign-up and 
 still work in Flask, and the login page warns that DMs, calendar and announcements
 won't; at sign-in it also offers Continue anyway.
 
-The setting covers Profile, the login page's sign-up and sign-in, logout and the
-navbar's DM bell (its unread count). Other pages that use Spring, such as DMs, the
-calendar and announcements, don't read it, and some links still lead to them:
-Profile's Reset password and Skill Passport, and the toolkit sidebar's View Grades,
-Calendar and Bathroom Pass.
+In this system the setting decides whether sign-up, sign-in and logout use Spring,
+and whether the navbar checks the Spring sign-in and loads the student's theme from
+Spring. Outside it, it covers Profile, the navbar's DM bell (its unread count), the
+Courses calendar card, the UI Builder, and chats embedded with Messages'
+`conversation-embed.js`. `/dm`, `/student/calendar` and the announcement chats don't
+read it yet, and some links still lead to them: Profile's Reset password and Skill
+Passport, and the toolkit sidebar's View Grades, Calendar and Bathroom Pass.
 
 What Profile does in each is in the [Profile README](../profile/README.md#flask-only-or-flask--spring).
 
@@ -68,15 +70,18 @@ browser can't pair the new header with a cached copy of the old `login.js`.
 Sign-up, sign-in, logout and the signed-in user are two classes in `js/session.js`:
 
 - `FlaskSession` is the core every site has. It does each step on Flask.
-- `SpringSession extends FlaskSession` for sites that also run Spring. Each method calls
-  the Flask one with `super` and then does Spring's step. Spring's result is reported,
-  never thrown, so a Spring failure never undoes the Flask account or sign-in.
+- `SpringSession extends FlaskSession` for sites that also run Spring. Sign-up and
+  logout call the Flask method with `super` and then do Spring's step; sign-in signs in
+  to both at the same time. Spring's result is reported, never thrown, so a Spring
+  failure never undoes the Flask account or sign-in. `springSignedIn()`, which the
+  navbar uses, asks Spring alone.
 
 Both make their requests through a `Backend` from `js/backend.js`, which knows one base URL.
 A starter builds them with `createSession(createBackends({ pythonURI, javaURI, fetchOptions,
 springEnabled }))`: `createBackends` makes a Spring backend only when `springEnabled` is
-true, and `createSession` picks `SpringSession` only when there is one. So `/login`, the
-navbar and logout never check `springEnabled`; they ask `session.usesSpring`.
+true, and `createSession` picks `SpringSession` only when there is one. So only the
+starters read `springEnabled`, and `login-page.js` and `navbar-login.js` ask
+`session.usesSpring` instead.
 
 ## Imports
 
@@ -84,10 +89,10 @@ A page's starter script imports the shared helpers (`assets/js/api/config.js`,
 `login-return.js`, and for the navbar Courses' `course-entry.js` and the dashboard's
 `FormatConverter`) with `{{ site.baseurl }}`, builds the session, and passes them in: the
 site header to `startNavbarLogin`, `/login` to `startLoginPage`, and `/logout` to
-`handleLogout(session)`. The
-modules never import `config.js` or use `../` paths. They're published into two
-folders, `assets/js/api/` and `assets/js/login/`, so a module may import only a file
-this system publishes beside it; `tests/imports.test.mjs` checks that.
+`handleLogout(session)`. The modules never import `config.js` or use `../` paths.
+They're published into two folders, `assets/js/api/` and `assets/js/login/`, so a
+module may import only a file this system publishes beside it;
+`tests/imports.test.mjs` checks that.
 
 ## Tests
 
@@ -96,5 +101,7 @@ node --test _projects/systems/login/tests/*.test.mjs
 ```
 
 The `tests/login_*.test.mjs` files at the repo root run the same tests with the rest of
-`node --test tests/*.test.mjs`. Courses' `course_entry.test.mjs` also runs
-`courseNavigation` from `js/navbar-login.js`.
+`node --test tests/*.test.mjs`. Two tests outside this folder also run Login code:
+Courses' `course_entry.test.mjs` starts the navbar for its course link, and
+`tests/microblog_review.test.mjs` checks the review page's guest passwords against
+`js/password-rules.js`.

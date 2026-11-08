@@ -2,8 +2,8 @@
 // request resolves to the answer's JSON, null for an empty body, or its text when it isn't JSON
 // (the same rule as Messages' messages-api.js), and rejects with a BackendError.
 
-// Names the request that failed and carries its HTTP status (0 when the server can't be reached)
-// and the parsed answer, so callers can show what the server said.
+// Names the request that failed and carries its HTTP status (0 when no answer arrived) and the
+// parsed answer, so callers can show what the server said.
 export class BackendError extends Error {
   constructor({ status, method, path, body = null, cause } = {}) {
     super(status ? `${method} ${path} answered HTTP ${status}` : `${method} ${path} could not reach the server`, cause ? { cause } : undefined);
