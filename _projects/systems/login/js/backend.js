@@ -24,13 +24,17 @@ export class Backend {
   async request(path, { method = 'GET', body } = {}) {
     const options = { ...this.fetchOptions, method };
     if (body !== undefined) options.body = JSON.stringify(body);
+    // The connection can also drop after the headers, while the body is read: that answer never
+    // arrived either, so it is status 0 too.
     let response;
+    let text;
     try {
       response = await fetch(`${this.baseUrl}${path}`, options);
+      text = await response.text();
     } catch (cause) {
       throw new BackendError({ status: 0, method, path, cause });
     }
-    const answer = parseAnswer(await response.text());
+    const answer = parseAnswer(text);
     if (!response.ok) throw new BackendError({ status: response.status, method, path, body: answer });
     return answer;
   }
