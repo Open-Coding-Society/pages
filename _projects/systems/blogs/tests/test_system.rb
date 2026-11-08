@@ -91,6 +91,10 @@ class BlogsSystemTest < Minitest::Test
       assert_includes html, "Runner fixture"
       assert_includes html, "SUBMISSION_TYPE_BLOG = \"code\""
       refute_includes html, 'id="lesson-sidebar"'
+      # Deleted: the first posted to Spring routes that never existed, and the second never parsed.
+      %w[ocs-analytics-enhanced.js code-runner-analytics.js].each do |script|
+        refute html.include?("/assets/js/#{script}"), "The post layout still loads #{script}"
+      end
       refute File.exist?(File.join(source, "_includes/course-document-player.html"))
       reader = File.read(File.join(source, "_site/reader/index.html"))
       assert_includes reader, "Catalog example"

@@ -11,8 +11,6 @@
 
 (function() {
     const LessonCompletion = {
-        pythonURI: window.pythonURI || 'http://localhost:5000',
-        javaURI: window.javaURI || 'http://localhost:8585',
         completedLessons: new Set(),
         lessonStartTimes: new Map(),
         
@@ -98,7 +96,7 @@
                     // Add click handler
                     button.addEventListener('click', (e) => {
                         e.preventDefault();
-                        this.completeLesson(lessonId, lesson);
+                        this.completeLesson(lessonId);
                     });
                 }
                 
@@ -108,81 +106,22 @@
         },
         
         /**
-         * Mark lesson as complete
+         * Mark lesson as complete. Completion is kept in this browser only:
+         * neither Flask nor Spring has an /api/lessons/complete route.
          */
-        completeLesson: function(lessonId, lessonElement) {
+        completeLesson: function(lessonId) {
             console.log('📚 Completing lesson:', lessonId);
             
             const startTime = this.lessonStartTimes.get(lessonId) || new Date();
             const timeToComplete = Math.round((Date.now() - startTime.getTime()) / 1000); // seconds
             
-            const lessonMetadata = {
-                lessonId: lessonId,
-                questName: this.extractQuestName(lessonElement),
-                moduleName: this.extractModuleName(lessonElement),
-                timeToCompleteSeconds: timeToComplete,
-                completedAt: new Date().toISOString(),
-                pageTitle: document.title,
-                url: window.location.href
-            };
-            
-            // Record event in analytics
-            if (window.OCSEnhancedAnalytics) {
-                window.OCSEnhancedAnalytics.recordEvent('lesson_completed', lessonMetadata);
-            }
-            
-            // Send to backend
-            this.sendCompletionToBackend(lessonMetadata);
+            this.saveCompletedLesson(lessonId);
             
             // Update UI
             this.markButtonAsCompleted(lessonId);
             
             // Show success message
             this.showSuccessMessage(lessonId, timeToComplete);
-        },
-        
-        /**
-         * Send lesson completion to backend
-         */
-        sendCompletionToBackend: async function(metadata) {
-            try {
-                // Try to save to Python backend
-                const response = await fetch(`${this.pythonURI}/api/lessons/complete`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify(metadata)
-                });
-                
-                if (!response.ok) {
-                    console.warn('Python backend lesson completion failed, trying Java backend');
-                    
-                    // Try Java backend
-                    const javaResponse = await fetch(`${this.javaURI}/api/lessons/complete`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify(metadata)
-                    });
-                    
-                    if (!javaResponse.ok) {
-                        throw new Error('Both backends failed');
-                    }
-                }
-                
-                // Save to localStorage as backup
-                this.saveCompletedLesson(metadata.lessonId);
-                
-                console.log('✅ Lesson completion recorded');
-            } catch (error) {
-                console.error('Error sending lesson completion:', error);
-                // Still save locally even if backend fails
-                this.saveCompletedLesson(metadata.lessonId);
-            }
         },
         
         /**
@@ -286,14 +225,6 @@
             const lessonId = this.extractLessonIdFromURL();
             if (lessonId && !this.lessonStartTimes.has(lessonId)) {
                 this.lessonStartTimes.set(lessonId, new Date());
-                
-                if (window.OCSEnhancedAnalytics) {
-                    window.OCSEnhancedAnalytics.recordEvent('lesson_started', {
-                        lessonId: lessonId,
-                        questName: this.extractQuestNameFromURL(),
-                        moduleName: this.extractModuleNameFromURL()
-                    });
-                }
                 console.log('📚 Lesson started:', lessonId);
             }
         },
@@ -306,24 +237,6 @@
                    element.dataset.lessonId || 
                    element.dataset.id ||
                    this.extractLessonIdFromURL();
-        },
-        
-        /**
-         * Extract quest name
-         */
-        extractQuestName: function(element) {
-            return element.dataset.quest || 
-                   element.dataset.questName || 
-                   this.extractQuestNameFromURL();
-        },
-        
-        /**
-         * Extract module name
-         */
-        extractModuleName: function(element) {
-            return element.dataset.module || 
-                   element.dataset.moduleName || 
-                   this.extractModuleNameFromURL();
         },
         
         /**
@@ -345,35 +258,6 @@
             const questIdx = parts.findIndex(p => p.includes('quest'));
             if (questIdx !== -1 && questIdx + 2 < parts.length) {
                 return parts[questIdx + 2];
-            }
-            
-            return null;
-        },
-        
-        /**
-         * Extract quest name from URL
-         */
-        extractQuestNameFromURL: function() {
-            const path = window.location.pathname;
-            
-            if (path.includes('cs-portfolio-quest')) return 'cs-portfolio-quest';
-            if (path.includes('digital-famine')) return 'digital-famine';
-            if (path.includes('west-coast')) return 'west-coast';
-            if (path.includes('frqs')) return 'frq-practice';
-            
-            return null;
-        },
-        
-        /**
-         * Extract module name from URL
-         */
-        extractModuleNameFromURL: function() {
-            const path = window.location.pathname;
-            const parts = path.split('/').filter(Boolean);
-            
-            const questIdx = parts.findIndex(p => p.includes('quest'));
-            if (questIdx !== -1 && questIdx + 1 < parts.length) {
-                return parts[questIdx + 1];
             }
             
             return null;
