@@ -1,8 +1,6 @@
-import { pythonURI, javaURI, fetchOptions, springEnabled } from './config.js';
-
-// logout from both java and python backends
-export async function handleLogout() {
-    // import config dynamically since we can't use import in non-module script
+// logout from both java and python backends. Callers pass config.js's values, since this
+// script is published to assets/js/api/ and must not import config.js itself.
+export async function handleLogout({ pythonURI, javaURI, fetchOptions, springEnabled }) {
 
     // logout from python backend
     try {
