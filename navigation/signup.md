@@ -114,7 +114,7 @@ search_exclude: true
       body: JSON.stringify(signupData),
     };
 
-    console.log("Sending signup requests:", { springURL, flaskURL, springRequest, flaskRequest });
+    // Never log the requests: their bodies hold the plaintext password.
 
     signupMessage.innerText = "Signing up...";
 
