@@ -16,6 +16,7 @@ const PUBLISHED_PATHS = [
   'assets/js/api/passwordRules.js',
   'assets/js/api/passwordFields.js',
   'assets/js/api/reverify.js',
+  'assets/js/login/login-page.js',
 ];
 
 function distribution() {
