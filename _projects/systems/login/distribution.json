@@ -9,6 +9,7 @@
     { "source": "js/password-rules.js", "destination": "assets/js/api/passwordRules.js" },
     { "source": "js/password-fields.js", "destination": "assets/js/api/passwordFields.js" },
     { "source": "js/reverify.js", "destination": "assets/js/api/reverify.js" },
-    { "source": "js/login-page.js", "destination": "assets/js/login/login-page.js" }
+    { "source": "js/login-page.js", "destination": "assets/js/login/login-page.js" },
+    { "source": "js/backend.js", "destination": "assets/js/login/backend.js" }
   ]
 }
