@@ -57,7 +57,7 @@ test('remainingChars counts down from the 280 limit', () => {
 
 test('guestCredentials makes a hidden guest login from a name', async () => {
     const { guestCredentials } = await import('../assets/js/api/microblog-review.js');
-    const { meetsSpringPasswordRules } = await import('../assets/js/api/passwordRules.js');
+    const { meetsSpringPasswordRules } = await import('../_projects/systems/login/js/password-rules.js');
     const fixed = length => 'k3j9q2wvbn7f0ha1xcz5'.slice(0, length);
     assert.deepEqual(guestCredentials('Darth Vader', fixed), { uid: 'darthvader-k3j9q2', password: 'Qr!k3j9q2wvbn7f0ha1xcz5aZ9' });
     assert.equal(guestCredentials('!!!', fixed).uid, 'guest-k3j9q2');
@@ -67,7 +67,7 @@ test('guestCredentials makes a hidden guest login from a name', async () => {
 
 test('guestCredentials draws the password separately from the visible username', async () => {
     const { guestCredentials } = await import('../assets/js/api/microblog-review.js');
-    const { meetsSpringPasswordRules } = await import('../assets/js/api/passwordRules.js');
+    const { meetsSpringPasswordRules } = await import('../_projects/systems/login/js/password-rules.js');
     const one = guestCredentials('Sam');
     assert.match(one.uid, /^sam-[a-z0-9]{6}$/);
     assert.match(one.password, /^Qr![a-z0-9]{20}aZ9$/);

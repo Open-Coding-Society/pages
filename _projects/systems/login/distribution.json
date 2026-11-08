@@ -1,0 +1,13 @@
+{
+  "files": [
+    { "source": "pages/login.md", "destination": "navigation/authentication/login.md" },
+    { "source": "pages/logout.md", "destination": "navigation/authentication/logout.md" },
+    { "source": "pages/guestlogin.md", "destination": "navigation/authentication/guestlogin.md" },
+    { "source": "pages/signup.md", "destination": "navigation/signup.md" },
+    { "source": "js/navbar-login.js", "destination": "assets/js/api/login.js" },
+    { "source": "js/logout.js", "destination": "assets/js/api/logout.js" },
+    { "source": "js/password-rules.js", "destination": "assets/js/api/passwordRules.js" },
+    { "source": "js/password-fields.js", "destination": "assets/js/api/passwordFields.js" },
+    { "source": "js/reverify.js", "destination": "assets/js/api/reverify.js" }
+  ]
+}

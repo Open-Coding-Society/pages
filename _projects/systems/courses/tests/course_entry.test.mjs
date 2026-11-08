@@ -33,7 +33,7 @@ test('course aliases normalize and invalid selections cannot form a URL', () => 
 });
 
 test('header routes guests and enrolled users directly without rewriting unrelated links', async () => {
-  const source = readFileSync(new URL('../../../../assets/js/api/login.js', import.meta.url), 'utf8');
+  const source = readFileSync(new URL('../../login/js/navbar-login.js', import.meta.url), 'utf8');
   const routing = source.slice(source.indexOf('async function updateNavigation('));
   const courseLink = { dataset: { defaultCourse: 'csse' }, href: '', textContent: '' };
   const trigger = { querySelectorAll: selector => {
