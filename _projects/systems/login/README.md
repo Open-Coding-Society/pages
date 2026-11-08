@@ -51,6 +51,8 @@ git-ignored, and `make` (or `make dev`) writes them again from here.
 | `pages/logout.md` | `navigation/authentication/logout.md` | `/logout` |
 | `js/login-page.js` | `assets/js/login/login-page.js` | the `/login` page's script, `startLoginPage` |
 | `js/navbar-login.js` | `assets/js/api/login.js` | the navbar's signed-in state, `startNavbarLogin`, started by the site header |
+| `js/session.js` | `assets/js/login/session.js` | `FlaskSession`, `SpringSession` and `createSession` |
+| `js/backend.js` | `assets/js/login/backend.js` | `Backend`, `BackendError` and `createBackends` |
 | `js/logout.js` | `assets/js/api/logout.js` | `handleLogout` |
 | `js/password-rules.js` | `assets/js/api/passwordRules.js` | the password rule and checklist, also used by `/support` and the microblog |
 | `js/password-fields.js` | `assets/js/api/passwordFields.js` | Show/Hide and the Caps Lock hint on password fields |
@@ -59,12 +61,28 @@ git-ignored, and `make` (or `make dev`) writes them again from here.
 The scripts keep their old published paths because pages, layouts and other systems
 load them by those paths.
 
+## Sessions
+
+Sign-up, sign-in, logout and the signed-in user are two classes in `js/session.js`:
+
+- `FlaskSession` is the core every site has. It does each step on Flask.
+- `SpringSession extends FlaskSession` for sites that also run Spring. Each method calls
+  the Flask one with `super` and then does Spring's step. Spring's result is reported,
+  never thrown, so a Spring failure never undoes the Flask account or sign-in.
+
+Both make their requests through a `Backend` from `js/backend.js`, which knows one base URL.
+A starter builds them with `createSession(createBackends({ pythonURI, javaURI, fetchOptions,
+springEnabled }))`: `createBackends` makes a Spring backend only when `springEnabled` is
+true, and `createSession` picks `SpringSession` only when there is one. So `/login`, the
+navbar and logout never check `springEnabled`; they ask `session.usesSpring`.
+
 ## Imports
 
 A page's starter script imports the shared helpers (`assets/js/api/config.js`,
 `login-return.js`, and for the navbar Courses' `course-entry.js` and the dashboard's
-`FormatConverter`) with `{{ site.baseurl }}` and passes them in: the site header to
-`startNavbarLogin`, `/login` to `startLoginPage`, and `/logout` to `handleLogout`. The
+`FormatConverter`) with `{{ site.baseurl }}`, builds the session, and passes them in: the
+site header to `startNavbarLogin`, `/login` to `startLoginPage`, and `/logout` to
+`handleLogout(session)`. The
 modules never import `config.js` or use `../` paths. They're published into two
 folders, `assets/js/api/` and `assets/js/login/`, so a module may import only a file
 this system publishes beside it; `tests/imports.test.mjs` checks that.
