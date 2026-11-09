@@ -1,5 +1,25 @@
 import Transform from './Transform.js';
 
+function circleRectangleContact(x, y, radius, left, top, right, bottom) {
+    const nearestX = Math.max(left, Math.min(x, right));
+    const nearestY = Math.max(top, Math.min(y, bottom));
+    const dx = x - nearestX;
+    const dy = y - nearestY;
+    const distance = Math.hypot(dx, dy);
+    if (distance > radius) return { hit: false };
+    if (distance > 0) {
+        return { hit: true, normal: { x: dx / distance, y: dy / distance } };
+    }
+    // An embedded center exits through its closest face.
+    const faces = [
+        { distance: y - top, normal: { x: 0, y: -1 } },
+        { distance: bottom - y, normal: { x: 0, y: 1 } },
+        { distance: x - left, normal: { x: -1, y: 0 } },
+        { distance: right - x, normal: { x: 1, y: 0 } },
+    ];
+    return { hit: true, normal: faces.reduce((a, b) => a.distance <= b.distance ? a : b).normal };
+}
+
 /**
  * The GameObject class serves as a base class for all game objects.
  * It mimics an interface by defining abstract methods that must be implemented
@@ -234,7 +254,7 @@ class GameObject {
         const otherRight = otherRect.right - otherWidthReduction;
         const otherBottom = otherRect.bottom - otherHeightReduction;
 
-        // Circular collision detection (default and only option)
+        // Characters stay circular; Barrier opts into its rectangular surface.
         const thisCenterX = (thisLeft + thisRight) / 2;
         const thisCenterY = (thisTop + thisBottom) / 2;
         const otherCenterX = (otherLeft + otherRight) / 2;
@@ -244,7 +264,19 @@ class GameObject {
         const thisRadius = Math.min(thisRight - thisLeft, thisBottom - thisTop) * thisRadiusPercent;
         const otherRadius = Math.min(otherRight - otherLeft, otherBottom - otherTop) * otherRadiusPercent;
         const distance = Math.hypot(thisCenterX - otherCenterX, thisCenterY - otherCenterY);
-        const hit = distance < thisRadius + otherRadius;
+        let hit = distance < thisRadius + otherRadius;
+        let normal;
+        if (other.collisionShape === 'rectangle') {
+            ({ hit, normal } = circleRectangleContact(
+                thisCenterX, thisCenterY, thisRadius, otherLeft, otherTop, otherRight, otherBottom,
+            ));
+        } else if (this.collisionShape === 'rectangle') {
+            const contact = circleRectangleContact(
+                otherCenterX, otherCenterY, otherRadius, thisLeft, thisTop, thisRight, thisBottom,
+            );
+            hit = contact.hit;
+            if (contact.normal) normal = { x: -contact.normal.x, y: -contact.normal.y };
+        }
       
         const touchPoints = {
             this: {
@@ -266,7 +298,23 @@ class GameObject {
             },
         };
 
+        if (normal) {
+            const vertical = Math.abs(normal.y) >= Math.abs(normal.x);
+            Object.assign(touchPoints.this, {
+                top: vertical && normal.y < 0,
+                bottom: vertical && normal.y > 0,
+                left: !vertical && normal.x < 0,
+                right: !vertical && normal.x > 0,
+            });
+            Object.assign(touchPoints.other, {
+                top: touchPoints.this.bottom,
+                bottom: touchPoints.this.top,
+                left: touchPoints.this.right,
+                right: touchPoints.this.left,
+            });
+        }
         this.collisionData = { hit, touchPoints };
+        if (normal) this.collisionData.normal = normal;
     }
 
     /**

@@ -64,8 +64,13 @@ and gravity applies even when moving. Down does not fly or crouch. It keeps
 The platformer game extends it in
 `_projects/games/platformer/levels/PlatformerPlayer.js`, using the engine's
 inherited circular collision detector, with platform contact responses,
-jump sound, and debug overlay local. There is no separate rectangular detector
-or rectangular support probe in the example. A new
+jump sound, and debug overlay local. The shared detector uses circle-to-rectangle
+contact for `Barrier` surfaces (zero reduction by default), so wide floors are
+solid across their full width. Characters remain circular, including at platform
+corners; character-to-character collision is unchanged. Tangent Barrier contact
+counts as support, and contact faces come from the closest surface rather than
+overlapping sprite extents. There is no game-specific detector or support probe.
+A new
 game must supply support/collision handling: override `hasSupport()` when
 needed, position the player on landing, then call `land()`; on an underside
 contact, position the player below the platform and call `hitCeiling()`.
