@@ -34,16 +34,15 @@ On `/login`, `/logout` and in the navbar, the setting decides whether sign-up,
 sign-in and logout use Spring, and whether the navbar checks the Spring sign-in and
 loads the student's theme from Spring. `/signup` and `/guestlogin` don't read it yet,
 so they call Spring even with `spring: false`. Outside this system it covers Profile,
-the navbar's DM bell (its unread count), the Courses calendar card, the UI Builder, and
-chats embedded with Messages' `conversation-embed.js`.
+the navbar's DM bell (its unread count), the Courses calendar card, the UI Builder,
+chats embedded with Messages' `conversation-embed.js`, and the site's analytics tracker
+(`assets/js/ocs-analytics-tracker.js`), which `_includes/head-custom.html` leaves out
+with `spring: false`.
 
 Many pages that use Spring don't read it yet, such as `/dm`, `/student/calendar` and
 the announcement chats, and some links still lead to pages that call Spring: Profile's
 Reset password (`/support`) and Skill Passport (`/analytics-dashboard`), and the
-toolkit sidebar's View Grades, Calendar and Bathroom Pass. The site's analytics
-tracker (`assets/js/ocs-analytics-tracker.js`, which `_includes/head-custom.html` loads
-on most pages, `/login` and `/logout` included) also sends to Spring once a visitor
-clicks or types, whatever the setting.
+toolkit sidebar's View Grades, Calendar and Bathroom Pass.
 
 What Profile does in each is in the [Profile README](../profile/README.md#flask-only-or-flask--spring).
 
