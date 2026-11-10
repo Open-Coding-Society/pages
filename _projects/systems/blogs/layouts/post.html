@@ -391,7 +391,8 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
       {% elsif submission_type == "code" %}
       <form class="submission-form active" id="code-form-blog">
         <div class="form-group">
-          <p class="form-hint">This submits the code from this lesson's code runner(s) below as a Gist for automatic review. Save each runner with its 💾 button before submitting.</p>
+          <p class="form-hint">Choose what to hand in: click <strong>Add to submission</strong> on each runner you want graded (hacks, popcorn hacks), and save it. Leaving out practice runners does not lower your grade, but a required hack you leave out is graded as missing. Your selection is sent as a Gist for automatic review.</p>
+          <p class="code-runner-count" id="code-runner-count-blog" aria-live="polite"></p>
           <ul class="code-runner-summary" id="code-runner-summary-blog"></ul>
         </div>
         <div class="form-group">
@@ -512,7 +513,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
       // window.javaURI/fetchOptions come from a module script further down the page,
       // which (like all module scripts) runs deferred - only after DOMContentLoaded is
       // it guaranteed to have executed, matching the pattern already used below for
-      // renderCodeRunnerSummaryBlog.
+      // the code-runner summary mount.
       document.addEventListener('DOMContentLoaded', autoCreateAssignmentIfNeededBlog);
 
       // Team-taught lessons (team_teach: true): the student rates the lesson in the microblog
@@ -536,23 +537,6 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
         const result = await (await startLessonFeedbackBlog()).beforeSubmit();
         if (!result.ok) throw new Error(result.message);
         {% endif %}
-      }
-
-      function renderCodeRunnerSummaryBlog() {
-        const list = document.getElementById('code-runner-summary-blog');
-        if (!list) return;
-        const runners = window.listRunners();
-        if (runners.length === 0) {
-          list.innerHTML = '<li>No code runners found on this page.</li>';
-          return;
-        }
-        const unsaved = new Set(window.unsavedRunners());
-        list.innerHTML = runners.map((el, i) => {
-          const id = el.dataset.runnerId || `runner_${i + 1}`;
-          return unsaved.has(el)
-            ? `<li>${id} — <span class="code-runner-unsaved">not saved yet</span></li>`
-            : `<li>${id} — <span class="code-runner-saved">saved</span></li>`;
-        }).join('');
       }
 
       async function ensureAssignmentIdBlog() {
@@ -900,23 +884,23 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
       // Code submission — bundled into a Gist, then POST to Spring API
       const codeFormBlog = document.getElementById('code-form-blog');
       if (codeFormBlog) {
-        // window.listRunners/etc. come from a module script further down the page, which
-        // (like all module scripts) runs deferred - only after DOMContentLoaded is it
-        // guaranteed to have executed, so the summary render waits for that event too.
-        document.addEventListener('DOMContentLoaded', renderCodeRunnerSummaryBlog);
+        // window.mountSubmissionSummary/etc. come from a module script further down the page,
+        // which (like all module scripts) runs deferred - only after DOMContentLoaded is it
+        // guaranteed to have executed, so the summary mount waits for that event too.
+        document.addEventListener('DOMContentLoaded', () => window.mountSubmissionSummary(
+          document.getElementById('code-runner-count-blog'),
+          document.getElementById('code-runner-summary-blog')));
         codeFormBlog.addEventListener('submit', async function (e) {
           e.preventDefault();
           const notes = document.getElementById('code-notes-blog')?.value?.trim() || '';
           const btn = this.querySelector('button[type="submit"]');
-          if (window.unsavedRunners().length > 0) {
-            showStatusBlog('error', 'Save each code runner with its 💾 button, submit each reflection with its 📤 button, and check any MCQ answers before submitting.');
+          // Only the runners the student added are checked and sent; skipped ones never block.
+          const selectionError = window.submissionError();
+          if (selectionError) {
+            showStatusBlog('error', selectionError);
             return;
           }
-          const files = window.readRunners();
-          if (Object.keys(files).length === 0) {
-            showStatusBlog('error', "No saved code found in this lesson's code runner(s).");
-            return;
-          }
+          const files = window.readRunners({ selectedOnly: true });
           const selfAssessment = getSelfAssessmentDataBlog();
           // Self-assessment is paused, so its required-field check is off for now.
           // const selfAssessmentError = validateSelfAssessmentBlog(selfAssessment);
@@ -938,8 +922,10 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
           try {
             await saveLessonFeedbackFirstBlog();
             const assignmentId = await ensureAssignmentIdBlog();
-            // kinds tells the grader which files are written reflections rather than code.
-            const gistUrl = await window.exportToGist(files, { type: 'submission', description: notes || 'Code submission', manifest: { kinds: window.readRunnerKinds() } });
+            // kinds tells the grader which files are written reflections rather than code; runners
+            // tells it which runners were left out, so it can tell missing hacks from skipped practice.
+            const manifest = { kinds: window.readRunnerKinds({ selectedOnly: true }), runners: window.runnerSelectionSummary() };
+            const gistUrl = await window.exportToGist(files, { type: 'submission', description: notes || 'Code submission', manifest });
             const content = { type: 'code', url: gistUrl, notes };
             const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
               ...fetchOptions,
@@ -1012,17 +998,19 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
     import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
     import { appendGistSettingsLink } from '{{ site.baseurl }}/assets/js/gist-connection-errors.js';
-    import { listRunners, unsavedRunners, readRunners, readRunnerKinds } from '{{ site.baseurl }}/assets/js/runner-io.js';
+    import { readRunners, readRunnerKinds, runnerSelectionSummary } from '{{ site.baseurl }}/assets/js/runner-io.js';
+    import { mountSubmissionSummary, submissionError } from '{{ site.baseurl }}/assets/js/runner-submission.js';
     window.pythonURI = pythonURI;
     window.javaURI = javaURI;
     window.fetchOptions = fetchOptions;
     window.exportToGist = exportToGist;
     window.appendGistSettingsLink = appendGistSettingsLink;
     // Used by the blog code-submission form, which runs in a classic script.
-    window.listRunners = listRunners;
-    window.unsavedRunners = unsavedRunners;
     window.readRunners = readRunners;
     window.readRunnerKinds = readRunnerKinds;
+    window.runnerSelectionSummary = runnerSelectionSummary;
+    window.mountSubmissionSummary = mountSubmissionSummary;
+    window.submissionError = submissionError;
   </script>
   <script src="{{ site.baseurl }}/assets/js/ocs-analytics-enhanced.js"></script>
   <script src="{{ site.baseurl }}/assets/js/code-runner-analytics.js"></script>

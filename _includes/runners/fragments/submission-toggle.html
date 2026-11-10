@@ -1,0 +1,12 @@
+{% comment %}
+  "Add to submission" toggle for one runner. Only code-submission assignments bundle runners,
+  so other pages render nothing. Students pick the runners they want graded; practice runners
+  can be left out. State and behavior live in assets/js/runner-submission.js.
+{% endcomment %}
+{% if page.assignment and page.assignment_submission_type == "code" %}
+<button type="button" class="ocs__btn runner-submit-toggle" data-runner-submit-toggle aria-pressed="false">➕ Add to submission</button>
+<script type="module">
+  import { mountSubmissionToggles } from '{{ site.baseurl }}/assets/js/runner-submission.js';
+  mountSubmissionToggles();
+</script>
+{% endif %}

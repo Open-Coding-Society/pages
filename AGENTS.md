@@ -57,6 +57,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * **系统扩展：** 在现有系统内工作并在需要时进行扩展，而不是创建全新的并行架构。
 * **日历页面约定：** `navigation/calendar.md` 里的布局和弹层样式要放到 SCSS 中，用语义化 class 代替 utility 风格的内联类。
 * **日历事件编辑：** Spring 的 `PUT /api/calendar/edit/{id}` 拒绝空 `period` 或 `description`；无课程事件发送 `Personal`。关联文档存于描述末行（`Linked doc: <url>`，见 `_projects/systems/calendar/js/CalendarDocLinks.js`）；测试：`node --test tests/calendar_doc_links.test.mjs`。
+* **代码提交选择：** 代码提交（`assignment_submission_type: code`）只发送学生点了“Add to submission”的 runner（四种 runner 的 challenge box 中的切换按钮，见 `_includes/runners/fragments/submission-toggle.html`）；选择存于 `<storageKey>__submit`，默认不选，课程作者无需标记。未选的 runner 不阻止提交；0 个已选或已选未保存时阻止。逻辑在 `runner-io.js`（`setRunnerSelected`、`submissionStatus`、`readRunners({ selectedOnly: true })`、`runnerSelectionSummary`）与 `runner-submission.js`（切换按钮、提交面板计数、`submissionError`），两个提交处理函数共用。Gist 清单的 `runners` 列出跳过的 runner；Spring 的 `AssignmentAiGradingService` 据此提示 AI：练习 runner 不扣分，评分标准或加权 hack 要求而缺失的作业按未尝试计。测试：`node --test tests/runner_submission_selection.test.mjs`，Spring 的 `AssignmentAiGradingRunnerSelectionTest`。
 * **跨域 API：** 供 `pages.opencodingsociety.com` 调用的 Spring API 端点要显式允许带凭据的跨域请求。
 * **文档：** 必要时为困难或复杂的实现创建详细文档。
 * **注释：** 为非平凡的逻辑添加注释，但要保持简短，重点关注“为什么”而不是“是什么”。
