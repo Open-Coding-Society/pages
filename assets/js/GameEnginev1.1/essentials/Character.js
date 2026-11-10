@@ -173,16 +173,49 @@ class Character extends GameObject {
 
 
     /**
-     * Manages the object's look, state, and movement. 
-     * 
+     * Attach a behavior with update(character), or null to return control to the game.
+     * Controllers produce semantic actions; movement remains the character's responsibility.
      */
-    update() {
+    setController(controller) {
+        if (controller !== null && typeof controller?.update !== 'function') {
+            throw new TypeError('Character controller must provide update(character)');
+        }
+        this.controller = controller;
+        if (this.pressedKeys) this.applyControlActions({});
+    }
+
+    updateController() {
+        if (!this.controller || this.gameEnv?.gameControl?.isPaused) return;
+        this.controller.update(this);
+    }
+
+    applyControlActions(actions) {
+        if (!this.keypress) {
+            throw new TypeError('Character needs a keypress mapping to apply control actions');
+        }
+        const pressedKeys = {};
+        for (const action of ['up', 'down', 'left', 'right']) {
+            if (actions[action] === true) {
+                if (this.keypress[action] === undefined) {
+                    throw new TypeError(`Character has no key mapping for ${action}`);
+                }
+                pressedKeys[this.keypress[action]] = true;
+            }
+        }
+        this.pressedKeys = pressedKeys;
+        this.updateVelocity();
+        this.updateDirection();
+    }
+
+    // Movement subclasses pass false after updating the controller before their physics.
+    update(updateController = true) {
         // If the game is paused, draw the current state but skip updates and movement
         if (this.gameEnv && this.gameEnv.gameControl && this.gameEnv.gameControl.isPaused) {
             this.draw();
             return;
         }
 
+        if (updateController) this.updateController();
         // Match v1 update order so collision checks use current rendered bounds.
         this.draw();
         this.collisionChecks();

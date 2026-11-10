@@ -12,6 +12,7 @@ categories:
 permalink: /flask/deploy
 toc: true
 lesson_group: Flask
+ourses: { csp: { week: 13 } }
 ---
 
 ## Prerequisites

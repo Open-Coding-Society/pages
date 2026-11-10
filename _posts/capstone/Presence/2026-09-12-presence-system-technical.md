@@ -182,7 +182,7 @@ Computer unlinked"]</pre>
             </tbody>
           </table>
         </div>
-        <p class="rfid-presence-about">Device key = the <code>X-API-Key</code> header the tap reader (and later the camera) sends (<code>RFID_API_KEY</code> on the server). Teacher / Admin = a normal OCS login. Example tap, the request the CrowPi sends and what Flask returns:</p>
+        <p class="rfid-presence-about">Device key = the <code>X-API-Key</code> header the tap reader (and later the camera) sends (<code>RFID_API_KEY</code> on the server). Teacher / Admin = a normal OCS login. Example tap, the request the tap reader sends and what Flask returns:</p>
         <pre>POST /api/presence/event
     X-API-Key: (device key)
 

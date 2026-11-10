@@ -2,7 +2,7 @@
 toc: false
 layout: post
 title: Classroom Presence System, Tap Reader Build
-description: Our own tap reader, a Raspberry Pi 4 with a PN532 NFC HAT, replacing the CrowPi, and the circular enclosure it goes into.
+description: Our own tap reader, a Raspberry Pi 4 with a PN532 NFC HAT, and the circular enclosure it goes into.
 permalink: /capstone/presence-system/tap-reader/
 year: "2026-2027"
 rp_active: tapreader
@@ -145,13 +145,10 @@ rp_active: tapreader
     <div class="ocs__card">
         <h3 class="ocs__section-title">Talking points</h3>
 
-        <h4>Why replace the CrowPi</h4>
-        <p>The CrowPi is a whole learning kit (screen, keyboard and dozens of sensors in a suitcase-style case), and we only use its RFID reader. A small dedicated reader can be mounted by the door and left there, and it frees up the CrowPi.</p>
-
         <h4>Why build our own (Option D)</h4>
         <ul>
           <li>Costs a few dollars and can work this week (options doc).</li>
-          <li>No code changes: <code>reader.py</code> already reads cards with the <code>mfrc522</code> Python library, the standard RC522 library, and the doc says the CrowPi uses the same chip. The fob IDs we've already registered should stay the same.</li>
+          <li>No code changes: <code>reader.py</code> already reads cards with the <code>mfrc522</code> Python library, the standard RC522 library. The fob IDs we've already registered should stay the same.</li>
           <li>Mr. Mortensen backed it: he's bringing supplies and ordering the RC522, and Shay is printing a case. Building it ourselves also means we control the hardware and can fix it.</li>
         </ul>
 
@@ -180,7 +177,7 @@ rp_active: tapreader
 
         <h4>Open questions</h4>
         <ul>
-          <li><strong>Network:</strong> the Pi 3 will hit the same school-wifi problem as the CrowPi (devices can't reach my laptop). Options: Ethernet, a phone hotspot, or hosting Flask somewhere both can reach.</li>
+          <li><strong>Network:</strong> the Pi 3 will hit the same school-wifi problem as before (devices can't reach my laptop). Options: Ethernet, a phone hotspot, or hosting Flask somewhere both can reach.</li>
           <li><strong>PN532 HAT:</strong> do we need it at all, or is the RC522 enough?</li>
           <li><strong>Read range through a laptop or case:</strong> laptop bodies (often metal) can weaken 13.56 MHz reads. We need to test where the tag sits.</li>
         </ul>

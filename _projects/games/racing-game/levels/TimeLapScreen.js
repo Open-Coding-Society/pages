@@ -18,6 +18,8 @@ const PANEL_SIZE = { width: 190, height: 62 };
  * - totalLaps: laps to win (default 3)
  * - finishLine: { x, top, bottom } in 0-1 coordinates (see LapTracker), normally on the track's
  *   painted start/finish line
+ * - checkpoint: required { x, top, bottom } gate across the far-side track lane;
+ *   cars must cross it moving left before a rightward finish-line crossing counts
  * - drawFinishLine: true to draw a checkered line, for tracks without one painted on
  * - hudPosition: { x, y } in 0-1 coordinates for the box's top-left, picked so it doesn't cover the track
  */

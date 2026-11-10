@@ -4,16 +4,84 @@ Run from the repository root with Node.js 22.15+ (or a current LTS).
 No npm dependencies, browser, or site build are needed:
 
 ```sh
-node --import ./assets/js/GameEnginev1.1/test/register-assets.mjs --test assets/js/GameEnginev1.1/test/*.test.mjs _projects/games/racing-game/tests/racing-player.test.mjs
+node --import ./assets/js/GameEnginev1.1/test/register-assets.mjs --test assets/js/GameEnginev1.1/test/*.test.mjs _projects/games/racing-game/tests/racing-player.test.mjs _projects/games/platformer/tests/*.test.mjs
 ```
 
 ## Shared behavior
+
+`Character` owns the optional behavior-controller contract:
+`setController({ update(character) { ... } })`, `updateController()`, and
+`applyControlActions({ up, down, left, right })`. Actions are boolean snapshots;
+omitted actions release their controls. The engine adapts actions to the
+existing key mapping without synthesizing DOM keyboard events. RPG, Driver,
+and Platformer interpret the same actions using their own movement rules.
+Controllers run once before movement, do not advance while paused, and own
+input until `setController(null)` restores keyboard control. With no controller,
+existing input behavior is unchanged.
+
+```javascript
+player.setController({
+  update(character) {
+    character.applyControlActions({ right: true });
+  },
+});
+// Later, release the bot's controls and accept keyboard input again.
+player.setController(null);
+```
+
+For Player, right means moving right; for PlayerDriver, it means steering
+right; for PlayerPlatformer, it means running right. Navigation and patrol
+policies choose these actions; they do not replace movement or collision rules.
+The low-level Character hook also accepts behaviors that manipulate its velocity
+directly; the action-to-key adapter requires a Player's key mapping and movement
+methods.
+
+RacingBot is the first example: its controller invokes the Autumn route policy.
+Race-start waiting, finish rules, and spin recovery remain game-owned.
+`AutumnBotGenetics.js` also contains offline training, simulation, and track
+geometry; its length is not the size of the shared bot API. Those algorithms
+remain outside Character. NPC patrols can adopt the same controller hook
+without requiring a bot subclass; custom update loops must call
+`updateController()` before their movement, avoiding a second invocation in
+the parent update.
 
 `essentials/Player.js` already accepts `data.keypress` for remapping. It also
 prevents browser scrolling for movement arrows assigned to that player.
 Unassigned arrows, typing fields, browser shortcuts, and paused/detached games
 retain their browser defaults. This cancels the default browser action, not
 event propagation or the engine's existing movement handling.
+
+`essentials/PlayerDriver.js` extends `Player` with throttle, braking, coasting,
+reverse, and steering controls. It accepts optional `data.driverPhysics`
+overrides; specialized games can also override the physics values after
+construction.
+
+`essentials/PlayerPlatformer.js` is a starter for side-view movement: mapped
+left/right keys move horizontally, up jumps once per press while supported,
+and gravity applies even when moving. Down does not fly or crouch. It keeps
+`Player.js` unchanged and disables its legacy gravity pass.
+
+The platformer game extends it in
+`_projects/games/platformer/levels/PlatformerPlayer.js`, using the engine's
+inherited circular collision detector, with platform contact responses,
+jump sound, and debug overlay local. The shared detector uses circle-to-rectangle
+contact for `Barrier` surfaces (zero reduction by default), so wide floors are
+solid across their full width. Characters remain circular, including at platform
+corners; character-to-character collision is unchanged. Tangent Barrier contact
+counts as support, and contact faces come from the closest surface rather than
+overlapping sprite extents. There is no game-specific detector or support probe.
+A new
+game must supply support/collision handling: override `hasSupport()` when
+needed, position the player on landing, then call `land()`; on an underside
+contact, position the player below the platform and call `hitCeiling()`.
+Override `onJump()` for sound or effects. Positive `verticalVelocity` means
+upward; `gravityAcceleration` and `jumpVelocity` are configurable through data.
+Physics retains the existing game's per-update units, not seconds.
+
+Student extension points include animation states, crouching, jump height,
+and platform contact responses using the shared engine detector. Keep game-specific assets and
+effects out of the engine, and test landings, ceilings, walking off edges,
+and held/released jump keys before changing collision behavior.
 
 Games can still override `handleKeyDown` and call `super.handleKeyDown(event)`.
 For example, RacingPlayer additionally rejects movement input during typing,

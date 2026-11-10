@@ -1,4 +1,19 @@
 # Team Triple T's org-owned Kanban, embedded on the Unified Social Club capstone page.
+# The GitHub board uses the detailed lifecycle columns; the page groups them into
+# the five OCS stages so the embed stays simple.
 Board:
-  url: "https://github.com/orgs/Unified-Social-Club-CSP/projects/1"
+  url: "https://github.com/orgs/Unified-Social-Club-CSP/projects/2"
   filter: "Owner"
+  columns:
+    - status: "Define"
+      stage: todo
+    - status: "Coded"
+      stage: doing
+    - status: "Unit Tested"
+      stage: doing
+    - status: "Integrate/PR"
+      stage: doing
+    - status: "Deploy"
+      stage: review
+    - status: "System Test"
+      stage: review

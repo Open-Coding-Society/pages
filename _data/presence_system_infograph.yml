@@ -9,6 +9,8 @@ Team:
 
 Mentor: "Dr. Douglas Fenner"
 
+Status: "Working prototype · UHF pilot in progress"
+
 Repo: "https://github.com/vibha1019/crowpi-attendance"
 Year: "2026-2027"
 
@@ -18,6 +20,9 @@ Pages:
   - key: hub
     tab: "Overview"
     url: "/capstone/presence-system/"
+  - key: funding
+    tab: "Funding"
+    url: "/capstone/presence-system/funding/"
   - key: dashboard
     tab: "Live Dashboard"
     url: "/capstone/presence-system/dashboard/"

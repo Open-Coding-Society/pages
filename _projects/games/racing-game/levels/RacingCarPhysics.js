@@ -1,3 +1,5 @@
+import { getDriverTurnRate } from '@assets/js/GameEnginev1.1/essentials/PlayerDriver.js';
+
 export const RACING_CAR_PHYSICS = Object.freeze({
   maxSpeed: 6,
   reverseSpeed: 2,
@@ -13,7 +15,5 @@ export const RACING_CAR_HITBOX = Object.freeze({
 });
 
 export function getRacingTurnRate(speed) {
-  if (speed === 0) return 0;
-  const speedFraction = Math.min(Math.abs(speed) / RACING_CAR_PHYSICS.maxSpeed, 1);
-  return RACING_CAR_PHYSICS.turnRate * (1 - 0.1 * speedFraction);
+  return getDriverTurnRate(speed, RACING_CAR_PHYSICS);
 }

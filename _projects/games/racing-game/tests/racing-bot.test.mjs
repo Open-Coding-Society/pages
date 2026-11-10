@@ -36,6 +36,7 @@ function fixture(mode = 'hardcoded') {
     keypress: keys,
     gameEnv: { innerWidth: 643, innerHeight: 360, gameControl: { isPaused: false }, container: { isConnected: true } },
   });
+  bot.setMode(mode);
   Object.assign(bot, {
     heading: 0,
     ...RACING_CAR_PHYSICS,
