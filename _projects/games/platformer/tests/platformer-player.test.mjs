@@ -11,7 +11,7 @@ function fixture() {
   const player = createKeyboardPlayer(PlatformerPlayer);
   const barrier = Object.create(Barrier.prototype);
   barrier.transform = new Transform(0, 100);
-  Object.assign(barrier, { width: 100, height: 20, canvas: { id: 'platform' } });
+  Object.assign(barrier, { width: 100, height: 20, collisionShape: 'rectangle', canvas: { id: 'platform' } });
   Object.assign(player, {
     width: 20,
     height: 20,
@@ -21,6 +21,7 @@ function fixture() {
     isGrounded: false,
     gameEnv: { gameObjects: [barrier] },
     collisionData: { touchPoints: { this: { top: true }, other: { id: 'platform' } } },
+    setupCanvas() {},
   });
   return { player, barrier };
 }
@@ -38,7 +39,7 @@ test('game subclass inherits engine collision detection and its hitbox reduction
   assert.equal(player.hasSupport(), true);
 });
 
-test('overlapping sprite corners do not collide unless the engine circles overlap', () => {
+test('overlapping sprite corners do not collide unless the player circle reaches the barrier', () => {
   const { player, barrier } = fixture();
   player.canvas = {
     id: 'player',
@@ -48,11 +49,63 @@ test('overlapping sprite corners do not collide unless the engine circles overla
   barrier.canvas.getBoundingClientRect = () => ({
     left: offset, top: offset, right: offset + 20, bottom: offset + 20, width: 20, height: 20,
   });
+
   player.isCollision(barrier);
   assert.equal(player.collisionData.hit, false);
   offset = 10;
   player.isCollision(barrier);
   assert.equal(player.collisionData.hit, true);
+});
+
+function liveFixture() {
+  const { player, barrier } = fixture();
+  player.position = { x: 5, y: 0 };
+  player.gravityAcceleration = 0.4;
+  player.state = { collisionEvents: [] };
+  player.clearPressedKeysOnCollision = false;
+  player.gameEnv.gameControl = { isPaused: false };
+  player.draw = () => {};
+  player._updateDebugHitboxOverlay = () => {};
+  player.move = () => {
+    player.position.x += player.velocity.x;
+    player.position.y += player.velocity.y;
+  };
+  const rect = object => ({
+    left: object.x, top: object.y, right: object.x + object.width,
+    bottom: object.y + object.height, width: object.width, height: object.height,
+  });
+  player.canvas = { id: 'player', getBoundingClientRect: () => rect(player) };
+  barrier.canvas.getBoundingClientRect = () => rect(barrier);
+  player.gameEnv.gameObjects.push(player);
+  return { player, barrier };
+}
+
+test('falling near the end of a wide platform lands on top and stays grounded for W', () => {
+  const { player } = liveFixture();
+  for (let frame = 0; frame < 60; frame += 1) player.update();
+  assert.equal(player.position.y, 81);
+  assert.equal(player.isGrounded, true);
+  assert.equal(player.verticalVelocity, 0);
+  pressKey(player, player.keypress.up);
+  player.update();
+  assert.ok(player.position.y < 81);
+  assert.ok(player.verticalVelocity > 0);
+  assert.equal(player.isGrounded, false);
+});
+
+test('walking across the platform retains support, and walking off its edge falls', () => {
+  const { player } = liveFixture();
+  player.position = { x: 5, y: 81 };
+  player.land();
+  pressKey(player, player.keypress.right);
+  for (let frame = 0; frame < 12; frame += 1) {
+    player.update();
+    assert.equal(player.isGrounded, true);
+    assert.equal(player.position.y, 81);
+  }
+  for (let frame = 0; frame < 15; frame += 1) player.update();
+  assert.equal(player.isGrounded, false);
+  assert.ok(player.position.y > 81);
 });
 
 test('a supported jump plays the game sound hook without landing canceling takeoff', () => {

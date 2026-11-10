@@ -122,7 +122,9 @@ class PlatformerPlayer extends PlayerPlatformer {
 	handleCollisionState() {
 		const touchPoints = this.collisionData?.touchPoints?.this;
 		const otherObject = this._resolveOtherObject();
-		const insets = this._getPlayerCollisionInsets();
+		const bounds = this._getPlayerWorldCollisionBounds();
+		const radius = Math.min(bounds.right - bounds.left, bounds.bottom - bounds.top)
+			* (this.hitbox?.radiusPercentage ?? 0.5);
 
 		if (!touchPoints) {
 			return;
@@ -133,30 +135,23 @@ class PlatformerPlayer extends PlayerPlatformer {
 			return;
 		}
 
-		if (touchPoints.left || touchPoints.right) {
-			this.velocity.x = 0;
-		}
-
-		// Standing on the top of a barrier: stop falling and skip gravity for this frame.
-		// Do not apply this while moving upward, or the jump gets canceled on the takeoff frame.
-		if (touchPoints.top && this.verticalVelocity <= 0) {
-			this.position.y = otherObject.y - (this.height - insets.bottom);
-			this.land();
-		}
-
-		// Hitting the underside of a barrier while jumping: stop upward motion.
-		if (touchPoints.bottom) {
-			this.position.y = otherObject.y + otherObject.height - insets.top;
+		// Resolve one contact face; overlapping top/side extents must not cancel a jump.
+		if (touchPoints.top) {
+			if (this.verticalVelocity <= 0) {
+				this.position.y = otherObject.y - this.height / 2 - radius;
+				this.land();
+			}
+		} else if (touchPoints.bottom && this.verticalVelocity > 0) {
+			this.position.y = otherObject.y + otherObject.height - this.height / 2 + radius;
 			this.hitCeiling();
+		} else if (touchPoints.left) {
+			this.velocity.x = 0;
+			this.position.x = otherObject.x - this.width / 2 - radius;
+		} else if (touchPoints.right) {
+			this.velocity.x = 0;
+			this.position.x = otherObject.x + otherObject.width - this.width / 2 + radius;
 		}
-
-		if (touchPoints.left) {
-			this.position.x = otherObject.x - (this.width - insets.right);
-		}
-
-		if (touchPoints.right) {
-			this.position.x = otherObject.x + otherObject.width - insets.left;
-		}
+		this.setupCanvas();
 	}
 
 	handleCollisionReaction(other) {
