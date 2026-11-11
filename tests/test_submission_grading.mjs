@@ -3,8 +3,9 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
-  GRADING_MESSAGES, applyGradingState, canPetition, clearManualGrade, filePetition, gradePills, gradingMessage,
-  hasManualOverride, isFinal, readGradingResponse, renderGradingHistory, requestAiRegrade, saveManualGrade,
+  GRADING_MESSAGES, applyGradingState, canPetition, clearManualGrade, fetchPetitions, filePetition, gradePills,
+  gradingMessage, hasManualOverride, isFinal, readGradingResponse, renderGradingHistory, renderPetitions,
+  requestAiRegrade, saveManualGrade,
 } from "../assets/js/submissions/grading.js";
 
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (ch) => (
@@ -223,6 +224,46 @@ test("a petition without an instructor grade before close is refused with a reas
 
   assert.equal(result.ok, false);
   assert.equal(result.message, GRADING_MESSAGES.NO_MANUAL_OVERRIDE);
+});
+
+test("a student's petitions load from the petitions endpoint", async () => {
+  const calls = recordingFetch(jsonResponse(200, [{ id: 3, status: "OPEN" }]));
+
+  const petitions = await fetchPetitions({ javaURI: "https://spring.test", fetchOptions: {}, submissionId: 7 });
+
+  assert.equal(calls[0].url, "https://spring.test/api/grade-reviews/submission/7/petitions");
+  assert.equal(calls[0].options.method, "GET");
+  assert.deepEqual(petitions, [{ id: 3, status: "OPEN" }]);
+});
+
+test("petitions someone else can't see fail with the outcome's message", async () => {
+  recordingFetch(jsonResponse(403, { outcome: "NOT_PERMITTED" }));
+
+  await assert.rejects(fetchPetitions({ javaURI: "https://spring.test", fetchOptions: {}, submissionId: 7 }),
+    { message: GRADING_MESSAGES.NOT_PERMITTED });
+});
+
+test("petitions show newest first with the teacher's decision and rationale", () => {
+  const html = renderPetitions([
+    { id: 1, status: "DECIDED", message: "I fixed <b>it</b>", gradeAtOpen: 7, decision: "NO_CHANGE",
+      rationale: "Rubric met at 7", openedAt: "2026-11-01T10:00:00", decidedAt: "2026-11-02T09:00:00" },
+    { id: 2, status: "DECIDED", message: "Tests pass now", gradeAtOpen: 7, decision: "ADJUST", rationale: "Confirmed",
+      adjustedGrade: 9.5, adjustedFeedback: "Good fix", openedAt: "2026-11-03T10:00:00", decidedAt: "2026-11-04T09:00:00" },
+    { id: 3, status: "OPEN", message: "Please look", gradeAtOpen: 9.5, openedAt: "2026-11-05T10:00:00" },
+  ], { escapeHtml, points: 10 });
+
+  const waiting = html.indexOf("Waiting for your teacher");
+  const changed = html.indexOf("Grade changed to 9.5/10");
+  const kept = html.indexOf("Grade kept");
+  assert.ok(waiting >= 0 && waiting < changed && changed < kept, "newest petition first");
+  assert.match(html, /ocs__status-pill--warn">Waiting for your teacher/);
+  assert.match(html, /<strong>Your teacher:<\/strong> Rubric met at 7/);
+  assert.match(html, /New feedback: Good fix/);
+  assert.match(html, /I fixed &lt;b&gt;it&lt;\/b&gt;/);
+});
+
+test("no petitions adds nothing to the history", () => {
+  assert.equal(renderPetitions([], { escapeHtml }), "");
 });
 
 test("history shows an instructor grade carried over to a new revision", () => {

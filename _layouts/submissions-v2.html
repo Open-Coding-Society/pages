@@ -699,7 +699,7 @@ active_tab: submissions
                                         <td>
                                             <div class="submission-actions ocs__links">
                                                 ${isFinal(submission) ? '' : `<button type="button" class="ocs__btn small accent fill" onclick="openEditModal(${submission.id})">Edit</button>`}
-                                                <button type="button" class="ocs__btn small" onclick="showSubmissionHistory(${submission.id})">History</button>
+                                                <button type="button" class="ocs__btn small" onclick="showSubmissionHistory(${submission.id}, true)">History</button>
                                                 ${canPetition(submission) ? `<button type="button" class="ocs__btn small" title="Ask your teacher to reconsider this grade" onclick="petitionGrade(${submission.id})">Petition</button>` : ''}
                                             </div>
                                         </td>
@@ -1070,13 +1070,14 @@ active_tab: submissions
         }
         try {
             const result = await filePetition({ javaURI, fetchOptions, submissionId, message });
-            alert(result.message);
+            alert(result.ok ? `${result.message} Open History to see the decision.` : result.message);
         } catch (e) {
             alert('Network error');
         }
     };
 
-    window.showSubmissionHistory = function(submissionId) {
+    // `mine` is set on the student's own rows, so the modal also lists their petitions.
+    window.showSubmissionHistory = function(submissionId, mine = false) {
         const submission = allSubmissions.find(current => String(current.id) === String(submissionId));
         showGradingHistory({
             javaURI,
@@ -1084,7 +1085,8 @@ active_tab: submissions
             submissionId,
             title: `${submission?.submitterName || 'Submission'} · ${submission?.assignmentName || ''}`,
             points: submission ? getAssignmentPoints(submission) : null,
-            escapeHtml
+            escapeHtml,
+            petitions: mine
         });
     };
 
