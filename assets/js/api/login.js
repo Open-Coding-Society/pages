@@ -130,13 +130,13 @@ function warnIfSpringSignedOut(loginArea) {
 }
 
 // The browser remembers whose theme it holds. When that isn't the signed-in student (a new
-// browser, or another student on a shared computer), load their theme from Spring so it shows
+// browser, or another student on a shared computer), load their theme from Flask so it shows
 // on every page right away, not only after they open the dashboard.
 async function syncThemeOwner(uid) {
     const previousOwner = localStorage.getItem('sitePreferencesOwner');
-    if (!springEnabled || !uid || previousOwner === uid) return;
+    if (!uid || previousOwner === uid) return;
     try {
-        const response = await fetch(`${javaURI}/api/user/preferences`, fetchOptions);
+        const response = await fetch(`${pythonURI}/api/user/preferences`, fetchOptions);
         if (!response.ok) return;
         const data = await response.json();
         const prefs = data?.id ? FormatConverter.toFrontend(data) : null;
