@@ -110,19 +110,21 @@ export class FormatConverter {
 export class PreferencesAPI {
     static isLoggedIn = false;
     static backendPrefsExist = false;
-    static javaURI = null;
+    static javaURI = null;    // Spring: head-tracking calibration
+    static pythonURI = null;  // Flask: login check and preferences
     static fetchOptions = null;
 
     /** Initialize with API config */
-    static init(javaURI, fetchOptions) {
+    static init(javaURI, fetchOptions, pythonURI) {
         PreferencesAPI.javaURI = javaURI;
+        PreferencesAPI.pythonURI = pythonURI;
         PreferencesAPI.fetchOptions = fetchOptions;
     }
 
-    /** Check login by hitting the person endpoint */
+    /** Check login against Flask, which stores the preferences */
     static async checkLogin() {
         try {
-            const res = await fetch(`${PreferencesAPI.javaURI}/api/person/get`, PreferencesAPI.fetchOptions);
+            const res = await fetch(`${PreferencesAPI.pythonURI}/api/id`, PreferencesAPI.fetchOptions);
             PreferencesAPI.isLoggedIn = res.ok;
             return res.ok;
         } catch (_) {
@@ -135,7 +137,7 @@ export class PreferencesAPI {
     /** Fetch preferences from backend (returns frontend-format or null) */
     static async get() {
         try {
-            const res = await fetch(`${PreferencesAPI.javaURI}/api/user/preferences`, PreferencesAPI.fetchOptions);
+            const res = await fetch(`${PreferencesAPI.pythonURI}/api/user/preferences`, PreferencesAPI.fetchOptions);
 
             if (res.status === 401) {
                 PreferencesAPI.isLoggedIn = false;
@@ -163,7 +165,7 @@ export class PreferencesAPI {
     static async set(prefs) {
         try {
             const method = PreferencesAPI.backendPrefsExist ? 'PUT' : 'POST';
-            const res = await fetch(`${PreferencesAPI.javaURI}/api/user/preferences`, {
+            const res = await fetch(`${PreferencesAPI.pythonURI}/api/user/preferences`, {
                 ...PreferencesAPI.fetchOptions,
                 method,
                 body: JSON.stringify(FormatConverter.toBackend(prefs))
@@ -179,7 +181,7 @@ export class PreferencesAPI {
     /** Delete preferences from backend */
     static async delete() {
         try {
-            const res = await fetch(`${PreferencesAPI.javaURI}/api/user/preferences`, {
+            const res = await fetch(`${PreferencesAPI.pythonURI}/api/user/preferences`, {
                 ...PreferencesAPI.fetchOptions,
                 method: 'DELETE'
             });
@@ -1508,9 +1510,9 @@ export class PreferencesController {
 // ============================================
 // PUBLIC API: Initialize the preferences module
 // ============================================
-export function initializePreferences(javaURI, fetchOptions) {
+export function initializePreferences(javaURI, fetchOptions, pythonURI) {
     // Initialize API config
-    PreferencesAPI.init(javaURI, fetchOptions);
+    PreferencesAPI.init(javaURI, fetchOptions, pythonURI);
 
     // Boot orchestrator — module scripts are deferred so DOMContentLoaded
     // may have already fired by the time this runs. Handle both cases.

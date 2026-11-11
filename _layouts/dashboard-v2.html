@@ -336,17 +336,17 @@ active_tab: dashboard
                         <p id="head-tracking-status" class="ocs__text ocs__dashboard-card-spaced-sm"></p>
                     </div>
                 </div>
-                <!-- Preferences UI: Now fetches/saves preferences from Spring backend API.
+                <!-- Preferences UI: fetches/saves preferences from the Flask backend API.
                      Falls back to localStorage for guests (not logged in).
                      Uses config.js for API endpoints. -->
                 <script type="module">
-                import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+                import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
                 import { initializePreferences } from '{{ site.baseurl }}/assets/js/pages/dashboard/preferences.js';
                 import { initAiTheme } from '{{ site.baseurl }}/assets/js/pages/dashboard/ai-theme.js';
                 import { initPreferencesLayout } from '{{ site.baseurl }}/assets/js/pages/dashboard/preferences-layout.js';
 
                 // Initialize the preferences module with API configuration
-                initializePreferences(javaURI, fetchOptions);
+                initializePreferences(javaURI, fetchOptions, pythonURI);
                 initAiTheme({ javaURI, fetchOptions });
                 initPreferencesLayout();
                 </script>
