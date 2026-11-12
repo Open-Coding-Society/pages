@@ -174,6 +174,18 @@ export async function filePetition({ javaURI, fetchOptions, submissionId, messag
   return readGradingResponse(response);
 }
 
+/** The student's own petitions on a submission, oldest first, each with the teacher's decision once made. */
+export async function fetchPetitions({ javaURI, fetchOptions, submissionId }) {
+  const response = await fetch(`${javaURI}/api/grade-reviews/submission/${encodeURIComponent(submissionId)}/petitions`, {
+    ...fetchOptions,
+    method: "GET",
+  });
+  if (!response.ok) {
+    throw new Error((await readGradingResponse(response)).message);
+  }
+  return response.json();
+}
+
 export async function fetchGradingHistory({ javaURI, fetchOptions, submissionId }) {
   const response = await fetch(`${javaURI}/api/submissions/${encodeURIComponent(submissionId)}/grading-history`, {
     ...fetchOptions,
@@ -229,6 +241,29 @@ export function renderGradingHistory(history, { escapeHtml, points = null }) {
   }).join("")}</div>`;
 }
 
+/** The student's petitions as HTML, newest first: what they asked, and the teacher's decision and rationale. */
+export function renderPetitions(petitions, { escapeHtml, points = null }) {
+  if (!petitions?.length) return "";
+  const text = (value) => escapeHtml(String(value ?? ""));
+  const when = (value) => text(new Date(value).toLocaleString());
+  const items = [...petitions].reverse().map((petition) => {
+    const decided = petition.status === "DECIDED";
+    const adjusted = petition.decision === "ADJUST";
+    const tone = !decided ? "warn" : adjusted ? "good" : "neutral";
+    const label = !decided ? "Waiting for your teacher"
+      : adjusted ? `Grade changed to ${formatGrade(petition.adjustedGrade, points)}` : "Grade kept";
+    return `<div class="ocs__tree-item">
+      <span class="ocs__status-pill ocs__status-pill--${tone}">${text(label)}</span>
+      <br><small>Sent ${when(petition.openedAt)} · Grade then: ${text(formatGrade(petition.gradeAtOpen, points))}</small>
+      ${petition.message ? `<p class="ocs__description">You wrote: ${text(petition.message)}</p>` : ""}
+      ${decided ? `<p class="ocs__description"><strong>Your teacher:</strong> ${text(petition.rationale)}</p>
+      ${petition.adjustedFeedback ? `<p class="ocs__description">New feedback: ${text(petition.adjustedFeedback)}</p>` : ""}
+      <small>Decided ${when(petition.decidedAt)}</small>` : ""}
+    </div>`;
+  }).join("");
+  return `<h4 class="ocs__section-title">Your petitions</h4><div class="ocs__tree">${items}</div>`;
+}
+
 function historyModal() {
   let modal = document.getElementById("grading-history-modal");
   if (modal) return modal;
@@ -260,8 +295,8 @@ function historyModal() {
   return modal;
 }
 
-/** Opens a modal with the submission's grading history. */
-export async function showGradingHistory({ javaURI, fetchOptions, submissionId, title, points, escapeHtml }) {
+/** Opens a modal with the submission's grading history, and the student's petitions when `petitions` is set. */
+export async function showGradingHistory({ javaURI, fetchOptions, submissionId, title, points, escapeHtml, petitions = false }) {
   const modal = historyModal();
   modal.querySelector(".ocs__modal-title").textContent = title || "Grading history";
   const body = modal.querySelector("[data-history-body]");
@@ -269,9 +304,14 @@ export async function showGradingHistory({ javaURI, fetchOptions, submissionId, 
   modal.classList.remove("hidden");
   modal.setAttribute("aria-hidden", "false");
   modal.querySelector("[data-close-history]").focus();
+  const petitionsHtml = petitions
+    ? fetchPetitions({ javaURI, fetchOptions, submissionId })
+      .then((list) => renderPetitions(list, { escapeHtml, points }))
+      .catch((error) => `<p class="ocs__description">Could not load your petitions: ${escapeHtml(error.message)}</p>`)
+    : Promise.resolve("");
   try {
     const history = await fetchGradingHistory({ javaURI, fetchOptions, submissionId });
-    body.innerHTML = renderGradingHistory(history, { escapeHtml, points });
+    body.innerHTML = renderGradingHistory(history, { escapeHtml, points }) + await petitionsHtml;
   } catch (error) {
     body.textContent = `Could not load history: ${error.message}`;
   }
