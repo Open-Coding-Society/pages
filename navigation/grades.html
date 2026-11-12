@@ -16,13 +16,12 @@ search_exclude: true
 
 <div class="ocs__container ocs__container--fill">
   <h2 class="ocs__section-title">Grades</h2>
-  <p class="ocs__description">See and predict your grades, reflect on each sprint, and manage submissions.</p>
+  <p>See and predict your grades, reflect on each sprint, and manage submissions.</p>
 
-  <div class="ocs__stack ocs__stack--wide">
-    {% for section in site.data.grades_hub %}
+  {% for section in site.data.grades_hub %}
     <section class="ocs__card" aria-labelledby="grades-{{ section.id }}">
       <h3 class="ocs__section-title" id="grades-{{ section.id }}">{{ section.title }}</h3>
-      <p class="ocs__description">{{ section.description }}</p>
+      <p>{{ section.description }}</p>
       <div class="ocs__hub-grid">
         {% for link in section.links %}
           {% if link.spring_path and site.spring == false %}{% continue %}{% endif %}
@@ -39,7 +38,6 @@ search_exclude: true
       </div>
     </section>
     {% endfor %}
-  </div>
 </div>
 
 <script type="module">
