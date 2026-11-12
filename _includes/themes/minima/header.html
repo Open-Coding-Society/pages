@@ -51,6 +51,21 @@
         </div>
     </header>
 
-    <script type="module" src="{{ site.baseurl }}/assets/js/api/login.js"></script>
+    <script type="module">
+        import { baseurl, pythonURI, javaURI, fetchOptions, springEnabled } from '{{ site.baseurl }}/assets/js/api/config.js';
+        import { addLoginReturn } from '{{ site.baseurl }}/assets/js/api/login-return.js';
+        import { savedCourse, selectEntryCourse, courseEntryUrl } from '{{ site.baseurl }}/assets/js/course-entry.js';
+        import { FormatConverter } from '{{ site.baseurl }}/assets/js/pages/dashboard/preferences.js';
+        import { createBackends } from '{{ site.baseurl }}/assets/js/login/backend.js';
+        import { createSession } from '{{ site.baseurl }}/assets/js/login/session.js';
+        import { startNavbarLogin } from '{{ site.baseurl }}/assets/js/login/navbar-login.js';
+
+        const backends = createBackends({ pythonURI, javaURI, fetchOptions, springEnabled });
+        startNavbarLogin({
+            session: createSession(backends), spring: backends.spring,
+            baseurl, pythonURI, fetchOptions, addLoginReturn, FormatConverter,
+            courseEntry: { savedCourse, selectEntryCourse, courseEntryUrl },
+        });
+    </script>
     <script type="module" src="{{ site.baseurl }}/assets/js/api/dm-notifications.js"></script>
     <script type="module" src="{{ site.baseurl }}/assets/js/api/microblog-notifications.js"></script>

@@ -95,6 +95,16 @@ images/projects/
 /_includes/profile-ai-connections.html
 /assets/js/profile/
 /_sass/open-coding/profile-gist-connection.scss
+# Login system distributions (authoritative sources in _projects/systems/login)
+/navigation/authentication/login.md
+/navigation/authentication/logout.md
+/navigation/authentication/guestlogin.md
+/navigation/signup.md
+/assets/js/api/logout.js
+/assets/js/api/passwordRules.js
+/assets/js/api/passwordFields.js
+/assets/js/api/reverify.js
+/assets/js/login/
 /_includes/post_list_image_card.html
 /_includes/announcement_calendar_demo.html
 /_includes/ocs_calendar_card.html

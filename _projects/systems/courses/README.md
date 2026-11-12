@@ -131,9 +131,11 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
 - **Site shell:** `_config.yml`, `_layouts/opencs.html`, and
   `_includes/themes/minima/header.html` remain site-owned. The header uses
   `[data-course-entry]` and the published course-entry helper.
-- **Authentication/configuration:** `assets/js/api/login.js` and
-  `assets/js/api/config.js` remain shared. Login selects a course through the
-  helper rather than maintaining a second routing policy.
+- **Authentication/configuration:** [login](../login/README.md) owns the navbar's
+  signed-in state (`js/navbar-login.js`), and `assets/js/api/config.js` remains
+  shared. The header passes this kit's course-entry helpers to Login's
+  `startNavbarLogin`, so Login selects a course through the helper rather than
+  maintaining a second routing policy; `tests/course_entry.test.mjs` runs that code.
 - **Document services:** reading time, TOC, submenu, Gist export/settings,
   runner I/O, grading/submission helpers, and Utterances remain shared. Lesson
   sources remain in their registered lesson projects, notebooks, and DOCX.

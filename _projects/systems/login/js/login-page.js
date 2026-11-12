@@ -1,155 +1,18 @@
----
-layout: page
-title: Login
-permalink: /login
-search_exclude: true
-show_reading_time: false
----
-<br>
-
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<div class="login-container">
-    <!-- Python Login Form -->
-    <div class="login-card">
-        <h1 id="pythonTitle">User Login</h1>
-        <hr>
-        <form id="pythonForm" onsubmit="loginBoth(); return false;">
-            <div class="form-group">
-                <input type="text" id="uid" placeholder="GitHub ID" required>
-            </div>
-            <div class="form-group">
-                <input type="password" id="password" placeholder="Password" required>
-            </div>
-            <p>
-                <button type="submit" class="large primary submit-button">Login</button>
-            </p>
-            <p id="message" style="color: red;"></p>
-            <!-- Shown after login when a student's verification has lapsed -->
-            <div id="reverify" style="display: none; text-align: center;">
-                <h3>School Email Verification</h3>
-                <p>Your verification has lapsed. Sign in with your school Google account to continue.</p>
-                <div class="g_id_signin"
-                     data-type="standard"
-                     data-size="large"
-                     data-theme="filled_blue"
-                     data-text="signin_with"
-                     data-shape="rectangular"
-                     data-logo_alignment="left"></div>
-                <p id="reverify-status"></p>
-            </div>
-            <p style="text-align: center;">
-                <a href="{{site.baseurl}}/support?topic=reset">Forgot your password?</a>
-            </p>
-        </form>
-    </div>
-    <div class="signup-card">
-        <h1 id="signupTitle">Sign Up</h1>
-        <hr>
-        <!-- Google OAuth Section (initially hidden) -->
-        <div id="oauth-verification" style="display: none; text-align: center; margin-bottom: 2rem;">
-            <h3 style="color: #6366f1; margin-bottom: 1rem;">🎓 School Email Verification</h3>
-            <p style="margin-bottom: 1.5rem; color: #d1d5db;">
-                Please sign in with your school Google account to verify you're a Poway USD student or teacher.
-                <br><strong>You must use an email ending in @stu.powayusd.com or @powayusd.com</strong>
-            </p>
-            <div id="g_id_onload"
-                 data-client_id="{{ site.google_client_id }}"
-                 data-callback="handleGoogleSignIn"
-                 data-auto_prompt="false">
-            </div>
-            <div class="g_id_signin" 
-                 data-type="standard"
-                 data-size="large"
-                 data-theme="filled_blue"
-                 data-text="signin_with"
-                 data-shape="rectangular"
-                 data-logo_alignment="left"
-                 style="margin-bottom: 1rem;">
-            </div>
-            <button type="button" class="large secondary" onclick="showSignupForm()" 
-                    style="background-color: #6b7280;">
-                ← Back to Form
-            </button>
-            <div id="oauth-status" style="margin-top: 1rem;"></div>
-        </div>
-        <!-- Signup Form -->
-        <form id="signupForm" onsubmit="handleSignupSubmit(event);">
-            <div class="form-group">
-                <select id="signupRole">
-                    <option value="student" selected>I am a Student</option>
-                    <option value="mentor">I am a Mentor</option>
-                    <option value="guest" id="guestOption" hidden disabled>I am a guest</option>
-                </select>
-                <p id="guest-note" hidden>
-                    A guest can view pages, comment on the microblog and react to posts. It needs no GitHub or school
-                    account, and it lasts only a few hours. Guest sign-up is open until <span id="guest-closes"></span>:
-                    log in with the same account during a later guest window to come back.
-                </p>
-            </div>
-            <div class="form-group">
-                <input type="text" id="name" placeholder="Name" required>
-            </div>
-            <div class="form-group">
-                <input type="text" id="signupUid" placeholder="GitHub ID" required>
-            </div>
-            <div class="form-group">
-                <input type="text" id="signupSid" placeholder="Student ID" required>
-            </div>
-            <div class="form-group">
-                <select id="signupSchool" required>
-                    <option value="" disabled selected>Select Your High School</option>
-                    <option value="Abraxas High School">Abraxas</option>
-                    <option value="Del Norte High School">Del Norte</option>
-                    <option value="Mt Carmel High School">Mt Carmel</option>
-                    <option value="Poway High School">Poway</option>
-                    <option value="Poway to Palomar">Poway to Palomar</option>
-                    <option value="Rancho Bernardo High School">Rancho Bernardo</option>
-                    <option value="Westview High School">Westview</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <input type="email" id="signupEmail" placeholder="Personal (not school) Email" required>
-            </div>
-            <div class="form-group">
-                <input type="password" id="signupPassword" placeholder="Password" required>
-            </div>
-            <!-- Confirm Password Field -->
-            <div class="form-group">
-                <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
-                <div id="password-validation-message" class="validation-message"></div>
-            </div>
-            <p>
-                <button type="submit" class="large primary submit-button">Sign Up</button>
-            </p>
-            <!-- Backend Status Display -->
-            <div class="backend-status">
-                <div id="flaskStatus" class="status-item">
-                    <span class="status-icon">⏳</span>
-                    <span class="status-text">Flask</span>
-                </div>
-                <div id="springStatus" class="status-item">
-                    <span class="status-icon">⏳</span>
-                    <span class="status-text">Spring</span>
-                </div>
-            </div>
-            <div id="overallStatus" class="overall-status hidden"></div>
-        </form>
-    </div>
-</div>
-
-<script type="module">
-    import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, springEnabled } from '{{site.baseurl}}/assets/js/api/config.js';
-    import { loginReturnPath } from '{{site.baseurl}}/assets/js/api/login-return.js';
-
-    import { reverifyNeeded, staffMustVerify, reverify } from '{{site.baseurl}}/assets/js/api/reverify.js';
-    import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
+// The /login page: sign-in, sign-up and Google re-verification. `session` is a FlaskSession, or a
+// SpringSession on a site that also runs Spring, so the page asks the session (usesSpring,
+// createsSpringAccount) and never reads the site's spring setting itself.
+// It is published to assets/js/login/, so the page's starter passes in every shared helper.
+export function startLoginPage({
+    session, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID, loginReturnPath,
+    reverifyNeeded, staffMustVerify, reverify,
+    SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist,
+    baseurl,
+}) {
 
     // Capture once so failed attempts and verification steps retain the destination.
-    const returnPath = loginReturnPath(window.location.href, document.referrer, {{ site.baseurl | jsonify }});
+    const returnPath = loginReturnPath(window.location.href, document.referrer, baseurl);
 
     let signupFormData = {};
-    let verifiedSchoolEmail = null;
     let validationTimeout = null;
 
     // Password validation with debouncing (1.5 second delay)
@@ -222,7 +85,7 @@ show_reading_time: false
     }
 
     // Backend status management
-    function updateBackendStatus(backend, status, message = '') {
+    function updateBackendStatus(backend, status) {
         const element = document.getElementById(`${backend}Status`);
         const icon = element.querySelector('.status-icon');
         const text = element.querySelector('.status-text');
@@ -262,7 +125,7 @@ show_reading_time: false
         overallEl.classList.remove('hidden', 'success', 'partial', 'error');
 
         // A Flask-only site (spring: false in _config.yml), or a guest, creates the account in Flask alone.
-        if (!usesSpring()) {
+        if (!signupCreatesSpringAccount()) {
             overallEl.classList.add(flaskSuccess ? 'success' : 'error');
             overallEl.textContent = flaskSuccess
                 ? '🎉 Account created! You can now login.'
@@ -290,13 +153,13 @@ show_reading_time: false
         }
     }
 
-    // Spring is used when the site has it. A guest never gets a Spring account: it would be a full account.
-    function usesSpring() {
-        return springEnabled && signupFormData.accountType !== 'guest';
+    // Whether this sign-up also creates a Spring account: never on a Flask-only site, or for a guest.
+    function signupCreatesSpringAccount() {
+        return session.createsSpringAccount(signupFormData);
     }
 
     // A Flask-only site has no Spring account, so sign-up shows only Flask's status.
-    if (!springEnabled) document.getElementById('springStatus').style.display = 'none';
+    if (!session.usesSpring) document.getElementById('springStatus').style.display = 'none';
 
     // The schools to choose from are Flask's data (GET /api/signup-options). The list in the markup stays
     // as what is offered when Flask cannot be asked, such as a Flask that has not been updated yet.
@@ -349,7 +212,7 @@ show_reading_time: false
         email.required = this.value !== 'guest';
         email.placeholder = this.value === 'guest' ? 'Email (optional, helps you keep one account)' : 'Personal (not school) Email';
         document.getElementById('guest-note').hidden = this.value !== 'guest';
-        if (springEnabled) document.getElementById('springStatus').style.display = this.value === 'guest' ? 'none' : '';
+        if (session.usesSpring) document.getElementById('springStatus').style.display = session.createsSpringAccount({ accountType: this.value }) ? '' : 'none';
         ['signupSid', 'signupSchool'].forEach(id => {
             const field = document.getElementById(id);
             field.required = !noSchool;
@@ -453,7 +316,6 @@ show_reading_time: false
                 showOAuthStatus('❌ You must use your school email address ending with @stu.powayusd.com or @powayusd.com', true);
                 return;
             }
-            verifiedSchoolEmail = email;
             signupFormData.idToken = response.credential;
             showOAuthStatus(`✅ School email verified: ${email}`);
 
@@ -500,27 +362,24 @@ show_reading_time: false
         }
     });
 
-    // Function to handle both Python and Java login simultaneously
+    // Signs in to Flask, and to Spring at the same time when the site has it, and only redirects after
+    // both finish. When Flask refuses, the error shows in #message and the page stays put.
     window.loginBoth = function () {
-        // Wrap both logins in Promises and only redirect after both finish. A Flask-only site
-        // (spring: false in _config.yml) signs in to Flask alone, so Spring counts as logged in.
-        let javaPromise = springEnabled
-            ? new Promise((resolve) => { window.javaLogin(resolve); })
-            : Promise.resolve(true);
-        let pythonPromise = new Promise((resolve) => {
-            window.pythonLogin(resolve);
-        });
-        // pythonPromise only settles when Flask accepts the login; on a Flask failure
-        // login() shows the error in #message and the page stays put.
-        Promise.all([javaPromise, pythonPromise]).then(([springLoggedIn, flaskBody]) => {
+        const messageEl = document.getElementById('message');
+        messageEl.textContent = '';
+        const uid = document.getElementById('uid').value;
+        const password = document.getElementById('password').value;
+        session.signIn(uid, password).then(({ flask: flaskBody, spring }) => {
+            // A Flask-only site has no Spring sign-in, so only an answer of false means Spring refused.
+            const springLoggedIn = spring !== false;
             const finish = () => {
                 // Guests have no profile; direct logins fall back to the home page.
                 if (flaskBody && flaskBody.user && flaskBody.user.limited) {
-                    window.location.href = returnPath || '{{site.baseurl}}/';
+                    window.location.href = returnPath || `${baseurl}/`;
                     return;
                 }
                 if (springLoggedIn) {
-                    window.location.href = returnPath || '{{site.baseurl}}/profile';
+                    window.location.href = returnPath || `${baseurl}/profile`;
                     return;
                 }
                 showSpringLoginWarning();
@@ -536,13 +395,23 @@ show_reading_time: false
                 return;
             }
             finish();
+        }, (error) => {
+            console.log(loginErrorText(error));
+            messageEl.textContent = loginErrorText(error);
         });
     };
+    // The same words config.js's login() uses: a 403 says why (an expired guest, a closed Guest Window,
+    // a pending account), and no answer at all means a network, CORS or server problem.
+    function loginErrorText(error) {
+        if (error.status === 0) return 'Possible CORS or service down error: ' + error.cause;
+        const why = error.status === 403 && error.body && error.body.message;
+        return 'Login error: ' + error.status + (why ? ' - ' + why : '');
+    }
     // A Mentor's verification has lapsed. Only a Teacher or Admin can verify it, and the
     // account still works, so say so and let them carry on.
     function showStaffVerifyNotice(finish) {
         const messageEl = document.getElementById('message');
-        const carryOn = springLink('{{site.baseurl}}/profile', 'Continue');
+        const carryOn = springLink(`${baseurl}/profile`, 'Continue');
         carryOn.addEventListener('click', (event) => {
             event.preventDefault();
             finish();
@@ -563,7 +432,7 @@ show_reading_time: false
             + 'Your Spring password may differ from your Flask password. ',
             springLink(`${javaURI}/mvc/person/reset`, 'Reset your Spring password'),
             ' or ask your teacher, then log in again. ',
-            springLink('{{site.baseurl}}/profile', 'Continue anyway'),
+            springLink(`${baseurl}/profile`, 'Continue anyway'),
         );
     }
     function springLink(href, label) {
@@ -572,75 +441,14 @@ show_reading_time: false
         link.textContent = label;
         return link;
     }
-    // Function to handle Python login
-    window.pythonLogin = function (done) {
-        const options = {
-            URL: `${pythonURI}/api/authenticate`,
-            callback: function(body) {
-                if (done) done(body);
-            },
-            message: "message",
-            method: "POST",
-            cache: "no-cache",
-            body: {
-                uid: document.getElementById("uid").value,
-                password: document.getElementById("password").value,
-            }
-        };
-        login(options);
-        // If login() is not async, call done() immediately
-        // if (done) done();
-    }
-    // Function to handle Java login
-    window.javaLogin = function (done) {
-        const loginURL = `${javaURI}/authenticate`;
-        const databaseURL = `${javaURI}/api/person/get`;
-        const userCredentials = JSON.stringify({
-            uid: document.getElementById("uid").value,
-            password: document.getElementById("password").value,
-        });
-        const loginOptions = {
-            ...fetchOptions,
-            method: "POST",
-            body: userCredentials,
-        };
-        console.log("Attempting Java login...");
-        fetch(loginURL, loginOptions)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Invalid login");
-                }
-                return response.text();
-            })
-            .then(data => {
-                console.log("Login successful!", data);
-                // Do not redirect here
-                // Fetch database after login success using fetchOptions
-                return fetch(databaseURL, fetchOptions);
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Spring server response: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Java database response:", data);
-                if (done) done(true);
-            })
-            .catch(error => {
-                console.error("Spring login failed:", error.message);
-                if (done) done(false);
-            });
-    };
-    window.signup = async function () {
+    async function signup() {
         const signupButton = document.querySelector(".signup-card button");
         // Disable the button and change its color
         signupButton.disabled = true;
         signupButton.classList.add("disabled");
         // Reset status indicators
         updateBackendStatus('flask', 'pending');
-        if (usesSpring()) updateBackendStatus('spring', 'pending');
+        if (signupCreatesSpringAccount()) updateBackendStatus('spring', 'pending');
         document.getElementById('overallStatus').classList.add('hidden');
 
         const data = signupFormData && Object.keys(signupFormData).length > 0 ? signupFormData : {
@@ -654,64 +462,21 @@ show_reading_time: false
 
         // Never log `data`: it holds the plaintext password and the Google ID token.
 
-        const flaskRequest = {
-            ...fetchOptions,
-            method: "POST",
-            body: JSON.stringify(data)
-        };
-
-        const springRequest = {
-            ...fetchOptions,
-            method: "POST",
-            body: JSON.stringify(data)
-        };
-
         try {
-            // Flask is the blocking source of truth for auth/signup.
-            const flaskResponse = await fetch(`${pythonURI}/api/user`, flaskRequest);
-            const flaskRaw = await flaskResponse.text();
-
-            let flaskData;
-            try {
-                flaskData = flaskRaw ? JSON.parse(flaskRaw) : {};
-            } catch (_) {
-                flaskData = null;
-            }
-            // Not a JSON object (an error page from a proxy, or "null"): a failure, and do not show its text
-            if (flaskData === null || typeof flaskData !== 'object') {
-                flaskData = { success: false };
-            }
-
-            if (!flaskResponse.ok || flaskData.success === false) {
-                const flaskMessage = flaskData.message || `Flask signup failed (${flaskResponse.status})`;
-                throw new Error(flaskMessage);
-            }
+            // Flask is the blocking source of truth for auth/signup: the session rejects when it refuses.
+            const { spring } = await session.signUp(data);
 
             updateBackendStatus('flask', 'success');
-            if (!usesSpring()) {
+            if (!spring) {
                 setTimeout(updateOverallStatus, 500);
                 return;
             }
 
             // Spring is best-effort; do not block signup success on this path.
-            fetch(`${javaURI}/api/person/create`, springRequest)
-                .then(async (springResponse) => {
-                    const springRaw = await springResponse.text();
-                    let springErrorMessage = '';
-                    if (springResponse.ok) {
-                        updateBackendStatus('spring', 'success');
-                    } else {
-                        console.warn("Spring signup failed:", springResponse.status, springRaw);
-                        springErrorMessage = readSpringError(springRaw, springResponse.status);
-                        updateBackendStatus('spring', 'error');
-                    }
-                    setTimeout(() => updateOverallStatus(springErrorMessage), 500);
-                })
-                .catch((springError) => {
-                    console.warn("Spring signup error:", springError.message);
-                    updateBackendStatus('spring', 'error');
-                    setTimeout(() => updateOverallStatus('Spring server unreachable'), 500);
-                });
+            spring.then(({ created, error }) => {
+                updateBackendStatus('spring', created ? 'success' : 'error');
+                setTimeout(() => updateOverallStatus(error), 500);
+            });
         } catch (error) {
             console.error("Flask signup error:", error);
             updateBackendStatus('flask', 'error');
@@ -721,35 +486,12 @@ show_reading_time: false
             signupButton.classList.remove("disabled");
         }
     }
-    // What to tell the user when Flask refused the signup. A TypeError means fetch() itself failed
+    // What to tell the user when Flask refused the signup. Status 0 means the request itself failed
     // (offline, CORS, server down), so there is no reply from Flask to quote.
     function flaskFailureMessage(error) {
-        if (error instanceof TypeError) {
+        if (error.status === 0) {
             return 'Could not reach the server. Check your connection and try again.';
         }
         return error.message;
     }
-    // Spring's /api/person/create answers errors as {"error": "..."}, e.g. a uid conflict.
-    function readSpringError(raw, status) {
-        try {
-            const body = JSON.parse(raw);
-            if (body && body.error) return body.error;
-        } catch (_) { /* not JSON */ }
-        return `HTTP ${status}`;
-    }
-    function javaDatabase() {
-        const URL = `${javaURI}/api/person/get`;
-        fetch(URL, fetchOptions)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Spring server response: ${response.status}`);
-                }
-                return response.json();
-            })
-            .catch(error => {
-                console.error("Java Database Error:", error);
-            });
-    }
-</script>
-
-<script type="module" src="{{site.baseurl}}/assets/js/api/passwordFields.js"></script>
+}
