@@ -208,7 +208,7 @@ Live sprint work from the team's planning issues, connected to the active FOPL f
 <div class="ocs__grid ocs__grid--standard cols-2">
     <div class="ocs__grid-cell ocs__grid-cell--header">Current project team</div>
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Arjun Ganesh</strong>
+        <strong>Pranav Sai</strong>
         <p>Scrum Master</p>
     </div>
     <div class="ocs__grid-cell">
@@ -218,6 +218,10 @@ Live sprint work from the team's planning issues, connected to the active FOPL f
     <div class="ocs__grid-cell">
         <strong>Raadin Ansari</strong>
         <p>Developer 2</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Luke Sanders</strong>
+        <p>Developer 3</p>
     </div>
 </div>
 
