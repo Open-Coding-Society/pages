@@ -98,14 +98,16 @@ permalink: /capstone/oncologysesh/
 
 
 <div class="ocs__grid ocs__grid--card">
+
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Disclaimer</strong>
+        <p>All modules are still going through the ideation process.</p>
+    </div>
+
     <div class="ocs__grid-cell">
         <strong>Patient and family resources</strong>
         <p>Organize educational material around common questions about cancer science and personalized treatment, with clear distinctions between general information and individual medical advice.</p>
-    </div>
-
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Learning check-in</strong>
-        <p>Offer an optional check-in where visitors can reflect on what they understand, identify unfamiliar terms, and choose what they would like to explore next.</p>
     </div>
 
     <div class="ocs__grid-cell">
@@ -121,11 +123,6 @@ permalink: /capstone/oncologysesh/
     <div class="ocs__grid-cell">
         <strong>Biomarker explorer</strong>
         <p>Introduce what biomarkers are and how they can inform cancer research and treatment decisions. This feature would explain concepts without calculating personal risk or recommending treatment.</p>
-    </div>
-
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Cell lab</strong>
-        <p>Adapt the earlier cell lab concept into an interactive introduction to cancer cells and the immune system, creating a foundation for learning about immunotherapy.</p>
     </div>
 
     <div class="ocs__grid-cell">
