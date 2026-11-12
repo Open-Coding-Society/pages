@@ -1033,7 +1033,7 @@ document.addEventListener('DOMContentLoaded', function(){
        <div>
            <h3><a href="{% post_url 2026-09-08-ncsncf-capstone %}">North County Special Needs Community Foundation</a></h3>
            <p>This capstone project involves refurbishing the North County Special Needs Community Foundation website to be more streamlined, organized, and professional. It will also overhaul and add new features such as an events backend and will update the Event Calendar to include categories.</p>
-           <p>Team: Mateo, Tristan, and Yue (Barbara)</p>
+           <p>Team: Raymond Liu, Pranay Kamath, Tristan, and Yue (Barbara)</p>
        </div>
    </div>
 

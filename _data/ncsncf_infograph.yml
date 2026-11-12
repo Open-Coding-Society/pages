@@ -1,62 +1,84 @@
+
 title: "North County Special Needs Community Foundation"
 subtitle: "2026-27 Capstone Infographic"
-quote: "The North County Special Needs Community Foundation provides vital community outreach and support. While the foundational mission is strong, the site currently suffers from a non-cohesive design, an unused event calendar, and a lack of sophisticated features necessary to seamlessly serve families and donors."
+
+quote: "The North County Special Needs Community Foundation provides vital community outreach and support for individuals with developmental disabilities and their families. Our capstone project focuses on modernizing its website to improve accessibility, navigation, and community engagement."
+
 github: "https://github.com/NCSNCF-Redesign/NCSNCF-FE"
 
 summary:
-  main_problems: "The website lacks visual cohesion across its pages, features an underutilized event calendar, and lacks modern, sophisticated features for community engagement, resource matching, and donor interactions."
+  main_problems: "The original website lacks visual cohesion across its pages, has an underutilized event calendar, and offers limited interactive features for community engagement, resource discovery, and donor interactions."
+
   original_url: "https://www.ncspecialneedsfoundation.com/"
-  project_direction: "This capstone project aims to modernize and streamline the NCSNCF web presence. We are creating a cohesive design system, activating and automating the event calendar, and integrating sophisticated interactive tools—such as a personalized resource navigator and dynamic community updates."
+
+  redesigned_url: "https://ncsncf-redesign.github.io/NCSNCF-FE/"
+
+  project_direction: "Our team is redesigning the NCSNCF website with a consistent visual style, improved navigation, and organized community information. We are also exploring interactive features such as an event calendar, personalized resource navigator, community surveys, and dynamic announcements."
 
 board:
   title: "Project Kanban Board"
-  url: "https://github.com/orgs/NCSNCF-Redesign/projects/2" 
+  url: "https://github.com/orgs/NCSNCF-Redesign/projects/2"
   filter: "NCSNCF Team"
 
 strengths_and_improvements:
   - title: "Community Impact & Mission"
     type: "strength"
     accent: true
-    description: "Strong community purpose with clear intent to support local special needs families and programs."
+    description: "The foundation supports individuals with developmental disabilities and their families by promoting community inclusion, friendships, educational opportunities, and independent living."
     links:
-      - label: "Visit Site"
+      - label: "Visit Original Website"
         url: "https://www.ncspecialneedsfoundation.com/"
         btn_class: "alert-green"
 
-  - title: "Non-Cohesive Design"
+  - title: "Website Redesign & Visual Consistency"
     type: "improvement"
-    accent: false
-    description: "Inconsistent typography, mismatched layouts, and fragmented color schemes create a disjointed experience across pages."
+    accent: true
+    description: "Our team is developing a redesigned website with updated page layouts, consistent styling, clearer navigation, and an improved user experience."
     links:
-      - label: "Design Audit"
-        url: "https://www.ncspecialneedsfoundation.com/"
-        btn_class: "alert-yellow"
+      - label: "View Our Redesign"
+        url: "https://ncsncf-redesign.github.io/NCSNCF-FE/"
+        btn_class: "alert-green"
 
-  - title: "Unused Event Calendar"
+  - title: "Community Events & Calendar"
     type: "improvement"
     accent: false
-    description: "The current event calendar is inactive and underutilized, missing key opportunities to inform families about community events and workshops."
+    description: "The original event calendar is underutilized. Our project aims to improve how families discover upcoming community events, programs, and activities."
     links:
-      - label: "Events Section"
+      - label: "Original Events Page"
         url: "https://www.ncspecialneedsfoundation.com/events-calendar"
-        btn_class: "alert-red"
+        btn_class: "alert-yellow"
 
-  - title: "Lack of Sophisticated Features"
+  - title: "Interactive Community Features"
     type: "improvement"
     accent: false
-    description: "The platform lacks modern elements such as smart resource filtering, personalized survey routing, and dynamic donor or member interaction."
+    description: "We are exploring features such as personalized resource filtering, community surveys, user profiles, and dynamic announcements to make the website more useful for families."
     links:
-      - label: "Feature Roadmap"
-        url: "https://www.ncspecialneedsfoundation.com/links"
-        btn_class: "alert-yellow"
+      - label: "Explore Our Project"
+        url: "https://ncsncf-redesign.github.io/NCSNCF-FE/"
+        btn_class: "alert-green"
+
+  - title: "Frontend Development & Collaboration"
+    type: "strength"
+    accent: true
+    description: "Our team uses GitHub, Jekyll, HTML, CSS, and JavaScript to develop the redesigned website. We organize development through GitHub issues, pull requests, and a Kanban board."
+    links:
+      - label: "View GitHub Repository"
+        url: "https://github.com/NCSNCF-Redesign/NCSNCF-FE"
+        btn_class: "alert-green"
 
 team:
-  - name: "Mateo Amador"
-    role: "Technologist/Developer"
-    portfolio: "https://avg11235.opencodingsociety.com/"
+  - name: "Pranay Kamath"
+    role: "Scrummer"
+    portfolio: "https:/pkdev0101.opencodingsociety.com/""
+
+  -  name: "Raymond Liu"
+     role: "Scrummer"
+    portfolio: "boyazo.github.io/portfolio/"
+
   - name: "Tristan Chiu"
-    role: "Technologist/Developer"
+    role: "Technologist/ Developer"
     portfolio: "https://tristan-chiu0.github.io/portfolio/"
+
   - name: "Yue Barbara Zhao"
     role: "Technologist/Developer"
     portfolio: "https://3rii0.github.io/portfolio/"
