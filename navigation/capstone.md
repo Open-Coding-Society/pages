@@ -120,10 +120,10 @@ document.addEventListener('DOMContentLoaded', function(){
       frontendUrl: "https://github.com/UGRC-CSA/Pages",
       backendUrl: "https://github.com/Open-Coding-Society/spring"
     },
-    "Oncology and Kids Cancer Foundation": {
-      pageUrl: "https://pages.opencodingsociety.com/capstone/oak/",
-      frontendUrl: "https://github.com/undergroundrapclub/portfolio",
-      backendUrl: "https://github.com/undergroundrapclub/oak_spring"
+    "Oncology Sesh": {
+      pageUrl: "https://pages.opencodingsociety.com/capstone/oncologysesh/",
+      frontendUrl: "https://github.com/CSP-Oncology/OCS-Kit-Pages",
+      backendUrl: "https://github.com/CSP-Oncology/OCS-Kit-Flask"
     }
   };
 
