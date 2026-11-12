@@ -28,7 +28,7 @@ permalink: /capstone/oncologysesh/
 
 {% assign oak_data = site.data.oak %}
 {% if oak_data.Board %}
-{% include ocs_kanban_board.html url=oak_data.Board.url %}
+{% include ocs_kanban_board.html url="https://github.com/orgs/CSP-Oncology/projects/3/views/1" %}
 {% endif %}
 
 
