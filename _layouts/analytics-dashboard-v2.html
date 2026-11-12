@@ -1214,8 +1214,16 @@ score += gists * 0.5
         });
     });
 
+    // A link such as /analytics-dashboard#grade opens that tab; the Grades hub
+    // links straight to the Grade Predictor this way.
+    function openLinkedTab() {
+        const tab = document.getElementById(`tab-${location.hash.slice(1)}`);
+        if (tab?.classList.contains("tab-btn")) tab.click();
+    }
+
     // Initialize on load
     window.onload = async () => {
+        openLinkedTab();
         const activeTab = document.querySelector(".tab-btn.active");
         if (activeTab) setUnderline(activeTab);
 
