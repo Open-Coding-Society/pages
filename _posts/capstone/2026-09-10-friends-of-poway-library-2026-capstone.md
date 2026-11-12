@@ -37,7 +37,7 @@ permalink: /capstone/poway-library-2026-27/
     <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noreferrer noopener">
         <span>Backend Repository</span>
     </a>
-    <a class="ocs__btn iridescent" href="https://fopl.opencodingsociety.com/home" target="_blank" rel="noreferrer noopener">Previous Prototype ↗</a>
+    <a class="ocs__btn iridescent" href="https://fopl-team-2026.github.io/bb-pages/home" target="_blank" rel="noreferrer noopener">Visit Website ↗</a>
 </div>
 
 <br>
