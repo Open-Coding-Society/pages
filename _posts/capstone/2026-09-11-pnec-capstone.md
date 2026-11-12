@@ -49,7 +49,7 @@ year: "2026-2027"
   <header class="ocs__card">
     <p class="ocs__badge">CSP 2026–2027 · Community capstone</p>
     <h2>Prepared neighbors. A stronger Poway.</h2>
-    <p class="ocs__lead">Samanvi, Joan, Isha and Ainsley are continuing the previous PNEC team's project. Our team proposes the features below to extend the inherited project, with scope and implementation to be reviewed with PNEC.</p>
+    <p class="ocs__lead">Samanvi, Joan, Isha, Mateo and Ainsley are continuing the previous PNEC team's project. Our team proposes the features below to extend the inherited project, with scope and implementation to be reviewed with PNEC.</p>
     <nav class="ocs__links" aria-label="PNEC project sections">
       <a class="ocs__btn accent fill" href="#team-kanban-board">Team Kanban Board</a>
       <a class="ocs__btn accent fill" href="#proposed-improvements">Nine proposed improvements</a>
@@ -217,6 +217,7 @@ year: "2026-2027"
       <div class="ocs__visual"><h3>Ainsley Albert</h3><p>Technologist / Developer 1</p></div>
       <div class="ocs__visual"><h3>Samanvi Yachareni</h3><p>Technologist / Developer 2</p></div>
       <div class="ocs__visual"><h3>Isha Chaturvedi</h3><p>Technologist / Developer 3</p></div>
+      <div class="ocs__visual"><h3>Mateo Durand</h3><p>Technologist / Developer 4</p></div>
     </div>
     <h3>Iteration process</h3>
     <ol>
