@@ -79,13 +79,8 @@ show_reading_time: false
                 <select id="signupRole">
                     <option value="student" selected>I am a Student</option>
                     <option value="mentor">I am a Mentor</option>
-                    <option value="guest" id="guestOption" hidden disabled>I am a guest</option>
                 </select>
-                <p id="guest-note" hidden>
-                    A guest can view pages, comment on the microblog and react to posts. It needs no GitHub or school
-                    account, and it lasts only a few hours. Guest sign-up is open until <span id="guest-closes"></span>:
-                    log in with the same account during a later guest window to come back.
-                </p>
+                <p id="signup-note" hidden></p>
             </div>
             <div class="form-group">
                 <input type="text" id="name" placeholder="Name" required>
@@ -290,72 +285,115 @@ show_reading_time: false
         }
     }
 
-    // Spring is used when the site has it. A guest never gets a Spring account: it would be a full account.
+    // Which account types the form offers, and what each one does, is Flask's data (GET /api/signup-options).
+    // This list is only what the form falls back on when Flask cannot be asked, such as a Flask that has not
+    // been updated yet: the options the markup has.
+    const FALLBACK_TYPES = [
+        { id: 'student', label: 'I am a Student', asks_school: true, email_required: true, spring_account: true, google_step: true, requires_open_window: false, note: null },
+        { id: 'mentor', label: 'I am a Mentor', asks_school: false, email_required: true, spring_account: true, google_step: false, requires_open_window: false, note: null },
+    ];
+    let signupTypes = FALLBACK_TYPES;
+    let windowCloses = null;  // when the Guest Window closes, while it is open
+    const typeOf = id => signupTypes.find(type => type.id === id) || signupTypes[0];
+
+    // Spring is used when the site has it, and the account type gets a Spring account: a guest, for one,
+    // would be given a full account.
     function usesSpring() {
-        return springEnabled && signupFormData.accountType !== 'guest';
+        return springEnabled && typeOf(signupFormData.accountType).spring_account !== false;
     }
 
     // A Flask-only site has no Spring account, so sign-up shows only Flask's status.
     if (!springEnabled) document.getElementById('springStatus').style.display = 'none';
 
-    // The schools to choose from are Flask's data (GET /api/signup-options). The list in the markup stays
-    // as what is offered when Flask cannot be asked, such as a Flask that has not been updated yet.
-    async function offerSchools() {
+    // What the form offers is Flask's data. The markup's own schools and account types stay as what is offered
+    // when Flask cannot be asked, an error comes back, or what comes back cannot be used, so sign-up never ends
+    // up with nothing to choose.
+    async function offerSignupOptions() {
+        let options = null;
         try {
             const response = await fetch(`${pythonURI}/api/signup-options`, fetchOptions);
-            const options = response.ok ? await response.json() : null;
-            if (!options || !Array.isArray(options.schools) || options.schools.length === 0) return;
-            const select = document.getElementById('signupSchool');
-            const chosen = select.value;
-            const placeholder = select.querySelector('option[value=""]');
-            select.replaceChildren(placeholder, ...options.schools.map(school => {
-                const option = document.createElement('option');
-                option.value = school.name;
-                option.textContent = school.label;  // text, never markup
-                return option;
-            }));
-            // a school picked before Flask answered stays picked, if Flask still offers it
-            select.value = options.schools.some(school => school.name === chosen) ? chosen : '';
+            options = response.ok ? await response.json() : null;
         } catch (_) {
-            // keep the markup's own list
+            // keep the markup's own lists
         }
+        if (!options) return;
+        showSchools(options.schools);
+        showTypes(options);
     }
-    offerSchools();
 
-    // A guest can sign up only while a Teacher or Admin has the Guest Window open, so the option is
-    // offered only then. If Flask cannot be asked, it stays hidden.
-    async function offerGuestOption() {
+    function showSchools(schools) {
+        if (!Array.isArray(schools) || schools.length === 0) return;
+        const select = document.getElementById('signupSchool');
+        const chosen = select.value;
+        const placeholder = select.querySelector('option[value=""]');
+        select.replaceChildren(placeholder, ...schools.map(school => {
+            const option = document.createElement('option');
+            option.value = school.name;
+            option.textContent = school.label;  // text, never markup
+            return option;
+        }));
+        // a school picked before Flask answered stays picked, if Flask still offers it
+        select.value = schools.some(school => school.name === chosen) ? chosen : '';
+    }
+
+    function showTypes(options) {
+        const types = options.account_types;
+        if (!Array.isArray(types) || types.length === 0
+            || !types.every(type => type && typeof type.id === 'string' && typeof type.label === 'string')) return;
+        signupTypes = types;
+        const select = document.getElementById('signupRole');
+        const needWindow = [];
+        select.replaceChildren(...types.map(type => {
+            const option = document.createElement('option');
+            option.value = type.id;
+            option.textContent = type.label;  // text, never markup
+            if (type.requires_open_window === true) {
+                option.hidden = option.disabled = true;  // offered only while the Guest Window is open
+                needWindow.push(option);
+            }
+            return option;
+        }));
+        select.value = types.some(type => type.id === options.default_account_type) ? options.default_account_type : types[0].id;
+        applyType();
+        if (needWindow.length > 0) offerWindowTypes(needWindow);
+    }
+
+    // A type that needs the Guest Window is offered only while a Teacher or Admin has it open. If Flask
+    // cannot be asked, it stays hidden.
+    async function offerWindowTypes(options) {
         try {
             const response = await fetch(`${pythonURI}/api/guest/window`, fetchOptions);
             const guestWindow = response.ok ? await response.json() : null;
             if (!guestWindow || guestWindow.open !== true) return;
-            const option = document.getElementById('guestOption');
-            option.hidden = false;
-            option.disabled = false;
             // Flask gives UTC with no zone mark: say so, so the time shown is the visitor's own
-            document.getElementById('guest-closes').textContent =
-                new Date(guestWindow.closes_at + 'Z').toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+            windowCloses = new Date(guestWindow.closes_at + 'Z').toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+            options.forEach(option => { option.hidden = option.disabled = false; });
+            applyType();
         } catch (_) {
             // no Guest Window to offer
         }
     }
-    offerGuestOption();
+    offerSignupOptions();
 
-    // A mentor or a guest has no student ID or school, so those fields are hidden and not required.
-    // A guest is asked for an email only to keep one account, so it is optional for them.
-    document.getElementById('signupRole').addEventListener('change', function () {
-        const noSchool = this.value === 'mentor' || this.value === 'guest';
+    // What the chosen account type asks of the form: whether there is a student ID and school, whether the email
+    // is required (otherwise it is only asked for, to keep one account), its note, and whether it gets a Spring account.
+    function applyType() {
+        const type = typeOf(document.getElementById('signupRole').value);
+        const noSchool = type.asks_school === false;
         const email = document.getElementById('signupEmail');
-        email.required = this.value !== 'guest';
-        email.placeholder = this.value === 'guest' ? 'Email (optional, helps you keep one account)' : 'Personal (not school) Email';
-        document.getElementById('guest-note').hidden = this.value !== 'guest';
-        if (springEnabled) document.getElementById('springStatus').style.display = this.value === 'guest' ? 'none' : '';
+        email.required = type.email_required !== false;
+        email.placeholder = email.required ? 'Personal (not school) Email' : 'Email (optional, helps you keep one account)';
+        const note = document.getElementById('signup-note');
+        note.hidden = !type.note;
+        note.textContent = type.note ? type.note + (type.requires_open_window && windowCloses ? ` Sign-up is open until ${windowCloses}.` : '') : '';
+        if (springEnabled) document.getElementById('springStatus').style.display = type.spring_account === false ? 'none' : '';
         ['signupSid', 'signupSchool'].forEach(id => {
             const field = document.getElementById(id);
             field.required = !noSchool;
             field.closest('.form-group').style.display = noSchool ? 'none' : '';
         });
-    });
+    }
+    document.getElementById('signupRole').addEventListener('change', applyType);
 
     window.handleSignupSubmit = function(event) {
         event.preventDefault();
@@ -372,9 +410,9 @@ show_reading_time: false
             return;
         }
 
-        // A mentor or a guest has no student ID or school: do not send what was typed before the role changed.
-        const role = document.getElementById("signupRole").value;
-        const hasSchool = role !== 'mentor' && role !== 'guest';
+        // A type with no student ID or school: do not send what was typed before the type changed.
+        const type = typeOf(document.getElementById("signupRole").value);
+        const hasSchool = type.asks_school !== false;
 
         // Store form data
         signupFormData = {
@@ -386,15 +424,14 @@ show_reading_time: false
             password: document.getElementById("signupPassword").value,
             accountType: document.getElementById("signupRole").value,
         };
-        if (role === 'guest' && !signupFormData.email) delete signupFormData.email;  // optional for a guest
+        if (type.email_required === false && !signupFormData.email) delete signupFormData.email;  // optional for this type
 
-        // A mentor cannot use a school email, so they skip it and wait for a Teacher/Admin
-        // to verify the account. A guest needs no verification at all. A student verifies with
-        // Google first.
-        if (signupFormData.accountType === 'mentor' || signupFormData.accountType === 'guest') {
-            signup();
-        } else {
+        // A type with school Google domains verifies with Google first. Any other skips it: a Teacher/Admin
+        // verifies the account, or it needs no verification at all.
+        if (type.google_step) {
             showOAuthVerification();
+        } else {
+            signup();
         }
     }
 
