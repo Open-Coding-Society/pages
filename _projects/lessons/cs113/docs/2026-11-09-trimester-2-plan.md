@@ -3,6 +3,11 @@ layout: post
 title: "OCS Curriculum Mapping Matrix: Trimester 2 Learning Plan"
 description: "Student-taught lessons about the OCS system for CS 111 to CS 113: schedule, weekly matrix, grading, lifecycle and publish checklist."
 permalink: /csa/trimester-2-plan/
+course:
+  - CS111
+  - CS112
+  - CS113
+categories: [CS111, CS112, CS113]   # Exception to the Oct 28 "no categories" comment: Topics only lists documents that have categories. See the PR.
 ---
 
 Students teach the class **about the OCS system**. Each lesson shows a real OCS feature, then the CS topic behind it: **predict → change → test → explain**.
