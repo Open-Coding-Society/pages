@@ -103,8 +103,8 @@ Our student team is developing a website to help people discover Poway Recovery 
 ---
 
 <div class="ocs__grid" style="text-align: center;">
-    <a class="ocs__btn" href="https://github.com/Anika2317/poway-recovery-center" target="_blank">
-        View GitHub Repository
+    <a class="ocs__btn" href="prc.opencodingsociety.com" target="_blank">
+        View Our Site
     </a>
 </div>
 
