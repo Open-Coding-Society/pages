@@ -149,6 +149,7 @@ images/projects/
 /_layouts/analytics-dashboard-v2.html
 /assets/js/ocs-analytics-dashboard.js
 /_sass/open-coding/analytics-dashboard-v2.scss
+/navigation/authentication/submissions.md
 
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile
