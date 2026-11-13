@@ -1,0 +1,49 @@
+---
+layout: aesthetihawk
+title: Grades
+description: Every grading page in one place, to see, predict and reflect on grades and to manage submissions.
+permalink: /grades/
+comments: false
+search_exclude: true
+---
+
+{% comment %}
+  Grades hub: links to the grading pages and tabs that already exist, grouped
+  as Grade, Reflect and Submissions. The links live in _data/grades_hub.yml.
+  Each page checks the viewer's role itself, so the hub only labels the
+  teacher and admin links instead of hiding them.
+{% endcomment %}
+
+<div class="ocs__container ocs__container--fill">
+  <h2 class="ocs__section-title">Grades</h2>
+  <p>See and predict your grades, reflect on each sprint, and manage submissions.</p>
+
+  {% for section in site.data.grades_hub %}
+    <section class="ocs__card" aria-labelledby="grades-{{ section.id }}">
+      <h3 class="ocs__section-title" id="grades-{{ section.id }}">{{ section.title }}</h3>
+      <p>{{ section.description }}</p>
+      <div class="ocs__hub-grid">
+        {% for link in section.links %}
+          {% if link.spring_path and site.spring == false %}{% continue %}{% endif %}
+          {% if link.spring_path %}
+        <a class="ocs__hub-card" href="#" data-spring-path="{{ link.spring_path }}" target="_blank" rel="noopener">
+          {% else %}
+        <a class="ocs__hub-card" href="{{ site.baseurl }}{{ link.url }}">
+          {% endif %}
+          {% if link.audience %}<span class="ocs__status-pill ocs__status-pill--neutral">{{ link.audience }}</span>{% endif %}
+          <strong class="ocs__hub-card-title">{{ link.title }}</strong>
+          <p>{{ link.description }}</p>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+</div>
+
+<script type="module">
+  // The Spring address depends on where the site runs, so config.js supplies it.
+  import { javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+  document.querySelectorAll('[data-spring-path]').forEach((link) => {
+    link.href = javaURI + link.dataset.springPath;
+  });
+</script>
