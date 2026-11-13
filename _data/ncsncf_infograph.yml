@@ -66,19 +66,21 @@ strengths_and_improvements:
         url: "https://github.com/NCSNCF-Redesign/NCSNCF-FE"
         btn_class: "alert-green"
 
+
 team:
   - name: "Pranay Kamath"
     role: "Scrummer"
-    portfolio: "https:/pkdev0101.opencodingsociety.com/""
+    portfolio: "https://pkdev0101.opencodingsociety.com/"
 
-  -  name: "Raymond Liu"
-     role: "Scrummer"
-    portfolio: "boyazo.github.io/portfolio/"
+  - name: "Raymond Liu"
+    role: "Scrummer"
+    portfolio: "https://boyazo.github.io/portfolio/"
 
   - name: "Tristan Chiu"
-    role: "Technologist/ Developer"
+    role: "Technologist/Developer"
     portfolio: "https://tristan-chiu0.github.io/portfolio/"
 
   - name: "Yue Barbara Zhao"
     role: "Technologist/Developer"
     portfolio: "https://3rii0.github.io/portfolio/"
+
