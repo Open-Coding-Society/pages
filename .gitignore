@@ -154,6 +154,7 @@ images/projects/
 /_layouts/submissions-v2.html
 /_includes/submissions/creator-dashboard.html
 /assets/js/submissions/grading.js
+/assets/js/submissions/creator-dashboard.js
 
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile
