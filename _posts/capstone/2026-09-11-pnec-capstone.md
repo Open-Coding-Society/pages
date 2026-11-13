@@ -44,18 +44,54 @@ year: "2026-2027"
 
 {% assign pnec_data = site.data.pnec_capstone %}
 
-<div class="ocs__stack ocs__stack--wide">
+
+  <div class="ocs__stack ocs__stack--wide">
   <header class="ocs__card">
     <p class="ocs__badge">CSP 2026–2027 · Community capstone</p>
     <h2>Prepared neighbors. A stronger Poway.</h2>
-    <p class="ocs__lead">Samanvi, Joan, and Ainsley are continuing the previous PNEC team's project. Our team proposes the features below to extend the inherited project, with scope and implementation to be reviewed with PNEC.</p>
+    <p class="ocs__lead">Samanvi, Joan, Isha, Mateo and Ainsley are continuing the previous PNEC team's project. Our team proposes the features below to extend the inherited project, with scope and implementation to be reviewed with PNEC.</p>
     <nav class="ocs__links" aria-label="PNEC project sections">
       <a class="ocs__btn accent fill" href="#team-kanban-board">Team Kanban Board</a>
       <a class="ocs__btn accent fill" href="#proposed-improvements">Nine proposed improvements</a>
       <a class="ocs__btn accent fill" href="#team-and-review">Meet the team</a>
       <a class="ocs__btn accent fill" href="#delivery-lifecycle">GitHub lifecycle</a>
     </nav>
+
   </header>
+  
+ <section class="ocs__card">
+  <p class="ocs__badge">CSP 2026–2027 · Group Milestones</p>
+  <h2>Goals That We Plan on Accomplishing</h2>
+  <p class="ocs__lead">
+    After meeting with the board, we received new recommendations for our website.
+    Below are the three milestones discussed during the meeting that we will focus on next.
+  </p>
+
+  <div class="ocs__grid ocs__grid--col2">
+  
+    <div class="ocs__visual">
+      <h3>Reliable Information & Content Accuracy</h3>
+      <p>Ensure Risk Watch provides accurate information from reliable sources and review existing website content for accuracy and relevance.</p>
+    </div>
+
+    <div class="ocs__visual">
+      <h3>Family Preparedness & Education</h3>
+      <p>Provide family preparedness resources, an interactive quiz, and weekly preparedness tips.</p>
+    </div>
+
+    <div class="ocs__visual">
+      <h3>Accessibility & Inclusivity</h3>
+      <p>Include multilingual support and screen reader accessibility to ensure all families can use the website.</p>
+    </div>
+
+    <div class="ocs__visual">
+      <h3>Community Engagement</h3>
+      <p>Promote community outreach and engagement to connect with families and share preparedness information.</p>
+    </div>
+  </div>
+</section>
+  
+
 
   <section class="ocs__card" aria-labelledby="team-kanban-board">
     <p class="ocs__badge">Plan · Track · Review</p>
@@ -180,6 +216,8 @@ year: "2026-2027"
       <div class="ocs__visual"><h3>Joan Kim</h3><p>Scrum Master / Developer</p></div>
       <div class="ocs__visual"><h3>Ainsley Albert</h3><p>Technologist / Developer 1</p></div>
       <div class="ocs__visual"><h3>Samanvi Yachareni</h3><p>Technologist / Developer 2</p></div>
+      <div class="ocs__visual"><h3>Isha Chaturvedi</h3><p>Technologist / Developer 3</p></div>
+      <div class="ocs__visual"><h3>Mateo Durand</h3><p>Technologist / Developer 4</p></div>
     </div>
     <h3>Iteration process</h3>
     <ol>
