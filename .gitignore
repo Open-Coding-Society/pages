@@ -146,6 +146,7 @@ images/projects/
 /assets/js/analytics/grade-calculator.js
 /navigation/authentication/analytics-dashboard.md
 /navigation/authentication/analytics-dashboard-v2.md
+/_layouts/analytics-dashboard-v2.html
 
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile
