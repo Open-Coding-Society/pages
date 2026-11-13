@@ -12,6 +12,7 @@
     { "source": "js/analytics/grade-calculator.js", "destination": "assets/js/analytics/grade-calculator.js" },
     { "source": "pages/analytics-dashboard.md", "destination": "navigation/authentication/analytics-dashboard.md" },
     { "source": "pages/analytics-dashboard-v2.md", "destination": "navigation/authentication/analytics-dashboard-v2.md" },
-    { "source": "layouts/analytics-dashboard-v2.html", "destination": "_layouts/analytics-dashboard-v2.html" }
+    { "source": "layouts/analytics-dashboard-v2.html", "destination": "_layouts/analytics-dashboard-v2.html" },
+    { "source": "js/ocs-analytics-dashboard.js", "destination": "assets/js/ocs-analytics-dashboard.js" }
   ]
 }
