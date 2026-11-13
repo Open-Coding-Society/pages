@@ -37,7 +37,7 @@ permalink: /capstone/poway-library-2026-27/
     <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noreferrer noopener">
         <span>Backend Repository</span>
     </a>
-    <a class="ocs__btn iridescent" href="https://fopl.opencodingsociety.com/home" target="_blank" rel="noreferrer noopener">Previous Prototype ↗</a>
+    <a class="ocs__btn iridescent" href="https://fopl-team-2026.github.io/bb-pages/home" target="_blank" rel="noreferrer noopener">Visit Website ↗</a>
 </div>
 
 <br>
@@ -308,7 +308,7 @@ Sprint work from the team's GitHub project, including planning and frontend issu
 <div class="ocs__grid ocs__grid--standard cols-2">
     <div class="ocs__grid-cell ocs__grid-cell--header">Current project team</div>
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Arjun Ganesh</strong>
+        <strong>Pranav Sai</strong>
         <p>Scrum Master</p>
     </div>
     <div class="ocs__grid-cell">
@@ -318,6 +318,10 @@ Sprint work from the team's GitHub project, including planning and frontend issu
     <div class="ocs__grid-cell">
         <strong>Raadin Ansari</strong>
         <p>Developer 2</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Luke Sanders</strong>
+        <p>Developer 3</p>
     </div>
 </div>
 
