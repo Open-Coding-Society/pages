@@ -1,5 +1,6 @@
 {
   "files": [
-    { "source": "pages/grades.html", "destination": "navigation/grades.html" }
+    { "source": "pages/grades.html", "destination": "navigation/grades.html" },
+    { "source": "data/grades_hub.yml", "destination": "_data/grades_hub.yml" }
   ]
 }

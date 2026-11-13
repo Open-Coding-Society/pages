@@ -135,6 +135,7 @@ images/projects/
 
 # Grades system distributions (authoritative sources in _projects/systems/grades)
 /navigation/grades.html
+/_data/grades_hub.yml
 
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile
