@@ -152,6 +152,7 @@ images/projects/
 /navigation/authentication/submissions.md
 /navigation/authentication/submissions-v2.md
 /_layouts/submissions-v2.html
+/_includes/submissions/creator-dashboard.html
 
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile
