@@ -156,6 +156,7 @@ images/projects/
 /assets/js/submissions/grading.js
 /assets/js/submissions/creator-dashboard.js
 /_sass/open-coding/submissions.scss
+/_sass/open-coding/submissions-v2.scss
 
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile

@@ -21,6 +21,7 @@
     { "source": "_includes/submissions/creator-dashboard.html", "destination": "_includes/submissions/creator-dashboard.html" },
     { "source": "js/submissions/grading.js", "destination": "assets/js/submissions/grading.js" },
     { "source": "js/submissions/creator-dashboard.js", "destination": "assets/js/submissions/creator-dashboard.js" },
-    { "source": "sass/submissions.scss", "destination": "_sass/open-coding/submissions.scss" }
+    { "source": "sass/submissions.scss", "destination": "_sass/open-coding/submissions.scss" },
+    { "source": "sass/submissions-v2.scss", "destination": "_sass/open-coding/submissions-v2.scss" }
   ]
 }
