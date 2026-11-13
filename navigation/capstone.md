@@ -816,7 +816,7 @@ document.addEventListener('DOMContentLoaded', function(){
        <div>
            <h3><a href="{{ '/capstone/poway-recovery-center/' | relative_url }}">Poway Recovery Center</a></h3>
            <p>Supporting Poway Recovery Center's mission by helping visitors find its recovery community, meetings, resources, and key contacts.</p>
-           <p>Team: Adya Shipekar, Anika Seksaria, Jailene Tang</p>
+           <p>Team: Nitya Hamsini Kasse, Vanshika Keswani, Hsu-Cheng Lin, Yiming Yin </p>
        </div>
    </div>
    
