@@ -47,7 +47,8 @@ function startPage({ session, referrer = '' }) {
   // functions the markup calls on it: a page that dropped `window.` from one would fail here.
   const window = { location: { href: LOGIN_URL }, addEventListener() {} };
   const context = vm.createContext({
-    document: { referrer, getElementById: element, querySelector: () => element('signup-button'), createElement: link },
+    // The Login form's button and the sign-up card's button are separate, so a test can watch each.
+    document: { referrer, getElementById: element, querySelector: (selector) => element(selector === '#pythonForm button[type="submit"]' ? 'login-button' : 'signup-button'), createElement: link },
     window, console: quiet, atob,
     alert: (text) => { throw new Error(`The page alerted: ${text}`); },
     setTimeout: (callback) => { callback(); return 0; }, clearTimeout() {},
@@ -128,6 +129,33 @@ test('a refused or failed sign-in shows the same words as before', async () => {
     await page.signIn();
     assert.equal(page.element('message').textContent, words);
     assert.equal(page.window.location.href, LOGIN_URL);
+  }
+});
+
+test('the Login button is off while signing in, and stays off when the page moves on', async () => {
+  // Flask hasn't answered yet: a second click now would send another login to Flask and Spring.
+  const waiting = startPage({ session: new FlaskSession({ flask: { request: () => new Promise(() => {}) } }) });
+  await waiting.signIn();
+  assert.equal(waiting.element('login-button').disabled, true);
+  const page = startPage({ session: new SpringSession({ flask: signedIn(), spring: springAccepts() }) });
+  await page.signIn();
+  assert.equal(page.window.location.href, '/preview/profile');
+  assert.equal(page.element('login-button').disabled, true);
+});
+
+test('the Login button comes back whenever the page stays put', async () => {
+  const stays = {
+    'Flask refused': new FlaskSession({ flask: signedIn(refuse(401)) }),
+    'Flask unreachable': new FlaskSession({ flask: signedIn(unreachable()) }),
+    'only Spring refused': new SpringSession({ flask: signedIn(), spring: fakeBackend({ 'POST /authenticate': refuse(401) }) }),
+    'a student must verify with Google again': new FlaskSession({ flask: signedIn({ user: { verification_required: true, verified_by_google: true } }) }),
+    'a mentor must ask staff': new FlaskSession({ flask: signedIn({ user: { verification_required: true, verified_by_google: false } }) }),
+  };
+  for (const [why, session] of Object.entries(stays)) {
+    const page = startPage({ session });
+    await page.signIn();
+    assert.equal(page.window.location.href, LOGIN_URL, why);
+    assert.equal(page.element('login-button').disabled, false, why);
   }
 });
 
