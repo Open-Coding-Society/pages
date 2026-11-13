@@ -6,6 +6,10 @@ title: "Poway Recovery Center"
 permalink: /capstone/poway-recovery-center/
 ---
 
+<div style="text-align: center; margin: 1.5rem 0 2rem;">
+    <a class="ocs__btn large accent fill" href="https://prc.opencodingsociety.com" target="_blank" rel="noopener">View Our Site</a>
+</div>
+
 ## The Story of Poway Recovery Center
 
 Poway Recovery Center began in 1983 as the Poway Alano Club, when 25 members of Alcoholics Anonymous created a meeting space on Garden Road. Their goal was a lasting home for recovery groups. After losing its longtime lease in 2016, the community helped establish a new home on Poway Road in 2018. In 2023, the organization became Poway Recovery Center, welcoming a wider range of recovery groups and resources.
@@ -98,14 +102,6 @@ Our student team is developing a website to help people discover Poway Recovery 
         <strong>📚 Resource Directory</strong>
         <p>Vetted mental health, donation, and volunteer resources.</p>
     </div>
-</div>
-
----
-
-<div class="ocs__grid" style="text-align: center;">
-    <a class="ocs__btn" href="prc.opencodingsociety.com" target="_blank">
-        View Our Site
-    </a>
 </div>
 
 
