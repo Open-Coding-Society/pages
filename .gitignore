@@ -145,6 +145,7 @@ images/projects/
 /assets/js/analytics/forecast-retrospective.js
 /assets/js/analytics/grade-calculator.js
 /navigation/authentication/analytics-dashboard.md
+/navigation/authentication/analytics-dashboard-v2.md
 
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile
