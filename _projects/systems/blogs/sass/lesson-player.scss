@@ -749,6 +749,24 @@ body:has(.lesson-player) {
   padding: 4px 0;
 }
 
+.code-runner-summary .ocs__btn {
+  margin-left: 6px;
+}
+
+// "N of M runners selected"; red while nothing is selected, since submit is blocked then.
+.code-runner-count {
+  margin: 8px 0 0;
+  font-weight: 600;
+}
+
+.code-runner-count--empty {
+  color: #ef4444;
+}
+
+.code-runner-skipped {
+  color: var(--text-muted);
+}
+
 .code-runner-saved {
   color: var(--pref-success-color, #22c55e);
 }

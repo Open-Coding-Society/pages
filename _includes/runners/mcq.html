@@ -18,7 +18,7 @@
   data-runner-kind="mcq"
   data-bundled="{{ mcq_bundled }}"
   data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
-  {% include runners/fragments/challenge-box.html title=include.title challenge="Check each answer as many times as you need. Your last saved answers are the ones submitted." %}
+  {% include runners/fragments/challenge-box.html title=include.title challenge="Check each answer as many times as you need. Your last saved answers are the ones submitted." submission_toggle=true %}
   <section class="ocs__dnd" data-mcq-root></section>
   <script type="application/json" data-mcq-questions>{{ include.questions }}</script>
 </div>
