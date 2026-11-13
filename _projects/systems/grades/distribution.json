@@ -6,6 +6,7 @@
     { "source": "pages/view-grades-v2.md", "destination": "_posts/student_toolkit/assignments/2025-01-21-gradeviewer-v2.md" },
     { "source": "sass/view-grades-v2.scss", "destination": "_sass/open-coding/view-grades-v2.scss" },
     { "source": "pages/retrospective.md", "destination": "navigation/authentication/retrospective.md" },
-    { "source": "layouts/retrospective.html", "destination": "_layouts/retrospective.html" }
+    { "source": "layouts/retrospective.html", "destination": "_layouts/retrospective.html" },
+    { "source": "js/analytics/sprint-retrospective.js", "destination": "assets/js/analytics/sprint-retrospective.js" }
   ]
 }

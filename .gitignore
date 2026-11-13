@@ -141,6 +141,7 @@ images/projects/
 /_sass/open-coding/view-grades-v2.scss
 /navigation/authentication/retrospective.md
 /_layouts/retrospective.html
+/assets/js/analytics/sprint-retrospective.js
 
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile
