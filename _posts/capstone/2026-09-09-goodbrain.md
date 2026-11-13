@@ -7,13 +7,17 @@ permalink: /capstone/goodbrain/
 microblog: true
 ---
 
+[Our My Good Brain Website Prototype](https://mgb.opencodingsociety.com/)
+
+[My Good Brain Actual Website](https://www.mygoodbrain.org/)
+
 My Good Brain is a 501(c)(3) nonprofit organization that promotes mental wellness, social-emotional learning, and healthy coping strategies for school-aged youth and adolescents through art, play, and psychology
 
 **Location**: Arts District Liberty Station (San Diego, CA) – features a creative studio, office, and community space.
 
 **Founder & Leadership**: Founded by Dr. Danessa Mayo, a licensed clinical psychologist and visual artist.
 
-Team: Rashi, Aashni, and Kelervia
+Team: Aashni, Rashi, Noah, and Kelervia
 
 <!-- Sprint Board: live from the team's GitHub project -->
 {% assign mgb_data = site.data.mygoodbrain %}
@@ -134,6 +138,36 @@ Team: Rashi, Aashni, and Kelervia
     <div class="ocs__grid-cell">
         <strong>04 · Seamless Navigation</strong>
         <p>A modernized UI designed to remove clutter and make key tools accessible in two clicks or fewer.</p>
+    </div>
+</div>
+
+<hr />
+
+## Our team
+
+> Our team is building a more engaging and accessible digital hub for youth wellness, creative expression, and community resources.
+
+<div class="ocs__grid ocs__grid--standard cols-2">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Current project team</div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Aashni</strong>
+        <p>Product Owner</p>
+    </div>
+
+    <div class="ocs__grid-cell">
+        <strong>Rashi</strong>
+        <p>Scrum Master</p>
+    </div>
+
+    <div class="ocs__grid-cell">
+        <strong>Noah</strong>
+        <p>System Architect</p>
+    </div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Kelervia</strong>
+        <p>Education Liaison</p>
     </div>
 </div>
 
