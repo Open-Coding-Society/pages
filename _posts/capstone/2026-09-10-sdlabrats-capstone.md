@@ -8,3 +8,9 @@ permalink: /capstone/sdlabrats/
 ---
 
 {% include sdlabrats-infograph.html %}
+
+<br>
+
+<div class="ocs__links ocs__links--wide">
+    <a class="ocs__btn alert-green iridescent" href="https://sdlabrats.opencodingsociety.com" target="_blank" rel="noreferrer noopener">Live Site ↗</a>
+</div>
