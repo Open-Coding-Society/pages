@@ -133,6 +133,8 @@ images/projects/
 /_sass/open-coding/timeline.scss
 /_sass/open-coding/announcement-calendar.scss
 
+# Grades system distributions (authoritative sources in _projects/systems/grades)
+
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile
 _projects/*/*/Makefile
