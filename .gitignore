@@ -138,6 +138,7 @@ images/projects/
 /_data/grades_hub.yml
 /_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md
 /_posts/student_toolkit/assignments/2025-01-21-gradeviewer-v2.md
+/_sass/open-coding/view-grades-v2.scss
 
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile
