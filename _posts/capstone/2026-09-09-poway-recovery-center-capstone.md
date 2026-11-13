@@ -115,8 +115,11 @@ Our student team is developing a website to help people discover Poway Recovery 
 ---
 
 <footer aria-label="Student team contacts">
-    <small>Student team contacts<br>
-    Adya Shipekar · Scrum Master · <a href="mailto:adya.shipekar1@gmail.com">adya.shipekar1@gmail.com</a><br>
-    Anika Seksaria · Developer · <a href="mailto:anika.seksaria@gmail.com">anika.seksaria@gmail.com</a><br>
-    Jailene Tang · Developer · <a href="mailto:tangjailene@gmail.com">tangjailene@gmail.com</a></small>
+  <small>
+    Student team contacts<br>
+    Nitya Hamsini Kasse <a href="mailto:nitya.hamsini@gmail.com">nitya.hamsini@gmail.com</a><br>
+    Vanshika Keswani <a href="mailto:vanshikakeswani@gmail.com">vanshikakeswani@gmail.com</a><br>
+    Hsu-Cheng Lin <a href="mailto:hclin329@gmail.com">hclin329@gmail.com</a><br>
+    Yiming Yin <a href="mailto:yimingyin55@gmail.com">yimingyin55@gmail.com</a>
+  </small>
 </footer>
