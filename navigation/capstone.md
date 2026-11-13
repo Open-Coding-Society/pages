@@ -820,6 +820,18 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
    
+   <!-- XRCare AI (CSP 26-27) -->
+   <div class="ocs__grid-cell CSP" data-year="2026-2027">
+       <a href="{{ '/capstone/xrcare-ai/' | relative_url }}">
+           <img src="{{ '/images/capstone/xrcare-ai-logo.png' | relative_url }}" alt="XRCare AI" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{{ '/capstone/xrcare-ai/' | relative_url }}">XRCare AI</a></h3>
+           <p>Supporting XRCare AI's mission by helping clinical teams, pharmacies, and educators discover its XR-AI Point-of-Care Co-pilot, team, and contacts.</p>
+           <p>Team: Adya Shipekar, Emily Capua, Rohan Chandra, Ishan Srivastava</p>
+       </div>
+   </div>
+
    <!-- Friends of the Poway Library  (CSP) -->
    <div class="ocs__grid-cell CSP">
        <a href="{% post_url 2026-03-09-poway-library %}">
