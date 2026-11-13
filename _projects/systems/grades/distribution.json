@@ -9,6 +9,7 @@
     { "source": "layouts/retrospective.html", "destination": "_layouts/retrospective.html" },
     { "source": "js/analytics/sprint-retrospective.js", "destination": "assets/js/analytics/sprint-retrospective.js" },
     { "source": "js/analytics/forecast-retrospective.js", "destination": "assets/js/analytics/forecast-retrospective.js" },
-    { "source": "js/analytics/grade-calculator.js", "destination": "assets/js/analytics/grade-calculator.js" }
+    { "source": "js/analytics/grade-calculator.js", "destination": "assets/js/analytics/grade-calculator.js" },
+    { "source": "pages/analytics-dashboard.md", "destination": "navigation/authentication/analytics-dashboard.md" }
   ]
 }
