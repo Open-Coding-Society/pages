@@ -1,0 +1,79 @@
+{
+  "members": [
+    {
+      "name": "Ishaan",
+      "tasks": [
+        {
+          "title": "Design simpler navigation",
+          "description": "Create desktop and mobile navigation mockups with clear paths to Programs, Register, Events, and Donate.",
+          "status": "To do"
+        },
+        {
+          "title": "Plan shorter page content",
+          "description": "Outline concise headings, summaries, and calls to action for the home and program pages.",
+          "status": "To do"
+        },
+        {
+          "title": "Design impact sections",
+          "description": "Plan impact tiers, statistics, and community stories that explain the organization\u2019s work.",
+          "status": "To do"
+        },
+        {
+          "title": "Build registration validation",
+          "description": "Validate required registration fields on the backend and return clear errors for invalid submissions.",
+          "status": "To do"
+        }
+      ]
+    },
+    {
+      "name": "Jake",
+      "tasks": [
+        {
+          "title": "Build responsive navigation",
+          "description": "Implement the approved navigation layout and verify keyboard and mobile access.",
+          "status": "To do"
+        },
+        {
+          "title": "Create program and teacher cards",
+          "description": "Build reusable program cards and teacher profiles with images, summaries, and clear links.",
+          "status": "To do"
+        },
+        {
+          "title": "Build registration form UI",
+          "description": "Implement accessible form fields, validation messages, and submission feedback.",
+          "status": "To do"
+        },
+        {
+          "title": "Improve page copy and SEO",
+          "description": "Add concise page copy, descriptive titles, headings, image alt text, and metadata.",
+          "status": "To do"
+        }
+      ]
+    },
+    {
+      "name": "Noah",
+      "tasks": [
+        {
+          "title": "Build student accounts",
+          "description": "Implement sign-in and student profiles with access to programs and activities.",
+          "status": "To do"
+        },
+        {
+          "title": "Build teacher accounts",
+          "description": "Implement teacher account access and enforce permissions for teacher-only features.",
+          "status": "To do"
+        },
+        {
+          "title": "Connect registration storage",
+          "description": "Connect registration submissions to persistence and verify successful and failed requests.",
+          "status": "To do"
+        },
+        {
+          "title": "Build events calendar integration",
+          "description": "Load event dates, times, locations, and descriptions into the calendar and homepage events strip.",
+          "status": "To do"
+        }
+      ]
+    }
+  ]
+}

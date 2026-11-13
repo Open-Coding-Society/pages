@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Introduction Java Spring Framework
-description: Introduction to API, JPA, ORM, POJOs in Java Spring Framework
+description: See how Spring turns a Java data object into a web app through an entity, a JPA repository, a controller, and endpoints a UI can call.
 permalink: /java/spring/intro/
 courses: {'csa': {'week': 3}}
 categories: [Java, Spring]

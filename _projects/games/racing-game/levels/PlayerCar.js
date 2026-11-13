@@ -1,23 +1,15 @@
-import EnginePlayer from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import PlayerDriver from '@assets/js/GameEnginev1.1/essentials/PlayerDriver.js';
+import { getRacingTurnRate, RACING_CAR_PHYSICS } from './RacingCarPhysics.js';
 
-export default class Player extends EnginePlayer {
+export default class Player extends PlayerDriver {
   constructor(data = {}, gameEnv = null) {
     super(data, gameEnv);
 
-    this.speed = 0;
-    this.maxSpeed = 6;
-    this.reverseSpeed = 2;
-    this.acceleration = 0.20;
-    this.braking = 0.2;
-    this.coasting = 0.05;
-    this.turnRate = 0.04;
-    this.heading = 0; // Radians; 0 points upward.
-    this.gravity = false;
-    this.updateDirection();
+    Object.assign(this, RACING_CAR_PHYSICS);
   }
 
-  updateDirection() {
-    this.direction = 'up';
+  getTurnRate(speed) {
+    return getRacingTurnRate(speed);
   }
 
   drawSprite() {
@@ -52,46 +44,19 @@ export default class Player extends EnginePlayer {
     this.ctx.restore();
   }
 
-  // Engine input handlers call this on keydown/keyup.
-  // Key presses update the sprite from the current heading, not the pressed key.
-  updateVelocity() {
-    this.moved = Object.values(this.pressedKeys).some(Boolean);
-  }
-
   update() {
     if (this.gameEnv?.gameControl?.isPaused) {
       super.update();
       return;
     }
-
-    const { up, down, left, right } = this.keypress;
-
-    if (this.pressedKeys[up]) {
-      this.speed = Math.min(this.speed + this.acceleration, this.maxSpeed);
-    } else if (this.pressedKeys[down]) {
-      this.speed = this.speed > 0
-        ? Math.max(this.speed - this.braking, 0)
-        : Math.max(this.speed - this.acceleration, -this.reverseSpeed);
-    } else if (this.speed > 0) {
-      this.speed = Math.max(this.speed - this.coasting, 0);
-    } else {
-      this.speed = Math.min(this.speed + this.coasting, 0);
+    if (this.raceFinished) {
+      this.pressedKeys = {};
+      this.speed = 0;
+      this.velocity.x = 0;
+      this.velocity.y = 0;
+      super.update();
+      return;
     }
-
-    const steering =
-      (this.pressedKeys[right] ? 1 : 0) -
-      (this.pressedKeys[left] ? 1 : 0);
-
-    if (this.speed !== 0) {
-      this.heading += steering * this.turnRate * Math.sign(this.speed);
-    }
-
-    this.updateDirection();
-    this.velocity.x = Math.sin(this.heading) * this.speed;
-    this.velocity.y = -Math.cos(this.heading) * this.speed;
-    this.moved = this.speed !== 0;
-
-    // Character uses this velocity for collision checks and movement.
     super.update();
   }
 }

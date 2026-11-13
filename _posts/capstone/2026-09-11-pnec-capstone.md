@@ -7,35 +7,112 @@ description: CSP capstone continuing the PNEC project with proposed household pr
 permalink: /capstone/powaynec-2026-2027/
 year: "2026-2027"
 ---
+ {% assign pnec_data = site.data.pnec_capstone %}
+
+  <section class="ocs__card" aria-labelledby="pnec-story">
+    <p class="ocs__badge">Our Community · Emergency Preparedness</p>
+    <h2 id="pnec-story">The Story of PNEC</h2>
+    <p class="ocs__lead">Neighbors helping neighbors prepare for the unexpected.</p>
+
+    <p>Founded in 2011, Poway Neighborhood Emergency Corps (PNEC) is an all-volunteer nonprofit dedicated to helping Poway residents prepare for emergencies and support one another.</p>
+
+    <div class="ocs__grid ocs__grid--col2">
+      <div class="ocs__visual">
+        <h3>What PNEC Does</h3>
+        <ul>
+          <li>Educates residents about wildfires, earthquakes, and other hazards.</li>
+          <li>Shares emergency planning tips and preparedness resources.</li>
+          <li>Connects neighbors through community outreach.</li>
+        </ul>
+      </div>
+      <div class="ocs__visual">
+        <h3>Why It Matters</h3>
+        <ul>
+          <li>Helps families prepare before disasters happen.</li>
+          <li>Encourages neighbors to look out for one another.</li>
+          <li>Builds a more informed and resilient community.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p>PNEC's mission is simple: help Poway become a community where residents are prepared, informed, and ready to help their neighbors.</p>
+
+    <div class="ocs__links">
+      <a class="ocs__btn accent fill" href="https://powaynec.com/" target="_blank" rel="noopener noreferrer">Visit Official PNEC Website ↗</a>
+    </div>
+  </section>
 
 {% assign pnec_data = site.data.pnec_capstone %}
 
-<div class="ocs__stack ocs__stack--wide">
+
+  <div class="ocs__stack ocs__stack--wide">
   <header class="ocs__card">
     <p class="ocs__badge">CSP 2026–2027 · Community capstone</p>
     <h2>Prepared neighbors. A stronger Poway.</h2>
-    <p class="ocs__lead">Samanvi, Joan, and Ainsley are continuing the previous PNEC team's project. Our team proposes the features below to extend the inherited project, with scope and implementation to be reviewed with PNEC.</p>
+    <p class="ocs__lead">Samanvi, Joan, Isha, Mateo and Ainsley are continuing the previous PNEC team's project. Our team proposes the features below to extend the inherited project, with scope and implementation to be reviewed with PNEC.</p>
     <nav class="ocs__links" aria-label="PNEC project sections">
       <a class="ocs__btn accent fill" href="#team-kanban-board">Team Kanban Board</a>
       <a class="ocs__btn accent fill" href="#proposed-improvements">Nine proposed improvements</a>
       <a class="ocs__btn accent fill" href="#team-and-review">Meet the team</a>
       <a class="ocs__btn accent fill" href="#delivery-lifecycle">GitHub lifecycle</a>
     </nav>
+
   </header>
+  
+ <section class="ocs__card">
+  <p class="ocs__badge">CSP 2026–2027 · Group Milestones</p>
+  <h2>Goals That We Plan on Accomplishing</h2>
+  <p class="ocs__lead">
+    After meeting with the board, we received new recommendations for our website.
+    Below are the three milestones discussed during the meeting that we will focus on next.
+  </p>
+
+  <div class="ocs__grid ocs__grid--col2">
+  
+    <div class="ocs__visual">
+      <h3>Reliable Information & Content Accuracy</h3>
+      <p>Ensure Risk Watch provides accurate information from reliable sources and review existing website content for accuracy and relevance.</p>
+    </div>
+
+    <div class="ocs__visual">
+      <h3>Family Preparedness & Education</h3>
+      <p>Provide family preparedness resources, an interactive quiz, and weekly preparedness tips.</p>
+    </div>
+
+    <div class="ocs__visual">
+      <h3>Accessibility & Inclusivity</h3>
+      <p>Include multilingual support and screen reader accessibility to ensure all families can use the website.</p>
+    </div>
+
+    <div class="ocs__visual">
+      <h3>Community Engagement</h3>
+      <p>Promote community outreach and engagement to connect with families and share preparedness information.</p>
+    </div>
+  </div>
+</section>
+  
+
 
   <section class="ocs__card" aria-labelledby="team-kanban-board">
     <p class="ocs__badge">Plan · Track · Review</p>
     <h2 id="team-kanban-board">Team Kanban Board</h2>
     <p>Follow our team's actual issues, assignments, and progress on GitHub.</p>
     {% if pnec_data.Board %}
-    {% include ocs_kanban_board.html url=pnec_data.Board.url filter=pnec_data.Board.filter title=pnec_data.Board.title %}
+    {% include ocs_kanban_board.html url=pnec_data.Board.url filter=pnec_data.Board.filter title=pnec_data.Board.title issue_metadata=pnec_data.Board.issue_metadata %}
     {% endif %}
     <div class="ocs__links">
+      <a class="ocs__btn small pill" href="{{ pnec_data.Board.project_url | escape }}" target="_blank" rel="noopener noreferrer">Open personal GitHub Project ↗</a>
       <a href="https://github.com/samanviy17-crypto/team-portfolio" target="_blank" rel="noopener noreferrer">Browse the team repository</a>
     </div>
-    <p class="ocs__text">The shared OCS component provides the board link and its availability message. Live cards, filters, and card metadata are unavailable for this personal board; no priorities or topics are inferred.</p>
-    <p class="ocs__callout">This personal GitHub Projects board opens on GitHub. GitHub blocks embedded frames, and its personal-board cards require authentication through the API, so live cards are not displayed here. GitHub controls which items each visitor can view.</p>
-    <p class="ocs__callout">Supported alternatives are this direct board link or an approved public, organization-owned project using the existing OCS board component. Moving a board or creating a credentialed server integration requires a separate decision; no board settings were changed.</p>
+    <p class="ocs__text">Cards load from our public repository issues. Stage labels determine columns first; otherwise, closed issues appear in Done, assigned open issues in In progress, and other open issues in To do. These columns are derived from issue data and may differ from our personal GitHub Project.</p>
+    <p class="ocs__text">Filter by an issue's first assignee; each card lists all assignees. The shared board reuses cached data for 10 minutes and checks GitHub again on a later page load. Pull requests and issues closed as not planned are omitted. Issue closure alone does not establish stakeholder acceptance.</p>
+    <p class="ocs__text">When present, Priority and Estimate labels show our proposed team priority and Fibonacci-hour effort estimate, not logged hours or Product Owner approval. One assignee coordinates each issue; individual academic contributions remain each student's responsibility.</p>
+  </section>
+
+  <section class="ocs__card" aria-labelledby="about-pnec">
+    <h2 id="about-pnec">About PNEC</h2>
+    <p>Poway Neighborhood Emergency Corps (PNEC) helps Poway residents prepare for emergencies by sharing preparedness information, coordinating with the city and first-response agencies, organizing preparedness activities, and encouraging neighbors to help one another. Our capstone improves the existing PNEC website to make this preparedness information easier to find and use.</p>
+    <a href="https://powaynec.com/" target="_blank" rel="noopener noreferrer">Visit the official PNEC website ↗</a>
   </section>
 
   <section class="ocs__card" aria-labelledby="project-overview">
@@ -139,6 +216,8 @@ year: "2026-2027"
       <div class="ocs__visual"><h3>Joan Kim</h3><p>Scrum Master / Developer</p></div>
       <div class="ocs__visual"><h3>Ainsley Albert</h3><p>Technologist / Developer 1</p></div>
       <div class="ocs__visual"><h3>Samanvi Yachareni</h3><p>Technologist / Developer 2</p></div>
+      <div class="ocs__visual"><h3>Isha Chaturvedi</h3><p>Technologist / Developer 3</p></div>
+      <div class="ocs__visual"><h3>Mateo Durand</h3><p>Technologist / Developer 4</p></div>
     </div>
     <h3>Iteration process</h3>
     <ol>

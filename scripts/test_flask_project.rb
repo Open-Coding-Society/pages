@@ -25,7 +25,8 @@ documents.concat(Dir[File.join(PROJECT, "notebooks/*.ipynb")].map do |path|
   [path, frontmatter(notebook.fetch("cells").first.fetch("source").join)]
 end)
 documents.each do |path, data|
-  assert(Array(data["categories"]).map(&:downcase).include?("flask"), "Flask category: #{path}")
+  assert(Array(data["categories"]).map(&:downcase).include?("flask") || data["courses"],
+    "Flask category or course placement: #{path}")
   assert(data["permalink"], "Stable permalink: #{path}")
   source = if path.end_with?(".ipynb")
              JSON.parse(File.read(path)).fetch("cells").map { |cell| cell.fetch("source").join }.join("\n")
@@ -39,36 +40,32 @@ assert(routes.uniq.size == routes.size, "No duplicate Flask permalinks")
 %w[/python/flask /python/flask/crash-course /flask/anatomy /python/flask/api /python/flask/jinja_ui /flask/overview /flask/deploy].each do |route|
   assert(routes.include?(route), "Existing route preserved: #{route}")
 end
-weekly_routes = {
-  "/python/flask/api/jokes" => 9,
-  "/flask/api/users" => 10,
-  "/python/flask/api/microblog" => 11
-}
-weekly_routes.each do |route, week|
+api_lessons = %w[/python/flask/api/jokes /flask/api/users /python/flask/api/microblog]
+{ 9 => %w[/flask/anatomy /python/flask], 10 => %w[/python/flask/api] }.each do |week, scheduled_routes|
   scheduled = documents.select { |_, data| data.dig("courses", "csp", "week") == week }
-  assert(scheduled.map { |_, data| data["permalink"] } == [route],
-    "Week #{week} has exactly its intended Flask API lesson")
+  assert(scheduled.map { |_, data| data["permalink"] }.sort == scheduled_routes.sort,
+    "Week #{week} has exactly its intended Flask pages")
 end
-api_routes = routes.select { |route| route.match?(%r{\A/python/flask/api(?:/|\z)}) || weekly_routes.key?(route) }
+api_routes = routes.select { |route| route.match?(%r{\A/python/flask/api(?:/|\z)}) || api_lessons.include?(route) }
 assert(api_routes.sort ==
-  (["/python/flask/api"] + weekly_routes.keys).sort,
+  (["/python/flask/api"] + api_lessons).sort,
   "The API collection contains only its hub and three lessons")
 api_map = YAML.safe_load(File.read(File.join(ROOT, "_data/python_flask_api.yml")))
-assert(api_map.fetch("Topics").map { |topic| topic.fetch("link") } == weekly_routes.keys,
+assert(api_map.fetch("Topics").map { |topic| topic.fetch("link") } == api_lessons,
   "The central API map links only Jokes, Users, and Microblog in sequence")
 assert(!api_map.to_s.match?(/\bweeks?\b/i), "API map content does not repeat the course schedule")
 top_level_map = YAML.safe_load(File.read(File.join(ROOT, "_data/python_flask.yml")))
 assert(top_level_map.fetch("Topics").map { |topic| topic.fetch("link") } ==
       %w[/python/flask/crash-course /flask/anatomy /python/flask/api /python/flask/jinja_ui],
        "The top-level Flask map retains setup, anatomy, the API hub, and Jinja references")
-curated_routes = ["/python/flask", "/flask/anatomy", "/python/flask/api"] + weekly_routes.keys
+curated_routes = ["/python/flask", "/flask/anatomy", "/python/flask/api"] + api_lessons
 documents.select { |_, data| curated_routes.include?(data["permalink"]) }.each do |path, data|
   body = File.read(path).split(/^---\s*$/, 3).last
   visible = [data["title"], data["description"], body].join("\n")
   assert(!visible.match?(/\bweeks?\b/i), "Teaching-week labels stay in metadata, not lesson content: #{path}")
 end
 assert(!File.exist?(File.join(ROOT, "hacks/api-usage/jokes_flask.md")),
-  "The retired standalone jokes demo cannot duplicate the Week 9 permalink")
+  "The retired standalone jokes demo cannot duplicate the Jokes permalink")
 assert(File.read(File.join(ROOT, "_projects/.makeprojects")).lines.map(&:strip).include?("lessons/flask:dev"),
        "Flask is registered for development builds")
 assert(Dir[File.join(ROOT, "_notebooks/CSP/flask/**/*.ipynb")].empty?, "No old notebook sources remain")
@@ -117,7 +114,7 @@ assert(structure.at_css("#main-py").text.include?("from __init__ import app, db,
 %w[api/user.py model/user.py hacks/joke.py hacks/jokes.py api/microblog_api.py model/microblog.py].each do |path|
   assert(structure.at_css("[data-flask-path='#{path}']"), "Structure guide includes the teaching source: #{path}")
 end
-lesson_documents = weekly_routes.keys.map do |route|
+lesson_documents = api_lessons.map do |route|
   path, = documents.find { |_, data| data["permalink"] == route }
   body = File.read(path).split(/^---\s*$/, 3).last
   liquid = Liquid::Template.parse(body).render!("site" => { "baseurl" => "/preview" })
@@ -167,4 +164,4 @@ Dir.mktmpdir("flask-publication-") do |destination|
   assert(!Dir.exist?(File.join(destination, "_posts/flask")),
          "Flask documentation stays inside the standard project output root")
 end
-puts "PASS: #{documents.size} Flask sources, API hub, three weekly API lessons, and retained non-API references"
+puts "PASS: #{documents.size} Flask sources, API hub, three API lessons, and retained non-API references"

@@ -149,4 +149,4 @@ lxdData:
       Image: "/images/blackjack.png"
       Alt: "Blackjack Image"
 ---
-{%- include tailwind/lxd.html -%}
+{%- include lxd.html -%}

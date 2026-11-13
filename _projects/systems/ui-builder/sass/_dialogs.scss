@@ -1,0 +1,89 @@
+// Dialogs and the block palette. The grammar's ocs__modal draws them; only the layering and the
+// palette's list are the builder's own.
+
+// Above the site's sticky header (navbar.scss gives it 999999999), so the backdrop dims it too:
+// the grammar's z-index of 50 sits under it.
+.ui-builder-dialog .ocs__modal {
+  z-index: 1000000000;
+}
+
+// Unscoped heading rules from other site styles (the documentation pages) turn every h2 green
+// and glowing; a dialog title follows the theme, as /dm's do.
+.ui-builder-dialog .ocs__modal-title {
+  color: var(--pref-text-color);
+  font-size: 1.25rem;
+  text-shadow: none;
+}
+
+.ui-builder-dialog .ocs__modal-card {
+  max-height: 85dvh;
+  overscroll-behavior: contain;
+}
+
+.ui-builder-palette-card {
+  max-width: 42rem;
+}
+
+// The choices scroll inside the card so the search box stays in view.
+.ui-builder-palette {
+  display: grid;
+  gap: 0.35rem;
+  max-height: 55dvh;
+  overflow: auto;
+}
+
+.ui-builder-palette-group {
+  margin: 0.6rem 0 0.15rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+// A choice is a full-width row with its icon, name and help, not an ocs__btn pill. Two classes:
+// preset themes give every <button> an accent border (.user-theme-active button), which hid the
+// highlighted choice among 25 outlined ones.
+.ui-builder-palette .ui-builder-choice {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.55rem;
+  background: var(--panel);
+  color: var(--pref-text-color);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  small {
+    display: block;
+    margin-top: 0.15rem;
+    color: var(--text-muted);
+  }
+
+  i {
+    color: var(--pref-accent-color);
+  }
+
+  // Tinted over the page color, as the outline's selected row is (_outline.scss).
+  &:hover,
+  &:focus-visible,
+  &[aria-selected="true"] {
+    outline: none;
+    border-color: var(--pref-accent-color);
+    background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--pref-bg-color));
+  }
+
+  &[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.ui-builder-revisions {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

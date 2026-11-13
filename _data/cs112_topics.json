@@ -93,7 +93,7 @@
         "coverage": "Java text-file instruction introduces file-opening errors and resource handling. Backend and file-persistence materials provide contexts for invalid input, failures, and recovery.",
         "gap": "Finish a dedicated exercise that tests failure paths, useful error reporting, and safe resource handling.",
         "pbl": "Send invalid input or a malformed import to a project feature and verify the reported error and unchanged valid data.",
-        "lessons": ["/fullstack/java/backend", "/csa/cs112/drafts/reliable-file-io/"]
+        "lessons": ["/fullstack/java/backend", "/csa/cs112/drafts/reliable-file-io/", "/csa/cs112/drafts/api-error-handling/"]
       }
     ]
   },
@@ -139,7 +139,7 @@
         "coverage": "Use the Web pathway: Spring-backed pages, frontend/backend integration, JQuery, and generated CRUD tables. Applets are not the teaching target.",
         "gap": "Require an end-to-end feature with a clear API contract and demonstrated success and error states.",
         "pbl": "Connect a browser interaction to a Spring endpoint and persist or retrieve project data.",
-        "lessons": ["/fullstack/java/frontend", "/fullstack/java/backend", "/fullstack/java/example", "toolkit/documentation/jquery", "/toolkit/documentation/tables", "/java/spring/ui/", "/csa/chat-migration"]
+        "lessons": ["/fullstack/java/frontend", "/fullstack/java/backend", "/fullstack/java/example", "toolkit/documentation/jquery", "/toolkit/documentation/tables", "/java/spring/ui/", "/csa/chat-migration", "/csa/cs112/drafts/spring-rest-endpoint/"]
       }
     ]
   },

@@ -1,6 +1,6 @@
 // Level objects and UI helpers.
 import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import CsPathwayPlayer from './CsPathwayPlayer.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 import FormPanel from '@assets/js/GameEnginev1.1/essentials/FormPanel.js';
 import Picker from '@assets/js/GameEnginev1.1/essentials/Picker.js';
@@ -17,7 +17,8 @@ import PersonaHallTrial from './PersonaHallTrial.js';
 import { pythonURI, javaURI, fetchOptions } from '@assets/js/api/config.js';
 import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/courseNavigation.js';
 const PROFILE_PANEL_ID = 'csse-profile-panel';
-import GameLevelCsPath1Way from './GameLevelCsPath1Way.js';
+import PathwayScoreboard from './PathwayScoreboard.js';
+import { completeLevelTask, getNextLevel } from '../model/pathwayScores.js';
 
 // Track player progress and choices per session.
 const identityState = {
@@ -451,6 +452,7 @@ class GameLevelCsPath0Forge {
               persona: result.title,
               personaId: result.persona,
             });
+            completeLevelTask('identity-forge', 'persona');
             this.showToast(`Persona selected: ${result.title}`);
             this.panel?.(`${result.title}\n\n${result.summary}`);
             this._personaHallOpen = false;
@@ -488,20 +490,21 @@ class GameLevelCsPath0Forge {
             level.clearZoneAlert?.();
             level.clearPanel?.();
 
-            // 5. Calculate transition index safely
-            const wayfindingIndex = gc.levelClasses?.findIndex(
-              (lc) => lc.levelId === 'wayfinding-world'
-            );
+            // 5. The next level comes from the play order in PATHWAY_LEVELS
+            const nextLevel = getNextLevel('identity-forge');
+            const nextIndex = gc.levelClasses?.findIndex(
+              (lc) => lc.levelId === nextLevel.key
+            ) ?? -1;
+            const nextLevelIsLoaded = nextIndex >= 0;
 
-            if (wayfindingIndex !== -1 && wayfindingIndex !== undefined) {
-              gc.currentLevelIndex = wayfindingIndex;
+            if (nextLevelIsLoaded) {
+              // 6. Execute level state transformation
+              gc.currentLevelIndex = nextIndex;
+              gc.transitionToLevel();
             } else {
-              gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelCsPath1Way);
-              gc.currentLevelIndex++;
+              // This page did not load the next level, so open its own page
+              window.location.href = `${level.gameEnv?.path || ''}${nextLevel.pagePath}`;
             }
-
-            // 6. Execute level state transformation
-            gc.transitionToLevel();
           },
 
           onClose: () => {
@@ -619,6 +622,7 @@ class GameLevelCsPath0Forge {
       }
 
       await this.updateProfilePanel(profile, { updateIdentityProgress: true });
+      completeLevelTask('identity-forge', 'identity');
       return this.profileData;
     };
 
@@ -664,6 +668,7 @@ class GameLevelCsPath0Forge {
       if (typeof this.profileManager?.updateProgress === 'function') {
         await this.profileManager.updateProgress('coursePlanMeta', updatedProfile.coursePlanMeta);
       }
+      completeLevelTask('identity-forge', 'course');
 
       if (selectedClass) {
         try {
@@ -759,6 +764,7 @@ class GameLevelCsPath0Forge {
         
         await this.profileManager.saveAvatar(avatarChoices.spriteMeta);
         await this.profileManager.updateAvatarProgress(true);
+        completeLevelTask('identity-forge', 'avatar');
 
         if (npc?.spriteData) {
           npc.spriteData.greeting = `Your forged avatar is ${spriteName}.`;
@@ -834,6 +840,7 @@ class GameLevelCsPath0Forge {
         
         await this.profileManager.saveTheme(themeChoice.themeMeta);
         await this.profileManager.updateThemeProgress(true);
+        completeLevelTask('identity-forge', 'theme');
  
         if (npc?.spriteData) {
           npc.spriteData.greeting = `Your world is set to ${themeName}.`;
@@ -1626,6 +1633,8 @@ class GameLevelCsPath0Forge {
     this.profilePanelView = new StatusPanel(profilePanelConfig);
     // Render and seed the panel immediately (mirror other levels).
     this.profilePanelView.render();
+    this.scoreboard = new PathwayScoreboard({ currentLevelKey: 'identity-forge', basePath: this.gameEnv.path });
+    this.scoreboard.show();
     this.profilePanelView.update({
       name: this.profileData?.name || '—',
       email: this.profileData?.email || '—',
@@ -2163,7 +2172,7 @@ class GameLevelCsPath0Forge {
 
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
-      { class: Player,           data: player_data },
+      { class: CsPathwayPlayer,           data: player_data },
       { class: FriendlyNpc,      data: npc_data_startGatekeeper },
       { class: FriendlyNpc,      data: npc_data_identityGatekeeper },
       { class: FriendlyNpc,      data: npc_data_avatarGatekeeper },
@@ -2422,6 +2431,7 @@ class GameLevelCsPath0Forge {
     if (this.profilePanelView) {
       this.profilePanelView.destroy();
     }
+    this.scoreboard?.destroy();
   }
 }
 

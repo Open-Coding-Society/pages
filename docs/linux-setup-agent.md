@@ -6,27 +6,27 @@ Open your **Ubuntu terminal** (or the Ubuntu terminal in WSL). If you cloned
 the repository in your home folder, run:
 
 ```bash
-cd ~/toolchain_trail
+cd ~/blueprints_pages
 python3 scripts/linux_setup_agent.py --watch
 ```
 
 Use the actual location of your Linux checkout if it is elsewhere. The spelling
-is **toolchain_trail**, not `toolchian_trail`. A Mac path beginning with
+is **blueprints_pages**, not `bluepritns_pages`. A Mac path beginning with
 `/Users/` is not automatically a path in Ubuntu. If `cd` fails, use
-`find ~ -maxdepth 5 -type d -name toolchain_trail 2>/dev/null` to locate an
+`find ~ -maxdepth 5 -type d -name blueprints_pages 2>/dev/null` to locate an
 existing checkout, then `cd` to the printed path. If none exists, clone your
 repository in Ubuntu first.
 
 You can also launch the script by its full path from any directory:
 
 ```bash
-python3 ~/toolchain_trail/scripts/linux_setup_agent.py --watch
+python3 ~/blueprints_pages/scripts/linux_setup_agent.py --watch
 ```
 
 Live mode opens a Bash session **in the checkout containing this script**.
 Its prompt starts with `[linux-agent]`. Type setup commands normally. When a
 command returns a nonzero status, yellow text shows the command, working folder,
-observed error, and suggested change. For example, `cd toolchian_trail` shows
+observed error, and suggested change. For example, `cd bluepritns_pages` shows
 the missing-folder error and a correctly quoted `cd` back to this checkout.
 `source venv/bin/activate` with no venv shows how to create it. Unknown failures
 are marked unresolved instead of inventing a fix. Fixes are never run automatically.
@@ -44,7 +44,7 @@ Launching another interactive shell or replacing `PROMPT_COMMAND` bypasses the w
 
 Yellow is enabled automatically in a color terminal. `--color always` forces it;
 `--color never`, `NO_COLOR`, or `TERM=dumb` disables automatic color. To open a
-different checkout use `--project /actual/path/to/toolchain_trail`.
+different checkout use `--project /actual/path/to/blueprints_pages`.
 
 ## Set up and check tools
 

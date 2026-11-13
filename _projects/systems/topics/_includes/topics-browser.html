@@ -1,65 +1,85 @@
 {% assign topics_course_context = false %}
 {% if include.course_context == true and page.topics_context != true %}{% assign topics_course_context = true %}{% endif %}
-<section class="topics-browser ocs__container" data-topics-browser data-course-context="{{ topics_course_context }}" data-initial-category="{{ page.lesson_category | downcase | escape }}" data-index-url="{{ '/assets/js/topics/data.json' | relative_url }}">
-  <header>
-    <h2>Topics</h2>
-  </header>
-  <div class="topics-browser__controls">
-    <div class="topics-browser__filters" id="topics-filters" role="group" aria-label="Topic and category filters">
-      <details class="topics-browser__category-disclosure" data-topics-primary open>
-        <summary><h3>Topic Filter</h3></summary>
-        <p class="ocs__links" role="group" aria-label="Combine checked topics" data-topics-match>
-          <button type="button" class="ocs__btn small accent fill" value="or" aria-pressed="true" title="Show documents in any checked topic" disabled>OR: any</button>
-          <button type="button" class="ocs__btn small accent" value="and" aria-pressed="false" title="Show only documents in every checked topic" disabled>AND: all</button>
-        </p>
-        <fieldset class="topics-browser__categories topics-browser__primary">
-          <legend class="topics-browser__accessible-label">Topic Filter</legend>
-          {% for category in site.data.topics_primary_categories %}
-          <label><input type="checkbox" value="{{ category[0] | escape }}"> {{ category[1] | escape }}</label>
-          {% endfor %}
-        </fieldset>
-      </details>
-      <details class="topics-browser__category-disclosure" data-topics-secondary>
-        <summary><h3>Categories Filter</h3></summary>
-        <fieldset class="topics-browser__categories">
-          <legend class="topics-browser__accessible-label">Categories Filter</legend>
-          {% for category in site.data.topics_secondary_categories %}
-          <label><input type="checkbox" value="{{ category[0] | escape }}"> {{ category[1] | escape }}</label>
-          {% endfor %}
-        </fieldset>
-      </details>
-      <button type="button" class="ocs__btn small accent" data-topics-clear aria-controls="topics-filters" disabled>Clear Filters</button>
-    </div>
-    <div class="topics-browser__search">
-      <h2><label for="topics-query">Search</label></h2>
+<section class="topics-browser" data-topics-browser data-course-context="{{ topics_course_context }}" data-initial-category="{{ page.lesson_category | downcase | escape }}" data-index-url="{{ '/assets/js/topics/data.json' | relative_url }}" data-unit-names="{{ site.data.topics_units | jsonify | escape }}">
+  <div class="ocs__split ocs__split--aside">
+    <aside class="ocs__stack" aria-label="Browse topics">
+      <h2>Topics</h2>
       <div class="topics-browser__search-input">
-        <input class="ocs__input" id="topics-query" type="search" placeholder="Search titles and document text" autocomplete="off" disabled>
+        <label class="topics-browser__accessible-label" for="topics-query">Search</label>
+        <input class="ocs__input" id="topics-query" type="search" placeholder="Search every lesson" autocomplete="off" disabled>
         <button type="button" class="ocs__btn small accent" data-topics-search-clear disabled>Clear Search</button>
       </div>
-    </div>
-    <div class="topics-browser__actions">
-      <label class="topics-browser__accessible-label" for="topics-view">View</label>
-      <select class="ocs__input" id="topics-view"><option value="cards">Cards</option><option value="list">List</option></select>
+      <nav aria-label="Topics">
+        <h3>Browse</h3>
+        <div class="ocs__tree" data-topics-nav></div>
+      </nav>
+      <section data-topics-more hidden>
+        <h3>More categories</h3>
+        <p class="ocs__links" data-topics-shortcuts></p>
+      </section>
+      <details class="topics-browser__category-disclosure" data-topics-advanced>
+        <summary><h3>Advanced filters</h3></summary>
+        <div class="topics-browser__filters" id="topics-filters" role="group" aria-label="Topic and category filters">
+          <details class="topics-browser__category-disclosure" data-topics-primary open>
+            <summary><h3>Topic Filter</h3></summary>
+            <p class="ocs__links" role="group" aria-label="Combine checked topics" data-topics-match>
+              <button type="button" class="ocs__btn small accent fill" value="or" aria-pressed="true" title="Show documents in any checked topic" disabled>OR: any</button>
+              <button type="button" class="ocs__btn small accent" value="and" aria-pressed="false" title="Show only documents in every checked topic" disabled>AND: all</button>
+            </p>
+            <fieldset class="topics-browser__categories topics-browser__primary">
+              <legend class="topics-browser__accessible-label">Topic Filter</legend>
+              {% for category in site.data.topics_primary_categories %}
+              <label data-topics-label="{{ category[1] | escape }}"><input type="checkbox" value="{{ category[0] | escape }}"> {{ category[1] | escape }}</label>
+              {% endfor %}
+            </fieldset>
+          </details>
+          <details class="topics-browser__category-disclosure" data-topics-secondary>
+            <summary><h3>Categories Filter</h3></summary>
+            <fieldset class="topics-browser__categories">
+              <legend class="topics-browser__accessible-label">Categories Filter</legend>
+              {% for category in site.data.topics_secondary_categories %}
+              <label data-topics-label="{{ category[1] | escape }}"><input type="checkbox" value="{{ category[0] | escape }}"> {{ category[1] | escape }}</label>
+              {% endfor %}
+            </fieldset>
+          </details>
+          <button type="button" class="ocs__btn small accent" data-topics-clear aria-controls="topics-filters" disabled>Clear Filters</button>
+        </div>
+        <p class="topics-browser__actions">
+          <label for="topics-view">View</label>
+          <select class="ocs__input" id="topics-view"><option value="list">Compact list</option><option value="cards">Cards</option></select>
+        </p>
+      </details>
+    </aside>
+    <div class="ocs__stack">
+      <header>
+        <h2 data-topics-heading>All topics</h2>
+        <p class="ocs__lead" role="status" aria-live="polite" data-topics-status>Loading full-text search…</p>
+      </header>
+      <div class="ocs__grid ocs__grid--card" data-topics-overview></div>
+      <h2 data-topics-title-heading hidden>Title matches <span class="topics-browser__count" data-topics-title-count></span></h2>
+      <div class="ocs__stack" data-topics-results>
+        <div data-topics-flat>
+          <div class="topics-browser__results">
+            {% for document in site.data.topics_catalog %}
+            <article class="topics-browser__card" data-topic-url="{{ document.url | escape }}">
+              <h2><a href="{% if topics_course_context %}{{ document.url | relative_url }}{% else %}{{ document.viewUrl | relative_url }}{% endif %}">{{ document.title | escape }}</a></h2>
+              {% if document.description != empty %}<p>{{ document.description | escape }}</p>{% endif %}
+              <p class="topics-browser__metadata">{{ document.categories | join: ' · ' | escape }}</p>
+              {% if topics_course_context and document.weeks.size > 0 %}
+              <p class="topics-browser__metadata">{{ document.weeks | join: ' · ' | escape }}</p>
+              {% endif %}
+            </article>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="ocs__stack" data-topics-groups></div>
+      </div>
+      <section data-topics-body-section hidden>
+        <h2>Text matches <span class="topics-browser__count" data-topics-body-count></span></h2>
+        <div class="ocs__nav-grid ocs__nav-grid--in-card" data-topics-body-results></div>
+      </section>
     </div>
   </div>
-  <p role="status" aria-live="polite" data-topics-status>Loading full-text search…</p>
-  <h2 data-topics-title-heading hidden>Title matches <span class="topics-browser__count" data-topics-title-count></span></h2>
-  <div class="topics-browser__results" data-topics-results>
-    {% for document in site.data.topics_catalog %}
-    <article class="topics-browser__card" data-topic-url="{{ document.url | escape }}">
-      <h2><a href="{% if topics_course_context %}{{ document.url | relative_url }}{% else %}{{ document.viewUrl | relative_url }}{% endif %}">{{ document.title | escape }}</a></h2>
-      {% if document.description != empty %}<p>{{ document.description | escape }}</p>{% endif %}
-      <p class="topics-browser__metadata">{{ document.categories | join: ' · ' | escape }}</p>
-      {% if topics_course_context and document.weeks.size > 0 %}
-      <p class="topics-browser__metadata">{{ document.weeks | join: ' · ' | escape }}</p>
-      {% endif %}
-    </article>
-    {% endfor %}
-  </div>
-  <section data-topics-body-section hidden>
-    <h2>Text matches <span class="topics-browser__count" data-topics-body-count></span></h2>
-    <div class="ocs__nav-grid ocs__nav-grid--in-card" data-topics-body-results></div>
-  </section>
   <noscript>Enable JavaScript to combine category filters and use full-text search. The document links above remain available.</noscript>
 </section>
 <script src="{{ '/assets/js/vendor/lunr.min.js' | relative_url }}"></script>

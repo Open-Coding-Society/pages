@@ -1,0 +1,39 @@
+{% assign boardStatuses = 'To do|In progress|Done' | split: '|' %}
+{% assign boardStages = 'todo|doing|done' | split: '|' %}
+{% assign taskCount = 0 %}
+{% for member in site.data.dad_project_board.members %}
+  {% assign taskCount = taskCount | plus: member.tasks.size %}
+{% endfor %}
+<section class="ocs__card ocs__keypoints" aria-labelledby="dad-board-title">
+  <div class="ocs__links">
+    <strong id="dad-board-title">D.A.D. Project Board</strong>
+    <span class="ocs__text">{{ taskCount }} cards</span>
+    <a class="ocs__btn small pill" href="https://github.com/Blazific11/Teamportfolio/issues" target="_blank" rel="noopener">Open on GitHub</a>
+  </div>
+  <ul class="ocs__kanban-board">
+    {% for status in boardStatuses %}
+    {% assign columnCount = 0 %}
+    {% for member in site.data.dad_project_board.members %}
+      {% assign memberTasks = member.tasks | where: 'status', status %}
+      {% assign columnCount = columnCount | plus: memberTasks.size %}
+    {% endfor %}
+    <li class="ocs__kanban-column" data-stage="{{ boardStages[forloop.index0] }}">
+      <div><strong>{{ status }}</strong> <span class="ocs__status-pill ocs__status-pill--neutral">{{ columnCount }}</span></div>
+      {% for member in site.data.dad_project_board.members %}
+        {% assign memberTasks = member.tasks | where: 'status', status %}
+        {% for task in memberTasks %}
+        <article class="ocs__kanban-item">
+          <span class="ocs__kanban-kicker">{{ member.name | escape }}</span>
+          <strong class="ocs__kanban-name">{{ task.title | escape }}</strong>
+          <details class="ocs__kanban-note">
+            <summary>Task details</summary>
+            <p>{{ task.description | escape }}</p>
+          </details>
+        </article>
+        {% endfor %}
+      {% endfor %}
+      {% if columnCount == 0 %}<div class="ocs__text">Nothing here</div>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</section>

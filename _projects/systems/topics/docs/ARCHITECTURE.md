@@ -113,18 +113,21 @@ loaded through relative includes is not expanded into the search text.
 
 ## Browser and search
 
-The [browser include](../_includes/topics-browser.html) presents two disclosures
-inside a filter box. Topic Filter defaults open; Categories Filter defaults
-closed. Topic Filter starts with its OR/AND pair: `ocs__btn` buttons in an
-`ocs__links` group, the current choice filled and `aria-pressed`, disabled until
-the search index loads. Clear Filters belongs to that box and clears only category
-selections.
-Search has its own clear control. Each clear button is dimmed and disabled when
-its corresponding state is empty.
+The [browser include](../_includes/topics-browser.html) is a full-width page
+with a sidebar (`ocs__split--aside`): Search, a Browse list of topics with counts,
+More categories shortcuts, and a collapsed Advanced filters disclosure. Choosing a
+topic shows its lessons as unit cards; each lesson is a dropdown with its full
+description and an Open lesson link, and quizzes and FRQ practice sit in the
+unit's Practice row. Units come from lesson titles; their optional names come
+from [`topics_units.yml`](../data/topics_units.yml). Layout details are in the
+[README](../README.md#page-layout).
 
-Topics and Search use semantic `h2` headings; filter disclosures use `h3`
-headings. The Cards/List selector sits above the output and retains an
-accessible View label without a visible prefix.
+Advanced filters holds the original two disclosures. Topic Filter defaults open;
+Categories Filter defaults closed. Topic Filter starts with its OR/AND pair:
+`ocs__btn` buttons in an `ocs__links` group, the current choice filled and
+`aria-pressed`, disabled until the search index loads. Clear Filters belongs to
+that box and clears only category selections. Search has its own clear control.
+Each clear button is dimmed and disabled when its corresponding state is empty.
 
 The [browser controller](../js/browser.js) builds a Lunr index in the client
 from the static catalog. Title, description and content participate in search,
@@ -135,7 +138,7 @@ Browsing and search use the same category filter:
 
 | Mode | Output |
 | --- | --- |
-| No query | Selected documents in Cards or List view |
+| No query | Topic tiles, or the chosen topic's unit cards (lesson dropdowns or cards) |
 | Search query | Title-match cards, followed by text-match cards with excerpts |
 | No matching documents | Explicit empty-result status |
 | Index unavailable | Error status with ordinary document links still available |
@@ -174,7 +177,7 @@ URL parameters carry browser state:
 - Repeated `category` values identify selected facets.
 - `q` carries the search text.
 - `match=and` requires every checked Topic Filter box; OR is the default.
-- `view=list` selects list browsing; cards are the default.
+- `view=cards` shows cards inside unit cards; the compact lesson list is the default.
 
 State is shareable and restored during browser history navigation. Clearing
 filters preserves the query, view and OR/AND choice; clearing Search preserves

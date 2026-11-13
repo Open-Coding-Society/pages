@@ -3,12 +3,19 @@
 // element on the page sets itself up:
 //   - signed in:  the course's events from the existing Spring /api/calendar endpoints
 //   - signed out: the school week (holidays included) and a sign-in note
+//   - no Spring (spring: false in _config.yml): the school week, and no request to Spring
 //   - data-sample: sample events for prototypes and demos, nothing leaves the browser
 // Clicking an event opens its details inside the card. The week shows one row
 // per day when the card is narrow (a sidebar), so it fits wherever it's added.
 // Everything is an existing OCS element; the card has no CSS of its own.
+//
+// A page that makes its cards from its own data (the UI Builder) puts the
+// include's empty card on the page with template=true and the school weeks
+// with ocs_calendar_card_data.html, then calls createCalendarCardSection for
+// each card and mountCalendarCard to start it. Those cards are marked manual,
+// so the cards this script starts by itself (mountAll) are only the include's.
 
-import { fetchOptions, javaURI } from '../../api/config.js';
+import { fetchOptions, javaURI, springEnabled as siteSpringEnabled } from '../../api/config.js';
 import { buildPreviewSeed, createLiveCalendarStore, createPreviewCalendarStore, fetchLiveIdentity } from './calendar-data.js';
 import { mountWeekView, renderEventCards } from './calendar-feed.js';
 import { coursePeriods, parseSchoolCalendar } from './calendar-model.js';
@@ -52,26 +59,42 @@ function showDetail(card, event, store, calendarUrl) {
   detail.hidden = false;
 }
 
-async function mountCard(card, weeks) {
-  card.dataset.mounted = 'true';
+// The school weeks the include put on the page (ocs_calendar_card_data.html).
+function schoolWeeks() {
+  const data = document.getElementById(SCHOOL_CALENDAR_ID);
+  if (!data) {
+    throw new Error('Calendar card: school calendar data missing; add it through _includes/ocs_calendar_card_data.html');
+  }
+  return parseSchoolCalendar(JSON.parse(data.textContent)).weeks;
+}
+
+// `run` is the card's mount: once it is stopped (unmounted) the card sets
+// nothing up, and its cleanups take off the listeners added here.
+async function mountCard(card, weeks, { springEnabled, run }) {
   const course = card.dataset.course || 'all';
   const calendarUrl = card.dataset.calendarUrl || '/student/calendar';
+  const sample = card.dataset.sample === 'true';
   card.setAttribute('aria-busy', 'true');
+
+  // Spring is asked who is signed in only on a site that has Spring.
+  const signedIn = !sample && springEnabled && Boolean(await liveIdentity());
+  if (run.stopped) return;   // unmounted while Spring answered
 
   let store;
   let signedOut = false;
-  if (card.dataset.sample === 'true') {
+  if (sample) {
     store = sampleStore({ course, weeks });
     setStatus(card, 'Sample week: these events are examples and stay in this browser.');
-  } else if (await liveIdentity()) {
+  } else if (signedIn) {
     store = createLiveCalendarStore({ course, javaURI, fetchOptions, sourceUrl: window.location.href });
   } else {
     store = createPreviewCalendarStore({ course, storageKey: `ocs-calendar-card-signed-out:${course}` });
     signedOut = true;
-    setStatus(card, 'Sign in to see your class events. Showing the school week.');
+    // Without Spring there are no class events to sign in for.
+    setStatus(card, springEnabled ? 'Sign in to see your class events. Showing the school week.' : 'Showing the school week.');
   }
 
-  const view = mountWeekView({
+  run.view = mountWeekView({
     host: card.querySelector('[data-hook="mount"]'),
     weeks,
     getStore: () => store,
@@ -79,27 +102,97 @@ async function mountCard(card, weeks) {
     onSelectEvent: (event) => showDetail(card, event, store, calendarUrl),
   });
   card.removeAttribute('aria-busy');
-  card.addEventListener('keydown', (e) => {
+  const closeOnEscape = (e) => {
     if (e.key === 'Escape') card.querySelector('[data-hook="detail"]').hidden = true;
-  });
+  };
   // Pick up events added in another tab (or by the teacher) when the student comes back.
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) view.refresh(); });
+  const refreshOnReturn = () => { if (!document.hidden) run.view.refresh(); };
+  card.addEventListener('keydown', closeOnEscape);
+  document.addEventListener('visibilitychange', refreshOnReturn);
+  run.cleanups.push(
+    () => card.removeEventListener('keydown', closeOnEscape),
+    () => document.removeEventListener('visibilitychange', refreshOnReturn),
+  );
 }
 
-function mountAll() {
-  const data = document.getElementById(SCHOOL_CALENDAR_ID);
-  if (!data) {
-    console.error('Calendar card: school calendar data missing; add it through _includes/ocs_calendar_card.html');
-    return;
-  }
-  const { weeks } = parseSchoolCalendar(JSON.parse(data.textContent));
-  document.querySelectorAll('[data-ocs-calendar]:not([data-mounted])').forEach((card) => {
-    mountCard(card, weeks).catch((err) => {
-      console.error('Calendar card: could not load', err);
-      card.removeAttribute('aria-busy');
-      setStatus(card, 'The calendar could not load right now.');
-    });
+// Each card's mount, so mounting one twice is harmless.
+const mounts = new WeakMap();
+
+// Starts one card and returns { refresh(), unmount() }. springEnabled is
+// config.js's unless given (spring in _config.yml); false, as on a Flask-only
+// site, makes no request to Spring and the card shows the school week.
+// refresh() reloads the week's events; unmount() takes off the card's
+// listeners, stops its week view and empties it.
+export function mountCalendarCard(card, { springEnabled = siteSpringEnabled } = {}) {
+  if (mounts.has(card)) return mounts.get(card);
+  const weeks = schoolWeeks();
+  const before = card.getAttribute('data-mounted');
+  const run = { stopped: false, view: null, cleanups: [] };
+  card.dataset.mounted = 'true';
+  const ready = mountCard(card, weeks, { springEnabled, run }).catch((err) => {
+    if (run.stopped) return;
+    console.error('Calendar card: could not load', err);
+    card.removeAttribute('aria-busy');
+    setStatus(card, 'The calendar could not load right now.');
   });
+
+  const handle = {
+    refresh: () => ready.then(() => (run.stopped ? undefined : run.view?.refresh())),
+    unmount() {
+      if (run.stopped) return;
+      run.stopped = true;
+      mounts.delete(card);
+      run.cleanups.forEach((cleanup) => cleanup());
+      run.view?.unmount();
+      card.querySelector('[data-hook="mount"]').replaceChildren();
+      const detail = card.querySelector('[data-hook="detail"]');
+      detail.replaceChildren();
+      detail.hidden = true;
+      setStatus(card, '');
+      card.removeAttribute('aria-busy');
+      if (before === null) card.removeAttribute('data-mounted');
+      else card.setAttribute('data-mounted', before);
+    },
+  };
+  mounts.set(card, handle);
+  return handle;
 }
 
-mountAll();
+// The include's cards: every card in `root` that isn't mounted yet. Cards
+// from createCalendarCardSection are marked manual and wait for their page's
+// own mountCalendarCard.
+export function mountAll(root = document) {
+  const cards = [...root.querySelectorAll('[data-ocs-calendar]:not([data-mounted])')];
+  if (cards.length && !document.getElementById(SCHOOL_CALENDAR_ID)) {
+    console.error('Calendar card: school calendar data missing; add it through _includes/ocs_calendar_card.html');
+    return [];
+  }
+  return cards.map((card) => mountCalendarCard(card));
+}
+
+// The include's title when it has none: the course's, or the class's for all.
+const titleFor = (course) => (course === 'all' ? 'Class calendar' : `${course.toUpperCase()} calendar`);
+
+// A card for a page that makes its own: a copy of the include's empty card
+// (template=true) for this course ("" is all courses) and title (by default
+// the include's), marked manual. The page adds it, then calls
+// mountCalendarCard(card).
+export function createCalendarCardSection({ course = '', title = '' } = {}, doc = document) {
+  const empty = doc.querySelector('template[data-ocs-template="calendar-card"]')?.content.querySelector('[data-ocs-calendar]');
+  if (!empty) {
+    throw new Error('Calendar card: the page has no card template; add {% include ocs_calendar_card.html template=true %}.');
+  }
+  const card = doc.importNode(empty, true);
+  const code = String(course ?? '').trim().toLowerCase() || 'all';
+  const heading = String(title ?? '').trim() || titleFor(code);
+  card.dataset.course = code;
+  card.setAttribute('aria-label', heading);
+  // The heading keeps the include's icon in front of its words.
+  const strong = card.querySelector('strong');
+  const icon = strong.querySelector('i');
+  strong.replaceChildren(...(icon ? [icon, ` ${heading}`] : [heading]));
+  card.dataset.mounted = 'manual';
+  return card;
+}
+
+if (typeof document !== 'undefined') mountAll();

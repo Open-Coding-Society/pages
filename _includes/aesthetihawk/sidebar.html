@@ -1,5 +1,10 @@
+{% comment %}
+  A page picks its sidebar with `sidebar: <data file>` in its front matter;
+  the Grades pages use grades_sidebar. Without it, the Profile sidebar shows.
+{% endcomment %}
+{% assign sidebar_name = page.sidebar | default: "aesthetihawk_sidebar" %}
 <ul class="flex flex-col py-4 space-y-1">
-  {% for section in site.data.aesthetihawk_sidebar %}
+  {% for section in site.data[sidebar_name] %}
     <li class="px-5">
       <div class="flex flex-row items-center h-8">
         <div class="text-sm font-light tracking-wide text-neutral-500">{{ section.section }}</div>

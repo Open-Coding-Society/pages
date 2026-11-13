@@ -1,0 +1,28 @@
+{%- comment -%}
+UI Builder page data, written once per page as JSON scripts that js/registry.js readRegistry()
+reads: the generic registry (_data/ui_builder.yml), the school pack (_data/ui_builder_school.yml),
+course titles from each course's own data file (the way Profile reads them) and, on the editor
+page only (editor=true), the editor's strings (_data/ui_builder_editor.yml). Every "<" is written
+as \u003c so a string in the data can never close the script element.
+
+widgets=true (the viewer) also puts on the page what the live kanban and calendar blocks copy:
+each owner's data once (#ocs-kanban-defaults, #ocsSchoolCalendarData) and its empty card inside
+a <template>, for kanban-board.js createKanbanSection and calendar-card.js createCalendarCardSection.
+Their scripts are loaded by the viewer only when a page has such a block.
+{%- endcomment -%}
+<script type="application/json" id="ui-builder-registry">{{ site.data.ui_builder | jsonify | replace: "<", "\u003c" }}</script>
+<script type="application/json" id="ui-builder-school">{{ site.data.ui_builder_school | jsonify | replace: "<", "\u003c" }}</script>
+{%- assign ui_builder_course_codes = site.data.ui_builder_school.course_codes | default: empty %}
+<script type="application/json" id="ui-builder-courses">[{%- for code in ui_builder_course_codes -%}
+  {%- assign ui_builder_course_title = site.data[code].course.title | default: code | split: " - " | last -%}
+  {"code": {{ code | jsonify | replace: "<", "\u003c" }}, "title": {{ ui_builder_course_title | jsonify | replace: "<", "\u003c" }}}{% unless forloop.last %},{% endunless %}
+{%- endfor -%}]</script>
+{%- if include.editor %}
+<script type="application/json" id="ui-builder-editor-text">{{ site.data.ui_builder_editor | jsonify | replace: "<", "\u003c" }}</script>
+{%- endif %}
+{%- if include.widgets %}
+{% include ocs_kanban_board_data.html %}
+{% include ocs_kanban_board.html template=true %}
+{% include ocs_calendar_card_data.html %}
+{% include ocs_calendar_card.html template=true %}
+{%- endif %}

@@ -45,6 +45,7 @@ class Barrier extends GameObject {
         this.color = data.color || 'rgba(255, 0, 0, 0.3)';
         this.visible = data.visible !== undefined ? data.visible : true;
         this.hitbox = data.hitbox || { widthPercentage: 0.0, heightPercentage: 0.0 };
+        this.collisionShape = 'rectangle';
 
         // Create a dedicated canvas for collision (like Character/Npc)
         this.canvas = document.createElement('canvas');

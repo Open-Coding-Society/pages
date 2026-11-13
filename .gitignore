@@ -18,6 +18,7 @@ venv/
 .venv
 port_venv/
 verifyTools.md
+setup-report.md
 _notebooks/CSP/big-ideas/big-idea-3-part-1-fundamentals/Period3/2024-9-27-fundamentals-3.6.4.ipynb
 .vscode/
 .bundle
@@ -64,7 +65,6 @@ images/projects/
 /_includes/lesson-modals.html
 /_includes/player-pages/
 /_includes/announcement_chat.html
-/_includes/week_chat.html
 /_includes/lesson_chat.html
 /_includes/lesson-submission-form.html
 /_includes/calendar.html
@@ -75,20 +75,30 @@ images/projects/
 /_includes/topics-document-nav.html
 /_plugins/topics.rb
 /_data/topics_primary.yml
+/_data/topics_units.yml
 /navigation/search.md
 /navigation/topics.md
 /assets/js/topics/
+
+# UI Builder system distributions (authoritative sources in _projects/systems/ui-builder)
+/navigation/ui-builder/
+/_data/ui_builder.yml
+/_data/ui_builder_school.yml
+/_data/ui_builder_editor.yml
+/_layouts/ui-builder-canvas.html
 
 # Profile system distributions (authoritative sources in _projects/systems/profile)
 /navigation/authentication/profile.md
 /navigation/authentication/profile-v2.md
 /_layouts/profile.html
 /_includes/profile-gist-connection.html
+/_includes/profile-ai-connections.html
 /assets/js/profile/
 /_sass/open-coding/profile-gist-connection.scss
 /_includes/post_list_image_card.html
 /_includes/announcement_calendar_demo.html
 /_includes/ocs_calendar_card.html
+/_includes/ocs_calendar_card_data.html
 /_includes/sprint-card.html
 /_includes/sprint-item-card.html
 /_includes/sprint-modals.html
@@ -122,6 +132,32 @@ images/projects/
 /_sass/open-coding/blogs.scss
 /_sass/open-coding/timeline.scss
 /_sass/open-coding/announcement-calendar.scss
+
+# Grades system distributions (authoritative sources in _projects/systems/grades)
+/navigation/grades.html
+/_data/grades_hub.yml
+/_data/grades_sidebar.yml
+/_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md
+/_posts/student_toolkit/assignments/2025-01-21-gradeviewer-v2.md
+/_sass/open-coding/view-grades-v2.scss
+/navigation/authentication/retrospective.md
+/_layouts/retrospective.html
+/assets/js/analytics/sprint-retrospective.js
+/assets/js/analytics/forecast-retrospective.js
+/assets/js/analytics/grade-calculator.js
+/navigation/authentication/analytics-dashboard.md
+/navigation/authentication/analytics-dashboard-v2.md
+/_layouts/analytics-dashboard-v2.html
+/assets/js/ocs-analytics-dashboard.js
+/_sass/open-coding/analytics-dashboard-v2.scss
+/navigation/authentication/submissions.md
+/navigation/authentication/submissions-v2.md
+/_layouts/submissions-v2.html
+/_includes/submissions/creator-dashboard.html
+/assets/js/submissions/grading.js
+/assets/js/submissions/creator-dashboard.js
+/_sass/open-coding/submissions.scss
+/_sass/open-coding/submissions-v2.scss
 
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile
@@ -157,3 +193,4 @@ _notebooks/**/*_content.md
 
 # Claude Code session artifacts
 .claude/
+.gstack/

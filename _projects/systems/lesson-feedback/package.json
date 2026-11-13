@@ -1,0 +1,9 @@
+{
+  "name": "ocs-lesson-feedback",
+  "private": true,
+  "type": "module",
+  "description": "Marks this project's .js files as ES modules so `node --test tests/*.test.mjs` can import them. Without it Node treats them as CommonJS and every test fails on 'Cannot use import statement outside a module'. Not published, not bundled, not copied into the site build.",
+  "scripts": {
+    "test": "node --test tests/"
+  }
+}

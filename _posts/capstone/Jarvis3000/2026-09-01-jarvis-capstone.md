@@ -27,6 +27,13 @@ rp_active: overview
     <p class="ocs__description">{{ data.Description }}</p>
   </div>
 
+  {% if data.Board %}
+  <div class="jv-kanban">
+    <h2 class="ocs__section-title" id="team-kanban-board">Team Kanban Board</h2>
+    {% include jarvis-kanban.html %}
+  </div>
+  {% endif %}
+
   <figure class="jv-figure">
     <img src="{{ '/images/jarvis/jarvis3000-overview-image.png' | relative_url }}" alt="How Jarvis3000 works: classroom cameras observe the room, Jarvis detects objects, and the system reports objects that moved" width="1774" height="887">
     <figcaption>Jarvis3000 observes classroom objects over time and highlights changes in their location.</figcaption>

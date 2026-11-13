@@ -34,6 +34,9 @@ class TrailPath extends GameObject {
     this.data = data;
     this.stations = data.stations || []; // ordered: zone 1 -> N, boss last
     this.getStatus = typeof data.getStatus === 'function' ? data.getStatus : () => STATION_STATUS.LOCKED;
+    this.getLaneWidth = typeof data.getLaneWidth === 'function' ? data.getLaneWidth : () => 0;
+    this.getLanePoints = typeof data.getLanePoints === 'function' ? data.getLanePoints : () => [];
+    this.getRoadPath = typeof data.getRoadPath === 'function' ? data.getRoadPath : () => null;
   }
 
   update() {
@@ -45,6 +48,7 @@ class TrailPath extends GameObject {
     const ctx = this.gameEnv.ctx;
     const t = performance.now();
 
+    this._drawLane(ctx);
     ctx.save();
     for (let i = 0; i < this.stations.length - 1; i++) {
       this._drawSegment(ctx, this.stations[i], this.stations[i + 1], t);
@@ -66,6 +70,35 @@ class TrailPath extends GameObject {
       return { x: obj.position.x + obj.width / 2, y: obj.position.y + obj.height / 2 };
     }
     return { ...station.position };
+  }
+
+  // Wide road under the status line. Same width the collision uses, so the
+  // visible edge is exactly where the player stops.
+  _drawLane(ctx) {
+    const width = this.getLaneWidth();
+    if (!width) return;
+    const centers = this.getLanePoints();
+    if (!centers || centers.length < 2) return;
+    const trace = () => {
+      ctx.beginPath();
+      centers.forEach((c, i) => (i ? ctx.lineTo(c.x, c.y) : ctx.moveTo(c.x, c.y)));
+    };
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.setLineDash([]);
+    trace();
+    ctx.strokeStyle = 'rgba(56,189,248,0.55)';
+    ctx.lineWidth = width + 6;
+    ctx.shadowColor = 'rgba(56,189,248,0.6)';
+    ctx.shadowBlur = 14;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    trace();
+    ctx.strokeStyle = 'rgba(10,16,40,0.82)';
+    ctx.lineWidth = width;
+    ctx.stroke();
+    ctx.restore();
   }
 
   _drawSegment(ctx, fromStation, toStation, t) {
@@ -94,9 +127,14 @@ class TrailPath extends GameObject {
       dashOffset = -((t / 40) % (dash[0] + dash[1]));
     }
 
+    const roadPath = this.getRoadPath(fromStation.id, toStation.id);
     ctx.beginPath();
-    ctx.moveTo(from.x, from.y);
-    ctx.lineTo(to.x, to.y);
+    if (roadPath && roadPath.length > 1) {
+      roadPath.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+    } else {
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+    }
     ctx.setLineDash(dash);
     ctx.lineDashOffset = dashOffset;
     ctx.strokeStyle = color;

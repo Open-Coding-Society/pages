@@ -2,12 +2,13 @@
 // when a field really changed, and saves only those fields.
 import { ACCOUNT_FIELDS, changedFields } from './profile-model.js';
 
-// Flask and Spring each keep a copy of the profile, so a field is saved to both.
-async function saveField({ pythonURI, javaURI, putUpdate, postUpdate }, key, value) {
+// Flask keeps the profile, and a site that runs Spring keeps a copy there too, so a field
+// is saved to Flask and, when springEnabled, to Spring.
+async function saveField({ pythonURI, javaURI, springEnabled, putUpdate, postUpdate }, key, value) {
     const body = { [key]: value };
     const [flaskSaved, springSaved] = await Promise.all([
         putUpdate({ URL: `${pythonURI}/api/user`, body }),
-        postUpdate({ URL: `${javaURI}/api/person/update`, body }),
+        springEnabled ? postUpdate({ URL: `${javaURI}/api/person/update`, body }) : true,
     ]);
     if (!flaskSaved || !springSaved) throw new Error(`${flaskSaved ? 'Spring' : 'Flask'} didn't accept it`);
 }

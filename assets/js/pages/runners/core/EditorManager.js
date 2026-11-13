@@ -24,14 +24,19 @@ export class EditorManager {
     fallbackCode = '',
     codeMirrorOptions = {},
     trackChanges = true,
+    plainText = false,
   } = {}) {
     if (!enabled) {
       return null;
     }
 
+    // plainText runners (written answers) keep the native textarea even when CodeMirror is
+    // on the page: prose needs wrapping and spellcheck, not line numbers or highlighting.
     const textarea = this.container.querySelector('.editor-textarea');
-    if (!textarea || typeof CodeMirror === 'undefined') {
-      console.warn(`Runner ${this.containerId}: CodeMirror editor unavailable`);
+    if (!textarea || plainText || typeof CodeMirror === 'undefined') {
+      if (!plainText) {
+        console.warn(`Runner ${this.containerId}: CodeMirror editor unavailable`);
+      }
       if (textarea) {
         textarea.value = initialCode || fallbackCode || '';
         if (trackChanges && typeof this.onChange === 'function') {

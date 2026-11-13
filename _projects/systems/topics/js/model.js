@@ -24,7 +24,7 @@ export function readState(search) {
     categories: [...new Set(params.getAll('category').map((value) => value.toLowerCase()))],
     match: params.get('match')?.toLowerCase() === 'and' ? 'and' : 'or',
     query: params.get('q') || '',
-    view: params.get('view') === 'list' ? 'list' : 'cards',
+    view: params.get('view') === 'cards' ? 'cards' : 'list',
   };
 }
 
@@ -33,7 +33,7 @@ export function writeState(state) {
   state.categories.forEach((category) => params.append('category', category));
   if (state.match === 'and') params.set('match', 'and');
   if (state.query) params.set('q', state.query);
-  if (state.view === 'list') params.set('view', 'list');
+  if (state.view === 'cards') params.set('view', 'cards');
   return params.toString();
 }
 
@@ -109,4 +109,62 @@ export function wrappableParts(text, longest = 20) {
     parts.push(...pieces.slice(1));
   }
   return parts;
+}
+
+// Browsing groups each document under one topic so the page reads as sections,
+// not one long grid. Checked topics (in Topic Filter order) take precedence,
+// otherwise every primary topic does; a document joins the first topic it has,
+// and documents with none go to `other`. Empty groups are left out.
+export function topicGroups(documents, categories, primary = [], other = 'other') {
+  const checked = primary.filter((topic) => categories.includes(topic));
+  const order = checked.length ? checked : primary;
+  const groups = new Map([...order, other].map((key) => [key, []]));
+  for (const document of documents) {
+    const key = order.find((topic) => document.categories.includes(topic)) || other;
+    groups.get(key).push(document);
+  }
+  return [...groups].filter(([, members]) => members.length)
+    .map(([key, members]) => ({ key, documents: members }));
+}
+
+export function categoryCounts(documents) {
+  const counts = new Map();
+  documents.forEach((document) => document.categories.forEach((category) =>
+    counts.set(category, (counts.get(category) || 0) + 1)));
+  return counts;
+}
+
+// Lesson titles name their unit: "1.01 Variables", "Unit 2 Quiz" or
+// "MCQ1 - Unit 1 Quiz". A year such as "2016 FRQ 3" is not a unit, so a bare
+// number needs the ".01" part.
+export function unitOf(title) {
+  const match = title.match(/^(\d+)\.\d+\s/) || title.match(/\bunit\s+(\d+)\b/i);
+  return match ? Number(match[1]) : null;
+}
+
+// Quizzes and FRQ practice sit apart from the lessons that teach.
+export function isPractice(title) {
+  return /\b(quiz|frq|mcq\d*)\b|practice/i.test(title);
+}
+
+// Units in number order, then lessons without a unit. Each unit lists its
+// lessons (titles sort naturally, so 1.02 comes before 1.10) and its practice.
+export function unitGroups(documents) {
+  const groups = new Map();
+  for (const document of documents) {
+    const unit = unitOf(document.title);
+    if (!groups.has(unit)) groups.set(unit, []);
+    groups.get(unit).push(document);
+  }
+  const byTitle = (a, b) => a.title.localeCompare(b.title, undefined, { numeric: true });
+  return [...groups].sort(([a], [b]) => (a ?? Infinity) - (b ?? Infinity))
+    .map(([unit, members]) => {
+      const sorted = members.sort(byTitle);
+      return {
+        unit,
+        documents: sorted,
+        lessons: sorted.filter((document) => !isPractice(document.title)),
+        practice: sorted.filter((document) => isPractice(document.title)),
+      };
+    });
 }

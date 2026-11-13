@@ -18,9 +18,9 @@ and browser paths. Do not edit those generated copies.
 | `layouts/sprint.html`, `layouts/courses.html` | Legacy sprint view and course wrapper | `_layouts/` |
 | `_includes/course-*.html` | Course pills and selected course title | `_includes/` |
 | `_includes/lesson-{sidebar-nav,topbar,modals}.html` | Desktop/mobile player controls | `_includes/` |
-| `_includes/player-pages/` | Home, sprint, week, chat, and Blogs page bodies | `_includes/player-pages/` |
+| `_includes/player-pages/` | Home, sprint, week, and Blogs page bodies | `_includes/player-pages/` |
 | `_includes/sprint-*.html` | Sprint cards, week cards, and progression modal | `_includes/` |
-| `_includes/{announcement_chat,week_chat,lesson_chat}.html` | Course, week, and document chat | `_includes/` |
+| `_includes/{announcement_chat,lesson_chat}.html` | Course and document chat | `_includes/` |
 | `_includes/{calendar,ocs_calendar_card,announcement_calendar_demo}.html` | Calendar integration and preview interfaces | `_includes/` |
 | `plugins/lesson_player_pages.rb` | Generates course player pages from schedule data | `_plugins/lesson_player_pages.rb` |
 | `data/{cs,csa,csp,csse,csh}.yml` | Shared sprint definitions and course schedules | `_data/` |
@@ -166,13 +166,13 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
   enrolled course in CSSE/CSP/CSA/CSH order.
 - Course homes remain `/navigation/courses/<course>/` and reuse the player with
   announcements/calendar. Legacy chooser/catalog routes remain available.
-- The generator creates sprint and Blogs pages, and week/chat pages only for
-  weeks with lessons. Sidebar links and generated URLs must stay aligned.
+- The generator creates sprint and Blogs pages, and week pages only for weeks
+  with lessons. Sidebar links and generated URLs must stay aligned.
 - Desktop and mobile panels put course buttons first, X at upper-right, and the
   selected title below. Hamburger controls open navigation; closing returns focus.
 - Blogs, Previous/Next, and reading completion are icon-only with accessible
   labels. Arrows appear on lessons and sprint/week introductions. Completion
-  appears only on lessons. Week chat remains in navigation, not the top bar.
+  appears only on lessons.
 - `ocs-course-navigation:<course>:<panel>` stores expanded sections, scroll,
   and the last document separately for desktop/mobile. Blogs remains in the
   main pane while the last document is highlighted for resuming; no automatic

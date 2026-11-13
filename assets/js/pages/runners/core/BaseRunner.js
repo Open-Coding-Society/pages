@@ -61,6 +61,7 @@ export class BaseRunner {
     fallbackCode = '',
     codeMirrorOptions = {},
     trackStats = true,
+    plainText = false,
   } = {}) {
     this.defaultCode = defaultCode ?? '';
     try {
@@ -80,6 +81,7 @@ export class BaseRunner {
       fallbackCode,
       codeMirrorOptions,
       trackChanges: true,
+      plainText,
     });
 
     if (this.trackStats) {

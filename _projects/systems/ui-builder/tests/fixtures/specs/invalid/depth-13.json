@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": { "title": "Nested thirteen levels deep", "description": "", "byline": "", "course": "csp", "width": "contained", "image": "" },
+  "sections": [
+    {
+      "id": "s-deep0001",
+      "type": "stack",
+      "settings": {},
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": [
+            {
+              "id": "b-deep0001",
+              "type": "checklist",
+              "settings": {
+                "items": [ [ [ [ [ "level 13" ] ] ] ] ]
+              },
+              "hidden": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

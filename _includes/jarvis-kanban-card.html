@@ -1,0 +1,5 @@
+<a class="ocs__kanban-item" href="{{ include.card.url | escape }}" target="_blank" rel="noopener noreferrer">
+  {% if include.card.number %}<div class="ocs__kanban-kicker">#{{ include.card.number }}</div>{% endif %}
+  <div class="ocs__kanban-name">{{ include.card.title | escape }}</div>
+  {% if include.card.people.size > 0 %}<div class="ocs__kanban-note">{{ include.card.people | join: ", " | escape }}</div>{% endif %}
+</a>

@@ -30,7 +30,7 @@ KNOWN_TARGETS := \
 	convert convert-docx convert-docx-config convert-single convert-registered-notebooks \
 	watch-notebooks watch-projects watch-files bundle-install jekyll-serve \
 	generate-makefiles build-project-includes build-registered-projects build-registered-docs build-dev-projects \
-	watch-registered-projects clean-registered-projects watch-dev-projects \
+	watch-registered-projects clean-registered-projects clean-removed-projects watch-dev-projects \
 	list-projects split-courses clean-courses clean-generated-makefiles use-minima use-cayman use-yat \
 	use-so-simple use-hydejack watch-rebuild
 
@@ -214,7 +214,7 @@ generate-makefiles:
 	done
 
 # Build all registered projects (game assets, not docs)
-build-registered-projects: build-project-includes
+build-registered-projects: clean-removed-projects build-project-includes
 	$(call run_projects,$(ALL_PROJECTS),Building,build)
 	@echo "Generating dynamic SASS imports..."
 	@$(PYTHON) scripts/generate_sass_imports.py
@@ -228,7 +228,7 @@ build-project-includes:
 		cp -R "$$source_dir"/. "_includes/projects/$$category/"; \
 	done
 
-build-dev-projects: build-project-includes
+build-dev-projects: clean-removed-projects build-project-includes
 	@echo "Active DEV Projects: $(ACTIVE_DEV_PROJECTS)"
 	$(call run_projects,$(ACTIVE_DEV_PROJECTS),Building,build)
 	@echo "Generating dynamic SASS imports..."
@@ -253,6 +253,10 @@ watch-dev-projects:
 clean-registered-projects:
 	$(call run_projects,$(ALL_PROJECTS),Cleaning,clean)
 	$(call run_projects,$(ALL_PROJECTS),Cleaning docs,docs-clean)
+
+# Remove what deleted projects built: clean-registered-projects only reaches projects still in .makeprojects
+clean-removed-projects:
+	@ruby scripts/clean_removed_projects.rb "$(CURDIR)"
 
 # General serve target (uses whatever is in _config.yml/Gemfile)
 serve-current: stop build-registered-projects convert split-courses build-registered-docs jekyll-serve
@@ -343,6 +347,7 @@ clean: stop
 	@make clean-courses || true
 	@echo "Cleaning project distributions..."
 	@make clean-registered-projects
+	@make clean-removed-projects
 	@rm -rf _includes/projects
 	@echo "Cleaning extracted DOCX images..."
 	@rm -rf images/docx/*.png images/docx/*.jpg images/docx/*.jpeg images/docx/*.gif 2>/dev/null || true
@@ -649,7 +654,7 @@ list-projects:
 		fi; \
 	done || echo "  None found"
 
-.PHONY: generate-makefiles build-project-includes list-projects build-registered-projects convert-registered-notebooks build-registered-docs watch-registered-projects clean-registered-projects clean-generated-makefiles
+.PHONY: generate-makefiles build-project-includes list-projects build-registered-projects convert-registered-notebooks build-registered-docs watch-registered-projects clean-registered-projects clean-removed-projects clean-generated-makefiles
 
 ###########################################
 # Allow unknown targets (project selectors)

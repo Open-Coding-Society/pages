@@ -5,6 +5,22 @@ import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackgr
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import EmpathyEpicPlayer from './EmpathyEpicPlayer.js';
+import { completeLevelTask } from '../model/pathwayScores.js';
+
+// Finished stations persist so a student can leave and come back.
+const EMPATHY_STATIONS_KEY = 'empathy_epic_completed_stations';
+const EMPATHY_STATION_COUNT = 5;
+
+function recordEmpathyStation(stationId) {
+  let done = [];
+  try { done = JSON.parse(localStorage.getItem(EMPATHY_STATIONS_KEY)) || []; } catch { done = []; }
+  if (!done.includes(stationId)) done.push(stationId);
+  localStorage.setItem(EMPATHY_STATIONS_KEY, JSON.stringify(done));
+  // Empathy Epic is one Wayfinding World task, done once every station is.
+  if (done.length >= EMPATHY_STATION_COUNT) {
+    completeLevelTask('wayfinding-world', 'empathy-epic');
+  }
+}
 
 /**
  * GameLevel - Empathy Epic
@@ -108,6 +124,7 @@ class GameLevelEmpathyEpic extends GameLevelCsPathIdentity {
           const completeStation = () => {
             setStationColor(npcSelf, 'green');
             npcSelf._quizCompleted = true;
+            recordEmpathyStation(id);
             npcSelf._quizRetryPending = false;
             ds.closeDialogue();
             npcSelf.isInteracting = false;

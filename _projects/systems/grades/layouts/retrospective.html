@@ -1,0 +1,84 @@
+---
+title: Retrospective
+layout: aesthetihawk
+active_tab: retrospective
+---
+
+<!-- Fonts loaded globally via head-custom.html -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css" />
+<div class="w-full">
+    <div class="space-y-4 sm:space-y-6">
+        <div class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700 relative">
+            <ul class="flex flex-wrap -mb-px relative" id="retro-tab-bar">
+                <li class="me-2">
+                    <a href="#sprint" id="retro-tab-sprint" data-panel="sprint"
+                        class="retro-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        Sprint Reflection
+                    </a>
+                </li>
+                <li class="me-2">
+                    <a href="#growth" id="retro-tab-growth" data-panel="growth"
+                        class="retro-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        Growth Over Time
+                    </a>
+                </li>
+                <li class="me-2">
+                    <a href="#forecast" id="retro-tab-forecast" data-panel="forecast"
+                        class="retro-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        Forecast Retrospective
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Sprint Reflection, rendered by assets/js/analytics/sprint-retrospective.js -->
+        <div id="retro-panel-sprint" class="retro-panel px-6 py-4 text-neutral-200" hidden></div>
+
+        <!-- Growth Over Time, rendered by assets/js/analytics/sprint-retrospective.js -->
+        <div id="retro-panel-growth" class="retro-panel px-6 py-4 text-neutral-200" hidden></div>
+
+        <!-- Forecast Retrospective, rendered by assets/js/analytics/forecast-retrospective.js -->
+        <div id="retro-panel-forecast" class="retro-panel px-6 py-4 text-neutral-200" hidden></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"></script>
+<script type="module">
+    import { initSprintReflection, initGrowthOverTime } from '{{ site.baseurl }}/assets/js/analytics/sprint-retrospective.js';
+    import { initForecastRetrospective, refreshForecastRetrospective } from '{{ site.baseurl }}/assets/js/analytics/forecast-retrospective.js';
+
+    // Each panel loads the first time its tab opens; the forecast panel refreshes on every visit
+    // because Smart Predict on the analytics dashboard may have logged a forecast since.
+    const started = new Set();
+    const loaders = {
+        sprint: () => initSprintReflection(document.getElementById('retro-panel-sprint')),
+        growth: () => initGrowthOverTime(document.getElementById('retro-panel-growth')),
+        forecast: () => initForecastRetrospective(document.getElementById('retro-panel-forecast')),
+    };
+    const ACTIVE = ['active', 'text-blue-500', 'border-blue-500'];
+
+    async function show(panel) {
+        if (!loaders[panel]) panel = 'sprint';
+        document.querySelectorAll('.retro-tab').forEach((tab) => {
+            const on = tab.dataset.panel === panel;
+            ACTIVE.forEach((cls) => tab.classList.toggle(cls, on));
+            if (on) tab.setAttribute('aria-current', 'page'); else tab.removeAttribute('aria-current');
+        });
+        document.querySelectorAll('.retro-panel').forEach((el) => { el.hidden = el.id !== `retro-panel-${panel}`; });
+        if (!started.has(panel)) {
+            started.add(panel);
+            await loaders[panel]();
+        } else if (panel === 'forecast') {
+            await refreshForecastRetrospective();
+        }
+    }
+
+    document.querySelectorAll('.retro-tab').forEach((tab) => {
+        tab.addEventListener('click', (event) => {
+            event.preventDefault();
+            history.replaceState(null, '', `#${tab.dataset.panel}`);
+            show(tab.dataset.panel);
+        });
+    });
+    show(location.hash.slice(1));
+</script>

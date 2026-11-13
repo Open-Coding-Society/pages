@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import PlayerCar from '../levels/PlayerCar.js';
+import { getRacingTurnRate, RACING_CAR_PHYSICS } from '../levels/RacingCarPhysics.js';
 import {
   createKeyboardPlayer,
   pressKey,
@@ -37,8 +38,8 @@ test('the car continues coasting after the up key is released until speed reache
 
   releaseKey(player, 87);
   player.update();
-  assert.equal(player.speed, 0.15);
-  assert.equal(player.velocity.y, -0.15);
+  assert.ok(Math.abs(player.speed - 0.15) < Number.EPSILON);
+  assert.ok(Math.abs(player.velocity.y + 0.15) < Number.EPSILON);
   assert.equal(player.moved, true);
 
   while (player.speed > 0) {
@@ -46,8 +47,27 @@ test('the car continues coasting after the up key is released until speed reache
   }
 
   assert.equal(player.speed, 0);
-  assert.deepEqual(player.velocity, { x: 0, y: 0 });
+  assert.ok(Math.abs(player.velocity.x) < Number.EPSILON);
+  assert.ok(Math.abs(player.velocity.y) < Number.EPSILON);
   assert.equal(player.moved, false);
+});
+
+test('player steering turns more gently at higher speeds', () => {
+  const slowCar = fixture();
+  slowCar.speed = 0.2;
+  slowCar.pressedKeys[68] = true;
+  slowCar.update();
+
+  const fastCar = fixture();
+  fastCar.speed = 5.2;
+  fastCar.pressedKeys[68] = true;
+  fastCar.update();
+
+  assert.equal(slowCar.heading, getRacingTurnRate(slowCar.speed));
+  assert.equal(fastCar.heading, getRacingTurnRate(fastCar.speed));
+  assert.ok(slowCar.heading < RACING_CAR_PHYSICS.turnRate);
+  assert.ok(fastCar.heading > 0);
+  assert.ok(fastCar.heading < slowCar.heading);
 });
 
 test('the sprite renders its upward-facing frame rotated by the car heading', () => {

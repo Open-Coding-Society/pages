@@ -8,7 +8,7 @@
 # you type them and prints inline help the moment one fails.
 #
 # Opt-in only - add one line to ~/.zshrc to enable it:
-#   source /absolute/path/to/toolchain_trail/scripts/mac_setup_agent.zsh
+#   source /absolute/path/to/pages/scripts/mac_setup_agent.zsh
 #
 # Everything here is local-only: no network calls, no browser/game
 # integration. It only watches commands starting with one of
@@ -35,7 +35,9 @@ if [[ -z "$MAC_AGENT_PYTHON3" ]]; then
     echo "mac_setup_agent: python3 not found at setup time - error diagnosis disabled for this session (✓ success markers still work)."
 fi
 
-MAC_AGENT_PREFIXES=(brew xcode-select java javac python3 pip3 git code softwareupdate gem bundle)
+# The install script is watched too, so a failed Toolchain Trail install step gets a fix tip.
+MAC_AGENT_PREFIXES=(brew xcode-select java javac python3 pip3 git code softwareupdate gem bundle
+    "bash scripts/activate_macos.sh" "./scripts/activate_macos.sh")
 
 _mac_agent_is_relevant() {
     local cmd="$1"

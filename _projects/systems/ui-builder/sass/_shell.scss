@@ -1,0 +1,273 @@
+// The editing shell: top bar, three panes, the scaled canvas, banners, feedback and the menu.
+
+// An app surface: the grammar's document container stops at 900px and pads for reading.
+.ui-builder {
+  width: 100%;
+  font-family: var(--pref-font-family);
+  color: var(--pref-text-color);
+}
+
+// The shell is a column of bar, banners, panes and feedback with tighter gaps than ocs__stack.
+.ui-builder-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+// Groups pushed to both ends of one wrapping row; ocs__links wraps but can't spread groups apart.
+.ui-builder-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.75rem;
+  background: var(--panel);
+}
+
+// ocs__links' 0.75rem gap is roomy for a toolbar of small buttons.
+.ui-builder .ui-builder-bar-group {
+  align-items: center;
+  gap: 0.4rem;
+}
+
+// The publish group stays at the right end when the bar wraps onto a second line.
+.ui-builder .ui-builder-bar-group:last-child {
+  margin-left: auto;
+}
+
+// A long page title must not push the toolbar onto three lines.
+.ui-builder .ui-builder-title {
+  display: inline-block;
+  max-width: 16rem;
+}
+
+// Live regions and status words that are text, not controls. The text color, not the muted one:
+// some presets' muted text is under 4.5:1 on their panels.
+.ui-builder-note {
+  color: var(--pref-text-color);
+  font-size: 0.8125rem;
+}
+
+// The grammar has no visually-hidden helper; this text is for screen readers only.
+.ui-builder-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+// Outline, canvas and inspector side by side from 1440px; below that the toggles open the
+// side panes beside the canvas, and on a phone everything stacks in reading order.
+.ui-builder-body {
+  display: grid;
+  grid-template-columns: 17rem minmax(0, 1fr) 22rem;
+  align-items: start;
+  gap: 0.75rem;
+}
+
+// The panes scroll on their own so the canvas stays in view.
+.ui-builder-pane {
+  min-width: 0;
+  max-height: calc(100dvh - 9rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.75rem;
+  background: var(--panel);
+
+  &:focus-visible {
+    outline: 2px solid var(--pref-accent-color);
+    outline-offset: 2px;
+  }
+}
+
+// Only one way to show the pane toggles: below the width that fits all three panes.
+.ui-builder .ui-builder-pane-toggle {
+  display: none;
+}
+
+@media (max-width: $uib-wide - 1px) {
+  .ui-builder .ui-builder-pane-toggle {
+    display: inline-flex;
+  }
+
+  .ui-builder-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ui-builder-body:not([data-outline-open]) .ui-builder-outline,
+  .ui-builder-body:not([data-inspector-open]) .ui-builder-inspector {
+    display: none;
+  }
+
+  .ui-builder-body[data-outline-open] {
+    grid-template-columns: 16rem minmax(0, 1fr);
+  }
+
+  .ui-builder-body[data-inspector-open] {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+  }
+
+  .ui-builder-body[data-outline-open][data-inspector-open] {
+    grid-template-columns: 15rem minmax(0, 1fr) 19rem;
+  }
+}
+
+@media (max-width: $uib-phone) {
+  .ui-builder-body,
+  .ui-builder-body[data-outline-open],
+  .ui-builder-body[data-inspector-open],
+  .ui-builder-body[data-outline-open][data-inspector-open] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ui-builder-pane {
+    max-height: none;
+  }
+
+  .ui-builder .ui-builder-title {
+    max-width: 10rem;
+  }
+}
+
+// The stage holds the zoom line and the frame; it is the canvas column of the grid.
+.ui-builder-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.ui-builder-stagebar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 1.25rem;
+}
+
+// A fixed-height window onto the device-width page: the iframe is laid out at the device's
+// width and scaled down to fit (editor-shell.js sets the variables), so media queries inside
+// the page see a real phone, tablet or desktop viewport.
+.ui-builder-viewport {
+  position: relative;
+  // 14rem: the site header, the bar, the feedback line above the panes and the stage's own bar.
+  height: clamp(26rem, calc(100dvh - 14rem), 64rem);
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--pref-text-color) 4%, var(--pref-bg-color));
+}
+
+.ui-builder-frame {
+  position: absolute;
+  top: 0;
+  left: var(--ui-frame-left, 0);
+  width: var(--ui-frame-width, 100%);
+  height: var(--ui-frame-height, 100%);
+  border: 0;
+  background: var(--pref-bg-color);
+  transform: scale(var(--ui-frame-scale, 1));
+  transform-origin: 0 0;
+}
+
+@media (max-width: $uib-phone) {
+  .ui-builder-viewport {
+    height: clamp(22rem, 70dvh, 40rem);
+  }
+}
+
+// Banners (lease, recovery) take no room when there are none.
+.ui-builder .ui-builder-banners:empty {
+  display: none;
+}
+
+// The feedback line keeps its height so messages don't shift the panes.
+.ui-builder-feedback {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.75rem;
+  border-left: 3px solid transparent;
+
+  // Tinted over the page color, as the outline's selected row is (_outline.scss).
+  &[data-error] {
+    border-left-color: var(--pref-accent-color);
+    background: color-mix(in srgb, var(--pref-accent-color) 10%, var(--pref-bg-color));
+  }
+
+  // The text color, underlined: most presets' accent is under 4.5:1 on that tint.
+  a {
+    color: var(--pref-text-color);
+    text-decoration: underline;
+  }
+}
+
+// The More menu: a popup under its button. The grammar's dropdown is a hover menu for links.
+.ui-builder-more {
+  position: relative;
+}
+
+.ui-builder-menu-wrap {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  z-index: 60;
+}
+
+.ui-builder-menu {
+  display: grid;
+  min-width: 13rem;
+  padding: 0.35rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.6rem;
+  background: var(--panel);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--pref-text-color) 18%, transparent);
+}
+
+// Menu items are full-width rows, not ocs__btn pills. Two classes: preset themes give every
+// <button> an accent border and the panel color (.user-theme-active button), which one would lose to.
+.ui-builder-menu .ui-builder-menu-item {
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--pref-text-color);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  // Tinted over the page color, as the outline's selected row is (_outline.scss). The keyboard's
+  // item also gets an outline: a tint alone is under 1.2:1 from its neighbours in some presets.
+  &:hover,
+  &:focus-visible {
+    background: color-mix(in srgb, var(--pref-accent-color) 16%, var(--pref-bg-color));
+  }
+
+  &:hover {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pref-accent-color);
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// A lease or recovery note sits inside a plain wrapper so [hidden] works on it.
+.ui-builder-banner .ocs__callout,
+.ui-builder-wrap .ocs__callout {
+  margin-top: 0;
+}

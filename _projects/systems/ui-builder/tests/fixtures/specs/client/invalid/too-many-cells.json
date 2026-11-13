@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "kind": "ocs-ui-page",
+  "page": {
+    "title": "Bad page",
+    "description": "",
+    "byline": "",
+    "course": "",
+    "width": "contained",
+    "image": ""
+  },
+  "sections": [
+    {
+      "id": "s-cols01",
+      "type": "columns",
+      "settings": {
+        "layout": "halves"
+      },
+      "hidden": false,
+      "cells": [
+        {
+          "blocks": []
+        },
+        {
+          "blocks": []
+        },
+        {
+          "blocks": []
+        },
+        {
+          "blocks": []
+        }
+      ]
+    }
+  ]
+}

@@ -75,10 +75,21 @@ search_exclude: true
 
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist } from '{{ site.baseurl }}/assets/js/api/passwordRules.js';
+
+  // Show each password rule under the field, ticking off as the user types
+  attachPasswordChecklist(document.getElementById("signupPassword"));
 
   // Sign up function to handle form submission
   window.signup = async function() {
     const signupMessage = document.getElementById("signupMessage");
+
+    // Catch a weak password here, before anything is sent to Flask or Spring
+    if (!meetsSpringPasswordRules(document.getElementById("signupPassword").value)) {
+      signupMessage.innerText = SPRING_PASSWORD_RULES;
+      return;
+    }
+
     const signupData = {
       uid: document.getElementById("signupUid").value,
       sid: document.getElementById("sid").value,

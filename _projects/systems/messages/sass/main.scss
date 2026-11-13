@@ -1,0 +1,29 @@
+// Styles for /dm (_projects/systems/messages/navigation/dm.md).
+//
+// The build copies this folder to _sass/projects/messages/ and writes the
+// assets/css/projects/messages/main.scss entry point. _sass/open-coding/_main.scss
+// pulls every project in through _sass/projects/_all.scss, so this is compiled into
+// the site-wide stylesheet -- which is why every selector below is under `.dm`.
+
+// The generated entry point (assets/css/projects/messages/main.scss) compiles this on
+// its own, without the global stylesheet's preamble, so the shared scale is imported
+// here the same way the other projects do it. This file declares variables and mixins
+// only and emits no CSS, so importing it twice costs nothing. Colours are not imported:
+// _tokens.scss reads the site palette through its :root custom properties instead.
+@import "open-coding/mixins/variables";
+
+@import "tokens";
+@import "layout";
+@import "list";
+@import "thread";
+@import "composer";
+@import "dialogs";
+
+// Last on purpose. The page's JS shows and hides panels by toggling the global
+// `.hidden` class, which is a single class and loses to any two-class rule above.
+// Re-asserting it here, after every partial, keeps hiding working at equal
+// specificity without reaching for !important.
+.dm .hidden,
+.dm [hidden] {
+  display: none;
+}

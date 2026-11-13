@@ -1,7 +1,15 @@
-import { baseurl, pythonURI, javaURI, fetchOptions } from './config.js';
+import { baseurl, pythonURI, javaURI, fetchOptions, springEnabled } from './config.js';
+import { addLoginReturn } from './login-return.js';
 import { savedCourse, selectEntryCourse, courseEntryUrl } from '../course-entry.js';
+import { FormatConverter } from '../pages/dashboard/preferences.js';
 
 console.log("login.js loaded");
+
+// Delegation also covers login links inserted after the credentials check.
+document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href]');
+    if (link) addLoginReturn(link, window.location.href, baseurl);
+}, true);
 
 document.addEventListener('DOMContentLoaded', function () {
     console.log("Base URL:", baseurl); // Debugging line
@@ -10,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 console.log("Credentials data:", data); // Debugging line
                 window.user = data;
+                if (data) syncThemeOwner(data.uid);
                 if (data) { // Update the login area based on the data
                     loginArea.innerHTML = `
                         <div class="dropdown">
@@ -23,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             : ''
                         }
                                 <a href="${baseurl}/profile">Profile</a>
-                                <a href="${baseurl}/dm">DMs</a>
                                 <a href="${baseurl}/logout">Logout</a>
                             </div>
                         </div>
@@ -50,7 +58,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
-                    warnIfSpringSignedOut(loginArea);
+                    // A limited account (a guest) never has a Spring account, so there is nothing to warn about
+                    if (!data.limited) warnIfSpringSignedOut(loginArea);
 
                     // Update navigation AFTER dropdown is set up
                     waitForElement('.trigger', 20, 100).then(() => {
@@ -100,7 +109,9 @@ function waitForElement(selector, maxAttempts = 20, interval = 100) {
 // The name in the navbar only reflects the Flask login. DMs, calendar and announcements
 // need a separate Spring login, which can fail on its own (e.g. a different Spring
 // password), so flag that in the account menu instead of letting those features 401 silently.
+// A Flask-only site (spring: false in _config.yml) has no Spring login to check.
 function warnIfSpringSignedOut(loginArea) {
+    if (!springEnabled) return;
     fetch(`${javaURI}/api/person/get`, fetchOptions)
         .then(response => {
             if (response.ok) return;
@@ -116,6 +127,33 @@ function warnIfSpringSignedOut(loginArea) {
             menu.prepend(relogin);
         })
         .catch(err => console.warn("Spring session check failed:", err));
+}
+
+// The browser remembers whose theme it holds. When that isn't the signed-in student (a new
+// browser, or another student on a shared computer), load their theme from Spring so it shows
+// on every page right away, not only after they open the dashboard.
+async function syncThemeOwner(uid) {
+    const previousOwner = localStorage.getItem('sitePreferencesOwner');
+    if (!springEnabled || !uid || previousOwner === uid) return;
+    try {
+        const response = await fetch(`${javaURI}/api/user/preferences`, fetchOptions);
+        if (!response.ok) return;
+        const data = await response.json();
+        const prefs = data?.id ? FormatConverter.toFrontend(data) : null;
+        localStorage.setItem('sitePreferencesOwner', uid);
+        if (prefs) {
+            localStorage.setItem('sitePreferences', JSON.stringify(prefs));
+            window.SitePreferences?.applyPreferences(prefs);
+        } else if (previousOwner) {
+            // Nothing saved on this account: drop the previous student's theme (a theme this
+            // browser had before anyone's sign-in was synced is kept).
+            localStorage.removeItem('sitePreferences');
+            localStorage.removeItem('siteThemeDecor');
+            window.SitePreferences?.resetPreferences();
+        }
+    } catch (error) {
+        console.error('Theme sync error:', error);
+    }
 }
 
 function getCredentials(baseurl) {

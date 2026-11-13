@@ -2,3 +2,7 @@
 Board:
   url: "https://github.com/orgs/SFI-Foundation/projects/1"
   filter: "Area"
+  # Reflection cards stay off the board, as before.
+  columns:
+    - status: "Finished Reflections"
+      hidden: true

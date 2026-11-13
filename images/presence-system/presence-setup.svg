@@ -1,0 +1,285 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" width="1600" height="1100" font-family="Inter, Helvetica, Arial, sans-serif">
+  <title>Classroom Presence System tap station</title>
+  <desc>Illustration of the tap station: a monitor showing the Live Dashboard, a Raspberry Pi keyboard and mouse, a Raspberry Pi 4 with a PN532 NFC HAT, labeled RFID cards, and a webcam with a Mac Mini for camera cross-verification, on a wooden desk in front of window blinds.</desc>
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9e1cf"/><stop offset="1" stop-color="#d9cfb8"/>
+    </linearGradient>
+    <linearGradient id="slat" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f6f0e2"/><stop offset="0.55" stop-color="#ece3cf"/><stop offset="1" stop-color="#cfc4ab"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#bfe0ef"/><stop offset="0.5" stop-color="#d8eef2"/><stop offset="1" stop-color="#9cb7b4"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a4f2c"/><stop offset="0.5" stop-color="#9d5c34"/><stop offset="1" stop-color="#7a4224"/>
+    </linearGradient>
+    <linearGradient id="woodEdge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b06a3c"/><stop offset="1" stop-color="#5c3019"/>
+    </linearGradient>
+    <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e4e6ea"/><stop offset="0.5" stop-color="#b9bdc4"/><stop offset="1" stop-color="#8e939b"/>
+    </linearGradient>
+    <linearGradient id="bezel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a2c30"/><stop offset="1" stop-color="#16171a"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1c2230"/><stop offset="1" stop-color="#121621"/>
+    </linearGradient>
+    <linearGradient id="glare" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.10"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0.02"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="keyboard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbfaf7"/><stop offset="1" stop-color="#dcd8d0"/>
+    </linearGradient>
+    <linearGradient id="pcb" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1f7a3d"/><stop offset="1" stop-color="#145a2c"/>
+    </linearGradient>
+    <linearGradient id="hat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2c63c9"/><stop offset="1" stop-color="#1b4596"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e7e9ee"/>
+    </linearGradient>
+    <linearGradient id="mini" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eceef1"/><stop offset="1" stop-color="#b8bcc3"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="7"/><feOffset dx="4" dy="8"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softShadow" x="-20%" y="-50%" width="140%" height="220%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4"/><feOffset dx="3" dy="5"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.3"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grain" width="220" height="40" patternUnits="userSpaceOnUse">
+      <path d="M0 8 C60 4 120 14 220 9 M0 22 C70 26 140 18 220 24 M0 34 C50 31 160 38 220 33" stroke="#6a381d" stroke-opacity="0.25" stroke-width="1.4" fill="none"/>
+    </pattern>
+  </defs>
+
+  <!-- Room: blinds and window -->
+  <rect width="1600" height="1100" fill="url(#wall)"/>
+  <g id="blinds">
+    <rect x="0" y="0" width="1290" height="700" fill="#e3dac6"/>
+    <g fill="url(#slat)" stroke="#c4b897" stroke-width="1">
+      <rect x="0" y="0" width="70" height="700"/><rect x="74" y="0" width="70" height="700"/><rect x="148" y="0" width="70" height="700"/>
+      <rect x="222" y="0" width="70" height="700"/><rect x="296" y="0" width="70" height="700"/><rect x="370" y="0" width="70" height="700"/>
+      <rect x="444" y="0" width="70" height="700"/><rect x="518" y="0" width="70" height="700"/><rect x="592" y="0" width="70" height="700"/>
+      <rect x="666" y="0" width="70" height="700"/><rect x="740" y="0" width="70" height="700"/><rect x="814" y="0" width="70" height="700"/>
+      <rect x="888" y="0" width="70" height="700"/><rect x="962" y="0" width="70" height="700"/><rect x="1036" y="0" width="70" height="700"/>
+      <rect x="1110" y="0" width="70" height="700"/><rect x="1184" y="0" width="70" height="700"/><rect x="1258" y="0" width="32" height="700"/>
+    </g>
+    <g fill="#ffffff" opacity="0.35">
+      <rect x="66" y="0" width="5" height="700"/><rect x="214" y="0" width="5" height="700"/><rect x="436" y="0" width="5" height="700"/>
+      <rect x="658" y="0" width="5" height="700"/><rect x="880" y="0" width="5" height="700"/><rect x="1102" y="0" width="5" height="700"/>
+    </g>
+  </g>
+  <g id="window">
+    <rect x="1290" y="0" width="310" height="700" fill="#cfd6d6"/>
+    <rect x="1312" y="0" width="276" height="520" fill="url(#sky)"/>
+    <g fill="#5f8a57" opacity="0.85">
+      <circle cx="1380" cy="250" r="70"/><circle cx="1450" cy="200" r="85"/><circle cx="1530" cy="260" r="75"/><circle cx="1420" cy="320" r="60"/>
+    </g>
+    <g fill="#7ea36f" opacity="0.8"><circle cx="1470" cy="150" r="45"/><circle cx="1560" cy="190" r="40"/></g>
+    <rect x="1312" y="400" width="276" height="120" fill="#9fb4b4" opacity="0.6"/>
+    <rect x="1330" y="440" width="70" height="26" rx="6" fill="#dfe3e6"/><rect x="1420" y="446" width="80" height="24" rx="6" fill="#6d7c86"/>
+    <rect x="1312" y="540" width="276" height="160" fill="#7f8b8a"/>
+    <g stroke="#a7b0b0" stroke-width="1" opacity="0.5">
+      <path d="M1312 560 H1588 M1312 580 H1588 M1312 600 H1588 M1312 620 H1588 M1312 640 H1588 M1312 660 H1588 M1312 680 H1588"/>
+    </g>
+    <rect x="1290" y="0" width="22" height="700" fill="#e6e9ea"/><rect x="1300" y="520" width="300" height="20" fill="#e6e9ea"/>
+  </g>
+
+  <!-- Desk -->
+  <polygon points="0,690 1600,640 1600,1035 0,1035" fill="url(#wood)"/>
+  <polygon points="0,690 1600,640 1600,1035 0,1035" fill="url(#grain)"/>
+  <polygon points="0,690 1600,640 1600,652 0,702" fill="#5a2f18" opacity="0.5"/>
+  <path d="M0 1035 H1600 V1072 Q800 1082 0 1072 Z" fill="url(#woodEdge)"/>
+  <rect x="0" y="1072" width="1600" height="28" fill="#2c2420"/>
+  <ellipse cx="760" cy="900" rx="650" ry="120" fill="#ffffff" opacity="0.05"/>
+
+  <!-- Cables (behind devices) -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M520 600 C520 690 470 720 420 760 C360 810 330 830 350 860" stroke="#151515" stroke-width="7"/>
+    <path d="M560 600 C600 700 690 720 760 760 C860 810 1000 820 1120 840 C1250 860 1330 900 1420 935" stroke="#151515" stroke-width="7"/>
+    <path d="M580 600 C620 690 760 700 860 740 C960 790 1120 800 1240 830 C1330 850 1380 880 1440 925" stroke="#d9473f" stroke-width="5"/>
+    <path d="M800 870 C860 820 950 780 1060 790 C1180 800 1300 860 1450 915" stroke="#c43c35" stroke-width="4"/>
+    <path d="M1000 760 C1080 780 1180 790 1260 820 C1330 850 1380 880 1430 900" stroke="#8a5a3c" stroke-width="4"/>
+    <path d="M1030 745 C1150 720 1300 730 1420 760 C1500 780 1560 800 1600 812" stroke="#1d1d1d" stroke-width="6"/>
+  </g>
+
+  <!-- Mac Mini (camera computer) -->
+  <g filter="url(#softShadow)">
+    <polygon points="880,706 1046,700 1066,716 900,723" fill="#f2f4f6"/>
+    <polygon points="900,723 1066,716 1066,744 900,752" fill="url(#mini)"/>
+    <polygon points="880,706 900,723 900,752 880,734" fill="#a9adb4"/>
+    <circle cx="1050" cy="731" r="2.5" fill="#7cf08f"/>
+  </g>
+
+  <!-- Monitor stand -->
+  <g filter="url(#shadow)">
+    <polygon points="312,742 640,722 700,770 360,794" fill="url(#silver)"/>
+    <polygon points="360,794 700,770 700,778 360,802" fill="#7d828a"/>
+    <rect x="490" y="560" width="86" height="190" rx="6" fill="url(#silver)"/>
+    <rect x="525" y="600" width="18" height="120" rx="9" fill="#3a3c40" opacity="0.6"/>
+  </g>
+
+  <!-- Monitor -->
+  <g filter="url(#shadow)">
+    <rect x="118" y="168" width="696" height="420" rx="8" fill="url(#bezel)"/>
+    <rect x="118" y="560" width="696" height="32" rx="6" fill="url(#silver)"/>
+    <text x="466" y="582" text-anchor="middle" font-size="14" font-style="italic" fill="#555b63">hp</text>
+    <rect x="130" y="180" width="672" height="378" fill="url(#screen)"/>
+  </g>
+
+  <!-- Screen: Live Dashboard -->
+  <g id="dashboard">
+    <rect x="130" y="180" width="672" height="16" fill="#e9ecf1"/>
+    <circle cx="140" cy="188" r="3.5" fill="#c3404b"/><rect x="152" y="184" width="70" height="8" rx="2" fill="#c9ced8"/>
+    <rect x="236" y="183" width="96" height="10" rx="3" fill="#ffffff" stroke="#c9ced8" stroke-width="0.8"/>
+    <rect x="130" y="196" width="672" height="12" fill="#f7f8fa"/><rect x="150" y="199" width="300" height="6" rx="3" fill="#dde1e8"/>
+    <text x="150" y="232" font-size="12" font-weight="800" fill="#eef2f8" letter-spacing="0.5">DEMO PERIOD</text>
+    <text x="150" y="246" font-size="7.5" fill="#9aa4b5">CS Honors Period 2 · Manually started · 42:10 remaining</text>
+    <rect x="150" y="256" width="632" height="26" rx="5" fill="#252c3a"/>
+    <rect x="160" y="262" width="80" height="14" rx="3" fill="#1a1f2a" stroke="#475066" stroke-width="0.8"/>
+    <text x="166" y="272" font-size="7" fill="#cfd6e2">CS Honors Period 2</text>
+    <rect x="686" y="262" width="88" height="14" rx="7" fill="#24385f"/>
+    <text x="730" y="272" font-size="6.5" fill="#cfe0ff" text-anchor="middle">Start 30-minute demo</text>
+    <g font-size="6.5" fill="#9aa4b5" text-anchor="middle">
+      <rect x="150" y="290" width="100" height="36" rx="5" fill="#1f2635"/><text x="200" y="307" font-size="12" font-weight="700" fill="#5fd38a">1</text><text x="200" y="319">Present</text>
+      <rect x="256" y="290" width="100" height="36" rx="5" fill="#1f2635"/><text x="306" y="307" font-size="12" font-weight="700" fill="#e8ecf3">0</text><text x="306" y="319">Tardy</text>
+      <rect x="362" y="290" width="100" height="36" rx="5" fill="#1f2635"/><text x="412" y="307" font-size="12" font-weight="700" fill="#e8ecf3">0</text><text x="412" y="319">Stepped Out</text>
+      <rect x="468" y="290" width="100" height="36" rx="5" fill="#1f2635"/><text x="518" y="307" font-size="12" font-weight="700" fill="#e8ecf3">0</text><text x="518" y="319">Absent</text>
+      <rect x="574" y="290" width="100" height="36" rx="5" fill="#1f2635"/><text x="624" y="307" font-size="12" font-weight="700" fill="#e8ecf3">0</text><text x="624" y="319">Left Early</text>
+      <rect x="680" y="290" width="102" height="36" rx="5" fill="#1f2635"/><text x="731" y="307" font-size="12" font-weight="700" fill="#e8ecf3">4</text><text x="731" y="319">Not Yet Arrived</text>
+    </g>
+    <rect x="150" y="334" width="632" height="200" rx="6" fill="#262a31"/>
+    <g font-size="6.5" font-weight="700" fill="#aab2c0" letter-spacing="0.4">
+      <text x="162" y="351">STUDENT</text><text x="350" y="351">STATUS</text><text x="520" y="351">SINCE</text><text x="630" y="351">CAMERA CHECK</text>
+    </g>
+    <g font-size="7.5" fill="#e3e7ee">
+      <rect x="156" y="358" width="620" height="30" fill="#2c3038"/><text x="162" y="377">Dr. Fenner</text>
+      <rect x="350" y="368" width="72" height="12" rx="6" fill="#1b1e24" stroke="#4a5263" stroke-width="0.8"/><text x="386" y="376.5" font-size="5.5" text-anchor="middle" fill="#c8cfdb">NOT YET ARRIVED</text>
+      <text x="520" y="377" fill="#7c8596">—</text><text x="630" y="377" fill="#7c8596">—</text>
+
+      <rect x="156" y="388" width="620" height="30" fill="#262a31"/><text x="162" y="407">John Mortensen</text>
+      <rect x="350" y="398" width="72" height="12" rx="6" fill="#1b1e24" stroke="#4a5263" stroke-width="0.8"/><text x="386" y="406.5" font-size="5.5" text-anchor="middle" fill="#c8cfdb">NOT YET ARRIVED</text>
+      <text x="520" y="407" fill="#7c8596">—</text><text x="630" y="407" fill="#7c8596">—</text>
+
+      <rect x="156" y="418" width="620" height="30" fill="#2c3038"/><text x="162" y="437">Kush Shah</text>
+      <rect x="350" y="428" width="72" height="12" rx="6" fill="#1b1e24" stroke="#4a5263" stroke-width="0.8"/><text x="386" y="436.5" font-size="5.5" text-anchor="middle" fill="#c8cfdb">NOT YET ARRIVED</text>
+      <text x="520" y="437" fill="#7c8596">—</text><text x="630" y="437" fill="#7c8596">—</text>
+
+      <rect x="156" y="448" width="620" height="30" fill="#262a31"/><text x="162" y="467">Ruta Sirdeshmukh</text>
+      <rect x="350" y="458" width="72" height="12" rx="6" fill="#1b1e24" stroke="#4a5263" stroke-width="0.8"/><text x="386" y="466.5" font-size="5.5" text-anchor="middle" fill="#c8cfdb">NOT YET ARRIVED</text>
+      <text x="520" y="467" fill="#7c8596">—</text><text x="630" y="467" fill="#7c8596">—</text>
+
+      <rect x="156" y="478" width="620" height="30" fill="#2f3a33"/><text x="162" y="497" font-weight="700">Vibha Mandayam</text>
+      <rect x="350" y="488" width="52" height="12" rx="6" fill="#2f8f55"/><text x="376" y="496.5" font-size="5.5" text-anchor="middle" fill="#ffffff" font-weight="700">PRESENT</text>
+      <text x="520" y="497" fill="#cfe9d8">10:12 AM</text>
+      <rect x="630" y="488" width="44" height="12" rx="6" fill="#244a33"/><text x="652" y="496.5" font-size="5.5" text-anchor="middle" fill="#8ff0b4" font-weight="700">✓ MATCH</text>
+    </g>
+    <text x="156" y="524" font-size="6" fill="#7c8596">Updated 10:12:04</text>
+    <rect x="130" y="180" width="672" height="378" fill="url(#glare)"/>
+  </g>
+
+  <!-- Webcam on top of monitor -->
+  <g filter="url(#softShadow)">
+    <rect x="430" y="146" width="72" height="26" rx="12" fill="#1d1f23"/>
+    <circle cx="466" cy="159" r="9" fill="#0d0e10" stroke="#3b3f46" stroke-width="2"/>
+    <circle cx="466" cy="159" r="4" fill="#25324a"/><circle cx="463.5" cy="156.5" r="1.5" fill="#9fb6d9"/>
+    <circle cx="492" cy="159" r="2" fill="#5fd38a"/>
+    <rect x="452" y="170" width="28" height="6" rx="2" fill="#2a2c30"/>
+  </g>
+
+  <!-- Keyboard (Raspberry Pi keyboard) -->
+  <g filter="url(#shadow)">
+    <polygon points="118,850 632,806 656,872 132,922" fill="url(#keyboard)"/>
+    <polygon points="132,922 656,872 656,882 134,933" fill="#bdb7ad"/>
+    <g fill="#ffffff" stroke="#cfcac1" stroke-width="1">
+      <!-- five skewed key rows -->
+      <path d="M140 860 l480 -41 l3 10 l-480 41 z"/>
+      <path d="M144 872 l480 -41 l3 11 l-480 41 z"/>
+      <path d="M148 885 l480 -41 l3 11 l-480 41 z"/>
+      <path d="M152 898 l480 -41 l3 11 l-480 41 z"/>
+      <path d="M156 911 l480 -41 l3 10 l-480 41 z"/>
+    </g>
+    <g stroke="#d6d1c8" stroke-width="1.2">
+      <path d="M168 858 l4 52 M200 855 l4 52 M232 852 l4 52 M264 849 l4 52 M296 847 l4 52 M328 844 l4 52 M360 841 l4 52 M392 838 l4 52 M424 836 l4 52 M456 833 l4 52 M488 830 l4 52 M520 827 l4 52 M552 825 l4 52 M584 822 l4 52"/>
+    </g>
+    <path d="M300 913 l170 -15 l2 7 l-170 15 z" fill="#f4f2ee" stroke="#cfcac1"/>
+    <g transform="translate(176 913) rotate(-5)"><circle r="5" fill="#c51a4a"/><circle cx="-3" cy="-5" r="2.2" fill="#3c9a3c"/><circle cx="3" cy="-5" r="2.2" fill="#3c9a3c"/></g>
+  </g>
+
+  <!-- Mouse -->
+  <g filter="url(#shadow)">
+    <path d="M610 905 C600 870 650 852 710 860 C770 868 790 900 770 925 C750 948 640 950 616 930 Z" fill="#f8f6f2"/>
+    <path d="M690 858 C730 860 772 878 778 902 L700 903 Z" fill="#c8243a"/>
+    <path d="M700 862 L703 903" stroke="#a51d30" stroke-width="1.5"/>
+    <ellipse cx="701" cy="878" rx="4" ry="8" fill="#8f1a2a"/>
+  </g>
+
+  <!-- RFID cards with handwritten names -->
+  <g font-family="'Bradley Hand', 'Marker Felt', 'Comic Sans MS', cursive" font-weight="700" text-anchor="middle" fill="#e08a1e">
+    <g transform="translate(860 948) rotate(-3)" filter="url(#softShadow)">
+      <rect width="128" height="90" rx="8" fill="url(#card)" stroke="#d2d6de"/>
+      <rect x="4" y="4" width="120" height="82" rx="6" fill="none" stroke="#ffffff" stroke-opacity="0.8"/>
+      <text x="64" y="52" font-size="17">Mr. Mortensen</text>
+    </g>
+    <g transform="translate(1000 944) rotate(2)" filter="url(#softShadow)">
+      <rect width="128" height="90" rx="8" fill="url(#card)" stroke="#d2d6de"/>
+      <text x="64" y="56" font-size="26">Kush</text>
+    </g>
+    <g transform="translate(1140 946) rotate(-2)" filter="url(#softShadow)">
+      <rect width="128" height="90" rx="8" fill="url(#card)" stroke="#d2d6de"/>
+      <text x="64" y="56" font-size="26">Vibha</text>
+    </g>
+    <g transform="translate(1280 950) rotate(3)" filter="url(#softShadow)">
+      <rect width="128" height="90" rx="8" fill="#eef3f8" stroke="#c7ced8" opacity="0.92"/>
+      <rect x="10" y="10" width="108" height="70" rx="5" fill="#ffffff" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- Raspberry Pi 4 with PN532 NFC HAT -->
+  <g filter="url(#shadow)">
+    <polygon points="1430,930 1588,918 1600,1006 1440,1022" fill="#1a1a1a" opacity="0.5"/>
+    <polygon points="1424,916 1586,904 1596,994 1434,1008" fill="url(#pcb)"/>
+    <polygon points="1434,1008 1596,994 1596,1004 1434,1018" fill="#0e3d1d"/>
+    <rect x="1438" y="990" width="22" height="16" fill="#c9ccd2"/><rect x="1470" y="988" width="22" height="16" fill="#c9ccd2"/>
+    <rect x="1504" y="986" width="18" height="12" fill="#2a2a2a"/><rect x="1530" y="984" width="18" height="12" fill="#2a2a2a"/>
+    <polygon points="1432,900 1580,888 1588,968 1440,980" fill="url(#hat)"/>
+    <polygon points="1440,980 1588,968 1588,976 1440,988" fill="#163a7c"/>
+    <rect x="1450" y="904" width="110" height="10" fill="#f1f1f1"/>
+    <g fill="#c8a24a"><rect x="1454" y="906" width="3" height="6"/><rect x="1462" y="906" width="3" height="6"/><rect x="1470" y="906" width="3" height="6"/><rect x="1478" y="906" width="3" height="6"/><rect x="1486" y="906" width="3" height="6"/><rect x="1494" y="906" width="3" height="6"/><rect x="1502" y="906" width="3" height="6"/><rect x="1510" y="906" width="3" height="6"/><rect x="1518" y="906" width="3" height="6"/><rect x="1526" y="906" width="3" height="6"/><rect x="1534" y="906" width="3" height="6"/><rect x="1542" y="906" width="3" height="6"/><rect x="1550" y="906" width="3" height="6"/></g>
+    <rect x="1466" y="924" width="84" height="42" rx="4" fill="none" stroke="#e6edf9" stroke-width="2.5"/>
+    <rect x="1474" y="931" width="68" height="28" rx="3" fill="none" stroke="#e6edf9" stroke-width="1.5" opacity="0.7"/>
+    <rect x="1556" y="930" width="14" height="14" fill="#202020"/>
+    <circle cx="1448" cy="934" r="2" fill="#ffcc4d"/><circle cx="1448" cy="944" r="2" fill="#ff5a5a"/>
+  </g>
+
+  <!-- Callouts -->
+  <g font-size="17" font-weight="600" fill="#1d2330">
+    <g>
+      <path d="M502 159 L585 112" stroke="#1d2330" stroke-width="1.6"/><circle cx="502" cy="159" r="4" fill="#1d2330"/>
+      <rect x="585" y="92" width="232" height="34" rx="17" fill="#ffffff" fill-opacity="0.92" stroke="#1d2330" stroke-width="1.2"/>
+      <text x="701" y="115" text-anchor="middle">Webcam · face check</text>
+    </g>
+    <g>
+      <path d="M802 250 L880 250" stroke="#1d2330" stroke-width="1.6"/><circle cx="802" cy="250" r="4" fill="#1d2330"/>
+      <rect x="880" y="233" width="232" height="34" rx="17" fill="#ffffff" fill-opacity="0.92" stroke="#1d2330" stroke-width="1.2"/>
+      <text x="996" y="256" text-anchor="middle">Live Dashboard</text>
+    </g>
+    <g>
+      <path d="M975 712 L1010 612" stroke="#1d2330" stroke-width="1.6"/><circle cx="975" cy="712" r="4" fill="#1d2330"/>
+      <rect x="900" y="578" width="260" height="34" rx="17" fill="#ffffff" fill-opacity="0.92" stroke="#1d2330" stroke-width="1.2"/>
+      <text x="1030" y="601" text-anchor="middle">Mac Mini · camera_client.py</text>
+    </g>
+    <g>
+      <path d="M1510 896 L1470 800" stroke="#1d2330" stroke-width="1.6"/><circle cx="1510" cy="896" r="4" fill="#1d2330"/>
+      <rect x="1290" y="766" width="300" height="34" rx="17" fill="#ffffff" fill-opacity="0.92" stroke="#1d2330" stroke-width="1.2"/>
+      <text x="1440" y="789" text-anchor="middle">Raspberry Pi 4 + PN532 · reader.py</text>
+    </g>
+  </g>
+</svg>

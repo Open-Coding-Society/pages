@@ -1,8 +1,11 @@
 // The group dialogs: find a group to join or make a new one, see and change a group's
-// members, and share files with a group. Leaving and deleting a group are buttons in
-// the conversation header (messages-page.js).
-import { button, cell, createDialog } from './dialogs.js';
-import { downloadName, groupSubtitle, isClassGroup, isCourseChannel, isGroupMember, sortGroups } from './messages-model.js';
+// members, and share files with a group. Leaving a group is a button in the conversation
+// header (messages-page.js). Deleting one starts at the bottom of Members, for site
+// admins only, and is confirmed in delete-group.js.
+import { button, cell, createDialog, saveFile } from './dialogs.js';
+import {
+  canDeleteGroup, deleteGroupWarning, groupSubtitle, isClassGroup, isCourseChannel, isGroupMember, sortGroups,
+} from './messages-model.js';
 
 const byName = (a, b) => String(a.name).localeCompare(String(b.name));
 
@@ -130,7 +133,7 @@ export function initFindGroup({ elements, api, me, onJoined }) {
   });
 }
 
-export function initMembers({ elements, api, me, onChanged }) {
+export function initMembers({ elements, api, me, onChanged, onDelete }) {
   let group = null;
   let lastResults = [];
   let searchCount = 0;
@@ -165,6 +168,9 @@ export function initMembers({ elements, api, me, onChanged }) {
   function render() {
     elements.title.textContent = `Members of ${group.name}`;
     elements.list.replaceChildren(...[...(group.members || [])].sort(byName).map(memberRow));
+    const deletable = canDeleteGroup(me, group);
+    elements.deleteSection.classList.toggle('hidden', !deletable);
+    if (deletable) elements.deleteWarning.textContent = deleteGroupWarning(group);
   }
 
   function renderResults(people) {
@@ -223,6 +229,12 @@ export function initMembers({ elements, api, me, onChanged }) {
     elements.status.textContent = '';
   });
 
+  // One dialog at a time: Members closes before the confirm dialog opens.
+  elements.deleteOpen.addEventListener('click', () => {
+    dialog.close();
+    onDelete(group);
+  });
+
   return {
     open(current, opener) {
       group = current;
@@ -242,18 +254,6 @@ function readAsBase64(file) {
   });
 }
 
-function saveFile(file) {
-  const bytes = Uint8Array.from(atob(file.base64Data || ''), character => character.charCodeAt(0));
-  const url = URL.createObjectURL(new Blob([bytes]));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = downloadName(file.filename);
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 0);
-}
-
 export function initFiles({ elements, api }) {
   let group = null;
   let loadCount = 0;
@@ -269,7 +269,9 @@ export function initFiles({ elements, api }) {
         elements.status.textContent = `Could not download ${file.filename}.`;
       }
     }));
-    row.append(cell(file.filename), action);
+    // Files shared before uploads were attributed have no uploadedBy, so they say so
+    // rather than showing a blank cell.
+    row.append(cell(file.filename), cell(file.uploadedBy || 'Unknown'), action);
     return row;
   }
 

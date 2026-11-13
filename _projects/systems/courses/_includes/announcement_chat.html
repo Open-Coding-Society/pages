@@ -6,8 +6,8 @@
 <!-- exist yet, so no manual DB seeding is required. -->
 <!-- -->
 <!-- Signed-out visitors still get the full UI: the chat drops into a local -->
-<!-- "preview" mode backed by localStorage, matching _includes/week_chat.html, -->
-<!-- so the feature is visible and testable without a login. -->
+<!-- "preview" mode backed by localStorage, so the feature is visible and -->
+<!-- testable without a login. -->
 <!-- -->
 <!-- Calendar: a strip of this school week sits above the messages, anyone -->
 <!-- signed in adds events with the /event slash command, and announcements -->
@@ -19,7 +19,7 @@
       <a class="chat-badge" href="{{ '/student/calendar' | relative_url }}" aria-label="Open OCS calendar" title="Open OCS calendar"><i class="fas fa-calendar" aria-hidden="true"></i></a>
       <div class="chat-heading-text">
         <h2 class="chat-title" id="announcementChatTitle">{{ page.course | upcase }} Announcements</h2>
-        <p class="chat-subtitle">Class-wide chat for this course — announcements, questions, anything that isn't week-specific.</p>
+        <p class="chat-subtitle">Class-wide chat for this course — announcements and questions.</p>
       </div>
     </div>
     <span class="chat-status-pill" id="announcementChatStatusPill">
@@ -85,7 +85,7 @@
   const SOCKJS_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js';
   const STOMP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js';
 
-  // Shared with the per-week chats: load the chat libraries once per page,
+  // Shared with the calendar and Messages: load the chat libraries once per page,
   // and only when a chat actually needs a live connection.
   function loadScriptOnce(src) {
     window.__ocsChatScripts = window.__ocsChatScripts || {};
@@ -299,9 +299,13 @@
     submitting = true;
     try {
       const html = await calendar.prepareMessage(composer.isEmpty() ? '' : composer.getHTML());
-      if (html !== null && sendMessage(html)) {
+      if (html === null) return;
+      showFormMessage('');
+      if (await sendMessage(html)) {
         composer.clear();
         calendar.reset();
+      } else {
+        showFormMessage('Could not send the message. Please try again.');
       }
     } finally {
       submitting = false;
@@ -666,11 +670,12 @@
       const res = await fetch(`${javaURI}/api/groups/chat/${state.backboneGroupId}/messages`, fetchOptions);
       if (!res.ok) { console.warn('Announcement chat: history HTTP', res.status); return; }
       const messages = await res.json();
+      // Spring calls a saved message's sender `author`; the socket frame calls it `sender`.
       (messages || []).forEach((msg) => {
-        const key = eventKey({ sender: msg.name, date: msg.date, message: msg.message });
+        const key = eventKey({ sender: msg.author, date: msg.date, message: msg.message });
         if (state.seenKeys.has(key)) return;
         state.seenKeys.add(key);
-        appendMessage({ id: msg.id, sender: msg.name, message: msg.message, date: msg.date, edited: msg.edited });
+        appendMessage({ id: msg.id, sender: msg.author, message: msg.message, date: msg.date, edited: msg.edited });
       });
     } catch (err) {
       console.warn('Announcement chat: history load failed', err);
@@ -727,28 +732,29 @@
     });
   }
 
-  function sendMessage(text) {
-    const date = new Date().toISOString();
-
+  // Posted over HTTP, like the Messages page: Spring takes the sender from the
+  // login cookie, which the socket's sendMessage can't read. The saved message
+  // comes back to every reader, this one included, on the group topic.
+  async function sendMessage(text) {
     if (state.mode === 'preview') {
-      const entry = { id: crypto.randomUUID(), sender: state.currentUserDisplayName || 'You', message: text, date };
+      const entry = { id: crypto.randomUUID(), sender: state.currentUserDisplayName || 'You', message: text, date: new Date().toISOString() };
       state.seenKeys.add(eventKey(entry));
       writePreviewMessage(entry);
       appendMessage(entry);
       return true;
     }
 
-    if (!state.connected || !state.stompClient || !state.backboneGroupId) return false;
-    const payload = {
-      context: 'sendMessage',
-      groupId: state.backboneGroupId,
-      sender: state.currentUserDisplayName || 'anonymous',
-      message: text,
-      image: null,
-      date,
-    };
-    try { state.stompClient.send('/app/groups.chat', {}, JSON.stringify(payload)); return true; }
-    catch (err) { console.error('Announcement chat: send failed', err); return false; }
+    if (!state.backboneGroupId) return false;
+    try {
+      const res = await fetch(`${javaURI}/api/groups/chat/${state.backboneGroupId}/messages`, {
+        ...fetchOptions, method: 'POST', body: JSON.stringify({ message: text, image: null }),
+      });
+      if (!res.ok) { console.warn('Announcement chat: send HTTP', res.status); return false; }
+      return true;
+    } catch (err) {
+      console.error('Announcement chat: send failed', err);
+      return false;
+    }
   }
 
   async function editMessage(messageId, newMessage) {

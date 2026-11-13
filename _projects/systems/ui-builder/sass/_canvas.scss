@@ -1,0 +1,80 @@
+// The canvas page's chrome (/ui-builder/canvas/, inside the editor's iframe): selection and hover
+// outlines, hidden and broken parts, and the add buttons in empty cells. The page itself is
+// plain ocs__ grammar; these rules only mark it up for editing.
+
+// The whole frame is clickable: a click on empty space selects nothing (Page settings).
+.ui-builder-canvas {
+  min-height: 100vh;
+}
+
+.ui-builder-canvas [data-ui-node] {
+  position: relative;
+  cursor: pointer;
+}
+
+.ui-builder-canvas [data-ui-hover] {
+  outline: 1px dashed var(--pref-accent-color);
+  outline-offset: 3px;
+}
+
+.ui-builder-canvas [data-ui-selected] {
+  outline: 2px solid var(--pref-accent-color);
+  outline-offset: 3px;
+}
+
+// A section's outline sits further out, so a selected block and its section don't overlap.
+.ui-builder-canvas [data-ui-kind="section"][data-ui-hover],
+.ui-builder-canvas [data-ui-kind="section"][data-ui-selected] {
+  outline-offset: 8px;
+}
+
+// Hidden parts stay visible while editing, striped and labelled.
+.ui-builder-canvas [data-ui-hidden] {
+  background-image: repeating-linear-gradient(135deg, color-mix(in srgb, var(--pref-text-color) 7%, transparent) 0 6px, transparent 6px 12px);
+}
+
+// Only the blocks' own content fades: faded, the "Hidden" label and the add buttons would fall
+// below 4.5:1 contrast. A block in a hidden section fades as well.
+.ui-builder-canvas [data-ui-hidden] [data-ui-kind="block"] > *,
+.ui-builder-canvas [data-ui-kind="block"][data-ui-hidden] > * {
+  opacity: 0.6;
+}
+
+.ui-builder-canvas [data-ui-hidden]::before {
+  content: attr(data-ui-hidden-label);
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  z-index: 1;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  background: var(--panel);
+  // The text color, not the muted one: some presets' muted text is under 4.5:1 on the panel.
+  color: var(--pref-text-color);
+  font-size: 0.7rem;
+}
+
+// A block that failed to draw, or an unknown type: dashed so it reads as something to fix.
+.ui-builder-canvas [data-ui-error] {
+  outline: 2px dashed var(--pref-accent-color);
+  outline-offset: 3px;
+}
+
+// A block with nothing to show yet keeps a visible, selectable box.
+.ui-builder-canvas [data-ui-empty] {
+  padding: 0.75rem;
+  border: 1px dashed var(--ui-border);
+  border-radius: 0.5rem;
+  color: var(--text-muted);
+}
+
+// An empty column keeps its height and shows where its add button is.
+.ui-builder-canvas [data-ui-cell] {
+  min-height: 3rem;
+}
+
+.ui-builder-canvas [data-ui-add] {
+  align-self: flex-start;
+  border-style: dashed;
+}

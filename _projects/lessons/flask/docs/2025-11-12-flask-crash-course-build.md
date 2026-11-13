@@ -1,7 +1,7 @@
 ---
 title: Crash Course on Building a Flask Server
 layout: post
-description: Standards-aligned, interactive unit for K–12 students to build a Flask
+description: Turn a frontend demo into a full-stack app with a live Flask backend that saves data, handles user login, and shows dynamic content.
   backend and full stack application.
 categories:
 - Python

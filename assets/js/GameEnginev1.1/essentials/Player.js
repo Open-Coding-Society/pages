@@ -51,6 +51,7 @@ class Player extends Character {
     }
 
     handleKeyDown(event) {
+        if (this.controller) return;
         const { keyCode, target } = event;
         const editing = target?.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target?.tagName || '');
         // Movement arrows belong to the game, not page scrolling. Preserve
@@ -75,6 +76,7 @@ class Player extends Character {
      * @param {Object} event - The keyup event object.
      */
     handleKeyUp({ keyCode }) {
+        if (this.controller) return;
         // remove the lifted key from the active keys array
         if (keyCode in this.pressedKeys) {
             delete this.pressedKeys[keyCode];
@@ -152,8 +154,9 @@ class Player extends Character {
         }
     }
 
-    update() {
-        super.update();
+    update(updateController = true) {
+        if (updateController) this.updateController();
+        super.update(false);
         if(!this.moved){
             if (this.gravity) {
                     this.time += 1;

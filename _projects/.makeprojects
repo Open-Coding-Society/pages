@@ -48,6 +48,7 @@ lessons/ds2
 systems/ai-ab-engine
 systems/calendar
 systems/profile:dev
+systems/grades:dev
 systems/blogs:dev
 systems/topics:dev
 systems/courses:dev
@@ -56,6 +57,8 @@ systems/auto-generator
 systems/auto-generator-ui
 systems/scraper
 systems/messages:dev
+systems/ui-builder
+systems/lesson-feedback:dev
 systems/test-project
 
 # === FLAT STRUCTURE (legacy/uncategorized) ===

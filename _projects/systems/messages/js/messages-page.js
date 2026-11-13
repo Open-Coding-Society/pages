@@ -3,11 +3,12 @@
 // in config.js and rich-text.js, which it imports with {{ site.baseurl }}, so the modules
 // here only import each other, with ./ paths.
 import { createChatSocket } from './chat-socket.js';
+import { initDeleteGroup } from './delete-group.js';
 import { initGroupFormation } from './group-formation.js';
 import { initFiles, initFindGroup, initMembers } from './group-dialogs.js';
 import { createMessagesApi } from './messages-api.js';
 import {
-  canFormGroups, conversationLabel, groupSubtitle, isAdmin, isClassGroup, isCourseChannel, sortGroups,
+  canFormGroups, conversationLabel, groupSubtitle, isClassGroup, isCourseChannel, sortGroups,
 } from './messages-model.js';
 import { initNewChat } from './new-chat.js';
 import { conversationHref, createSidebar } from './sidebar.js';
@@ -51,7 +52,6 @@ export async function startMessagesPage({ config, richText }) {
 
   const me = await signedInPerson(api, setStatus);
   if (!me) return;
-  const admin = isAdmin(me);
   const state = { groups: [], conversations: [], active: null };
   const findItem = (kind, id) => (kind === 'group' ? state.groups : state.conversations).find(item => item.id === id);
 
@@ -79,6 +79,9 @@ export async function startMessagesPage({ config, richText }) {
       title: byId('messagesThreadTitle'), subtitle: byId('messagesThreadSubtitle'), messages: byId('messagesLog'),
       form: byId('messagesForm'), send: byId('messagesSend'), cancelEdit: byId('messagesCancelEdit'),
       formStatus: byId('messagesFormStatus'),
+      imageAttach: byId('messagesImageAttach'), imageInput: byId('messagesImage'),
+      imagePreview: byId('messagesImagePreview'), imageThumb: byId('messagesImageThumb'),
+      imageRemove: byId('messagesImageRemove'),
     },
     onDmRead: id => {
       const conversation = findItem('dm', id);
@@ -86,6 +89,7 @@ export async function startMessagesPage({ config, richText }) {
       conversation.unreadCount = 0;
       render();
     },
+    onGroupRead: id => markGroupRead(findItem('group', id)),
     onFileShared: id => files.refreshIfShowing(id),
   });
 
@@ -98,7 +102,23 @@ export async function startMessagesPage({ config, richText }) {
     groupActions.classList.toggle('hidden', !group);
     if (!group) return;
     byId('messagesLeaveGroup').classList.toggle('hidden', isClassGroup(group));
-    byId('messagesDeleteGroup').classList.toggle('hidden', !admin);
+  }
+
+  // Clears the badge straight away, then tells Spring, then the navbar bell. The count is
+  // a notification, so a failed write is not worth interrupting the person for -- the
+  // next load corrects it.
+  async function markGroupRead(group) {
+    if (!group) return;
+    if (group.unreadCount) {
+      group.unreadCount = 0;
+      render();
+    }
+    try {
+      await api.markGroupRead(group.id);
+      window.dispatchEvent(new CustomEvent('dm:group-read', { detail: { groupId: group.id } }));
+    } catch (error) {
+      console.warn('Messages: could not mark the group read', error);
+    }
   }
 
   function openConversation(kind, id) {
@@ -110,6 +130,9 @@ export async function startMessagesPage({ config, richText }) {
     if (!thread.open(kind, id, heading)) return false;
     state.active = { kind, id };
     notice.textContent = '';
+    // Opening a group clears its badge. Done here rather than in thread.js so it
+    // happens once per open, matching how a DM is marked read.
+    if (kind === 'group') markGroupRead(item);
     render();
     showGroupActions(kind === 'group' ? item : null);
     history.replaceState(null, '', conversationHref(kind, id));
@@ -127,6 +150,23 @@ export async function startMessagesPage({ config, richText }) {
     history.replaceState(null, '', window.location.pathname);
   }
 
+  // Unread counts live apart from the groups themselves (Spring counts them by reading
+  // each group's message file), so they are fetched separately and folded in. Best
+  // effort: a failure leaves the lists usable, just without counts.
+  async function loadGroupUnread() {
+    let unreadByGroup = {};
+    try {
+      unreadByGroup = (await api.groupUnread())?.unreadByGroup || {};
+    } catch (error) {
+      console.warn('Messages: could not load group notifications', error);
+      return;
+    }
+    state.groups.forEach(group => {
+      group.unreadCount = Number(unreadByGroup[group.id] || 0);
+    });
+    render();
+  }
+
   async function loadGroups() {
     try {
       state.groups = sortGroups((await api.myGroups(me.id) || []).filter(group => !isCourseChannel(group)));
@@ -135,7 +175,13 @@ export async function startMessagesPage({ config, richText }) {
       notice.textContent = 'Could not load your groups. Reload the page to try again.';
     }
     render();
+    loadGroupUnread();
   }
+
+  // The page only follows the open conversation's socket topic, so a message posted in
+  // another group never reaches it. The navbar bell re-counts groups when the tab comes
+  // back to the front and every couple of minutes, and its 'dm:unread' summary (below)
+  // carries the counts here, so the page doesn't ask Spring a second time.
 
   async function loadConversations() {
     try {
@@ -169,13 +215,28 @@ export async function startMessagesPage({ config, richText }) {
     }
   }
 
+  const deleteGroup = initDeleteGroup({
+    api,
+    onDeleted: group => {
+      groupGone(group.id);
+      notice.textContent = `Deleted ${group.name}.`;
+    },
+    elements: {
+      dialog: byId('deleteGroupDialog'), form: byId('deleteGroupForm'), title: byId('deleteGroupTitle'),
+      warning: byId('deleteGroupWarning'), nameToType: byId('deleteGroupNameToType'), name: byId('deleteGroupName'),
+      status: byId('deleteGroupStatus'), confirm: byId('deleteGroupConfirm'),
+    },
+  });
   const members = initMembers({
     api,
     me,
     onChanged: groupChanged,
+    // Cancel returns focus to the header's Members button, where this started.
+    onDelete: group => deleteGroup.open(group, byId('messagesMembers')),
     elements: {
       dialog: byId('membersDialog'), title: byId('membersTitle'), list: byId('membersList'),
       search: byId('membersSearch'), results: byId('membersResults'), status: byId('membersStatus'),
+      deleteSection: byId('membersDeleteSection'), deleteWarning: byId('membersDeleteWarning'), deleteOpen: byId('membersDelete'),
     },
   });
   byId('messagesMembers').addEventListener('click', event => {
@@ -198,19 +259,6 @@ export async function startMessagesPage({ config, richText }) {
       notice.textContent = `Could not leave ${group.name}. Try again.`;
     }
   });
-  byId('messagesDeleteGroup').addEventListener('click', async () => {
-    const group = openGroup();
-    if (!group || !window.confirm(`Delete ${group.name} for all ${group.members.length} members? This can’t be undone.`)) return;
-    try {
-      await api.deleteGroup(group.id);
-      groupGone(group.id);
-      notice.textContent = `Deleted ${group.name}.`;
-    } catch (error) {
-      console.warn('Messages: could not delete the group', error);
-      notice.textContent = `Could not delete ${group.name}. Try again.`;
-    }
-  });
-
   initFindGroup({
     api,
     me,
@@ -260,6 +308,13 @@ export async function startMessagesPage({ config, richText }) {
   // The navbar bell's summary keeps the unread counts current, and shows conversations
   // someone else started since the list loaded.
   window.addEventListener('dm:unread', ({ detail }) => {
+    // A group the bell counts but the list doesn't have is one the page leaves alone.
+    // The open group is marked read as messages arrive, so it never shows a count.
+    const groupCounts = detail.groups || {};
+    state.groups.forEach(group => {
+      const isOpen = state.active?.kind === 'group' && state.active.id === group.id;
+      group.unreadCount = isOpen ? 0 : Number(groupCounts[group.id] || 0);
+    });
     const counts = detail.conversations || {};
     const known = new Set(state.conversations.map(conversation => String(conversation.id)));
     if (Object.keys(counts).some(id => !known.has(id))) {

@@ -10,7 +10,7 @@
 
   <!-- Sprint Board: live from the team's GitHub project -->
   {% if data.Board %}
-  {% include ocs_kanban_board.html url=data.Board.url filter=data.Board.filter %}
+  {% include ocs_kanban_board.html url=data.Board.url filter=data.Board.filter columns=data.Board.columns %}
   {% endif %}
 
   <!-- Project Cards -->
