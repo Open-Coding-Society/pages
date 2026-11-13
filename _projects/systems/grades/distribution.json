@@ -1,4 +1,5 @@
 {
   "files": [
+    { "source": "pages/grades.html", "destination": "navigation/grades.html" }
   ]
 }
