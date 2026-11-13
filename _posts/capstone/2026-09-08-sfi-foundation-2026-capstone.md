@@ -38,6 +38,9 @@ permalink: /capstone/sfi-foundation/
 <br>
 
 <div class="ocs__links ocs__links--wide">
+    <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://sfi.opencodingsociety.com/" target="_blank" rel="noreferrer noopener">
+        <span>Visit Deployed SFI Website</span>
+    </a>
     <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://github.com/SFI-Foundation/Frontend" target="_blank" rel="noreferrer noopener">
         <span class="ocs__btn-icon" aria-hidden="true">
             <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -215,19 +218,28 @@ This is SFI Foundation's public contact information. For feedback on this studen
         <p>Scrum Master</p>
     </div>
     <div class="ocs__grid-cell">
-        <strong>Arya Taghavi Zargar</strong>
-        <p>Technologist / Developer</p>
-    </div>
-    <div class="ocs__grid-cell">
         <strong>Deyar Raissadat</strong>
-        <p>Technologist / Developer</p>
-    </div>
-    <div class="ocs__grid-cell">
-        <strong>Ishan Khandelwal</strong>
         <p>Technologist / Developer</p>
     </div>
     <div class="ocs__grid-cell">
         <strong>Vayun Shekhar</strong>
         <p>Technologist / Developer</p>
+    </div>
+</div>
+
+---
+
+## SFI Foundation mentors
+
+<div class="ocs__grid ocs__grid--card">
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Jennifer Faye</strong>
+        <p>SFI Foundation mentor</p>
+        <p><a href="mailto:jfaye@sfifoundation.com">jfaye@sfifoundation.com</a></p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Chris Bowden</strong>
+        <p>SFI Foundation mentor</p>
+        <p><a href="mailto:cbowden@sfifoundation.com">cbowden@sfifoundation.com</a></p>
     </div>
 </div>
