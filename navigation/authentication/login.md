@@ -143,6 +143,7 @@ show_reading_time: false
     import { loginReturnPath } from '{{site.baseurl}}/assets/js/api/login-return.js';
 
     import { reverifyNeeded, staffMustVerify, reverify } from '{{site.baseurl}}/assets/js/api/reverify.js';
+    import { confirmRoleAttestation } from '{{site.baseurl}}/assets/js/api/role-attestation.js';
     import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules, attachPasswordChecklist } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
 
     // Capture once so failed attempts and verification steps retain the destination.
@@ -520,10 +521,14 @@ show_reading_time: false
             flaskAccepted = true;
             flaskBody = body;
         });
-        Promise.all([javaPromise, pythonPromise]).then(([springLoggedIn]) => {
+        Promise.all([javaPromise, pythonPromise]).then(async ([springLoggedIn]) => {
             if (!flaskAccepted) {
                 stayOnPage();
                 return;
+            }
+            // Flask knows which mentors a Teacher or Admin verified; Spring is told before the page moves on.
+            if (springEnabled && springLoggedIn) {
+                await confirmRoleAttestation(javaURI, fetchOptions, flaskBody && flaskBody.role_attestation);
             }
             const finish = () => {
                 // Guests have no profile; direct logins fall back to the home page.
