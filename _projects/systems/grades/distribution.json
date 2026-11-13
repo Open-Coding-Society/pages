@@ -16,6 +16,7 @@
     { "source": "js/ocs-analytics-dashboard.js", "destination": "assets/js/ocs-analytics-dashboard.js" },
     { "source": "sass/analytics-dashboard-v2.scss", "destination": "_sass/open-coding/analytics-dashboard-v2.scss" },
     { "source": "pages/submissions.md", "destination": "navigation/authentication/submissions.md" },
-    { "source": "pages/submissions-v2.md", "destination": "navigation/authentication/submissions-v2.md" }
+    { "source": "pages/submissions-v2.md", "destination": "navigation/authentication/submissions-v2.md" },
+    { "source": "layouts/submissions-v2.html", "destination": "_layouts/submissions-v2.html" }
   ]
 }

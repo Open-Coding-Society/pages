@@ -151,6 +151,7 @@ images/projects/
 /_sass/open-coding/analytics-dashboard-v2.scss
 /navigation/authentication/submissions.md
 /navigation/authentication/submissions-v2.md
+/_layouts/submissions-v2.html
 
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile
