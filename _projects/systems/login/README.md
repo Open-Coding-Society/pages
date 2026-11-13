@@ -42,7 +42,7 @@ with `spring: false`.
 Many pages that use Spring don't read it yet, such as `/dm`, `/student/calendar` and
 the announcement chats, and some links still lead to pages that call Spring: Profile's
 Reset password (`/support`) and Skill Passport (`/analytics-dashboard`), and the
-toolkit sidebar's View Grades, Calendar and Bathroom Pass.
+toolkit sidebar's Calendar and Bathroom Pass. View Grades moved to the Grades sidebar.
 
 What Profile does in each is in the [Profile README](../profile/README.md#flask-only-or-flask--spring).
 

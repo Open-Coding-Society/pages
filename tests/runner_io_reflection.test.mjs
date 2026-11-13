@@ -45,7 +45,7 @@ test("code runners bundle exactly as before and reflections bundle as Markdown",
   assert.deepEqual(readRunnerKinds(), { "loops-0.py": "code", "loops-why.md": "reflection" });
 });
 
-test("an unsubmitted reflection blocks the page submit like an unsaved code runner", () => {
+test("an unsubmitted reflection counts as unsaved, like an unsaved code runner", () => {
   storage.set("page_loops-0", "print(1)");
 
   assert.deepEqual(unsavedRunners().map((el) => el.dataset.runnerId), ["loops-why"]);

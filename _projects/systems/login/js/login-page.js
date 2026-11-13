@@ -365,6 +365,11 @@ export function startLoginPage({
     // Signs in to Flask, and to Spring at the same time when the site has it, and only redirects after
     // both finish. When Flask refuses, the error shows in #message and the page stays put.
     window.loginBoth = function () {
+        // One attempt at a time: repeat clicks while the servers answer would each send
+        // another login to Flask and Spring. The button comes back whenever the page stays put.
+        const loginButton = document.querySelector('#pythonForm button[type="submit"]');
+        loginButton.disabled = true;
+        const stayOnPage = () => { loginButton.disabled = false; };
         const messageEl = document.getElementById('message');
         messageEl.textContent = '';
         const uid = document.getElementById('uid').value;
@@ -382,20 +387,25 @@ export function startLoginPage({
                     window.location.href = returnPath || `${baseurl}/profile`;
                     return;
                 }
+                stayOnPage();
                 showSpringLoginWarning();
             };
             if (reverifyNeeded(flaskBody)) {
+                stayOnPage();
                 reverifying = true;
                 afterReverify = finish;
                 document.getElementById('reverify').style.display = 'block';
                 return;
             }
             if (staffMustVerify(flaskBody)) {
+                stayOnPage();
                 showStaffVerifyNotice(finish);
                 return;
             }
             finish();
         }, (error) => {
+            // Flask refused (or couldn't be reached): the page stays put, so the button comes back.
+            stayOnPage();
             console.log(loginErrorText(error));
             messageEl.textContent = loginErrorText(error);
         });

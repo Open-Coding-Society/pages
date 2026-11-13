@@ -142,6 +142,7 @@ minima:
     - navigation/course.md
     - navigation/capstone.md
     - navigation/topics.md
+    - navigation/grades.html
 exclude:
 # Jekyll defaults
   - vendor

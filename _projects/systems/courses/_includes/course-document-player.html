@@ -144,7 +144,8 @@
   import { pythonURI, fetchOptions, javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
   import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
   import { appendGistSettingsLink } from '{{ site.baseurl }}/assets/js/gist-connection-errors.js';
-  import { listRunners, unsavedRunners, readRunners, readRunnerKinds } from '{{ site.baseurl }}/assets/js/runner-io.js';
+  import { readRunners, readRunnerKinds, runnerSelectionSummary } from '{{ site.baseurl }}/assets/js/runner-io.js';
+  import { mountSubmissionSummary, submissionError } from '{{ site.baseurl }}/assets/js/runner-submission.js';
   import { createNavigationState } from '{{ site.baseurl }}/assets/js/course-navigation-state.js';
   import { readGradingResponse } from '{{ site.baseurl }}/assets/js/submissions/grading.js';
   import { rememberCourse } from '{{ site.baseurl }}/assets/js/course-entry.js';
@@ -680,8 +681,10 @@
     const assignmentId = await ensureAssignmentId();
     // Resolve the user first so we don't burn a Gist creation on a request that will fail anyway.
     const { uid, personId } = await resolveCurrentUser();
-    // kinds tells the grader which files are written reflections rather than code.
-    const gistUrl = await exportToGist(files, { type: 'submission', description: description || 'Code submission', manifest: { kinds: readRunnerKinds() } });
+    // kinds tells the grader which files are written reflections rather than code; runners
+    // tells it which runners were left out, so it can tell missing hacks from skipped practice.
+    const manifest = { kinds: readRunnerKinds({ selectedOnly: true }), runners: runnerSelectionSummary() };
+    const gistUrl = await exportToGist(files, { type: 'submission', description: description || 'Code submission', manifest });
     const content = { type: 'code', url: gistUrl, notes: description };
     const res = await fetch(`${javaURI}/api/submissions/${assignmentId}`, {
       ...fetchOptions,
@@ -928,28 +931,6 @@
 
   /**
    * ============================================
-   * CODE SUBMISSION: Show which runners will be sent
-   * ============================================
-   */
-  function renderCodeRunnerSummary() {
-    const list = document.getElementById('code-runner-summary');
-    if (!list) return;
-    const runners = listRunners();
-    if (runners.length === 0) {
-      list.innerHTML = '<li>No code runners found on this page.</li>';
-      return;
-    }
-    const unsaved = new Set(unsavedRunners());
-    list.innerHTML = runners.map((el, i) => {
-      const id = el.dataset.runnerId || `runner_${i + 1}`;
-      return unsaved.has(el)
-        ? `<li>${id} — <span class="code-runner-unsaved">not saved yet</span></li>`
-        : `<li>${id} — <span class="code-runner-saved">saved</span></li>`;
-    }).join('');
-  }
-
-  /**
-   * ============================================
    * LESSON FEEDBACK: team-taught lessons (team_teach: true)
    * ============================================
    * The student rates the lesson in the microblog panel's Ratings tab, and the
@@ -1048,20 +1029,18 @@
 
     const codeForm = document.getElementById('code-form');
     if (codeForm) {
-      renderCodeRunnerSummary();
+      mountSubmissionSummary(document.getElementById('code-runner-count'), document.getElementById('code-runner-summary'));
       codeForm.addEventListener('submit', async function (e) {
         e.preventDefault();
         const notes = document.getElementById('code-notes')?.value?.trim() || '';
         const submitBtn = codeForm.querySelector('button[type="submit"]');
-        if (unsavedRunners().length > 0) {
-          showStatus('error', 'Save each code runner with its 💾 button, submit each reflection with its 📤 button, and check any MCQ answers before submitting.');
+        // Only the runners the student added are checked and sent; skipped ones never block.
+        const selectionError = submissionError();
+        if (selectionError) {
+          showStatus('error', selectionError);
           return;
         }
-        const files = readRunners();
-        if (Object.keys(files).length === 0) {
-          showStatus('error', "No saved code found in this lesson's code runner(s).");
-          return;
-        }
+        const files = readRunners({ selectedOnly: true });
         const selfAssessment = getSelfAssessmentData();
         // Self-assessment is paused, so its required-field check is off for now.
         // const selfAssessmentError = validateSelfAssessment(selfAssessment);

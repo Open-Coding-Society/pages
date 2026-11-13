@@ -1,0 +1,51 @@
+# The Grades hub (/grades/, navigation/grades.html) shows these sections in
+# order. Every link opens a page or tab that already exists; a `#name` opens
+# that tab. `audience` labels links that only teachers or admins can use, and
+# `spring_path` links open the Spring backend (skipped when `spring: false`).
+- id: grade
+  title: Grade
+  description: See your grades and predict where they are heading.
+  links:
+    - title: View Grades
+      url: /student/view-grades
+      description: Grade, feedback and status for each assignment.
+    - title: Grade Predictor
+      url: /analytics-dashboard#grade
+      description: Predict a grade and try what-if scores.
+
+- id: reflect
+  title: Reflect
+  description: Look back on each sprint and set a goal for the next one.
+  links:
+    - title: Sprint Reflection
+      url: /retrospective#sprint
+      description: Answer questions and rank your skills; teachers comment.
+    - title: Growth Over Time
+      url: /retrospective#growth
+      description: Chart your skill ranks across sprints.
+    - title: Forecast Retrospective
+      url: /retrospective#forecast
+      description: Set a growth goal from your grade forecasts.
+
+- id: submissions
+  title: Submissions
+  description: Turn in work, then review and grade it.
+  links:
+    - title: My Submissions
+      url: /submissions#my-submissions
+      description: Update your work and petition a grade.
+    - title: Assignments You Created
+      url: /submissions#created-assignments
+      description: Creators and graders review the submissions they manage.
+    - title: All Submissions
+      url: /submissions#all-submissions
+      audience: Teachers
+      description: Review everyone's work.
+    - title: Assignment Tracker
+      spring_path: /mvc/assignments/tracker
+      audience: Teachers
+      description: Close assignments and decide reviews. Opens in Spring.
+    - title: Evaluate Users
+      url: /dashboard
+      audience: Admins
+      description: Find a user and evaluate their work.

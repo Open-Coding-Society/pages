@@ -120,10 +120,10 @@ document.addEventListener('DOMContentLoaded', function(){
       frontendUrl: "https://github.com/UGRC-CSA/Pages",
       backendUrl: "https://github.com/Open-Coding-Society/spring"
     },
-    "Oncology and Kids Cancer Foundation": {
-      pageUrl: "https://pages.opencodingsociety.com/capstone/oak/",
-      frontendUrl: "https://github.com/undergroundrapclub/portfolio",
-      backendUrl: "https://github.com/undergroundrapclub/oak_spring"
+    "Oncology Sesh": {
+      pageUrl: "https://pages.opencodingsociety.com/capstone/oncologysesh/",
+      frontendUrl: "https://github.com/CSP-Oncology/OCS-Kit-Pages",
+      backendUrl: "https://github.com/CSP-Oncology/OCS-Kit-Flask"
     }
   };
 
@@ -441,16 +441,16 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
-       <!-- Oncology and Kids Cancer Association (CSP, 2026/2027) -->
-       <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/oak/' | relative_url }}">
-       <a href="{% post_url 2026-09-08-oak-cancer-capstone %}">
-           <img src="/images/capstone/oak.png" alt="Oncology and Kids Cancer Foundation" class="ocs__image-frame ocs__image-frame--thumbnail" />
+   <!-- Oncology Sesh (CSP, 2026/2027) -->
+   <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/oncologysesh/' | relative_url }}">
+       <a href="{{ '/capstone/oncologysesh/' | relative_url }}">
+           <img src="{{ '/images/capstone/oncologysesh-logo.png' | relative_url }}" alt="Oncology Sesh" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url 2026-09-08-oak-cancer-capstone %}">Oncology and Kids Cancer Association</a></h3>
+           <h3><a href="{{ '/capstone/oncologysesh/' | relative_url }}">Oncology Sesh</a></h3>
            <p>CSP</p>
            <p>This capstone project aims to connect and educate both cancer families and cancer patients. We aim to create a platform where people can learn more about cancer on a biological level through interactive learning modules, as well as connect cancer patients through interactive multiplayer games. Rather than cancer websites having long strings of text, people of all ages will be able to easily navigate, learn, and play through these new and advanced modules.</p>
-           <p>Team: Salma, Isha, Aashi, and Emily</p>
+           <p>Team: Anika, Salma, Aashi, Jailene</p>
        </div>
    </div>
 
@@ -820,6 +820,18 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
    
+   <!-- XRCare AI (CSP 26-27) -->
+   <div class="ocs__grid-cell CSP" data-year="2026-2027">
+       <a href="{{ '/capstone/xrcare-ai/' | relative_url }}">
+           <img src="{{ '/images/capstone/xrcare-ai-logo.png' | relative_url }}" alt="XRCare AI" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{{ '/capstone/xrcare-ai/' | relative_url }}">XRCare AI</a></h3>
+           <p>Supporting XRCare AI's mission by helping clinical teams, pharmacies, and educators discover its XR-AI Point-of-Care Co-pilot, team, and contacts.</p>
+           <p>Team: Adya Shipekar, Emily Capua, Rohan Chandra, Ishan Srivastava</p>
+       </div>
+   </div>
+
    <!-- Friends of the Poway Library  (CSP) -->
    <div class="ocs__grid-cell CSP">
        <a href="{% post_url 2026-03-09-poway-library %}">

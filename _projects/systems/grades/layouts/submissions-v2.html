@@ -1201,6 +1201,14 @@ active_tab: submissions
         // Initialize underline
         const activeTab = document.querySelector('.tab-btn.active');
         if (activeTab) setUnderline(activeTab);
+
+        // A link such as /submissions#all-submissions opens that tab; the Grades
+        // hub links to each tab this way. All Submissions stays hidden for
+        // non-admins, so a link to it leaves them on My Submissions.
+        const linkedTab = document.getElementById(`tab-${location.hash.slice(1)}`);
+        if (linkedTab?.classList.contains('tab-btn') && linkedTab.style.display !== 'none') {
+            linkedTab.click();
+        }
     }
 
     function setupFilters() {
