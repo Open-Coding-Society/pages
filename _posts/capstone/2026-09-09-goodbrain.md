@@ -7,7 +7,9 @@ permalink: /capstone/goodbrain/
 microblog: true
 ---
 
-[My Good Brain Website](https://mgb.opencodingsociety.com/)
+[Our My Good Brain Website Prototype](https://mgb.opencodingsociety.com/)
+
+[My Good Brain Actual Website](https://www.mygoodbrain.org/)
 
 My Good Brain is a 501(c)(3) nonprofit organization that promotes mental wellness, social-emotional learning, and healthy coping strategies for school-aged youth and adolescents through art, play, and psychology
 
