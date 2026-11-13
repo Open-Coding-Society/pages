@@ -17,9 +17,9 @@ permalink: /capstone/oncologysesh/
 <div class="ocs__grid ocs__grid--standard cols-2">
     <div class="ocs__grid-cell ocs__grid-cell--header">OncologySesh · Organization</div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
+    <div class="ocs__grid-cell ocs__grid-cell--accent ocs__grid-cell--wide">
         <strong>What do they aim to do?</strong>
-        <p>OncologySesh aims to improve cancer treatment outcomes by developing liquid biopsy technology that helps identify biomarkers relevant to personalized immunotherapy. Its work focuses on helping clinicians make more informed treatment decisions.</p>
+        <p>Sesh Incorporated describes itself as a San Diego biotechnology startup. Its RELOAD (Restriction Element Loss Of Allele Detection) blood test is designed to identify biomarkers such as HLA loss of heterozygosity (HLA LOH), helping inform immunotherapy decisions.</p>
         <strong>Why we chose this organization</strong>
         <p><strong>Our motivation:</strong> Our team shares an interest in STEM and in making complex medical information easier to understand. OncologySesh’s focus on precision oncology inspired us to explore how an educational website could help patients and families learn about the science behind personalized cancer care.</p>
     </div>
@@ -45,7 +45,7 @@ permalink: /capstone/oncologysesh/
     </div>
 
     <div class="ocs__grid-cell">
-        <img src="{{ '/images/capstone/oncologysesh.png' | relative_url }}" alt="Student capstone exploring OncologySesh-inspired cancer education" loading="lazy" style="max-width: 220px; width: 100%; height: auto; display: block; margin: 0 auto;">
+        <img src="{{ '/images/capstone/oncologysesh-logo.png' | relative_url }}" alt="Student capstone exploring OncologySesh-inspired cancer education" loading="lazy" style="max-width: 220px; width: 100%; height: auto; display: block; margin: 0 auto;">
         <p><strong>Project focus:</strong> accessible cancer education, biomarker explanations, liquid biopsy concepts, interactive activities, reading-level options, and resources for preparing questions for a care team.</p>
     </div>
 </div>
@@ -56,16 +56,58 @@ permalink: /capstone/oncologysesh/
 
 <div class="ocs__links ocs__links--wide">
     <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://github.com/CSP-Oncology/OCS-Kit-Flask" target="_blank" rel="noreferrer noopener">
-        <span>Backend Repository</span>
+        Backend Repository
     </a>
     <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="https://www.oncologysesh.com/" target="_blank" rel="noreferrer noopener">
-        <span>Original Oncology Sesh Website</span>
+        Original Oncology Sesh Website
     </a>
 </div>
 
 
 <br>
 
+
+---
+
+
+## Organization background
+
+According to the [official Sesh website](https://www.oncologysesh.com/), the organization develops cancer diagnostics. Our capstone proposes educational tools inspired by that work; the activities below are student ideas rather than official Sesh services.
+
+### Founders and leadership
+
+<div class="ocs__grid ocs__grid--standard cols-2">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Sesh leadership · separate from our student team</div>
+    <div class="ocs__grid-cell">
+        <strong>Andrew Sinkoe</strong>
+        <p>Co-founder and CEO</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Matt Creager</strong>
+        <p>Co-founder, Collaborations</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Adam Lowe</strong>
+        <p>Business Development Advisor</p>
+    </div>
+</div>
+
+### Published development milestones
+
+The website does not specify a founding date. Its news documents these milestones:
+
+- **November 8, 2025:** NIH SBIR research funding announced.
+- **December 23, 2025:** Joined EvoNexus to support commercialization.
+- **March 17, 2026:** Selected for CONNECT Cool Companies.
+- **May 7, 2026:** Advanced to SDAC VIII's final six.
+- **June 4, 2026:** Announced a San Diego Angel Conference win and $200,000 investment.
+- **June 2026:** Reported an SDIC Showcase Golden Ticket award.
+
+### Collaborators
+
+The official site displays EvoNexus, Cleveland Clinic, University of Delaware, Providence, Frederick National Laboratory, and a logo hosted by Liga Puertorriqueña Contra el Cáncer. It does not detail each collaboration's scope.
+
+Source: [Sesh — organization, collaborators, contact, and news](https://www.oncologysesh.com/), reviewed November 12, 2026. The site identifies Sesh as a startup; nonprofit status is not established there.
 
 ---
 
@@ -217,25 +259,34 @@ permalink: /capstone/oncologysesh/
     <div class="ocs__grid-cell ocs__grid-cell--header">Current project team</div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Salma</strong>
-        <p>Developer</p>
+        <strong>Anika</strong>
+        <p>Product Owner</p>
     </div>
 
     <div class="ocs__grid-cell">
-        <strong>Anika</strong>
-        <p>Developer</p>
+        <strong>Salma</strong>
+        <p>Scrum Master</p>
     </div>
 
     <div class="ocs__grid-cell">
         <strong>Aashi</strong>
-        <p>Developer</p>
+        <p>System Architect</p>
     </div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Jailene</strong>
-        <p>Developer</p>
+        <p>Education Liaison</p>
     </div>
 </div>
 
 
 <br>
+
+
+<footer aria-label="Student team contacts">
+    <small>Student team contacts<br>
+    Salma Zaghloul · Scrum Master · <a href="mailto:zaghloulsalma@hotmail.com">zaghloulsalma@hotmail.com</a><br>
+    Anika Seksaria · Product Owner · <a href="mailto:anika.seksaria@gmail.com">anika.seksaria@gmail.com</a><br>
+    Aashi Hegu · System Architect · <a href="mailto:aashihegu1@gmail.com">aashihegu1@gmail.com</a><br>
+    Jailene Tang · Education Liaison · <a href="mailto:tangjailene@gmail.com">tangjailene@gmail.com</a></small>
+</footer>

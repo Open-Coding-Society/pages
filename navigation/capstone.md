@@ -441,16 +441,16 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
-       <!-- Oncology Sesh (CSP, 2026/2027) -->
-       <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/oak/' | relative_url }}">
-       <a href="{% post_url 2026-09-08-oncologysesh-capstone %}">
-           <img src="/images/capstone/oncologysesh.png" alt="Oncology Sesh" class="ocs__image-frame ocs__image-frame--thumbnail" />
+   <!-- Oncology Sesh (CSP, 2026/2027) -->
+   <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/oncologysesh/' | relative_url }}">
+       <a href="{{ '/capstone/oncologysesh/' | relative_url }}">
+           <img src="{{ '/images/capstone/oncologysesh-logo.png' | relative_url }}" alt="Oncology Sesh" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url 2026-09-08-oncologysesh-capstone %}">Oncology Sesh</a></h3>
+           <h3><a href="{{ '/capstone/oncologysesh/' | relative_url }}">Oncology Sesh</a></h3>
            <p>CSP</p>
            <p>This capstone project aims to connect and educate both cancer families and cancer patients. We aim to create a platform where people can learn more about cancer on a biological level through interactive learning modules, as well as connect cancer patients through interactive multiplayer games. Rather than cancer websites having long strings of text, people of all ages will be able to easily navigate, learn, and play through these new and advanced modules.</p>
-           <p>Team: Salma, Isha, Aashi, and Emily</p>
+           <p>Team: Anika, Salma, Aashi, Jailene</p>
        </div>
    </div>
 
