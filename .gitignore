@@ -136,6 +136,7 @@ images/projects/
 # Grades system distributions (authoritative sources in _projects/systems/grades)
 /navigation/grades.html
 /_data/grades_hub.yml
+/_data/grades_sidebar.yml
 /_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md
 /_posts/student_toolkit/assignments/2025-01-21-gradeviewer-v2.md
 /_sass/open-coding/view-grades-v2.scss

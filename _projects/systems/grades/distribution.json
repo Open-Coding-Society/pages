@@ -2,6 +2,7 @@
   "files": [
     { "source": "pages/grades.html", "destination": "navigation/grades.html" },
     { "source": "data/grades_hub.yml", "destination": "_data/grades_hub.yml" },
+    { "source": "data/grades_sidebar.yml", "destination": "_data/grades_sidebar.yml" },
     { "source": "pages/view-grades.md", "destination": "_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md" },
     { "source": "pages/view-grades-v2.md", "destination": "_posts/student_toolkit/assignments/2025-01-21-gradeviewer-v2.md" },
     { "source": "sass/view-grades-v2.scss", "destination": "_sass/open-coding/view-grades-v2.scss" },
