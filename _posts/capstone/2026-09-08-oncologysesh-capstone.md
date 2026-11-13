@@ -17,7 +17,7 @@ permalink: /capstone/oncologysesh/
 <div class="ocs__grid ocs__grid--standard cols-2">
     <div class="ocs__grid-cell ocs__grid-cell--header">OncologySesh · Organization</div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent">
+    <div class="ocs__grid-cell ocs__grid-cell--accent ocs__grid-cell--wide">
         <strong>What do they aim to do?</strong>
         <p>Sesh Incorporated describes itself as a San Diego biotechnology startup. Its RELOAD (Restriction Element Loss Of Allele Detection) blood test is designed to identify biomarkers such as HLA loss of heterozygosity (HLA LOH), helping inform immunotherapy decisions.</p>
         <strong>Why we chose this organization</strong>
@@ -56,10 +56,10 @@ permalink: /capstone/oncologysesh/
 
 <div class="ocs__links ocs__links--wide">
     <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://github.com/CSP-Oncology/OCS-Kit-Flask" target="_blank" rel="noreferrer noopener">
-        <span>Backend Repository</span>
+        Backend Repository
     </a>
     <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="https://www.oncologysesh.com/" target="_blank" rel="noreferrer noopener">
-        <span>Original Oncology Sesh Website</span>
+        Original Oncology Sesh Website
     </a>
 </div>
 
@@ -271,7 +271,7 @@ Source: [Sesh — organization, collaborators, contact, and news](https://www.on
     <div class="ocs__grid-cell">
         <strong>Aashi</strong>
         <p>System Architect</p>
-    </div>SSSsS
+    </div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Jailene</strong>
@@ -287,6 +287,6 @@ Source: [Sesh — organization, collaborators, contact, and news](https://www.on
     <small>Student team contacts<br>
     Salma Zaghloul · Scrum Master · <a href="mailto:zaghloulsalma@hotmail.com">zaghloulsalma@hotmail.com</a><br>
     Anika Seksaria · Product Owner · <a href="mailto:anika.seksaria@gmail.com">anika.seksaria@gmail.com</a><br>
-    Aashi Hegu· System Architect · <a href="mailto:aashihegu1@gmail.com">aashihegu@gmail.com</a><br>
+    Aashi Hegu · System Architect · <a href="mailto:aashihegu1@gmail.com">aashihegu1@gmail.com</a><br>
     Jailene Tang · Education Liaison · <a href="mailto:tangjailene@gmail.com">tangjailene@gmail.com</a></small>
 </footer>
