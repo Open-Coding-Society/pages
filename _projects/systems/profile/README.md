@@ -45,8 +45,8 @@ What Profile does in each:
 The setting covers Profile, the login page's sign-up and sign-in, logout and the
 navbar's DM bell (its unread count). Other pages that use Spring, such as DMs, the
 calendar and announcements, don't read it, and some links still lead to them:
-Profile's Reset password and Skill Passport, and the toolkit sidebar's View Grades,
-Calendar and Bathroom Pass.
+Profile's Reset password and Skill Passport, and the toolkit sidebar's Calendar and
+Bathroom Pass. View Grades moved to the Grades sidebar.
 
 ### Try it
 

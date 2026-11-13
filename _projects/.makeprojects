@@ -48,6 +48,7 @@ lessons/ds2
 systems/ai-ab-engine
 systems/calendar
 systems/profile:dev
+systems/grades:dev
 systems/blogs:dev
 systems/topics:dev
 systems/courses:dev
