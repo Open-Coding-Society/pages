@@ -1,4 +1,3 @@
-
 ---
 microblog: true
 toc: false
@@ -48,9 +47,7 @@ Our capstone team is helping further this mission by redesigning the foundation'
 
 ## Explore Our Website Redesign
 
-Our team is modernizing the NCSNCF website with updated layouts,
-improved navigation, and a more consistent design.
-Explore the original website and our student-built redesign below.
+Our team is modernizing the NCSNCF website with updated layouts, improved navigation, and a more consistent design. Explore the original website and our student-built redesign below.
 
 <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
 
@@ -94,9 +91,7 @@ Explore the original website and our student-built redesign below.
 
 ## Our Capstone: What We're Building
 
-Our project focuses on improving the NCSNCF website while
-exploring new tools that could make it easier for families
-and community members to connect with the foundation.
+Our project focuses on improving the NCSNCF website while exploring new tools that could make it easier for families and community members to connect with the foundation.
 
 <div class="ocs__grid ocs__grid--color" style="margin-bottom: 1.5rem;">
 
@@ -155,12 +150,9 @@ and community members to connect with the foundation.
 
 ## Our Development Process
 
-Our team uses GitHub to organize development, track progress,
-and collaborate on the redesign.
+Our team uses GitHub to organize development, track progress, and collaborate on the redesign.
 
-We use issues and a Kanban board to manage tasks, review
-changes through pull requests, and continuously improve
-the website throughout the capstone project.
+We use issues and a Kanban board to manage tasks, review changes through pull requests, and continuously improve the website throughout the capstone project.
 
 <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
 
