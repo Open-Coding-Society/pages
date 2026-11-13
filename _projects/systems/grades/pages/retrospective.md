@@ -2,6 +2,8 @@
 layout: retrospective
 title: Retrospective
 permalink: /retrospective
+active_tab: retrospective
+sidebar: grades_sidebar
 comments: false
 ---
 
