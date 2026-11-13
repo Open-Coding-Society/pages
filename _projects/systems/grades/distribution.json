@@ -4,6 +4,7 @@
     { "source": "data/grades_hub.yml", "destination": "_data/grades_hub.yml" },
     { "source": "pages/view-grades.md", "destination": "_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md" },
     { "source": "pages/view-grades-v2.md", "destination": "_posts/student_toolkit/assignments/2025-01-21-gradeviewer-v2.md" },
-    { "source": "sass/view-grades-v2.scss", "destination": "_sass/open-coding/view-grades-v2.scss" }
+    { "source": "sass/view-grades-v2.scss", "destination": "_sass/open-coding/view-grades-v2.scss" },
+    { "source": "pages/retrospective.md", "destination": "navigation/authentication/retrospective.md" }
   ]
 }
