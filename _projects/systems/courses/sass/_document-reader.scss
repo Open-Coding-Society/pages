@@ -21,18 +21,66 @@
     .ocs__links { gap: 0.25rem; }
     p { margin: 0; }
   }
+  // Review circle: in front of the current document in navigation.
+  .document-reader__complete.ocs__btn {
+    width: 2rem;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border-radius: 50%;
+  }
+  // Previous and Next show the neighboring titles beside the arrows.
+  .ocs__pager[data-reader-pager] {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "previous next";
+    margin-top: 2rem;
+    [data-reader-previous] { grid-area: previous; }
+    [data-reader-next] { grid-area: next; text-align: right; }
+    .ocs__pager-link {
+      display: block;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--ui-border);
+      border-radius: 0.75rem;
+      background: var(--panel);
+      color: var(--pref-text-color);
+      text-decoration: none;
+      &:hover, &:focus-visible { border-color: var(--pref-accent-color); }
+    }
+    .ocs__pager-link i { color: var(--pref-accent-color); }
+  }
   &__panes {
     display: grid;
     grid-template-columns: minmax(240px, 1fr) minmax(0, 4fr);
     min-height: 0;
     flex: 1;
   }
-  &__navigation {
+  &__sidebar {
+    display: flex;
+    flex-direction: column;
     min-width: 0;
-    overflow-y: auto;
-    padding: 0.75rem;
+    min-height: 0;
     background: var(--panel);
     border-right: 1px solid var(--ui-border);
+  }
+  // Collapsed navigation still names the current document, with its review circle.
+  &__current {
+    display: none;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0 1.15rem 0.75rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    span { flex: 1; min-width: 0; padding-top: 0.3rem; }
+  }
+  &__navigation:not([open]) + &__current { display: flex; }
+  &__navigation {
+    min-width: 0;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0.75rem;
     summary {
       cursor: pointer;
       padding: 0.6rem 0.4rem;
@@ -91,6 +139,12 @@
       padding: 0.5rem;
     }
     .document-reader__check { font-size: 0.75rem; }
+    .document-reader__active {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      .document-reader__lesson.ocs__btn { flex: 1; min-width: 0; }
+    }
     [aria-current="page"] {
       font-weight: bold;
     }
@@ -113,7 +167,7 @@
   }
   @media (max-width: 768px) {
     &__panes { display: flex; flex-direction: column; overflow: hidden; }
-    &__navigation {
+    &__sidebar {
       flex: 0 0 auto;
       max-height: 45%;
       border-right: 0;

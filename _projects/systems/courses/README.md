@@ -89,7 +89,17 @@ not only assignments, and follow the existing per-course completion state.
 Course home, week and sidebar links carry course context. Topics links
 carry Topics/filter context. The reader toolbar's `<` and `>` buttons open the
 previous and next document in the selected course or Topics order (the same
-targets as the bottom pager) and hide at either end. Navigation sections, scroll and last document use
+targets as the bottom pager) and hide at either end. The bottom pager shows
+`< previous title` and `next title >`.
+
+In course context the review circle lives in navigation, not in the document:
+with navigation open it sits in front of the current document's row; with
+navigation collapsed a `( ) Title` row appears under the course heading. Topics
+hides the circle because completion is per course. On desktop the reader
+scrolls the current document's row near the top of navigation, so the circle
+stays visible. The storage helper's `restore()` keeps the student's saved
+sections and only opens (never toggles) the current document's sprint and week.
+Navigation sections, scroll and last document use
 the existing per-course/per-panel storage helper; switching contexts releases
 its old listeners. Completion retains `<course>-lesson-completion` and the
 original document URL, with no writes when simply changing views.

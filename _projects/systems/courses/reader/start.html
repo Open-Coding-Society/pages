@@ -16,10 +16,10 @@
       <a class="ocs__btn ocs__btn--icon small accent" data-reader-toolbar-previous hidden aria-label="Previous document" title="Previous document"><i class="fas fa-chevron-left" aria-hidden="true"></i></a>
       <a class="ocs__btn ocs__btn--icon small accent" data-reader-toolbar-next hidden aria-label="Next document" title="Next document"><i class="fas fa-chevron-right" aria-hidden="true"></i></a>
     </nav>
-    <button class="ocs__btn small accent" type="button" data-reader-complete hidden aria-pressed="false">Mark lesson complete</button>
     <p role="status" aria-live="polite" data-reader-status></p>
   </header>
   <div class="document-reader__panes">
+    <div class="document-reader__sidebar">
     <details class="document-reader__navigation" data-reader-navigation open>
       <summary><span data-reader-heading>Navigation</span></summary>
       <nav aria-label="Document navigation">
@@ -36,4 +36,9 @@
         <div data-reader-tree></div>
       </nav>
     </details>
+    <p class="document-reader__current">
+      <button class="document-reader__complete ocs__btn ocs__btn--icon small accent" type="button" data-reader-complete hidden aria-pressed="false" aria-label="Reviewed: {{ page.title | escape }}" title="Mark reviewed"><i class="fa-regular fa-circle" aria-hidden="true" data-reader-complete-icon></i></button>
+      <span>{{ page.title | escape }}</span>
+    </p>
+    </div>
     <div class="document-reader__main" data-reader-main>

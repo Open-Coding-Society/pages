@@ -63,7 +63,10 @@ test('reader navigation displays lesson types and updates week completion withou
     }
     set textContent(value) { this.children = [String(value)]; }
     get textContent() { return this.children.map(child => typeof child === 'string' ? child : child.textContent).join(''); }
-    append(...children) { this.children.push(...children); }
+    append(...children) {
+      children.forEach(child => { if (typeof child !== 'string') child.parentRow = this; });
+      this.children.push(...children);
+    }
     replaceChildren(...children) { this.children = children; }
     setAttribute(name, value) { this.attributes[name] = String(value); }
     removeAttribute(name) { delete this.attributes[name]; if (name === 'href') delete this.href; }
@@ -96,10 +99,14 @@ test('reader navigation displays lesson types and updates week completion withou
     documentUrl: '/assignment/', defaultCourse: 'csp', indexUrl: '/index.json',
   };
   root.querySelector = selector => hooks[selector.match(/^\[data-reader-([a-z-]+)\]$/)?.[1]];
+  const glyph = new Element('i');
+  glyph.dataset.readerCompleteIcon = '';
+  hooks.complete.append(glyph);
   root.querySelectorAll = () => [];
   const documents = [
     { title: 'Assignment with a full descriptive title', url: '/assignment/', assignment: true, categories: [], courses: { csp: { week: 1 } } },
     { title: 'Reference', url: '/reference/', assignment: false, categories: [], courses: { csp: { week: 1 } } },
+    { title: 'Next week', url: '/next-week/', assignment: false, categories: [], courses: { csp: { week: 2 } } },
     { title: 'Outside the schedule', url: '/outside/', assignment: false, categories: [], courses: { csp: { week: 8 } } },
   ];
   const saved = new Map([['csp-lesson-completion', JSON.stringify({ '/reference/': true })]]);
@@ -111,7 +118,7 @@ test('reader navigation displays lesson types and updates week completion withou
     matchMedia: () => ({ matches: false }),
     localStorage: { getItem: key => saved.get(key) || null, setItem: (key, value) => saved.set(key, value) },
     fetch: async () => ({ ok: true, json: async () => ({
-      documents, courses: { csp: { title: 'CSP', sprints: [{ id: 'Sprint1', title: 'Start', start: 1, end: 1, weeks: { 1: 'Foundations' } }] } },
+      documents, courses: { csp: { title: 'CSP', sprints: [{ id: 'Sprint1', title: 'Start', start: 1, end: 2, weeks: { 1: 'Foundations', 2: 'Building' } }] } },
     }) }),
     window: { addEventListener: (name, callback) => { listeners[name] = callback; }, dispatchEvent: event => listeners[event.type]?.(event) },
     CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail; } },
@@ -124,15 +131,18 @@ test('reader navigation displays lesson types and updates week completion withou
   await startDocumentReader(root, {
     readState: () => ({ query: '', categories: [] }), writeState: () => '',
     selectedDocuments: () => documents, rememberCourse: () => {},
-    createNavigationState: () => ({ restore() {}, destroy() {}, restorePosition() {} }),
+    // The real helper restores saved sections and opens the current path; the reader must not close any.
+    createNavigationState: (_root, _course, _panel, sections) => ({
+      restore() { sections.forEach(section => section.setOpen(true)); }, destroy() {}, restorePosition() {},
+    }),
   });
 
   assert.equal(hooks.heading.textContent, 'CSP');
   const groups = hooks.tree.querySelectorAll('[data-week-group]');
-  assert.equal(groups.length, 2);
+  assert.equal(groups.length, 3);
   assert.equal(groups[0].querySelector('[data-week-count]').textContent, '1/2');
   assert.equal(groups[0].querySelector('[data-week-count]').attributes['aria-label'], '1 of 2 lessons completed');
-  assert.equal(groups[1].querySelector('[data-week-count]').textContent, '0/1');
+  assert.equal(groups[2].querySelector('[data-week-count]').textContent, '0/1');
   const links = hooks.tree.querySelectorAll('[data-lesson-id]');
   assert.ok(links[0].children[0].classList.contains('fa-file-alt'));
   assert.ok(links[1].children[0].classList.contains('fa-file-code'));
@@ -148,13 +158,36 @@ test('reader navigation displays lesson types and updates week completion withou
   assert.equal(hooks['toolbar-next'].href, hooks.next.href);
   assert.equal(hooks['toolbar-next'].href, '/preview/reference/?context=course&course=csp');
   assert.equal(hooks['toolbar-next'].attributes['aria-label'], 'Next document: Reference');
+  assert.equal(hooks.next.textContent, 'Reference ');
+  assert.ok(hooks.next.children[1].classList.contains('fa-chevron-right'));
+  assert.equal(hooks.next.attributes['aria-label'], 'Next document: Reference');
+  const treeButton = hooks.tree.querySelector('[data-reader-complete]');
+  assert.ok(links[0].parentRow.classList.contains('document-reader__active'));
+  assert.equal(links[0].parentRow.children[0], treeButton);
+  assert.equal(treeButton.attributes['aria-label'], `Reviewed: ${documents[0].title}`);
+  assert.equal(hooks.tree.querySelectorAll('[data-reader-complete]').length, 1);
+  assert.deepEqual(groups.slice(0, 2).map(group => group.open), [true, true],
+    'a saved-open week without the current document stays open');
+  assert.equal(hooks.tree.children[0].open, true);
+  const reviewButtons = [hooks.complete, treeButton];
+  for (const button of reviewButtons) {
+    assert.equal(button.hidden, false);
+    assert.equal(button.attributes['aria-pressed'], 'false');
+    assert.equal(button.children[0].className, 'fa-regular fa-circle');
+  }
 
-  hooks.complete.listeners.click();
+  treeButton.listeners.click();
   assert.equal(groups[0].querySelector('[data-week-count]').textContent, '2/2');
-  assert.equal(links[0].querySelector('[data-lesson-completed]').hidden, false);
+  for (const button of reviewButtons) {
+    assert.equal(button.attributes['aria-pressed'], 'true');
+    assert.equal(button.children[0].className, 'fas fa-check');
+  }
+  assert.equal(links[0].querySelector('[data-lesson-completed]').hidden, true,
+    'the current row shows completion on its circle, not a second check');
   assert.equal(JSON.parse(saved.get('csp-lesson-completion'))['/assignment/'], true);
   hooks.complete.listeners.click();
   assert.equal(groups[0].querySelector('[data-week-count]').textContent, '1/2');
+  assert.equal(treeButton.attributes['aria-pressed'], 'false');
   assert.equal(links[0].querySelector('[data-lesson-completed]').hidden, true);
 
   const originalError = console.error;
@@ -173,6 +206,7 @@ test('reader navigation displays lesson types and updates week completion withou
   hooks.context.listeners.change();
   assert.equal(hooks.heading.textContent, 'Topics');
   assert.equal(hooks.complete.hidden, true);
+  assert.equal(hooks.tree.querySelectorAll('[data-reader-complete]').length, 0);
   assert.equal(hooks.tree.querySelectorAll('[data-week-group]').length, 0);
   assert.ok(hooks.tree.querySelectorAll('[data-lesson-id]').every(link =>
     link.querySelector('[data-lesson-completed]').hidden));

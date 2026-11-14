@@ -105,6 +105,17 @@ class DocumentReaderTest < Minitest::Test
           assert_equal 1, button.css(".fa-chevron-#{direction == 'previous' ? 'left' : 'right'}[aria-hidden='true']").size
           assert_match(/document/, button["aria-label"])
         end
+        assert_equal 0, toolbar.css("[data-reader-complete]").size
+        assert_equal 0, document.css(".post-header [data-reader-complete], [data-reader-pager] [data-reader-complete]").size
+        sidebar = document.at_css(".document-reader__sidebar")
+        assert_equal %w[details p], sidebar.element_children.map(&:name)
+        current = sidebar.at_css(".document-reader__current")
+        circle = current.at_css("button[data-reader-complete]")
+        assert circle.key?("hidden")
+        assert_equal "Reviewed: #{original.data['title']}", circle["aria-label"]
+        assert_equal 1, circle.css(".fa-circle[aria-hidden='true']").size
+        assert_equal original.data["title"], current.at_css("span").text
+        assert_equal %w[a a], document.at_css("[data-reader-pager]").element_children.map(&:name)
         assert_equal 1, document.css("#code-form-blog").size
         assert_equal 3, document.css(".code-runner-container").size
         assert_equal %w[csp csse topics].sort, document.css("[data-reader-context] option").map { |option| option["value"] }.sort

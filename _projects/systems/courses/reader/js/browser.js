@@ -12,7 +12,7 @@ export async function startDocumentReader(root, tools) {
   const query = root.querySelector('[data-reader-query]');
   const category = root.querySelector('[data-reader-category]');
   const status = root.querySelector('[data-reader-status]');
-  const complete = root.querySelector('[data-reader-complete]');
+  const currentButton = root.querySelector('[data-reader-complete]');
   const pager = root.querySelector('[data-reader-pager]');
   const panel = matchMedia('(max-width: 768px)').matches ? 'mobile' : 'desktop';
   if (panel === 'mobile') sidebar.open = false;
@@ -44,15 +44,20 @@ export async function startDocumentReader(root, tools) {
 
   function updateCompletion() {
     const data = completionData();
-    complete.hidden = !context.course;
-    complete.disabled = data === null;
     const done = data?.[identity] === true;
-    complete.textContent = done ? 'Mark lesson incomplete' : 'Mark lesson complete';
-    complete.setAttribute('aria-pressed', String(done));
-    complete.classList.toggle('fill', done);
+    [currentButton, ...tree.querySelectorAll('[data-reader-complete]')].forEach(button => {
+      button.hidden = !context.course;
+      button.disabled = data === null;
+      button.setAttribute('aria-pressed', String(done));
+      button.title = done ? 'Reviewed (select to undo)' : 'Mark reviewed';
+      button.classList.toggle('fill', done);
+      button.querySelector('[data-reader-complete-icon]').className = done ? 'fas fa-check' : 'fa-regular fa-circle';
+    });
     tree.querySelectorAll('[data-lesson-id]').forEach(link => {
       const completed = data?.[link.dataset.lessonId] === true;
-      link.querySelector('[data-lesson-completed]').hidden = !completed;
+      // The current document shows its state on its review circle instead.
+      link.querySelector('[data-lesson-completed]').hidden = !completed
+        || (Boolean(context.course) && link.dataset.lessonId === identity);
       link.setAttribute('aria-label', `${link.title}${completed ? ' (completed)' : ''}`);
     });
     tree.querySelectorAll('[data-week-group]').forEach(group => {
@@ -89,14 +94,40 @@ export async function startDocumentReader(root, tools) {
     return link;
   }
 
+  function reviewButton(title) {
+    const button = node('button', undefined, 'document-reader__complete ocs__btn ocs__btn--icon small accent');
+    button.type = 'button';
+    button.dataset.readerComplete = '';
+    button.setAttribute('aria-label', `Reviewed: ${title}`);
+    const glyph = node('i', undefined, 'fa-regular fa-circle');
+    glyph.setAttribute('aria-hidden', 'true');
+    glyph.dataset.readerCompleteIcon = '';
+    button.append(glyph);
+    button.addEventListener('click', toggleCompletion);
+    return button;
+  }
+
   function appendLessons(parent, documents) {
     const list = node('ul', undefined, 'ocs__tree document-reader__lessons');
     documents.forEach(document => {
       const item = node('li', undefined, 'ocs__tree-item');
+      if (context.course && document.url === identity) {
+        item.classList.add('document-reader__active');
+        item.append(reviewButton(document.title));
+      }
       item.append(lessonLink(document));
       list.append(item);
     });
     parent.append(list);
+  }
+
+  // Desktop scrolls the current document's row near the top. navigation.restore()
+  // already opened its sprint and week and kept the student's other saved sections.
+  function scrollCurrentNearTop() {
+    const row = tree.querySelector('[data-reader-complete]');
+    if (!row?.getBoundingClientRect || sidebar.clientHeight === 0) return;
+    const offset = row.getBoundingClientRect().top - sidebar.getBoundingClientRect().top;
+    sidebar.scrollTop += offset - sidebar.clientHeight / 4;
   }
 
   function courseTree() {
@@ -154,6 +185,7 @@ export async function startDocumentReader(root, tools) {
     });
     navigation = createNavigationState(sidebar, context.course, panel, sections);
     navigation.restore();
+    if (panel === 'desktop') scrollCurrentNearTop();
     return weeks.flatMap(group => group.lessons);
   }
 
@@ -198,7 +230,10 @@ export async function startDocumentReader(root, tools) {
       button.hidden = !available;
       if (available) {
         const href = readerLink(document.url, base, context, context.course ? '' : writeState(topics));
-        link.textContent = document.title;
+        link.replaceChildren(...(hook === 'previous'
+          ? [icon('fa-chevron-left'), ` ${document.title}`]
+          : [`${document.title} `, icon('fa-chevron-right')]));
+        link.setAttribute('aria-label', `${label} document: ${document.title}`);
         link.href = href;
         button.href = href;
         button.setAttribute('aria-label', `${label} document: ${document.title}`);
@@ -260,7 +295,7 @@ export async function startDocumentReader(root, tools) {
     topics.categories = category.value ? [category.value] : [];
     updateUrl();
   });
-  complete.addEventListener('click', () => {
+  function toggleCompletion() {
     const data = completionData();
     if (!context.course || data === null) return;
     data[identity] = data[identity] !== true;
@@ -273,7 +308,8 @@ export async function startDocumentReader(root, tools) {
     }
     updateCompletion();
     window.dispatchEvent(new CustomEvent('completionChanged', { detail: { itemId: identity, completed: data[identity] } }));
-  });
+  }
+  currentButton.addEventListener('click', toggleCompletion);
   window.addEventListener('popstate', () => {
     context = readerContext(location.search, membership, root.dataset.defaultCourse);
     topics = readState(location.search);
