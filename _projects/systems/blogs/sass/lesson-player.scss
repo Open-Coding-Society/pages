@@ -18,12 +18,19 @@ body:has(.lesson-player) {
 
 .lesson-player {
   display: flex;
+  flex-direction: column;
   height: calc(100vh - 80px);
   width: 100vw;
   position: fixed;
   top: 80px;
   left: 0;
   z-index: 1000;
+}
+
+.lesson-player__panes {
+  display: flex;
+  flex: 1;
+  min-height: 0;
 }
 
 /* LEFT SIDEBAR */
@@ -70,7 +77,7 @@ body:has(.lesson-player) {
 .course-panel-actions {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 8px;
   margin-bottom: 12px;
 
@@ -211,14 +218,25 @@ body:has(.lesson-player) {
   background: color-mix(in srgb, var(--pref-accent-color) 10%, transparent);
 }
 
+.lesson-item[data-lesson-id] {
+  border-radius: 1rem;
+  gap: 8px;
+}
+
+.lesson-item[data-lesson-id] .lesson-title {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
 .lesson-item.active .lesson-title,
 .lesson-item.navigation-resume .lesson-title {
   color: $text;
 }
 
 .lesson-status-icon {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
+  font-size: 12px;
   flex-shrink: 0;
   transition: all 0.2s ease;
 }
@@ -285,6 +303,12 @@ body:has(.lesson-player) {
 
 .breadcrumbs .current {
   color: $text;
+}
+
+.breadcrumbs .course-breadcrumb-select {
+  width: auto;
+  min-width: 5rem;
+  flex-shrink: 0;
 }
 
 /* Keep each crumb whole and let the lesson title truncate; it is repeated as
@@ -940,8 +964,9 @@ body:has(.lesson-player) {
 }
 
 .modal-lesson-status {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
+  font-size: 12px;
   flex-shrink: 0;
   transition: all 0.2s ease;
 }
@@ -957,7 +982,9 @@ body:has(.lesson-player) {
 
 .modal-lesson-title {
   flex: 1;
+  min-width: 0;
   font-size: 14px;
+  overflow-wrap: anywhere;
 }
 @keyframes checkmarkAppear {
   0% {
@@ -987,6 +1014,10 @@ body:has(.lesson-player) {
 
   .lesson-sidebar {
     display: none;
+  }
+
+  .lesson-player__panes {
+    flex-direction: column;
   }
 
   .lesson-main {

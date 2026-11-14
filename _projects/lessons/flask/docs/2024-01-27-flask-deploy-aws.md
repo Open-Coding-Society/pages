@@ -104,23 +104,23 @@ Route 53 DNS Setup:
 
 3. Use the format below to write into your config file, make updates according to comments
 
-```python
+```nginx
 server {
-   listen 80;
+    listen 80;
     listen [::]:80;
-    server_name -----.stu.opencodingsociety.com ; # CHANGE SERVER NAME TO YOUR REGISTERED DOMAIN
+    server_name -----.stu.opencodingsociety.com; # CHANGE SERVER NAME TO YOUR REGISTERED DOMAIN
+
     location / {
         proxy_pass http://localhost:8---; # CHANGE PORT TO YOUR UNIQUE PORT
-        # Simple requests
-        if ($request_method ~* "(GET|POST|PUT|DELETE)") { # Customize Request methods based on your needs
-                add_header "Access-Control-Allow-Origin"  *;
-        }
-        # Preflighted requests
-        if ($request_method = OPTIONS ) {
-                add_header "Access-Control-Allow-Origin"  *;
-                add_header "Access-Control-Allow-Methods" "GET, POST, PUT, DELETE, OPTIONS, HEAD"; # Make sure the request methods above match here
-                add_header "Access-Control-Allow-Headers" "Authorization, Origin, X-Requested-With, Content-Type, Accept";
-                return 200;
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Authorization, Origin, X-Requested-With, Content-Type, Accept' always;
+
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain; charset=utf-8';
+            add_header 'Content-Length' 0;
+            return 204;
         }
     }
 }
@@ -144,7 +144,7 @@ If all runs smoothly, continue to [Certbot config](https://open-coding-society.g
 
 - Run command below and follow prompts
 
-```python
+```bash
 sudo certbot --nginx
 ```
 
@@ -280,13 +280,9 @@ In your AWS EC2 terminal;
 
 1. Navigate to your repo: `cd ~/my_unique_name`
 
-2. `docker-compose down`
+2. `git pull`
 
-> Test Server in browser using https://, it should be down (502 Bad Gateway in browser)
-
-1. `git pull`
-
-2. Rebuild your docker container: `docker-compose up -d --build`
+3. Rebuild your docker container: `docker-compose up -d --build`
 
 > Test Server in browser using https://, sll updates should be up and running on internet.
 
@@ -340,7 +336,7 @@ Click on a service to view its settings. A service can be reloaded, restarted, o
 
 If you are running Ubuntu 17.10 or later, a "Loading available updates failed" error message will appear. This is because Ubuntu changed the network management from network-manager to netplan.io, which has not been updated in Cockpit. A way to fix this is to change netplan's configuration file to manage one interface with network-manager.
 
-```python
+```bash
 sudo nano /etc/netplan/50-cloud-init.yaml
 ```
 

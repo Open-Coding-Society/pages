@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, follow">
+  <title>{{ page.title | escape }}</title>
+  <link rel="canonical" href="{{ page.reader_redirect_url | absolute_url }}">
+</head>
+<body>
+  <p>This document has one shared reader. <a id="reader-destination" href="{{ page.reader_redirect_url | relative_url }}?context={% if page.reader_redirect_course %}course&amp;course={{ page.reader_redirect_course | url_encode }}{% else %}topics{% endif %}">Continue to {{ page.title | escape }}</a>.</p>
+  <script>
+    (function () {
+      var link = document.getElementById('reader-destination');
+      var target = new URL(link.href);
+      var incoming = new URLSearchParams(location.search);
+      incoming.delete('context');
+      incoming.delete('course');
+      incoming.forEach(function (value, key) { target.searchParams.append(key, value); });
+      target.hash = location.hash;
+      link.href = target.href;
+      location.replace(target.href);
+    })();
+  </script>
+</body>
+</html>

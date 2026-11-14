@@ -7,7 +7,7 @@ const gridStyles = await readFile(
   'utf8'
 );
 const capstonePage = await readFile(
-  new URL('../navigation/capstone.md', import.meta.url),
+  new URL('../_projects/systems/capstone/_includes/capstone-browser.html', import.meta.url),
   'utf8'
 );
 
@@ -22,7 +22,6 @@ test('capstone card title links underline when the card is hovered or focused', 
 test('Toolchain Trail title is inside a repository-relative link', () => {
   assert.match(
     capstonePage,
-    /<h3><a href="\{\{ '\/capstone\/toolchain-trail\/' \| relative_url \}\}">\{\{ site\.data\.toolchain-trail-capstone\.Title \}\}<\/a><\/h3>/
+    /<h3><a href="\{\{ project\.url \| relative_url \}\}">\{\{ project\.title \| escape \}\}<\/a><\/h3>/
   );
-  assert.doesNotMatch(capstonePage, /<h3><a[^>]+><\/a>\{\{ site\.data\.toolchain-trail-capstone\.Title \}\}/);
 });

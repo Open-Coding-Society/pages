@@ -95,7 +95,7 @@ function cardHeader(title, extra) {
   return h('div', { class: 'ocs__card-header' }, title ? h('h3', { class: 'ocs__section-title' }, title) : null, extra);
 }
 
-// a.ocs__btn links in an ocs__links row, as in _posts/capstone/2026-09-11-pnec-capstone.md.
+// a.ocs__btn links in an ocs__links row, as in _posts/capstone/2026-2027/2026-09-11-pnec-capstone.md.
 function buttonRow(items, emphasizeFirst, ctx) {
   const buttons = [];
   for (const item of items) {
@@ -120,7 +120,7 @@ function linkCard(title, raw, ctx, message) {
 
 /* ---------- content blocks ---------- */
 
-// _posts/capstone/2026-09-11-pnec-capstone.md: badge, heading, ocs__lead, ocs__links. The badge is a
+// _posts/capstone/2026-2027/2026-09-11-pnec-capstone.md: badge, heading, ocs__lead, ocs__links. The badge is a
 // <strong> so presets keep its accent; its <div> stops ocs__stack stretching the pill full width.
 function hero(settings, ctx) {
   const badge = lineOf(settings, 'badge');
@@ -164,7 +164,7 @@ function image(settings, ctx) {
   return h('figure', null, h('img', attrs), caption ? h('figcaption', null, caption) : null);
 }
 
-// The ocs__links row of _posts/capstone/2026-09-11-pnec-capstone.md, first button accent fill.
+// The ocs__links row of _posts/capstone/2026-2027/2026-09-11-pnec-capstone.md, first button accent fill.
 function buttons(settings, ctx) {
   return buttonRow(listOf(settings, 'links', ctx, 'buttons'), ownValue(settings, 'emphasize_first') !== false, ctx);
 }

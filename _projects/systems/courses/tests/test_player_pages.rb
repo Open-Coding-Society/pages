@@ -38,7 +38,7 @@ lessons = [
   { "csx" => { "week" => 0 } },
   { "csx" => { "week" => 0 } },
   { "csx" => { "week" => "2" } },                        # the week as text, as some notebooks write it
-  { "csx" => { "week" => 3 }, "csy" => { "week" => 3 } } # in two courses, so in neither sidebar
+  { "csx" => { "week" => 3 }, "csy" => { "week" => 3 } } # shared lesson appears in both courses
 ]
 
 pages = generate({ "cs" => shared, "csx" => course, "infograph" => infographic }, lessons)
@@ -47,7 +47,7 @@ by_url = pages.to_h { |page| [page.url, page] }
 expected = %w[
   /csx/sprint-1/ /csx/week-0/
   /csx/sprint-2/ /csx/week-2/
-  /csx/sprint-3/ /csx/blogs/
+  /csx/sprint-3/ /csx/week-3/ /csx/blogs/
 ]
 assert(by_url.keys.sort == expected.sort,
        "Each sprint and the course's blogs get a page, and so does each week with lessons, the weeks " \

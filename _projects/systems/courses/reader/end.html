@@ -1,0 +1,16 @@
+      <nav class="ocs__pager" aria-label="Document order" data-reader-pager hidden>
+        <a class="ocs__pager-link" data-reader-previous></a>
+        <a class="ocs__pager-link next" data-reader-next></a>
+      </nav>
+    </div>
+  </div>
+</div>
+<script type="module">
+  import { startDocumentReader } from {{ '/assets/js/projects/courses/reader/browser.js' | relative_url | jsonify }};
+  import { readState, writeState, selectedDocuments } from {{ '/assets/js/projects/topics/model.js' | relative_url | jsonify }};
+  import { createNavigationState } from {{ '/assets/js/course-navigation-state.js' | relative_url | jsonify }};
+  import { rememberCourse } from {{ '/assets/js/course-entry.js' | relative_url | jsonify }};
+  startDocumentReader(document.querySelector('[data-document-reader]'), {
+    readState, writeState, selectedDocuments, createNavigationState, rememberCourse
+  });
+</script>

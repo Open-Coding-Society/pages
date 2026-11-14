@@ -8,6 +8,12 @@ permalink: /capstone/presence-system/
 sticky_rank: 1
 year: "2026-2027"
 rp_active: hub
+capstone_project:
+  course: CSH
+  school_year: "2026-2027"
+  title: "Classroom Presence System"
+  description: "A design-based research project asking whether classroom presence can be measured with zero teacher effort. Three low-effort inputs, RFID tap, QR scan, and face scan, are evaluated in parallel against a shared presence engine and the bell schedule to track instructional minutes and show who is missing in real time."
+  team: "Vibha Mandayam (RFID), Ruta Sirdeshmukh (QR), Kush Shah (Camera)"
 ---
 
 <!-- markdownlint-disable MD033 MD010 MD012 -->
