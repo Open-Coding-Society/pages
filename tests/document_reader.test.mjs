@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readerContext, readerLink, courseWeeks } from '../_projects/systems/courses/reader/js/model.js';
 import { startDocumentReader } from '../_projects/systems/courses/reader/js/browser.js';
+import { COURSE_ORDER, courseEntryUrl } from '../_projects/systems/courses/js/player/course-entry.js';
 
 const membership = { csp: { week: 0 }, csse: { week: 1 } };
 
@@ -45,6 +46,7 @@ test('course cadence uses each placement without duplicating document identity',
 async function startFakeReader(t, {
   dataset = {}, restore = () => {}, extraDocuments = [], sprintTitle = 'Start', currentTitle = '',
   sprints = [{ id: 'Sprint1', title: sprintTitle, start: 1, end: 2, weeks: { 1: 'Foundations', 2: 'Building' } }],
+  extraCourses = {},
 } = {}) {
   class Element {
     constructor(tag = 'div') {
@@ -120,14 +122,18 @@ async function startFakeReader(t, {
   ];
   const saved = new Map([['csp-lesson-completion', JSON.stringify({ '/reference/': true })]]);
   const listeners = {};
+  const redirects = [];
+  const remembered = [];
+  const location = new URL(`https://example.test${root.dataset.documentUrl}?context=course&course=csp`);
+  location.assign = url => redirects.push(url);
   const replacements = {
     document: { createElement: tag => new Element(tag) },
-    location: new URL(`https://example.test${root.dataset.documentUrl}?context=course&course=csp`),
+    location,
     history: { pushState() {}, replaceState() {} },
     matchMedia: () => ({ matches: false }),
     localStorage: { getItem: key => saved.get(key) || null, setItem: (key, value) => saved.set(key, value) },
     fetch: async () => ({ ok: true, json: async () => ({
-      documents, courses: { csp: { title: 'CSP', sprints } },
+      documents, courses: { csp: { title: 'CSP', sprints }, ...extraCourses },
     }) }),
     window: { addEventListener: (name, callback) => { listeners[name] = callback; }, dispatchEvent: event => listeners[event.type]?.(event) },
     CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail; } },
@@ -139,13 +145,13 @@ async function startFakeReader(t, {
   }
   await startDocumentReader(root, {
     readState: () => ({ query: '', categories: [] }), writeState: () => '',
-    selectedDocuments: shown => shown, rememberCourse: () => {},
+    selectedDocuments: shown => shown, COURSE_ORDER, courseEntryUrl, rememberCourse: course => remembered.push(course),
     // The real helper restores saved sections and opens the current path; the reader must not close any.
     createNavigationState: (_root, _course, _panel, sections) => ({
       restore() { sections.forEach(section => section.setOpen(true)); restore(hooks); }, destroy() {}, restorePosition() {},
     }),
   });
-  return { hooks, documents, saved, listeners };
+  return { hooks, documents, saved, listeners, redirects, remembered };
 
 }
 
@@ -347,6 +353,64 @@ test('minimal current title prefixes the course sprint and week', async t => {
     dataset: { documentUrl: '/assignment/' },
   });
   assert.equal(hooks['current-title'].textContent, 'S1-W1: Assignment with a full descriptive title');
+});
+
+test('the reader offers every configured course and opens home for a course without this document', async t => {
+  const { hooks, redirects, remembered, saved } = await startFakeReader(t, {
+    extraCourses: {
+      csse: { title: 'CSSE', sprints: [] },
+      csa: { title: 'CSA', sprints: [] },
+      csh: { title: 'CSH', sprints: [] },
+    },
+  });
+  assert.deepEqual(hooks.context.children.map(option => option.value), ['csse', 'csp', 'csa', 'csh', 'topics']);
+  const completion = saved.get('csp-lesson-completion');
+  hooks.context.value = 'csa';
+  hooks.context.listeners.change();
+  assert.deepEqual(redirects, ['/preview/navigation/courses/csa/']);
+  assert.equal(remembered.at(-1), 'csa');
+  assert.equal(hooks['current-title'].textContent, 'S1-W1: Assignment with a full descriptive title');
+  assert.equal(saved.get('csp-lesson-completion'), completion);
+  assert.equal(saved.has('csa-lesson-completion'), false);
+});
+
+test('a week transition can switch to another course home rather than reinterpret its week', async t => {
+  const { hooks, redirects } = await startFakeReader(t, {
+    currentTitle: 'Week 2: Building',
+    dataset: {
+      documentUrl: '/csp/week-2/', membership: JSON.stringify({ csp: { week: 2 } }),
+      overview: 'week', overviewSprint: '1', overviewWeek: '2',
+    },
+    extraCourses: { csa: { title: 'CSA', sprints: [] } },
+  });
+  hooks.context.value = 'csa';
+  hooks.context.listeners.change();
+  assert.deepEqual(redirects, ['/preview/navigation/courses/csa/']);
+  assert.equal(hooks['current-title'].textContent, 'S1-W2: Building');
+});
+
+test('a shared document switches course navigation in place and uses that course placement', async t => {
+  const { hooks, redirects, remembered } = await startFakeReader(t, {
+    dataset: {
+      documentUrl: '/shared/',
+      membership: JSON.stringify({ csp: { week: 1 }, csa: { week: 2 } }),
+    },
+    extraDocuments: [{
+      title: 'Shared lesson', url: '/shared/', assignment: false, categories: [],
+      courses: { csp: { week: 1 }, csa: { week: 2 } },
+    }],
+    extraCourses: {
+      csa: { title: 'CSA', sprints: [{ id: 'Sprint2', title: 'Java', start: 2, end: 2, weeks: { 2: 'Java objects' } }] },
+    },
+  });
+  assert.equal(hooks['current-title'].textContent, 'S1-W1: Shared lesson');
+  hooks.context.value = 'csa';
+  hooks.context.listeners.change();
+  assert.deepEqual(redirects, []);
+  assert.equal(remembered.at(-1), 'csa');
+  assert.equal(hooks.heading.textContent, 'CSA');
+  assert.equal(hooks['current-title'].textContent, 'S2-W2: Shared lesson');
+  assert.equal(hooks.tree.querySelector('[data-lesson-id]').href, '/preview/shared/?context=course&course=csa');
 });
 
 test('course home continues the document the student last read', async t => {

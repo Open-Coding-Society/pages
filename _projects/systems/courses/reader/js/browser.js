@@ -2,7 +2,7 @@ import { readerContext, readerLink, courseWeeks } from './model.js';
 
 export async function startDocumentReader(root, tools) {
   if (!root) return;
-  const { readState, writeState, selectedDocuments, createNavigationState, rememberCourse } = tools;
+  const { readState, writeState, selectedDocuments, createNavigationState, COURSE_ORDER, courseEntryUrl, rememberCourse } = tools;
   const membership = JSON.parse(root.dataset.membership);
   const base = root.dataset.baseurl;
   const identity = root.dataset.documentUrl;
@@ -374,6 +374,14 @@ export async function startDocumentReader(root, tools) {
     if (!response.ok) throw new Error(`Reader index HTTP ${response.status}`);
     payload = await response.json();
     if (!Array.isArray(payload.documents) || !payload.courses) throw new Error('Invalid reader index');
+    const courses = COURSE_ORDER.filter(course => Object.hasOwn(payload.courses, course));
+    const topicsOption = node('option', 'Topics');
+    topicsOption.value = 'topics';
+    selector.replaceChildren(...courses.map(course => {
+      const option = node('option', course.toUpperCase());
+      option.value = course;
+      return option;
+    }), topicsOption);
     const categories = [...new Set(payload.documents.flatMap(document => document.categories))].sort();
     categories.forEach(value => {
       const option = node('option', value);
@@ -389,6 +397,12 @@ export async function startDocumentReader(root, tools) {
     return;
   }
   selector.addEventListener('change', () => {
+    if (selector.value !== 'topics' && !Object.hasOwn(membership, selector.value)) {
+      navigation?.destroy();
+      rememberCourse(selector.value);
+      location.assign(courseEntryUrl(base, selector.value));
+      return;
+    }
     context = { course: selector.value === 'topics' ? null : selector.value, issue: '' };
     updateUrl();
   });

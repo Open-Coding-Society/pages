@@ -75,8 +75,12 @@ fields remain unchanged.
 
 The original URL accepts `?context=course&course=csp` or `?context=topics`.
 Plain links retain the old course-priority default (CSP, CSA, CSSE, CSH); references
-without course placement default to Topics. Only courses actually declared in
-the document are offered. The sidebar draws existing sprint/week cadence from
+without course placement default to Topics. The toolbar offers all configured
+OCS courses in the shared `COURSE_ORDER`, plus Topics. Choosing a course declared
+in the document changes its navigation in place; choosing another course opens
+that course's home without assigning the current document to it. Course
+availability comes from the reader index, not the current page's placements.
+The sidebar draws existing sprint/week cadence from
 course YAML, or category-filtered titles/descriptions using Topics' shared filter
 rules. Full-text search remains in `/topics/`. Context changes leave the article,
 runner editors, unsaved form fields and submission listeners mounted.
