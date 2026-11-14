@@ -1,0 +1,9 @@
+{
+  "files": [
+    { "source": "pages/capstone.md", "destination": "navigation/capstone.md" },
+    { "source": "_includes/capstone-browser.html", "destination": "_includes/projects/capstone/capstone-browser.html" },
+    { "source": "plugins/capstone.rb", "destination": "_plugins/capstone.rb" },
+    { "source": "js", "destination": "assets/js/capstone-directory" },
+    { "source": "sass/main.scss", "destination": "_sass/projects/capstone/main.scss" }
+  ]
+}

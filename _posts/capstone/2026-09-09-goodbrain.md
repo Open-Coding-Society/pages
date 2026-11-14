@@ -5,6 +5,13 @@ layout: post
 title: My Good Brain
 permalink: /capstone/goodbrain/
 microblog: true
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "My Good Brain"
+  image: "/images/capstone/my_good_brain.png"
+  description: "An interactive hub bridging psychology, neuroscience, and art to support youth mental and emotional wellness"
+  team: "Rashi Gaurav, Aashni Katari, Kelervia Fang"
 ---
 
 [Our My Good Brain Website Prototype](https://mgb.opencodingsociety.com/)

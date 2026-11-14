@@ -6,6 +6,16 @@ title: Unified Social Club
 description: "Club games for Unified Social Club, a free social club for adults with special needs in Poway: Club Bingo, Club Trivia Live, and Club Jeopardy, with big print and hands-free Nod to select."
 permalink: /capstone/unified-social-club/
 year: "2026-2027"
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "Unified Social Club"
+  image: "/images/capstone/unified-social-club.png"
+  description: "Club games for Poway's free social club for adults with special needs: Club Bingo, Club Trivia Live (like Kahoot), and Club Jeopardy, played together at club night or at home, with big print and hands-free Nod to select."
+  team: "Triple T (Chetan Tiduwar, Aaditya Prem, Kashyap Tubati)"
+  links:
+    frontend: "https://github.com/Unified-Social-Club-CSP/usc-pages"
+    backend: "https://github.com/Unified-Social-Club-CSP/usc-flask"
 ---
 
 > [Unified Social Club](https://www.unifiedsocialclub.com/) gives adults with special needs in Poway a free, safe place to make friends: board and card games, arts and crafts, karaoke, and sports at the Mickey Cafagna Community Center (13094 Civic Center Dr, Poway). Games are the heart of every club night, so Team Triple T is building three club games members can play together on the big screen or on their own phones.

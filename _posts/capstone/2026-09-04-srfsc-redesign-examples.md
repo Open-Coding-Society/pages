@@ -7,6 +7,12 @@ description: Visual mockup examples showing how the Scripps Ranch Fire Safe Coun
 permalink: /capstone/srfsc/
 author: Krish Kelageri, Jasan Boprai, Shourya Patel
 year: "2026-2027"
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "SRFSC Website Redesign Examples"
+  description: "Visual mockup examples showing how the Scripps Ranch Fire Safe Council website could be redesigned for clarity, urgency, and action."
+  team: "Krish Kelageri, Jasan Boprai, Shourya Patel"
 ---
 
 <div class="comms-infograph">

@@ -9,6 +9,16 @@ description: >
   donation pathways, community history, and library-themed games.
 categories: [Capstone]
 permalink: /capstone/poway-library-2026-27/
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "Friends of the Poway Library 2026–27"
+  image: "/images/capstone/poway_library.png"
+  description: "A CSP capstone continuing the previous Friends of the Poway Library prototype with a searchable bookstore catalog, events and newsletters, volunteer and donation pathways, community history, profiles, and library-themed games."
+  team: "Arjun Ganesh — Scrum Master; Nathan Trieu — Developer 1; Raadin Ansari — Developer 2"
+  links:
+    frontend: "https://github.com/Boolean-Boyz/bb-pages"
+    backend: "https://github.com/Boolean-Boyz/bb-flask"
 ---
 
 > **Student capstone · In development.** This project continues the 2025–26 Friends of the Poway Library prototype. It is a student-built concept and is not the official Friends of the Poway Library or San Diego County Library website.

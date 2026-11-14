@@ -5,6 +5,13 @@ title: OCS Intelligence LLM
 description:
 permalink: "/capstone/ocs-intelligence/"
 year: 2026-2027
+capstone_project:
+  course: CSH
+  school_year: "2026-2027"
+  title: "OCS Intelligence LLM"
+  image: "/images/capstone/ocs-intelligence.png"
+  description: "A generously donated 8× GTX 1070 rack becomes a shared open-weight LLM for OCS: live access from student harnesses, every student in mind, electricity as the only ongoing cost."
+  team: "Nikhil Maturi, Adi Katre, Mihir Bapat, Yash Parikh, Anvay Vahia, Yash Patil"
 ---
 <!-- markdownlint-disable -->
 {% assign data = site.data.ocs_intelligence_infograph %}

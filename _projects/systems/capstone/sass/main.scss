@@ -1,0 +1,31 @@
+.capstone-browser {
+  &__header { margin-bottom: 1rem; }
+  &__courses {
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  &__year-label, &__search-label {
+    font-weight: 600;
+  }
+  &__search {
+    box-sizing: border-box;
+    margin-top: 0.35rem;
+    width: 100%;
+  }
+  &__status {
+    min-height: 1.5em;
+    margin: 0.35rem 0 0.75rem;
+  }
+  [data-capstone-card][hidden] { display: none; }
+  &__image-link { display: block; }
+  &__placeholder {
+    display: grid;
+    min-height: 10rem;
+    place-items: center;
+    border: 1px solid rgba(128, 128, 128, 0.4);
+    border-radius: 0.75rem;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+  &__links summary { cursor: pointer; }
+}

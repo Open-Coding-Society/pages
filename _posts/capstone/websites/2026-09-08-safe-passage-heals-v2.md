@@ -8,6 +8,13 @@ description: >
   management tools, community events, and an interactive recovery simulation.
 categories: [Capstone]
 permalink: /capstone/safe-passage-heals-v2/
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "Safe Passage Heals - Media Management Tools and Interactive Recovery Simulation V2.0"
+  image: "/images/capstone/sph.png"
+  description: "An updated version of the Safe Passage Heals project focused on media management tools and an interactive recovery simulation that builds on the original project."
+  team: "Yiming Yin, Noor Saif Bijapur, Luke Sanders"
 ---
 
 <link rel="stylesheet" href="{{ '/assets/css/safe-passage-board.css' | relative_url }}">

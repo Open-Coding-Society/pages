@@ -6,6 +6,13 @@ title: Poway Neighborhood Emergency Corps 2026–2027
 description: CSP capstone continuing the PNEC project with proposed household preparedness, volunteer coordination, and community information tools.
 permalink: /capstone/powaynec-2026-2027/
 year: "2026-2027"
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "Poway Neighborhood Emergency Corps 2026–2027"
+  image: "/images/capstone/powaynec-logo-white.png"
+  description: "Continuing the PNEC project with proposed household preparedness, volunteer coordination, and community information tools."
+  team: "Samanvi, Joan, Ainsley"
 ---
  {% assign pnec_data = site.data.pnec_capstone %}
 

@@ -6,6 +6,13 @@ title: UESL Foundation — CSP Capstone Project
 description: How our team built an AI chatbot, accessible game engine, and social platform to extend UESL's mission for individuals with intellectual and developmental disabilities across San Diego.
 permalink: /capstone/uesl/
 sticky_rank: 8
+capstone_project:
+  course: CSP
+  school_year: "2025-2026"
+  title: "UESL Foundation"
+  image: "/images/capstone/uesl_foundation.svg"
+  description: "Built an AI chatbot, accessible game engine with 8 IDD-friendly modes, and a social platform to extend UESL's reach for individuals with intellectual and developmental disabilities across San Diego."
+  team: "Sathwik Kintada, Rudra B Joshi, Darshan"
 ---
 
 <div style="background: linear-gradient(135deg, #0f0a1e 0%, #1a1033 100%); border-radius: 16px; padding: 2.5rem; margin-bottom: 2rem; border: 1px solid rgba(124,58,237,0.3);">

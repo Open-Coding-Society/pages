@@ -4,6 +4,13 @@ toc: false
 layout: post
 title: Shoreline Community Services, Volunteer Page
 permalink: /capstone/shoreline-volunteer/
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "Shoreline Community Services"
+  image: "/images/capstone/shoreline.jpeg"
+  description: "Extending Shoreline Community Services' outreach through smarter volunteer coordination and easier giving, this capstone project bridges technology and grassroots community care in San Diego."
+  team: "Vanshika Keswani, Nitya Kasse, Hsu-Cheng Lin"
 ---
 {% assign shoreline_data = site.data.shoreline_volunteer %}
 <!-- markdownlint-disable MD033 -->

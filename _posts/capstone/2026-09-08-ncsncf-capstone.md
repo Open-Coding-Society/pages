@@ -4,6 +4,13 @@ toc: false
 layout: post
 title: North County Special Needs Community Foundation
 permalink: /capstone/ncsncf/
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "North County Special Needs Community Foundation"
+  image: "/images/capstone/ncsncf.jpg"
+  description: "This capstone project involves refurbishing the North County Special Needs Community Foundation website to be more streamlined, organized, and professional. It will also overhaul and add new features such as an events backend and will update the Event Calendar to include categories."
+  team: "Raymond Liu, Pranay Kamath, Tristan, and Yue (Barbara)"
 ---
 
 ## Our Story: North County Special Needs Community Foundation

@@ -11,6 +11,16 @@ categories: [Capstone]
 permalink: /capstone/oncologysesh/
 
 
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "Oncology Sesh"
+  image: "/images/capstone/oncologysesh-logo.png"
+  description: "CSP"
+  team: "Anika, Salma, Aashi, Jailene"
+  links:
+    frontend: "https://github.com/CSP-Oncology/OCS-Kit-Pages"
+    backend: "https://github.com/CSP-Oncology/OCS-Kit-Flask"
 ---
 
 

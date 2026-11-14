@@ -3,6 +3,13 @@ microblog: true
 toc: false
 title: "Sentri: The AI-Driven Recovery Ecosystem"
 permalink: /capstone/sentri/
+capstone_project:
+  course: CSP
+  school_year: "2025-2026"
+  title: "Sentri"
+  image: "/images/capstone/sentri.png"
+  description: "A comprehensive recovery ecosystem for the Poway Recovery Center that utilizes an intelligent guide to match users with specialized support programs, provides personalized meeting schedules, and tracks long-term sobriety milestones through a secure, high-fidelity user profile/dashboard"
+  team: "Lilian Wu, Anika Marathe, Jaynee Chauhan"
 ---
 
 <div id="sentri-showcase" class="sentri-root">

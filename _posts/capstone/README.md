@@ -13,7 +13,9 @@ permalink: /capstone-home-documentation/
 
 ## Capstone Infographics Home Page Documentation
 
-This document explains how to use the capstone home page located at `_posts/capstone/2026-02-09-capstone_home.md`.
+This document explains the Capstone directory. Its implementation is maintained
+under `_projects/systems/capstone/`; the registered project publishes generated
+copies into the site.
 
 <video width="640" height="360" controls>
 <source src="/assets/capstoneguide.mp4" type="video/mp4">
@@ -33,7 +35,8 @@ The page also includes interactive tools for visitors:
 - Search by project title, description, or team member names
 - Open project-related links from the folder button on each card
 
-This page is a static Jekyll post enhanced with client-side JavaScript. Card content and external link metadata are defined directly in the post file, not loaded dynamically from the backend at render time.
+The directory is rendered from project front matter at build time; it does not
+load catalog data from the backend.
 
 ### How to use the page
 
@@ -53,49 +56,38 @@ This page is a static Jekyll post enhanced with client-side JavaScript. Card con
  - Search matches the project title, description, and team member names.
 
 4. **Open project links**
- - Click the folder icon button in the top-right corner of a project card.
- - A popup appears with available links:
-   - `Project Page`
-   - `Frontend Repo`
-   - `Backend Repo`
- - The popup is populated from the `linkMap` object in the JavaScript section.
- - Click outside the popup or press `Escape` to close it.
-
-5. **Keep titles exact**
- - The popup matches project titles exactly to entries in `linkMap`.
- - If a title changes, update the corresponding string key in `linkMap`.
+ - Expand **Project links** on a card to open its project page or declared repositories.
 
 ### Front-end page structure
-The capstone home page includes:
-- A filter toolbar with `All`, `CSA`, and `CSP` buttons.
-- A search input field that filters card visibility instantly.
-- A `div` with `id="capstone-grid"` containing all project cards.
-- Each project card is a block of HTML with one project title, description, and team list.
-- The JavaScript `linkMap` object drives the popup external links.
+
+The Capstone landing page is a thin Jekyll page that includes the browser.
+The system's Jekyll generator discovers documents with a `capstone_project`
+frontmatter mapping and renders cards from that catalog. Course/year filtering
+and search are implemented in the system's JavaScript.
 
 ### Adding or updating a project card
-To add a new capstone project:
 
-1. Add a card inside the `<div id="capstone-grid">` container.
-2. Match the existing card structure:
- - Use a wrapper such as `class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA"` or `CSP`.
- - Wrap the image and title with `{% raw %}<a href="{% post_url yyyy-mm-dd-slug %}">{% endraw %}`.
- - Keep the title, description, and team members visible inside the card.
+The Capstone directory is generated from project post front matter. Do not edit
+the landing-page grid or add a title-keyed link map. Add a `capstone_project`
+mapping to the project's post instead:
 
-3. Add or update a `linkMap` entry if the project should show external links.
- - Use the exact project title as the `linkMap` key.
- - Include any of `pageUrl`, `frontendUrl`, or `backendUrl`.
-
-
-Example `linkMap` entry:
-
-```js
-"HawkHub": {
- pageUrl: "https://pages.opencodingsociety.com/capstone/hawkhub/",
- frontendUrl: "https://github.com/SoniDhenuva/HawkHub",
- backendUrl: "https://github.com/SoniDhenuva/hawkhub_spring"
-}
+```yaml
+capstone_project:
+  course: CSP
+  school_year: 2026-2027
+  image: /images/capstone/example.png
+  team: [Student One, Student Two]
+  links:
+    frontend: https://github.com/example/frontend
+    backend: https://github.com/example/backend
 ```
+
+Use the post's existing `title` and `description`, or override them inside
+`capstone_project` when the directory card needs a shorter label or summary.
+The course is required (`CSA`, `CSP`, `CSH`, or `CSSE`); all other fields are
+optional. Supporting posts stay out of the directory unless they opt in.
+Implementation and validation are documented in the
+[Capstone system README](../../_projects/systems/capstone/README.md).
 
 ### Backend overview
 The Spring backend for capstone project data lives in `spring/src/main/java/com/open/spring/mvc/capstone`.

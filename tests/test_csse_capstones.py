@@ -2,6 +2,7 @@
 
 Run after make: venv/bin/python -m unittest discover -s tests -p test_csse_capstones.py
 """
+import os
 import unittest
 from pathlib import Path
 
@@ -9,12 +10,13 @@ import yaml
 from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parents[1]
+SITE = Path(os.environ.get('OCS_SITE_DIR', ROOT / '_site')).resolve()
 
 
 class CsseCapstoneTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.page = BeautifulSoup((ROOT / '_site/capstone/index.html').read_text(), 'html.parser')
+        cls.page = BeautifulSoup((SITE / 'capstone/index.html').read_text(), 'html.parser')
         cls.cards = cls.page.select('#capstone-grid > .CSSE')
         cls.games = []
         for path in (ROOT / '_posts').rglob('*.md'):
@@ -36,7 +38,7 @@ class CsseCapstoneTests(unittest.TestCase):
         for card in self.cards:
             destination = card['data-page-url']
             self.assertEqual(card.select_one('h3 a')['href'], destination)
-            target = ROOT / '_site' / destination.lstrip('/')
+            target = SITE / destination.lstrip('/')
             self.assertTrue(target.is_file() or (target / 'index.html').is_file() or target.with_suffix('.html').is_file(), destination)
 
     def test_cards_preserve_metadata_without_inventing_years(self):
@@ -52,11 +54,11 @@ class CsseCapstoneTests(unittest.TestCase):
             self.assertFalse(card.select('[style]'))
 
     def test_course_control_and_legacy_link(self):
-        self.assertEqual(self.page.select_one('#show-csse').get_text(), 'CSSE')
+        self.assertEqual(self.page.select_one('button[data-course="CSSE"]').get_text(), 'CSSE')
         self.assertIsNone(self.page.select_one('#year-select option[value="unspecified"]'))
         grid = self.page.select_one('#capstone-grid')
         self.assertEqual(grid.select('.CSSE'), grid.find_all('div', recursive=False)[-len(self.cards):])
-        old = BeautifulSoup((ROOT / '_site/cs-pathway/games/index.html').read_text(), 'html.parser')
+        old = BeautifulSoup((SITE / 'cs-pathway/games/index.html').read_text(), 'html.parser')
         self.assertIsNotNone(old.select_one('a[href="/capstone/?course=CSSE"]'))
         self.assertIn('window.location.replace("/capstone/?course=CSSE")', str(old))
 

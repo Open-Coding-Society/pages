@@ -4,6 +4,13 @@ toc: false
 layout: post
 title: "Poway Recovery Center"
 permalink: /capstone/poway-recovery-center/
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "Poway Recovery Center"
+  image: "/images/capstone/poway-recovery-center-logo.png"
+  description: "Supporting Poway Recovery Center's mission by helping visitors find its recovery community, meetings, resources, and key contacts."
+  team: "Nitya Hamsini Kasse, Vanshika Keswani, Hsu-Cheng Lin, Yiming Yin"
 ---
 
 <div style="text-align: center; margin: 1.5rem 0 2rem;">

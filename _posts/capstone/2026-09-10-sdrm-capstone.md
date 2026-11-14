@@ -4,6 +4,13 @@ toc: false
 layout: post
 title: San Diego Rescue Mission — Website Improvement
 permalink: /capstone/sdrm/
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "San Diego Rescue Mission"
+  image: "/images/capstone/sdrm.png"
+  description: "This capstone project modernizes the San Diego Rescue Mission website with improved navigation, a filterable Get Help Now page, clearer donation impact information, volunteer availability filters, and site-wide search to help residents, donors, and volunteers find what they need."
+  team: "Aarav, Ryden"
 ---
 
 <!-- Sprint Board: live from the team's GitHub project -->

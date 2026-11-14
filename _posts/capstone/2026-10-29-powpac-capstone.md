@@ -8,6 +8,13 @@ description: >
   production galleries, and an improved navbar and search experience.
 categories: [Capstone]
 permalink: /capstone/powpac/
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "PowPAC - Poway Performing Arts Company"
+  image: "/images/capstone/powpac-logo.png"
+  description: "Helping PowPAC improve their website with cleaner organization, production galleries, search, and UI, so audiences can find shows, tickets, auditions, and ways to support Poway's community theatre."
+  team: "Samarth H, Rigved G, Rohan S"
 ---
 
 PowPAC, the Poway Performing Arts Company, is Poway's only community theatre. Established in 1981 and celebrating 45 years, this volunteer-run 501(c)(3) nonprofit produces diverse and balanced works at its home in the Lively Center on Poway Road. Its season includes plays, musicals, and special events, with auditions, ticket information, and visit details published on the site, all supported by members, donors, and volunteers who handle everything from the box office and hospitality to sets, costumes, lighting, and stage management.

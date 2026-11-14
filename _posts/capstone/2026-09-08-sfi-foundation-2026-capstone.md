@@ -10,6 +10,16 @@ description: >
   understand, and track.
 categories: [Capstone]
 permalink: /capstone/sfi-foundation/
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "SFI Foundation 2026–27"
+  image: "/images/capstone/sfi-foundation-2026-27.png"
+  description: "A CSP capstone continuing the SFI Foundation modernization prototype with searchable safety standards, ML-assisted spec matching, browser-based equipment detection, personal gear tracking, and staff management tools."
+  team: "Ruhaan Bansal, Arya Taghavi Zargar, Deyar Raissadat, Ishan Jha, Ishan Khandelwal, Vayun Shekhar"
+  links:
+    frontend: "https://github.com/ruhaanb622/SFI-Frontend"
+    backend: "https://github.com/ruhaanb622/SFI-Backend"
 ---
 
 > **Student capstone · In development.** This project explores a clearer way to discover and organize motorsports safety information. It is not an official SFI Foundation product and does not replace official SFI standards, labels, or PDF documents.

@@ -7,6 +7,15 @@ description: An accessible game-building prototype for UESL, with a visual proje
 permalink: /capstone/uesl-game-maker/
 sticky_rank: 1
 year: "2026-2027"
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "UESL Accessible Game Maker 2.0"
+  image: "/images/capstone/uesl_foundation.svg"
+  description: "An accessible game creation platform guiding participants through templates, live themes, and IDD-focused comfort profiles before keyboard-friendly playtesting. Versioned state validates choices, restores browser drafts, and exports engine-ready configurations for UESL’s advanced editor and GameEnginev1.2."
+  team: "Ishan, Rohan, Adhvay"
+  links:
+    frontend: "https://github.com/RazorCrest00/uesl-accessible-game-maker"
 ---
 
 > We are Adhvay, Rohan, and Ishan. We are building an accessible space where UESL participants can create and play their own games, learn through experimentation, and eventually share those experiences with others.

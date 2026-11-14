@@ -1,0 +1,60 @@
+<section class="capstone-browser" data-capstone-browser>
+  <header class="capstone-browser__header">
+    <h2>Student Capstone Projects</h2>
+    <p>Explore student-led projects, their teams, and the work they are building.</p>
+  </header>
+
+  <div class="ocs__links capstone-browser__courses" role="group" aria-label="Filter projects by course">
+    {% assign capstone_courses = "CSA,CSP,CSH,CSSE" | split: "," %}
+    <button class="ocs__btn capstone-browser__course is-active" type="button" data-course="all" aria-pressed="true">All</button>
+    {% for course in capstone_courses %}
+    <button class="ocs__btn capstone-browser__course" type="button" data-course="{{ course }}" aria-pressed="false">{{ course }}</button>
+    {% endfor %}
+    <label class="capstone-browser__year-label" for="capstone-year">School year</label>
+    <select class="ocs__input" id="capstone-year" data-capstone-year>
+      {% for year in site.data.capstone_years %}
+      {% if forloop.first %}<option value="{{ year }}" selected>{{ year | replace: "-", "/" }}</option>{% endif %}
+      {% endfor %}
+      <option value="">All years</option>
+      {% for year in site.data.capstone_years offset:1 %}
+      <option value="{{ year }}">{{ year | replace: "-", "/" }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <label class="capstone-browser__search-label" for="capstone-search">Search projects, descriptions, or team members</label>
+  <input class="ocs__input capstone-browser__search" id="capstone-search" type="search" data-capstone-search
+    placeholder="Search projects, descriptions, or team members" autocomplete="off">
+  <p class="capstone-browser__status" role="status" aria-live="polite" data-capstone-status></p>
+
+  <div id="capstone-grid" class="ocs__grid ocs__grid--card cols-3">
+    {% for project in site.data.capstone_catalog %}
+    {% assign project_course = project.course | default: "Other" %}
+    <article class="ocs__grid-cell capstone-browser__card {{ project_course }}" data-capstone-card
+      data-course="{{ project_course | escape }}" data-year="{{ project.school_year | escape }}">
+      <a class="capstone-browser__image-link" href="{{ project.url | relative_url }}">
+        {% if project.image %}
+        {% assign image_prefix = project.image | slice: 0, 4 %}
+        <img class="ocs__image-frame ocs__image-frame--thumbnail" src="{% if image_prefix == 'http' %}{{ project.image | escape }}{% else %}{{ project.image | relative_url }}{% endif %}" alt="{{ project.title | escape }}" loading="lazy">
+        {% else %}
+        <span class="capstone-browser__placeholder" aria-hidden="true">{{ project.title | slice: 0, 3 | upcase | escape }}</span>
+        {% endif %}
+      </a>
+      <h3><a href="{{ project.url | relative_url }}">{{ project.title | escape }}</a></h3>
+      {% if project.description %}<p>{{ project.description | escape }}</p>{% endif %}
+      {% if project.team.size > 0 %}<p><strong>Team:</strong> {{ project.team | join: ", " | escape }}</p>{% endif %}
+      <details class="capstone-browser__links">
+        <summary>Project links</summary>
+        <ul>
+          <li><a href="{{ project.url | relative_url }}">Project page</a></li>
+          {% for link in project.links %}
+          <li><a href="{{ link.url | escape }}" target="_blank" rel="noopener noreferrer">{{ link.label | escape }}</a></li>
+          {% endfor %}
+        </ul>
+      </details>
+    </article>
+    {% endfor %}
+    {% include capstone-games.html %}
+  </div>
+</section>
+<script type="module" src="{{ '/assets/js/capstone-directory/browser.js' | relative_url }}"></script>

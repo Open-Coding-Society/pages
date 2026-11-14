@@ -8,6 +8,18 @@ permalink: /capstone/jarvis/
 sticky_rank: 1
 year: "2026-2027"
 rp_active: overview
+capstone_project:
+  course: CSH
+  school_year: "2026-2027"
+  title: "Jarvis3000"
+  image: "/images/capstone/jarvis.jpg"
+  team:
+    - Arnav Mittal
+    - Shriya Paladagu
+    - Soni Dhenuva
+    - Xavier Thompson
+  links:
+    repository: "https://github.com/Arnav210/Jarvis3000"
 ---
 
 {% assign data = site.data.jarvis_infograph %}
