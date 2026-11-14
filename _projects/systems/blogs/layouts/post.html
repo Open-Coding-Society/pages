@@ -39,7 +39,9 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
 
 {% if page.topics_context %}{% assign is_course_lesson = false %}{% endif %}
 {% if page.document_reader and page.player_page == nil %}{% assign is_course_lesson = false %}{% endif %}
-{% if is_course_lesson %}
+{% if page.player_page and page.document_reader %}
+{% include projects/courses/reader/overview.html %}
+{% elsif is_course_lesson %}
 {% include course-document-player.html %}
 {% else %}
 {% if page.document_reader %}{% include projects/courses/reader/start.html %}{% endif %}

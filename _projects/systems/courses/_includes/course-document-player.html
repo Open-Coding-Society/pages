@@ -1,30 +1,10 @@
 {% comment %}
-Course overview player and legacy lesson fallback. Canonical lesson documents
-use the shared reader shell instead; courses are not restricted to CSP.
+Legacy course player: used only when the document reader is not installed
+(standalone Courses) or for lessons the reader does not index. With the reader,
+course home, sprint, week and Blogs pages use reader/overview.html instead.
 {% endcomment %}
 
-{% assign posts = null | compact %}
-{% assign posts = posts | concat: site.posts | concat: site.pages %}
-
-{%- comment -%}
-  This course's lessons: the posts and pages whose front matter puts them in
-  this course, including shared documents. Found once here for player pages.
-{%- endcomment -%}
-{%- assign coursePosts = "" | split: "" -%}
-{%- for post in posts -%}
-  {%- if post.courses[current_course] and post.reader_redirect_url == nil -%}
-    {%- assign coursePosts = coursePosts | push: post -%}
-  {%- endif -%}
-{%- endfor -%}
-{%- if current_course == 'csa' -%}
-  {%- assign coursePosts = coursePosts | sort: "title" -%}
-{%- endif -%}
-{%- comment -%}
-  The same lessons grouped by week, in the same order, so a week's lessons are
-  one lookup (lessonsByWeek | where: "name", week) instead of a scan of every
-  lesson for every week. plus: 0 reads "2" and 2 alike, as the sidebar always has.
-{%- endcomment -%}
-{%- assign lessonsByWeek = coursePosts | group_by_exp: "post", "post.courses[current_course].week | plus: 0" -%}
+{% include course-lessons.html %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 

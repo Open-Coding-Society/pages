@@ -101,6 +101,21 @@ test('OCS reader links retain selected ancestors and resume identity without leg
   navigation.destroy();
 });
 
+test('a sprint or week overview opens its ancestors without replacing the resume document', () => {
+  const setup = fixture({
+    sections: { 'sprint-1': false, 'sprint-2': false, 'week-2': false },
+    scrollTop: 0, lastDocument: 'https://example.test/csa/document/',
+  });
+  const current = setup.root.querySelector();
+  current.href = 'https://example.test/csa/week-2/';
+  setup.root.querySelector = selector =>
+    selector.includes('[data-reader-overview][aria-current="page"]') ? current : null;
+  createNavigationState(setup.root, 'csa', 'desktop', setup.sections, setup.environment).restore();
+  assert.deepEqual(setup.sections.map(section => section.open), [false, true, true]);
+  assert.equal(JSON.parse(setup.storage.get('ocs-course-navigation:csa:desktop')).lastDocument,
+    'https://example.test/csa/document/');
+});
+
 test('reveals a selected row outside the restored viewport without resetting to the top', () => {
   const setup = fixture({ sections: {}, scrollTop: 500 });
   createNavigationState(setup.root, 'csa', 'desktop', setup.sections, setup.environment).restore();

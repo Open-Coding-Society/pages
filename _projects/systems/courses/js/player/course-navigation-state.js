@@ -1,7 +1,7 @@
 export function createNavigationState(root, course, panel, sections, environment = window) {
   const key = `ocs-course-navigation:${course}:${panel}`;
   let state = { sections: {}, scrollTop: 0, lastDocument: null };
-  const selection = '.lesson-item.active, .sprint-nav [aria-current="page"], .modal-lesson-item.active, .document-reader__lesson[aria-current="page"]';
+  const selection = '.lesson-item.active, .sprint-nav [aria-current="page"], .modal-lesson-item.active, .document-reader__lesson[aria-current="page"], [data-reader-overview][aria-current="page"]';
   let resume = null;
 
   function selectedRow() {

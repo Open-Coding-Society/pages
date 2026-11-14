@@ -1,0 +1,13 @@
+{%- comment -%}
+  Course home, sprint, week and Blogs pages in the document reader shell, so
+  they share its toolbar, course navigation and mobile behavior with lessons.
+  The body is still the page's player-pages include: the announcements chat on
+  home, and the sprint/week introductions built from _data/<course>.yml.
+  Expects current_course and current_week from the post layout.
+{%- endcomment -%}
+{% include course-lessons.html %}
+{% include projects/courses/reader/start.html %}
+<article class="document-reader__overview" data-player-page="{{ page.player_page.kind }}">
+  {% include player-pages/{{ page.player_page.kind }}.html %}
+</article>
+{% include projects/courses/reader/end.html %}

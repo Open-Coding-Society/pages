@@ -18,6 +18,7 @@
     { "source": "reader/reader.rb", "destination": "_plugins/projects/courses/document_reader.rb" },
     { "source": "reader/start.html", "destination": "_includes/projects/courses/reader/start.html" },
     { "source": "reader/end.html", "destination": "_includes/projects/courses/reader/end.html" },
+    { "source": "reader/overview.html", "destination": "_includes/projects/courses/reader/overview.html" },
     { "source": "reader/redirect.html", "destination": "_layouts/projects/courses/reader-redirect.html" },
     { "source": "reader/reference.html", "destination": "_layouts/projects/courses/reader-reference.html" },
     { "source": "reader/js", "destination": "assets/js/projects/courses/reader" },

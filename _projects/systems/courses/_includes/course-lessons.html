@@ -1,0 +1,19 @@
+{%- comment -%}
+  This course's lessons for overview pages: coursePosts are the posts and pages
+  whose front matter puts them in current_course, including shared documents;
+  lessonsByWeek groups them by week, so a week's lessons are one lookup
+  (lessonsByWeek | where: "name", week). plus: 0 reads "2" and 2 alike.
+  Used by the reader overview shell and the legacy course player.
+{%- endcomment -%}
+{%- assign posts = null | compact -%}
+{%- assign posts = posts | concat: site.posts | concat: site.pages -%}
+{%- assign coursePosts = "" | split: "" -%}
+{%- for post in posts -%}
+  {%- if post.courses[current_course] and post.reader_redirect_url == nil -%}
+    {%- assign coursePosts = coursePosts | push: post -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- if current_course == 'csa' -%}
+  {%- assign coursePosts = coursePosts | sort: "title" -%}
+{%- endif -%}
+{%- assign lessonsByWeek = coursePosts | group_by_exp: "post", "post.courses[current_course].week | plus: 0" -%}

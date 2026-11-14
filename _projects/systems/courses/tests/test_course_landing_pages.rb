@@ -21,7 +21,7 @@ Dir.mktmpdir("course-landing-") do |source|
   FileUtils.cp(File.join(ROOT, "_includes/themes/minima/header.html"),
                File.join(source, "_includes/themes/minima/header.html"))
   FileUtils.mkdir_p(File.join(source, "_includes/player-pages"))
-  %w[course-document-player.html course-nav.html course-title.html lesson-sidebar-nav.html lesson-topbar.html lesson-modals.html announcement_chat.html].each do |name|
+  %w[course-document-player.html course-lessons.html course-nav.html course-title.html lesson-sidebar-nav.html lesson-topbar.html lesson-modals.html announcement_chat.html].each do |name|
     FileUtils.cp(File.join(PROJECT, "_includes", name), File.join(source, "_includes"))
   end
   %w[blog-catalog.html post_list_image_card.html blog-reader.html].each do |name|

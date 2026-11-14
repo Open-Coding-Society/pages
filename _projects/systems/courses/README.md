@@ -35,8 +35,15 @@ The exact file mappings are in [distribution.json](distribution.json). Directory
 mappings include all their files recursively. New shared-path resources must be
 added there and their generated paths ignored in the root `.gitignore`.
 
-Blogs owns `layouts/post.html`. Document pages use the shared reader, while
-course home/sprint/week/Blogs pages keep the Courses-owned player adapter. Courses'
+Blogs owns `layouts/post.html`. Document pages and course home/sprint/week/Blogs
+overview pages share the reader shell: `plugins/lesson_player_pages.rb`
+(`host_in_reader`) gives every `player_page` a `document_reader` membership, and
+`reader/overview.html` renders the unchanged `player-pages/<kind>.html` body (or
+the home page's announcements/calendar) in the reader's main pane. The overview's
+sprint or week is marked current in the navigation; `<` `>` step into the
+neighboring lessons, and on home `>` continues the last-read document. The
+Courses-owned player (`course-document-player.html`) remains only as the fallback
+when the reader is not installed or a lesson is unindexed. Courses'
 Blogs page delegates to Blogs' reusable reader with `course=` and `search=true`,
 so it lists posts whose `courses` includes that course, including shared lessons,
 under a search bar. Both systems preserve the
@@ -50,8 +57,9 @@ pages omit the duplicate body heading. The document reader labels its navigation
 with the course title, not the current lesson week. Lesson titles and identities
 remain unchanged.
 
-Course overview pages switch courses through the OCS dropdown in the breadcrumb
-bar. It opens the selected course's home, preserving `site.baseurl`; the desktop
+In the legacy fallback player, course overview pages switch courses through the
+OCS dropdown in the breadcrumb bar. It opens the selected course's home,
+preserving `site.baseurl`; the desktop
 sidebar and mobile navigation panel retain their close controls, title and
 lesson navigation without duplicate course pills. The standalone sprint layout
 still uses its existing course menu.
@@ -97,7 +105,10 @@ with navigation open it sits in front of the current document's row; with
 navigation collapsed a `( ) Title` row appears under the course heading. Topics
 hides the circle because completion is per course. In course context the
 navigation starts with `Course Progress  done/total` (unique lessons, updated
-with completion) above a divider; Topics shows its document count there. Each
+with completion) above a divider; Topics shows its document count there. Course
+navigation lists every document placed in the course, the same set as the week
+overview, including `search_exclude` or `hide` pages such as CSA MCQ Lessons;
+those flags only keep a document out of Topics (`topics: false` in the index). Each
 week row is one element: the `W<n>` pill and the underlined title link to the week
 overview, while the marker and count open or close the week. Week rows sit flush under their sprint,
 with the done count under the pill and the title at lesson-row size. On desktop the reader
@@ -249,8 +260,8 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
   `_config.yml`'s `default_course`. Returning guests use `ocs-selected-course`;
   signed-in users prefer their saved enrolled course, otherwise their first
   enrolled course in CSSE/CSP/CSA/CSH order.
-- Course homes remain `/navigation/courses/<course>/` and reuse the player with
-  announcements/calendar. Legacy chooser/catalog routes remain available.
+- Course homes remain `/navigation/courses/<course>/` and render their
+  announcements/calendar inside the reader shell (legacy player as fallback). Legacy chooser/catalog routes remain available.
 - The generator creates sprint and Blogs pages, and week pages only for weeks
   with lessons. Sidebar links and generated URLs must stay aligned.
 - Desktop and mobile panels put course buttons first, X at upper-right, and the

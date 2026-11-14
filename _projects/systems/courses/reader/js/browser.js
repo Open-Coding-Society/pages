@@ -14,6 +14,13 @@ export async function startDocumentReader(root, tools) {
   const status = root.querySelector('[data-reader-status]');
   const currentButton = root.querySelector('[data-reader-complete]');
   const pager = root.querySelector('[data-reader-pager]');
+  // Course home, sprint, week and Blogs pages are overviews, not documents:
+  // no review circle, and the tree marks their sprint or week instead.
+  const overview = {
+    kind: root.dataset.overview || '',
+    sprint: Number(root.dataset.overviewSprint),
+    week: Number(root.dataset.overviewWeek),
+  };
   const panel = matchMedia('(max-width: 768px)').matches ? 'mobile' : 'desktop';
   if (panel === 'mobile') sidebar.open = false;
   let context = readerContext(location.search, membership, root.dataset.defaultCourse);
@@ -46,7 +53,7 @@ export async function startDocumentReader(root, tools) {
     const data = completionData();
     const done = data?.[identity] === true;
     [currentButton, ...tree.querySelectorAll('[data-reader-complete]')].forEach(button => {
-      button.hidden = !context.course;
+      button.hidden = !context.course || Boolean(overview.kind);
       button.disabled = data === null;
       button.setAttribute('aria-pressed', String(done));
       button.title = done ? 'Reviewed (select to undo)' : 'Mark reviewed';
@@ -130,13 +137,22 @@ export async function startDocumentReader(root, tools) {
     parent.append(list);
   }
 
-  // Desktop scrolls the current document's row near the top. navigation.restore()
+  // Desktop scrolls the current row (document, or this overview's sprint/week,
+  // or on course home the resumed document) near the top. navigation.restore()
   // already opened its sprint and week and kept the student's other saved sections.
   function scrollCurrentNearTop() {
-    const row = tree.querySelector('[data-reader-complete]');
+    const row = tree.querySelector('[aria-current="page"]') || tree.querySelector('.navigation-resume');
     if (!row?.getBoundingClientRect || sidebar.clientHeight === 0) return;
     const offset = row.getBoundingClientRect().top - sidebar.getBoundingClientRect().top;
     sidebar.scrollTop += offset - sidebar.clientHeight / 4;
+  }
+
+  // The overview being read: course-navigation-state opens its ancestors.
+  function markCurrent(link) {
+    link.dataset.readerOverview = '';
+    link.setAttribute('aria-current', 'page');
+    link.classList.add('document-reader__overview-current');
+    if (link.classList.contains('ocs__btn')) link.classList.add('fill');
   }
 
   function courseTree() {
@@ -153,16 +169,17 @@ export async function startDocumentReader(root, tools) {
       // The W pill and the title open the week overview; the marker and count toggle the week.
       const summary = node('summary', undefined, 'document-reader__week-summary');
       const overviewUrl = `${base}/${context.course}/week-${group.week}/`;
-      const overview = node('a', `W${group.week}`, 'ocs__status-pill ocs__status-pill--good document-reader__week-pill');
-      overview.href = overviewUrl;
-      overview.dataset.weekOverview = '';
-      overview.setAttribute('aria-label', `Week ${group.week} overview`);
-      overview.title = `Week ${group.week} overview`;
-      summary.append(overview);
+      const pill = node('a', `W${group.week}`, 'ocs__status-pill ocs__status-pill--good document-reader__week-pill');
+      pill.href = overviewUrl;
+      pill.dataset.weekOverview = '';
+      pill.setAttribute('aria-label', `Week ${group.week} overview`);
+      pill.title = `Week ${group.week} overview`;
+      summary.append(pill);
       const weekTitle = node('a', title || `Week ${group.week}`, 'document-reader__week-title');
       weekTitle.href = overviewUrl;
       weekTitle.dataset.weekTitle = '';
       summary.append(weekTitle);
+      if (overview.kind === 'week' && overview.week === group.week) markCurrent(weekTitle);
       const count = node('span', undefined, 'ocs__status-pill ocs__status-pill--neutral');
       count.dataset.weekCount = '';
       summary.append(count);
@@ -181,6 +198,7 @@ export async function startDocumentReader(root, tools) {
       const intro = node('a', undefined, 'ocs__btn small accent document-reader__intro');
       intro.append(icon('fa-flag'), 'Sprint overview');
       intro.href = `${base}/${context.course}/sprint-${sprint.id.replace('Sprint', '')}/`;
+      if (overview.kind === 'sprint' && `Sprint${overview.sprint}` === sprint.id) markCurrent(intro);
       details.append(intro);
       groups.forEach(group => { placed.add(group.week); appendWeek(details, group, sprint.weeks[String(group.week)]); });
       tree.append(details);
@@ -207,13 +225,35 @@ export async function startDocumentReader(root, tools) {
 
   function topicsTree() {
     const primary = payload.primary || [];
-    const selected = selectedDocuments(payload.documents, topics.categories, null,
+    const selected = selectedDocuments(payload.documents.filter(document => document.topics !== false), topics.categories, null,
       { primary, match: topics.match }).filter(document => {
       const text = `${document.title} ${document.description}`.toLowerCase();
       return topics.query.toLowerCase().trim().split(/\s+/).every(word => text.includes(word));
     });
     appendLessons(tree, selected);
     return selected;
+  }
+
+  // Previous/next around this page. An overview sits before its first lesson,
+  // so a sprint or week page leads into it; course home continues the last
+  // document the student read (course-navigation-state's resume row).
+  function neighbors(order) {
+    if (!overview.kind) {
+      const index = order.findIndex(document => document.url === identity);
+      return index < 0 ? [] : [order[index - 1], order[index + 1]];
+    }
+    if (!context.course) return [];
+    if (overview.kind === 'home') {
+      const row = tree.querySelector('.navigation-resume');
+      const document = row && order.find(entry => entry.url === row.dataset.lessonId);
+      return [undefined, document ? { ...document, href: row.href, resume: true } : undefined];
+    }
+    const sprint = payload.courses[context.course].sprints.find(entry => entry.id === `Sprint${overview.sprint}`);
+    const firstWeek = overview.kind === 'week' ? overview.week : Number(sprint?.start);
+    if (!['sprint', 'week'].includes(overview.kind) || !Number.isFinite(firstWeek)) return [];
+    const index = order.findIndex(document => Number(document.courses[context.course].week) >= firstWeek);
+    const position = index < 0 ? order.length : index;
+    return [order[position - 1], order[position]];
   }
 
   function render() {
@@ -243,23 +283,24 @@ export async function startDocumentReader(root, tools) {
     } else {
       total.textContent = `${order.length} documents`;
     }
-    const index = order.findIndex(document => document.url === identity);
-    pager.hidden = index < 0;
-    for (const [hook, label, document] of [['previous', 'Previous', order[index - 1]], ['next', 'Next', order[index + 1]]]) {
+    const [previous, next] = neighbors(order);
+    pager.hidden = !previous && !next;
+    for (const [hook, label, document] of [['previous', 'Previous', previous], ['next', next?.resume ? 'Continue' : 'Next', next]]) {
       const link = root.querySelector(`[data-reader-${hook}]`);
       const button = root.querySelector(`[data-reader-toolbar-${hook}]`);
-      const available = Boolean(document) && index >= 0;
+      const available = Boolean(document);
       link.hidden = !available;
       button.hidden = !available;
       if (available) {
-        const href = readerLink(document.url, base, context, context.course ? '' : writeState(topics));
+        const href = document.href || readerLink(document.url, base, context, context.course ? '' : writeState(topics));
         link.replaceChildren(...(hook === 'previous'
           ? [icon('fa-chevron-left'), ` ${document.title}`]
           : [`${document.title} `, icon('fa-chevron-right')]));
-        link.setAttribute('aria-label', `${label} document: ${document.title}`);
+        const description = document.resume ? `Continue reading: ${document.title}` : `${label} document: ${document.title}`;
+        link.setAttribute('aria-label', description);
         link.href = href;
         button.href = href;
-        button.setAttribute('aria-label', `${label} document: ${document.title}`);
+        button.setAttribute('aria-label', description);
         button.title = `${label}: ${document.title}`;
       } else {
         button.removeAttribute('href');

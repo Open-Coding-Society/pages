@@ -75,6 +75,7 @@ _layouts/projects/
 /_includes/blog-catalog.html
 /_includes/blog-reader.html
 /_includes/course-document-player.html
+/_includes/course-lessons.html
 
 # UI Builder system distributions (authoritative sources in _projects/systems/ui-builder)
 /navigation/ui-builder/

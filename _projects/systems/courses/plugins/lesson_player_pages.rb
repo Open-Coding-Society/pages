@@ -10,9 +10,11 @@
 # player-pages includes, not generated HTML. Week pages require a lesson in that
 # course/week; sprint and Blogs pages do not.
 #
-# Each page carries generated `player_page` metadata. Blogs' post layout routes
-# it through Courses' course-document-player.html and player-pages/<kind>.html.
-# Course home pages are authored separately under Courses' navigation/.
+# Each page carries generated `player_page` metadata. With the document reader
+# installed, host_in_reader gives these pages (and the authored course homes)
+# reader metadata, so Blogs' post layout renders them in reader/overview.html;
+# without it they fall back to course-document-player.html. Either way the body
+# is player-pages/<kind>.html. Course home pages are authored under navigation/.
 #
 # Courses still own classroom cadence. The canonical document reader
 # (reader/reader.rb) handles individual lessons with Course or Topics navigation.
@@ -47,9 +49,26 @@ module LessonPlayerPages
         end
         site.pages << page(site, course, "blogs", nil, nil, "Blogs")
       end
+      host_in_reader(site)
     end
 
     private
+
+    # With the document reader installed, course home, sprint, week and Blogs
+    # pages use its shell (reader/overview.html) instead of the legacy player.
+    # Their only placement is their own course; a week page sits in its week.
+    def host_in_reader(site)
+      return unless File.file?(site.in_source_dir("_includes/projects/courses/reader/overview.html"))
+
+      (site.posts.docs + site.pages).each do |doc|
+        player = doc.data["player_page"]
+        next unless player.is_a?(Hash) && player["course"]
+
+        course = player["course"].to_s
+        placement = player["week"].nil? ? {} : { "week" => player["week"] }
+        doc.data["document_reader"] = { "courses" => { course => placement }, "default_course" => course }
+      end
+    end
 
     # Shared documents appear in each declared course without copied lessons.
     # to_i reads the week the way the sidebar's `| plus: 0` does.

@@ -47,6 +47,11 @@ class DocumentReaderTest < Minitest::Test
         File.write(File.join(source, "_posts/2026-07-22-javascript.md"), body)
         reference = "---\nlayout: opencs\ntitle: Reference\npermalink: /reference/\ncategories: [JavaScript]\n---\nReference body\n"
         File.write(File.join(source, "reference.md"), reference)
+        # Course-placed navigation pages stay out of Topics but belong to their week.
+        File.write(File.join(source, "mcq.md"), "---\nlayout: post\ntitle: MCQ Lessons\npermalink: /csp/mcq\n" \
+          "courses: {csp: {week: 1}}\nsearch_exclude: true\n---\nMCQ units\n")
+        File.write(File.join(source, "language.md"), "---\nlayout: opencs\ntitle: Language Reference\n" \
+          "permalink: /language-reference/\ncourses: {csse: {week: 1}}\nsearch_exclude: true\n---\nLanguage body\n")
         # A previous build may have both sorts of generated course copies.
         %w[wrapper converted-notebook].each do |name|
           File.write(File.join(source, "_posts/2026-07-22-#{name}.md"), <<~POST)
@@ -126,7 +131,17 @@ class DocumentReaderTest < Minitest::Test
         assert_includes html, "Intro to JavaScript"
         refute_includes html, "DUPLICATED LESSON BODY"
         index = JSON.parse(File.read(File.join(site.dest, "assets/js/projects/courses/reader/data.json")))
-        assert_equal ["/javascript/intro", "/reference/"], index["documents"].map { |entry| entry["url"] }
+        assert_equal ["/javascript/intro", "/reference/"],
+          index["documents"].reject { |entry| entry["topics"] == false }.map { |entry| entry["url"] }
+        placed = index["documents"].select { |entry| entry["topics"] == false }
+        assert_equal({ "/csp/mcq" => { "csp" => { "week" => 1 } }, "/language-reference/" => { "csse" => { "week" => 1 } } },
+          placed.to_h { |entry| [entry["url"], entry["courses"]] })
+        language = Nokogiri::HTML(File.read(File.join(site.dest, "language-reference/index.html")))
+        assert_equal ["csse"], language.css("[data-reader-context] option").map { |option| option["value"] } - ["topics"]
+        assert_includes language.at_css("[data-reader-main] article").text, "Language body"
+        csp_week = Nokogiri::HTML(File.read(File.join(site.dest, "csp/week-1/index.html")))
+        assert_includes csp_week.css("a").map { |link| link["href"] }, "#{base}/csp/mcq?context=course&course=csp",
+          "the week overview and reader navigation list the same page"
         assert_equal({ "csse" => { "week" => 1 }, "csp" => { "week" => 0 } }, index["documents"].first["courses"])
         topics = JSON.parse(File.read(File.join(site.dest, "assets/js/projects/topics/data.json")))
         assert_equal ["/javascript/intro", "/reference/"], topics.map { |entry| entry["url"] }
@@ -172,6 +187,13 @@ class DocumentReaderTest < Minitest::Test
         { "csp" => 0, "csse" => 1 }.each do |course, week|
           overview = File.read(File.join(site.dest, "#{course}/week-#{week}/index.html"))
           assert_includes overview, "#{base}/javascript/intro?context=course&amp;course=#{course}"
+          shell = Nokogiri::HTML(overview).at_css("[data-document-reader]")
+          refute_nil shell, "#{course} week #{week} overview uses the document reader shell"
+          assert_equal "week", shell["data-overview"]
+          assert_equal week.to_s, shell["data-overview-week"]
+          assert_equal({ course => { "week" => week } }, JSON.parse(shell["data-membership"]))
+          refute_nil shell.at_css('[data-reader-main] article[data-player-page="week"]')
+          refute_includes overview, 'class="lesson-player"'
         end
         script = document.css("script:not([src])").map(&:content).find { |text| text.include?("CURRENT_LESSON_ID_BLOG") }
         _, error, result = Open3.capture3("node", "--check", stdin_data: script)

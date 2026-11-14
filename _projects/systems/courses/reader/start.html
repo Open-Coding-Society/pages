@@ -3,6 +3,11 @@
      data-baseurl="{{ site.baseurl | escape }}"
      data-membership="{{ page.document_reader.courses | jsonify | escape }}"
      data-default-course="{{ page.document_reader.default_course | escape }}"
+     {%- if page.player_page %}
+     data-overview="{{ page.player_page.kind | escape }}"
+     data-overview-sprint="{{ page.player_page.sprint | escape }}"
+     data-overview-week="{{ page.player_page.week | escape }}"
+     {%- endif %}
      data-index-url="{{ '/assets/js/projects/courses/reader/data.json' | relative_url }}">
   <header class="document-reader__toolbar">
     <a class="ocs__btn ocs__btn--icon small accent" href="{{ '/topics/' | relative_url }}" data-reader-home aria-label="Topics catalog" title="Topics catalog"><i class="fas fa-home" aria-hidden="true"></i></a>

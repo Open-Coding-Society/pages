@@ -57,12 +57,20 @@ module DocumentReader
         [code, { "title" => data["course"]["title"] || code.upcase, "sprints" => sprints }] unless sprints.empty?
       end.to_h
 
+      # A course placement lists the document in that course's navigation, as the
+      # week overview does; search_exclude and hide only keep it out of Topics.
+      placed = lambda do |data|
+        data["courses"].is_a?(Hash) && data["courses"].any? do |course, placement|
+          schedules.key?(course) && placement.is_a?(Hash) && placement.key?("week")
+        end
+      end
       documents = (site.posts.docs + site.pages).select do |document|
         data = document.data
-        (LAYOUTS.include?(data["layout"]) || (data["layout"] == "opencs" && !Array(data["categories"]).empty?)) && !data["player_page"] &&
-          !data["reader_redirect_url"] && data["hide"] != true &&
-          data["lesson_status"] != "draft" && data["search_exclude"] != true &&
-          (data["courses"].is_a?(Hash) || !Array(data["categories"]).empty?)
+        layout_ok = LAYOUTS.include?(data["layout"]) ||
+          (data["layout"] == "opencs" && (!Array(data["categories"]).empty? || placed.call(data)))
+        listed = topics_listed?(data) && (data["courses"].is_a?(Hash) || !Array(data["categories"]).empty?)
+        layout_ok && !data["player_page"] && !data["reader_redirect_url"] &&
+          data["lesson_status"] != "draft" && (placed.call(data) || listed)
       end.uniq(&:url)
       entries = documents.map do |document|
         data = document.data
@@ -82,7 +90,8 @@ module DocumentReader
           "url" => document.url, "title" => data["title"].to_s,
           "description" => data["description"].to_s,
           "categories" => categories.map { |category| category.strip.downcase }.uniq,
-          "courses" => placements, "assignment" => data["assignment"] == true
+          "courses" => placements, "assignment" => data["assignment"] == true,
+          "topics" => topics_listed?(data)
         }
       end.sort_by { |entry| entry["title"].downcase }
       payload = {
@@ -93,6 +102,13 @@ module DocumentReader
       page.data = { "layout" => nil, "search_exclude" => true }
       page.content = JSON.generate(payload)
       site.pages << page
+    end
+
+    private
+
+    # Hidden and search-excluded documents stay out of Topics and search.
+    def topics_listed?(data)
+      data["hide"] != true && data["search_exclude"] != true
     end
   end
 end

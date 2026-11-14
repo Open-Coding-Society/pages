@@ -130,6 +130,7 @@
       justify-self: start;
       min-width: 0;
       color: var(--pref-text-color);
+      &.document-reader__overview-current { font-weight: 700; text-decoration-color: var(--pref-accent-color); }
       text-decoration: underline;
       text-decoration-color: color-mix(in srgb, var(--pref-accent-color) 60%, transparent);
       text-underline-offset: 0.2em;

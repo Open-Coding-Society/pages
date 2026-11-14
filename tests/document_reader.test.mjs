@@ -42,7 +42,7 @@ test('course cadence uses each placement without duplicating document identity',
   assert.equal(documents[0].url, '/shared');
 });
 
-test('reader navigation displays lesson types and updates week completion without changing identity', async t => {
+async function startFakeReader(t, { dataset = {}, restore = () => {}, extraDocuments = [] } = {}) {
   class Element {
     constructor(tag = 'div') {
       this.tag = tag;
@@ -73,12 +73,16 @@ test('reader navigation displays lesson types and updates week completion withou
     addEventListener(name, callback) { this.listeners[name] = callback; }
     querySelectorAll(selector) {
       const data = selector.match(/^\[data-([a-z-]+)\]$/);
-      if (!data) return [];
-      const key = data[1].replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+      const className = selector.match(/^\.([a-z_-]+)$/)?.[1];
+      const current = selector === '[aria-current="page"]';
+      if (!data && !className && !current) return [];
+      const key = data?.[1].replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+      const matches = child => (data && Object.hasOwn(child.dataset, key)) ||
+        (className && child.classList.contains(className)) || (current && child.attributes['aria-current'] === 'page');
       const results = [];
       const walk = element => {
         element.children.filter(child => typeof child !== 'string').forEach(child => {
-          if (Object.hasOwn(child.dataset, key)) results.push(child);
+          if (matches(child)) results.push(child);
           walk(child);
         });
       };
@@ -96,7 +100,7 @@ test('reader navigation displays lesson types and updates week completion withou
   const root = new Element();
   root.dataset = {
     membership: JSON.stringify({ csp: { week: 1 } }), baseurl: '/preview',
-    documentUrl: '/assignment/', defaultCourse: 'csp', indexUrl: '/index.json',
+    documentUrl: '/assignment/', defaultCourse: 'csp', indexUrl: '/index.json', ...dataset,
   };
   root.querySelector = selector => hooks[selector.match(/^\[data-reader-([a-z-]+)\]$/)?.[1]];
   const glyph = new Element('i');
@@ -108,12 +112,13 @@ test('reader navigation displays lesson types and updates week completion withou
     { title: 'Reference', url: '/reference/', assignment: false, categories: [], courses: { csp: { week: 1 } } },
     { title: 'Next week', url: '/next-week/', assignment: false, categories: [], courses: { csp: { week: 2 } } },
     { title: 'Outside the schedule', url: '/outside/', assignment: false, categories: [], courses: { csp: { week: 8 } } },
+    ...extraDocuments,
   ];
   const saved = new Map([['csp-lesson-completion', JSON.stringify({ '/reference/': true })]]);
   const listeners = {};
   const replacements = {
     document: { createElement: tag => new Element(tag) },
-    location: new URL('https://example.test/assignment/?context=course&course=csp'),
+    location: new URL(`https://example.test${root.dataset.documentUrl}?context=course&course=csp`),
     history: { pushState() {}, replaceState() {} },
     matchMedia: () => ({ matches: false }),
     localStorage: { getItem: key => saved.get(key) || null, setItem: (key, value) => saved.set(key, value) },
@@ -130,12 +135,18 @@ test('reader navigation displays lesson types and updates week completion withou
   }
   await startDocumentReader(root, {
     readState: () => ({ query: '', categories: [] }), writeState: () => '',
-    selectedDocuments: () => documents, rememberCourse: () => {},
+    selectedDocuments: shown => shown, rememberCourse: () => {},
     // The real helper restores saved sections and opens the current path; the reader must not close any.
     createNavigationState: (_root, _course, _panel, sections) => ({
-      restore() { sections.forEach(section => section.setOpen(true)); }, destroy() {}, restorePosition() {},
+      restore() { sections.forEach(section => section.setOpen(true)); restore(hooks); }, destroy() {}, restorePosition() {},
     }),
   });
+  return { hooks, documents, saved, listeners };
+
+}
+
+test('reader navigation displays lesson types and updates week completion without changing identity', async t => {
+  const { hooks, documents, saved, listeners } = await startFakeReader(t);
 
   assert.equal(hooks.heading.textContent, 'CSP');
   const groups = hooks.tree.querySelectorAll('[data-week-group]');
@@ -225,4 +236,68 @@ test('reader navigation displays lesson types and updates week completion withou
   assert.equal(hooks.tree.querySelectorAll('[data-week-group]').length, 0);
   assert.ok(hooks.tree.querySelectorAll('[data-lesson-id]').every(link =>
     link.querySelector('[data-lesson-completed]').hidden));
+});
+
+test('a week overview marks its week, hides review circles and leads into its first lesson', async t => {
+  const { hooks } = await startFakeReader(t, { dataset: {
+    documentUrl: '/csp/week-2/', membership: JSON.stringify({ csp: { week: 2 } }),
+    overview: 'week', overviewSprint: '1', overviewWeek: '2',
+  } });
+  const groups = hooks.tree.querySelectorAll('[data-week-group]');
+  const current = hooks.tree.querySelectorAll('[aria-current="page"]');
+  assert.equal(current.length, 1);
+  assert.equal(current[0], groups[1].querySelector('[data-week-title]'));
+  assert.ok(Object.hasOwn(current[0].dataset, 'readerOverview'), 'course-navigation-state selects the overview');
+  assert.equal(hooks.complete.hidden, true, 'an overview is not a document to review');
+  assert.equal(hooks.tree.querySelectorAll('[data-reader-complete]').length, 0);
+  assert.equal(hooks['toolbar-previous'].href, '/preview/reference/?context=course&course=csp');
+  assert.equal(hooks['toolbar-next'].href, '/preview/next-week/?context=course&course=csp');
+  assert.equal(hooks.pager.hidden, false);
+});
+
+test('a sprint overview marks its Sprint overview button and leads into the sprint', async t => {
+  const { hooks } = await startFakeReader(t, { dataset: {
+    documentUrl: '/csp/sprint-1/', membership: JSON.stringify({ csp: {} }), overview: 'sprint', overviewSprint: '1',
+  } });
+  const [intro] = hooks.tree.querySelectorAll('[aria-current="page"]');
+  assert.ok(intro.classList.contains('document-reader__intro') && intro.classList.contains('fill'));
+  assert.equal(hooks['toolbar-previous'].hidden, true);
+  assert.equal(hooks['toolbar-next'].href, '/preview/assignment/?context=course&course=csp');
+});
+
+test('course home continues the document the student last read', async t => {
+  const { hooks } = await startFakeReader(t, {
+    dataset: { documentUrl: '/navigation/courses/csp/', membership: JSON.stringify({ csp: {} }), overview: 'home' },
+    restore: ({ tree }) => {
+      const row = tree.querySelectorAll('[data-lesson-id]').find(link => link.dataset.lessonId === '/next-week/');
+      row.classList.add('navigation-resume');
+    },
+  });
+  assert.equal(hooks.tree.querySelectorAll('[aria-current="page"]').length, 0);
+  assert.equal(hooks.complete.hidden, true);
+  assert.equal(hooks['toolbar-previous'].hidden, true);
+  assert.equal(hooks['toolbar-next'].href, '/preview/next-week/?context=course&course=csp');
+  assert.equal(hooks['toolbar-next'].attributes['aria-label'], 'Continue reading: Next week');
+  assert.equal(hooks.next.textContent, 'Next week ');
+});
+
+test('course home without reading history has no previous or next', async t => {
+  const { hooks } = await startFakeReader(t, {
+    dataset: { documentUrl: '/navigation/courses/csp/', membership: JSON.stringify({ csp: {} }), overview: 'home' },
+  });
+  assert.equal(hooks['toolbar-next'].hidden, true);
+  assert.equal(hooks.pager.hidden, true);
+});
+
+test('a course-placed page kept out of Topics is still a lesson in its course week', async t => {
+  const mcq = { title: 'CSA MCQ Lessons', url: '/csa/mcq', assignment: false, categories: [], topics: false, courses: { csp: { week: 1 } } };
+  const { hooks } = await startFakeReader(t, { extraDocuments: [mcq] });
+  const week = hooks.tree.querySelectorAll('[data-week-group]')[0];
+  assert.ok(week.querySelectorAll('[data-lesson-id]').some(link => link.dataset.lessonId === '/csa/mcq'));
+  assert.equal(week.querySelector('[data-week-count]').textContent, '1/3');
+  assert.equal(hooks.count.querySelector('[data-reader-progress]').textContent, '1/5');
+  hooks.context.value = 'topics';
+  hooks.context.listeners.change();
+  assert.equal(hooks.count.textContent, '4 documents');
+  assert.ok(!hooks.tree.querySelectorAll('[data-lesson-id]').some(link => link.dataset.lessonId === '/csa/mcq'));
 });
