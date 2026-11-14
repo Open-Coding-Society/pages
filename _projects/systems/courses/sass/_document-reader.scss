@@ -1,3 +1,6 @@
+@import "open-coding/mixins/variables";
+@import "open-coding/elements/buttons/tokens";
+
 .document-reader {
   position: fixed;
   inset: 80px 0 0;
@@ -94,52 +97,55 @@
         outline-offset: -2px;
       }
     }
-    summary { font-size: 1.25rem; }
-    .document-reader__sprint > summary { color: var(--pref-accent-color); }
-    .document-reader__sprint { margin-bottom: 0.75rem; }
-    // Weeks sit flush under their sprint; the lesson guide line runs down from the week's arrow.
-    .document-reader__week {
-      margin: 0.5rem 0 0;
-      padding-left: 0;
-      border-left: 0;
-      > .document-reader__lessons { margin-left: 0.75rem; }
-    }
-    // Arrow | W pill over its done count | title, at the lesson rows' text size.
-    .document-reader__week-summary {
+    .document-reader__sprint { margin-bottom: $spacing-sm; }
+    // Weeks and their lessons nest with the OCS tree element (indent and guide line).
+    .document-reader__week { margin-top: $spacing-xxs; }
+    // Sprint and week rows: S or W pill (OCS small pill button holding the arrow) | underlined
+    // title (the overview link). The sprint pill sits on the left margin, larger than the week.
+    .document-reader__folder-summary {
       display: grid;
-      grid-template-columns: auto auto minmax(0, 1fr);
-      grid-template-areas: "marker pill title" "marker count title";
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas: "pill title";
       align-items: center;
-      gap: 0.25rem 0.5rem;
-      font-size: 15px;
-      line-height: 20px;
-      &::before {
-        content: "\25B6";
-        grid-area: marker;
-        color: var(--pref-accent-color);
-        font-size: 0.7rem;
-      }
-      .document-reader__week-pill { grid-area: pill; }
-      [data-week-count] { grid-area: count; justify-self: center; }
+      gap: $spacing-xxxs $spacing-xxs;
+      padding-left: 0;
+      list-style: none;
+      &::-webkit-details-marker { display: none; }
     }
-    .document-reader__week[open] > .document-reader__week-summary::before {
-      transform: rotate(90deg);
+    // More specific than .ocs__btn.small, which can load later in the bundle.
+    .document-reader__folder-pill.ocs__btn {
+      grid-area: pill;
+      gap: $spacing-xxxs;
+      font-weight: 700;
+      @media (max-width: $breakpoint-mobile) { height: nth(map-get($sizes, medium), 1); }
     }
-    .document-reader__week-title {
+    .document-reader__folder-arrow {
+      font-size: 0.7em;
+      transition: transform 0.15s ease;
+    }
+    .document-reader__folder[open] > summary .document-reader__folder-arrow { transform: rotate(90deg); }
+    .document-reader__folder-title {
       grid-area: title;
       justify-self: start;
       min-width: 0;
       color: var(--pref-text-color);
-      &.document-reader__overview-current { font-weight: 700; text-decoration-color: var(--pref-accent-color); }
       text-decoration: underline;
       text-decoration-color: color-mix(in srgb, var(--pref-accent-color) 60%, transparent);
       text-underline-offset: 0.2em;
-      &:hover, &:focus-visible { text-decoration-color: var(--pref-accent-color); }
       overflow-wrap: anywhere;
+      &:hover, &:focus-visible { text-decoration-color: var(--pref-accent-color); }
+      &.document-reader__overview-current { font-weight: 700; text-decoration-color: var(--pref-accent-color); }
     }
-    .document-reader__week-pill {
-      text-decoration: none;
-      &:hover, &:focus-visible { outline: 2px solid var(--pref-accent-color); outline-offset: 1px; }
+    .document-reader__sprint > summary {
+      font-size: $text-xl;
+      .document-reader__folder-title { color: var(--pref-accent-color); }
+    }
+    // Weeks use the lesson rows' text size, with the done count under the pill.
+    .document-reader__week > summary {
+      grid-template-areas: "pill title" "count title";
+      font-size: nth(map-get($sizes, small), 5);
+      line-height: nth(map-get($sizes, small), 6);
+      [data-week-count] { grid-area: count; justify-self: center; }
     }
     // Course Progress (or the Topics count) is divided from the sprint list.
     [data-reader-count] {
@@ -151,11 +157,6 @@
       padding: 0.5rem 0.4rem 0.75rem;
       border-bottom: 1px solid var(--ui-border);
       color: var(--text-muted);
-    }
-    .document-reader__intro {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
     }
     label { display: block; margin-top: 0.5rem; }
     .ocs__input { width: 100%; min-width: 0; box-sizing: border-box; }

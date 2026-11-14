@@ -15,7 +15,7 @@ class DocumentReaderTest < Minitest::Test
 
   def test_wrapped_navigation_links_override_fixed_small_button_height
     stylesheet = File.read(File.join(ROOT, "_projects/systems/courses/sass/_document-reader.scss"))
-    css = Sass::Engine.new(stylesheet, syntax: :scss).render
+    css = Sass::Engine.new(stylesheet, syntax: :scss, load_paths: [File.join(ROOT, "_sass")]).render
     # More specific than .ocs__btn.small, which can load later in the bundle.
     rule = css[/\.document-reader__navigation \.document-reader__lesson\.ocs__btn \{([^}]+)\}/, 1]
     refute_nil rule
@@ -24,6 +24,8 @@ class DocumentReaderTest < Minitest::Test
     assert_match(/box-sizing: border-box;/, rule)
     assert_match(/grid-template-columns: auto minmax\(0, 1fr\) auto;/, rule)
     assert_match(/\.document-reader__navigation \.document-reader__check \{\s*font-size: 0\.75rem;/, css)
+    # S/W pills grow to the OCS medium button height on mobile, over .ocs__btn.small.
+    assert_match(/@media \(max-width: 768px\) \{\s*\.document-reader__navigation \.document-reader__folder-pill\.ocs__btn \{\s*height: 35px;/, css)
   end
 
   def test_real_shared_javascript_keeps_one_document_and_submission_identity

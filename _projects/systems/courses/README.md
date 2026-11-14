@@ -88,7 +88,7 @@ guides for lesson links. Selected links use `fill`; do not reuse the legacy
 Theme changes apply without rebuilding the sidebar or replacing the article.
 Reader lesson links override the small control's fixed height so wrapped titles
 stay inside their button and do not overlap neighboring rows.
-Both course navigation treatments keep the sprint flag, show each week's
+Both course navigation treatments show each week's
 completed/total lesson count, and distinguish assignments from references with
 their document icons. Lesson titles wrap and a small check marks completion;
 the mobile course menu mirrors those indicators. Counts include all lessons,
@@ -108,10 +108,18 @@ navigation starts with `Course Progress  done/total` (unique lessons, updated
 with completion) above a divider; Topics shows its document count there. Course
 navigation lists every document placed in the course, the same set as the week
 overview, including `search_exclude` or `hide` pages such as CSA MCQ Lessons;
-those flags only keep a document out of Topics (`topics: false` in the index). Each
-week row is one element: the `W<n>` pill and the underlined title link to the week
-overview, while the marker and count open or close the week. Week rows sit flush under their sprint,
-with the done count under the pill and the title at lesson-row size. On desktop the reader
+those flags only keep a document out of Topics (`topics: false` in the index).
+Sprint and week rows share one treatment, built by one `folder()` helper in
+`reader/js/browser.js` and one style rule: an `S<n>` or `W<n>` pill (an OCS
+`ocs__btn small pill` holding the arrow) followed by the title, an underlined
+link to the overview page. The pill and its arrow open or close the folder; the
+title opens the overview. A sprint without a title in its YAML shows
+`Sprint <n>`. Sprint pills sit on the left margin with the larger title; weeks
+nest one OCS tree level under their sprint, with the done count under the pill
+and the title at lesson-row size. Pills grow to the OCS `medium` button height
+on mobile. The toolbar `<` `>` and the pager step through the sprint and week
+overviews in course order (sprint, its first week, that week's lessons, the next
+week...). On desktop the reader
 scrolls the current document's row near the top of navigation, so the circle
 stays visible. The storage helper's `restore()` keeps the student's saved
 sections and only opens (never toggles) the current document's sprint and week.

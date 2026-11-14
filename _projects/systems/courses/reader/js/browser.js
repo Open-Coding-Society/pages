@@ -161,49 +161,54 @@ export async function startDocumentReader(root, tools) {
     const sections = [];
     const placed = new Set();
     const currentWeek = Number(membership[context.course].week);
+    // Reading order for < >: each sprint and week overview comes before its lessons.
+    const order = [];
+    // Sprint and week rows share one treatment: the S or W pill holds the arrow and,
+    // being plain text inside the summary, toggles the folder; the title opens the overview.
+    function folder(className, pillText, titleText, href, current) {
+      const details = node('details', undefined, `document-reader__folder ${className}`);
+      const summary = node('summary', undefined, 'document-reader__folder-summary');
+      const pill = node('span', undefined, 'ocs__btn small pill document-reader__folder-pill');
+      pill.append(icon('fa-chevron-right document-reader__folder-arrow'), pillText);
+      const title = node('a', titleText, 'document-reader__folder-title');
+      title.href = href;
+      if (current) markCurrent(title);
+      summary.append(pill, title);
+      details.append(summary);
+      order.push({ title: titleText, href, current });
+      return { details, summary, title };
+    }
+    function section(id, details) {
+      sections.push({ id, element: details, isOpen: () => details.open, setOpen: open => { details.open = open; } });
+    }
     function appendWeek(parent, group, title) {
-      const details = node('details', undefined, 'ocs__tree document-reader__week');
+      const { details, summary, title: weekTitle } = folder('ocs__tree document-reader__week', `W${group.week}`,
+        title || `Week ${group.week}`, `${base}/${context.course}/week-${group.week}/`,
+        overview.kind === 'week' && overview.week === group.week);
       details.dataset.week = String(group.week);
       details.dataset.weekGroup = '';
       details.open = group.week === currentWeek;
-      // The W pill and the title open the week overview; the marker and count toggle the week.
-      const summary = node('summary', undefined, 'document-reader__week-summary');
-      const overviewUrl = `${base}/${context.course}/week-${group.week}/`;
-      const pill = node('a', `W${group.week}`, 'ocs__status-pill ocs__status-pill--good document-reader__week-pill');
-      pill.href = overviewUrl;
-      pill.dataset.weekOverview = '';
-      pill.setAttribute('aria-label', `Week ${group.week} overview`);
-      pill.title = `Week ${group.week} overview`;
-      summary.append(pill);
-      const weekTitle = node('a', title || `Week ${group.week}`, 'document-reader__week-title');
-      weekTitle.href = overviewUrl;
       weekTitle.dataset.weekTitle = '';
-      summary.append(weekTitle);
-      if (overview.kind === 'week' && overview.week === group.week) markCurrent(weekTitle);
       const count = node('span', undefined, 'ocs__status-pill ocs__status-pill--neutral');
       count.dataset.weekCount = '';
       summary.append(count);
-      details.append(summary);
       appendLessons(details, group.lessons);
+      order.push(...group.lessons);
       parent.append(details);
-      sections.push({ id: `week-${group.week}`, element: details,
-        isOpen: () => details.open, setOpen: open => { details.open = open; } });
+      section(`week-${group.week}`, details);
     }
     schedule.sprints.forEach(sprint => {
       const groups = weeks.filter(group => group.week >= sprint.start && group.week <= sprint.end);
       if (!groups.length) return;
-      const details = node('details', undefined, 'document-reader__sprint');
+      const number = sprint.id.replace('Sprint', '');
+      const { details, title: sprintTitle } = folder('document-reader__sprint', `S${number}`,
+        String(sprint.title || '').trim() || `Sprint ${number}`, `${base}/${context.course}/sprint-${number}/`,
+        overview.kind === 'sprint' && `Sprint${overview.sprint}` === sprint.id);
+      sprintTitle.dataset.sprintTitle = '';
       details.open = groups.some(group => group.week === currentWeek);
-      details.append(node('summary', `${sprint.id}: ${sprint.title}`));
-      const intro = node('a', undefined, 'ocs__btn small accent document-reader__intro');
-      intro.append(icon('fa-flag'), 'Sprint overview');
-      intro.href = `${base}/${context.course}/sprint-${sprint.id.replace('Sprint', '')}/`;
-      if (overview.kind === 'sprint' && `Sprint${overview.sprint}` === sprint.id) markCurrent(intro);
-      details.append(intro);
       groups.forEach(group => { placed.add(group.week); appendWeek(details, group, sprint.weeks[String(group.week)]); });
       tree.append(details);
-      sections.push({ id: `sprint-${sprint.id.replace('Sprint', '')}-lessons`, element: details,
-        isOpen: () => details.open, setOpen: open => { details.open = open; } });
+      section(`sprint-${number}-lessons`, details);
     });
     weeks.filter(group => !placed.has(group.week)).forEach(group => {
       // No week overview is generated outside the schedule's sprint ranges.
@@ -215,12 +220,13 @@ export async function startDocumentReader(root, tools) {
       heading.append(count);
       section.append(heading);
       appendLessons(section, group.lessons);
+      order.push(...group.lessons);
       tree.append(section);
     });
     navigation = createNavigationState(sidebar, context.course, panel, sections);
     navigation.restore();
     if (panel === 'desktop') scrollCurrentNearTop();
-    return weeks.flatMap(group => group.lessons);
+    return order;
   }
 
   function topicsTree() {
@@ -234,26 +240,17 @@ export async function startDocumentReader(root, tools) {
     return selected;
   }
 
-  // Previous/next around this page. An overview sits before its first lesson,
-  // so a sprint or week page leads into it; course home continues the last
-  // document the student read (course-navigation-state's resume row).
+  // Previous/next around this page. Course order includes the sprint and week
+  // overviews; course home continues the last document the student read
+  // (course-navigation-state's resume row).
   function neighbors(order) {
-    if (!overview.kind) {
-      const index = order.findIndex(document => document.url === identity);
-      return index < 0 ? [] : [order[index - 1], order[index + 1]];
-    }
-    if (!context.course) return [];
     if (overview.kind === 'home') {
       const row = tree.querySelector('.navigation-resume');
       const document = row && order.find(entry => entry.url === row.dataset.lessonId);
       return [undefined, document ? { ...document, href: row.href, resume: true } : undefined];
     }
-    const sprint = payload.courses[context.course].sprints.find(entry => entry.id === `Sprint${overview.sprint}`);
-    const firstWeek = overview.kind === 'week' ? overview.week : Number(sprint?.start);
-    if (!['sprint', 'week'].includes(overview.kind) || !Number.isFinite(firstWeek)) return [];
-    const index = order.findIndex(document => Number(document.courses[context.course].week) >= firstWeek);
-    const position = index < 0 ? order.length : index;
-    return [order[position - 1], order[position]];
+    const index = order.findIndex(entry => (overview.kind ? entry.current : entry.url === identity));
+    return index < 0 ? [] : [order[index - 1], order[index + 1]];
   }
 
   function render() {

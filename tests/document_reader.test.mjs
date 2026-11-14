@@ -42,7 +42,7 @@ test('course cadence uses each placement without duplicating document identity',
   assert.equal(documents[0].url, '/shared');
 });
 
-async function startFakeReader(t, { dataset = {}, restore = () => {}, extraDocuments = [] } = {}) {
+async function startFakeReader(t, { dataset = {}, restore = () => {}, extraDocuments = [], sprintTitle = 'Start' } = {}) {
   class Element {
     constructor(tag = 'div') {
       this.tag = tag;
@@ -123,7 +123,7 @@ async function startFakeReader(t, { dataset = {}, restore = () => {}, extraDocum
     matchMedia: () => ({ matches: false }),
     localStorage: { getItem: key => saved.get(key) || null, setItem: (key, value) => saved.set(key, value) },
     fetch: async () => ({ ok: true, json: async () => ({
-      documents, courses: { csp: { title: 'CSP', sprints: [{ id: 'Sprint1', title: 'Start', start: 1, end: 2, weeks: { 1: 'Foundations', 2: 'Building' } }] } },
+      documents, courses: { csp: { title: 'CSP', sprints: [{ id: 'Sprint1', title: sprintTitle, start: 1, end: 2, weeks: { 1: 'Foundations', 2: 'Building' } }] } },
     }) }),
     window: { addEventListener: (name, callback) => { listeners[name] = callback; }, dispatchEvent: event => listeners[event.type]?.(event) },
     CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail; } },
@@ -156,16 +156,15 @@ test('reader navigation displays lesson types and updates week completion withou
   const progress = hooks.count.querySelector('[data-reader-progress]');
   assert.equal(hooks.count.textContent, 'Course Progress1/4');
   assert.equal(progress.attributes['aria-label'], '1 of 4 course lessons completed');
-  const weekPill = groups[0].querySelector('[data-week-overview]');
-  assert.equal(weekPill.tag, 'a');
-  assert.equal(weekPill.textContent, 'W1');
-  assert.equal(weekPill.href, '/preview/csp/week-1/');
-  assert.equal(weekPill.attributes['aria-label'], 'Week 1 overview');
+  const [weekSummary] = groups[0].children;
+  assert.deepEqual(weekSummary.children.slice(0, 2).map(child => [child.tag, child.textContent]), [['span', 'W1'], ['a', 'Foundations']],
+    'like the S pill, the W pill (with its arrow) toggles the week; only the title is a link');
+  assert.ok(weekSummary.children[0].classList.contains('ocs__btn'), 'the pill is an OCS small pill button');
+  assert.ok(weekSummary.children[0].children[0].classList.contains('fa-chevron-right'), 'the arrow is inside the pill');
   const weekTitle = groups[0].querySelector('[data-week-title]');
-  assert.equal(weekTitle.tag, 'a');
-  assert.equal(weekTitle.href, '/preview/csp/week-1/', 'the week title also opens the overview');
+  assert.equal(weekTitle.href, '/preview/csp/week-1/', 'the week title opens the overview');
   assert.ok(!groups[0].children.some(child => child.textContent === 'Week 1 overview'),
-    'the overview is the W pill, not a separate button');
+    'the overview is the week title, not a separate button');
   assert.equal(groups[2].querySelector('[data-week-count]').textContent, '0/1');
   const links = hooks.tree.querySelectorAll('[data-lesson-id]');
   assert.ok(links[0].children[0].classList.contains('fa-file-alt'));
@@ -175,9 +174,16 @@ test('reader navigation displays lesson types and updates week completion withou
   assert.equal(links[0].querySelector('[data-lesson-completed]').hidden, true);
   assert.equal(links[1].querySelector('[data-lesson-completed]').hidden, false);
   assert.equal(links[1].attributes['aria-label'], 'Reference (completed)');
-  assert.ok(hooks.tree.children[0].children[1].children[0].classList.contains('fa-flag'));
-  assert.equal(hooks['toolbar-previous'].hidden, true);
-  assert.equal(hooks['toolbar-previous'].href, undefined);
+  const sprint = hooks.tree.children[0];
+  const [sprintSummary] = sprint.children;
+  assert.equal(sprintSummary.tag, 'summary');
+  assert.deepEqual(sprintSummary.children.map(child => [child.tag, child.textContent]), [['span', 'S1'], ['a', 'Start']],
+    'the S pill toggles with the marker; only the title is a link');
+  assert.equal(sprint.querySelector('[data-sprint-title]').href, '/preview/csp/sprint-1/');
+  assert.ok(!sprint.children.some(child => child.textContent === 'Sprint overview'), 'no separate Sprint overview button');
+  assert.equal(hooks['toolbar-previous'].hidden, false);
+  assert.equal(hooks['toolbar-previous'].href, '/preview/csp/week-1/', '< steps back to the week overview');
+  assert.equal(hooks['toolbar-previous'].attributes['aria-label'], 'Previous document: Foundations');
   assert.equal(hooks['toolbar-next'].hidden, false);
   assert.equal(hooks['toolbar-next'].href, hooks.next.href);
   assert.equal(hooks['toolbar-next'].href, '/preview/reference/?context=course&course=csp');
@@ -255,14 +261,16 @@ test('a week overview marks its week, hides review circles and leads into its fi
   assert.equal(hooks.pager.hidden, false);
 });
 
-test('a sprint overview marks its Sprint overview button and leads into the sprint', async t => {
+test('a sprint overview marks its sprint title and leads into the sprint', async t => {
   const { hooks } = await startFakeReader(t, { dataset: {
     documentUrl: '/csp/sprint-1/', membership: JSON.stringify({ csp: {} }), overview: 'sprint', overviewSprint: '1',
   } });
-  const [intro] = hooks.tree.querySelectorAll('[aria-current="page"]');
-  assert.ok(intro.classList.contains('document-reader__intro') && intro.classList.contains('fill'));
-  assert.equal(hooks['toolbar-previous'].hidden, true);
-  assert.equal(hooks['toolbar-next'].href, '/preview/assignment/?context=course&course=csp');
+  const current = hooks.tree.querySelectorAll('[aria-current="page"]');
+  assert.equal(current.length, 1);
+  assert.equal(current[0], hooks.tree.querySelector('[data-sprint-title]'));
+  assert.ok(current[0].classList.contains('document-reader__overview-current'));
+  assert.equal(hooks['toolbar-previous'].hidden, true, 'the first sprint overview starts the course');
+  assert.equal(hooks['toolbar-next'].href, '/preview/csp/week-1/', '> steps into the week overview, then its lessons');
 });
 
 test('course home continues the document the student last read', async t => {
@@ -300,4 +308,9 @@ test('a course-placed page kept out of Topics is still a lesson in its course we
   hooks.context.listeners.change();
   assert.equal(hooks.count.textContent, '4 documents');
   assert.ok(!hooks.tree.querySelectorAll('[data-lesson-id]').some(link => link.dataset.lessonId === '/csa/mcq'));
+});
+
+test('a sprint without a title is named by its number', async t => {
+  const { hooks } = await startFakeReader(t, { sprintTitle: '  ' });
+  assert.equal(hooks.tree.querySelector('[data-sprint-title]').textContent, 'Sprint 1');
 });
