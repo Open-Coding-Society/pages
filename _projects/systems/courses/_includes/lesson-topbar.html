@@ -78,20 +78,18 @@
     {%- comment -%}
       Moves through the lesson order shown in the sidebar.
       prevLesson() and nextLesson() are defined in _layouts/post.html.
+      Topics replaces the old Blogs shortcut for browsing documents.
     {%- endcomment -%}
+    {%- if page.player_page == nil or page.player_page.kind == 'sprint' or page.player_page.kind == 'week' %}
     <nav class="ocs__links" aria-label="Lesson navigation">
-      <a class="ocs__btn ocs__btn--icon small accent{% if page.player_page.kind == 'blogs' %} fill{% endif %}" href="{{ site.baseurl }}/{{ current_course }}/blogs/"{% if page.player_page.kind == 'blogs' %} aria-current="page"{% endif %} aria-label="Course blogs" title="Course blogs">
-        <i class="fas fa-blog" aria-hidden="true"></i>
-      </a>
-      {%- if page.player_page == nil or page.player_page.kind == 'sprint' or page.player_page.kind == 'week' %}
       <button class="ocs__btn ocs__btn--icon small accent" onclick="prevLesson()" type="button" aria-label="Previous lesson" title="Previous lesson">
         <i class="fas fa-chevron-left" aria-hidden="true"></i>
       </button>
       <button class="ocs__btn ocs__btn--icon small accent" onclick="nextLesson()" type="button" aria-label="Next lesson" title="Next lesson">
         <i class="fas fa-chevron-right" aria-hidden="true"></i>
       </button>
-      {%- endif %}
     </nav>
+    {%- endif %}
   </div>
 
   {%- unless page.player_page %}

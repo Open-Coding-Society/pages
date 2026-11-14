@@ -18,6 +18,7 @@
     background: var(--panel);
     border-bottom: 1px solid var(--ui-border);
     .ocs__input { width: auto; min-width: 8rem; }
+    .ocs__links { gap: 0.25rem; }
     p { margin: 0; }
   }
   &__panes {

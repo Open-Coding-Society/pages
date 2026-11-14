@@ -190,12 +190,21 @@ export async function startDocumentReader(root, tools) {
     root.querySelector('[data-reader-count]').textContent = `${order.length} documents`;
     const index = order.findIndex(document => document.url === identity);
     pager.hidden = index < 0;
-    for (const [hook, document] of [['previous', order[index - 1]], ['next', order[index + 1]]]) {
+    for (const [hook, label, document] of [['previous', 'Previous', order[index - 1]], ['next', 'Next', order[index + 1]]]) {
       const link = root.querySelector(`[data-reader-${hook}]`);
-      link.hidden = !document || index < 0;
-      if (document) {
+      const button = root.querySelector(`[data-reader-toolbar-${hook}]`);
+      const available = Boolean(document) && index >= 0;
+      link.hidden = !available;
+      button.hidden = !available;
+      if (available) {
+        const href = readerLink(document.url, base, context, context.course ? '' : writeState(topics));
         link.textContent = document.title;
-        link.href = readerLink(document.url, base, context, context.course ? '' : writeState(topics));
+        link.href = href;
+        button.href = href;
+        button.setAttribute('aria-label', `${label} document: ${document.title}`);
+        button.title = `${label}: ${document.title}`;
+      } else {
+        button.removeAttribute('href');
       }
     }
     updateCompletion();

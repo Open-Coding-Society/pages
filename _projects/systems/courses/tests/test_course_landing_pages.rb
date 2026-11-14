@@ -150,11 +150,11 @@ Dir.mktmpdir("course-landing-") do |source|
       assert(breadcrumbs.include?('aria-label="Open course navigation"') &&
              !breadcrumbs.include?('fa-times'),
              "#{path} keeps only hamburger open controls beside Home")
-      assert(html.match?(%r{<a class="ocs__btn[^"]*" href="/preview/#{course}/blogs/"[^>]*aria-label="Course blogs"[^>]*>\s*<i class="fas fa-blog" aria-hidden="true"></i>\s*</a>}),
-             "#{path} keeps an icon-only accessible Blogs shortcut")
       topbar = html.split('class="topbar-lesson"', 2).last.split('class="lesson-content"', 2).first
       assert(!topbar.include?('fa-comments'),
              "#{path} omits the extra topbar chat shortcut")
+      assert(!topbar.include?('fa-blog') && !topbar.include?('aria-label="Course blogs"'),
+             "#{path} omits the Blogs shortcut; Topics replaces it")
       if path == "#{course}/blogs/index.html"
         listed = html.scan(/class="post-link" href="([^"]+)"/).flatten
         assert(listed == ["/preview/shared/?context=course&amp;course=#{course}", "/preview/only-#{course}/?context=course&amp;course=#{course}"],
@@ -172,8 +172,6 @@ Dir.mktmpdir("course-landing-") do |source|
         end
         assert(breadcrumbs.match?(%r{title="Course home".*course-breadcrumb-select.*class="current">Blogs</span>}m),
                "#{path} shows Home, selected course, and Blogs in breadcrumb order")
-        assert(html.match?(%r{<a class="ocs__btn[^"]* fill" href="/preview/#{course}/blogs/" aria-current="page"}),
-               "#{path} highlights the current Blogs page")
       end
       sidebar = html.split('id="lesson-sidebar"', 2).last.split('<script>', 2).first
       parsed = Nokogiri::HTML(html)

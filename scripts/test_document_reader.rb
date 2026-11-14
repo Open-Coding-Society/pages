@@ -97,6 +97,14 @@ class DocumentReaderTest < Minitest::Test
         assert_equal home, document.at_css(".document-reader__toolbar").element_children.first
         assert_equal 1, home.css(".fa-home[aria-hidden='true']").size
         assert_equal "Topics catalog", home["aria-label"]
+        toolbar = document.at_css(".document-reader__toolbar")
+        %w[previous next].each do |direction|
+          button = toolbar.at_css("[data-reader-toolbar-#{direction}]")
+          refute_nil button, "toolbar has a #{direction} document button"
+          assert button.key?("hidden"), "#{direction} button waits for the reader order"
+          assert_equal 1, button.css(".fa-chevron-#{direction == 'previous' ? 'left' : 'right'}[aria-hidden='true']").size
+          assert_match(/document/, button["aria-label"])
+        end
         assert_equal 1, document.css("#code-form-blog").size
         assert_equal 3, document.css(".code-runner-container").size
         assert_equal %w[csp csse topics].sort, document.css("[data-reader-context] option").map { |option| option["value"] }.sort

@@ -66,6 +66,7 @@ test('reader navigation displays lesson types and updates week completion withou
     append(...children) { this.children.push(...children); }
     replaceChildren(...children) { this.children = children; }
     setAttribute(name, value) { this.attributes[name] = String(value); }
+    removeAttribute(name) { delete this.attributes[name]; if (name === 'href') delete this.href; }
     addEventListener(name, callback) { this.listeners[name] = callback; }
     querySelectorAll(selector) {
       const data = selector.match(/^\[data-([a-z-]+)\]$/);
@@ -87,6 +88,7 @@ test('reader navigation displays lesson types and updates week completion withou
   const hooks = Object.fromEntries([
     'navigation', 'tree', 'context', 'query', 'category', 'status', 'complete',
     'pager', 'heading', 'topic-controls', 'home', 'full-topics', 'count', 'previous', 'next',
+    'toolbar-previous', 'toolbar-next',
   ].map(name => [name, new Element()]));
   const root = new Element();
   root.dataset = {
@@ -140,6 +142,12 @@ test('reader navigation displays lesson types and updates week completion withou
   assert.equal(links[1].querySelector('[data-lesson-completed]').hidden, false);
   assert.equal(links[1].attributes['aria-label'], 'Reference (completed)');
   assert.ok(hooks.tree.children[0].children[1].children[0].classList.contains('fa-flag'));
+  assert.equal(hooks['toolbar-previous'].hidden, true);
+  assert.equal(hooks['toolbar-previous'].href, undefined);
+  assert.equal(hooks['toolbar-next'].hidden, false);
+  assert.equal(hooks['toolbar-next'].href, hooks.next.href);
+  assert.equal(hooks['toolbar-next'].href, '/preview/reference/?context=course&course=csp');
+  assert.equal(hooks['toolbar-next'].attributes['aria-label'], 'Next document: Reference');
 
   hooks.complete.listeners.click();
   assert.equal(groups[0].querySelector('[data-week-count]').textContent, '2/2');

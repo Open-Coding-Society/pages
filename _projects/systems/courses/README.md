@@ -86,8 +86,10 @@ their document icons. Lesson titles wrap and a small check marks completion;
 the mobile course menu mirrors those indicators. Counts include all lessons,
 not only assignments, and follow the existing per-course completion state.
 
-Course home, week, sidebar and Blogs links carry course context. Topics links
-carry Topics/filter context. Navigation sections, scroll and last document use
+Course home, week and sidebar links carry course context. Topics links
+carry Topics/filter context. The reader toolbar's `<` and `>` buttons open the
+previous and next document in the selected course or Topics order (the same
+targets as the bottom pager) and hide at either end. Navigation sections, scroll and last document use
 the existing per-course/per-panel storage helper; switching contexts releases
 its old listeners. Completion retains `<course>-lesson-completion` and the
 original document URL, with no writes when simply changing views.
@@ -224,7 +226,8 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
 ## Preserved behavior
 
 - The header opens `/navigation/courses/<course>/` (Home/Announcements) directly.
-  Blogs remains available through its icon and shows Home > course > Blogs.
+  The topbar no longer has a Blogs shortcut (Topics replaces it); the generated
+  Blogs page still shows Home > course > Blogs.
   Course breadcrumbs use the short pill name (CSSE/CSP/CSA/CSH), while the
   navigation panel retains the full course title.
   New guests default to CSSE through
@@ -237,7 +240,7 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
   with lessons. Sidebar links and generated URLs must stay aligned.
 - Desktop and mobile panels put course buttons first, X at upper-right, and the
   selected title below. Hamburger controls open navigation; closing returns focus.
-- Blogs, Previous/Next, and reading completion are icon-only with accessible
+- Previous/Next and reading completion are icon-only with accessible
   labels. Arrows appear on lessons and sprint/week introductions. Completion
   appears only on lessons.
 - `ocs-course-navigation:<course>:<panel>` stores expanded sections, scroll,

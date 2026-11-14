@@ -12,6 +12,10 @@
       {% endfor %}
       <option value="topics"{% unless page.document_reader.default_course %} selected{% endunless %}>Topics</option>
     </select>
+    <nav class="ocs__links" aria-label="Previous and next document">
+      <a class="ocs__btn ocs__btn--icon small accent" data-reader-toolbar-previous hidden aria-label="Previous document" title="Previous document"><i class="fas fa-chevron-left" aria-hidden="true"></i></a>
+      <a class="ocs__btn ocs__btn--icon small accent" data-reader-toolbar-next hidden aria-label="Next document" title="Next document"><i class="fas fa-chevron-right" aria-hidden="true"></i></a>
+    </nav>
     <button class="ocs__btn small accent" type="button" data-reader-complete hidden aria-pressed="false">Mark lesson complete</button>
     <p role="status" aria-live="polite" data-reader-status></p>
   </header>
