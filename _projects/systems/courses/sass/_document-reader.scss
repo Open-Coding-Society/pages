@@ -202,7 +202,9 @@
     .post { max-width: 100%; }
     img { max-width: 100%; height: auto; }
     pre { max-width: 100%; overflow-x: auto; }
-    table { display: block; max-width: 100%; overflow-x: auto; }
+    // Markdown tables scroll as blocks; .ocs__table keeps table layout (its
+    // .ocs__table-wrap scrolls) so width and column shares still apply.
+    table:not(.ocs__table) { display: block; max-width: 100%; overflow-x: auto; }
   }
   @media (max-width: 768px) {
     &__panes { display: flex; flex-direction: column; overflow: hidden; }

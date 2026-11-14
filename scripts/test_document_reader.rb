@@ -29,6 +29,8 @@ class DocumentReaderTest < Minitest::Test
     # anywhere would shrink hosted table columns (course calendar days) to one character.
     main = css[/\.document-reader__main \{([^}]+)\}/, 1]
     assert_match(/overflow-wrap: break-word;/, main)
+    # Only Markdown tables become scrolling blocks; .ocs__table must fill its width.
+    assert_match(/\.document-reader__main table:not\(\.ocs__table\) \{\s*display: block;/, css)
   end
 
   def test_real_shared_javascript_keeps_one_document_and_submission_identity
