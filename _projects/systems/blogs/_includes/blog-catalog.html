@@ -15,14 +15,12 @@
 {% endif %}
 {%- if include.course -%}
   {%- comment -%}
-    A course's posts are the ones whose courses names that course and no
-    other, the rule the course player uses for its own lessons. A post for
-    several courses still shows, through the one-course copy that
-    scripts/split_multi_course_files.py makes of it.
+    Each document appears directly in every declared course. Compatibility
+    redirects are not documents and must never appear as extra cards.
   {%- endcomment -%}
   {%- assign coursePosts = "" | split: "" -%}
   {%- for post in rawposts -%}
-    {%- if post.courses[include.course] and post.courses.size == 1 -%}
+    {%- if post.courses[include.course] and post.reader_redirect_url == nil -%}
       {%- assign coursePosts = coursePosts | push: post -%}
     {%- endif -%}
   {%- endfor -%}
@@ -32,7 +30,7 @@
 <!-- Hide posts if front matter flag hide:true -->
 {% assign posts = '' | split:'' %}
 {% for post in rawposts %}
-  {% if post.hide != true %}
+  {% if post.hide != true and post.reader_redirect_url == nil %}
     {% assign posts = posts | push: post %}
   {% endif %}
 {% endfor %}
@@ -84,7 +82,7 @@
       {% assign post_id = post.canonical_id | default: post.id %}
       {% unless seen_ids contains post_id or post.title contains "_content" %}
         <li{% if catalog_search %} data-post-search-card data-post-search-text="{{ post.title | strip_html | escape }} {{ post.description | strip_html | escape }}"{% endif %}>
-          {%- include post_list_image_card.html -%}
+          {%- include post_list_image_card.html course=include.course -%}
         </li>
         {% assign seen_ids = seen_ids | push: post_id %}
       {% endunless %}

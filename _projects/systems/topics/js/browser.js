@@ -71,7 +71,10 @@ if (root) {
   function contextLink(document) {
     const original = cardByUrl.get(document.url).querySelector('h2 a');
     const url = new URL(original.href);
-    if (root.dataset.courseContext !== 'true') url.search = writeState(state);
+    if (root.dataset.courseContext !== 'true') {
+      url.search = writeState(state);
+      url.searchParams.set('context', 'topics');
+    }
     return url.href;
   }
 

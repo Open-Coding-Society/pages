@@ -35,14 +35,64 @@ The exact file mappings are in [distribution.json](distribution.json). Directory
 mappings include all their files recursively. New shared-path resources must be
 added there and their generated paths ignored in the root `.gitignore`.
 
-Blogs owns `layouts/post.html`. Its course branch delegates to the Courses-owned
-player include; conventional documents render without that adapter. Courses'
+Blogs owns `layouts/post.html`. Document pages use the shared reader, while
+course home/sprint/week/Blogs pages keep the Courses-owned player adapter. Courses'
 Blogs page delegates to Blogs' reusable reader with `course=` and `search=true`,
-so it lists only posts whose `courses` names that course alone (the rule the
-player uses for its own lessons) under a search bar. Both systems preserve the
+so it lists posts whose `courses` includes that course, including shared lessons,
+under a search bar. Both systems preserve the
 existing runtime paths and are always-on `:dev` projects.
 
 ## Build and development
+
+### Canonical document reader
+
+No lesson front matter changes or separate document list are required.
+`reader/reader.rb` discovers published `post`/`notebook` documents with categories
+or course placements and adds navigation metadata. Categorized `opencs` reference
+pages get the same shell through `reader/reference.html`; bespoke application
+layouts are not replaced. The original title, permalink, content and assignment
+fields remain unchanged.
+
+The original URL accepts `?context=course&course=csp` or `?context=topics`.
+Plain links retain the old course-priority default (CSP, CSA, CSSE, CSH); references
+without course placement default to Topics. Only courses actually declared in
+the document are offered. The sidebar draws existing sprint/week cadence from
+course YAML, or category-filtered titles/descriptions using Topics' shared filter
+rules. Full-text search remains in `/topics/`. Context changes leave the article,
+runner editors, unsaved form fields and submission listeners mounted.
+
+The reader uses the site's live OCS theme tokens: `--panel` for navigation and
+toolbar surfaces, the page background for content, and OCS accent buttons/tree
+guides for lesson links. Selected links use `fill`; do not reuse the legacy
+`lesson-item` class, whose preference-engine override masks selection colors.
+Theme changes apply without rebuilding the sidebar or replacing the article.
+Reader lesson links override the small control's fixed height so wrapped titles
+stay inside their button and do not overlap neighboring rows.
+
+Course home, week, sidebar and Blogs links carry course context. Topics links
+carry Topics/filter context. Navigation sections, scroll and last document use
+the existing per-course/per-panel storage helper; switching contexts releases
+its old listeners. Completion retains `<course>-lesson-completion` and the
+original document URL, with no writes when simply changing views.
+
+`make split-courses` now emits compatibility redirects, not copied lessons.
+Old `/topics/view/...` and `/<document>/<course>/` links forward to the original
+permalink with context, preserving hashes and filter parameters. Old converted
+notebook variants are treated as redirects too; author notebooks are not edited.
+Jekyll deduplicates legacy redirect variants before building the catalogs.
+
+The existing Blogs submission forms, runner includes, lesson feedback and grading
+helpers execute on the original permalink. Query parameters never enter
+`contentUrl` or runner storage keys. **Previously course-split assignments may
+have separate historical IDs**: this rollout does not delete or merge their
+records; new submissions through redirected URLs resolve the canonical
+assignment. Review old assignment rows in the teacher dashboard if needed.
+
+Tests: `bundle exec ruby scripts/test_document_reader.rb`,
+`node --test tests/document_reader.test.mjs tests/course_navigation_state.test.mjs`,
+and `venv/bin/python -m unittest discover -s tests -p test_convert_notebooks.py`.
+The Ruby test renders a real shared Intro to JavaScript lesson at both baseurls
+and executes its assignment-resolution script against a mocked backend.
 
 ### Optional sprint introductions
 

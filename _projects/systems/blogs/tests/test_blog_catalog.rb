@@ -133,9 +133,7 @@ empty_search = render.call(search_page, [post("unrelated", "2026-02-19")])
 assert(!empty_search.include?("post-search"), "An empty catalog must not show a search bar")
 assert(empty_search.include?("No documentation is available yet."), "An empty catalog keeps its message")
 
-# course= (passed by a course's Blogs page) keeps the posts that name only that
-# course, the rule the course player uses for its own lessons. A post for several
-# courses is listed through its one-course copies from split_multi_course_files.py.
+# course= includes shared documents directly; legacy redirects are never cards.
 hosted = lambda do |markup, entries|
   Liquid::Template.parse(markup).render!(
     { "site" => { "posts" => entries }, "page" => { "title" => "Blogs" }, "current_course" => "csa" },
@@ -146,13 +144,13 @@ course_posts = [
   post("csa-lesson", "2026-03-03", "courses" => { "csa" => { "week" => 2 } }),
   post("csp-lesson", "2026-03-04", "courses" => { "csp" => { "week" => 2 } }),
   post("shared-lesson", "2026-03-05", "courses" => { "csa" => { "week" => 3 }, "csp" => { "week" => 3 } }),
-  post("shared-lesson-csa", "2026-03-05", "courses" => { "csa" => { "week" => 3 } }),
+  post("shared-lesson-csa", "2026-03-05", "reader_redirect_url" => "/shared-lesson/"),
   post("capstone", "2026-03-06", "sticky_rank" => 1),
   post("hidden-csa", "2026-03-07", "courses" => { "csa" => { "week" => 4 } }, "hide" => true)
 ]
 csa = hosted.call("{% include blog-catalog.html course=current_course %}", course_posts)
 csa_links = csa.scan(/class="post-link" href="([^"]+)"/).flatten
-assert(csa_links == %w[/preview/shared-lesson-csa/ /preview/csa-lesson/],
+assert(csa_links == %w[/preview/shared-lesson/?context=course&amp;course=csa /preview/csa-lesson/?context=course&amp;course=csa],
        "A course's catalog lists only that course's own posts, newest first; got #{csa_links.inspect}")
 assert(!csa.include?("post-search"), "course= alone must not add a search bar")
 none = hosted.call('{% include blog-catalog.html course="csh" %}', course_posts)
@@ -162,7 +160,7 @@ course_search = hosted.call("{% include blog-catalog.html course=current_course 
 assert(course_search.include?("data-post-search>") && course_search.scan("<li data-post-search-card").size == 2,
        "search=true must put the bar over the course's own cards")
 everything = hosted.call("{% include blog-catalog.html %}", course_posts)
-assert(everything.scan('class="post-link"').size == 5,
+assert(everything.scan('class="post-link"').size == 4,
        "Without course= the catalog must still list every visible post")
 
 puts "PASS: blog catalog filtering, ordering, cards, deduplication, baseurl, empty state, search bar and course filter"

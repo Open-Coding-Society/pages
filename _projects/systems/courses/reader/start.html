@@ -1,0 +1,37 @@
+<div class="document-reader" data-document-reader
+     data-document-url="{{ page.url | escape }}"
+     data-baseurl="{{ site.baseurl | escape }}"
+     data-membership="{{ page.document_reader.courses | jsonify | escape }}"
+     data-default-course="{{ page.document_reader.default_course | escape }}"
+     data-index-url="{{ '/assets/js/projects/courses/reader/data.json' | relative_url }}">
+  <header class="document-reader__toolbar">
+    <label for="document-reader-context">Navigation</label>
+    <select id="document-reader-context" class="ocs__input" data-reader-context>
+      {% for placement in page.document_reader.courses %}
+      <option value="{{ placement[0] | escape }}"{% if placement[0] == page.document_reader.default_course %} selected{% endif %}>{{ placement[0] | upcase }}</option>
+      {% endfor %}
+      <option value="topics"{% unless page.document_reader.default_course %} selected{% endunless %}>Topics</option>
+    </select>
+    <a class="ocs__btn small accent" href="{{ '/topics/' | relative_url }}" data-reader-home>Topics catalog</a>
+    <button class="ocs__btn small accent" type="button" data-reader-complete hidden aria-pressed="false">Mark lesson complete</button>
+    <p role="status" aria-live="polite" data-reader-status></p>
+  </header>
+  <div class="document-reader__panes">
+    <details class="document-reader__navigation" data-reader-navigation open>
+      <summary>Document navigation</summary>
+      <nav aria-label="Document navigation">
+        <h2 data-reader-heading>Navigation</h2>
+        <div data-reader-topic-controls hidden>
+          <label for="document-reader-query">Search titles and descriptions</label>
+          <input class="ocs__input" id="document-reader-query" type="search" data-reader-query autocomplete="off">
+          <label for="document-reader-category">Category</label>
+          <select class="ocs__input" id="document-reader-category" data-reader-category>
+            <option value="">All categories</option>
+          </select>
+          <a class="ocs__btn small accent" href="{{ '/topics/' | relative_url }}" data-reader-full-topics>Full search and filters</a>
+        </div>
+        <p data-reader-count></p>
+        <div data-reader-tree></div>
+      </nav>
+    </details>
+    <div class="document-reader__main" data-reader-main>

@@ -1,11 +1,11 @@
 require "json"
 require "cgi"
 
-# Builds Topics' category catalog, search data, and reference-view pages at
-# Jekyll build time. Original document routes and course behavior stay intact.
+# Builds Topics' category catalog and search data at Jekyll build time.
+# Former reference-view routes redirect to the original document and context.
 #
 # JavaScript in js/browser.js and js/model.js handles live search and filter
-# controls; js/document.js preserves navigation context in reference views.
+# controls; Courses' reader preserves navigation context on original documents.
 # This Ruby code prepares their data and HTML, not visitor interactions.
 #
 # Methods declared with `self.` belong to the module (like Java static methods).
@@ -28,7 +28,7 @@ module Topics
     values.map(&:strip).uniq { |value| value.downcase }
   end
 
-  # Builds a reference-view route from an existing site-relative document URL.
+  # Builds a legacy reference-view route for its compatibility redirect.
   #
   # @param url [String] Original URL beginning with "/", without query/fragment.
   # @return [String] URL prefixed with "/topics/view". Extensionless routes get
@@ -63,7 +63,7 @@ module Topics
     result
   end
 
-  # Jekyll integration that discovers documents and adds reference-only views.
+  # Jekyll integration that discovers documents and adds compatibility routes.
   #
   # Jekyll instantiates this subclass and calls generate during its build.
   class Generator < Jekyll::Generator
@@ -71,7 +71,7 @@ module Topics
     safe true
     priority :lowest
 
-    # Publishes category data, a JSON search catalog, and Topics document pages.
+    # Publishes category data, a JSON search catalog, and legacy redirects.
     #
     # Includes categorized posts/pages, excluding hidden, draft, search-excluded,
     # and generated course-player pages. Duplicate original URLs keep the first
@@ -86,7 +86,7 @@ module Topics
     #   Catalog entries include title, description, category keys/display labels,
     #   source path, original/view URLs, searchable text, weeks, and an optional
     #   converted source filename. Adds site.pages for the JSON catalog and each
-    #   reference view; original source pages/posts are not replaced.
+    #   legacy redirect; no duplicate lesson bodies are generated.
     # @raise [Jekyll::Errors::FatalException] If primary-topic YAML or a document's
     #   category metadata is invalid.
     def generate(site)
@@ -115,7 +115,7 @@ module Topics
           "labels" => names,
           "path" => document.relative_path,
           "url" => document.url,
-          "viewUrl" => Topics.view_url(document.url),
+          "viewUrl" => "#{document.url}?context=topics",
           "content" => searchable_content(document.content),
           "weeks" => (document.data["courses"] || {}).to_h.filter_map do |course, value|
             "#{course.upcase} week #{value['week']}" if value.is_a?(Hash) && value["week"]
@@ -129,27 +129,21 @@ module Topics
       site.pages << Topics.page(site, "/assets/js/projects/topics/data.json",
                          { "layout" => nil, "search_exclude" => true }, JSON.generate(entries))
       documents.each do |document|
-        # dup/merge copies metadata so disabling course chat here cannot change
-        # the original document. Its URL remains the submission identity.
-        data = document.data.dup.merge(
-          "topics_context" => true, "topics_original_url" => document.url,
-          "search_exclude" => true, "chat" => false,
-          "path" => document.relative_path
-        )
-        # Posts rely on layout defaults that PageWithoutAFile does not inherit.
-        data["layout"] ||= "post" if document.is_a?(Jekyll::Document)
-        content = document.content
-        # Shared post/notebook layouts add Topics navigation themselves; other
-        # layouts need it prepended to their content to avoid losing the controls.
-        unless %w[post notebook].include?(data["layout"])
-          data["topics_nav_in_content"] = true
-          content = "{% include projects/topics/topics-document-nav.html %}\n" \
-                    "<script type=\"module\" src=\"{{ '/assets/js/projects/topics/document.js' | relative_url }}\"></script>\n\n" + content
-        end
-        view = Topics.page(site, Topics.view_url(document.url), data, content)
-        # The viewing route changes, but conversion and relative includes use the source.
-        view.process("document#{document.extname}")
+        data = {
+          "layout" => "projects/courses/reader-redirect", "title" => document.data["title"],
+          "reader_redirect_url" => document.url, "search_exclude" => true, "sitemap" => false
+        }
+        view = Topics.page(site, Topics.view_url(document.url), data, "")
         site.pages << view
+        # Older catalogs also indexed each course-specific copy of shared
+        # lessons. Keep those reference links without re-indexing the copies.
+        courses = document.data["courses"]
+        if courses.is_a?(Hash) && courses.size > 1
+          courses.each_key do |course|
+            legacy = "#{document.url.sub(%r{/\z}, '')}/#{course}/"
+            site.pages << Topics.page(site, Topics.view_url(legacy), data, "")
+          end
+        end
       end
     end
 

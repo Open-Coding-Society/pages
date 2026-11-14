@@ -15,6 +15,13 @@
     { "source": "js/player/course-navigation-state.js", "destination": "assets/js/course-navigation-state.js" },
     { "source": "js/announcement-calendar", "destination": "assets/js/chat/calendar" },
     { "source": "js/courses.js", "destination": "assets/js/projects/courses/courses.js" },
+    { "source": "reader/reader.rb", "destination": "_plugins/projects/courses/document_reader.rb" },
+    { "source": "reader/start.html", "destination": "_includes/projects/courses/reader/start.html" },
+    { "source": "reader/end.html", "destination": "_includes/projects/courses/reader/end.html" },
+    { "source": "reader/redirect.html", "destination": "_layouts/projects/courses/reader-redirect.html" },
+    { "source": "reader/reference.html", "destination": "_layouts/projects/courses/reader-reference.html" },
+    { "source": "reader/js", "destination": "assets/js/projects/courses/reader" },
+    { "source": "sass/_document-reader.scss", "destination": "_sass/projects/courses/_document-reader.scss" },
     { "source": "sass/main.scss", "destination": "_sass/projects/courses/main.scss" },
     { "source": "sass/viewing/timeline.scss", "destination": "_sass/open-coding/timeline.scss" },
     { "source": "sass/viewing/announcement-calendar.scss", "destination": "_sass/open-coding/announcement-calendar.scss" }

@@ -1,7 +1,7 @@
 export function createNavigationState(root, course, panel, sections, environment = window) {
   const key = `ocs-course-navigation:${course}:${panel}`;
   let state = { sections: {}, scrollTop: 0, lastDocument: null };
-  const selection = '.lesson-item.active, .sprint-nav [aria-current="page"], .modal-lesson-item.active';
+  const selection = '.lesson-item.active, .sprint-nav [aria-current="page"], .modal-lesson-item.active, .document-reader__lesson[aria-current="page"]';
   let resume = null;
 
   function selectedRow() {
@@ -80,5 +80,13 @@ export function createNavigationState(root, course, panel, sections, environment
   root.addEventListener('navigation-toggle', save);
   root.addEventListener('toggle', save, true);
   environment.addEventListener('pagehide', save);
-  return { restore, restorePosition, save };
+  function destroy() {
+    save();
+    root.removeEventListener('scroll', save);
+    root.removeEventListener('click', save);
+    root.removeEventListener('navigation-toggle', save);
+    root.removeEventListener('toggle', save, true);
+    environment.removeEventListener('pagehide', save);
+  }
+  return { restore, restorePosition, save, destroy };
 }

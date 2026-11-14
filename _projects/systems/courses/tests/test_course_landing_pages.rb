@@ -70,7 +70,7 @@ Dir.mktmpdir("course-landing-") do |source|
     blog_post.call("2026-10-01-only-#{course}.md", "title" => "Only #{course.upcase}",
                    "permalink" => "/only-#{course}/", "courses" => { course => { "week" => 9 } })
     blog_post.call("2026-10-02-shared-#{course}.md", "title" => "Shared lesson",
-                   "permalink" => "/shared/#{course}/", "courses" => { course => { "week" => 9 } })
+                   "permalink" => "/shared/#{course}/", "reader_redirect_url" => "/shared/")
   end
   blog_post.call("2026-10-02-shared.md", "title" => "Shared lesson", "permalink" => "/shared/",
                  "courses" => %w[csse csp csa csh].to_h { |course| [course, { "week" => 9 }] })
@@ -152,7 +152,7 @@ Dir.mktmpdir("course-landing-") do |source|
              "#{path} omits the extra topbar chat shortcut")
       if path == "#{course}/blogs/index.html"
         listed = html.scan(/class="post-link" href="([^"]+)"/).flatten
-        assert(listed == ["/preview/shared/#{course}/", "/preview/only-#{course}/"],
+        assert(listed == ["/preview/shared/?context=course&amp;course=#{course}", "/preview/only-#{course}/?context=course&amp;course=#{course}"],
                "#{path} lists only #{course}'s own posts, newest first; got #{listed.inspect}")
         assert(html.include?("#{course.upcase} posts: pinned posts first, then the newest."),
                "#{path} says whose posts it lists")

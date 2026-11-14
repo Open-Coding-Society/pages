@@ -19,6 +19,9 @@ class TopicsTest < Minitest::Test
     Dir.mktmpdir("topics-") do |source|
       ProjectPublisher.run("publish", PROJECT, source)
       ProjectPublisher.run("publish", File.join(ROOT, "_projects/systems/blogs"), source)
+      redirect_layout = File.join(source, "_layouts/projects/courses")
+      FileUtils.mkdir_p(redirect_layout)
+      FileUtils.cp(File.join(ROOT, "_projects/systems/courses/reader/redirect.html"), File.join(redirect_layout, "reader-redirect.html"))
       File.write(File.join(source, "_layouts/opencs.html"), "<main>{{ content }}</main>")
       File.write(File.join(source, "_includes/course-document-player.html"), '<div id="course-player">{{ content }}</div>')
       FileUtils.cp(File.join(ROOT, "_includes/reading_time.html"), File.join(source, "_includes"))
@@ -96,17 +99,17 @@ class TopicsTest < Minitest::Test
       assert_includes original, 'id="course-player"'
       topic = File.read(File.join(source, "_site/topics/view/java/algorithms/index.html"))
       refute_includes topic, 'id="course-player"'
-      assert_includes topic, "Interactive runner"
-      assert_includes topic, "<strong>Relative evidence</strong>"
-      assert_includes topic, 'id="algorithm-heading"'
-      assert_includes topic, "CURRENT_LESSON_ID_BLOG = \"/java/algorithms/\""
-      assert_includes topic, "/preview/topics/?category=java"
-      assert_includes topic, "/preview/assets/js/projects/topics/document.js"
+      refute_includes topic, "Interactive runner"
+      refute_includes topic, "Algorithm evidence."
+      assert_includes topic, "/preview/java/algorithms/?context=topics"
+      assert_includes topic, "location.replace(target.href)"
+      assert_includes original, "Interactive runner"
+      assert_includes original, "<strong>Relative evidence</strong>"
       outline = File.read(File.join(source, "_site/topics/view/csa/cs112/index.html"))
-      assert_includes outline, "Topics document navigation"
+      assert_includes outline, "/preview/csa/cs112/?context=topics"
       browser = File.read(File.join(source, "_site/topics/index.html"))
       assert_includes browser, "Java Algorithms"
-      assert_includes browser, "/preview/topics/view/java/algorithms/"
+      assert_includes browser, "/preview/java/algorithms/?context=topics"
       assert_includes browser, '<h2>Topics</h2>'
       assert_includes browser, '<summary><h3>Topic Filter</h3></summary>'
       assert_includes browser, '<summary><h3>Categories Filter</h3></summary>'

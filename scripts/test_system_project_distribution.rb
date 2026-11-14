@@ -92,7 +92,7 @@ class SystemProjectDistributionTest < Minitest::Test
   def test_new_roots_are_cleaned_even_without_a_distribution_cache
     in_workspace do |workspace|
       project = project_copy(workspace, "topics")
-      paths = %w[navigation _data _plugins].map do |root|
+      paths = %w[navigation _data _plugins _layouts].map do |root|
         path = File.join(workspace, root, "projects/topics/orphan")
         FileUtils.mkdir_p(File.dirname(path))
         File.write(path, "old output")

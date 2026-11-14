@@ -347,8 +347,10 @@ Project builds use one Python batch with up to four workers. Unchanged notebooks
 are skipped using `.notebook-conversion-cache/`; editing the source or converter,
 or deleting/modifying the output, causes reconversion. Identical Markdown is not
 rewritten. `make convert` scans legacy notebook sources only; registered-project
-build targets handle project sources. `make split-courses` still publishes
-multi-course variants from generated posts.
+build targets handle project sources. `make split-courses` now publishes small
+compatibility redirects at former per-course URLs, not duplicated lesson bodies.
+The shared reader uses the original permalink with Course/Topics query context;
+titles, source front matter and canonical submission identity stay unchanged.
 
 `make dev` now retains generated output and performs one incremental build of
 the selected projects instead of cleaning and converting them twice. Use

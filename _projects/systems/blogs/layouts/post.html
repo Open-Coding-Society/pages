@@ -9,10 +9,10 @@ Check if this is a course lesson and determine which course context to use
 {% assign current_course = null %}
 {% assign current_week = null %}
 
-{% comment %}Since files are now course-specific, get the single course{% endcomment %}
+{% comment %}Resolve the player-page course or the default lesson course; shared documents use the reader below.{% endcomment %}
 {% if page.player_page %}
 {% comment %}
-A sprint, week, chat, or blogs page made by _plugins/lesson_player_pages.rb.
+A course home page, or a generated sprint, week, or Blogs overview.
 Sprint and blogs pages are not part of one week, so their current_week is null.
 {% endcomment %}
 {% assign current_course = page.player_page.course %}
@@ -38,9 +38,11 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
 {% endif %}
 
 {% if page.topics_context %}{% assign is_course_lesson = false %}{% endif %}
+{% if page.document_reader and page.player_page == nil %}{% assign is_course_lesson = false %}{% endif %}
 {% if is_course_lesson %}
 {% include course-document-player.html %}
 {% else %}
+{% if page.document_reader %}{% include projects/courses/reader/start.html %}{% endif %}
 {% if page.topics_context and page.topics_nav_in_content != true %}
 {% include projects/topics/topics-document-nav.html %}
 <script type="module" src="{{ '/assets/js/projects/topics/document.js' | relative_url }}"></script>
@@ -276,6 +278,10 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     {%- endif -%}
 
     {{ content }}
+
+    {% if page.show_gist_export %}
+    {% include gist-export-button.html %}
+    {% endif %}
 
     {% if page.grading_modules %}
     {% comment %} Grading/submission module at the bottom of the content (non-course-lesson pages) {% endcomment %}
@@ -1014,8 +1020,11 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
   </script>
   <script src="{{ site.baseurl }}/assets/js/ocs-analytics-enhanced.js"></script>
   <script src="{{ site.baseurl }}/assets/js/code-runner-analytics.js"></script>
+  {% unless page.document_reader.courses.size > 0 %}
   <script src="{{ site.baseurl }}/assets/js/lesson-completion.js"></script>
   <script src="{{ site.baseurl }}/assets/js/lesson-completion-bigsix.js"></script>
+  {% endunless %}
 </article>
+{% if page.document_reader %}{% include projects/courses/reader/end.html %}{% endif %}
 
 {% endif %}

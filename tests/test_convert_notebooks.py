@@ -181,7 +181,7 @@ class NotebookConversionTests(unittest.TestCase):
             os.chdir(previous)
         self.assertFalse(staged.with_name("topic_csa.ipynb").exists())
 
-    def test_project_multi_course_post_still_splits_into_existing_routes(self):
+    def test_project_multi_course_post_keeps_one_body_and_redirects_existing_routes(self):
         source = self.notebook("_projects/lessons/demo/notebooks/topic.ipynb", courses={"csa": {"week": 13}, "csp": {"week": 4}})
         self.convert([source])
         previous = Path.cwd()
@@ -194,8 +194,31 @@ class NotebookConversionTests(unittest.TestCase):
         output = Path(converter.get_relative_output_path(source))
         csa = output.with_name(output.stem + "_csa.md")
         self.assertIn("/fixture/csa/", csa.read_text())
-        self.assertIn("week: 13", csa.read_text())
+        self.assertIn("reader_redirect_url: /fixture", csa.read_text())
+        self.assertIn("reader_redirect_course: csa", csa.read_text())
+        self.assertNotIn("assignment:", csa.read_text())
+        self.assertNotIn("include_relative", csa.read_text())
+        self.assertFalse(output.with_name(output.stem + "_content.md").exists())
         self.assertFalse((self.root / "_notebooks/projects").exists())
+
+    def test_old_converted_course_copy_becomes_a_redirect_without_touching_notebooks(self):
+        source = self.notebook("_projects/lessons/demo/notebooks/topic.ipynb", courses={"csa": {"week": 13}, "csp": {"week": 4}})
+        self.convert([source])
+        output = Path(converter.get_relative_output_path(source))
+        original = output.read_text()
+        legacy = output.with_name(output.stem.removesuffix("_IPYNB_2_") + "_csa_IPYNB_2_.md")
+        legacy.write_text("---\npermalink: /fixture/csa/\nassignment: true\n---\nOld duplicated body\n")
+        previous = Path.cwd()
+        try:
+            os.chdir(self.root)
+            with contextlib.redirect_stdout(io.StringIO()):
+                splitter.find_and_split_multi_course_files()
+        finally:
+            os.chdir(previous)
+        self.assertIn("reader_redirect_url: /fixture", legacy.read_text())
+        self.assertNotIn("assignment:", legacy.read_text())
+        self.assertNotIn("Old duplicated body", legacy.read_text())
+        self.assertEqual(original, output.read_text())
 
     def prepare_make_fixture(self):
         scripts = self.root / "scripts"

@@ -1,5 +1,6 @@
 {% comment %}
-=== TWO-PANE LESSON PLAYER FOR CSP COURSES ===
+Course overview player and legacy lesson fallback. Canonical lesson documents
+use the shared reader shell instead; courses are not restricted to CSP.
 {% endcomment %}
 
 {% assign posts = null | compact %}
@@ -7,11 +8,11 @@
 
 {%- comment -%}
   This course's lessons: the posts and pages whose front matter puts them in
-  this course only. Found once here for the sidebar and the player pages.
+  this course, including shared documents. Found once here for player pages.
 {%- endcomment -%}
 {%- assign coursePosts = "" | split: "" -%}
 {%- for post in posts -%}
-  {%- if post.courses[current_course] and post.courses.size == 1 -%}
+  {%- if post.courses[current_course] and post.reader_redirect_url == nil -%}
     {%- assign coursePosts = coursePosts | push: post -%}
   {%- endif -%}
 {%- endfor -%}
@@ -1181,4 +1182,3 @@
 
   document.addEventListener('DOMContentLoaded', initializePage);
 </script>
-

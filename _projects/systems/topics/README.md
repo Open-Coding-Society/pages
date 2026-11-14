@@ -83,12 +83,13 @@ text DOM nodes rather than inserting document HTML.
 Category combinations, the AND choice (`match=and`), query and browsing view are
 shareable through URL parameters.
 
-Topics document routes under `/topics/view/` retain full interactive content,
-Runners and Submissions without activating the course player. Assignment identity
-uses the original document URL. Original document routes retain their course
-behavior. A Topics return link restores the selected filters/query/view; links
-to other indexed documents retain Topics context. An explicit original-context
-link is available.
+Topics opens the original document permalink with `?context=topics`, not a copy
+of its content. The Courses-owned shared reader provides the same sidebar/main
+layout for Topics and course navigation, leaving Runners, Submissions and lesson
+feedback on the original document identity. Former `/topics/view/` routes are
+small compatibility redirects that retain filter parameters and fragments.
+Plain document links keep their default course context when a course is declared.
+The reader's Topics catalog link restores filters, query and view.
 
 Topics' browser include can also be hosted in a course page. It shows document
 week metadata there, but never uses weeks to define topic membership. Existing
@@ -96,17 +97,17 @@ language-reference pages host the same browser with their category selected.
 
 Use `{% include projects/topics/topics-browser.html course_context=true %}` within a course
 document to show weeks and link to original course views. The ordinary include
-uses Topics views even when a reference page also carries course/week metadata.
+uses Topics context even when a reference page also carries course/week metadata.
 The shared language-reference include selects course context when the page has
 course metadata. Course reference sources use `layout: post` to retain the
-course player; `layout: opencs` bypasses that adapter.
+shared reader; categorized `layout: opencs` reference pages also receive that shell.
 
 ## Resource map
 
 | Source | Published destination |
 | --- | --- |
 | `pages/` | `navigation/projects/topics/`; Topics landing and Search compatibility entry |
-| `plugins/topics.rb` | `_plugins/projects/topics/topics.rb`; builds category index and document views |
+| `plugins/topics.rb` | `_plugins/projects/topics/topics.rb`; builds category index and legacy redirects |
 | `data/topics_primary.yml` | `_data/projects/topics/topics_primary.yml`; ordered primary category names |
 | `data/topics_units.yml` | `_data/projects/topics/topics_units.yml`; optional unit names per topic |
 | `_includes/` | `_includes/projects/topics/`; shared browser and document navigation |

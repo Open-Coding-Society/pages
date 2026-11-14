@@ -1,25 +1,36 @@
-# Builds the pages the lesson sidebar links to that are not lessons:
+# Builds course overview pages, not lesson documents:
 #
 #   /<course>/sprint-<n>/      the sprint's intro: what it is about and its weeks
 #   /<course>/week-<w>/        the week's intro: its learning goals and lessons
-#   /<course>/blogs/           every post on the site
+#   /<course>/blogs/           searchable catalog of this course's documents
 #
 # A course is a data file with a `course:` block and Sprint1, Sprint2, ... keys,
 # like _data/csa.yml, so a new sprint or week gets its pages from the data alone.
-# The pages are made in memory while the site builds; there is no file to edit.
+# The pages are made in memory while the site builds; edit the course data or
+# player-pages includes, not generated HTML. Week pages require a lesson in that
+# course/week; sprint and Blogs pages do not.
 #
-# Each page carries `player_page` in its front matter. _layouts/post.html sees it,
-# shows the page inside the lesson player, and draws the page body from
-# _includes/player-pages/<kind>.html.
+# Each page carries generated `player_page` metadata. Blogs' post layout routes
+# it through Courses' course-document-player.html and player-pages/<kind>.html.
+# Course home pages are authored separately under Courses' navigation/.
+#
+# Courses still own classroom cadence. The canonical document reader
+# (reader/reader.rb) handles individual lessons with Course or Topics navigation.
+# A shared lesson has one original permalink and can belong to multiple courses;
+# this generator creates their overview pages, never copies of the lesson body.
 #
 # Test: bundle exec ruby scripts/test_player_pages.rb
 module LessonPlayerPages
+  # Publishes course overview routes after canonical-document metadata is ready.
   class Generator < Jekyll::Generator
     safe true
     priority :low
 
     SPRINT_KEY = /\ASprint(\d+)\z/
 
+    # @param site [Jekyll::Site] loaded course schedules and document placements
+    # @return [void]
+    # @note Appends generated overview pages to site.pages; source files are unchanged.
     def generate(site)
       site.data.each do |course, data|
         next unless course_data?(data)
@@ -40,12 +51,12 @@ module LessonPlayerPages
 
     private
 
-    # The weeks the sidebar lists: weeks with a lesson that is in this course
-    # only. to_i reads the week the way the sidebar's `| plus: 0` does.
+    # Shared documents appear in each declared course without copied lessons.
+    # to_i reads the week the way the sidebar's `| plus: 0` does.
     def weeks_with_lessons(site, course)
       (site.posts.docs + site.pages).filter_map do |doc|
         courses = doc.data["courses"]
-        next unless courses.is_a?(Hash) && courses.size == 1 && courses[course]
+        next unless courses.is_a?(Hash) && courses[course] && !doc.data["reader_redirect_url"]
 
         entry = courses[course]
         (entry.is_a?(Hash) ? entry["week"] : nil).to_i

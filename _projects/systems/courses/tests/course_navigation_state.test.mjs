@@ -13,6 +13,7 @@ function fixture(saved, currentSection = 'week-2') {
     querySelectorAll: () => [],
     getBoundingClientRect: () => ({ top: 0, bottom: 400 }),
     addEventListener: (name, handler) => listeners.set(name, handler),
+    removeEventListener: name => listeners.delete(name),
   };
   selected.getBoundingClientRect = () => ({ top: 250 - root.scrollTop, bottom: 280 - root.scrollTop });
   const sections = ['sprint-1', 'sprint-2', 'week-2'].map(id => ({
@@ -25,6 +26,7 @@ function fixture(saved, currentSection = 'week-2') {
   const environment = {
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
     addEventListener: (name, handler) => listeners.set(name, handler),
+    removeEventListener: name => listeners.delete(name),
   };
   return { root, sections, environment, storage, listeners };
 }
@@ -39,6 +41,17 @@ test('restores other expanded sections and opens the selected sprint and week', 
   const saved = JSON.parse(setup.storage.get('ocs-course-navigation:csa:desktop'));
   assert.equal(saved.sections['week-2'], true);
   assert.equal(saved.scrollTop, 100);
+});
+
+test('switching reader context releases navigation listeners and saves its own state', () => {
+  const setup = fixture(null, null);
+  const navigation = createNavigationState(setup.root, 'csa', 'desktop', setup.sections, setup.environment);
+  navigation.restore();
+  setup.sections[0].open = true;
+  navigation.destroy();
+  assert.equal(setup.listeners.size, 0);
+  const saved = JSON.parse(setup.storage.get('ocs-course-navigation:csa:desktop'));
+  assert.equal(saved.sections['sprint-1'], true);
 });
 
 test('Blogs keeps the last document visible without changing the page or completion', () => {
@@ -72,6 +85,20 @@ test('opening a document updates the resume target, even before leaving its page
   current.href = 'https://example.test/csa/new-document/';
   createNavigationState(setup.root, 'csa', 'desktop', setup.sections, setup.environment).restore();
   assert.equal(JSON.parse(setup.storage.get('ocs-course-navigation:csa:desktop')).lastDocument, current.href);
+});
+
+test('OCS reader links retain selected ancestors and resume identity without legacy lesson styling', () => {
+  const setup = fixture();
+  const current = setup.root.querySelector();
+  current.dataset.lessonId = '/javascript/intro';
+  current.href = 'https://example.test/javascript/intro?context=course&course=csa';
+  setup.root.querySelector = selector =>
+    selector.includes('.document-reader__lesson[aria-current="page"]') ? current : null;
+  const navigation = createNavigationState(setup.root, 'csa', 'desktop', setup.sections, setup.environment);
+  navigation.restore();
+  assert.deepEqual(setup.sections.map(section => section.open), [false, true, true]);
+  assert.equal(JSON.parse(setup.storage.get('ocs-course-navigation:csa:desktop')).lastDocument, current.href);
+  navigation.destroy();
 });
 
 test('reveals a selected row outside the restored viewport without resetting to the top', () => {

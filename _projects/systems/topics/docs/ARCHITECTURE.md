@@ -51,8 +51,8 @@ Blogs supplies shared document layouts and interactive integrations.
 ```
 
 The diagram describes capabilities and relationships, not separate copies of
-authored lessons. Topics document routes are generated presentation views of
-the underlying documents.
+authored lessons. Topics and Courses now use one canonical document URL with
+navigation context in the query string, rather than generated document copies.
 
 ## Categories and primary topics
 
@@ -101,7 +101,7 @@ The generator creates:
   metadata.
 - Primary and secondary category collections for the browser.
 - A JSON search catalog at `/assets/js/projects/topics/data.json`.
-- Full-document routes under `/topics/view/`.
+- Compatibility redirects under `/topics/view/`, without lesson bodies.
 
 Category keys are lowercase for comparison; display labels retain authored
 names. Invalid category values or an invalid primary-topic configuration fail
@@ -155,22 +155,23 @@ the selected collection rather than replacing it with a global search overlay.
 
 ## Document viewing and navigation
 
-The ordinary reference browser opens `/topics/view/...` routes. These routes
-preserve full content and interactive capabilities while suppressing the
-course player and document-scoped chat. Original document URLs retain their
-normal course or standalone behavior.
+The reference browser opens the original permalink with `?context=topics`.
+The [shared reader](../../courses/reader/reader.rb) renders one document with a
+Course or Topics sidebar. Its [controller](../../courses/reader/js/browser.js)
+switches navigation without replacing content, runner editors or submission
+forms. Course options come only from the document's own course placements.
 
-Generated views retain source paths and Markdown conversion so relative
-includes resolve against the authored document. The shared
-[Blogs post layout](../../blogs/layouts/post.html) recognizes Topics context
-and preserves the original document URL as the submission identity. A viewing
-route does not create a new assignment.
+The [Blogs post layout](../../blogs/layouts/post.html) retains the original
+document URL as submission identity and uses its existing forms and feedback
+checks in both contexts. Chat is not disabled by making a reference copy: there
+is no copy. Bespoke application layouts remain intact rather than being forced
+into the document shell.
 
-The [document navigation](../_includes/topics-document-nav.html) offers a return
-to Topics and an original-context link. The [document controller](../js/document.js)
-restores category, query and view parameters on the return link. Links to
-indexed same-site documents preserve Topics context; unrelated or external
-links retain their destinations.
+Former `/topics/view/` addresses contain small compatibility redirects. They
+preserve filters and fragments while forwarding to the canonical document.
+The reader's Topics return link restores the category/query state. Its sidebar
+uses the same category selection rules as the full browser; full-text search
+and highlighting remain in the full Topics catalog.
 
 URL parameters carry browser state:
 

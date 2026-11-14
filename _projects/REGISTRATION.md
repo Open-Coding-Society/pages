@@ -126,11 +126,13 @@ each resource under a generic ignored project root:
 | Standalone pages | `navigation/projects/<name>/` |
 | YAML / JSON data | `_data/projects/<name>/` |
 | Jekyll plugins | `_plugins/projects/<name>/` |
+| Jekyll layouts | `_layouts/projects/<name>/` |
 
 Use explicit permalinks on standalone pages to preserve public routes without
 turning navigation into blog posts. Includes use `projects/<name>/<file>`;
 data is namespaced as `site.data.projects.<name>`. Jekyll loads nested plugins
-automatically. These three new roots are manifest destinations, not automatic
+automatically. Reference nested layouts as `projects/<name>/<layout>`.
+These roots are manifest destinations, not automatic
 copies of every `data/` folder (some projects use `data/` for JavaScript).
 The shared template cleans all of these project directories, and
 `clean-removed-projects` handles them after a project is deleted.

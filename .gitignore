@@ -59,6 +59,7 @@ images/projects/
 navigation/projects/
 _data/projects/
 _plugins/projects/
+_layouts/projects/
 
 # Course kit distributions (authoritative sources in _projects/systems/courses)
 /_includes/course-nav.html

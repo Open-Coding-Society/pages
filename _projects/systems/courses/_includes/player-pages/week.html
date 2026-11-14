@@ -49,7 +49,7 @@
   </div>
   <div class="ocs__nav-grid ocs__nav-grid--in-card">
     {%- for post in weekPosts %}
-    <a class="ocs__nav-card" href="{{ site.baseurl }}{{ post.url }}">
+    <a class="ocs__nav-card" href="{{ site.baseurl }}{{ post.url }}?context=course&amp;course={{ current_course | url_encode }}">
       <span class="ocs__nav-card-kicker">{% if post.lesson_type == 'ap-practice' %}Supplemental AP practice{% elsif post.assignment == true %}Assignment{% else %}Lesson{% endif %}</span>
       <span class="ocs__nav-card-title">{{ post.title | escape }}</span>
       {% if post.description %}

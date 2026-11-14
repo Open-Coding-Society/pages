@@ -1,0 +1,98 @@
+.document-reader {
+  position: fixed;
+  inset: 80px 0 0;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  background: var(--pref-bg-color);
+  color: var(--pref-text-color);
+  font-family: var(--pref-font-family);
+  [hidden] { display: none !important; }
+
+  &__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--panel);
+    border-bottom: 1px solid var(--ui-border);
+    .ocs__input { width: auto; min-width: 8rem; }
+    p { margin: 0; }
+  }
+  &__panes {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) minmax(0, 4fr);
+    min-height: 0;
+    flex: 1;
+  }
+  &__navigation {
+    min-width: 0;
+    overflow-y: auto;
+    padding: 0.75rem;
+    background: var(--panel);
+    border-right: 1px solid var(--ui-border);
+    summary {
+      cursor: pointer;
+      padding: 0.6rem 0.4rem;
+      border-radius: 0.25rem;
+      font-weight: 600;
+      color: var(--pref-text-color);
+      &::marker { color: var(--pref-accent-color); }
+      &:hover { background: color-mix(in srgb, var(--pref-accent-color) 8%, transparent); }
+      &:focus-visible {
+        outline: 2px solid var(--pref-accent-color);
+        outline-offset: -2px;
+      }
+    }
+    h2 { font-size: 1.25rem; }
+    .document-reader__sprint > summary { color: var(--pref-accent-color); }
+    .document-reader__sprint { margin-bottom: 0.75rem; }
+    .document-reader__week { padding-left: 0.5rem; margin-top: 0.5rem; }
+    label { display: block; margin-top: 0.5rem; }
+    .ocs__input { width: 100%; min-width: 0; box-sizing: border-box; }
+    a { overflow-wrap: anywhere; }
+    .document-reader__lesson.ocs__btn {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      // OCS small controls have a fixed height; lesson titles must wrap.
+      height: auto;
+      min-height: 28px;
+      white-space: normal;
+      text-align: left;
+      padding: 0.5rem;
+    }
+    [aria-current="page"] {
+      font-weight: bold;
+    }
+  }
+  &__lessons {
+    padding: 0;
+    list-style: none;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  &__completed::before { content: "\2713 "; }
+  &__main {
+    overflow-y: auto;
+    min-width: 0;
+    padding: 1.5rem;
+    overflow-wrap: anywhere;
+    .post { max-width: 100%; }
+    img { max-width: 100%; height: auto; }
+    pre { max-width: 100%; overflow-x: auto; }
+    table { display: block; max-width: 100%; overflow-x: auto; }
+  }
+  @media (max-width: 768px) {
+    &__panes { display: flex; flex-direction: column; overflow: hidden; }
+    &__navigation {
+      flex: 0 0 auto;
+      max-height: 45%;
+      border-right: 0;
+      border-bottom: 1px solid var(--ui-border);
+    }
+    &__main { flex: 1; padding: 0.75rem; }
+    &__toolbar { padding: 0.5rem; font-size: 0.9rem; }
+  }
+}
