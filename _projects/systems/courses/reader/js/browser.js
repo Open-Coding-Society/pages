@@ -51,14 +51,37 @@ export async function startDocumentReader(root, tools) {
     complete.setAttribute('aria-pressed', String(done));
     complete.classList.toggle('fill', done);
     tree.querySelectorAll('[data-lesson-id]').forEach(link => {
-      link.classList.toggle('document-reader__completed', data?.[link.dataset.lessonId] === true);
+      const completed = data?.[link.dataset.lessonId] === true;
+      link.querySelector('[data-lesson-completed]').hidden = !completed;
+      link.setAttribute('aria-label', `${link.title}${completed ? ' (completed)' : ''}`);
+    });
+    tree.querySelectorAll('[data-week-group]').forEach(group => {
+      const lessons = [...group.querySelectorAll('[data-lesson-id]')];
+      const count = group.querySelector('[data-week-count]');
+      const completed = lessons.filter(link => data?.[link.dataset.lessonId] === true).length;
+      count.textContent = `${data === null ? '?' : completed}/${lessons.length}`;
+      count.setAttribute('aria-label', data === null
+        ? `Completion unavailable for ${lessons.length} lessons`
+        : `${completed} of ${lessons.length} lessons completed`);
     });
   }
 
+  function icon(className) {
+    const element = node('i', undefined, `fas ${className}`);
+    element.setAttribute('aria-hidden', 'true');
+    return element;
+  }
+
   function lessonLink(document) {
-    const link = node('a', document.title, 'ocs__btn small accent document-reader__lesson');
+    const link = node('a', undefined, 'ocs__btn small accent document-reader__lesson');
+    link.append(icon(document.assignment ? 'fa-file-alt' : 'fa-file-code'), document.title);
+    const check = icon('fa-check document-reader__check');
+    check.dataset.lessonCompleted = '';
+    check.hidden = true;
+    link.append(check);
     link.href = readerLink(document.url, base, context, context.course ? '' : writeState(topics));
     link.dataset.lessonId = document.url;
+    link.title = document.title;
     if (document.url === identity) {
       link.classList.add('fill');
       link.setAttribute('aria-current', 'page');
@@ -85,8 +108,15 @@ export async function startDocumentReader(root, tools) {
     function appendWeek(parent, group, title) {
       const details = node('details', undefined, 'ocs__tree document-reader__week');
       details.dataset.week = String(group.week);
+      details.dataset.weekGroup = '';
       details.open = group.week === currentWeek;
-      details.append(node('summary', `Week ${group.week}${title ? `: ${title}` : ''}`));
+      const summary = node('summary', undefined, 'document-reader__week-summary');
+      summary.append(node('span', `W${group.week}`, 'ocs__status-pill ocs__status-pill--good'));
+      summary.append(node('span', title || `Week ${group.week}`, 'document-reader__week-title'));
+      const count = node('span', undefined, 'ocs__status-pill ocs__status-pill--neutral');
+      count.dataset.weekCount = '';
+      summary.append(count);
+      details.append(summary);
       const intro = node('a', `Week ${group.week} overview`, 'ocs__btn small accent');
       intro.href = `${base}/${context.course}/week-${group.week}/`;
       details.append(intro);
@@ -101,7 +131,8 @@ export async function startDocumentReader(root, tools) {
       const details = node('details', undefined, 'document-reader__sprint');
       details.open = groups.some(group => group.week === currentWeek);
       details.append(node('summary', `${sprint.id}: ${sprint.title}`));
-      const intro = node('a', 'Sprint overview', 'ocs__btn small accent');
+      const intro = node('a', undefined, 'ocs__btn small accent document-reader__intro');
+      intro.append(icon('fa-flag'), 'Sprint overview');
       intro.href = `${base}/${context.course}/sprint-${sprint.id.replace('Sprint', '')}/`;
       details.append(intro);
       groups.forEach(group => { placed.add(group.week); appendWeek(details, group, sprint.weeks[String(group.week)]); });
@@ -112,7 +143,12 @@ export async function startDocumentReader(root, tools) {
     weeks.filter(group => !placed.has(group.week)).forEach(group => {
       // No week overview is generated outside the schedule's sprint ranges.
       const section = node('section');
-      section.append(node('h3', `Week ${group.week}`));
+      section.dataset.weekGroup = '';
+      const heading = node('h3', `Week ${group.week} `);
+      const count = node('span', undefined, 'ocs__status-pill ocs__status-pill--neutral');
+      count.dataset.weekCount = '';
+      heading.append(count);
+      section.append(heading);
       appendLessons(section, group.lessons);
       tree.append(section);
     });
@@ -139,14 +175,16 @@ export async function startDocumentReader(root, tools) {
     selector.value = context.course || 'topics';
     status.textContent = context.issue;
     root.querySelector('[data-reader-heading]').textContent = context.course
-      ? `${context.course.toUpperCase()} · Week ${membership[context.course].week}` : 'Topics';
+      ? payload.courses[context.course].title : 'Topics';
     root.querySelector('[data-reader-topic-controls]').hidden = Boolean(context.course);
     query.value = topics.query;
     category.value = topics.categories.length === 1 ? topics.categories[0] : '';
     const home = root.querySelector('[data-reader-home]');
     home.href = context.course ? `${base}/navigation/courses/${context.course}/`
       : `${base}/topics/?${writeState(topics)}`;
-    home.textContent = context.course ? `${context.course.toUpperCase()} home` : 'Topics catalog';
+    const homeLabel = context.course ? `${context.course.toUpperCase()} home` : 'Topics catalog';
+    home.setAttribute('aria-label', homeLabel);
+    home.title = homeLabel;
     root.querySelector('[data-reader-full-topics]').href = `${base}/topics/?${writeState(topics)}`;
     const order = context.course ? courseTree() : topicsTree();
     root.querySelector('[data-reader-count]').textContent = `${order.length} documents`;

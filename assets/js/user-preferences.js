@@ -357,8 +357,7 @@
         html.user-theme-active .lesson-sidebar,
         html.user-theme-active .sidebar-header,
         html.user-theme-active .sprint-nav,
-        html.user-theme-active .sprint-section,
-        html.user-theme-active .lesson-item {
+        html.user-theme-active .sprint-section {
           background-color: ${panel} !important;
           color: ${text} !important;
         }

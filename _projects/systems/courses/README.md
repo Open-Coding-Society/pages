@@ -44,6 +44,18 @@ existing runtime paths and are always-on `:dev` projects.
 
 ## Build and development
 
+Both viewer toolbars start with the Home icon and course/context selector above
+the two panes. Course titles live in the scrolling navigation pane; course home
+pages omit the duplicate body heading. The document reader labels its navigation
+with the course title, not the current lesson week. Lesson titles and identities
+remain unchanged.
+
+Course overview pages switch courses through the OCS dropdown in the breadcrumb
+bar. It opens the selected course's home, preserving `site.baseurl`; the desktop
+sidebar and mobile navigation panel retain their close controls, title and
+lesson navigation without duplicate course pills. The standalone sprint layout
+still uses its existing course menu.
+
 ### Canonical document reader
 
 No lesson front matter changes or separate document list are required.
@@ -68,6 +80,11 @@ guides for lesson links. Selected links use `fill`; do not reuse the legacy
 Theme changes apply without rebuilding the sidebar or replacing the article.
 Reader lesson links override the small control's fixed height so wrapped titles
 stay inside their button and do not overlap neighboring rows.
+Both course navigation treatments keep the sprint flag, show each week's
+completed/total lesson count, and distinguish assignments from references with
+their document icons. Lesson titles wrap and a small check marks completion;
+the mobile course menu mirrors those indicators. Counts include all lessons,
+not only assignments, and follow the existing per-course completion state.
 
 Course home, week, sidebar and Blogs links carry course context. Topics links
 carry Topics/filter context. Navigation sections, scroll and last document use

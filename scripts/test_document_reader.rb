@@ -22,6 +22,8 @@ class DocumentReaderTest < Minitest::Test
     assert_match(/height: auto;/, rule)
     assert_match(/white-space: normal;/, rule)
     assert_match(/box-sizing: border-box;/, rule)
+    assert_match(/grid-template-columns: auto minmax\(0, 1fr\) auto;/, rule)
+    assert_match(/\.document-reader__navigation \.document-reader__check \{\s*font-size: 0\.75rem;/, css)
   end
 
   def test_real_shared_javascript_keeps_one_document_and_submission_identity
@@ -89,6 +91,12 @@ class DocumentReaderTest < Minitest::Test
         document = Nokogiri::HTML(html)
         assert_equal 1, document.css("[data-document-reader]").size
         assert_equal 1, document.css("article").size
+        assert_equal 1, document.css("[data-reader-navigation] > summary [data-reader-heading]").size
+        assert_equal 0, document.css("[data-reader-navigation] > nav h2[data-reader-heading]").size
+        home = document.at_css("[data-reader-home]")
+        assert_equal home, document.at_css(".document-reader__toolbar").element_children.first
+        assert_equal 1, home.css(".fa-home[aria-hidden='true']").size
+        assert_equal "Topics catalog", home["aria-label"]
         assert_equal 1, document.css("#code-form-blog").size
         assert_equal 3, document.css(".code-runner-container").size
         assert_equal %w[csp csse topics].sort, document.css("[data-reader-context] option").map { |option| option["value"] }.sort

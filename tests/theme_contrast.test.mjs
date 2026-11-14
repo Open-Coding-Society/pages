@@ -137,3 +137,11 @@ test('the default button shape leaves ocs__btn its own shapes; a picked shape re
   square.api.applyPreferences({ ...api.PRESETS.Midnight, buttonStyle: 'square' });
   assert.match(square.sheet(), /html\.user-theme-active \.ocs__btn,[^{]*\{\s*border-radius: 0 !important;/);
 });
+
+test('theme overrides leave the selected lesson background visible', () => {
+  const engine = loadEngine();
+  engine.api.applyPreferences(api.PRESETS.Midnight);
+  assert.doesNotMatch(engine.sheet(), /html\.user-theme-active \.lesson-item\s*[{,]/);
+  const sass = readFileSync(new URL('../_sass/open-coding/theme/user-preferences.scss', import.meta.url), 'utf8');
+  assert.doesNotMatch(sass, /,\s*\.lesson-item\s*\{/);
+});

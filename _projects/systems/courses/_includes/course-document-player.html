@@ -29,17 +29,17 @@ use the shared reader shell instead; courses are not restricted to CSP.
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <div class="lesson-player">
-  <!-- LEFT SIDEBAR -->
-  {% include lesson-sidebar-nav.html %}
+  {% capture course_sidebar %}{% include lesson-sidebar-nav.html %}{% endcapture %}
+  {% include lesson-topbar.html %}
+  <div class="lesson-player__panes">
+  {{ course_sidebar }}
 
   <!-- MAIN CONTENT -->
   <div class="lesson-main">
-    <!-- Top Bar -->
-    {% include lesson-topbar.html %}
-
     <!-- Lesson Content -->
     <div class="lesson-content">
       <div class="lesson-content-inner">
+        {% unless page.player_page.kind == "home" %}
         <div class="lesson-header">
           <h1>{{ page.title | escape }}</h1>
           {%- unless page.player_page -%}
@@ -54,6 +54,7 @@ use the shared reader shell instead; courses are not restricted to CSP.
           </div>
           {%- endunless -%}
         </div>
+        {% endunless %}
 
         {% if page.player_page %}
         {%- comment -%}
@@ -111,6 +112,8 @@ use the shared reader shell instead; courses are not restricted to CSP.
         {%- endif -%}
       </div>
     </div>
+  </div>
+  </div>
 </div>
 
 {% if page.challenge_submit %}
@@ -285,6 +288,7 @@ use the shared reader shell instead; courses are not restricted to CSP.
         icon.classList.toggle('incomplete', !isCompleted);
         icon.classList.toggle('completed', isCompleted);
       }
+      item.setAttribute('aria-label', `${item.title}${isCompleted ? ' (completed)' : ''}`);
       
       if (isCompleted) completed++;
     });
@@ -473,7 +477,7 @@ use the shared reader shell instead; courses are not restricted to CSP.
       url: item.href,
       completed: item.dataset.lessonId && completionData[item.dataset.lessonId] || false,
       active: item.classList.contains('active') || item.getAttribute('aria-current') === 'page',
-      icon: item.dataset.lessonId ? 'fa-solid fa-circle' : (item.querySelector('i')?.className || 'fas fa-book')
+      icon: item.querySelector('i:not(.lesson-status-icon)')?.className || 'fas fa-book'
     });
 
     return Array.from(document.querySelectorAll('#lesson-sidebar .sprint-section'), section => ({
@@ -482,6 +486,7 @@ use the shared reader shell instead; courses are not restricted to CSP.
       weeks: Array.from(section.querySelectorAll('[data-week-group]'), week => ({
         title: week.querySelector('summary .lesson-title').textContent.trim(),
         badge: week.querySelector('summary .ocs__status-pill').textContent.trim(),
+        count: week.querySelector('[data-week-count]').textContent.trim(),
         rows: Array.from(week.querySelectorAll('.ocs__tree > .lesson-item, .ocs__tree .ocs__links a'), toRow)
       }))
     }));
@@ -492,13 +497,12 @@ use the shared reader shell instead; courses are not restricted to CSP.
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]
   ));
 
-  // A title that doesn't fit ends with "…" where the reader can hover to see it
-  // whole, and wraps on a touch screen (ocs__truncate--hover).
   function renderModalRow(lesson) {
     return `
-          <a href="${escapeHTML(lesson.url)}" data-lesson-id="${escapeHTML(lesson.id || '')}" class="modal-lesson-item ${lesson.active ? 'active' : ''}" title="${escapeHTML(lesson.title)}">
-            <i class="${lesson.completed ? 'fa-solid fa-circle-check' : escapeHTML(lesson.icon)} modal-lesson-status ${lesson.completed ? 'completed' : 'incomplete'}"></i>
-            <span class="modal-lesson-title ocs__truncate ocs__truncate--hover">${escapeHTML(lesson.title)}</span>
+          <a href="${escapeHTML(lesson.url)}" data-lesson-id="${escapeHTML(lesson.id || '')}" class="modal-lesson-item ${lesson.active ? 'active' : ''}" title="${escapeHTML(lesson.title)}" aria-label="${escapeHTML(lesson.title)}${lesson.completed ? ' (completed)' : ''}">
+            <i class="${escapeHTML(lesson.icon)}" aria-hidden="true"></i>
+            <span class="modal-lesson-title">${escapeHTML(lesson.title)}</span>
+            ${lesson.completed ? '<i class="fa-solid fa-circle-check modal-lesson-status completed" aria-hidden="true"></i>' : ''}
           </a>`;
   }
 
@@ -509,7 +513,7 @@ use the shared reader shell instead; courses are not restricted to CSP.
     modalContent.innerHTML = sprints.map(sprint => {
       const sprintId = sprint.title.replace(/\s+/g, '-').toLowerCase();
       const weeksHTML = sprint.weeks.map(week => `
-          <h4 class="ocs__section-title"><span class="ocs__status-pill ocs__status-pill--good">${escapeHTML(week.badge)}</span> ${escapeHTML(week.title)}</h4>
+          <h4 class="ocs__section-title"><span class="ocs__status-pill ocs__status-pill--good">${escapeHTML(week.badge)}</span> ${escapeHTML(week.title)} <span class="ocs__status-pill ocs__status-pill--neutral">${escapeHTML(week.count)}</span></h4>
           <div class="ocs__tree">${week.rows.map(renderModalRow).join('')}
           </div>`).join('');
 

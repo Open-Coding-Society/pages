@@ -3,6 +3,7 @@ require "tmpdir"
 require "fileutils"
 require "json"
 require "open3"
+require "nokogiri"
 
 ROOT = File.expand_path("../../../..", __dir__)
 PROJECT = File.expand_path("..", __dir__)
@@ -76,6 +77,10 @@ Dir.mktmpdir("course-landing-") do |source|
                  "courses" => %w[csse csp csa csh].to_h { |course| [course, { "week" => 9 }] })
   blog_post.call("2026-10-03-capstone.md", "title" => "Site capstone", "permalink" => "/capstone/",
                  "sticky_rank" => 1)
+  File.write(File.join(source, "assignment.md"), YAML.dump(
+    "layout" => nil, "title" => "A descriptive assignment title", "permalink" => "/assignment/",
+    "assignment" => true, "courses" => %w[csse csp csa csh].to_h { |course| [course, { "week" => 1 }] }
+  ) + "---\nAssignment\n")
   site = Jekyll::Site.new(Jekyll.configuration(
     "source" => source, "destination" => File.join(source, "_site"),
     "layouts_dir" => File.join(source, "_layouts"),
@@ -131,17 +136,17 @@ Dir.mktmpdir("course-landing-") do |source|
       end
       assert(html.scan('id="floating-menu-btn"').size == 1,
              "#{path} has exactly one mobile navigation button")
-      assert(html.match?(%r{<div class="breadcrumbs">\s*<button class="mobile-course-menu"[^>]*aria-controls="timeline-modal"}),
-             "#{path} places mobile course navigation at the upper left before breadcrumbs")
+      assert(html.match?(%r{<div class="breadcrumbs">\s*<a[^>]*aria-label="Course home"}),
+             "#{path} starts the breadcrumb with course Home")
       breadcrumbs = html.split('class="breadcrumbs"', 2).last.split('</div>', 2).first
       if path == "navigation/courses/#{course}/index.html"
-        assert(breadcrumbs.include?("<span class=\"current\">#{course.upcase}</span>") &&
+        assert(breadcrumbs.include?(" selected>#{course.upcase}</option>") &&
                !breadcrumbs.include?(title),
-               "#{path} uses the short course pill name, not the full title")
+               "#{path} uses the short course dropdown name without a duplicate title crumb")
       end
       assert(breadcrumbs.include?('id="lesson-sidebar-toggle"') &&
-             breadcrumbs.index('id="lesson-sidebar-toggle"') < breadcrumbs.index('title="Course home"'),
-             "#{path} places desktop navigation on the left before the home icon")
+             breadcrumbs.index('id="lesson-sidebar-toggle"') > breadcrumbs.index('course-breadcrumb-select'),
+             "#{path} keeps navigation controls after Home and Course")
       assert(breadcrumbs.include?('aria-label="Open course navigation"') &&
              !breadcrumbs.include?('fa-times'),
              "#{path} keeps only hamburger open controls beside Home")
@@ -165,23 +170,32 @@ Dir.mktmpdir("course-landing-") do |source|
           _, error, status = Open3.capture3("node", "--input-type=module", "--check", stdin_data: script.first)
           assert(status.success?, "#{path} module parses: #{error}")
         end
-        assert(breadcrumbs.match?(%r{title="Course home".*href="/preview/navigation/courses/#{course}/">#{course.upcase}</a>.*class="current">Blogs</span>}m),
+        assert(breadcrumbs.match?(%r{title="Course home".*course-breadcrumb-select.*class="current">Blogs</span>}m),
                "#{path} shows Home, selected course, and Blogs in breadcrumb order")
         assert(html.match?(%r{<a class="ocs__btn[^"]* fill" href="/preview/#{course}/blogs/" aria-current="page"}),
                "#{path} highlights the current Blogs page")
       end
       sidebar = html.split('id="lesson-sidebar"', 2).last.split('<script>', 2).first
-      assert(sidebar.include?('aria-label="Courses"'), "#{path} has course pills in the sidebar")
-      assert(sidebar.match?(%r{</a>\s*</nav>\s*<button[^>]*id="lesson-sidebar-close"[^>]*aria-label="Close course navigation"[^>]*>\s*<i class="fas fa-times"[^>]*></i>\s*</button>\s*</div>\s*<h2>}),
-             "#{path} puts desktop close after course buttons and before the title")
-      assert(sidebar.index('aria-label="Courses"') < sidebar.index('<h2>'),
-             "#{path} places pills above the course title")
+      parsed = Nokogiri::HTML(html)
+      player = parsed.at_css('.lesson-player')
+      assert(player.at_css('.topbar-lesson').parent == player &&
+             player.at_css('#lesson-sidebar').parent == player.at_css('.lesson-player__panes') &&
+             player.at_css('.lesson-main').parent == player.at_css('.lesson-player__panes'),
+             "#{path} places the toolbar above both panes")
+      assert(parsed.css('.lesson-main .lesson-header').empty? == (path == "navigation/courses/#{course}/index.html"),
+             "#{path} suppresses only the duplicate course home body title")
+      dropdowns = parsed.css('.breadcrumbs select[aria-label="Course"]')
+      assert(dropdowns.size == 1, "#{path} has one breadcrumb course dropdown")
+      dropdown = dropdowns.first
+      assert(dropdown["onchange"] == "window.location.assign(this.value)",
+             "#{path} navigates to the selected course home")
+      assert(dropdown.css('option[selected]').map(&:text) == [course.upcase],
+             "#{path} selects the current course without relying on page.course")
+      assert(!sidebar.include?('course-pill-nav'), "#{path} removes sidebar course pills")
       %w[csse csp csa csh].each do |target|
-        assert(sidebar.include?("href=\"/preview/navigation/courses/#{target}/\""),
-               "#{path} links to #{target} respecting baseurl")
+        assert(dropdown.css('option').any? { |option| option["value"] == "/preview/navigation/courses/#{target}/" },
+               "#{path} switches to #{target} respecting baseurl")
       end
-      assert(sidebar.match?(%r{href="/preview/navigation/courses/#{course}/"[^>]*aria-current="page"}),
-             "#{path} highlights the current course even without page.course")
       assert(sidebar.include?("href=\"/preview/#{course}/sprint-1/\""),
              "#{path} keeps the existing sprint route")
       assert(!html.include?("/#{course}/week-1/chat/"),
@@ -193,14 +207,27 @@ Dir.mktmpdir("course-landing-") do |source|
              "#{path} shows a week as one row: W pill, then the title cut with an ellipsis, then the count")
       assert(week.match?(%r{</summary>\s*<div class="ocs__tree">\s*<a href="/preview/#{course}/week-1/"}),
              "#{path} puts the week's intro first in the week's tree, even with its lessons")
-      assert(html.include?('course-mobile-nav"'), "#{path} exposes course pills on mobile")
+      nav = parsed.at_css('#lesson-sidebar')
+      assert(nav.at_css("a[href='/preview/#{course}/sprint-1/'] .fa-flag"),
+             "#{path} identifies the sprint intro with a flag")
+      reference = nav.at_css("a[data-lesson-id='/#{course}/example/']")
+      assignment = nav.at_css("a[data-lesson-id='/assignment/']")
+      assert(reference.at_css('.fa-file-code') && assignment.at_css('.fa-file-alt'),
+             "#{path} distinguishes reference and assignment icons")
+      [reference, assignment].each do |lesson|
+        title = lesson.at_css('.lesson-title')
+        assert(!title['class'].include?('ocs__truncate') && lesson.element_children.last['class'].include?('lesson-status-icon'),
+               "#{path} wraps lesson titles and places the smaller completion icon after them")
+      end
+      assert(html.include?('course-mobile-nav"'), "#{path} keeps mobile navigation")
       assert(!sidebar.include?("href=\"/preview/#{course}/blogs/\""),
              "#{path} omits redundant sidebar Blogs")
       assert(html.match?(%r{<div class="sprint-nav">\s*<div class="sprint-section">}),
              "#{path} starts sidebar navigation directly with sprints")
       mobile = html.split('class="course-panel-actions course-mobile-nav"', 2).last.split('id="timeline-modal-content"', 2).first
-      assert(mobile.match?(%r{</nav>\s*<button[^>]*id="timeline-close-btn"[^>]*>\s*<i class="fas fa-times"[^>]*></i>\s*</button>\s*</div>\s*<h3>}),
-             "#{path} puts mobile close after course buttons and before the title")
+      assert(!mobile.include?('course-pill-nav') &&
+             mobile.match?(%r{<button[^>]*id="timeline-close-btn"[^>]*>\s*<i class="fas fa-times"[^>]*></i>\s*</button>\s*</div>\s*<h3>}),
+             "#{path} keeps mobile close and removes duplicate course pills")
       sidebar_title = sidebar[%r{<h2>(.*?)</h2>}m, 1]
       assert(mobile.include?("<h3>#{sidebar_title}</h3>") && !mobile.include?("Course Timeline"),
              "#{path} shows the same selected course title below both button rows")
@@ -212,4 +239,4 @@ Dir.mktmpdir("course-landing-") do |source|
   end
 end
 
-puts "PASS: all four course landings, shared calendar/chat, sidebar pills, baseurl, existing lessons, mobile navigation and class-only Blogs with search"
+puts "PASS: all four course landings, shared calendar/chat, breadcrumb course dropdown, baseurl, existing lessons, mobile navigation and class-only Blogs with search"

@@ -45,15 +45,41 @@
         outline-offset: -2px;
       }
     }
-    h2 { font-size: 1.25rem; }
+    summary { font-size: 1.25rem; }
     .document-reader__sprint > summary { color: var(--pref-accent-color); }
     .document-reader__sprint { margin-bottom: 0.75rem; }
     .document-reader__week { padding-left: 0.5rem; margin-top: 0.5rem; }
+    .document-reader__week-summary {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      &::before {
+        content: "\25B6";
+        color: var(--pref-accent-color);
+        font-size: 0.7rem;
+      }
+    }
+    .document-reader__week[open] > .document-reader__week-summary::before {
+      transform: rotate(90deg);
+    }
+    .document-reader__week-title {
+      flex: 1;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .document-reader__intro {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
     label { display: block; margin-top: 0.5rem; }
     .ocs__input { width: 100%; min-width: 0; box-sizing: border-box; }
     a { overflow-wrap: anywhere; }
     .document-reader__lesson.ocs__btn {
-      display: block;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.4rem;
       box-sizing: border-box;
       width: 100%;
       // OCS small controls have a fixed height; lesson titles must wrap.
@@ -63,6 +89,7 @@
       text-align: left;
       padding: 0.5rem;
     }
+    .document-reader__check { font-size: 0.75rem; }
     [aria-current="page"] {
       font-weight: bold;
     }
@@ -73,7 +100,6 @@
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
   }
-  &__completed::before { content: "\2713 "; }
   &__main {
     overflow-y: auto;
     min-width: 0;
