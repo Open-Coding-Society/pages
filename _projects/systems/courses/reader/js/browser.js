@@ -13,6 +13,8 @@ export async function startDocumentReader(root, tools) {
   const category = root.querySelector('[data-reader-category]');
   const status = root.querySelector('[data-reader-status]');
   const currentButton = root.querySelector('[data-reader-complete]');
+  const currentTitle = root.querySelector('[data-reader-current-title]');
+  const initialTitle = currentTitle?.textContent || '';
   const pager = root.querySelector('[data-reader-pager]');
   // Course home, sprint, week and Blogs pages are overviews, not documents:
   // no review circle, and the tree marks their sprint or week instead.
@@ -85,6 +87,44 @@ export async function startDocumentReader(root, tools) {
         ? `Course progress unavailable for ${lessons.size} lessons`
         : `${completed} of ${lessons.size} course lessons completed`);
     }
+  }
+
+  function compactCourseTitle(sprint, week, title) {
+    const prefix = `S${sprint}-W${week}`;
+    return title ? `${prefix}: ${title}` : prefix;
+  }
+
+  function updateCurrentTitle() {
+    if (!currentTitle) return;
+    if (overview.kind === 'week' && context.course) {
+      if (!/^\d+$/.test(root.dataset.overviewSprint || '') || !/^\d+$/.test(root.dataset.overviewWeek || '')) {
+        console.error('Week overview has invalid sprint or week metadata', {
+          sprint: root.dataset.overviewSprint, week: root.dataset.overviewWeek,
+        });
+        status.textContent = 'Week overview information is unavailable. Reload to retry.';
+        currentTitle.textContent = initialTitle;
+        return;
+      }
+      const weekLabel = `Week ${overview.week}`;
+      let title = initialTitle;
+      if (title === weekLabel) title = '';
+      else if (title.startsWith(`${weekLabel}: `)) title = title.slice(weekLabel.length + 2);
+      currentTitle.textContent = compactCourseTitle(overview.sprint, overview.week, title);
+      return;
+    }
+
+    const document = payload.documents.find(entry => entry.url === identity);
+    const placement = document?.courses?.[context.course];
+    if (!placement) {
+      currentTitle.textContent = document?.title || initialTitle;
+      return;
+    }
+    const week = Number(placement.week);
+    const sprint = payload.courses[context.course]?.sprints.find(entry => week >= entry.start && week <= entry.end);
+    const sprintNumber = sprint?.id.replace(/^Sprint/, '');
+    currentTitle.textContent = sprintNumber === undefined
+      ? document.title
+      : compactCourseTitle(sprintNumber, week, document.title);
   }
 
   function icon(className) {
@@ -280,6 +320,7 @@ export async function startDocumentReader(root, tools) {
     } else {
       total.textContent = `${order.length} documents`;
     }
+    updateCurrentTitle();
     const [previous, next] = neighbors(order);
     pager.hidden = !previous && !next;
     for (const [hook, label, document] of [['previous', 'Previous', previous], ['next', next?.resume ? 'Continue' : 'Next', next]]) {

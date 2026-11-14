@@ -102,8 +102,11 @@ targets as the bottom pager) and hide at either end. The bottom pager shows
 
 In course context the review circle lives in navigation, not in the document:
 with navigation open it sits in front of the current document's row; with
-navigation collapsed a `( ) Title` row appears under the course heading. Topics
-hides the circle because completion is per course. In course context the
+navigation collapsed a `( ) S<n>-W<n>: Title` row appears under the course
+heading, identifying the current document's sprint and week. Week transition
+pages show the same prefix before their theme, without a review circle; an
+untitled week shows only `S<n>-W<n>`. Topics hides the circle because completion
+is per course. In course context the
 navigation starts with `Course Progress  done/total` (unique lessons, updated
 with completion) above a divider; Topics shows its document count there. Course
 navigation lists every document placed in the course, the same set as the week

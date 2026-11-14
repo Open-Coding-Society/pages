@@ -192,11 +192,13 @@ class DocumentReaderTest < Minitest::Test
           shell = Nokogiri::HTML(overview).at_css("[data-document-reader]")
           refute_nil shell, "#{course} week #{week} overview uses the document reader shell"
           assert_equal "week", shell["data-overview"]
+          assert_equal "1", shell["data-overview-sprint"]
           assert_equal week.to_s, shell["data-overview-week"]
           assert_equal({ course => { "week" => week } }, JSON.parse(shell["data-membership"]))
           refute_nil shell.at_css('[data-reader-main] article[data-player-page="week"]')
           article = shell.at_css('[data-reader-main] article[data-player-page="week"]')
           assert_equal "Week #{week}: #{site.data.dig(course, "Sprint1", week, "theme")}", article.at_css("h2").text
+          assert_equal article.at_css("h2").text, shell.at_css("[data-reader-current-title]").text
           sprint_link = article.at_css(".lesson-body p a")
           refute_nil sprint_link
           assert_equal "#{base}/#{course}/sprint-1/", sprint_link["href"]

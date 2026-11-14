@@ -42,7 +42,10 @@ test('course cadence uses each placement without duplicating document identity',
   assert.equal(documents[0].url, '/shared');
 });
 
-async function startFakeReader(t, { dataset = {}, restore = () => {}, extraDocuments = [], sprintTitle = 'Start' } = {}) {
+async function startFakeReader(t, {
+  dataset = {}, restore = () => {}, extraDocuments = [], sprintTitle = 'Start', currentTitle = '',
+  sprints = [{ id: 'Sprint1', title: sprintTitle, start: 1, end: 2, weeks: { 1: 'Foundations', 2: 'Building' } }],
+} = {}) {
   class Element {
     constructor(tag = 'div') {
       this.tag = tag;
@@ -95,9 +98,10 @@ async function startFakeReader(t, { dataset = {}, restore = () => {}, extraDocum
   const hooks = Object.fromEntries([
     'navigation', 'tree', 'context', 'query', 'category', 'status', 'complete',
     'pager', 'heading', 'topic-controls', 'home', 'full-topics', 'count', 'previous', 'next',
-    'toolbar-previous', 'toolbar-next',
+    'toolbar-previous', 'toolbar-next', 'current-title',
   ].map(name => [name, new Element()]));
   const root = new Element();
+  hooks['current-title'].textContent = currentTitle;
   root.dataset = {
     membership: JSON.stringify({ csp: { week: 1 } }), baseurl: '/preview',
     documentUrl: '/assignment/', defaultCourse: 'csp', indexUrl: '/index.json', ...dataset,
@@ -123,7 +127,7 @@ async function startFakeReader(t, { dataset = {}, restore = () => {}, extraDocum
     matchMedia: () => ({ matches: false }),
     localStorage: { getItem: key => saved.get(key) || null, setItem: (key, value) => saved.set(key, value) },
     fetch: async () => ({ ok: true, json: async () => ({
-      documents, courses: { csp: { title: 'CSP', sprints: [{ id: 'Sprint1', title: sprintTitle, start: 1, end: 2, weeks: { 1: 'Foundations', 2: 'Building' } }] } },
+      documents, courses: { csp: { title: 'CSP', sprints } },
     }) }),
     window: { addEventListener: (name, callback) => { listeners[name] = callback; }, dispatchEvent: event => listeners[event.type]?.(event) },
     CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail; } },
@@ -149,6 +153,7 @@ test('reader navigation displays lesson types and updates week completion withou
   const { hooks, documents, saved, listeners } = await startFakeReader(t);
 
   assert.equal(hooks.heading.textContent, 'CSP');
+  assert.equal(hooks['current-title'].textContent, 'S1-W1: Assignment with a full descriptive title');
   const groups = hooks.tree.querySelectorAll('[data-week-group]');
   assert.equal(groups.length, 3);
   assert.equal(groups[0].querySelector('[data-week-count]').textContent, '1/2');
@@ -236,6 +241,7 @@ test('reader navigation displays lesson types and updates week completion withou
   hooks.context.value = 'topics';
   hooks.context.listeners.change();
   assert.equal(hooks.heading.textContent, 'Topics');
+  assert.equal(hooks['current-title'].textContent, documents[0].title);
   assert.equal(hooks.count.textContent, '4 documents');
   assert.equal(hooks.complete.hidden, true);
   assert.equal(hooks.tree.querySelectorAll('[data-reader-complete]').length, 0);
@@ -245,10 +251,14 @@ test('reader navigation displays lesson types and updates week completion withou
 });
 
 test('a week overview marks its week, hides review circles and leads into its first lesson', async t => {
-  const { hooks } = await startFakeReader(t, { dataset: {
-    documentUrl: '/csp/week-2/', membership: JSON.stringify({ csp: { week: 2 } }),
-    overview: 'week', overviewSprint: '1', overviewWeek: '2',
-  } });
+  const { hooks } = await startFakeReader(t, {
+    currentTitle: 'Week 2: Building',
+    dataset: {
+      documentUrl: '/csp/week-2/', membership: JSON.stringify({ csp: { week: 2 } }),
+      overview: 'week', overviewSprint: '1', overviewWeek: '2',
+    },
+  });
+  assert.equal(hooks['current-title'].textContent, 'S1-W2: Building');
   const groups = hooks.tree.querySelectorAll('[data-week-group]');
   const current = hooks.tree.querySelectorAll('[aria-current="page"]');
   assert.equal(current.length, 1);
@@ -262,15 +272,81 @@ test('a week overview marks its week, hides review circles and leads into its fi
 });
 
 test('a sprint overview marks its sprint title and leads into the sprint', async t => {
-  const { hooks } = await startFakeReader(t, { dataset: {
-    documentUrl: '/csp/sprint-1/', membership: JSON.stringify({ csp: {} }), overview: 'sprint', overviewSprint: '1',
-  } });
+  const { hooks } = await startFakeReader(t, {
+    currentTitle: 'Sprint 1: Start',
+    dataset: {
+      documentUrl: '/csp/sprint-1/', membership: JSON.stringify({ csp: {} }), overview: 'sprint', overviewSprint: '1',
+    },
+  });
+  assert.equal(hooks['current-title'].textContent, 'Sprint 1: Start');
   const current = hooks.tree.querySelectorAll('[aria-current="page"]');
   assert.equal(current.length, 1);
   assert.equal(current[0], hooks.tree.querySelector('[data-sprint-title]'));
   assert.ok(current[0].classList.contains('document-reader__overview-current'));
   assert.equal(hooks['toolbar-previous'].hidden, true, 'the first sprint overview starts the course');
   assert.equal(hooks['toolbar-next'].href, '/preview/csp/week-1/', '> steps into the week overview, then its lessons');
+});
+
+test('a week transition uses its sprint and week in the compact title only in course navigation', async t => {
+  const { hooks } = await startFakeReader(t, {
+    currentTitle: 'Week 0: Onboarding & Readiness',
+    dataset: {
+      documentUrl: '/csp/week-0/', membership: JSON.stringify({ csp: { week: 0 } }),
+      overview: 'week', overviewSprint: '1', overviewWeek: '0',
+    },
+    extraDocuments: [{ title: 'Tools', url: '/tools/', assignment: false, categories: [], courses: { csp: { week: 0 } } }],
+    sprints: [{ id: 'Sprint1', title: 'Start', start: 0, end: 2, weeks: { 0: 'Onboarding & Readiness', 1: 'Foundations', 2: 'Building' } }],
+  });
+  assert.equal(hooks['current-title'].textContent, 'S1-W0: Onboarding & Readiness');
+  assert.equal(hooks.complete.hidden, true, 'week overviews do not gain review controls');
+
+  hooks.context.value = 'topics';
+  hooks.context.listeners.change();
+  assert.equal(hooks['current-title'].textContent, 'Week 0: Onboarding & Readiness');
+
+  hooks.context.value = 'csp';
+  hooks.context.listeners.change();
+  assert.equal(hooks['current-title'].textContent, 'S1-W0: Onboarding & Readiness');
+});
+
+test('an untitled week transition does not repeat the week number', async t => {
+  const { hooks } = await startFakeReader(t, {
+    currentTitle: 'Week 0',
+    dataset: {
+      documentUrl: '/csp/week-0/', membership: JSON.stringify({ csp: { week: 0 } }),
+      overview: 'week', overviewSprint: '0', overviewWeek: '0',
+    },
+    extraDocuments: [{ title: 'Tools', url: '/tools/', assignment: false, categories: [], courses: { csp: { week: 0 } } }],
+    sprints: [{ id: 'Sprint0', title: 'Start', start: 0, end: 0, weeks: {} }],
+  });
+  assert.equal(hooks['current-title'].textContent, 'S0-W0');
+});
+
+test('a week transition reports missing sprint or week metadata', async t => {
+  const originalError = console.error;
+  const errors = [];
+  console.error = (...args) => errors.push(args);
+  try {
+    const { hooks } = await startFakeReader(t, {
+      currentTitle: 'Week 1: Foundations',
+      dataset: {
+        documentUrl: '/csp/week-1/', membership: JSON.stringify({ csp: { week: 1 } }),
+        overview: 'week', overviewSprint: '', overviewWeek: '1',
+      },
+    });
+    assert.equal(hooks['current-title'].textContent, 'Week 1: Foundations');
+    assert.match(hooks.status.textContent, /Week overview information is unavailable/);
+    assert.equal(errors.length, 1);
+  } finally {
+    console.error = originalError;
+  }
+});
+
+test('minimal current title prefixes the course sprint and week', async t => {
+  const { hooks } = await startFakeReader(t, {
+    dataset: { documentUrl: '/assignment/' },
+  });
+  assert.equal(hooks['current-title'].textContent, 'S1-W1: Assignment with a full descriptive title');
 });
 
 test('course home continues the document the student last read', async t => {
