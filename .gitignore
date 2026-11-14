@@ -80,6 +80,11 @@ images/projects/
 /navigation/topics.md
 /assets/js/topics/
 
+# Capstone system distributions (authoritative sources in _projects/systems/capstone)
+/_plugins/capstone.rb
+/navigation/capstone.md
+/assets/js/capstone-directory/
+
 # UI Builder system distributions (authoritative sources in _projects/systems/ui-builder)
 /navigation/ui-builder/
 /_data/ui_builder.yml
