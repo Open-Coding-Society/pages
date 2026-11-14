@@ -70,11 +70,6 @@
                 }
                 return response.json();
             })
-            .then(data => {
-                if (data === null) return null;
-                console.log(data);
-                return data;
-            })
             .catch(err => {
                 console.error("Fetch error: ", err);
                 return null;

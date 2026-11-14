@@ -155,7 +155,7 @@ class LoginManager {
 
   /**
    * Update the OCS header nav (#loginArea) to reflect the logged-in user.
-   * Mirrors the logic in /assets/js/api/login.js so a mid-session login
+   * Mirrors the navbar logic in _projects/systems/login/js/navbar-login.js so a mid-session login
    * (e.g. via the game panel) is reflected immediately without a page reload.
    *
    * @param {{ name: string, uid: string, roles?: Array }} userData

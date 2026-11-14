@@ -303,9 +303,6 @@ show_reading_time: false
             }
             return response.json();
         })
-        .then(data => {
-            console.log("Java database response:", data);
-        })
         .catch(error => {
             console.error("Login failed:", error.message);
             // Spring login is optional for guest flow; avoid auto-create fallback.
@@ -345,7 +342,7 @@ show_reading_time: false
             password: document.getElementById("signupPassword").value,
         };
 
-        console.log("Sending this data to Flask (Guest):", JSON.stringify(data, null, 2));
+        // Never log `data`: it holds the plaintext password.
         console.log("Request URL:", `${pythonURI}/api/user/guest`);
 
         const flaskRequest = {
@@ -365,12 +362,6 @@ show_reading_time: false
             }
 
             updateBackendStatus('flask', 'success');
-            try {
-                const parsed = raw ? JSON.parse(raw) : {};
-                console.log("Flask result:", parsed);
-            } catch (_) {
-                console.log("Flask result (non-JSON):", raw);
-            }
         } catch (error) {
             console.error("Flask signup error:", error);
             updateBackendStatus('flask', 'error');
