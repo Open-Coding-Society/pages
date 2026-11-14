@@ -69,6 +69,15 @@ export async function startDocumentReader(root, tools) {
         ? `Completion unavailable for ${lessons.length} lessons`
         : `${completed} of ${lessons.length} lessons completed`);
     });
+    const progress = root.querySelector('[data-reader-count]').querySelector('[data-reader-progress]');
+    if (progress) {
+      const lessons = new Set([...tree.querySelectorAll('[data-lesson-id]')].map(link => link.dataset.lessonId));
+      const completed = [...lessons].filter(id => data?.[id] === true).length;
+      progress.textContent = `${data === null ? '?' : completed}/${lessons.size}`;
+      progress.setAttribute('aria-label', data === null
+        ? `Course progress unavailable for ${lessons.size} lessons`
+        : `${completed} of ${lessons.size} course lessons completed`);
+    }
   }
 
   function icon(className) {
@@ -141,16 +150,23 @@ export async function startDocumentReader(root, tools) {
       details.dataset.week = String(group.week);
       details.dataset.weekGroup = '';
       details.open = group.week === currentWeek;
+      // The W pill and the title open the week overview; the marker and count toggle the week.
       const summary = node('summary', undefined, 'document-reader__week-summary');
-      summary.append(node('span', `W${group.week}`, 'ocs__status-pill ocs__status-pill--good'));
-      summary.append(node('span', title || `Week ${group.week}`, 'document-reader__week-title'));
+      const overviewUrl = `${base}/${context.course}/week-${group.week}/`;
+      const overview = node('a', `W${group.week}`, 'ocs__status-pill ocs__status-pill--good document-reader__week-pill');
+      overview.href = overviewUrl;
+      overview.dataset.weekOverview = '';
+      overview.setAttribute('aria-label', `Week ${group.week} overview`);
+      overview.title = `Week ${group.week} overview`;
+      summary.append(overview);
+      const weekTitle = node('a', title || `Week ${group.week}`, 'document-reader__week-title');
+      weekTitle.href = overviewUrl;
+      weekTitle.dataset.weekTitle = '';
+      summary.append(weekTitle);
       const count = node('span', undefined, 'ocs__status-pill ocs__status-pill--neutral');
       count.dataset.weekCount = '';
       summary.append(count);
       details.append(summary);
-      const intro = node('a', `Week ${group.week} overview`, 'ocs__btn small accent');
-      intro.href = `${base}/${context.course}/week-${group.week}/`;
-      details.append(intro);
       appendLessons(details, group.lessons);
       parent.append(details);
       sections.push({ id: `week-${group.week}`, element: details,
@@ -219,7 +235,14 @@ export async function startDocumentReader(root, tools) {
     home.title = homeLabel;
     root.querySelector('[data-reader-full-topics]').href = `${base}/topics/?${writeState(topics)}`;
     const order = context.course ? courseTree() : topicsTree();
-    root.querySelector('[data-reader-count]').textContent = `${order.length} documents`;
+    const total = root.querySelector('[data-reader-count]');
+    if (context.course) {
+      const progress = node('span', undefined, 'ocs__status-pill ocs__status-pill--neutral');
+      progress.dataset.readerProgress = '';
+      total.replaceChildren(node('span', 'Course Progress'), progress);
+    } else {
+      total.textContent = `${order.length} documents`;
+    }
     const index = order.findIndex(document => document.url === identity);
     pager.hidden = index < 0;
     for (const [hook, label, document] of [['previous', 'Previous', order[index - 1]], ['next', 'Next', order[index + 1]]]) {

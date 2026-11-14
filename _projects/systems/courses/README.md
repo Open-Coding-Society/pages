@@ -95,7 +95,12 @@ targets as the bottom pager) and hide at either end. The bottom pager shows
 In course context the review circle lives in navigation, not in the document:
 with navigation open it sits in front of the current document's row; with
 navigation collapsed a `( ) Title` row appears under the course heading. Topics
-hides the circle because completion is per course. On desktop the reader
+hides the circle because completion is per course. In course context the
+navigation starts with `Course Progress  done/total` (unique lessons, updated
+with completion) above a divider; Topics shows its document count there. Each
+week row is one element: the `W<n>` pill and the underlined title link to the week
+overview, while the marker and count open or close the week. Week rows sit flush under their sprint,
+with the done count under the pill and the title at lesson-row size. On desktop the reader
 scrolls the current document's row near the top of navigation, so the circle
 stays visible. The storage helper's `restore()` keeps the student's saved
 sections and only opens (never toggles) the current document's sprint and week.

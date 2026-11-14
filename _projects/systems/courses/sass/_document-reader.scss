@@ -97,24 +97,59 @@
     summary { font-size: 1.25rem; }
     .document-reader__sprint > summary { color: var(--pref-accent-color); }
     .document-reader__sprint { margin-bottom: 0.75rem; }
-    .document-reader__week { padding-left: 0.5rem; margin-top: 0.5rem; }
+    // Weeks sit flush under their sprint; the lesson guide line runs down from the week's arrow.
+    .document-reader__week {
+      margin: 0.5rem 0 0;
+      padding-left: 0;
+      border-left: 0;
+      > .document-reader__lessons { margin-left: 0.75rem; }
+    }
+    // Arrow | W pill over its done count | title, at the lesson rows' text size.
     .document-reader__week-summary {
-      display: flex;
+      display: grid;
+      grid-template-columns: auto auto minmax(0, 1fr);
+      grid-template-areas: "marker pill title" "marker count title";
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.25rem 0.5rem;
+      font-size: 15px;
+      line-height: 20px;
       &::before {
         content: "\25B6";
+        grid-area: marker;
         color: var(--pref-accent-color);
         font-size: 0.7rem;
       }
+      .document-reader__week-pill { grid-area: pill; }
+      [data-week-count] { grid-area: count; justify-self: center; }
     }
     .document-reader__week[open] > .document-reader__week-summary::before {
       transform: rotate(90deg);
     }
     .document-reader__week-title {
-      flex: 1;
+      grid-area: title;
+      justify-self: start;
       min-width: 0;
+      color: var(--pref-text-color);
+      text-decoration: underline;
+      text-decoration-color: color-mix(in srgb, var(--pref-accent-color) 60%, transparent);
+      text-underline-offset: 0.2em;
+      &:hover, &:focus-visible { text-decoration-color: var(--pref-accent-color); }
       overflow-wrap: anywhere;
+    }
+    .document-reader__week-pill {
+      text-decoration: none;
+      &:hover, &:focus-visible { outline: 2px solid var(--pref-accent-color); outline-offset: 1px; }
+    }
+    // Course Progress (or the Topics count) is divided from the sprint list.
+    [data-reader-count] {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin: 0 0 0.75rem;
+      padding: 0.5rem 0.4rem 0.75rem;
+      border-bottom: 1px solid var(--ui-border);
+      color: var(--text-muted);
     }
     .document-reader__intro {
       display: inline-flex;

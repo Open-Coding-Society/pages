@@ -142,6 +142,19 @@ test('reader navigation displays lesson types and updates week completion withou
   assert.equal(groups.length, 3);
   assert.equal(groups[0].querySelector('[data-week-count]').textContent, '1/2');
   assert.equal(groups[0].querySelector('[data-week-count]').attributes['aria-label'], '1 of 2 lessons completed');
+  const progress = hooks.count.querySelector('[data-reader-progress]');
+  assert.equal(hooks.count.textContent, 'Course Progress1/4');
+  assert.equal(progress.attributes['aria-label'], '1 of 4 course lessons completed');
+  const weekPill = groups[0].querySelector('[data-week-overview]');
+  assert.equal(weekPill.tag, 'a');
+  assert.equal(weekPill.textContent, 'W1');
+  assert.equal(weekPill.href, '/preview/csp/week-1/');
+  assert.equal(weekPill.attributes['aria-label'], 'Week 1 overview');
+  const weekTitle = groups[0].querySelector('[data-week-title]');
+  assert.equal(weekTitle.tag, 'a');
+  assert.equal(weekTitle.href, '/preview/csp/week-1/', 'the week title also opens the overview');
+  assert.ok(!groups[0].children.some(child => child.textContent === 'Week 1 overview'),
+    'the overview is the W pill, not a separate button');
   assert.equal(groups[2].querySelector('[data-week-count]').textContent, '0/1');
   const links = hooks.tree.querySelectorAll('[data-lesson-id]');
   assert.ok(links[0].children[0].classList.contains('fa-file-alt'));
@@ -178,6 +191,7 @@ test('reader navigation displays lesson types and updates week completion withou
 
   treeButton.listeners.click();
   assert.equal(groups[0].querySelector('[data-week-count]').textContent, '2/2');
+  assert.equal(progress.textContent, '2/4');
   for (const button of reviewButtons) {
     assert.equal(button.attributes['aria-pressed'], 'true');
     assert.equal(button.children[0].className, 'fas fa-check');
@@ -205,6 +219,7 @@ test('reader navigation displays lesson types and updates week completion withou
   hooks.context.value = 'topics';
   hooks.context.listeners.change();
   assert.equal(hooks.heading.textContent, 'Topics');
+  assert.equal(hooks.count.textContent, '4 documents');
   assert.equal(hooks.complete.hidden, true);
   assert.equal(hooks.tree.querySelectorAll('[data-reader-complete]').length, 0);
   assert.equal(hooks.tree.querySelectorAll('[data-week-group]').length, 0);
