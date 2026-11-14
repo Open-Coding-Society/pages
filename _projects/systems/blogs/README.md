@@ -68,6 +68,7 @@ make -C _projects/systems/blogs build
 bundle exec ruby scripts/test_blogs_system.rb
 bundle exec ruby scripts/test_blog_catalog.rb
 node --test tests/post_search.test.mjs
+node --test tests/mark_complete_button.test.mjs
 bundle exec ruby scripts/test_course_landing_pages.rb
 ```
 
