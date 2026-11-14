@@ -36,6 +36,10 @@ IMAGES_DEST = $(WORKSPACE_ROOT)/images/projects/$(PROJECT_NAME)
 NOTEBOOK_DEST = $(WORKSPACE_ROOT)/_notebooks/projects/$(PROJECT_NAME)
 DOCS_DEST = $(WORKSPACE_ROOT)/_posts/projects/$(PROJECT_NAME)
 INCLUDES_DEST = $(WORKSPACE_ROOT)/_includes/projects/$(PROJECT_NAME)
+PAGES_DEST = $(WORKSPACE_ROOT)/navigation/projects/$(PROJECT_NAME)
+DATA_DEST = $(WORKSPACE_ROOT)/_data/projects/$(PROJECT_NAME)
+PLUGINS_DEST = $(WORKSPACE_ROOT)/_plugins/projects/$(PROJECT_NAME)
+LAYOUTS_DEST = $(WORKSPACE_ROOT)/_layouts/projects/$(PROJECT_NAME)
 NOTEBOOKS = $(wildcard $(NOTEBOOK_SOURCE)/*.ipynb)
 
 ###########################################
@@ -143,6 +147,10 @@ clean:
 	@rm -rf $(IMAGES_DEST)
 	@rm -rf $(DOCS_DEST)
 	@rm -rf $(INCLUDES_DEST)
+	@rm -rf $(PAGES_DEST)
+	@rm -rf $(DATA_DEST)
+	@rm -rf $(PLUGINS_DEST)
+	@rm -rf $(LAYOUTS_DEST)
 	@touch /tmp/.jekyll_rebuild_trigger 2>/dev/null || true
 	@echo "✓ Distribution cleaned (source files preserved in _projects/$(PROJECT_NAME))"
 

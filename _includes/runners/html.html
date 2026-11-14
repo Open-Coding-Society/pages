@@ -5,7 +5,7 @@
   data-runner-id="{{ include.runner_id }}"
   data-default-code="{{ include.code | jsonify | escape }}"
   data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
-  {% include runners/fragments/challenge-box.html title="HTML Runner Challenge" challenge=include.challenge %}
+  {% include runners/fragments/challenge-box.html title="HTML Runner Challenge" challenge=include.challenge submission_toggle=true %}
 
   {% if include.source %}
   <details>

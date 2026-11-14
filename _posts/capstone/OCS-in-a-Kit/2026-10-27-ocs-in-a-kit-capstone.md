@@ -7,6 +7,13 @@ description: Turning Open Coding Society's classroom platform into a school-neut
 permalink: /capstone/ocs-in-a-kit/
 sticky_rank: 1
 year: "2026-2027"
+capstone_project:
+  course: CSA
+  school_year: "2026-2027"
+  title: "OCS-in-a-Kit"
+  image: "/images/OCS-Kit-Capstone.png"
+  description: "Open Coding Society built a full classroom platform with lessons, a code runner, grading, chat, and hall passes, but it was wired to one school, with names, logins, and settings hard coded in. OCS-in-a-Kit turns that into a product any school or organization can run on its own. An admin picks a kit, answers a few questions, and gets a working copy with no coding required. Vanilla is a basic site with accounts and a blog. Education adds a full CS classroom: lessons, code runner, assignments, grading, an AI tutor, and hall pass. Business drops the classroom features for chat, calendar, and an AI chatbot aimed at organizations. Every kit bundles the same three codebases, a Portfolio frontend plus Flask and Spring backends, and admins can turn individual features on or off later without reinstalling."
+  team: "Shayan, Dhyan, Arnav, Harrish, Darshan"
 ---
 
 {% assign data = site.data.ocs_in_a_kit_infograph %}

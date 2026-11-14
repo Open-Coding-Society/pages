@@ -50,7 +50,7 @@ Blogs - reusable document and discovery system
 
 A week's documents are selected by course/week frontmatter. The course's
 Blogs catalog is a different collection: every post whose `courses` names that
-course alone, whatever its week, with a search bar over them. Posts for no
+course, including shared lessons, whatever its week, with a search bar over them. Posts for no
 single class, such as capstones, are in the site-wide catalog at
 `/navigation/blogs/`. Both can reference the same underlying Jekyll document.
 Authored lessons stay in their registered lesson projects, notebooks, or DOCX;
@@ -100,7 +100,10 @@ communication infrastructure.
 - [Generated page definitions](../plugins/lesson_player_pages.rb).
 - Course pills, title, sidebar, top bar, mobile drawer and sprint/week views.
 - [Course document player adapter](../_includes/course-document-player.html):
-  the two-pane presentation of documents in a course context.
+  course home, sprint, week and Blogs pages.
+- [Shared document reader](../reader/reader.rb): one canonical document with
+  Course/Topics navigation; [reader controller](../reader/js/browser.js) changes
+  navigation without remounting runners or submission forms.
 - [Course Blogs adapter](../_includes/player-pages/blogs.html): delegates to
   the reusable Blogs reader, without duplicating it.
 - Course selection and per-course/per-panel navigation state.

@@ -113,7 +113,8 @@
   {% elsif submission_type == "code" %}
   <form class="submission-form active" id="code-form">
     <div class="form-group">
-      <p class="form-hint">This submits the code from this lesson's code runner(s) below as a Gist for automatic review. Save each runner with its 💾 button before submitting.</p>
+      <p class="form-hint">Choose what to hand in: click <strong>Add to submission</strong> on each runner you want graded (hacks, popcorn hacks), and save it. Leaving out practice runners does not lower your grade, but a required hack you leave out is graded as missing. Your selection is sent as a Gist for automatic review.</p>
+      <p class="code-runner-count" id="code-runner-count" aria-live="polite"></p>
       <ul class="code-runner-summary" id="code-runner-summary"></ul>
     </div>
     <div class="form-group">

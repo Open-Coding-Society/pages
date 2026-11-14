@@ -18,7 +18,7 @@
   data-bundled="{{ reflection_bundled }}"
   data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
   {% capture reflection_title %}Reflection {% if include.reflection_number %}#{{ include.reflection_number }}{% endif %}{% endcapture %}
-  {% include runners/fragments/challenge-box.html title=reflection_title challenge=include.question %}
+  {% include runners/fragments/challenge-box.html title=reflection_title challenge=include.question submission_toggle=true %}
 
   {% capture reflection_top_controls %}
       <button type="button" class="ocs__btn utility submit" data-hook="submit" title="Submit Answer" aria-label="Submit Answer"></button>
@@ -76,7 +76,7 @@ import { BaseRunner } from '{{site.baseurl}}/assets/js/pages/runners/index.js';
       runner.updateStatus('Changed since you submitted. Click Submit to update your answer.');
     } else {
       runner.updateStatus(bundled
-        ? '✔ Submitted. Sent with your code when you click Submit Code at the bottom of the page.'
+        ? '✔ Submitted. Sent with your code if you add it to your submission and click Submit Code.'
         : '✔ Submitted. Saved on this device.');
     }
   }

@@ -1,0 +1,334 @@
+---
+microblog: true
+toc: false
+layout: post
+title: North County Special Needs Community Foundation
+permalink: /capstone/ncsncf/
+capstone_project:
+  course: CSP
+  school_year: "2026-2027"
+  title: "North County Special Needs Community Foundation"
+  image: "/images/capstone/ncsncf.jpg"
+  description: "This capstone project involves refurbishing the North County Special Needs Community Foundation website to be more streamlined, organized, and professional. It will also overhaul and add new features such as an events backend and will update the Event Calendar to include categories."
+  team: "Raymond Liu, Pranay Kamath, Tristan, and Yue (Barbara)"
+---
+
+## Our Story: North County Special Needs Community Foundation
+
+The North County Special Needs Community Foundation (NCSNCF) was established in 2011 to support adults with developmental disabilities and their families throughout Poway and North County San Diego.
+
+The foundation grew from community initiatives such as the Poway Padres Special Olympics softball program, which began in 1998. Over time, its mission expanded to include educational opportunities, social connections, independent living, and community support.
+
+Our capstone team is helping further this mission by redesigning the foundation's website to make information easier to access, improve navigation, and create a more welcoming online experience.
+
+[Visit the Official NCSNCF Website](https://www.ncspecialneedsfoundation.com/)
+
+## Mission and Community
+
+<div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
+
+  <div class="ocs__grid-cell ocs__grid-cell--header">
+    Supporting the NCSNCF Community
+  </div>
+
+  <div class="ocs__grid-cell">
+    <strong>The Foundation's Mission</strong>
+    <p>
+      NCSNCF supports individuals with developmental disabilities
+      by promoting community inclusion, educational opportunities,
+      friendships, and independent living.
+    </p>
+  </div>
+
+  <div class="ocs__grid-cell ocs__grid-cell--accent">
+    <strong>Why Our Redesign Matters</strong>
+    <p>
+      Families, caregivers, volunteers, and community members
+      need an organized and accessible way to find programs,
+      upcoming events, and helpful resources.
+      Our redesign aims to make these connections easier.
+    </p>
+  </div>
+
+</div>
+
+## Explore Our Website Redesign
+
+Our team is modernizing the NCSNCF website with updated layouts, improved navigation, and a more consistent design. Explore the original website and our student-built redesign below.
+
+<div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
+
+  <div class="ocs__grid-cell ocs__grid-cell--header">
+    Original Website vs. Our Redesign
+  </div>
+
+  <div class="ocs__grid-cell">
+    <h3>Original Website</h3>
+    <p>
+      Explore the foundation's existing website,
+      including its mission, community programs,
+      and event information.
+    </p>
+
+    <a class="ocs__btn fill small"
+       href="https://www.ncspecialneedsfoundation.com/"
+       target="_blank"
+       rel="noopener noreferrer">
+      View Original Website
+    </a>
+  </div>
+
+  <div class="ocs__grid-cell ocs__grid-cell--accent">
+    <h3>Our Redesigned Website</h3>
+    <p>
+      Explore our student-developed website featuring
+      improved page layouts, more consistent styling,
+      and clearer navigation.
+    </p>
+
+    <a class="ocs__btn alert-green fill small"
+       href="https://ncsncf-redesign.github.io/NCSNCF-FE/"
+       target="_blank"
+       rel="noopener noreferrer">
+      Explore Our Redesign
+    </a>
+  </div>
+
+</div>
+
+## Our Capstone: What We're Building
+
+Our project focuses on improving the NCSNCF website while exploring new tools that could make it easier for families and community members to connect with the foundation.
+
+<div class="ocs__grid ocs__grid--color" style="margin-bottom: 1.5rem;">
+
+  <div class="ocs__grid-cell">
+    <strong>Website Redesign</strong>
+    <p>
+      Creating consistent layouts, updated styling,
+      and easier navigation throughout the website.
+    </p>
+  </div>
+
+  <div class="ocs__grid-cell">
+    <strong>Community Event Calendar</strong>
+    <p>
+      Improving how visitors discover upcoming
+      community events, programs, and activities.
+    </p>
+  </div>
+
+  <div class="ocs__grid-cell">
+    <strong>Community Surveys</strong>
+    <p>
+      Exploring surveys that allow families and
+      community members to share feedback
+      and communicate their needs.
+    </p>
+  </div>
+
+  <div class="ocs__grid-cell">
+    <strong>Resource Discovery</strong>
+    <p>
+      Planning features that help users find
+      relevant programs, community resources,
+      and support opportunities.
+    </p>
+  </div>
+
+  <div class="ocs__grid-cell">
+    <strong>Community Announcements</strong>
+    <p>
+      Exploring ways to highlight important updates,
+      foundation news, and upcoming opportunities.
+    </p>
+  </div>
+
+  <div class="ocs__grid-cell">
+    <strong>Frontend and Backend Development</strong>
+    <p>
+      Organizing our frontend and backend repositories
+      to support website development and
+      future interactive features.
+    </p>
+  </div>
+
+</div>
+
+## Our Development Process
+
+Our team uses GitHub to organize development, track progress, and collaborate on the redesign.
+
+We use issues and a Kanban board to manage tasks, review changes through pull requests, and continuously improve the website throughout the capstone project.
+
+<div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
+
+  <div class="ocs__grid-cell ocs__grid-cell--header">
+    Explore Our Development
+  </div>
+
+  <div class="ocs__grid-cell">
+    <strong>Frontend Repository</strong>
+    <p>
+      View the code behind our redesigned website,
+      including page layouts, styling, and navigation.
+    </p>
+
+    <a class="ocs__btn alert-green fill small"
+       href="https://github.com/NCSNCF-Redesign/NCSNCF-FE"
+       target="_blank"
+       rel="noopener noreferrer">
+      View Frontend Code
+    </a>
+  </div>
+
+  <div class="ocs__grid-cell ocs__grid-cell--accent">
+    <strong>Project Kanban Board</strong>
+    <p>
+      Follow our team's progress, development tasks,
+      and upcoming improvements.
+    </p>
+
+    <a class="ocs__btn fill small"
+       href="https://github.com/orgs/NCSNCF-Redesign/projects/2"
+       target="_blank"
+       rel="noopener noreferrer">
+      View Kanban Board
+    </a>
+  </div>
+
+</div>
+
+---
+
+## Project Infographic and Team
+
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
+
+{% assign data = site.data.ncsncf_infograph %}
+
+<div>
+
+  <!-- Project Introduction -->
+  <blockquote>{{ data.quote }}</blockquote>
+
+  <h2>{{ data.title }} {{ data.subtitle }}</h2>
+
+  <!-- Project Summary Section -->
+  <div class="ocs__grid ocs__grid--standard cols-2"
+       style="margin-bottom: 1.5rem;">
+
+    <div class="ocs__grid-cell ocs__grid-cell--header">
+      Project Summary
+    </div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+      <strong>Main Problems</strong>
+      <p>{{ data.summary.main_problems }}</p>
+
+      <a class="ocs__btn alert-green fill small"
+         href="{{ data.summary.original_url }}"
+         target="_blank"
+         rel="noopener noreferrer">
+        See Original Website
+      </a>
+    </div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+      <strong>Project Direction</strong>
+      <p>{{ data.summary.project_direction }}</p>
+
+      <a class="ocs__btn alert-green fill small"
+         href="{{ data.summary.redesigned_url }}"
+         target="_blank"
+         rel="noopener noreferrer">
+        Explore Our Redesign
+      </a>
+    </div>
+
+  </div>
+
+  <!-- GitHub Repository -->
+  <div style="margin-bottom: 1.5rem;">
+    <a class="ocs__btn large"
+       href="{{ data.github }}"
+       target="_blank"
+       rel="noopener noreferrer">
+      View GitHub Repository
+    </a>
+  </div>
+
+  <!-- Live Kanban Board -->
+  {% if data.board %}
+    <h2>{{ data.board.title }}</h2>
+
+    {% include ocs_kanban_board.html
+       url=data.board.url
+       filter=data.board.filter %}
+  {% endif %}
+
+  <hr />
+
+  <!-- Strengths and Improvements Section -->
+  <h2>Website Strengths and Improvements</h2>
+
+  <div class="ocs__grid ocs__grid--standard cols-2"
+       style="margin-bottom: 1.5rem;">
+
+    <div class="ocs__grid-cell ocs__grid-cell--header">
+      Our Website Improvement Goals
+    </div>
+
+    {% for item in data.strengths_and_improvements %}
+      <div class="ocs__grid-cell {% if item.accent %}ocs__grid-cell--accent{% endif %}">
+
+        <strong>{{ item.title }}</strong>
+        <p>{{ item.description }}</p>
+
+        {% for link in item.links %}
+          <a class="ocs__btn {{ link.btn_class }} fill small"
+             href="{{ link.url }}"
+             target="_blank"
+             rel="noopener noreferrer">
+            {{ link.label }}
+          </a>
+        {% endfor %}
+
+      </div>
+    {% endfor %}
+
+  </div>
+
+  <hr />
+
+  <!-- Team Members Section -->
+  <h2>Meet Our Capstone Team</h2>
+
+  <div class="ocs__grid ocs__grid--standard cols-3"
+       style="margin-bottom: 1.5rem;">
+
+    <div class="ocs__grid-cell ocs__grid-cell--header">
+      Team Members and Collaborators
+    </div>
+
+    {% for member in data.team %}
+      <div class="ocs__grid-cell ocs__grid-cell--accent">
+
+        <strong>{{ member.name }}</strong>
+        <p>{{ member.role }}</p>
+
+        <a class="ocs__btn alert-green iridescent fill small"
+           href="{{ member.portfolio }}"
+           target="_blank"
+           rel="noopener noreferrer">
+          View Portfolio
+        </a>
+
+      </div>
+    {% endfor %}
+
+  </div>
+
+</div>
+<!-- markdownlint-restore -->

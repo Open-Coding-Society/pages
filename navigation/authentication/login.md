@@ -298,6 +298,30 @@ show_reading_time: false
     // A Flask-only site has no Spring account, so sign-up shows only Flask's status.
     if (!springEnabled) document.getElementById('springStatus').style.display = 'none';
 
+    // The schools to choose from are Flask's data (GET /api/signup-options). The list in the markup stays
+    // as what is offered when Flask cannot be asked, such as a Flask that has not been updated yet.
+    async function offerSchools() {
+        try {
+            const response = await fetch(`${pythonURI}/api/signup-options`, fetchOptions);
+            const options = response.ok ? await response.json() : null;
+            if (!options || !Array.isArray(options.schools) || options.schools.length === 0) return;
+            const select = document.getElementById('signupSchool');
+            const chosen = select.value;
+            const placeholder = select.querySelector('option[value=""]');
+            select.replaceChildren(placeholder, ...options.schools.map(school => {
+                const option = document.createElement('option');
+                option.value = school.name;
+                option.textContent = school.label;  // text, never markup
+                return option;
+            }));
+            // a school picked before Flask answered stays picked, if Flask still offers it
+            select.value = options.schools.some(school => school.name === chosen) ? chosen : '';
+        } catch (_) {
+            // keep the markup's own list
+        }
+    }
+    offerSchools();
+
     // A guest can sign up only while a Teacher or Admin has the Guest Window open, so the option is
     // offered only then. If Flask cannot be asked, it stays hidden.
     async function offerGuestOption() {
@@ -478,17 +502,29 @@ show_reading_time: false
 
     // Function to handle both Python and Java login simultaneously
     window.loginBoth = function () {
+        // One attempt at a time: repeat clicks while the servers answer would each send
+        // another login to Flask and Spring. The button comes back whenever the page stays put.
+        const loginButton = document.querySelector('#pythonForm button[type="submit"]');
+        loginButton.disabled = true;
+        const stayOnPage = () => { loginButton.disabled = false; };
         // Wrap both logins in Promises and only redirect after both finish. A Flask-only site
         // (spring: false in _config.yml) signs in to Flask alone, so Spring counts as logged in.
         let javaPromise = springEnabled
             ? new Promise((resolve) => { window.javaLogin(resolve); })
             : Promise.resolve(true);
-        let pythonPromise = new Promise((resolve) => {
-            window.pythonLogin(resolve);
-        });
-        // pythonPromise only settles when Flask accepts the login; on a Flask failure
+        // The callback runs only when Flask accepts the login; on a Flask failure
         // login() shows the error in #message and the page stays put.
-        Promise.all([javaPromise, pythonPromise]).then(([springLoggedIn, flaskBody]) => {
+        let flaskAccepted = false;
+        let flaskBody;
+        let pythonPromise = window.pythonLogin((body) => {
+            flaskAccepted = true;
+            flaskBody = body;
+        });
+        Promise.all([javaPromise, pythonPromise]).then(([springLoggedIn]) => {
+            if (!flaskAccepted) {
+                stayOnPage();
+                return;
+            }
             const finish = () => {
                 // Guests have no profile; direct logins fall back to the home page.
                 if (flaskBody && flaskBody.user && flaskBody.user.limited) {
@@ -499,15 +535,18 @@ show_reading_time: false
                     window.location.href = returnPath || '{{site.baseurl}}/profile';
                     return;
                 }
+                stayOnPage();
                 showSpringLoginWarning();
             };
             if (reverifyNeeded(flaskBody)) {
+                stayOnPage();
                 reverifying = true;
                 afterReverify = finish;
                 document.getElementById('reverify').style.display = 'block';
                 return;
             }
             if (staffMustVerify(flaskBody)) {
+                stayOnPage();
                 showStaffVerifyNotice(finish);
                 return;
             }
@@ -563,9 +602,7 @@ show_reading_time: false
                 password: document.getElementById("password").value,
             }
         };
-        login(options);
-        // If login() is not async, call done() immediately
-        // if (done) done();
+        return login(options);
     }
     // Function to handle Java login
     window.javaLogin = function (done) {

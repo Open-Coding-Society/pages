@@ -1,6 +1,6 @@
 {% assign games = site.posts | where: "game_directory", true | where_exp: "game", "game.exclude_from_games != true" | sort: "game_order" %}
 {% for game in games %}
-  <div class="ocs__grid-cell CSSE" data-year="{{ game.school_year | default: '' | escape }}" data-page-url="{{ game.url | relative_url }}">
+  <div class="ocs__grid-cell CSSE" data-capstone-card data-course="CSSE" data-year="{{ game.school_year | default: '' | escape }}" data-page-url="{{ game.url | relative_url }}">
     {% assign game_image = game.image %}
     {% unless game_image %}
       {% assign project_path = game.path | split: '/' %}

@@ -62,8 +62,8 @@ are the sources `_projects/systems/courses/_includes/course-document-player.html
 (course lessons) and `_projects/systems/blogs/layouts/post.html` (standalone posts and
 their `/topics/view/` copies), with the submission mount in
 `_projects/systems/blogs/_includes/lesson-submission-form.html`. The Teacher Dashboard
-(`assets/js/submissions/creator-dashboard.js`) gets `openLessonSummary` from
-`_layouts/submissions-v2.html`, which imports the dialog only when it is opened. All
+(`_projects/systems/grades/js/submissions/creator-dashboard.js`) gets `openLessonSummary`
+from `_projects/systems/grades/layouts/submissions-v2.html`, which imports the dialog only when it is opened. All
 student text is set with `textContent`.
 
 ## Tests
