@@ -139,9 +139,9 @@ minima:
     - { platform: youtube, user_url: "https://www.youtube.com/@OpenCodingSociety" } 
   nav_pages:
     - navigation/course.md
-    - navigation/projects/capstone/capstone.md
     - navigation/projects/topics/topics.md
     - navigation/grades.html
+    - navigation/projects/capstone/capstone.md
 exclude:
 # Jekyll defaults
   - vendor
