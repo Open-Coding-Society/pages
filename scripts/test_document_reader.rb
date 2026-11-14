@@ -26,6 +26,9 @@ class DocumentReaderTest < Minitest::Test
     assert_match(/\.document-reader__navigation \.document-reader__check \{\s*font-size: 0\.75rem;/, css)
     # S/W pills grow to the OCS medium button height on mobile, over .ocs__btn.small.
     assert_match(/@media \(max-width: 768px\) \{\s*\.document-reader__navigation \.document-reader__folder-pill\.ocs__btn \{\s*height: 35px;/, css)
+    # anywhere would shrink hosted table columns (course calendar days) to one character.
+    main = css[/\.document-reader__main \{([^}]+)\}/, 1]
+    assert_match(/overflow-wrap: break-word;/, main)
   end
 
   def test_real_shared_javascript_keeps_one_document_and_submission_identity

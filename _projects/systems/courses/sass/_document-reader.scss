@@ -196,7 +196,9 @@
     overflow-y: auto;
     min-width: 0;
     padding: 1.5rem;
-    overflow-wrap: anywhere;
+    // break-word, not anywhere: anywhere also shrinks table columns to one
+    // character (the course calendar's day labels on phones).
+    overflow-wrap: break-word;
     .post { max-width: 100%; }
     img { max-width: 100%; height: auto; }
     pre { max-width: 100%; overflow-x: auto; }
