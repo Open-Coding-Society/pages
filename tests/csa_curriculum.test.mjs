@@ -217,7 +217,7 @@ test("the scheduled memory lesson explains Java value passing correctly", () => 
 test("additional simulator and shared API resources do not overload curated CSA weeks", () => {
     const simulator = JSON.parse(fs.readFileSync(path.join(root, "_projects/lessons/ap-frq-simulator/index.ipynb"), "utf8"));
     assert.doesNotMatch(simulator.cells[0].source.join(""), /^courses:/m);
-    const capstone = fs.readFileSync(path.join(root, "_posts/capstone/2026-05-19-exam-simulator-capstone.md"), "utf8");
+    const capstone = fs.readFileSync(path.join(root, "_posts/capstone/2025-2026/2026-05-19-exam-simulator-capstone.md"), "utf8");
     assert.doesNotMatch(capstone.split(/\n---/)[0], /^courses:/m);
     const shared = JSON.parse(fs.readFileSync(path.join(root, "_notebooks/Foundation/H-code/2026-03-15-srp-api-chaining.ipynb"), "utf8"));
     const frontmatter = shared.cells[0].source.join("");

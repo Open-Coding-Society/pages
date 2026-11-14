@@ -91,6 +91,13 @@ Implementation and validation are documented in the
 
 ### Authoring project pages
 
+Place individual project posts in `2025-2026/`, `2026-2027/`, or the matching
+school-year directory. Use `capstone_project.school_year` for listed projects
+and top-level `school_year` for supporting posts. If absent, assign the year
+from the post date using an August cutoff. Keep explicit permalinks stable.
+The former `websites/` posts follow the same year grouping. Leave
+`Intelligence/`, `OCS-in-a-Kit/`, `Presence/`, and `Jarvis3000/` intact.
+
 Keep page-specific HTML and Liquid directly in the project's Markdown post.
 Use includes only for shared components (navigation, footers, repeated board
 cards, or OCS Kanban boards). Existing YAML data stays under `_data/`.

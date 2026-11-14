@@ -40,6 +40,17 @@ now edited in the source post and deployed with the site.
 
 ## Project page content
 
+Flat project posts and the former `websites/` posts are organized under
+`_posts/capstone/<school_year>/` (currently `2025-2026/` and `2026-2027/`).
+Use `capstone_project.school_year` for catalog entries; supporting posts use
+top-level `school_year` without opting into the catalog. For posts without a
+declared year, assign it from the post date with August starting the school
+year. Preserve filenames and explicit permalinks when moving posts.
+The `Intelligence/`, `OCS-in-a-Kit/`, `Presence/`, and `Jarvis3000/` project
+directories remain independent and are not reorganized by year. The shared
+authoring README stays at the Capstone root. Year grouping does not change
+page style or YAML data ownership.
+
 Keep project-specific HTML and Liquid in the owning Markdown post under
 `_posts/capstone/`, not in a one-page include. Existing YAML data remains under
 `_data/`. Keep includes for genuinely shared components, such as project

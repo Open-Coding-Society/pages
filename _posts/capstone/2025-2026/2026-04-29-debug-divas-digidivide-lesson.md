@@ -1,4 +1,5 @@
 ---
+school_year: "2025-2026"
 toc: false
 layout: post
 title: Digital Divide Interactive learning 

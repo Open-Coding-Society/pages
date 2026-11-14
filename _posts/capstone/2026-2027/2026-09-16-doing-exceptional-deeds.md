@@ -1,4 +1,5 @@
 ---
+school_year: "2026-2027"
 microblog: true
 toc: false
 layout: post

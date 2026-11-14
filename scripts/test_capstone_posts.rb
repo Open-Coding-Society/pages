@@ -9,6 +9,21 @@ class CapstonePostsTest < Minitest::Test
   end.freeze
   INCLUDE = /\{%\s*include\s+([^\s%]+)(.*?)%\}/m
 
+  def test_year_grouped_posts_match_their_declared_school_year_and_keep_explicit_urls
+    root = File.join(ROOT, "_posts/capstone")
+    assert_empty Dir[File.join(root, "????-??-??-*.md")]
+    refute Dir.exist?(File.join(root, "websites"))
+    grouped = Dir[File.join(root, "????-????/*.md")]
+    refute_empty grouped
+
+    grouped.each do |path|
+      data = SafeYAML.load(File.read(path).split("---", 3)[1])
+      year = data.dig("capstone_project", "school_year") || data["school_year"]
+      assert_equal File.basename(File.dirname(path)), year, path
+      assert_match %r{\A/}, data.fetch("permalink"), path
+    end
+  end
+
   def test_capstone_includes_are_shared_or_parameterized_components
     sources = %w[_posts/**/*.md _includes/**/*.html _layouts/**/*.html navigation/**/*.md]
       .flat_map { |pattern| Dir[File.join(ROOT, pattern)] }
@@ -40,7 +55,7 @@ class CapstonePostsTest < Minitest::Test
   def test_educators_post_renders_html_and_yaml_backed_liquid_at_both_baseurls
     ["", "/preview"].each do |baseurl|
       site = build_site(baseurl)
-      html = render(site, "_posts/capstone/2026-02-06-educators-capstone.md")
+      html = render(site, "_posts/capstone/2025-2026/2026-02-06-educators-capstone.md")
       data = site.data.fetch("educators_infograph")
 
       assert_equal data.fetch("Title"), html.at_css(".ed-title").text
