@@ -11,8 +11,6 @@
 
 (function() {
     const LessonCompletion = {
-        pythonURI: window.pythonURI || 'http://localhost:5000',
-        javaURI: window.javaURI || 'http://localhost:8585',
         completedLessons: new Set(),
         lessonStartTimes: new Map(),
         
@@ -36,8 +34,9 @@
          * Add "Mark as Complete" buttons to lessons
          */
         addCompleteButtons: function() {
-            // Find lesson containers
-            const lessons = document.querySelectorAll('[data-lesson], .lesson-content, .frq-container, .page-content');
+            // Find lesson containers. Not [data-lesson]: on the quest module pages those are
+            // the lesson cards, which show the quest's own progress.
+            const lessons = document.querySelectorAll('.lesson-content, .frq-container, .page-content');
             
             lessons.forEach(lesson => {
                 // Skip if button already exists
@@ -72,13 +71,15 @@
                     transition: 'all 0.3s ease'
                 });
                 
-                // Add hover effect
+                // Add hover effect. A completed (disabled) button can still get
+                // mouseenter and mouseleave, so leave its gray color alone.
                 button.addEventListener('mouseenter', () => {
+                    if (button.disabled) return;
                     button.style.backgroundColor = '#059669';
                     button.style.transform = 'scale(1.05)';
                 });
                 button.addEventListener('mouseleave', () => {
-                    button.style.backgroundColor = '#10b981';
+                    if (!button.disabled) button.style.backgroundColor = '#10b981';
                     button.style.transform = 'scale(1)';
                 });
                 
@@ -98,7 +99,7 @@
                     // Add click handler
                     button.addEventListener('click', (e) => {
                         e.preventDefault();
-                        this.completeLesson(lessonId, lesson);
+                        this.completeLesson(lessonId);
                     });
                 }
                 
@@ -108,81 +109,22 @@
         },
         
         /**
-         * Mark lesson as complete
+         * Mark lesson as complete. Completion is kept in this browser only:
+         * neither Flask nor Spring has an /api/lessons/complete route.
          */
-        completeLesson: function(lessonId, lessonElement) {
+        completeLesson: function(lessonId) {
             console.log('📚 Completing lesson:', lessonId);
             
             const startTime = this.lessonStartTimes.get(lessonId) || new Date();
             const timeToComplete = Math.round((Date.now() - startTime.getTime()) / 1000); // seconds
             
-            const lessonMetadata = {
-                lessonId: lessonId,
-                questName: this.extractQuestName(lessonElement),
-                moduleName: this.extractModuleName(lessonElement),
-                timeToCompleteSeconds: timeToComplete,
-                completedAt: new Date().toISOString(),
-                pageTitle: document.title,
-                url: window.location.href
-            };
-            
-            // Record event in analytics
-            if (window.OCSEnhancedAnalytics) {
-                window.OCSEnhancedAnalytics.recordEvent('lesson_completed', lessonMetadata);
-            }
-            
-            // Send to backend
-            this.sendCompletionToBackend(lessonMetadata);
+            this.saveCompletedLesson(lessonId);
             
             // Update UI
             this.markButtonAsCompleted(lessonId);
             
             // Show success message
             this.showSuccessMessage(lessonId, timeToComplete);
-        },
-        
-        /**
-         * Send lesson completion to backend
-         */
-        sendCompletionToBackend: async function(metadata) {
-            try {
-                // Try to save to Python backend
-                const response = await fetch(`${this.pythonURI}/api/lessons/complete`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify(metadata)
-                });
-                
-                if (!response.ok) {
-                    console.warn('Python backend lesson completion failed, trying Java backend');
-                    
-                    // Try Java backend
-                    const javaResponse = await fetch(`${this.javaURI}/api/lessons/complete`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify(metadata)
-                    });
-                    
-                    if (!javaResponse.ok) {
-                        throw new Error('Both backends failed');
-                    }
-                }
-                
-                // Save to localStorage as backup
-                this.saveCompletedLesson(metadata.lessonId);
-                
-                console.log('✅ Lesson completion recorded');
-            } catch (error) {
-                console.error('Error sending lesson completion:', error);
-                // Still save locally even if backend fails
-                this.saveCompletedLesson(metadata.lessonId);
-            }
         },
         
         /**
@@ -210,11 +152,13 @@
         },
         
         /**
-         * Update button after completion
+         * Update the lesson's buttons after completion. Each button carries its lesson's id,
+         * so match the buttons themselves: on FRQ pages the first element with that id is
+         * the button, which has no .mark-complete-btn inside it.
          */
         markButtonAsCompleted: function(lessonId) {
-            const button = document.querySelector(`[data-lesson-id="${lessonId}"], [data-lesson="${lessonId}"]`)?.querySelector('.mark-complete-btn');
-            if (button) {
+            document.querySelectorAll('.mark-complete-btn').forEach(button => {
+                if (button.dataset.lessonId !== lessonId) return;
                 button.classList.add('completed');
                 button.style.backgroundColor = '#6b7280';
                 button.style.cursor = 'not-allowed';
@@ -225,7 +169,7 @@
                     Lesson Completed
                 `;
                 button.disabled = true;
-            }
+            });
         },
         
         /**
@@ -286,14 +230,6 @@
             const lessonId = this.extractLessonIdFromURL();
             if (lessonId && !this.lessonStartTimes.has(lessonId)) {
                 this.lessonStartTimes.set(lessonId, new Date());
-                
-                if (window.OCSEnhancedAnalytics) {
-                    window.OCSEnhancedAnalytics.recordEvent('lesson_started', {
-                        lessonId: lessonId,
-                        questName: this.extractQuestNameFromURL(),
-                        moduleName: this.extractModuleNameFromURL()
-                    });
-                }
                 console.log('📚 Lesson started:', lessonId);
             }
         },
@@ -306,24 +242,6 @@
                    element.dataset.lessonId || 
                    element.dataset.id ||
                    this.extractLessonIdFromURL();
-        },
-        
-        /**
-         * Extract quest name
-         */
-        extractQuestName: function(element) {
-            return element.dataset.quest || 
-                   element.dataset.questName || 
-                   this.extractQuestNameFromURL();
-        },
-        
-        /**
-         * Extract module name
-         */
-        extractModuleName: function(element) {
-            return element.dataset.module || 
-                   element.dataset.moduleName || 
-                   this.extractModuleNameFromURL();
         },
         
         /**
@@ -345,35 +263,6 @@
             const questIdx = parts.findIndex(p => p.includes('quest'));
             if (questIdx !== -1 && questIdx + 2 < parts.length) {
                 return parts[questIdx + 2];
-            }
-            
-            return null;
-        },
-        
-        /**
-         * Extract quest name from URL
-         */
-        extractQuestNameFromURL: function() {
-            const path = window.location.pathname;
-            
-            if (path.includes('cs-portfolio-quest')) return 'cs-portfolio-quest';
-            if (path.includes('digital-famine')) return 'digital-famine';
-            if (path.includes('west-coast')) return 'west-coast';
-            if (path.includes('frqs')) return 'frq-practice';
-            
-            return null;
-        },
-        
-        /**
-         * Extract module name from URL
-         */
-        extractModuleNameFromURL: function() {
-            const path = window.location.pathname;
-            const parts = path.split('/').filter(Boolean);
-            
-            const questIdx = parts.findIndex(p => p.includes('quest'));
-            if (questIdx !== -1 && questIdx + 1 < parts.length) {
-                return parts[questIdx + 1];
             }
             
             return null;

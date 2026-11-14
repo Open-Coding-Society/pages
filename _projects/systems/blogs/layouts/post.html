@@ -993,7 +993,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
   {%- endif -%}
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
 
-  <!-- Enhanced Analytics Tracking -->
+  <!-- API addresses, Gist export and runner I/O for the submission form's classic scripts -->
   <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
     import { exportToGist } from '{{ site.baseurl }}/assets/js/gist.js';
@@ -1012,8 +1012,6 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
     window.mountSubmissionSummary = mountSubmissionSummary;
     window.submissionError = submissionError;
   </script>
-  <script src="{{ site.baseurl }}/assets/js/ocs-analytics-enhanced.js"></script>
-  <script src="{{ site.baseurl }}/assets/js/code-runner-analytics.js"></script>
   <script src="{{ site.baseurl }}/assets/js/lesson-completion.js"></script>
   <script src="{{ site.baseurl }}/assets/js/lesson-completion-bigsix.js"></script>
 </article>
