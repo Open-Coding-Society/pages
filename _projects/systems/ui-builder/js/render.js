@@ -140,6 +140,17 @@ function layoutFor(registry, key) {
   };
 }
 
+// A section style the frame's registry field lists ("card", "tint", "outline") adds the
+// grammar's band around the section; "plain", missing or unknown styles add nothing.
+function bandClass(section, registry) {
+  const style = own(own(section, 'settings'), 'style');
+  if (typeof style !== 'string' || style === 'plain' || !/^[a-z]{1,16}$/.test(style)) return '';
+  const frame = isObject(registry.frames) && Object.prototype.hasOwnProperty.call(registry.frames, own(section, 'type')) ? registry.frames[section.type] : null;
+  const field = frame && Array.isArray(frame.fields) ? frame.fields.find((item) => item && item.id === 'style') : null;
+  const known = field && Array.isArray(field.options) && field.options.some((option) => option && option.value === style);
+  return known ? ` ocs__band ocs__band--${style}` : '';
+}
+
 function sectionNode(section, ctx) {
   if (!isObject(section)) return null;
   if (own(section, 'hidden') === true && ctx.mode !== 'canvas') return null;
@@ -151,11 +162,11 @@ function sectionNode(section, ctx) {
     // One column: its blocks sit directly in the section (every cell's, should there be more).
     const take = blockTaker(perSection);
     const blocks = cells.flatMap((cell) => take(blocksOf(cell)));
-    return h('section', { class: 'ocs__stack', ...attrs }, blocks.map((block) => blockNode(block, ctx)));
+    return h('section', { class: `ocs__stack${bandClass(section, ctx.registry)}`, ...attrs }, blocks.map((block) => blockNode(block, ctx)));
   }
   if (type === 'columns') {
     const layout = layoutFor(ctx.registry, own(own(section, 'settings'), 'layout'));
-    return h('section', { class: layout.className, ...attrs },
+    return h('section', { class: `${layout.className}${bandClass(section, ctx.registry)}`, ...attrs },
       columnsOf(cells, layout.cells, perSection).map((blocks, index) => h('div', { class: 'ocs__stack', 'data-ui-cell': String(index) },
         blocks.map((block) => blockNode(block, ctx)))));
   }
