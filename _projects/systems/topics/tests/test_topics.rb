@@ -64,7 +64,7 @@ class TopicsTest < Minitest::Test
         layout: opencs
         permalink: /course-browser/
         ---
-        {% include topics-browser.html course_context=true %}
+        {% include projects/topics/topics-browser.html course_context=true %}
       DOC
       reference_includes = File.join(source, "_includes/projects/lessons")
       FileUtils.mkdir_p(reference_includes)
@@ -81,7 +81,7 @@ class TopicsTest < Minitest::Test
         "baseurl" => "/preview", "disqus" => {}
       ))
       site.process
-      index = JSON.parse(File.read(File.join(source, "_site/assets/js/topics/data.json")))
+      index = JSON.parse(File.read(File.join(source, "_site/assets/js/projects/topics/data.json")))
       assert_equal 3, index.size
       lesson = index.find { |entry| entry["url"] == "/java/algorithms/" }
       assert_equal %w[java algorithms], lesson["categories"]
@@ -101,7 +101,7 @@ class TopicsTest < Minitest::Test
       assert_includes topic, 'id="algorithm-heading"'
       assert_includes topic, "CURRENT_LESSON_ID_BLOG = \"/java/algorithms/\""
       assert_includes topic, "/preview/topics/?category=java"
-      assert_includes topic, "/preview/assets/js/topics/document.js"
+      assert_includes topic, "/preview/assets/js/projects/topics/document.js"
       outline = File.read(File.join(source, "_site/topics/view/csa/cs112/index.html"))
       assert_includes outline, "Topics document navigation"
       browser = File.read(File.join(source, "_site/topics/index.html"))
@@ -158,11 +158,12 @@ class TopicsTest < Minitest::Test
 
   def test_primary_category_configuration_rejects_duplicates
     Dir.mktmpdir("topics-invalid-") do |source|
-      FileUtils.mkdir_p(File.join(source, "_data"))
-      File.write(File.join(source, "_data/topics_primary.yml"), "- Java\n- java\n")
+      FileUtils.mkdir_p(File.join(source, "_data/projects/topics"))
+      File.write(File.join(source, "_data/projects/topics/topics_primary.yml"), "- Java\n- java\n")
       site = Jekyll::Site.new(Jekyll.configuration("source" => source, "config" => [], "quiet" => true))
       site.read
-      assert_raises(Jekyll::Errors::FatalException) { Topics::Generator.new.generate(site) }
+      error = assert_raises(Jekyll::Errors::FatalException) { Topics::Generator.new.generate(site) }
+      assert_includes error.message, "_data/projects/topics/topics_primary.yml"
     end
   end
 end

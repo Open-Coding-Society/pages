@@ -111,6 +111,37 @@ to global conversion or notebook splitting. Project multi-course posts are
 still split from `_posts` by `make split-courses`. Do not hand-edit copied
 notebooks, generated posts, or course-split files.
 
+### Namespaced system distributions
+
+System projects may use `distribution.json` with the shared publisher to place
+each resource under a generic ignored project root:
+
+| Resource | Destination |
+| --- | --- |
+| Includes | `_includes/projects/<name>/` |
+| JavaScript | `assets/js/projects/<name>/` |
+| CSS / SASS | `assets/css/projects/<name>/`, `_sass/projects/<name>/` |
+| Images | `images/projects/<name>/` |
+| Posts | `_posts/projects/<name>/` |
+| Standalone pages | `navigation/projects/<name>/` |
+| YAML / JSON data | `_data/projects/<name>/` |
+| Jekyll plugins | `_plugins/projects/<name>/` |
+
+Use explicit permalinks on standalone pages to preserve public routes without
+turning navigation into blog posts. Includes use `projects/<name>/<file>`;
+data is namespaced as `site.data.projects.<name>`. Jekyll loads nested plugins
+automatically. These three new roots are manifest destinations, not automatic
+copies of every `data/` folder (some projects use `data/` for JavaScript).
+The shared template cleans all of these project directories, and
+`clean-removed-projects` handles them after a project is deleted.
+
+The publisher's `.project-distribution-cache/<name>.json` records ownership and
+checksums. Keep the cache when changing destinations: the next publish removes
+obsolete outputs before recording the new paths. Do not delete caches to
+resolve ownership conflicts. Never hand-edit generated files or add per-project
+ignore rules for these roots. Examples: `systems/topics` and `systems/capstone`.
+Validate with `bundle exec ruby scripts/test_system_project_distribution.rb`.
+
 ### CSA Curriculum Source Ownership
 
 CSA sources are registered lesson projects under `lessons/cs112`, `lessons/cs113`,

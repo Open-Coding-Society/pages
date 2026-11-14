@@ -7,4 +7,4 @@ lesson_category: flask
 search_exclude: true
 ---
 
-{% include topics-browser.html %}
+{% include projects/topics/topics-browser.html %}

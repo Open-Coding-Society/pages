@@ -22,6 +22,9 @@ class RemovedProjectCleanupTest < Minitest::Test
     assets/css/projects/student-management-groups/main.scss
     _sass/projects/student-management-groups/main.scss
     images/projects/student-management-groups/icon.png
+    navigation/projects/student-management-groups/groups.md
+    _data/projects/student-management-groups/groups.yml
+    _plugins/projects/student-management-groups/groups.rb
     _projects/systems/student-management-groups/Makefile
   ].freeze
 
@@ -79,6 +82,9 @@ class RemovedProjectCleanupTest < Minitest::Test
       assets/js/projects/messages/thread.js
       _includes/projects/systems/chat.html
       _projects/systems/messages/Makefile
+      navigation/projects/messages/dm.md
+      _data/projects/messages/messages.yml
+      _plugins/projects/messages/messages.rb
       _posts/projects/new-game/2026-04-15-new-game_IPYNB_2_.md
       assets/js/projects/new-game/game.js
       _projects/games/new-game/Makefile

@@ -94,7 +94,7 @@ Topics' browser include can also be hosted in a course page. It shows document
 week metadata there, but never uses weeks to define topic membership. Existing
 language-reference pages host the same browser with their category selected.
 
-Use `{% include topics-browser.html course_context=true %}` within a course
+Use `{% include projects/topics/topics-browser.html course_context=true %}` within a course
 document to show weeks and link to original course views. The ordinary include
 uses Topics views even when a reference page also carries course/week metadata.
 The shared language-reference include selects course context when the page has
@@ -105,12 +105,12 @@ course player; `layout: opencs` bypasses that adapter.
 
 | Source | Published destination |
 | --- | --- |
-| `pages/` | Top-menu Topics landing and Search compatibility entry |
-| `plugins/topics.rb` | `_plugins/topics.rb`; builds category index and document views |
-| `data/topics_primary.yml` | `_data/topics_primary.yml`; ordered primary category names |
-| `data/topics_units.yml` | `_data/topics_units.yml`; optional unit names per topic |
-| `_includes/` | Shared Topics browser and document navigation |
-| `js/` | `assets/js/topics/`; search, filters, view and link context |
+| `pages/` | `navigation/projects/topics/`; Topics landing and Search compatibility entry |
+| `plugins/topics.rb` | `_plugins/projects/topics/topics.rb`; builds category index and document views |
+| `data/topics_primary.yml` | `_data/projects/topics/topics_primary.yml`; ordered primary category names |
+| `data/topics_units.yml` | `_data/projects/topics/topics_units.yml`; optional unit names per topic |
+| `_includes/` | `_includes/projects/topics/`; shared browser and document navigation |
+| `js/` | `assets/js/projects/topics/`; search, filters, view and link context |
 | `sass/main.scss` | Registered project style import |
 | `tests/` | Category, search, rendering and submission-identity regressions |
 
@@ -119,10 +119,17 @@ Makefile and [distribution manifest](distribution.json). Generated runtime
 copies are not authoring sources. No local npm setup is needed: Lunr is the
 existing shared vendor library.
 
+All outputs use the shared ignored `projects/<name>/` roots. YAML is available
+at `site.data.projects.topics`; plugins load recursively from `_plugins`.
+Explicit permalinks keep `/topics/` and `/search/` unchanged and keep these
+pages out of blog feeds. Publishing removes the previous root-level outputs
+using their distribution cache; do not delete that cache before migration.
+
 ## Validation
 
 ```sh
 bundle exec ruby scripts/test_topics.rb
+bundle exec ruby scripts/test_system_project_distribution.rb
 node --test tests/topics.test.mjs
 ```
 

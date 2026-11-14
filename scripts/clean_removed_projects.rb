@@ -13,6 +13,7 @@ module RemovedProjectCleaner
   OUTPUT_ROOTS = %w[
     _posts/projects _includes/projects _notebooks/projects _sass/projects
     assets/js/projects assets/css/projects images/projects
+    navigation/projects _data/projects _plugins/projects
   ].freeze
   # The template's index target copies index.md to _posts/projects/<date>-<project>.md.
   INDEX_POST = /\A\d{4}-\d{2}-\d{2}-(.+)\.md\z/

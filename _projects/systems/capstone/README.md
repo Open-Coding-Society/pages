@@ -66,20 +66,26 @@ hide Jekyll errors; do not wrap working Liquid in a `raw` block.
 
 | Source | Published destination |
 | --- | --- |
-| `pages/capstone.md` | `navigation/capstone.md` |
+| `pages/` | `navigation/projects/capstone/` |
 | `_includes/capstone-browser.html` | `_includes/projects/capstone/capstone-browser.html` |
-| `plugins/capstone.rb` | `_plugins/capstone.rb` |
-| `js/` | `assets/js/capstone-directory/` |
+| `plugins/` | `_plugins/projects/capstone/` |
+| `js/` | `assets/js/projects/capstone/` |
 | `sass/main.scss` | `_sass/projects/capstone/main.scss` |
 
 Generated root copies are not authoring sources. The system is registered as
 `systems/capstone:dev` and uses the shared distribution manifest and generated
 Makefile.
 
+Every output uses a generic ignored project root; no Capstone-specific ignore
+rules are required. The landing page remains a Jekyll page at `/capstone/`,
+not a blog post. Publishing removes old root-level outputs using the previous
+distribution cache, which must be kept during migration.
+
 ## Validation
 
 ```sh
 bundle exec ruby scripts/test_capstone.rb
 bundle exec ruby scripts/test_capstone_posts.rb
+bundle exec ruby scripts/test_system_project_distribution.rb
 node --test tests/capstone.test.mjs tests/capstone_title_hover.test.mjs
 ```

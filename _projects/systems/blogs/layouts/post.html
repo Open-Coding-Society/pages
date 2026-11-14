@@ -42,8 +42,8 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
 {% include course-document-player.html %}
 {% else %}
 {% if page.topics_context and page.topics_nav_in_content != true %}
-{% include topics-document-nav.html %}
-<script type="module" src="{{ '/assets/js/topics/document.js' | relative_url }}"></script>
+{% include projects/topics/topics-document-nav.html %}
+<script type="module" src="{{ '/assets/js/projects/topics/document.js' | relative_url }}"></script>
 {% endif %}
 {% comment %}
 === REGULAR BLOG POST LAYOUT FOR NON-CSP POSTS ===

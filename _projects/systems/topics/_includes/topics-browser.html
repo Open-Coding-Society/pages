@@ -1,6 +1,6 @@
 {% assign topics_course_context = false %}
 {% if include.course_context == true and page.topics_context != true %}{% assign topics_course_context = true %}{% endif %}
-<section class="topics-browser" data-topics-browser data-course-context="{{ topics_course_context }}" data-initial-category="{{ page.lesson_category | downcase | escape }}" data-index-url="{{ '/assets/js/topics/data.json' | relative_url }}" data-unit-names="{{ site.data.topics_units | jsonify | escape }}">
+<section class="topics-browser" data-topics-browser data-course-context="{{ topics_course_context }}" data-initial-category="{{ page.lesson_category | downcase | escape }}" data-index-url="{{ '/assets/js/projects/topics/data.json' | relative_url }}" data-unit-names="{{ site.data.projects.topics.topics_units | jsonify | escape }}">
   <div class="ocs__split ocs__split--aside">
     <aside class="ocs__stack" aria-label="Browse topics">
       <h2>Topics</h2>
@@ -83,4 +83,4 @@
   <noscript>Enable JavaScript to combine category filters and use full-text search. The document links above remain available.</noscript>
 </section>
 <script src="{{ '/assets/js/vendor/lunr.min.js' | relative_url }}"></script>
-<script type="module" src="{{ '/assets/js/topics/browser.js' | relative_url }}"></script>
+<script type="module" src="{{ '/assets/js/projects/topics/browser.js' | relative_url }}"></script>

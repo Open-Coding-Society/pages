@@ -100,7 +100,7 @@ The generator creates:
   URL, Topics view URL, searchable content and optional course/week display
   metadata.
 - Primary and secondary category collections for the browser.
-- A JSON search catalog at `/assets/js/topics/data.json`.
+- A JSON search catalog at `/assets/js/projects/topics/data.json`.
 - Full-document routes under `/topics/view/`.
 
 Category keys are lowercase for comparison; display labels retain authored
