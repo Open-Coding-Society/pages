@@ -23,7 +23,7 @@
 {%- endcomment %}
 <div class="lesson-body">
   <h2>{{ page.title | escape }}</h2>
-  <p>Week {{ current_week }} of <a href="{{ site.baseurl }}/{{ current_course }}/sprint-{{ page.player_page.sprint }}/">Sprint {{ page.player_page.sprint }}: {{ sprintInfo.title | strip | escape }}</a>.</p>
+  <p><a href="{{ site.baseurl }}/{{ current_course }}/sprint-{{ page.player_page.sprint }}/">{{ sprintInfo.title | strip | escape }}</a></p>
 </div>
 
 {%- if weekData.goals %}

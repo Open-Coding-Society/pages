@@ -193,6 +193,14 @@ class DocumentReaderTest < Minitest::Test
           assert_equal week.to_s, shell["data-overview-week"]
           assert_equal({ course => { "week" => week } }, JSON.parse(shell["data-membership"]))
           refute_nil shell.at_css('[data-reader-main] article[data-player-page="week"]')
+          article = shell.at_css('[data-reader-main] article[data-player-page="week"]')
+          assert_equal "Week #{week}: #{site.data.dig(course, "Sprint1", week, "theme")}", article.at_css("h2").text
+          sprint_link = article.at_css(".lesson-body p a")
+          refute_nil sprint_link
+          assert_equal "#{base}/#{course}/sprint-1/", sprint_link["href"]
+          assert_equal "Getting started", sprint_link.text
+          refute_match(/Week #{week} of/, article.text)
+          refute_match(/Sprint 1:/, article.text)
           refute_includes overview, 'class="lesson-player"'
         end
         script = document.css("script:not([src])").map(&:content).find { |text| text.include?("CURRENT_LESSON_ID_BLOG") }
