@@ -14,4 +14,228 @@ capstone_project:
   team: "Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengji L, Jacob C, Arnav P"
 ---
 
-{% include ocs-admin-security-team.html %}
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
+{% assign data = site.data["ocs-admin-security-team"] %}
+{% comment %}
+  Capstone page body for /capstone/ocs-admin-security/ (OCS Admin & Security team; OCS in a Kit is its first sector).
+  Built only from shared ocs__ grammar (_sass/open-coding/elements): no page-specific classes or styles.
+  Each sector lists what shipped, what is in review, and what's next. To move an item, cut its entry
+  from one list to the other, then update the count pill beside each heading and the roadmap table.
+{% endcomment %}
+<div class="ocs__container">
+<div class="ocs__card">
+<div class="ocs__badge">Capstone</div>
+<img class="ocs__image-frame ocs__image-frame--thumbnail" src="{{ data.Logo | prepend: '/images/' | relative_url }}" alt="{{ data.TeamName | escape }} logo">
+<p class="ocs__lead">{{ data.Tagline | escape }}</p>
+<div class="ocs__links">
+<a class="ocs__btn medium alert-green fill" href="https://github.com/CSA-Admin-OCS">Our team on GitHub</a>
+<a class="ocs__btn medium" href="https://github.com/Open-Coding-Society/pages">Frontend repo</a>
+<a class="ocs__btn medium" href="https://github.com/Open-Coding-Society/spring">Spring backend</a>
+<a class="ocs__btn medium" href="https://github.com/Open-Coding-Society/flask">Flask backend</a>
+</div>
+<div class="ocs__stats">
+<div class="ocs__stat"><span class="ocs__stat-value">{{ data.Team | size }}</span><span class="ocs__stat-label">team members</span></div>
+<div class="ocs__stat"><span class="ocs__stat-value">3</span><span class="ocs__stat-label">sectors</span></div>
+<div class="ocs__stat"><span class="ocs__stat-value">3</span><span class="ocs__stat-label">codebases</span></div>
+</div>
+<div class="ocs__callout"><strong>We are the OCS Admin & Security team.</strong> Our goal is that any school can stand up its own Open Coding Society, under its own name, without editing our code. Security and backend are the two things a kit must already have right, so that the platform is safe by default and its accounts are easy for staff to run.</div>
+<div class="ocs__hub-grid">
+<a class="ocs__hub-card" href="#kit"><span class="ocs__nav-card-kicker">Sector 1 &middot; our mission</span><span class="ocs__hub-card-title">OCS in a Kit</span><p>Package OCS so another school can ship it under its own name.</p></a>
+<a class="ocs__hub-card" href="#security"><span class="ocs__nav-card-kicker">Sector 2</span><span class="ocs__hub-card-title">Security</span><p>What keeps every kit safe: sign-in and student code.</p></a>
+<a class="ocs__hub-card" href="#backend"><span class="ocs__nav-card-kicker">Sector 3</span><span class="ocs__hub-card-title">Backend</span><p>What lets a school's staff run it: accounts, mentors, and data.</p></a>
+<a class="ocs__hub-card" href="#vision"><span class="ocs__nav-card-kicker">Beyond</span><span class="ocs__hub-card-title">Vision and team flow</span><p>Where we are headed and how we split the work.</p></a>
+</div>
+</div>
+
+{% include ocs_kanban_board.html url="https://github.com/orgs/CSA-Admin-OCS/projects/16" title="OCS in a Kit Kanban Board" %}
+
+<div class="ocs__card" id="kit">
+<h2 class="ocs__section-title">OCS in a Kit</h2>
+<p class="ocs__lead">Everything that makes OCS ours becomes a setting, so another school can make it theirs.</p>
+<div class="ocs__callout"><strong>Why this comes first:</strong> our security and backend work only reaches another school if it ships in a form that school can set up. So every feature we build keeps its school-specific values in the kit, not in the code.</div>
+<div class="ocs__split">
+<div class="ocs__visual"><div class="ocs__team"><span class="ocs__team-label">Owned by</span><span class="ocs__team-name">The whole team, alongside every feature</span></div></div>
+<div class="ocs__visual"><div class="ocs__team"><span class="ocs__team-label">Built with</span><span class="ocs__team-name"><span class="ocs__status-pill">Flask</span> <span class="ocs__status-pill">Spring</span> <span class="ocs__status-pill">Jekyll</span> <span class="ocs__status-pill">Data files</span></span></div></div>
+</div>
+<h3 class="ocs__section-title">In review <span class="ocs__status-pill ocs__status-pill--neutral">1</span></h3>
+<ul class="ocs__checklist">
+<li class="open"><span class="ocs__checklist-box"></span><span><strong>One data file for Flask.</strong> School domains, account types, and policy values live in one file, not in code (<a href="https://github.com/Open-Coding-Society/flask/pull/84">Flask #84</a>).</span></li>
+</ul>
+<h3 class="ocs__section-title">Next <span class="ocs__status-pill ocs__status-pill--warn">4</span></h3>
+<ul class="ocs__checklist">
+<li><span class="ocs__checklist-box"></span><span><strong>Pages reads the kit.</strong> The frontend takes the same school settings from data, not from hard-coded values.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Spring student-email check.</strong> Spring decides who is a student from the kit's domains, not a fixed list.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>New branding.</strong> A school ships the platform under its own name and look.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Go-live checklist.</strong> The deployment steps below, written up so a new school can follow them.</span></li>
+</ul>
+<h3 class="ocs__section-title">What a school changes</h3>
+<div class="ocs__grid ocs__grid--standard">
+<div class="ocs__grid-cell"><strong>School domains</strong><br>Which email addresses count as students and staff.</div>
+<div class="ocs__grid-cell"><strong>Account types</strong><br>Which roles exist and how each one is activated.</div>
+<div class="ocs__grid-cell"><strong>Policy values</strong><br>Rules such as how often accounts are re-verified.</div>
+</div>
+<h3 class="ocs__section-title">How a release goes live</h3>
+<div class="ocs__grid ocs__grid--standard cols-4">
+<div class="ocs__grid-cell"><strong>1</strong><br>Run the database migration</div>
+<div class="ocs__grid-cell"><strong>2</strong><br>Set <code>GOOGLE_CLIENT_ID</code></div>
+<div class="ocs__grid-cell"><strong>3</strong><br>Deploy pages, then Flask</div>
+<div class="ocs__grid-cell"><strong>4</strong><br>Sign up one real student and confirm activation</div>
+</div>
+</div>
+
+{% include ocs_kanban_board.html url="https://github.com/orgs/CSA-Admin-OCS/projects/5" title="OCS Security Kanban Board" %}
+
+<div class="ocs__card" id="security">
+<h2 class="ocs__section-title">Security</h2>
+<p class="ocs__lead">Every kit ships safe: only verified people get in, and student code never touches the platform.</p>
+<div class="ocs__split">
+<div class="ocs__visual"><div class="ocs__team"><span class="ocs__team-label">Owned by</span><span class="ocs__team-name">Zhengji L, Harrish A, Jacob C, Lucas M</span></div></div>
+<div class="ocs__visual"><div class="ocs__team"><span class="ocs__team-label">Built with</span><span class="ocs__team-name"><span class="ocs__status-pill">Spring Boot</span> <span class="ocs__status-pill">Flask</span> <span class="ocs__status-pill">Docker</span> <span class="ocs__status-pill">JWT</span> <span class="ocs__status-pill">Google OAuth2</span></span></div></div>
+</div>
+<h3 class="ocs__section-title">Shipped <span class="ocs__status-pill ocs__status-pill--good">5</span></h3>
+<div class="ocs__keypoints">
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Password rules at every layer.</strong> Checked in the frontend, Spring, and Flask, so skipping the website still yields no account.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Signup check.</strong> Blocks signups whose GitHub and student ID don't match.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Verified password reset.</strong> Needs Google and GitHub ID verification, is rate-limited, and signs out old tokens.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Safe password sync.</strong> Plaintext sync to Flask is refused over insecure links.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Isolated Flask runner.</strong> Python runs in its own Docker container, never in the main app.</span></div>
+</div>
+<h3 class="ocs__section-title">In progress <span class="ocs__status-pill ocs__status-pill--warn">1</span></h3>
+<ul class="ocs__checklist">
+<li class="open"><span class="ocs__checklist-box"></span><span><strong>Login cookies.</strong> Harrish is working on the cookies that keep a user signed in, so a session stays secure from login to logout.</span></li>
+</ul>
+<h3 class="ocs__section-title">Next <span class="ocs__status-pill ocs__status-pill--warn">7</span></h3>
+<ul class="ocs__checklist">
+<li><span class="ocs__checklist-box"></span><span><strong>Simpler password policy.</strong> Spring's password-complexity check is causing support issues, so it comes out first.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Forced password reset.</strong> Anyone on a weak or default password must change it at login.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Yearly re-verification.</strong> Students confirm who they are at login once a year.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Isolated Spring runner.</strong> Java gets its own container. The API wiring is in progress.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Runner hardening.</strong> Settings move to <code>.env</code>, plus resource limits, timeouts, non-root execution, and restricted network and filesystem.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Spring access control.</strong> Permissions on every endpoint.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Audit log.</strong> A record of important security events.</span></li>
+</ul>
+<h3 class="ocs__section-title">How submitted code is run</h3>
+<div class="ocs__grid ocs__grid--standard cols-4">
+<div class="ocs__grid-cell"><strong>1</strong><br>Student submits code</div>
+<div class="ocs__grid-cell"><strong>2</strong><br>Spring or Flask receives it</div>
+<div class="ocs__grid-cell"><strong>3</strong><br>Runs in a separate container</div>
+<div class="ocs__grid-cell"><strong>4</strong><br>Only the result comes back</div>
+</div>
+<h3 class="ocs__section-title">How a password reset works</h3>
+<div class="ocs__grid ocs__grid--standard">
+<div class="ocs__grid-cell"><strong>1</strong><br>Reset requested</div>
+<div class="ocs__grid-cell"><strong>2</strong><br>Google and GitHub ID verified</div>
+<div class="ocs__grid-cell"><strong>3</strong><br>Ticket issued, rate-limited</div>
+<div class="ocs__grid-cell"><strong>4</strong><br>Password changed</div>
+<div class="ocs__grid-cell"><strong>5</strong><br>Active tokens invalidated</div>
+</div>
+<div class="ocs__callout"><div class="ocs__links"><a class="ocs__btn medium alert-green fill" href="https://github.com/orgs/CSA-Admin-OCS/projects/5/views/2">See Security tasks on our GitHub project board</a></div></div>
+</div>
+
+{% include ocs_kanban_board.html url="https://github.com/orgs/CSA-Admin-OCS/projects/1" title="OCS Admin Kanban Board" %}
+
+{% include ocs_kanban_board.html url="https://github.com/orgs/CSA-Admin-OCS/projects/7" title="Mentor Kanban Board" %}
+
+<div class="ocs__card" id="backend">
+<h2 class="ocs__section-title">Backend</h2>
+<p class="ocs__lead">Every kit ships runnable: each account has a known state, and staff can see and change it.</p>
+<div class="ocs__split">
+<div class="ocs__visual"><div class="ocs__team"><span class="ocs__team-label">Owned by</span><span class="ocs__team-name">Harrish A, Arnav P, Darshan S, Shayan B, Rudra J, Dhyan S, Lucas M</span></div></div>
+<div class="ocs__visual"><div class="ocs__team"><span class="ocs__team-label">Built with</span><span class="ocs__team-name"><span class="ocs__status-pill">Flask</span> <span class="ocs__status-pill">Spring Security</span> <span class="ocs__status-pill">Google OAuth2</span> <span class="ocs__status-pill">Database migrations</span> <span class="ocs__status-pill">Docker</span></span></div></div>
+</div>
+<h3 class="ocs__section-title">Shipped <span class="ocs__status-pill ocs__status-pill--good">6</span></h3>
+<div class="ocs__keypoints">
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Account activation.</strong> Every account carries an active flag and a last-verified date (<a href="https://github.com/Open-Coding-Society/flask/pull/82">Flask #82</a>, <a href="https://github.com/Open-Coding-Society/pages/pull/1768">pages #1768</a>).</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Student activation.</strong> Students are activated by signing in with their school Google account.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Mentor verification.</strong> Signup can identify a mentor, and mentors start inactive until staff verify them.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Mentor role.</strong> <code>ROLE_MENTOR</code> sits between teacher and admin, with its own view of the site.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Support pages rework.</strong> A dropdown groups the support tabs, with guides for new students.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span><strong>Docker cleanup.</strong> Redundant images and containers removed.</span></div>
+</div>
+<h3 class="ocs__section-title">In review <span class="ocs__status-pill ocs__status-pill--neutral">3</span></h3>
+<ul class="ocs__checklist">
+<li class="open"><span class="ocs__checklist-box"></span><span><strong>Guest accounts.</strong> Keep them working under the new activation rules.</span></li>
+<li class="open"><span class="ocs__checklist-box"></span><span><strong>Backup restore.</strong> Restoring a backup keeps each account's activation state.</span></li>
+<li class="open"><span class="ocs__checklist-box"></span><span><strong>Pending status.</strong> A user who is waiting on verification can see their own status.</span></li>
+</ul>
+<h3 class="ocs__section-title">In progress <span class="ocs__status-pill ocs__status-pill--warn">1</span></h3>
+<ul class="ocs__checklist">
+<li class="open"><span class="ocs__checklist-box"></span><span><strong>Mentor dashboard.</strong> We are building a dashboard where each mentor tracks only their own groups' progress and notes, building on the mentor role and verification already shipped. Darshan leads it, with Harrish building alongside.</span></li>
+</ul>
+<h3 class="ocs__section-title">Next <span class="ocs__status-pill ocs__status-pill--warn">5</span></h3>
+<ul class="ocs__checklist">
+<li><span class="ocs__checklist-box"></span><span><strong>Account Administration screen.</strong> Teachers and admins see all accounts, filter by role and active status, and activate or deactivate. A prototype runs locally. Still open is whether a teacher may deactivate an admin.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Status column.</strong> Shows each account's state with a deactivate action. It waits on the kit's data file.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Production vs. testing config.</strong> Separate Spring settings, so test settings never reach production.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>Spring database migration.</strong> Move the Spring data to the new setup, with upgrades applied automatically.</span></li>
+<li><span class="ocs__checklist-box"></span><span><strong>AI review with mentor design.</strong> Mentor-guided review of student work.</span></li>
+</ul>
+<h3 class="ocs__section-title">How an account becomes active</h3>
+<div class="ocs__grid ocs__grid--standard cols-4">
+<div class="ocs__grid-cell"><strong>1</strong><br>Person signs up as student or mentor</div>
+<div class="ocs__grid-cell"><strong>2</strong><br>Student: school Google sign-in activates</div>
+<div class="ocs__grid-cell"><strong>3</strong><br>Mentor: inactive until staff verify</div>
+<div class="ocs__grid-cell"><strong>4</strong><br>Active flag and verified date saved</div>
+</div>
+<div class="ocs__callout"><strong>Deferred:</strong> the Observer role, which needs authorization from a student and then from staff, and domain or test accounts, which stay out until their requirements are clearer.</div>
+<div class="ocs__callout"><div class="ocs__links"><a class="ocs__btn medium alert-green fill" href="https://github.com/orgs/CSA-Admin-OCS/projects/6/">Accounts and mentor tasks</a><a class="ocs__btn medium" href="https://github.com/orgs/CSA-Admin-OCS/projects/7/">Database and infrastructure tasks</a></div></div>
+</div>
+
+<div class="ocs__card" id="vision">
+<h2 class="ocs__section-title">Our vision</h2>
+<p class="ocs__lead">An Open Coding Society any school can adopt in its own name, with no account, code, or data left exposed.</p>
+<div class="ocs__keypoints">
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span>A new school changes a data file, not our code.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span>Every account is verified, and staff can see its status.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span>Student code always runs contained.</span></div>
+<div class="ocs__keypoint"><span class="ocs__check">&#10003;</span><span>New roles get the right access, and nothing more.</span></div>
+</div>
+<h3 class="ocs__section-title">Roadmap</h3>
+<div class="ocs__table-wrap">
+<table class="ocs__table">
+<thead><tr><th>Work</th><th>Sector</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>OCS as a reusable kit</td><td>OCS in a Kit</td><td><span class="ocs__status-pill ocs__status-pill--neutral">Flask in review</span></td></tr>
+<tr><td>Sign-up, activation, and verification</td><td>Backend</td><td><span class="ocs__status-pill ocs__status-pill--good">Merged</span></td></tr>
+<tr><td>Activation follow-ups: guests, backup restore, pending status</td><td>Backend</td><td><span class="ocs__status-pill ocs__status-pill--neutral">In peer review</span></td></tr>
+<tr><td>Mentor dashboard</td><td>Backend</td><td><span class="ocs__status-pill ocs__status-pill--warn">In progress</span></td></tr>
+<tr><td>Account Administration screen</td><td>Backend</td><td><span class="ocs__status-pill ocs__status-pill--warn">Prototype</span></td></tr>
+<tr><td>Login workflow: forced reset and yearly re-verification</td><td>Security</td><td><span class="ocs__status-pill ocs__status-pill--warn">Not started</span></td></tr>
+<tr><td>Observer role and domain or test accounts</td><td>Backend</td><td><span class="ocs__status-pill ocs__status-pill--neutral">Deferred</span></td></tr>
+<tr><td>Deployment</td><td>OCS in a Kit</td><td><span class="ocs__status-pill ocs__status-pill--warn">After the PRs land</span></td></tr>
+</tbody>
+</table>
+</div>
+<h3 class="ocs__section-title">How we work</h3>
+<div class="ocs__grid ocs__grid--standard cols-2">
+<div class="ocs__grid-cell"><strong>Three sectors, three reps</strong><br>One rep each for security, mentor, and kit work speaks for that area.</div>
+<div class="ocs__grid-cell"><strong>Daily meetings</strong><br>Decide the work and keep the board honest.</div>
+<div class="ocs__grid-cell"><strong>One owner, cap of two</strong><br>Each task has one owner, and the least-loaded member claims first.</div>
+<div class="ocs__grid-cell"><strong>Reviewed and reported</strong><br>Review before done, and a weekly update every Thursday.</div>
+</div>
+<h3 class="ocs__section-title" id="team-flow">Our team flow</h3>
+<p>This mindmap shows how we split the work. Everyone branches off the CSA Admin hub, and the colored dots show which workstreams each person is on: <strong>OCS in a Kit</strong> (pink), <strong>Mentor Dashboard</strong> (orange), <strong>Database</strong> (green), and <strong>Security</strong> (blue).</p>
+<img class="ocs__image-frame" src="{{ '/images/capstone/csa-admin-mindmap.jpg' | relative_url }}" alt="Mindmap of the CSA Admin team. Lucas works on the database and has moved from JS to SQL. Jacob works on SQL. Rudra works in the database and handles OCS communications. Arnav works on OCS in a Kit and leads Harrish (mentor dashboard and login cookies), Dhyan (working with Lucas on the database), and Shayan (login lockout after too many invalid attempts). Darshan builds the mentor dashboard. Zhengji works with security. A dashed line links Shayan's lockout work to Darshan." loading="lazy">
+<h3 class="ocs__section-title">How the work flows</h3>
+<div class="ocs__grid ocs__grid--standard cols-2">
+<div class="ocs__grid-cell"><strong>Arnav drives OCS in a Kit</strong><br>Arnav works only on the kit, and Harrish, Dhyan, and Shayan report through Arnav. That keeps every branch building toward something another school can set up.</div>
+<div class="ocs__grid-cell"><strong>Darshan and Harrish build the mentor dashboard</strong><br>Darshan leads the dashboard and Harrish builds alongside, so mentors can track their own groups. Harrish also works on login cookies, tying the dashboard to secure sign-in.</div>
+<div class="ocs__grid-cell"><strong>Zhengji anchors security</strong><br>Zhengji works with security, alongside Harrish's login cookies and Shayan's login lockout, so sign-in stays protected as the kit grows.</div>
+<div class="ocs__grid-cell"><strong>The database track runs in parallel</strong><br>Lucas and Jacob (the green boxes) work on SQL. Dhyan pairs with Lucas, and Rudra works in the database while handling OCS communications for the team.</div>
+<div class="ocs__grid-cell"><strong>Every task feeds the kit</strong><br>Nearly every member carries the pink dot: whatever they build keeps its school-specific values in the kit. Dashed lines mark work that crosses branches, such as Shayan's login lockout, which ties into the accounts Darshan's dashboard shows.</div>
+</div>
+</div>
+
+<div class="ocs__card">
+<h2 class="ocs__section-title">Following along</h2>
+<div class="ocs__links">
+<a class="ocs__btn medium alert-green fill" href="https://github.com/CSA-Admin-OCS/pages">Main repo</a>
+<a class="ocs__btn medium" href="https://github.com/orgs/CSA-Admin-OCS/projects/1">Project board</a>
+<a class="ocs__btn medium" href="https://github.com/CSA-Admin-OCS/spring">Spring repo</a>
+<a class="ocs__btn medium" href="https://github.com/CSA-Admin-OCS/flask">Flask repo</a>
+<a class="ocs__btn medium" href="https://github.com/CSA-Admin-OCS/pages/issues/26">Future work (issue #26)</a>
+</div>
+</div>
+</div>
+<!-- markdownlint-restore -->

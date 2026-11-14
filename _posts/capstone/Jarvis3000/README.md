@@ -1,7 +1,9 @@
 # Jarvis project board
 
-The overview uses `_includes/jarvis-kanban.html` and the existing OCS Kanban
-styles. Its wider layout is scoped to `.jv-kanban` in `_sass/capstone/jarvis.scss`.
+The overview's board markup lives in `2026-09-01-jarvis-capstone.md` and uses
+the existing OCS Kanban styles. Its wider layout is scoped to `.jv-kanban` in
+`_sass/capstone/jarvis.scss`. Repeated cards still use
+`_includes/jarvis-kanban-card.html`; navigation and footers remain shared.
 No shared component, build, deployment, or repository instruction changes are
 required.
 

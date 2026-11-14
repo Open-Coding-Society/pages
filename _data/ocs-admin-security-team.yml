@@ -1,5 +1,5 @@
 # Data for the OCS Admin & Security Team capstone page.
-# Read by _includes/ocs-admin-security-team.html. Edit here to change the title, intro, or team.
+# Read by _posts/capstone/2026-09-03-ocs-admin-security-team.md. Edit here to change the title, intro, or team.
 Title: "OCS Admin & Security"
 TeamName: "OCS Admin & Security Team"
 Logo: "capstone/cccs-security-logo.png"

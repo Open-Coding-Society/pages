@@ -38,6 +38,19 @@ Create/Edit buttons were removed because creating a project only stored a
 session-scoped draft and editing had no save operation. Published entries are
 now edited in the source post and deployed with the site.
 
+## Project page content
+
+Keep project-specific HTML and Liquid in the owning Markdown post under
+`_posts/capstone/`, not in a one-page include. Existing YAML data remains under
+`_data/`. Keep includes for genuinely shared components, such as project
+navigation, footers, repeated board cards, and the OCS Kanban board.
+
+Scope Markdown-lint suppression to embedded HTML with
+`<!-- markdownlint-capture -->`, `<!-- markdownlint-disable -->`, and
+`<!-- markdownlint-restore -->`. Restoring the captured rules preserves any
+surrounding lint settings. These comments do not disable Liquid processing or
+hide Jekyll errors; do not wrap working Liquid in a `raw` block.
+
 ## Resources
 
 | Source | Published destination |
@@ -56,5 +69,6 @@ Makefile.
 
 ```sh
 bundle exec ruby scripts/test_capstone.rb
+bundle exec ruby scripts/test_capstone_posts.rb
 node --test tests/capstone.test.mjs tests/capstone_title_hover.test.mjs
 ```

@@ -89,6 +89,18 @@ optional. Supporting posts stay out of the directory unless they opt in.
 Implementation and validation are documented in the
 [Capstone system README](../../_projects/systems/capstone/README.md).
 
+### Authoring project pages
+
+Keep page-specific HTML and Liquid directly in the project's Markdown post.
+Use includes only for shared components (navigation, footers, repeated board
+cards, or OCS Kanban boards). Existing YAML data stays under `_data/`.
+
+Enclose embedded HTML in `<!-- markdownlint-capture -->`,
+`<!-- markdownlint-disable -->`, and `<!-- markdownlint-restore -->` comments.
+These suppress Markdown-lint warnings locally and restore the surrounding
+rules without preventing Liquid from rendering. Do not use `raw` around
+working Liquid.
+
 ### Backend overview
 The Spring backend for capstone project data lives in `spring/src/main/java/com/open/spring/mvc/capstone`.
 
