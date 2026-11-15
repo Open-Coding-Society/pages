@@ -94,7 +94,11 @@
   grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
   height: var(--dm-shell-height);
   margin-top: var(--dm-space-lg);
-  border-top: 1px solid var(--dm-rule);
+  border: 1px solid var(--dm-rule);
+  border-radius: calc(var(--dm-radius) * 2);
+  background: color-mix(in srgb, var(--dm-bg) 96%, var(--dm-ink));
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.16);
+  overflow: hidden;
 }
 
 .dm__aside {
@@ -103,6 +107,7 @@
   min-height: 0;
   flex-direction: column;
   border-right: 1px solid var(--dm-rule);
+  background: var(--dm-wash);
 }
 
 // The scroll container, so the pane's own edge stays put while the list moves.
@@ -111,7 +116,7 @@
   flex: 1;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: var(--dm-space-md) var(--dm-space-md) var(--dm-space-lg) 0;
+  padding: var(--dm-space-md);
 }
 
 .dm__thread {
@@ -119,7 +124,7 @@
   min-width: 0;
   min-height: 0;
   flex-direction: column;
-  padding-left: var(--dm-space-lg);
+  padding-inline: var(--dm-space-lg);
 }
 
 .dm__back {

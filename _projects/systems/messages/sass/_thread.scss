@@ -75,7 +75,7 @@
   grid-template-columns: auto minmax(0, 1fr);
   gap: 0.55rem;
   max-width: calc(var(--dm-measure) + 3rem);
-  padding: 0.45rem 0;
+  padding: 0.5rem 0;
   animation: dm-fade $transition-slow ease both;
 }
 
@@ -108,6 +108,17 @@
 
 .dm .chat-msg-main {
   min-width: 0;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--dm-rule);
+  border-radius: var(--dm-radius);
+  background: var(--dm-wash);
+}
+
+.dm .chat-msg.is-self .chat-msg-main {
+  border-color: color-mix(in srgb, var(--dm-accent) 35%, var(--dm-rule));
+  background: color-mix(in srgb, var(--dm-accent) 8%, transparent);
 }
 
 .dm .chat-msg-meta {
@@ -165,6 +176,39 @@
 // short of it when it is not, and is capped in height so a tall portrait photo cannot
 // push the rest of the conversation off screen. width:auto with a min keeps a small
 // image legible without stretching it past its own resolution.
+.dm .chat-msg-image-link {
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 0.6rem;
+  border-radius: var(--dm-radius);
+
+  &::after {
+    content: '\2197  Open';
+    position: absolute;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    padding: 0.25rem 0.45rem;
+    border-radius: var(--dm-radius-sm);
+    background: rgba(0, 0, 0, 0.72);
+    color: #fff;
+    font-family: var(--dm-font);
+    font-size: 0.6875rem;
+    opacity: 0;
+    transform: translateY(2px);
+    transition: opacity $transition-fast ease, transform $transition-fast ease;
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    opacity: 1;
+    transform: none;
+  }
+
+  @include dm-focus-ring;
+}
+
 .dm .chat-msg img.ocs__image-frame {
   display: block;
   width: auto;
@@ -174,10 +218,16 @@
   max-height: 22rem;
   object-fit: contain;
   object-position: left top;
-  margin-top: 0.6rem;
+  margin-top: 0;
   border: 1px solid var(--dm-rule);
   border-radius: var(--dm-radius);
   background: var(--dm-wash);
+  transition: border-color $transition-fast ease, filter $transition-fast ease;
+}
+
+.dm .chat-msg-image-link:hover img {
+  border-color: var(--dm-accent);
+  filter: brightness(0.9);
 }
 
 // Edit and delete stay out of the way until the message is hovered or focused.

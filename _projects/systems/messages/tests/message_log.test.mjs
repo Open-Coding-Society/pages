@@ -73,6 +73,7 @@ test('texts reword the log', () => {
   assert.equal(element.querySelector('[data-key="m1"]').querySelector('.chat-msg-sender').textContent, 'Du');
   assert.equal(bodyOf(element, 'm1').textContent, 'Gelöscht.');
   assert.equal(element.querySelector('[data-key="m2"]').querySelector('img.ocs__image-frame').alt, 'Bild von Grace Hopper');
+  assert.equal(element.querySelector('[data-key="m2"]').querySelector('.chat-msg-image-link').target, '_blank');
 });
 
 test('a read-only log offers no edit or delete, even on your own messages', () => {

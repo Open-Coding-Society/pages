@@ -4,12 +4,35 @@
 // _projects/systems/courses/sass/main.scss -- it is deliberately left alone.
 
 .dm__composer {
+  position: relative;
   display: flex;
   align-items: flex-end;
   gap: var(--dm-space-sm);
   flex: none;
   padding: var(--dm-space-md) 0 var(--dm-space-lg);
   border-top: 1px solid var(--dm-rule);
+}
+
+.dm__drop-hint {
+  position: absolute;
+  inset: 0 0 var(--dm-space-sm);
+  z-index: 3;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dm-space-sm);
+  border: 2px dashed var(--dm-accent);
+  border-radius: var(--dm-radius);
+  background: color-mix(in srgb, var(--dm-bg) 88%, var(--dm-accent));
+  color: var(--dm-ink);
+  font-family: var(--dm-font);
+  font-size: 0.875rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.dm__composer.is-dragging .dm__drop-hint {
+  display: flex;
 }
 
 .dm .rt-composer {
@@ -143,6 +166,11 @@
   display: inline-flex;
   flex: none;
   align-items: center;
+}
+
+.dm__image-action i {
+  margin-right: 0.3rem;
+  color: var(--dm-accent);
 }
 
 // The real file input: present for the label and for assistive technology, but never

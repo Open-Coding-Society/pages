@@ -40,6 +40,7 @@ function render() {
     const count = people + groups;
     badge.textContent = count > 99 ? '99+' : String(count);
     badge.hidden = count === 0;
+    bell.classList.toggle('has-unread', count > 0);
 
     if (count === 0) {
         bell.title = 'Messages';
