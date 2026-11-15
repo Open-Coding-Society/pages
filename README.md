@@ -20,6 +20,50 @@ Exchange of information from this repository to you personal GitHub Pages can be
 
 ---
 
+## Progressive runner dependencies
+
+Code, pseudocode, UI/HTML, and editable game runners can carry saved code between
+cells on the same page. Mark the original reusable region with `@provides` and
+the destination starter with `@dependency`. End both regions with `@end`:
+
+```java
+/**
+ * A mentoring area.
+ * @provides Expertise
+ */
+class Expertise {
+    // Student implementation
+}
+/** @end Expertise */
+```
+
+In a later runner, use `@dependency Expertise` instead of `@provides Expertise`
+around its copy of the class. Save the original runner, select **Expertise** in
+the destination's **Dependencies** dropdown, and click **Update dependency**.
+The destination keeps its annotations and all code outside that region. Save it
+after updating; submitted code includes the transferred implementation.
+Multiple dependencies offer **Update all**. Updates use the original saved
+provider, never another runner's dependency copy or unsaved edits. Edited
+destination regions require confirmation before replacement.
+
+Use names unique to the page, and keep regions separate (no nesting). Java,
+JavaScript and SCSS support `/** ... */` or `/* ... */`; Python uses
+`# @provides Helpers` / `# @end Helpers`; CB pseudocode uses `//`; HTML uses
+`<!-- @dependency Card -->` / `<!-- @end Card -->`.
+Tags must occupy comment lines, not share a line with executable code.
+The default region language is the runner's language. For embedded styles in a
+UI runner, explicitly match it on both sides, for example
+`/* @provides Palette scss */` and `/* @dependency Palette scss */`.
+The allowed languages are `java`, `javascript`, `python`, `pseudocode`, `html`,
+`css`, and `scss`. This transfers source only; it does not add SCSS compilation
+or cross-language execution.
+
+Missing saved providers, duplicate names, malformed boundaries, and language
+mismatches are reported without changing the destination. Existing runners
+without tags remain independent. Older saved code without tags is not silently
+rewritten; add the documented tags to that saved code to enable dependencies.
+Tests: `node --test tests/runner_dependencies.test.mjs tests/runner_dependency_controls.test.mjs tests/runner_submission_selection.test.mjs`.
+
 ## History
 
 This project is in its 4th revision (aka 4.0).

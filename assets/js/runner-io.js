@@ -115,6 +115,7 @@ export function runnerSelectionSummary() {
 
 /** The saved code for one runner element, or null. */
 export function readRunner(el) {
+  if (el.dataset.dependencyDirty === 'true') return null;
   const key = el.dataset.storageKey;
   if (!key) return null;
   return localStorage.getItem(key)?.trim() || null;

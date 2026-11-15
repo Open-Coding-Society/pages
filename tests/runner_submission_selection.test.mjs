@@ -126,3 +126,18 @@ test("a page with no runners cannot be submitted", () => {
   containers = [];
   assert.match(submissionError(), /no runners/);
 });
+
+test("a transferred dependency must be saved before its selected runner can be submitted", () => {
+  const selected = containers[1];
+  storage.set("page_hack-1", "old saved code");
+  io.setRunnerSelected(selected, true);
+  selected.dataset.dependencyDirty = "true";
+  assert.equal(io.readRunner(selected), null);
+  assert.match(submissionError(), /save/i);
+  assert.deepEqual(io.readRunners({ selectedOnly: true }), {});
+
+  storage.set("page_hack-1", "complete program with transferred class");
+  delete selected.dataset.dependencyDirty;
+  assert.equal(submissionError(), null);
+  assert.match(io.readRunners({ selectedOnly: true })["hack-1.py"].content, /transferred class/);
+});
