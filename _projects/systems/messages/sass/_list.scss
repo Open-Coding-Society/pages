@@ -90,9 +90,10 @@
   gap: 0.15rem;
   padding: 0.7rem 0.75rem 0.7rem 0.8rem;
   border: 0;
-  border-bottom: 1px solid var(--dm-rule);
-  border-left: 2px solid transparent;
-  border-radius: 0;
+  margin-block: 0.15rem;
+  border: 1px solid transparent;
+  border-left: 3px solid transparent;
+  border-radius: var(--dm-radius);
   background: none;
   text-decoration: none;
   color: var(--dm-muted);
@@ -107,6 +108,8 @@
 
   &.is-active {
     border-left-color: var(--dm-accent);
+    border-block-color: var(--dm-rule);
+    border-right-color: var(--dm-rule);
     background: var(--dm-wash);
     color: var(--dm-ink);
   }
@@ -133,11 +136,14 @@
 // The unread count. The one place the accent earns its keep.
 .dm .ocs__nav-card-cta {
   justify-self: start;
-  margin-top: 0.2rem;
+  margin-top: 0.3rem;
+  padding: 0.18rem 0.48rem;
+  border-radius: 999px;
+  background: var(--dm-accent);
   font-family: var(--dm-font);
   font-size: 0.6875rem;
   letter-spacing: 0.06em;
-  color: var(--dm-accent);
+  color: var(--dm-bg);
 }
 
 // An unread row reads a shade louder than a read one.

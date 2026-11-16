@@ -91,6 +91,10 @@ bottom; README.md in that folder explains how it fits together.
         that can store an image.
       {%- endcomment -%}
       <form class="dm__composer" id="messagesForm" autocomplete="off">
+        <span class="dm__drop-hint" id="messagesDropHint" aria-hidden="true">
+          <i class="fas fa-cloud-arrow-up" aria-hidden="true"></i>
+          Drop screenshot or image here
+        </span>
         <button class="dm__action dm-cancel-edit" id="messagesCancelEdit" type="button" hidden>Cancel</button>
         <span class="dm__attach hidden" id="messagesImageAttach">
           {%- comment -%}
@@ -99,7 +103,9 @@ bottom; README.md in that folder explains how it fits together.
             forwards.
           {%- endcomment -%}
           <input class="dm__file-input" id="messagesImage" type="file" accept="image/*">
-          <label class="dm__action" for="messagesImage">Image</label>
+          <label class="dm__action dm__image-action" for="messagesImage">
+            <i class="fas fa-image" aria-hidden="true"></i> Add image
+          </label>
         </span>
         <button class="dm__send" id="messagesSend" type="submit" disabled>Send</button>
       </form>

@@ -12,6 +12,7 @@ export const LOG_TEXTS = Object.freeze({
   editMessage: 'Edit message',
   deleteMessage: 'Delete message',
   imageFrom: 'Image from {name}',
+  openImage: 'Open image from {name} in a new tab',
   deleted: 'This message was deleted.',
   today: 'Today',
   yesterday: 'Yesterday',
@@ -191,12 +192,21 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     } else {
       richText.renderRichMessage(body, shownBody(messages.get(message.key), formatBody));
       if (message.image) {
+        const imageSource = pfpSrc(message.image);
+        const imageLink = document.createElement('a');
+        imageLink.className = 'chat-msg-image-link';
+        imageLink.href = imageSource;
+        imageLink.target = '_blank';
+        imageLink.rel = 'noopener noreferrer';
+        imageLink.setAttribute('aria-label', fillText(text.openImage, { name: message.senderName }));
+        imageLink.title = fillText(text.openImage, { name: message.senderName });
         const image = document.createElement('img');
         image.className = 'ocs__image-frame';
-        image.src = pfpSrc(message.image);
+        image.src = imageSource;
         image.alt = fillText(text.imageFrom, { name: message.senderName });
         image.loading = 'lazy';
-        main.appendChild(image);
+        imageLink.appendChild(image);
+        main.appendChild(imageLink);
       }
     }
     // A message saved before ids existed can't be edited or deleted.
@@ -240,7 +250,7 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     showDeleted(row.querySelector('.chat-msg-body'));
     row.querySelector('.chat-msg-actions')?.remove();
     row.querySelector('.chat-msg-edited')?.remove();
-    row.querySelector('img.ocs__image-frame')?.remove();
+    row.querySelector('.chat-msg-image-link')?.remove();
   }
 
   // A line between messages that isn't anyone's message, like a shared file.
