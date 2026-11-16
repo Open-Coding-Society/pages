@@ -57,19 +57,31 @@ test('the Collectables lesson transfers its saved catalog into HW #3 without rep
   const runners = notebook.cells.filter((cell) => cell.cell_type === 'code')
     .map((cell) => cell.source.join(''));
   const providers = [];
+  const expectedDependencies = [
+    [],
+    ['Foundation', 'Expertise'],
+    ['Foundation', 'Expertise', 'Mentor'],
+    ['Foundation', 'Expertise', 'Mentor', 'MentorCatalog'],
+  ];
   let final;
   for (const [index, source] of runners.entries()) {
     const blocks = parseDependencyBlocks(source, 'java');
-    const names = blocks.filter((block) => block.kind === 'dependency').map((block) => block.name);
-    const updated = updateDependencies(source, 'java', providers, names).code;
-    for (const block of parseDependencyBlocks(updated, 'java').filter((block) => block.kind === 'provides')) {
-      const saved = updated.slice(0, block.bodyStart) + `// saved ${block.name} work\n`
-        + updated.slice(block.bodyStart);
-      providers.push({ id: String(index), language: 'java', source: saved });
+    const dependencies = blocks.filter((block) => block.kind === 'dependency');
+    const names = dependencies.map((block) => block.name);
+    assert.deepEqual(names, expectedDependencies[index]);
+    for (const block of dependencies) {
+      assert.equal(source.slice(block.bodyStart, block.bodyEnd), '', `${block.name} starts empty`);
     }
+    const updated = updateDependencies(source, 'java', providers, names).code;
+    const exports = parseDependencyBlocks(updated, 'java').filter((block) => block.kind === 'provides');
+    let saved = updated;
+    for (const block of exports.toReversed()) {
+      saved = saved.slice(0, block.bodyStart) + `// saved ${block.name} work\n` + saved.slice(block.bodyStart);
+    }
+    if (exports.length) providers.push({ id: String(index), language: 'java', source: saved });
     final = updated;
   }
-  for (const name of ['Expertise', 'Mentor', 'MentorCatalog']) {
+  for (const name of ['Foundation', 'Expertise', 'Mentor', 'MentorCatalog']) {
     assert.ok(final.includes(`// saved ${name} work`), name);
   }
   const source = runners.at(-1);

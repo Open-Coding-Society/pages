@@ -82,6 +82,27 @@ test('missing saved sources report an error without falling back to starter code
   assert.match(target.status.textContent, /no saved provider/);
 });
 
+test('Update all fills empty dependencies from two blocks in one saved runner', () => {
+  const document = page();
+  document.defaultView.confirm = () => { throw new Error('Empty imports need no overwrite confirmation'); };
+  const source = '/** @provides Foundation */\nclass Catalog {}\n/** @end Foundation */\n'
+    + provide('class Expertise {}');
+  runner(document, 'popcorn', source, source);
+  const empty = '/** @dependency Foundation */\n/** @end Foundation */\n'
+    + consume('') + '\nclass Mentor {}';
+  const target = runner(document, 'mentor', empty);
+  target.select.value = '*';
+  target.update();
+  assert.match(target.instance.code, /class Catalog/);
+  assert.match(target.instance.code, /class Expertise/);
+  assert.ok(target.instance.code.endsWith('class Mentor {}'));
+  assert.match(target.status.textContent, /Updated Foundation, Expertise/);
+  const updated = target.instance.code;
+  target.update();
+  assert.equal(target.instance.code, updated);
+  assert.match(target.status.textContent, /already match/);
+});
+
 test('local dependency edits require confirmation but unrelated TODO edits do not', () => {
   const document = page();
   document.defaultView.confirm = (message) => { document.confirmations.push(message); return document.accept; };
