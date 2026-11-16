@@ -109,6 +109,7 @@ bottom; README.md in that folder explains how it fits together.
         </span>
         <button class="dm__send" id="messagesSend" type="submit" disabled>Send</button>
       </form>
+      <p class="dm__hint">Send with Ctrl+Enter (Cmd+Enter on Mac) or the Send button.</p>
       <div class="dm__attach-preview hidden" id="messagesImagePreview">
         <img id="messagesImageThumb" alt="Image attached to your next message">
         <button type="button" class="dm__action" id="messagesImageRemove">Remove</button>
