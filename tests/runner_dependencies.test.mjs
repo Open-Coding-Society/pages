@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { readFileSync } from 'node:fs';
 import { parseDependencyBlocks, updateDependencies } from '../assets/js/pages/runners/core/DependencyBlocks.js';
 
 const provider = (name, body) => `/**\n * Description\n * @provides ${name}\n */\n${body}\n/** @end ${name} */`;
@@ -48,6 +49,37 @@ test('refreshing two dependencies preserves destination markers, TODOs and execu
   assert.match(result.code, /\/\/ TODO: dashboard\nclass Main \{\}/);
   assert.equal(parseDependencyBlocks(result.code, 'java').length, 2);
   assert.equal(updateDependencies(result.code, 'java', sources, ['Expertise', 'Mentor']).code, result.code);
+});
+
+test('the Collectables lesson transfers its saved catalog into HW #3 without replacing gap work', () => {
+  const notebook = JSON.parse(readFileSync(new URL(
+    '../_projects/lessons/cs113/notebooks/2026-10-26-collectables-assignment.ipynb', import.meta.url), 'utf8'));
+  const runners = notebook.cells.filter((cell) => cell.cell_type === 'code')
+    .map((cell) => cell.source.join(''));
+  const providers = [];
+  let final;
+  for (const [index, source] of runners.entries()) {
+    const blocks = parseDependencyBlocks(source, 'java');
+    const names = blocks.filter((block) => block.kind === 'dependency').map((block) => block.name);
+    const updated = updateDependencies(source, 'java', providers, names).code;
+    for (const block of parseDependencyBlocks(updated, 'java').filter((block) => block.kind === 'provides')) {
+      const saved = updated.slice(0, block.bodyStart) + `// saved ${block.name} work\n`
+        + updated.slice(block.bodyStart);
+      providers.push({ id: String(index), language: 'java', source: saved });
+    }
+    final = updated;
+  }
+  for (const name of ['Expertise', 'Mentor', 'MentorCatalog']) {
+    assert.ok(final.includes(`// saved ${name} work`), name);
+  }
+  const source = runners.at(-1);
+  const ownWork = (code) => code.slice(code.indexOf('// ===== Capstone records'));
+  assert.equal(ownWork(final), ownWork(source));
+  const catalog = parseDependencyBlocks(final, 'java').find((block) => block.name === 'MentorCatalog');
+  const body = final.slice(catalog.bodyStart, catalog.bodyEnd);
+  assert.match(body, /class MentorDatabase/);
+  assert.match(body, /class MentorCatalog/);
+  assert.doesNotMatch(body, /class Main|mentorGaps|class Capstone/);
 });
 
 test('missing, duplicate and incompatible providers reject the entire update', () => {
