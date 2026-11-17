@@ -97,6 +97,13 @@ collects coins a `PlayerPlatformer` touches, declares a win when every coin is
 collected, and sends the player back to their start when they touch an enemy.
 GameBuilder's Platform template uses it.
 
+`essentials/ClickerGame.js` is a whole clicker game in one object: give it a
+`target` picture, `targetCount`, `targetSpeed`, `goalScore`, `winMessage` and
+`powerUps` (`{ name, src, cost, effect: 'per-click' | 'auto-click', amount }`).
+It listens for clicks on the game container, because the canvas is replaced
+when the game resizes. `GameEnvBackground` without a picture fills with its
+data's `color`. GameBuilder's Clicker template uses both.
+
 The platformer game extends it in
 `_projects/games/platformer/levels/PlatformerPlayer.js` only for its jump sound
 and debug hitbox overlay.

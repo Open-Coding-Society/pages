@@ -72,8 +72,8 @@ picture, so Clicker offers plain background colours. A test checks that every
 listed picture exists in the repository.
 
 Each game type keeps its own settings in the workspace, so switching types does
-not lose work. Only types with `"codeReady": true` (RPG, Racing and Platform today) can
-**Push →**; the others report that code generation is coming.
+not lose work. All four types are `"codeReady": true` and can **Push →**; a type marked
+false reports that code generation is coming.
 
 Each code-ready type other than RPG has a generator in `js/generators/` that
 turns its panel settings into a level module (`generators/source.mjs` holds the
@@ -93,6 +93,13 @@ engine's `PlatformChallenge` with the coins and enemies (X/Y is their centre).
 Collecting every coin wins; touching an enemy sends the player back to the
 start, and enemies walk a short way left and right. Player pictures carry their
 sprite sheet layout in the JSON; enemy and coin pictures carry their size.
+
+Clicker (`generators/clicker.mjs`) builds a plain-colour `GameEnvBackground`
+and the engine's `ClickerGame`, which draws the targets (still or bouncing),
+the points panel and a shop card per power-up. Clicking a target scores; a
+card buys its power-up when there are enough points, and it can be bought
+again. Per-click power-ups add to every click; auto-click power-ups add points
+each second. Earned points count toward the goal even after they are spent.
 
 ## Protecting workspace work
 

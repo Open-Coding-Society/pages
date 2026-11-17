@@ -29,6 +29,7 @@ import { populateSelect, selectAsset } from './form-controls.mjs';
 import { createListItem, createTemplateImages, createTemplateOptions, validateGameTemplates } from './game-templates.mjs';
 import { readTemplatePanel, renderTemplatePanel } from './template-panel.mjs';
 import { generateLevelCode } from './code-generator.mjs?v=2';
+import { generateClickerCode } from './generators/clicker.mjs';
 import { generatePlatformCode } from './generators/platform.mjs';
 import { generateRacingCode } from './generators/racing.mjs';
 import { waitForGameRunner } from './runner-bridge.mjs';
@@ -62,7 +63,8 @@ const setStatus = createActionFeedback(status);
 // Code generators for the data-defined game types, by template id.
 const templateGenerators = {
   racing: generateRacingCode,
-  platform: generatePlatformCode
+  platform: generatePlatformCode,
+  clicker: generateClickerCode
 };
 
 function siteUrl(path) {

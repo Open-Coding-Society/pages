@@ -250,7 +250,7 @@
     "id": "clicker",
     "name": "Clicker",
     "description": "Click targets to score points, then spend them on power-ups.",
-    "codeReady": false,
+    "codeReady": true,
     "assets": {
       "targets": [
         { "name": "Cookie", "src": "/hacks/cookie-clicker/assets/baseCookie.png" },
