@@ -23,6 +23,8 @@ capstone_project:
     backend: "https://github.com/CSP-Oncology/OCS-Kit-Flask"
 ---
 
+[Visit our OncologySesh website](https://oncologysesh.opencodingsociety.com/)
+
 
 <div class="ocs__grid ocs__grid--standard cols-2">
     <div class="ocs__grid-cell ocs__grid-cell--header">OncologySesh · Organization</div>
