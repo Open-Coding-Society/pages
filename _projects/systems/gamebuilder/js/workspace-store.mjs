@@ -5,7 +5,9 @@
  * @data Version 2 records contain builder state, exact code, generation baseline,
  * engine selection, barrier edit/cancel state, and the chosen game template with
  * each template's panel options. Version 1 records (saved before templates) load
- * as the RPG template. Saved and recovery slots are separate; revisions prevent
+ * as the RPG template. A game type that uses spline barriers (Racing) keeps them
+ * in its options as `barriers`, and the barrier being edited belongs to the open
+ * game type. Saved and recovery slots are separate; revisions prevent
  * another tab's work being silently overwritten.
  * @usage Create a store with browser Storage and a page-specific key. Read before
  * writing; import/export use parseWorkspace/serializeWorkspace, never execution.
@@ -37,6 +39,21 @@ function checkPoints(points) {
 const ID_PATTERN = /^[A-Za-z0-9_-]+$/;
 const isOptionValue = (value) => typeof value === 'string' || typeof value === 'boolean' || Number.isFinite(value);
 
+/** Spline barriers, as the RPG builder and barrier-using game types store them; returns their ids. */
+function checkBarriers(barriers) {
+  if (!Array.isArray(barriers)) fail('barriers must be a list');
+  const barrierIds = new Set();
+  for (const barrier of barriers) {
+    checkKeys(barrier, ['id', 'name', 'visible', 'points'], 'barrier');
+    if (typeof barrier.id !== 'string' || !/^[A-Za-z0-9_-]+$/.test(barrier.id) || barrierIds.has(barrier.id)
+      || typeof barrier.name !== 'string'
+      || (barrier.visible !== undefined && typeof barrier.visible !== 'boolean')) fail('invalid barrier');
+    barrierIds.add(barrier.id);
+    checkPoints(barrier.points);
+  }
+  return barrierIds;
+}
+
 // Template options are checked for shape only; game-templates.json defines their meaning.
 function checkTemplate(template) {
   checkKeys(template, ['id', 'options'], 'template');
@@ -44,7 +61,11 @@ function checkTemplate(template) {
   if (!isRecord(template.options)) fail('template options must be an object');
   for (const [templateId, options] of Object.entries(template.options)) {
     if (!ID_PATTERN.test(templateId) || !isRecord(options)) fail('invalid template options');
-    for (const value of Object.values(options)) {
+    for (const [key, value] of Object.entries(options)) {
+      if (key === 'barriers') {
+        checkBarriers(value);
+        continue;
+      }
       if (isOptionValue(value)) continue;
       if (!Array.isArray(value)) fail('template option has an unsupported value');
       const itemIds = new Set();
@@ -92,15 +113,10 @@ export function validateWorkspace(document) {
     ids.add(npc.id);
     checkPosition(npc.position, true);
   }
-  const barrierIds = new Set();
-  for (const barrier of state.barriers) {
-    checkKeys(barrier, ['id', 'name', 'visible', 'points'], 'barrier');
-    if (typeof barrier.id !== 'string' || !/^[A-Za-z0-9_-]+$/.test(barrier.id) || barrierIds.has(barrier.id)
-      || typeof barrier.name !== 'string'
-      || (barrier.visible !== undefined && typeof barrier.visible !== 'boolean')) fail('invalid barrier');
-    barrierIds.add(barrier.id);
-    checkPoints(barrier.points);
-  }
+  // The barrier being edited belongs to the open game type: RPG state or that type's options.
+  const openTemplateBarriers = document.template.options[document.template.id]?.barriers;
+  const rpgBarrierIds = checkBarriers(state.barriers);
+  const barrierIds = Array.isArray(openTemplateBarriers) ? checkBarriers(openTemplateBarriers) : rpgBarrierIds;
   const editing = document.editing;
   checkKeys(editing, ['activeBarrierId', 'barrierEditSnapshot', 'nextNpcIndex', 'nextBarrierIndex'], 'editing');
   for (const key of ['nextNpcIndex', 'nextBarrierIndex']) {

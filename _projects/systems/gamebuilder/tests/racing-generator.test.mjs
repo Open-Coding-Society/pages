@@ -58,6 +58,29 @@ test('a second player and obstacles add their own objects', () => {
   assert.deepEqual(classes[3].data.INIT_POSITION, { x: 0.3, y: 0.4 });
 });
 
+test('spline barriers become walls the cars cannot cross', () => {
+  const barriers = [
+    { id: 'barrier-1', name: 'Barrier 1', visible: true, points: [{ x: 0.1, y: 0.2 }, { x: 0.5, y: 0.25 }, { x: 0.9, y: 0.2 }] },
+    { id: 'barrier-2', name: 'Barrier 2', visible: false, points: [{ x: 0.1, y: 0.9 }, { x: 0.9, y: 0.9 }] }
+  ];
+  const { code, errors } = generateRacingCode({ ...starter(), barriers }, images);
+  assert.deepEqual(errors, []);
+  assert.match(code, /^import SplineBarrier from '\/assets\/js\/GameEnginev1\.1\/essentials\/SplineBarrier\.js';$/m);
+  const walls = levelClasses(code).filter((entry) => entry.class === 'SplineBarrier').map((entry) => entry.data);
+  assert.deepEqual(walls, [
+    { id: 'barrier-1', coordinateSpace: 'normalized', visible: true, splinePoints: barriers[0].points },
+    { id: 'barrier-2', coordinateSpace: 'normalized', visible: false, splinePoints: barriers[1].points }
+  ]);
+  assert.equal(levelClasses(code).at(-1).class, 'LapRace', 'the lap race still draws last');
+});
+
+test('a barrier with fewer than two points cannot be pushed', () => {
+  const barriers = [{ id: 'barrier-1', name: 'Barrier 1', visible: true, points: [{ x: 0.1, y: 0.2 }] }];
+  const { code, errors } = generateRacingCode({ ...starter(), barriers }, images);
+  assert.equal(code, '');
+  assert.deepEqual(errors.map((error) => error.field), ['barriers.0']);
+});
+
 test('bad Racing settings return errors and no code', () => {
   const options = { ...starter(), name: ' ', laps: 2.5, backgroundKey: 'moon', obstacles: [{ spriteKey: 'cone', x: 4, y: 0 }] };
   const { code, errors } = generateRacingCode(options, images);

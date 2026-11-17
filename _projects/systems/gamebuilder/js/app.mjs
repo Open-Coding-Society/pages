@@ -51,9 +51,10 @@ const form = root.querySelector('[data-role="builder-form"]');
 const generateButton = root.querySelector('[data-action="generate"]');
 const npcList = form.querySelector('[data-role="npc-list"]');
 const npcEmptyMessage = form.querySelector('[data-role="npc-empty"]');
-const barrierList = form.querySelector('[data-role="barrier-list"]');
-const barrierEmptyMessage = form.querySelector('[data-role="barrier-empty"]');
-const addBarrierButton = form.querySelector('[data-action="add-barrier"]');
+const barrierForm = root.querySelector('[data-role="barrier-form"]');
+const barrierList = barrierForm.querySelector('[data-role="barrier-list"]');
+const barrierEmptyMessage = barrierForm.querySelector('[data-role="barrier-empty"]');
+const addBarrierButton = barrierForm.querySelector('[data-action="add-barrier"]');
 const templateChoices = root.querySelector('[data-role="template-choices"]');
 const templateDescription = root.querySelector('[data-role="template-description"]');
 const templateForm = root.querySelector('[data-role="template-form"]');
@@ -309,7 +310,7 @@ try {
   const barrierEditor = createBarrierPlacementEditor(
     root.querySelector('.ocs__gamebuilder-runner .gameContainer'),
     (barrierId, point) => {
-      const barrier = state.barriers.find((entry) => entry.id === barrierId);
+      const barrier = barrierOwner().barriers.find((entry) => entry.id === barrierId);
       if (!barrier) {
         throw new Error(`Barrier "${barrierId}" is no longer available`);
       }
@@ -321,7 +322,6 @@ try {
   );
   fillForm(state);
   renderNpcs(state.npcs, catalog.sprites);
-  renderBarriers(state.barriers, activeBarrierId);
   renderTemplateChoices();
   showTemplate(templateId);
 
@@ -343,10 +343,23 @@ try {
     return templateId === rpgTemplateId;
   }
 
+  /** Whether the open game type uses the spline barrier panel (RPG always does). */
+  function hasBarriers() {
+    return isRpgTemplate() || templates.get(templateId).barriers === true;
+  }
+
+  /** The settings that hold the open game type's barriers: RPG state or that type's options. */
+  function barrierOwner() {
+    return isRpgTemplate() ? state : templateOptions[templateId];
+  }
+
   /** Keeps the open panel's values before switching away or saving. */
   function storeOpenTemplateOptions() {
     if (isRpgTemplate()) return;
-    templateOptions[templateId] = readTemplatePanel(templateForm, templates.get(templateId));
+    const options = readTemplatePanel(templateForm, templates.get(templateId));
+    // Barriers are drawn on the preview, not read from the panel, so keep them.
+    if (hasBarriers()) options.barriers = templateOptions[templateId]?.barriers ?? [];
+    templateOptions[templateId] = options;
   }
 
   function showTemplate(id) {
@@ -360,20 +373,25 @@ try {
     templateForm.hidden = isRpgTemplate();
     if (isRpgTemplate()) {
       templateForm.replaceChildren();
-      return;
+    } else {
+      templateOptions[id] ??= createTemplateOptions(template, templateImages.get(id));
+      // Settings saved before this type had barriers start with none.
+      if (hasBarriers()) templateOptions[id].barriers ??= [];
+      renderTemplatePanel(templateForm, template, templateOptions[id], templateImages.get(id));
     }
-    templateOptions[id] ??= createTemplateOptions(template, templateImages.get(id));
-    renderTemplatePanel(templateForm, template, templateOptions[id], templateImages.get(id));
+    barrierForm.hidden = !hasBarriers();
+    updateBarrierEditor();
   }
 
   function updateBarrierEditor() {
+    const barriers = hasBarriers() ? barrierOwner().barriers : [];
     addBarrierButton.disabled = Boolean(activeBarrierId);
-    renderBarriers(state.barriers, activeBarrierId);
-    barrierEditor.setBarriers(state.barriers, activeBarrierId);
+    renderBarriers(barriers, activeBarrierId);
+    barrierEditor.setBarriers(barriers, activeBarrierId);
   }
 
   function beginBarrierEdit(barrierId) {
-    const barrier = state.barriers.find((entry) => entry.id === barrierId);
+    const barrier = barrierOwner().barriers.find((entry) => entry.id === barrierId);
     if (!barrier) {
       throw new Error(`Barrier "${barrierId}" is no longer available`);
     }
@@ -493,10 +511,20 @@ try {
       state.npcs = state.npcs.filter((npc) => npc.id !== npcId);
       renderNpcs(state.npcs, catalog.sprites);
       setStatus('NPC removed. Generate code to sync the change to GAME_RUNNER.');
-    } else if (button.dataset.action === 'add-barrier') {
+    }
+    persistence.changed();
+  });
+
+  barrierForm.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-action]');
+    if (!button) return;
+    // Keep the open panel's values current before its barrier list changes.
+    if (isRpgTemplate()) state = readForm(state);
+    else storeOpenTemplateOptions();
+
+    if (button.dataset.action === 'add-barrier') {
       if (activeBarrierId) return;
-      state = readForm(state);
-      while (state.barriers.some((barrier) => barrier.id === `barrier-${nextBarrierIndex + 1}`)) nextBarrierIndex++;
+      while (barrierOwner().barriers.some((barrier) => barrier.id === `barrier-${nextBarrierIndex + 1}`)) nextBarrierIndex++;
       const index = nextBarrierIndex++;
       const barrier = {
         id: `barrier-${index + 1}`,
@@ -504,16 +532,14 @@ try {
         visible: true,
         points: []
       };
-      state.barriers.push(barrier);
+      barrierOwner().barriers.push(barrier);
       beginBarrierEdit(barrier.id);
     } else if (button.dataset.action === 'edit-barrier') {
       if (activeBarrierId) return;
-      state = readForm(state);
       beginBarrierEdit(button.dataset.barrierId);
     } else if (button.dataset.action === 'remove-barrier') {
       const barrierId = button.dataset.barrierId;
-      state = readForm(state);
-      state.barriers = state.barriers.filter((barrier) => barrier.id !== barrierId);
+      barrierOwner().barriers = barrierOwner().barriers.filter((barrier) => barrier.id !== barrierId);
       if (activeBarrierId === barrierId) {
         activeBarrierId = null;
         barrierEditSnapshot = null;
@@ -521,7 +547,7 @@ try {
       updateBarrierEditor();
       setStatus('Barrier removed. Generate code to sync the change to GAME_RUNNER.');
     } else if (button.dataset.action === 'toggle-barrier-visibility') {
-      const barrier = state.barriers.find((entry) => entry.id === button.dataset.barrierId);
+      const barrier = barrierOwner().barriers.find((entry) => entry.id === button.dataset.barrierId);
       if (!barrier || barrier.id === activeBarrierId) return;
       barrier.visible = barrier.visible === false;
       updateBarrierEditor();
@@ -529,7 +555,7 @@ try {
         `${barrier.name} ${barrier.visible ? 'shown' : 'hidden'}. Hidden barriers still block player movement.`
       );
     } else if (button.dataset.action === 'undo-barrier-point') {
-      const barrier = state.barriers.find((entry) => entry.id === activeBarrierId);
+      const barrier = barrierOwner().barriers.find((entry) => entry.id === activeBarrierId);
       if (!barrier?.points.length) return;
       barrier.points.pop();
       updateBarrierEditor();
@@ -537,7 +563,7 @@ try {
       barrierList.querySelector(`[data-action="${nextAction}"]`).focus({ preventScroll: true });
       setStatus(`${barrier.name}: last point removed.`);
     } else if (button.dataset.action === 'finish-barrier') {
-      const barrier = state.barriers.find((entry) => entry.id === activeBarrierId);
+      const barrier = barrierOwner().barriers.find((entry) => entry.id === activeBarrierId);
       if (!barrier || barrier.points.length < 2) {
         setStatus('Add at least two points before finishing a barrier.', 'error');
         return;
@@ -551,11 +577,11 @@ try {
       setStatus(`${barrier.name} finished. Add another barrier or generate code.`);
     } else if (button.dataset.action === 'cancel-barrier') {
       const barrierId = activeBarrierId;
-      const barrier = state.barriers.find((entry) => entry.id === barrierId);
+      const barrier = barrierOwner().barriers.find((entry) => entry.id === barrierId);
       if (barrierEditSnapshot?.length) {
         barrier.points = barrierEditSnapshot;
       } else {
-        state.barriers = state.barriers.filter((entry) => entry.id !== barrierId);
+        barrierOwner().barriers = barrierOwner().barriers.filter((entry) => entry.id !== barrierId);
       }
       activeBarrierId = null;
       barrierEditSnapshot = null;
