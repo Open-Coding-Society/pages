@@ -122,6 +122,22 @@ export function highlightParts(text, query) {
   return parts;
 }
 
+// Whether a sidebar row matches the "Find a conversation" box: every typed word appears
+// in a group's name, course or period, or in a member's or participant's name or uid.
+// Case doesn't matter, and an empty search matches everything.
+export function matchesConversationSearch(kind, item, query) {
+  const terms = String(query ?? '').toLowerCase().split(/\s+/).filter(Boolean);
+  if (!terms.length) return true;
+  const people = kind === 'group' ? item?.members : item?.participants;
+  const searchable = [
+    kind === 'group' ? item?.name : '',
+    kind === 'group' ? item?.course : '',
+    kind === 'group' && item?.period ? `period ${item.period}` : '',
+    ...(people || []).flatMap(person => [person?.name, person?.uid]),
+  ].filter(Boolean).join('\n').toLowerCase();
+  return terms.every(term => searchable.includes(term));
+}
+
 export function groupSubtitle(group) {
   const count = (group.members || []).length;
   return [

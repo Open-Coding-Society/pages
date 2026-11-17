@@ -1,7 +1,8 @@
 // The open conversation's messages, drawn with the chat-* class names the course chats
 // use and styled for /dm in sass/_thread.scss: a divider for each day, then each message
-// with its avatar, sender and time, and edit and delete buttons on your own messages
-// (none in a read-only log).
+// with its avatar, sender and time, a Reply button, and edit and delete buttons on your
+// own messages (none in a read-only log). A reply shows a quote of the message it
+// answers, from the [[reply:...]] marker at the start of its body (assets/js/chat/chat-reply.js).
 import { dayKey, dayLabel, initialsFor, pfpSrc, tintFor } from './messages-model.js';
 
 // What the log says, worded for /dm. A host passes its own wording for any of these in
@@ -11,6 +12,7 @@ export const LOG_TEXTS = Object.freeze({
   edited: '(edited)',
   editMessage: 'Edit message',
   deleteMessage: 'Delete message',
+  replyMessage: 'Reply',
   imageFrom: 'Image from {name}',
   openImage: 'View image from {name} larger',
   closeImage: 'Close image',
@@ -51,7 +53,17 @@ export function shownBody(message, formatBody) {
   }
 }
 
-export function createMessageLog(element, { richText, me, onEdit, onDelete, readOnly = false, texts = {}, formatBody = null }) {
+// A body without its reply marker, and the reply it carries. A host whose richText
+// predates replies shows bodies as stored.
+function splitReply(richText, body) {
+  return typeof richText.extractReplyMarker === 'function'
+    ? richText.extractReplyMarker(body)
+    : { reply: null, html: body };
+}
+
+export function createMessageLog(element, {
+  richText, me, onEdit, onDelete, onReply = null, readOnly = false, texts = {}, formatBody = null,
+}) {
   if (formatBody !== null && typeof formatBody !== 'function') {
     throw new TypeError('createMessageLog: formatBody must be a function or null');
   }
@@ -232,6 +244,19 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     body.classList.add('is-deleted');
   }
 
+  // The body's reply quote (if any) goes just before the body; formatBody sees the rest.
+  // Clicking the quote scrolls to the original and marks it, as a search result does.
+  function renderBody(body, stored) {
+    const { reply, html } = splitReply(richText, stored.body);
+    const main = body.parentNode;
+    main.querySelector('.chat-reply-quote')?.remove();
+    if (reply && typeof richText.renderReplyQuote === 'function') {
+      main.insertBefore(richText.renderReplyQuote(reply, { onJump: id => reveal(String(id)) }), body);
+    }
+    body.replaceChildren();
+    richText.renderRichMessage(body, shownBody({ ...stored, body: html }, formatBody));
+  }
+
   function actionButton(icon, label, handler) {
     const button = document.createElement('button');
     button.type = 'button';
@@ -289,7 +314,7 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     if (message.deleted) {
       showDeleted(body);
     } else {
-      richText.renderRichMessage(body, shownBody(messages.get(message.key), formatBody));
+      renderBody(body, messages.get(message.key));
       if (message.image) {
         const imageSource = pfpSrc(message.image);
         const imageLink = document.createElement('a');
@@ -327,14 +352,17 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
         main.appendChild(imageLink);
       }
     }
-    // A message saved before ids existed can't be edited or deleted.
-    if (!readOnly && isSelf && message.id && !message.deleted) {
+    // A message saved before ids existed can't be replied to, edited or deleted.
+    if (!readOnly && message.id && !message.deleted && (onReply || isSelf)) {
       const actions = document.createElement('div');
       actions.className = 'chat-msg-actions';
-      actions.append(
-        actionButton('fa-pen', text.editMessage, () => onEdit(messages.get(message.key))),
-        actionButton('fa-trash', text.deleteMessage, button => onDelete(messages.get(message.key), button)),
-      );
+      if (onReply) actions.append(actionButton('fa-reply', text.replyMessage, () => onReply(messages.get(message.key))));
+      if (isSelf) {
+        actions.append(
+          actionButton('fa-pen', text.editMessage, () => onEdit(messages.get(message.key))),
+          actionButton('fa-trash', text.deleteMessage, button => onDelete(messages.get(message.key), button)),
+        );
+      }
       main.appendChild(actions);
     }
 
@@ -350,9 +378,7 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     stored.edited = true;
     const row = rowFor(key);
     if (!row) return;
-    const bodyElement = row.querySelector('.chat-msg-body');
-    bodyElement.replaceChildren();
-    richText.renderRichMessage(bodyElement, shownBody(stored, formatBody));
+    renderBody(row.querySelector('.chat-msg-body'), stored);
     const meta = row.querySelector('.chat-msg-meta');
     if (!meta.querySelector('.chat-msg-edited')) meta.appendChild(editedTag());
   }
@@ -366,6 +392,7 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     const row = rowFor(key);
     if (!row) return;
     showDeleted(row.querySelector('.chat-msg-body'));
+    row.querySelector('.chat-reply-quote')?.remove();
     row.querySelector('.chat-msg-actions')?.remove();
     row.querySelector('.chat-msg-edited')?.remove();
     // If the viewer is showing the image of the message just deleted, close it rather

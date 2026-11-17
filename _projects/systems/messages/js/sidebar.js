@@ -1,7 +1,8 @@
 // The two lists beside the conversation: your groups, then your direct messages. Each
 // row is an ocs__nav-card link (/dm?group=<id> or /dm?dm=<id>), so a conversation opens
-// from a bookmark or in a new tab; a plain click opens it in place.
-import { conversationLabel, groupSubtitle, initialsFor } from './messages-model.js';
+// from a bookmark or in a new tab; a plain click opens it in place. A search (`query`)
+// keeps only the rows that match it (matchesConversationSearch).
+import { conversationLabel, groupSubtitle, initialsFor, matchesConversationSearch } from './messages-model.js';
 
 export const conversationHref = (kind, id) => `?${kind}=${encodeURIComponent(id)}`;
 
@@ -67,15 +68,18 @@ export function createSidebar({ groupList, dmList, onOpen }) {
   const unreadFirst = rows => [...rows]
     .sort((a, b) => Number(Boolean(b.unreadCount)) - Number(Boolean(a.unreadCount)));
 
-  function render({ groups, conversations, active }) {
-    groupList.replaceChildren(...(groups.length
-      ? unreadFirst(groups).map(group => row('group', group.id, group.name, groupSubtitle(group),
+  function render({ groups, conversations, active, query = '' }) {
+    const shownGroups = groups.filter(group => matchesConversationSearch('group', group, query));
+    const shownConversations = conversations.filter(conversation => matchesConversationSearch('dm', conversation, query));
+    // An empty list says why: nothing yet, or nothing that matches the search.
+    groupList.replaceChildren(...(shownGroups.length
+      ? unreadFirst(shownGroups).map(group => row('group', group.id, group.name, groupSubtitle(group),
         unreadNote(group.unreadCount), active))
-      : [emptyLine('No groups yet. Find one to join, or make one.')]));
-    dmList.replaceChildren(...(conversations.length
-      ? unreadFirst(conversations).map(conversation => row('dm', conversation.id, conversationLabel(conversation), '',
+      : [emptyLine(query ? 'No groups match your search.' : 'No groups yet. Find one to join, or make one.')]));
+    dmList.replaceChildren(...(shownConversations.length
+      ? unreadFirst(shownConversations).map(conversation => row('dm', conversation.id, conversationLabel(conversation), '',
         unreadNote(conversation.unreadCount), active))
-      : [emptyLine('No direct messages yet.')]));
+      : [emptyLine(query ? 'No direct messages match your search.' : 'No direct messages yet.')]));
   }
 
   return { render };
