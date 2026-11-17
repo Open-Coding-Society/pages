@@ -10,21 +10,47 @@
  * uses the existing builder form (`panel: "rpg"`). Other templates list
  * `sections`; a section has either `fields` or one repeatable `list` whose
  * items have their own `fields`. Field types are text, number, checkbox,
- * choice, background and sprite.
+ * choice and image. Each template lists its own pictures in `assets`, as
+ * named groups of `{ name, src }` (for example Racing's `tracks` and `cars`);
+ * `src` is a site path to an image the base game already publishes. An image
+ * field names the group it chooses from with `assetGroup`.
  *
  * @usage
- * Call `validateGameTemplates(data)` once after loading the JSON. Use
- * `fieldDefault`, `createTemplateOptions` and `createListItem` to fill a
- * panel when a template is chosen or a list item is added.
+ * Call `validateGameTemplates(data)` once after loading the JSON, then
+ * `createTemplateImages(template)` for each template's picture choices. Use
+ * `fieldDefault`, `createTemplateOptions` and `createListItem` with those
+ * images to fill a panel when a template is chosen or a list item is added.
  */
+import { toKey } from './asset-catalog.mjs';
+
 const ID_PATTERN = /^[a-z][A-Za-z0-9-]*$/;
-const FIELD_TYPES = ['text', 'number', 'checkbox', 'choice', 'background', 'sprite'];
+const FIELD_TYPES = ['text', 'number', 'checkbox', 'choice', 'image'];
 
 function fail(message) {
   throw new TypeError(`Invalid game templates: ${message}`);
 }
 
-function checkField(field, seenIds, templateId) {
+// A site path such as /images/platformer/sprites/knight.png that stays on the site.
+function isSitePath(src) {
+  return typeof src === 'string' && src.startsWith('/') && !src.startsWith('//')
+    && !src.includes('\\') && !src.split('/').includes('..');
+}
+
+function checkAssets(template) {
+  const groups = template.assets;
+  if (!groups || typeof groups !== 'object' || Array.isArray(groups)) fail(`${template.id} needs an assets object`);
+  for (const [groupId, items] of Object.entries(groups)) {
+    if (!Array.isArray(items) || items.length === 0) fail(`${template.id}.${groupId} needs at least one image`);
+    const keys = new Set();
+    for (const item of items) {
+      const key = typeof item?.name === 'string' ? toKey(item.name) : '';
+      if (!key || keys.has(key) || !isSitePath(item.src)) fail(`${template.id}.${groupId} has an invalid or duplicate image`);
+      keys.add(key);
+    }
+  }
+}
+
+function checkField(field, seenIds, templateId, assets) {
   const label = `${templateId}.${field?.id}`;
   if (!field || !ID_PATTERN.test(field.id) || seenIds.has(field.id)) fail(`${label} needs a unique id`);
   seenIds.add(field.id);
@@ -41,6 +67,7 @@ function checkField(field, seenIds, templateId) {
     const values = Array.isArray(field.choices) ? field.choices.map((choice) => choice?.value) : [];
     if (values.length === 0 || !values.includes(field.default)) fail(`${label} default must be one of its choices`);
   }
+  if (field.type === 'image' && !Object.hasOwn(assets, field.assetGroup)) fail(`${label} names an unknown assetGroup`);
   if (field.type === 'text' && typeof field.default !== 'string') fail(`${label} needs a text default`);
   if (field.type === 'checkbox' && typeof field.default !== 'boolean') fail(`${label} needs a true/false default`);
 }
@@ -55,6 +82,7 @@ export function validateGameTemplates(data) {
       || typeof template.codeReady !== 'boolean') fail(`${template.id} needs a name, description and codeReady`);
     if (template.panel === 'rpg') continue;
     if (!Array.isArray(template.sections) || template.sections.length === 0) fail(`${template.id} needs sections`);
+    checkAssets(template);
 
     const seenIds = new Set();
     for (const section of template.sections) {
@@ -64,7 +92,7 @@ export function validateGameTemplates(data) {
       // Each section is either plain fields or a single repeatable list.
       if (hasFields === hasList) fail(`${template.id} section "${section.legend}" needs fields or a list`);
       if (hasFields) {
-        section.fields.forEach((field) => checkField(field, seenIds, template.id));
+        section.fields.forEach((field) => checkField(field, seenIds, template.id, template.assets));
         continue;
       }
       const list = section.list;
@@ -72,38 +100,45 @@ export function validateGameTemplates(data) {
       seenIds.add(list.id);
       if (typeof list.itemName !== 'string' || !Array.isArray(list.fields)) fail(`${list.id} needs itemName and fields`);
       const itemIds = new Set(['id']);
-      list.fields.forEach((field) => checkField(field, itemIds, `${template.id}.${list.id}`));
+      list.fields.forEach((field) => checkField(field, itemIds, `${template.id}.${list.id}`, template.assets));
     }
   }
   if (!data.some((template) => template.panel === 'rpg')) fail('the RPG template is required');
   return data;
 }
 
-/** Starter value for one field; asset fields use their default asset when the catalog has it. */
-export function fieldDefault(field, catalog) {
-  if (field.type === 'background' || field.type === 'sprite') {
-    const assets = field.type === 'background' ? catalog.backgrounds : catalog.sprites;
-    return assets.has(field.default) ? field.default : assets.keys().next().value;
+/** Picture choices for one template: a Map of group id to a Map of key → { key, name, src }. */
+export function createTemplateImages(template) {
+  const groups = new Map();
+  for (const [groupId, items] of Object.entries(template.assets ?? {})) {
+    const entries = items.map((item) => [toKey(item.name), { key: toKey(item.name), name: item.name, src: item.src }]);
+    groups.set(groupId, new Map(entries));
   }
+  return groups;
+}
+
+/** Starter value for one field; an image field starts on the first picture in its group. */
+export function fieldDefault(field, images) {
+  if (field.type === 'image') return images.get(field.assetGroup).keys().next().value;
   return field.default;
 }
 
-export function createListItem(list, existingItems, catalog) {
+export function createListItem(list, existingItems, images) {
   const used = new Set(existingItems.map((item) => item.id));
   let number = existingItems.length + 1;
   while (used.has(`${list.id}-${number}`)) number++;
   const item = { id: `${list.id}-${number}` };
-  for (const field of list.fields) item[field.id] = fieldDefault(field, catalog);
+  for (const field of list.fields) item[field.id] = fieldDefault(field, images);
   return item;
 }
 
-export function createTemplateOptions(template, catalog) {
+export function createTemplateOptions(template, images) {
   const options = {};
   for (const section of template.sections ?? []) {
     if (section.list) {
       options[section.list.id] = [];
     } else {
-      for (const field of section.fields) options[field.id] = fieldDefault(field, catalog);
+      for (const field of section.fields) options[field.id] = fieldDefault(field, images);
     }
   }
   return options;

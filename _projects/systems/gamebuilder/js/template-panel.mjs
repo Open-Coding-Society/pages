@@ -12,17 +12,17 @@
  * saved workspaces.
  *
  * @usage
- * `renderTemplatePanel(form, template, options, catalog)` replaces the form's
- * contents. `readTemplatePanel(form, template)` returns the options shown.
+ * `renderTemplatePanel(form, template, options, images)` replaces the form's
+ * contents; `images` comes from `createTemplateImages(template)`. `readTemplatePanel(form, template)` returns the options shown.
  * Add/remove buttons carry `data-template-action` for the caller to handle.
  */
 import { fieldDefault } from './game-templates.mjs';
 import { populateSelect, selectAsset } from './form-controls.mjs';
 
-function createControl(field, value, catalog) {
-  if (field.type === 'background' || field.type === 'sprite') {
+function createControl(field, value, images) {
+  if (field.type === 'image') {
     const select = document.createElement('select');
-    populateSelect(select, field.type === 'background' ? catalog.backgrounds : catalog.sprites);
+    populateSelect(select, images.get(field.assetGroup));
     selectAsset(select, value);
     return select;
   }
@@ -53,9 +53,9 @@ function createControl(field, value, catalog) {
   return input;
 }
 
-function createField(field, values, catalog) {
-  const value = values[field.id] ?? fieldDefault(field, catalog);
-  const control = createControl(field, value, catalog);
+function createField(field, values, images) {
+  const value = values[field.id] ?? fieldDefault(field, images);
+  const control = createControl(field, value, images);
   control.dataset.templateField = field.id;
   const label = document.createElement('label');
   if (field.type === 'checkbox') {
@@ -80,7 +80,7 @@ function createActionButton(text, action, listId, itemId = '') {
   return button;
 }
 
-function renderList(list, items, catalog) {
+function renderList(list, items, images) {
   const wrapper = document.createElement('div');
   wrapper.dataset.templateList = list.id;
   const addButton = createActionButton(`Add ${list.itemName.toLowerCase()}`, 'add-item', list.id);
@@ -103,14 +103,14 @@ function renderList(list, items, catalog) {
     header.append(title, removeButton);
     const fields = document.createElement('div');
     fields.className = 'ocs__gamebuilder-npc-fields';
-    fields.append(...list.fields.map((field) => createField(field, item, catalog)));
+    fields.append(...list.fields.map((field) => createField(field, item, images)));
     card.append(header, fields);
     wrapper.append(card);
   });
   return wrapper;
 }
 
-export function renderTemplatePanel(form, template, options, catalog) {
+export function renderTemplatePanel(form, template, options, images) {
   form.replaceChildren();
   for (const section of template.sections) {
     const fieldset = document.createElement('fieldset');
@@ -124,9 +124,9 @@ export function renderTemplatePanel(form, template, options, catalog) {
       fieldset.append(help);
     }
     if (section.list) {
-      fieldset.append(renderList(section.list, options[section.list.id] ?? [], catalog));
+      fieldset.append(renderList(section.list, options[section.list.id] ?? [], images));
     } else {
-      fieldset.append(...section.fields.map((field) => createField(field, options, catalog)));
+      fieldset.append(...section.fields.map((field) => createField(field, options, images)));
     }
     form.append(fieldset);
   }
