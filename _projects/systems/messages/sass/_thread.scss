@@ -79,6 +79,17 @@
   animation: dm-fade $transition-slow ease both;
 }
 
+// The message a search result opened (message-log.js sets .is-found). The wash holds
+// for a moment, then fades, so the eye lands on the message without it staying marked.
+// The spread shadow carries the wash past the row's edges, which have no side padding.
+.dm .chat-msg.is-found {
+  --dm-found: color-mix(in srgb, var(--dm-accent) 22%, transparent);
+  border-radius: var(--dm-radius-sm);
+  background: var(--dm-found);
+  box-shadow: 0 0 0 0.35rem var(--dm-found);
+  animation: dm-found 2.4s ease-out 0.8s both;
+}
+
 // Yours is marked by the weight of your name, not by moving it across the column.
 .dm .chat-msg.is-self .chat-msg-sender {
   font-weight: 600;
@@ -283,8 +294,17 @@
   }
 }
 
+@keyframes dm-found {
+  to {
+    background-color: transparent;
+    box-shadow: 0 0 0 0.35rem transparent;
+  }
+}
+
+// With no fade, a found message keeps its wash until another one is found.
 @media (prefers-reduced-motion: reduce) {
   .dm .chat-msg,
+  .dm .chat-msg.is-found,
   .dm .chat-empty {
     animation: none;
   }

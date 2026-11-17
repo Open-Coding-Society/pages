@@ -21,6 +21,7 @@ same way they reach a direct message.
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
 | `js/messages-api.js` | Every Spring and Flask request. |
+| `js/message-search.js` | The search box in a direct message's header: debounced query for that chat, matches listed under the header with the match marked, and jumping to the one picked. |
 | `js/chat-socket.js` | The STOMP-over-SockJS connection to Spring's `/ws-chat`, one for `/dm` and one for each embed. |
 | `js/messages-model.js` | Pure functions: one message shape for DMs and groups, labels, roles. |
 | `js/formation-model.js` | Pure functions: the steps of forming groups. |
@@ -173,7 +174,10 @@ Spring:
 
 - `GET /api/person/get`, `GET /api/people/search?query=`
 - `/api/dm/conversations` (list, start), `/api/dm/conversations/{id}/messages` (read,
-  send, edit, delete), `POST /api/dm/conversations/{id}/read`
+  send, edit, delete), `POST /api/dm/conversations/{id}/read`,
+  `GET /api/dm/search?q=` (your direct messages only, 2-100 characters, newest 50;
+  add `&conversationId=` for one chat, which is what the page does; group chats are
+  not searched)
 - `GET /api/groups/person/{personId}` (your groups), `GET /api/groups/search?name=`,
   `GET /api/groups` (Form groups only), `POST /api/groups`, `DELETE /api/groups/{id}`,
   `POST` and `DELETE /api/groups/{id}/members/{personId}`

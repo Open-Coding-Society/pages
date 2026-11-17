@@ -211,3 +211,39 @@ test('a send still saving when the pane is destroyed fetches nothing afterwards'
   await settle();
   assert.equal(api.calls.filter(([name]) => name === 'groupMessages').length, loadsBefore);
 });
+
+const dmRow = (id, body) => ({ id, senderUid: 'grace', senderName: 'Grace', body, sentAt: '2026-10-20T10:00:00Z' });
+
+test('showMessage on a conversation that is still loading marks the message once it arrives', async () => {
+  const api = stubApi({ dmMessages: [dmRow(1, 'first'), dmRow(2, 'second')] });
+  const { thread, elements } = makeThread({ api });
+  thread.open('dm', 5, { title: 'Grace', subtitle: 'Direct message' });
+  thread.showMessage('2');
+  assert.equal(elements.messages.querySelector('.is-found'), null);
+  await settle();
+
+  const found = elements.messages.querySelector('.is-found');
+  assert.equal(found.dataset.key, '2');
+  assert.deepEqual(found.scrolledIntoView, { block: 'center' });
+});
+
+test('showMessage on a loaded conversation marks the message straight away', async () => {
+  const api = stubApi({ dmMessages: [dmRow(1, 'first'), dmRow(2, 'second')] });
+  const { thread, elements } = makeThread({ api });
+  thread.open('dm', 5, { title: 'Grace', subtitle: 'Direct message' });
+  await settle();
+
+  thread.showMessage('1');
+  assert.equal(elements.messages.querySelector('.is-found').dataset.key, '1');
+  // The same conversation again: nothing reloads, and the new find replaces the old.
+  assert.equal(thread.open('dm', 5, { title: 'Grace', subtitle: 'Direct message' }), true);
+  thread.showMessage('2');
+  assert.deepEqual(elements.messages.querySelectorAll('.is-found').map(row => row.dataset.key), ['2']);
+  assert.equal(api.calls.filter(([name]) => name === 'dmMessages').length, 1);
+});
+
+test('showMessage with no conversation open does nothing', () => {
+  const { thread, elements } = makeThread();
+  thread.showMessage('1');
+  assert.equal(elements.messages.querySelector('.is-found'), null);
+});

@@ -66,6 +66,21 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     lastDay = null;
   }
 
+  // Scrolls one message into view and marks it .is-found, which sass/_thread.scss
+  // washes with the accent and fades. Only the newest find keeps the mark. Returns
+  // whether the message is in the log.
+  function reveal(key) {
+    const row = rowFor(key);
+    if (!row) return false;
+    element.querySelectorAll('.is-found').forEach(found => found.classList.remove('is-found'));
+    // Reading a layout property between taking the class off and putting it back makes
+    // the browser restart the fade when the same message is found twice in a row.
+    void row.offsetWidth;
+    row.classList.add('is-found');
+    row.scrollIntoView({ block: 'center' });
+    return true;
+  }
+
   function showEmpty(title, hint = '') {
     clear();
     const empty = document.createElement('div');
@@ -265,7 +280,7 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
   }
 
   return {
-    clear, showEmpty, append, updateBody, markDeleted, note,
+    clear, showEmpty, append, updateBody, markDeleted, note, reveal,
     has: key => messages.has(key),
     get: key => messages.get(key),
   };

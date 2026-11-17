@@ -1,6 +1,61 @@
 // The Groups and Direct messages lists. Rows are built by js/sidebar.js as
 // .ocs__nav-card links, so the grammar's class names are what gets styled here.
 
+// Search inside the open direct message: a box in the chat's header (js/message-search.js
+// shows it only while a DM is open) and a panel of matches between the header and the log.
+.dm__search {
+  width: min(100%, 16rem);
+  margin: 0 0 0 auto;
+}
+
+.dm__search-panel {
+  max-height: 40%;
+  overflow-y: auto;
+  padding: var(--dm-space-sm) 0;
+  border-bottom: 1px solid var(--dm-rule);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.dm__search-status {
+  margin: 0 0 var(--dm-space-xs);
+  font-family: var(--dm-font);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--dm-faint);
+
+  &:empty {
+    display: none;
+  }
+}
+
+// A match is a button, not a link: it scrolls the open chat rather than going anywhere.
+.dm .ocs__nav-card.dm__hit {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+// A result's excerpt. The match keeps the ink colour on an accent tint, the pairing the
+// themes are checked for, rather than the browser's yellow.
+.dm__hit-text {
+  font-family: var(--dm-font);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--dm-muted);
+  overflow-wrap: anywhere;
+
+  mark {
+    padding: 0 0.1em;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--dm-accent) 30%, transparent);
+    color: var(--dm-ink);
+  }
+}
+
 .dm__group {
   & + & {
     margin-top: var(--dm-space-lg);
