@@ -512,11 +512,15 @@ import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.j
         people.forEach(person => {
             const card = document.createElement('div');
             card.className = 'cursor-pointer border border-neutral-700 bg-neutral-800 rounded-xl p-5 shadow hover:border-blue-500 transition';
+            // Names come from the students themselves, so they go in as text, never as HTML.
             card.innerHTML = `
-                <div class="font-semibold text-lg mb-1">${person.name || 'No Name'}</div>
-                <div class="text-sm text-neutral-400 mb-1">UID: <span class="font-mono">${person.uid}</span></div>
-                <div class="text-xs text-neutral-500">ID: ${person.id}</div>
+                <div class="font-semibold text-lg mb-1"></div>
+                <div class="text-sm text-neutral-400 mb-1">UID: <span class="font-mono"></span></div>
+                <div class="text-xs text-neutral-500"></div>
             `;
+            card.children[0].textContent = person.name || 'No Name';
+            card.querySelector('.font-mono').textContent = person.uid;
+            card.children[2].textContent = `ID: ${person.id}`;
             card.addEventListener('click', () => openEvalModal(person));
             peopleList.appendChild(card);
         });
@@ -558,7 +562,9 @@ import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.j
     async function openEvalModal(person) {
         currentPerson = person;
         hasExistingEval = false;
-        modalTitle.innerHTML = `Evaluate: ${person.name} <span class="text-sm text-neutral-400 font-normal">(UID: ${person.uid})</span>`;
+        modalTitle.innerHTML = `Evaluate: <span></span> <span class="text-sm text-neutral-400 font-normal"></span>`;
+        modalTitle.children[0].textContent = person.name;
+        modalTitle.children[1].textContent = `(UID: ${person.uid})`;
 
         // --- Fetch existing admin evaluation (if any) ---
         let evalData = null;

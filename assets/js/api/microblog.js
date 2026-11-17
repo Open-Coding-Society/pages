@@ -195,7 +195,9 @@ const REOPENED_MARKER = '[[microblog:reopened]]';
 // A single reply's status: `<marker> <replyId> <uid>`
 const REPLY_RESOLVED_MARKER = '[[microblog:reply-resolved]]';
 const REPLY_REOPENED_MARKER = '[[microblog:reply-reopened]]';
-const STATUS_MARKERS = [RESOLVED_MARKER, REOPENED_MARKER, REPLY_RESOLVED_MARKER, REPLY_REOPENED_MARKER];
+// A survey vote: `<marker> <optionIndex>` (see Surveys below)
+const VOTE_MARKER = '[[microblog:vote]]';
+const STATUS_MARKERS = [RESOLVED_MARKER, REOPENED_MARKER, REPLY_RESOLVED_MARKER, REPLY_REOPENED_MARKER, VOTE_MARKER];
 
 /**
  * Mark a post resolved or reopen it
@@ -302,4 +304,101 @@ export function getReplyResolution(post, replyId, pageAuthorUids) {
         };
     }
     return resolution;
+}
+
+/*
+ * Surveys.
+ *
+ * A post's writer can attach a survey when creating it: the post's content is
+ * the question, and the choices are saved in the post's free-form `data`, like
+ * its channel. A vote is a marker reply, like resolve markers, so any signed-in
+ * user can vote without being able to edit the post, and the server stamps who
+ * voted. Each person's latest vote counts, so voting again changes a vote.
+ */
+export const SURVEY_LIMITS = Object.freeze({ minOptions: 2, maxOptions: 6, optionLength: 80 });
+
+/**
+ * Clean the choices typed into the survey builder before they are saved
+ * @param {string[]} options - Raw input values, blanks allowed
+ * @returns {string[]} - Trimmed choices, blanks dropped
+ * @throws {Error} - When there are too few or too many choices, a choice is too long, or two repeat
+ */
+export function normalizeSurveyOptions(options) {
+    const cleaned = (options || []).map(option => String(option ?? '').trim()).filter(Boolean);
+    const { minOptions, maxOptions, optionLength } = SURVEY_LIMITS;
+    if (cleaned.length < minOptions) throw new Error(`A survey needs at least ${minOptions} choices.`);
+    if (cleaned.length > maxOptions) throw new Error(`A survey can have at most ${maxOptions} choices.`);
+    if (cleaned.some(option => option.length > optionLength)) {
+        throw new Error(`Keep each survey choice under ${optionLength} characters.`);
+    }
+    const seen = new Set(cleaned.map(option => option.toLowerCase()));
+    if (seen.size !== cleaned.length) throw new Error('Each survey choice must be different.');
+    return cleaned;
+}
+
+/**
+ * The survey saved on a post, read defensively since `data` is free-form
+ * @param {Object} post - A post from the API
+ * @returns {string[]|null} - The choices, or null when the post has no usable survey
+ */
+export function postSurvey(post) {
+    const options = post && post.survey && post.survey.options;
+    if (!Array.isArray(options)) return null;
+    const labels = options.filter(option => typeof option === 'string' && option.trim());
+    return labels.length >= SURVEY_LIMITS.minOptions ? labels.slice(0, SURVEY_LIMITS.maxOptions) : null;
+}
+
+/**
+ * Vote for one of a post's survey choices (replaces this person's earlier vote)
+ * @param {number|string} postId - The survey's post
+ * @param {number} optionIndex - Index into the post's survey options
+ */
+export async function voteInSurvey(postId, optionIndex) {
+    if (!Number.isInteger(optionIndex) || optionIndex < 0) {
+        throw new Error(`Survey vote needs a choice index, not ${optionIndex}`);
+    }
+    return sendWithoutCooldown('/api/microblog/reply', 'POST', { postId, content: `${VOTE_MARKER} ${optionIndex}` });
+}
+
+/**
+ * Count a survey's votes from the post's marker replies
+ * @param {Object} post - Post with its `replies` array (markers included)
+ * @param {number|null} userId - The signed-in user's id, to find their choice
+ * @returns {{ options: {label: string, votes: number}[], total: number, myChoice: number|null }|null}
+ */
+export function getSurveyResults(post, userId) {
+    const labels = postSurvey(post);
+    if (!labels) return null;
+    // Latest vote per voter, keyed by the server-stamped userId
+    const choices = new Map();
+    for (const reply of (post.replies || [])) {
+        if (!isStatusMarker(reply) || reply.userId == null) continue;
+        const { marker, values: [rawIndex] } = readMarker(reply);
+        if (marker !== VOTE_MARKER || !/^\d+$/.test(rawIndex || '')) continue;
+        const index = Number(rawIndex);
+        if (index < labels.length) choices.set(reply.userId, index);
+    }
+    const options = labels.map(label => ({ label, votes: 0 }));
+    choices.forEach(index => { options[index].votes += 1; });
+    const myChoice = userId != null && choices.has(userId) ? choices.get(userId) : null;
+    return { options, total: choices.size, myChoice };
+}
+
+/**
+ * Whether a post matches the panel's search box. Every word typed must appear
+ * somewhere in the post: its text, writer, topic, survey choices, or replies.
+ * @param {Object} post - A post from the API, with its `replies`
+ * @param {string} query - What was typed in the search box
+ * @returns {boolean}
+ */
+export function matchesSearch(post, query) {
+    const terms = String(query || '').toLowerCase().split(/\s+/).filter(Boolean);
+    if (!terms.length) return true;
+    const replies = (post.replies || []).filter(reply => !isStatusMarker(reply));
+    const searchable = [
+        post.content, post.userName, post.topicPath,
+        ...(postSurvey(post) || []),
+        ...replies.flatMap(reply => [reply.content, reply.userName])
+    ].filter(Boolean).join('\n').toLowerCase();
+    return terms.every(term => searchable.includes(term));
 }

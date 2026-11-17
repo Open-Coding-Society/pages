@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Runner dependency browser fixture</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+</head>
+<body>
+  <h1>Progressive runner dependencies</h1>
+  <p>Uses the lesson's actual source and the shared runner editor, saving and execution APIs.</p>
+  <main></main>
+  <script type="module">
+    import { BaseRunner } from '/assets/js/pages/runners/core/BaseRunner.js';
+    import { CodeExecutor } from '/assets/js/pages/runners/executors/CodeExecutor.js';
+    import { readRunners, setRunnerSelected } from '/assets/js/runner-io.js';
+
+    const runners = new Map();
+    function addRunner(id, source, language) {
+      const container = document.createElement('section');
+      container.id = id;
+      container.className = 'code-runner-container';
+      container.dataset.runnerId = id;
+      container.dataset.storageKey = `dependency-browser-fixture_${id}`;
+      const title = document.createElement('h2');
+      title.textContent = id;
+      container.append(title);
+      container.insertAdjacentHTML('beforeend', `
+        <div class="editor-container">
+          <div class="control-panel">
+            <button data-hook="run">Run</button>
+            <button data-hook="save">Save</button>
+            <select class="languageSelect" aria-label="Language"><option>${language}</option></select>
+          </div>
+          <textarea class="editor-textarea"></textarea>
+        </div>
+        <div class="output-content"></div>
+      `);
+      document.querySelector('main').append(container);
+      const runner = new BaseRunner(container);
+      const editor = runner.initializeEditor({ defaultCode: source, codeMirrorOptions: { mode: language } });
+      runner.bindEditorButtons();
+      if (language === 'java') {
+        const executor = new CodeExecutor({
+          editor: editor || { getValue: () => runner.getValue() },
+          outputElement: container.querySelector('.output-content'),
+          languageSelect: container.querySelector('.languageSelect'),
+          javaURI: location.origin,
+          fetchOptions: { headers: { 'Content-Type': 'application/json' } },
+        });
+        runner.bindButton('', () => executor.run(), 'run');
+      }
+      runners.set(id, runner);
+    }
+    const notebook = await (await fetch('/_projects/lessons/cs113/notebooks/2026-10-26-collectables-assignment.ipynb')).json();
+    const cells = notebook.cells.filter((cell) => cell.cell_type === 'code');
+    cells.forEach((cell, index) => addRunner(
+      ['expertise', 'mentor', 'dashboard'][index],
+      cell.source.join('').replace(/\nMain\.main\(null\);?\s*$/, ''),
+      'java',
+    ));
+    addRunner('python-provider', '# @provides Helpers\ndef helper():\n    return 42\n# @end Helpers', 'python');
+    addRunner('python-consumer', '# @dependency Helpers\ndef helper():\n    return 0\n# @end Helpers\nprint(helper())', 'python');
+    addRunner('pseudocode-provider', '// @provides Double\nPROCEDURE Double(n) { RETURN(n * 2) }\n// @end Double', 'pseudocode');
+    addRunner('pseudocode-consumer', '// @dependency Double\nPROCEDURE Double(n) { RETURN(0) }\n// @end Double\nDISPLAY(Double(4))', 'pseudocode');
+    addRunner('javascript-provider', '/** @provides Score */\nconst score = () => 42;\n/** @end Score */', 'javascript');
+    addRunner('javascript-consumer', '/** @dependency Score */\nconst score = () => 0;\n/** @end Score */\nconsole.log(score());', 'javascript');
+    addRunner('ui-provider', '/* @provides Palette scss */\n$accent: red;\n/* @end Palette */', 'javascript');
+    addRunner('html-consumer', '<style>\n<!-- @dependency Palette scss -->\n$accent: blue;\n<!-- @end Palette -->\n</style>', 'html');
+    globalThis.dependencyFixture = { runners, readRunners, setRunnerSelected };
+    document.body.dataset.ready = 'true';
+  </script>
+</body>
+</html>

@@ -13,7 +13,7 @@
         <!-- Post title wrapped in an h3 tag -->
         <h3>
             <!-- Link to the post's URL with the post title as the link text -->
-            <a class="post-link" href="{{ post.url | relative_url }}"{% if catalog_search %} data-post-search-field{% endif %}>
+            <a class="post-link" href="{{ post.url | relative_url }}{% if include.course %}?context=course&amp;course={{ include.course | url_encode }}{% endif %}"{% if catalog_search %} data-post-search-field{% endif %}>
                 {{ post.title | escape }}
             </a>
         </h3>

@@ -1,11 +1,12 @@
 import json
 import re
 import unittest
+from pathlib import Path
 
 import nbformat
 from nbconvert import MarkdownExporter
 
-from scripts.convert_notebooks import process_custom_cells
+from scripts.convert_notebooks import inject_code_runners, process_custom_cells
 
 QUESTIONS = [{"q": "Pick one", "code": "if (a < b) { }", "choices": ["Yes", "No"], "answer": 1, "why": "Because."}]
 
@@ -18,10 +19,26 @@ def convert(cells, permalink="/csa/loops/"):
     """Run the converter's cell pipeline and Markdown export, as a notebook conversion does."""
     notebook = process_custom_cells(nbformat.v4.new_notebook(cells=cells), permalink)
     markdown, _ = MarkdownExporter().from_notebook_node(notebook)
-    return markdown
+    return inject_code_runners(markdown, notebook)
 
 
 class McqRunnerConversionTest(unittest.TestCase):
+    def test_collectables_lesson_renders_the_pre_coding_quiz_instead_of_json(self):
+        source = Path(__file__).resolve().parents[1] / (
+            "_projects/lessons/cs113/notebooks/2026-10-26-collectables-assignment.ipynb"
+        )
+        notebook = nbformat.read(source, as_version=4)
+
+        markdown = convert(notebook.cells, permalink="/csa/cs112/collectables")
+
+        self.assertIn('runner_id="collectables-apcsa-check"', markdown)
+        self.assertNotIn("<!-- MCQ_RUNNER:", markdown)
+        self.assertLess(markdown.index("### MCQ Check"), markdown.index("include runners/mcq.html"))
+        self.assertLess(markdown.index("include runners/mcq.html"),
+                        markdown.index("### Popcorn Hack: Build an Expertise Catalog\n"))
+        self.assertIn("### Homework Hack #3: Find the Remaining Mentor Gaps", markdown)
+        self.assertEqual(4, markdown.count("{% include runners/code.html"))
+
     def test_a_marker_becomes_an_mcq_runner_with_its_title_id_and_questions(self):
         markdown = convert([marker_cell()])
 

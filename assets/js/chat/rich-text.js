@@ -11,7 +11,9 @@
  *       opts.enterKey is 'send' (a chat: Enter sends, the default) or
  *       'newline' (a form field: Enter starts a new line and never sends).
  *       destroy() removes what it added outside its element, for a composer
- *       taken off a page that stays open.
+ *       taken off a page that stays open. opts.onPasteImage(file), when given,
+ *       receives an image pasted from the clipboard (a screenshot, a copied
+ *       picture) instead of the editor; the chat attaches it to the next message.
  *
  *   renderRichMessage(container, raw) -> parses a stored message, keeps only
  *       that same subset, turns bare URLs into links, and appends the result.
@@ -23,6 +25,14 @@
  * sanitizer passes text through untouched and the widgets keep `white-space:
  * pre-wrap`, so their newlines survive.
  */
+
+import { imageFromClipboard } from './chat-image.js';
+
+// Replying to a message (the [[reply:...]] marker), re-exported so the chats that
+// are handed this module (/dm's modules) can reach it without a ../ import.
+export * from './chat-reply.js';
+// Reading a pasted or attached image (the course chats; /dm has its own copy).
+export * from './chat-image.js';
 
 const MAX_LENGTH_DEFAULT = 2000;
 
@@ -280,6 +290,7 @@ export function createRichComposer(opts = {}) {
     onSubmit = () => {},
     onInput = () => {},
     enterKey = 'send',
+    onPasteImage = null,
   } = opts;
   if (!ENTER_KEYS.includes(enterKey)) {
     throw new TypeError(`createRichComposer: enterKey must be 'send' or 'newline', not ${JSON.stringify(enterKey)}`);
@@ -772,9 +783,14 @@ export function createRichComposer(opts = {}) {
 
   editor.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' || e.isComposing) return;
+    // In a chat, Enter inside a list has to build the list, so it can't also send:
+    // the browser's own Enter starts the next item and, on an empty item, leaves
+    // the list. Ctrl/Cmd+Enter (or the Send button) sends instead.
+    const sendShortcut = enterKey === 'send' && (e.ctrlKey || e.metaKey);
+    if (enterKey === 'send' && !e.shiftKey && !sendShortcut && inListItem()) return;
     // Shift+Enter is a soft newline, and so is Enter in a form field ('newline');
     // inside a list that means the next item.
-    if (e.shiftKey || enterKey === 'newline') {
+    if (!sendShortcut && (e.shiftKey || enterKey === 'newline')) {
       if (inListItem()) {
         e.preventDefault();
         document.execCommand('insertParagraph', false, null);
@@ -808,10 +824,16 @@ export function createRichComposer(opts = {}) {
 
   // Strip formatting from pasted content — paste as plain text, then let the
   // sender re-format. Keeps junk markup out of messages.
+  // An image on the clipboard goes to the host's onPasteImage, which attaches it.
   editor.addEventListener('paste', (e) => {
     e.preventDefault();
-    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-    insertText(text);
+    const clipboard = e.clipboardData || window.clipboardData;
+    const image = onPasteImage ? imageFromClipboard(clipboard) : null;
+    if (image) {
+      onPasteImage(image);
+      return;
+    }
+    insertText(clipboard.getData('text/plain'));
   });
 
   updatePlaceholder();

@@ -86,7 +86,7 @@
         "coverage": "Queue/deque references discuss library LinkedList use. The tree implementation skeleton is available for authoring; from-scratch linked-list foundations are mapped in the CS112 report.",
         "gap": "Finish tree/BST insertion, traversal, and search. Dedicated 2-3-4 tree and skip-list lessons are still needed; graph lessons are not a substitute for tree implementation.",
         "pbl": "Build a search index for project records and compare a BST with a linked-list scan.",
-        "lessons": ["/teamTeachCollectables/queue-dequeue", "/csa/cs113/drafts/tree-layers/"]
+        "lessons": ["/teamTeachCollectables/queue-dequeue", "/csa/cs113/drafts/tree-layers/", "/csa/cs113/history-deletion/"]
       },
       {
         "id": "collection-implementation",

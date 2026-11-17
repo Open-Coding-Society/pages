@@ -2,43 +2,70 @@
 // `chat-*` class names the course chats also use; those rules live inside
 // `.announcement-chat`, so nothing from them reaches this page.
 
+// The bar across the top: who the conversation is with, and a group's actions. The same
+// height as the bar over the list, so the line under both runs straight across.
 .dm__thread-head {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: var(--dm-space-md);
-  flex-wrap: wrap;
-  padding: var(--dm-space-md) 0;
+  flex: none;
+  min-height: var(--dm-bar);
+  padding: var(--dm-space-xs) var(--dm-gutter);
   border-bottom: 1px solid var(--dm-rule);
 }
 
 .dm__thread-heading {
   min-width: 0;
+  flex: 1;
 }
 
 .dm__thread-title {
   margin: 0;
+  overflow: hidden;
   font-family: var(--dm-font);
-  font-size: 1.125rem;
-  font-weight: 500;
+  font-size: $text-lg;
+  font-weight: 600;
   line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--dm-ink);
 }
 
-.dm__thread-subtitle {
+// `.dm .dm__thread-subtitle`: it is a <small>, and _dialogs.scss sizes and colours every
+// `.dm small`, which a single class would lose to.
+.dm .dm__thread-subtitle {
   display: block;
-  margin-top: 0.2rem;
+  margin-top: 0.1rem;
   font-family: var(--dm-font);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  color: var(--dm-faint);
+  font-size: $text-sm;
+  line-height: 1.3;
+
+  @include dm-quiet;
+
+  &:empty {
+    display: none;
+  }
 }
 
 .dm__thread-actions {
   display: flex;
   align-items: center;
   gap: var(--dm-space-xs);
-  flex-wrap: wrap;
+  flex: none;
+}
+
+// On a phone the bar also holds the way back to the list, so a group's actions take a
+// line of their own under its name instead of squeezing it.
+@include dm-below($breakpoint-mobile) {
+  .dm__thread-head {
+    flex-wrap: wrap;
+    gap: var(--dm-space-xs) var(--dm-space-sm);
+  }
+
+  .dm__thread-actions {
+    flex-basis: 100%;
+  }
 }
 
 // ── The log ────────────────────────────────────────────────────────────────────
@@ -47,63 +74,95 @@
   flex: 1;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: var(--dm-space-lg) 0;
+  padding: var(--dm-space-md) 0;
 
   @include dm-focus-ring(-2px);
 }
 
+// A new day: its name between two lines.
 .dm .chat-day {
-  margin: var(--dm-space-lg) 0 var(--dm-space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--dm-space-sm);
+  margin: var(--dm-space-md) var(--dm-gutter) var(--dm-space-xs);
   font-family: var(--dm-font);
-  font-size: 0.625rem;
-  letter-spacing: 0.14em;
+  font-size: $text-xs;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--dm-faint);
-  border-top: 1px solid var(--dm-rule);
-  padding-top: 0.6rem;
+  // Not dm-quiet: opacity would fade the two lines along with the word, and they are
+  // already the faintest thing on the page.
+  color: var(--dm-ink);
+
+  &::before,
+  &::after {
+    content: '';
+    height: 1px;
+    flex: 1;
+    background: var(--dm-rule);
+  }
 
   &:first-child {
     margin-top: 0;
-    border-top: 0;
-    padding-top: 0;
   }
 }
 
-// Every message sits on the same side, tucked in close to its avatar.
+// Every message sits on the same side and runs the width of the pane, so the row under
+// the pointer can be picked out by its background; the text itself keeps to the measure.
 .dm .chat-msg {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.55rem;
-  max-width: calc(var(--dm-measure) + 3rem);
-  padding: 0.45rem 0;
+  gap: 0.75rem;
+  padding: 0.5rem var(--dm-gutter);
+  transition: background-color $transition-fast ease;
   animation: dm-fade $transition-slow ease both;
+
+  &:hover,
+  &:focus-within {
+    background: var(--dm-wash);
+  }
 }
 
-// Yours is marked by the weight of your name, not by moving it across the column.
-.dm .chat-msg.is-self .chat-msg-sender {
-  font-weight: 600;
+// The message a search result opened (message-log.js sets .is-found). The wash holds
+// for a moment, then fades, so the eye lands on the message without it staying marked.
+// A row runs the width of the pane and has its own side padding, so the wash is simply
+// its background, in the same place the hover wash goes.
+.dm .chat-msg.is-found {
+  background: color-mix(in srgb, var(--dm-accent) 22%, transparent);
+  animation: dm-found 2.4s ease-out 0.8s both;
 }
 
+// The same avatar the conversation list uses: initials on a tint of the accent.
 .dm .chat-avatar {
   display: grid;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
   place-items: center;
   overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--dm-accent) 45%, transparent);
   border-radius: 50%;
-  background: var(--dm-wash);
-  border: 1px solid var(--dm-rule);
+  background: color-mix(in srgb, var(--dm-accent) 12%, transparent);
   font-family: var(--dm-font);
-  font-size: 0.625rem;
+  font-size: $text-sm;
+  font-weight: 700;
   letter-spacing: 0.02em;
   text-decoration: none;
-  color: var(--dm-muted);
+  color: var(--dm-ink);
 
   img {
     width: 100%;
     height: 100%;
+    border-radius: 0;
     object-fit: cover;
   }
+}
+
+// Yours is marked by a solid avatar and a heavier name, not by moving it across the pane.
+.dm .chat-msg.is-self .chat-avatar {
+  border-color: var(--dm-accent);
+  background: var(--dm-accent);
+  color: var(--dm-bg);
 }
 
 .dm .chat-msg-main {
@@ -114,39 +173,60 @@
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.15rem;
 }
 
 .dm .chat-msg-sender {
   font-family: var(--dm-font);
-  font-size: 0.8125rem;
-  font-weight: 500;
+  font-size: $text-md;
+  font-weight: 600;
   line-height: 1.3;
   color: var(--dm-ink);
+}
+
+.dm .chat-msg.is-self .chat-msg-sender {
+  font-weight: 700;
 }
 
 .dm .chat-msg-time,
 .dm .chat-msg-edited {
   font-family: var(--dm-font);
-  font-size: 0.625rem;
-  letter-spacing: 0.04em;
-  color: var(--dm-faint);
+  font-size: $text-sm;
+  line-height: 1.3;
+
+  @include dm-quiet;
 }
 
 .dm .chat-msg-body {
   display: block;
   max-width: var(--dm-measure);
-  font-size: 0.9375rem;
+  font-size: $text-md;
   line-height: 1.65;
   color: var(--dm-ink);
   overflow-wrap: anywhere;
 
   p {
-    margin: 0 0 0.6em;
+    margin: 0 0 0.5em;
 
     &:last-child {
       margin-bottom: 0;
     }
+  }
+
+  ul,
+  ol {
+    margin: 0.25em 0 0.5em;
+    padding-left: 1.4em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // The site dims every li; in a message a list item is body text like the rest.
+  li {
+    margin: 0.1em 0;
+    color: inherit;
   }
 
   a {
@@ -156,7 +236,8 @@
 
   &.is-deleted {
     font-style: italic;
-    color: var(--dm-faint);
+
+    @include dm-quiet;
   }
 }
 
@@ -165,6 +246,46 @@
 // short of it when it is not, and is capped in height so a tall portrait photo cannot
 // push the rest of the conversation off screen. width:auto with a min keeps a small
 // image legible without stretching it past its own resolution.
+.dm .chat-msg-image-link {
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 0.5rem;
+  border-radius: var(--dm-radius);
+  // A magnifier, because the click opens the image over the conversation rather than
+  // navigating. The anchor is still a link for middle-click and the context menu, so the
+  // cursor is the only thing saying which of the two a plain click does.
+  cursor: zoom-in;
+
+  // A label on the corner while the pointer or the keyboard is on it. Its colours are
+  // the page's own, so it reads over any image in any theme.
+  &::after {
+    content: 'Expand';
+    position: absolute;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    padding: 0.2rem 0.45rem;
+    border: 1px solid var(--dm-rule-strong);
+    border-radius: var(--dm-radius-sm);
+    background: var(--dm-bg);
+    font-family: var(--dm-font);
+    font-size: $text-xs;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--dm-ink);
+    opacity: 0;
+    transition: opacity $transition-fast ease;
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    opacity: 1;
+  }
+
+  @include dm-focus-ring;
+}
+
 .dm .chat-msg img.ocs__image-frame {
   display: block;
   width: auto;
@@ -174,49 +295,168 @@
   max-height: 22rem;
   object-fit: contain;
   object-position: left top;
-  margin-top: 0.6rem;
+  margin-top: 0;
+  padding: 0;
   border: 1px solid var(--dm-rule);
   border-radius: var(--dm-radius);
   background: var(--dm-wash);
+  transition: border-color $transition-fast ease;
 }
 
-// Edit and delete stay out of the way until the message is hovered or focused.
-.dm .chat-msg-actions {
+.dm .chat-msg-image-link:hover img,
+.dm .chat-msg-image-link:focus-visible img {
+  border-color: var(--dm-accent);
+}
+
+// The image viewer: a sheet over the whole window with the image at its natural size,
+// built by js/message-log.js on the first click and kept in the `.dm` root so these
+// rules reach it.
+//
+// The z-index is one more than the site header's (999999999, in
+// _sass/open-coding/navbar.scss), not a step on the shared scale. The viewer is modal:
+// with the scale's $z-tooltip it sat over the page but under the header, which hid the
+// close button behind the navbar and left the navbar clickable above a sheet that
+// claims the whole window.
+.dm .chat-image-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000000000;
   display: flex;
-  gap: 0.75rem;
-  margin-top: 0.4rem;
+  align-items: center;
+  justify-content: center;
+  padding: var(--dm-space-xl);
+  background: var(--dm-scrim);
+  backdrop-filter: blur(6px);
+  // Clicking the sheet closes it, so all of it reads as "click to dismiss".
+  cursor: zoom-out;
+}
+
+.dm .chat-image-viewer-image {
+  // Never larger than the image really is, so a small screenshot is not blown up into
+  // a blurry wall; the window caps it the rest of the time.
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  border: 1px solid var(--dm-rule-strong);
+  border-radius: var(--dm-radius);
+  background: var(--dm-bg);
+  cursor: zoom-out;
+}
+
+.dm .chat-image-viewer-close {
+  @include dm-quiet-button;
+
+  // Everything below is after the mixin on purpose, to square the button off around its
+  // one glyph and give it the page behind it: it sits on the scrim, not on a pane.
+  position: absolute;
+  top: var(--dm-space-md);
+  right: var(--dm-space-md);
+  width: 2.25rem;
+  height: 2.25rem;
+  justify-content: center;
+  padding: 0;
+  border-color: var(--dm-rule-strong);
+  background: var(--dm-bg);
+  font-size: $text-md;
+}
+
+// Edit and delete: a small toolbar on the row's top corner, there only while the
+// message is under the pointer or holds the keyboard, and never taking a line of its own.
+.dm .chat-msg-actions {
+  position: absolute;
+  top: -0.7rem;
+  right: var(--dm-gutter);
+  display: flex;
+  gap: 1px;
+  padding: 2px;
+  border: 1px solid var(--dm-rule-strong);
+  border-radius: var(--dm-radius);
+  background: var(--dm-bg);
   opacity: 0;
-  transition: opacity $transition-base ease;
+  pointer-events: none;
+  transition: opacity $transition-fast ease;
 }
 
 .dm .chat-msg:hover .chat-msg-actions,
 .dm .chat-msg:focus-within .chat-msg-actions {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .dm .chat-msg-action {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
   padding: 0;
   border: 0;
+  border-radius: var(--dm-radius-sm);
   background: none;
-  font-size: 0.6875rem;
-  color: var(--dm-faint);
+  font-size: $text-sm;
+  color: var(--dm-muted);
   cursor: pointer;
-  transition: color $transition-fast ease;
+  transition: color $transition-fast ease, background-color $transition-fast ease;
 
   &:hover {
+    background: var(--dm-hover);
     color: var(--dm-ink);
+  }
+
+  @include dm-focus-ring(-1px);
+}
+
+// A reply's quote of the message it answers (chat-reply.js's renderReplyQuote): a
+// slim accent-ruled block above the reply's text. It is a button, so clicking it
+// scrolls to the original and marks it (.is-found).
+.dm .chat-reply-quote {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  max-width: min(100%, var(--dm-measure));
+  margin: 0.15rem 0 0.35rem;
+  padding: 0.3rem 0.6rem;
+  border: 0;
+  border-left: 3px solid var(--dm-accent);
+  border-radius: var(--dm-radius-sm);
+  background: var(--dm-wash);
+  font-family: var(--dm-font);
+  text-align: left;
+  color: var(--dm-ink);
+  cursor: pointer;
+  transition: background-color $transition-fast ease;
+
+  &:hover {
+    background: var(--dm-hover);
   }
 
   @include dm-focus-ring;
 }
 
+.dm .chat-reply-quote-sender {
+  font-size: $text-xs;
+  font-weight: 600;
+  color: var(--dm-ink);
+}
+
+.dm .chat-reply-quote-text {
+  overflow: hidden;
+  font-size: $text-sm;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  @include dm-quiet;
+}
+
 // A line that is not a message, such as a shared file.
 .dm .chat-system {
-  margin: var(--dm-space-md) 0;
+  margin: var(--dm-space-xs) var(--dm-gutter);
   font-family: var(--dm-font);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  color: var(--dm-faint);
+  font-size: $text-sm;
+  line-height: 1.5;
+  color: var(--dm-ink);
 }
 
 // The filename in "<someone> shared a file:" -- a button that downloads it.
@@ -243,11 +483,12 @@
 }
 
 // ── Empty and loading states ───────────────────────────────────────────────────
+// Said at the top of the pane, where the first message would be, in the same column.
 .dm .chat-empty {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  padding: var(--dm-space-xl) 0;
+  gap: 0.35rem;
+  padding: var(--dm-space-lg) var(--dm-gutter);
   animation: dm-fade $transition-slow ease both;
 
   // message-log.js prepends a Font Awesome glyph; the page says it in words instead.
@@ -259,16 +500,17 @@
 .dm .chat-empty-title {
   margin: 0;
   font-family: var(--dm-font);
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--dm-muted);
+  font-size: $text-lg;
+  font-weight: 600;
+  color: var(--dm-ink);
 }
 
 .dm .chat-empty-hint {
-  max-width: 34ch;
-  font-size: 0.875rem;
+  max-width: var(--dm-measure);
+  font-size: $text-md;
   line-height: 1.6;
-  color: var(--dm-faint);
+
+  @include dm-quiet;
 }
 
 @keyframes dm-fade {
@@ -283,8 +525,17 @@
   }
 }
 
+@keyframes dm-found {
+  to {
+    background-color: transparent;
+    box-shadow: 0 0 0 0.35rem transparent;
+  }
+}
+
+// With no fade, a found message keeps its wash until another one is found.
 @media (prefers-reduced-motion: reduce) {
   .dm .chat-msg,
+  .dm .chat-msg.is-found,
   .dm .chat-empty {
     animation: none;
   }

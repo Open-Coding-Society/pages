@@ -65,8 +65,9 @@ export function login(options) {
     // Clear the message area
     document.getElementById(options.message).textContent = "";
 
-    // Fetch JWT from the server
-    fetch(options.URL, requestOptions)
+    // Fetch JWT from the server. The returned promise settles once the result is shown,
+    // so a caller can tell when the attempt is over (it never rejects).
+    return fetch(options.URL, requestOptions)
     .then(response => {
         // Trap error response from the Web API
         if (!response.ok) {

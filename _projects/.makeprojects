@@ -48,8 +48,11 @@ lessons/ds2
 systems/ai-ab-engine
 systems/calendar
 systems/profile:dev
+systems/login:dev
+systems/grades:dev
 systems/blogs:dev
 systems/topics:dev
+systems/capstone:dev
 systems/courses:dev
 systems/gamebuilder:dev
 systems/auto-generator

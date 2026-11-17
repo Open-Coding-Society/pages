@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Automated Multi-Course File Splitter for Jekyll
+Multi-Course Compatibility Routes for Jekyll
 
-This script automatically detects markdown files with multiple course assignments
-and splits them into separate course-specific files with unique permalinks.
+Keep the original document and create small redirects at its former per-course
+URLs. Never copy lesson bodies or modify author notebooks.
 
 Usage:
     python3 scripts/split_multi_course_files.py
@@ -93,99 +93,67 @@ def has_multiple_courses(front_matter):
     return False
 
 def create_course_specific_file(original_path, front_matter, body_content, course, course_data):
-    """Create a course-specific file with modified front matter and include."""
+    """Create a redirect at a former course-specific output path."""
     # Generate new filename with appropriate extension
     original_name = original_path.stem
     file_extension = original_path.suffix
     course_filename = f"{original_name}_{course}{file_extension}"
     course_file_path = original_path.parent / course_filename
     
-    # Create new front matter for this course
-    new_front_matter = front_matter.copy()
-    new_front_matter['courses'] = {course: course_data}
-    
-    # Generate unique permalink
-    if 'permalink' in new_front_matter:
-        original_permalink = new_front_matter['permalink'].rstrip('/')
-        new_front_matter['permalink'] = f"{original_permalink}/{course}/"
-    
-    if original_path.suffix == '.ipynb':
-        create_notebook_course_file(original_path, course_file_path, new_front_matter, body_content)
-    else:
-        create_markdown_course_file(original_path, course_file_path, new_front_matter)
-    
-    print(f"✓ Created course-specific file: {course_file_path}")
+    original_permalink = front_matter.get('permalink')
+    if not isinstance(original_permalink, str) or not original_permalink.startswith('/'):
+        raise ValueError(f"{original_path}: shared documents need an explicit site-relative permalink")
+    new_front_matter = {
+        'layout': 'projects/courses/reader-redirect',
+        'title': front_matter.get('title', ''),
+        'permalink': f"{original_permalink.rstrip('/')}/{course}/",
+        'reader_redirect_url': original_permalink,
+        'reader_redirect_course': course,
+        'search_exclude': True,
+        'sitemap': False,
+    }
+
+    create_markdown_course_file(original_path, course_file_path, new_front_matter)
+    # Older checkouts also converted generated *_<course>.ipynb notebooks.
+    # Replace their published Markdown only; never edit those notebooks.
+    if original_path.stem.endswith('_IPYNB_2_'):
+        legacy_name = original_path.stem[:-len('_IPYNB_2_')] + f"_{course}_IPYNB_2_.md"
+        legacy_path = original_path.with_name(legacy_name)
+        if legacy_path.exists():
+            legacy_front_matter, _ = parse_markdown_front_matter(legacy_path.read_text(encoding='utf-8'))
+            if legacy_front_matter and legacy_front_matter.get('permalink') == new_front_matter['permalink']:
+                create_markdown_course_file(original_path, legacy_path, new_front_matter)
+
+    print(f"✓ Created compatibility route: {course_file_path}")
     return course_file_path
 
 def create_markdown_course_file(original_path, course_file_path, new_front_matter):
-    """Create a markdown course-specific file."""
+    """Write a redirect's metadata, without lesson content or assignment fields."""
     yaml_content = yaml.dump(new_front_matter, default_flow_style=False, allow_unicode=True)
-    content_filename = f"{original_path.stem}_content.md"
+    course_content = f"---\n{yaml_content}---\n"
     
-    course_content = f"""---
-{yaml_content}---
-
-{{% include_relative {content_filename} %}}"""
-    
-    with open(course_file_path, 'w', encoding='utf-8') as f:
-        f.write(course_content)
-
-def create_notebook_course_file(original_path, course_file_path, new_front_matter, notebook_content):
-    """Create a notebook course-specific file."""
-    try:
-        notebook = json.loads(notebook_content)
-        
-        # Update front matter in first cell
-        if notebook['cells'] and notebook['cells'][0].get('cell_type') == 'raw':
-            yaml_content = yaml.dump(new_front_matter, default_flow_style=False, allow_unicode=True)
-            new_front_matter_content = f"---\n{yaml_content}---\n"
-            notebook['cells'][0]['source'] = [new_front_matter_content]
-        
-        # Write the modified notebook
-        with open(course_file_path, 'w', encoding='utf-8') as f:
-            json.dump(notebook, f, indent=2)
-            
-    except (json.JSONDecodeError, KeyError) as e:
-        print(f"Error creating notebook course file: {e}")
-
-def create_content_only_file(original_path, body_content):
-    """Create a content-only version for includes (without modifying original)."""
-    # Only create content files for markdown (notebooks don't use includes)
-    if original_path.suffix == '.md':
-        content_filename = f"{original_path.stem}_content.md"
-        content_file_path = original_path.parent / content_filename
-        
-        # Write content-only file
-        with open(content_file_path, 'w', encoding='utf-8') as f:
-            f.write(body_content)
-        
-        print(f"✓ Created content file: {content_file_path}")
-        return content_file_path
-    return None
+    if not course_file_path.exists() or course_file_path.read_text(encoding='utf-8') != course_content:
+        course_file_path.write_text(course_content, encoding='utf-8')
 
 def find_and_split_multi_course_files():
-    """Find all markdown and notebook files with multiple courses and split them."""
-    # Check both _posts and _notebooks directories
+    """Publish legacy course URLs from Markdown outputs, leaving sources intact."""
     directories = []
-    for dir_name in ['_posts', '_notebooks']:
+    for dir_name in ['_posts']:
         dir_path = Path(dir_name)
         if dir_path.exists():
             directories.append(dir_path)
     
     if not directories:
-        print("❌ Neither _posts nor _notebooks directory found")
+        print("No _posts directory; build lesson outputs before creating compatibility routes")
         return
     
     processed_files = []
+    failures = []
     
     # Find all markdown and notebook files
     for directory in directories:
-        for file_pattern in ['*.md', '*.ipynb']:
+        for file_pattern in ['*.md']:
             for file_path in directory.rglob(file_pattern):
-                # Project notebooks publish directly to _posts; old staging copies
-                # are not authoritative inputs and must not regenerate stale variants.
-                if directory.name == '_notebooks' and file_path.is_relative_to(directory / 'projects'):
-                    continue
                 # Skip already split files
                 if re.search(r'_(csp|csa|csse|csh)\.(md|ipynb)$', str(file_path)):
                     continue
@@ -200,10 +168,8 @@ def find_and_split_multi_course_files():
                         print(f"\nProcessing multi-course file: {file_path}")
                         courses = front_matter['courses']
                         
-                        # Create content-only file (for markdown includes only)
-                        create_content_only_file(file_path, body_content)
-                        
-                        # Create course-specific files  
+                        # Replaces old generated wrappers in place; the author
+                        # document and its original permalink stay untouched.
                         for course, course_data in courses.items():
                             create_course_specific_file(file_path, front_matter, body_content, course, course_data)
                         
@@ -211,6 +177,10 @@ def find_and_split_multi_course_files():
                 
                 except Exception as e:
                     print(f"❌ Error processing {file_path}: {e}")
+                    failures.append(str(file_path))
+
+    if failures:
+        raise RuntimeError(f"Could not create compatibility routes for: {', '.join(failures)}")
     
     if processed_files:
         print(f"\n✅ Successfully processed {len(processed_files)} multi-course files:")
@@ -226,9 +196,8 @@ def clean_split_files():
     variants are left in place: the Makefile's NOTEBOOK_FILES/MARKDOWN_FILES
     are computed once at parse time (before `clean` runs), so if `clean-courses`
     deleted them mid-build, `convert` would still expect to produce posts from
-    them and fail with "No rule to make target". Regeneration is idempotent
-    (find_and_split_multi_course_files skips files that already exist), so
-    leaving them behind is safe.
+    them and fail with "No rule to make target". Their published variants become
+    compatibility redirects, so leaving the notebooks behind is safe.
     """
     directories = []
     for dir_name in ['_posts']:
@@ -256,7 +225,7 @@ def clean_split_files():
 
 def main():
     """Main function to run the multi-course file splitter."""
-    print("Multi-Course File Splitter")
+    print("Multi-Course Compatibility Routes")
     print("=" * 40)
     
     import sys

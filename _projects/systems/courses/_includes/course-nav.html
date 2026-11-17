@@ -1,8 +1,16 @@
-<!-- Course Navigation Pill Menu -->
 {% assign nav_course = current_course | default: page.course | downcase %}
+{% if include.dropdown %}
+<select class="ocs__input course-breadcrumb-select" aria-label="Course" onchange="window.location.assign(this.value)">
+  {% assign nav_courses = "csse,csp,csa,csh" | split: "," %}
+  {% for code in nav_courses %}
+  <option value="{{ site.baseurl }}/navigation/courses/{{ code }}/"{% if nav_course == code %} selected{% endif %}>{{ code | upcase }}</option>
+  {% endfor %}
+</select>
+{% else %}
 <nav class="ocs__links course-pill-nav" aria-label="Courses">
       <a href="{{ site.baseurl }}/navigation/courses/csse/" class="ocs__btn pill{% if nav_course == 'csse' %} alert-green fill{% endif %}"{% if nav_course == 'csse' %} aria-current="page"{% endif %}>CSSE</a>
       <a href="{{ site.baseurl }}/navigation/courses/csp/" class="ocs__btn pill{% if nav_course == 'csp' %} alert-green fill{% endif %}"{% if nav_course == 'csp' %} aria-current="page"{% endif %}>CSP</a>
       <a href="{{ site.baseurl }}/navigation/courses/csa/" class="ocs__btn pill{% if nav_course == 'csa' %} alert-green fill{% endif %}"{% if nav_course == 'csa' %} aria-current="page"{% endif %}>CSA</a>
       <a href="{{ site.baseurl }}/navigation/courses/csh/" class="ocs__btn pill{% if nav_course == 'csh' %} alert-green fill{% endif %}"{% if nav_course == 'csh' %} aria-current="page"{% endif %}>CSH</a>
 </nav>
+{% endif %}

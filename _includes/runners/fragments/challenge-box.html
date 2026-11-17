@@ -2,4 +2,5 @@
 <div class="challenge-box">
   <h3>{{ challenge_title }}</h3>
   <p>{{ include.challenge }}</p>
+  {% if include.submission_toggle %}{% include runners/fragments/submission-toggle.html %}{% endif %}
 </div>

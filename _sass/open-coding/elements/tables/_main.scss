@@ -4,6 +4,12 @@
 .ocs__table-wrap {
   width: 100%;
   overflow-x: auto;
+
+  // The wrap scrolls, so keep table layout: Minima turns every table into a
+  // scrolling block under 800px, which stops columns sharing the width.
+  > .ocs__table {
+    display: table;
+  }
 }
 
 .ocs__table {

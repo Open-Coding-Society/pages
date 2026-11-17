@@ -56,6 +56,10 @@ _sass/projects/
 assets/js/projects/
 assets/css/projects/
 images/projects/
+navigation/projects/
+_data/projects/
+_plugins/projects/
+_layouts/projects/
 
 # Course kit distributions (authoritative sources in _projects/systems/courses)
 /_includes/course-nav.html
@@ -71,14 +75,7 @@ images/projects/
 /_includes/blog-catalog.html
 /_includes/blog-reader.html
 /_includes/course-document-player.html
-/_includes/topics-browser.html
-/_includes/topics-document-nav.html
-/_plugins/topics.rb
-/_data/topics_primary.yml
-/_data/topics_units.yml
-/navigation/search.md
-/navigation/topics.md
-/assets/js/topics/
+/_includes/course-lessons.html
 
 # UI Builder system distributions (authoritative sources in _projects/systems/ui-builder)
 /navigation/ui-builder/
@@ -95,6 +92,16 @@ images/projects/
 /_includes/profile-ai-connections.html
 /assets/js/profile/
 /_sass/open-coding/profile-gist-connection.scss
+# Login system distributions (authoritative sources in _projects/systems/login)
+/navigation/authentication/login.md
+/navigation/authentication/logout.md
+/navigation/authentication/guestlogin.md
+/navigation/signup.md
+/assets/js/api/logout.js
+/assets/js/api/passwordRules.js
+/assets/js/api/passwordFields.js
+/assets/js/api/reverify.js
+/assets/js/login/
 /_includes/post_list_image_card.html
 /_includes/announcement_calendar_demo.html
 /_includes/ocs_calendar_card.html
@@ -132,6 +139,32 @@ images/projects/
 /_sass/open-coding/blogs.scss
 /_sass/open-coding/timeline.scss
 /_sass/open-coding/announcement-calendar.scss
+
+# Grades system distributions (authoritative sources in _projects/systems/grades)
+/navigation/grades.html
+/_data/grades_hub.yml
+/_data/grades_sidebar.yml
+/_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md
+/_posts/student_toolkit/assignments/2025-01-21-gradeviewer-v2.md
+/_sass/open-coding/view-grades-v2.scss
+/navigation/authentication/retrospective.md
+/_layouts/retrospective.html
+/assets/js/analytics/sprint-retrospective.js
+/assets/js/analytics/forecast-retrospective.js
+/assets/js/analytics/grade-calculator.js
+/navigation/authentication/analytics-dashboard.md
+/navigation/authentication/analytics-dashboard-v2.md
+/_layouts/analytics-dashboard-v2.html
+/assets/js/ocs-analytics-dashboard.js
+/_sass/open-coding/analytics-dashboard-v2.scss
+/navigation/authentication/submissions.md
+/navigation/authentication/submissions-v2.md
+/_layouts/submissions-v2.html
+/_includes/submissions/creator-dashboard.html
+/assets/js/submissions/grading.js
+/assets/js/submissions/creator-dashboard.js
+/_sass/open-coding/submissions.scss
+/_sass/open-coding/submissions-v2.scss
 
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile

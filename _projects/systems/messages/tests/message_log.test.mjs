@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { installFakeDom } from './fake-dom.mjs';
+import { fakeEvent, installFakeDom } from './fake-dom.mjs';
 
 installFakeDom();
 
@@ -73,6 +73,7 @@ test('texts reword the log', () => {
   assert.equal(element.querySelector('[data-key="m1"]').querySelector('.chat-msg-sender').textContent, 'Du');
   assert.equal(bodyOf(element, 'm1').textContent, 'Gelöscht.');
   assert.equal(element.querySelector('[data-key="m2"]').querySelector('img.ocs__image-frame').alt, 'Bild von Grace Hopper');
+  assert.equal(element.querySelector('[data-key="m2"]').querySelector('.chat-msg-image-link').target, '_blank');
 });
 
 test('a read-only log offers no edit or delete, even on your own messages', () => {
@@ -93,4 +94,117 @@ test('formatBody changes what a message and its edits show, but Edit still loads
 
 test('a formatBody that is not a function is refused when the log is made', () => {
   assert.throws(() => makeLog({ formatBody: 'uppercase' }), TypeError);
+});
+
+// The image viewer. A plain click opens it over the conversation; the ways people ask
+// for a new tab on purpose are left to the browser.
+function withImage(options = {}) {
+  const made = makeLog(options);
+  made.log.append(message('m1', '', { image: '/images/plan.png' }), false);
+  made.link = made.element.querySelector('.chat-msg-image-link');
+  return made;
+}
+
+test('a plain click on a sent image opens the viewer instead of following the link', () => {
+  const { log, link } = withImage();
+  const event = fakeEvent('click');
+  link.dispatchEvent(event);
+  assert.ok(event.defaultPrevented, 'the link is not followed');
+  assert.ok(log.isViewerOpen(), 'the viewer is open');
+  const image = document.body.querySelector('.chat-image-viewer-image');
+  assert.equal(image.src, '/images/plan.png');
+  assert.equal(image.alt, 'Image from Grace Hopper');
+  log.destroy();
+});
+
+test('the viewer is not opened by the clicks that mean "open in a new tab"', () => {
+  for (const props of [{ ctrlKey: true }, { metaKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }]) {
+    const { log, link } = withImage();
+    const event = fakeEvent('click', props);
+    link.dispatchEvent(event);
+    assert.ok(!event.defaultPrevented, `${JSON.stringify(props)} is left to the browser`);
+    assert.ok(!log.isViewerOpen(), `${JSON.stringify(props)} opens no viewer`);
+    log.destroy();
+  }
+});
+
+test('the viewer closes on the image, the backdrop and Escape, and stops listening after', () => {
+  const { log, link } = withImage();
+  link.dispatchEvent(fakeEvent('click'));
+  document.body.querySelector('.chat-image-viewer-image').dispatchEvent(fakeEvent('click'));
+  assert.ok(!log.isViewerOpen(), 'clicking the image closes it');
+
+  link.dispatchEvent(fakeEvent('click'));
+  const viewer = document.body.querySelector('.chat-image-viewer');
+  viewer.dispatchEvent(fakeEvent('click', { target: viewer }));
+  assert.ok(!log.isViewerOpen(), 'clicking the backdrop closes it');
+
+  link.dispatchEvent(fakeEvent('click'));
+  document.dispatchEvent(fakeEvent('keydown', { key: 'Escape' }));
+  assert.ok(!log.isViewerOpen(), 'Escape closes it');
+
+  // Closed, so Escape is no longer listened for: nothing is left on the document.
+  const after = fakeEvent('keydown', { key: 'Escape' });
+  document.dispatchEvent(after);
+  assert.ok(!after.defaultPrevented, 'the Escape listener was taken back on close');
+  log.destroy();
+});
+
+test('a click inside the viewer that is not the backdrop leaves it open', () => {
+  const { log, link } = withImage();
+  link.dispatchEvent(fakeEvent('click'));
+  const viewer = document.body.querySelector('.chat-image-viewer');
+  const close = viewer.querySelector('.chat-image-viewer-close');
+  viewer.dispatchEvent(fakeEvent('click', { target: close }));
+  assert.ok(log.isViewerOpen(), 'the backdrop handler ignores clicks on its children');
+  close.dispatchEvent(fakeEvent('click'));
+  assert.ok(!log.isViewerOpen(), 'the close button closes it');
+  log.destroy();
+});
+
+test('deleting a message whose image is open closes the viewer', () => {
+  const { log, link } = withImage();
+  link.dispatchEvent(fakeEvent('click'));
+  assert.ok(log.isViewerOpen());
+  log.markDeleted('m1');
+  assert.ok(!log.isViewerOpen(), 'the viewer does not outlive the image it was showing');
+  log.destroy();
+});
+
+test('destroy takes the viewer off the page', () => {
+  const { log, link } = withImage();
+  link.dispatchEvent(fakeEvent('click'));
+  assert.ok(document.body.querySelector('.chat-image-viewer'), 'built on first use');
+  log.destroy();
+  assert.ok(!document.body.querySelector('.chat-image-viewer'), 'and removed again');
+});
+
+test('a host can reword the viewer close button', () => {
+  const { log, link } = withImage({ texts: { closeImage: 'Bild schließen' } });
+  link.dispatchEvent(fakeEvent('click'));
+  const close = document.body.querySelector('.chat-image-viewer-close');
+  assert.equal(close.getAttribute('aria-label'), 'Bild schließen');
+  log.destroy();
+});
+
+test('reveal scrolls to a message and marks it, and only the newest find stays marked', () => {
+  const { element, log } = makeLog();
+  log.append(message('m1', 'first'), false);
+  log.append(message('m2', 'second'), false);
+  const first = element.querySelector('[data-key="m1"]');
+  const second = element.querySelector('[data-key="m2"]');
+
+  assert.equal(log.reveal('m1'), true);
+  assert.equal(first.classList.contains('is-found'), true);
+  assert.deepEqual(first.scrolledIntoView, { block: 'center' });
+
+  assert.equal(log.reveal('m2'), true);
+  assert.equal(first.classList.contains('is-found'), false);
+  assert.equal(second.classList.contains('is-found'), true);
+});
+
+test('reveal says when the message is not in the log', () => {
+  const { log } = makeLog();
+  log.append(message('m1', 'first'), false);
+  assert.equal(log.reveal('m9'), false);
 });

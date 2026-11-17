@@ -96,6 +96,48 @@ export function conversationLabel(conversation) {
   return names.length ? names.join(', ') : 'Conversation';
 }
 
+// Search asks Spring only for a query at least this long, and Spring answers with at most
+// this many messages. Both mirror DirectMessageService's MIN_SEARCH_LENGTH and
+// MAX_SEARCH_RESULTS, so the page can say why nothing was asked or that there may be more.
+export const MIN_SEARCH_LENGTH = 2;
+export const MAX_SEARCH_RESULTS = 50;
+
+// Splits `text` around every place `query` appears, ignoring case: [{ text, match }].
+// Parts rather than HTML, so a result is built from text nodes and nothing in a message
+// is ever read as markup.
+export function highlightParts(text, query) {
+  const source = String(text ?? '');
+  const needle = String(query ?? '').trim().toLowerCase();
+  if (!source) return [];
+  if (!needle) return [{ text: source, match: false }];
+  const haystack = source.toLowerCase();
+  const parts = [];
+  let from = 0;
+  for (let at = haystack.indexOf(needle); at !== -1; at = haystack.indexOf(needle, from)) {
+    if (at > from) parts.push({ text: source.slice(from, at), match: false });
+    parts.push({ text: source.slice(at, at + needle.length), match: true });
+    from = at + needle.length;
+  }
+  if (from < source.length) parts.push({ text: source.slice(from), match: false });
+  return parts;
+}
+
+// Whether a sidebar row matches the "Find a conversation" box: every typed word appears
+// in a group's name, course or period, or in a member's or participant's name or uid.
+// Case doesn't matter, and an empty search matches everything.
+export function matchesConversationSearch(kind, item, query) {
+  const terms = String(query ?? '').toLowerCase().split(/\s+/).filter(Boolean);
+  if (!terms.length) return true;
+  const people = kind === 'group' ? item?.members : item?.participants;
+  const searchable = [
+    kind === 'group' ? item?.name : '',
+    kind === 'group' ? item?.course : '',
+    kind === 'group' && item?.period ? `period ${item.period}` : '',
+    ...(people || []).flatMap(person => [person?.name, person?.uid]),
+  ].filter(Boolean).join('\n').toLowerCase();
+  return terms.every(term => searchable.includes(term));
+}
+
 export function groupSubtitle(group) {
   const count = (group.members || []).length;
   return [

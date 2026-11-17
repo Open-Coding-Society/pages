@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   canDeleteGroup, canFormGroups, classifyDmEvent, classifyGroupEvent, confirmsGroupName, conversationLabel, dayLabel,
-  deleteGroupWarning, dmMessage, downloadName, groupMessage, groupSubtitle, initialsFor, isAdmin, isClassGroup,
-  isCourseChannel, isGroupMember, isImageFile, pfpSrc, sortGroups, tintFor,
+  deleteGroupWarning, dmMessage, downloadName, groupMessage, groupSubtitle, highlightParts, initialsFor, isAdmin,
+  isClassGroup, isCourseChannel, isGroupMember, isImageFile, pfpSrc, sortGroups, tintFor,
 } from '../js/messages-model.js';
 
 test('dmMessage keeps the sender uid as the key that marks your own messages', () => {
@@ -254,4 +254,30 @@ test('isImageFile and downloadName read a shared file name', () => {
   assert.equal(isImageFile('notes.pdf'), false);
   assert.equal(downloadName('a/b\\plan.pdf'), 'plan.pdf');
   assert.equal(downloadName(''), 'file');
+});
+
+test('highlightParts marks every place the query appears, whatever its case', () => {
+  assert.deepEqual(highlightParts('Sprint plan: sprint 3 starts', 'SPRINT'), [
+    { text: 'Sprint', match: true },
+    { text: ' plan: ', match: false },
+    { text: 'sprint', match: true },
+    { text: ' 3 starts', match: false },
+  ]);
+});
+
+test('highlightParts leaves text without the query, or with no query, as one plain part', () => {
+  assert.deepEqual(highlightParts('nothing here', 'sprint'), [{ text: 'nothing here', match: false }]);
+  assert.deepEqual(highlightParts('nothing here', '  '), [{ text: 'nothing here', match: false }]);
+  assert.deepEqual(highlightParts('', 'sprint'), []);
+  assert.deepEqual(highlightParts(null, 'sprint'), []);
+});
+
+test('highlightParts keeps markup in a message as text', () => {
+  assert.deepEqual(highlightParts('<b>bold</b> move', 'b>'), [
+    { text: '<', match: false },
+    { text: 'b>', match: true },
+    { text: 'bold</', match: false },
+    { text: 'b>', match: true },
+    { text: ' move', match: false },
+  ]);
 });

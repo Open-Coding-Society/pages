@@ -1,5 +1,6 @@
 import { ButtonFeedback } from './ButtonFeedback.js';
 import { EditorManager } from './EditorManager.js';
+import { mountRunnerDependencies } from './RunnerDependencies.js';
 import { StatsManager } from './StatsManager.js';
 import { StorageManager } from './StorageManager.js';
 
@@ -88,6 +89,11 @@ export class BaseRunner {
       this.stats.updateFromCode(this.currentCode);
     }
 
+    this.dependencies?.destroy();
+    this.dependencies = enabled && !plainText
+      ? mountRunnerDependencies(this, codeMirrorOptions.mode)
+      : null;
+
     return this.editor;
   }
 
@@ -121,11 +127,14 @@ export class BaseRunner {
 
   saveToStorage(value = this.getValue()) {
     this.currentCode = value;
-    return this.storage.save(value);
+    const saved = this.storage.save(value);
+    this.dependencies?.saved(value);
+    return saved;
   }
 
   clearStorage() {
     this.storage.clear();
+    this.dependencies?.cleared();
   }
 
   flashButton(button, temporaryLabel = '✔', duration = 2000) {

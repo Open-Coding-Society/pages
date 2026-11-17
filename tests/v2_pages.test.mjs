@@ -16,11 +16,11 @@ function frontMatter(text) {
 // [main page source, /v2 page source, main address, what makes it the restyled page]
 const PAGES = [
   ['navigation/authentication/analytics.md', 'navigation/authentication/dashboard-v2.md', '/dashboard', { layout: 'dashboard-v2' }],
-  ['navigation/authentication/analytics-dashboard.md', 'navigation/authentication/analytics-dashboard-v2.md', '/analytics-dashboard', { layout: 'analytics-dashboard-v2' }],
-  ['navigation/authentication/submissions.md', 'navigation/authentication/submissions-v2.md', '/submissions', { layout: 'submissions-v2' }],
+  ['_projects/systems/grades/pages/analytics-dashboard.md', '_projects/systems/grades/pages/analytics-dashboard-v2.md', '/analytics-dashboard', { layout: 'analytics-dashboard-v2' }],
+  ['_projects/systems/grades/pages/submissions.md', '_projects/systems/grades/pages/submissions-v2.md', '/submissions', { layout: 'submissions-v2' }],
   ['navigation/toolkit/bathroom_pass.md', 'navigation/toolkit/bathroom_pass-v2.md', '/student/bathroom_pass', { wrapper: 'ocs__bathroompass-v2-page' }],
   ['_projects/systems/calendar/index.md', '_projects/systems/calendar/navigation/calendar-v2.md', '/student/calendar', { wrapper: 'ocs__calendar-v2-page' }],
-  ['_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md', '_posts/student_toolkit/assignments/2025-01-21-gradeviewer-v2.md', '/student/view-grades', { wrapper: 'ocs__view-grades-v2-page' }],
+  ['_projects/systems/grades/pages/view-grades.md', '_projects/systems/grades/pages/view-grades-v2.md', '/student/view-grades', { wrapper: 'ocs__view-grades-v2-page' }],
 ];
 
 test('each main address serves the restyled page', () => {
@@ -42,10 +42,10 @@ test('each /v2 address sends visitors to the main page', () => {
   }
 });
 
-// The calendar's navigation/ pages are copied into _posts, and view grades is a post, so their
+// The calendar's navigation/ pages are copied into _posts, and view grades is published as a post, so their
 // stubs would show up as duplicate cards in the Blogs catalog.
 test('the /v2 stubs that are posts stay out of the Blogs catalog', () => {
-  for (const stub of ['_projects/systems/calendar/navigation/calendar-v2.md', '_posts/student_toolkit/assignments/2025-01-21-gradeviewer-v2.md']) {
+  for (const stub of ['_projects/systems/calendar/navigation/calendar-v2.md', '_projects/systems/grades/pages/view-grades-v2.md']) {
     assert.equal(frontMatter(read(stub)).hide, 'true', stub);
   }
 });
@@ -62,7 +62,9 @@ test('the dashboard has no tab that can hide Preferences', () => {
 // Merges can drop an @import without any build error; the page then renders unstyled.
 test('every v2 page partial is imported into the site stylesheet', () => {
   const main = read('_sass/open-coding/_main.scss');
-  const partials = readdirSync(new URL('../_sass/open-coding/', import.meta.url))
+  // The grading pages' partials live in the Grades system and are published to _sass/open-coding/.
+  const partials = ['../_sass/open-coding/', '../_projects/systems/grades/sass/']
+    .flatMap((dir) => readdirSync(new URL(dir, import.meta.url)))
     .filter((name) => /-v2\.scss$/.test(name))
     .map((name) => name.replace(/^_/, '').replace(/\.scss$/, ''));
   assert.ok(partials.length > 0, 'found the v2 partials');

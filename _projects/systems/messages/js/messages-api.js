@@ -36,6 +36,11 @@ export function createMessagesApi({ javaURI, pythonURI, fetchOptions }) {
     editDm: (id, messageId, body) => spring(`/api/dm/conversations/${part(id)}/messages/${part(messageId)}`, 'PATCH', { body }),
     deleteDm: (id, messageId) => spring(`/api/dm/conversations/${part(id)}/messages/${part(messageId)}`, 'DELETE'),
     markDmRead: id => spring(`/api/dm/conversations/${part(id)}/read`, 'POST'),
+    // Messages in your own conversations whose text contains the query, newest first.
+    // With a conversation id, only that conversation is searched.
+    searchDms: (query, conversationId) => spring(
+      `/api/dm/search?q=${part(query)}${conversationId ? `&conversationId=${part(conversationId)}` : ''}`,
+    ),
 
     myGroups: personId => spring(`/api/groups/person/${part(personId)}`),
     allGroups: () => spring('/api/groups'),

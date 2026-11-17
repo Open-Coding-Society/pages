@@ -4,6 +4,9 @@
 // visible, marks it read and tells the navbar bell (assets/js/api/dm-notifications.js).
 // /dm makes one pane for the page. conversation-embed.js makes one per embedded chat,
 // which is why a pane can be read-only, use its host's wording and be destroyed.
+// Replies carry a [[reply:...]] marker at the start of their body (chat-reply.js,
+// reached through `richText`); an image pasted into the composer is attached like one
+// picked with the Image control or dropped on the composer.
 import { classifyDmEvent, classifyGroupEvent, dmMessage, groupMessage } from './messages-model.js';
 import { createMessageLog, fillText, withTexts } from './message-log.js';
 import { readImageFile, saveFile } from './dialogs.js';
@@ -25,6 +28,9 @@ export const THREAD_TEXTS = Object.freeze({
   deleteFailed: 'Could not delete the message. Try again.',
   waitForSave: 'Wait for your message to finish saving first.',
   imageUnreadable: 'Could not read that image. Try a different file.',
+  imageOnly: 'Drop an image or screenshot here.',
+  imageWhileEditing: 'Images can’t be added while you edit a message.',
+  imageMessage: '🖼 Image',
   fileShared: '{sender} shared a file:',
   fileSharedBySomeone: 'A file was shared:',
   fileGone: '{filename} is no longer shared with this group.',
@@ -76,19 +82,36 @@ export function createThread({
   let early = []; // frames that arrived before the open conversation's history
   let unseenWhileHidden = false;
   let pendingImage = null; // a data URL attached to the next message, or null
+  let replyingTo = null; // { id, sender, excerpt } the next message replies to
+  let editingReply = null; // the reply marker of the message being edited, kept on save
+  let dragDepth = 0;
   let destroyed = false;
 
+  // Replies need chat-reply.js's helpers; a host with an older rich-text.js has none.
+  const canReply = typeof richText.addReplyMarker === 'function';
+
   // A read-only pane shows the conversation but can't change it: no composer, and no
-  // edit or delete on your own messages.
+  // reply, edit or delete.
   const log = createMessageLog(elements.messages, {
-    richText, me, onEdit: beginEdit, onDelete: deleteMessage, readOnly, texts, formatBody,
+    richText, me, onEdit: beginEdit, onDelete: deleteMessage, onReply: canReply ? beginReply : null,
+    readOnly, texts, formatBody,
   });
+  // Pasted images go where the Image control's would, so only where that control exists.
   const composer = readOnly
     ? null
-    : richText.createRichComposer({ placeholder: text.placeholder, maxLength: 2000, onSubmit: submit });
+    : richText.createRichComposer({
+      placeholder: text.placeholder, maxLength: 2000, onSubmit: submit,
+      onPasteImage: elements.imageInput ? pasteImage : null,
+    });
   if (composer) {
     elements.form.classList.add('chat-form--rich');
     elements.form.insertBefore(composer.element, elements.cancelEdit);
+  }
+  // "Replying to …" sits just above the composer.
+  const replyBar = composer && canReply ? richText.createReplyBar({ onCancel: clearReply }) : null;
+  if (replyBar) {
+    if (elements.form.parentNode) elements.form.parentNode.insertBefore(replyBar.element, elements.form);
+    else elements.form.insertBefore(replyBar.element, elements.form.firstChild);
   }
 
   const isOpen = (kind, id) => current?.kind === kind && current.id === id;
@@ -137,6 +160,11 @@ export function createThread({
 
   async function pickImage(file) {
     if (!file) return;
+    if (file.type && !file.type.startsWith('image/')) {
+      clearImage();
+      showFormMessage(text.imageOnly);
+      return;
+    }
     try {
       pendingImage = await readImageFile(file);
     } catch (error) {
@@ -151,8 +179,40 @@ export function createThread({
     refreshComposer();
   }
 
+  // A pasted image waits like a picked one, wherever the conversation can store images.
+  function pasteImage(file) {
+    if (!current?.loaded || !kinds[current.kind]?.supportsImages) return;
+    if (editing) {
+      showFormMessage(text.imageWhileEditing);
+      return;
+    }
+    pickImage(file);
+  }
+
+  function clearReply() {
+    replyingTo = null;
+    replyBar?.hide();
+  }
+
+  // An image-only message has no text to quote, so its quote says so.
+  function beginReply(message) {
+    if (!composer || pending === 'edit' || !current?.loaded || !message?.id || message.deleted) return;
+    if (editing) resetEdit();
+    const { html } = richText.extractReplyMarker(message.body);
+    replyingTo = {
+      id: message.id,
+      sender: message.isSelf ? me.name : message.senderName,
+      excerpt: richText.replyExcerpt(html) || (message.image ? text.imageMessage : ''),
+    };
+    replyBar.show(replyingTo);
+    showFormMessage('');
+    composer.focus();
+  }
+
   function resetEdit() {
     editing = null;
+    editingReply = null;
+    clearReply();
     composer?.clear();
     clearImage();
     showFormMessage('');
@@ -161,8 +221,12 @@ export function createThread({
 
   function beginEdit(message) {
     if (!composer || pending || !message || message.deleted) return;
+    clearReply();
     editing = message;
-    composer.setHTML(message.body);
+    // The quote isn't editable text: it is set aside and put back on save.
+    const { reply, html } = canReply ? richText.extractReplyMarker(message.body) : { reply: null, html: message.body };
+    editingReply = reply;
+    composer.setHTML(html);
     showFormMessage('');
     refreshComposer();
     composer.focus();
@@ -199,14 +263,16 @@ export function createThread({
     const { kind, id } = current;
     const target = editing;
     const html = composer.getHTML();
+    const reply = target ? editingReply : replyingTo;
+    const outgoing = reply ? richText.addReplyMarker(html, reply) : html;
     const hadFocus = composer.element.contains(document.activeElement);
     pending = target ? 'edit' : 'send';
     showFormMessage('');
     refreshComposer();
     let saved = null;
     try {
-      if (target) await kinds[kind].edit(id, target.id, html);
-      else saved = await kinds[kind].send(id, html, sendingImage || null);
+      if (target) await kinds[kind].edit(id, target.id, outgoing);
+      else saved = await kinds[kind].send(id, outgoing, sendingImage || null);
     } catch (error) {
       pending = null;
       console.warn('Messages: could not save the message', error);
@@ -223,13 +289,14 @@ export function createThread({
     if (destroyed) return;
     pending = null;
     if (target) {
-      log.updateBody(target.key, html);
+      log.updateBody(target.key, outgoing);
       resetEdit();
       if (hadFocus) composer.focus();
       return;
     }
-    // The attachment went with that message; the next one starts clean.
+    // The attachment and the reply went with that message; the next one starts clean.
     if (sendingImage) clearImage();
+    if (reply && reply === replyingTo) clearReply();
     // Keep anything typed while the message was sending.
     if (composer.getHTML() === html) composer.clear();
     refreshComposer();
@@ -401,6 +468,15 @@ export function createThread({
     refreshComposer();
     if (current.catchUp) loadNew(kind, id);
     if (kind === 'dm') markRead(id);
+    if (current.reveal) log.reveal(current.reveal);
+  }
+
+  // Scrolls the open conversation to one message and marks it: what a search result
+  // asks for. Asked while the history is still loading, it happens once that arrives.
+  function showMessage(key) {
+    if (!current) return;
+    if (current.loaded) log.reveal(key);
+    else current.reveal = key;
   }
 
   function close() {
@@ -431,6 +507,8 @@ export function createThread({
     socket.unfollow();
     document.removeEventListener('visibilitychange', onVisibilityChange);
     composer?.destroy();
+    // Takes the image viewer and its Escape listener off the page too.
+    log.destroy();
   }
 
   document.addEventListener('visibilitychange', onVisibilityChange);
@@ -442,6 +520,29 @@ export function createThread({
     });
     elements.cancelEdit.addEventListener('click', resetEdit);
     elements.imageInput?.addEventListener('change', event => pickImage(event.target.files?.[0]));
+    const setDragging = active => {
+      elements.form.classList.toggle('is-dragging', active);
+      if (elements.dropHint) elements.dropHint.setAttribute('aria-hidden', String(!active));
+    };
+    elements.form.addEventListener('dragenter', event => {
+      event.preventDefault();
+      dragDepth += 1;
+      setDragging(true);
+    });
+    elements.form.addEventListener('dragover', event => {
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
+    });
+    elements.form.addEventListener('dragleave', () => {
+      dragDepth = Math.max(0, dragDepth - 1);
+      if (dragDepth === 0) setDragging(false);
+    });
+    elements.form.addEventListener('drop', event => {
+      event.preventDefault();
+      dragDepth = 0;
+      setDragging(false);
+      pickImage(event.dataTransfer?.files?.[0]);
+    });
     elements.imageRemove?.addEventListener('click', () => {
       clearImage();
       refreshComposer();
@@ -450,6 +551,9 @@ export function createThread({
       if (event.key === 'Escape' && editing && pending !== 'edit') {
         event.preventDefault();
         resetEdit();
+      } else if (event.key === 'Escape' && replyingTo) {
+        event.preventDefault();
+        clearReply();
       }
     });
   }
@@ -457,7 +561,7 @@ export function createThread({
   close();
 
   return {
-    open, close, resume, setHeading, destroy,
+    open, close, resume, setHeading, showMessage, destroy,
     current: () => (current ? { kind: current.kind, id: current.id } : null),
   };
 }

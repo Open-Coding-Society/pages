@@ -78,7 +78,7 @@ export function mountMcqRunner(container, questions) {
   const { storageKey } = container.dataset;
   const picksKey = `${storageKey}_picks`;
   const sentWith = container.dataset.bundled === 'true'
-    ? 'Sent when you click Submit Code at the bottom of the page.'
+    ? 'Sent with your code if you add it to your submission and click Submit Code.'
     : 'Saved on this device.';
   const picks = parseMcqPicks(localStorage.getItem(picksKey), questions);
   let index = 0;
