@@ -3,8 +3,9 @@
 // Teachers and admins open sprints; for each one a student ranks the Ground 0 evaluation items
 // (T01-T12 technical, P01-P10 professional, 0 = not entered, 1-5), writes a summary per section,
 // answers the retrospective questions and ticks the Ground 0 checklist. The teacher adds their own
-// rank and a comment beside every item, and the student sees both. Growth Over Time charts each
-// item across the year's sprints. Everything is stored in Spring (/api/sprint-retros); the items
+// rank and a comment beside every item, and the student sees both. The reflection reads as numbered
+// steps with a progress line each, and the checklist is one collapsible group per heading with a bar
+// each, so nobody faces every checkbox at once. Growth Over Time charts each item across the year's sprints. Everything is stored in Spring (/api/sprint-retros); the items
 // come from SprintRetroTemplate there, so this file only relies on their ids.
 import { javaURI, fetchOptions } from '../api/config.js';
 
@@ -17,7 +18,7 @@ const STORY_KEYS = ['techRetro', 'proRetro', 'techGoal', 'commitBehavior'];
 class SignedOut extends Error {}
 
 const shared = { loaded: null, template: null, sprints: [], canManage: false };
-const ref = { root: null, sprintId: null, mode: 'mine', studentId: null, roster: [], view: null, dirty: false, editingId: null };
+const ref = { root: null, sprintId: null, mode: 'mine', studentId: null, roster: [], view: null, dirty: false, editingId: null, checkFilter: 'all' };
 const growth = { root: null, personId: null, progress: null, chart: null, viewKey: 'sections', perspective: 'self' };
 
 // ---------- shared ----------
@@ -222,6 +223,18 @@ function renderForm() {
     const form = ref.root.querySelector('[data-sr="form"]');
     const ranked = Object.keys(student.ranks).length;
     const totalItems = sections().reduce((n, s) => n + s.items.length, 0);
+    const checklist = shared.template.checklist;
+    // The teacher's columns stay out of a student's way until there is feedback to put in them.
+    const showTeacher = review || Boolean(view.teacherUpdatedAt);
+    // Groups left open survive a re-render (a save); a fresh view opens the first unfinished one.
+    const previous = [...form.querySelectorAll('.sr-group')];
+    const firstOpen = checklist.findIndex((section) => section.checks.some((check) => !checks.has(check.id)));
+    const isOpen = (i) => (previous.length ? Boolean(previous[i] && previous[i].open) : !review && i === firstOpen);
+    const steps = [
+        { id: 'checklist', title: 'Ground 0 checklist' },
+        ...shared.template.evaluations.map((evaluation) => ({ id: `eval-${evaluation.key}`, title: evaluation.title })),
+    ];
+    const stepHead = (id, title) => `<div class="sr-step"><span class="sr-step-num">${steps.findIndex((step) => step.id === id) + 1}</span><h3 class="sr-h3">${title}</h3></div>`;
 
     const who = review ? escapeHtml(view.personName || 'This student') : 'You';
     const savedLine = view.updatedAt ? `${who} saved ${fmtWhen(view.updatedAt)} · ${ranked} of ${totalItems} ranked` : `${who} ${review ? 'has' : 'have'} not saved this reflection yet`;
@@ -234,24 +247,43 @@ function renderForm() {
         <div><span class="sr-label">${review ? 'Student' : 'Your reflection'}</span><span>${savedLine}</span></div>
         <div><span class="sr-label">Teacher</span><span>${feedbackLine}</span></div>
       </div>
+      <nav class="sr-steps" aria-label="Parts of this reflection">
+        ${steps.map((step, i) => `
+          <button type="button" class="sr-stepchip" data-jump="sr-step-${step.id}">
+            <span class="sr-step-num">${i + 1}</span>
+            <span class="sr-stepchip-text"><span class="sr-stepchip-title">${escapeHtml(step.title)}</span><span class="sr-small sr-muted" data-step-status="${step.id}"></span></span>
+          </button>`).join('')}
+      </nav>
       ${!review && teacher.overall ? `
         <div class="sr-card sr-card--teacher">
           <span class="sr-label">Overall comment from your teacher</span>
           <p class="sr-quote">${escapeHtml(teacher.overall)}</p>
         </div>` : ''}
-      <details class="sr-card" ${review ? '' : 'open'}>
-        <summary class="sr-summary">Ground 0 checklist <span class="sr-pill">${checks.size} of ${totalChecks}</span></summary>
-        <p class="sr-muted sr-small">Check your starting position before you rank yourself.</p>
-        <div class="sr-checklist">
-          ${shared.template.checklist.map((section) => `
-            <fieldset class="sr-checks">
-              <legend>${escapeHtml(section.title)}</legend>
-              ${section.checks.map((check) => `
-                <label><input type="checkbox" data-check="${check.id}" ${checks.has(check.id) ? 'checked' : ''} ${review ? 'disabled' : ''}> <span>${escapeHtml(check.text)}</span></label>`).join('')}
-            </fieldset>`).join('')}
+      <div class="sr-card" id="sr-step-checklist">
+        ${stepHead('checklist', 'Ground 0 checklist')}
+        <p class="sr-muted sr-small">Check your starting position before you rank yourself. Open one group at a time.</p>
+        <div class="sr-checkbar">
+          <div class="sr-meter" data-check-overall role="progressbar" aria-label="Checklist progress" aria-valuemin="0" aria-valuemax="${totalChecks}"><span></span></div>
+          <span class="sr-small" data-check-total></span>
+          <div class="sr-seg" role="group" aria-label="Which items to show">
+            <button type="button" data-check-filter="all">All</button>
+            <button type="button" data-check-filter="todo">To do</button>
+          </div>
+          <button type="button" class="sr-btn sr-btn--ghost sr-btn--sm" data-check-toggle>Expand all</button>
         </div>
-      </details>
-      ${shared.template.evaluations.map((evaluation) => evaluationCard(evaluation, student, teacher, review)).join('')}
+        <div class="sr-groups" data-checklist>
+          ${checklist.map((section, i) => `
+            <details class="sr-group" ${isOpen(i) ? 'open' : ''}>
+              <summary><span class="sr-group-title">${escapeHtml(section.title)}</span><span class="sr-meter"><span></span></span><span class="sr-group-count" data-group-count></span></summary>
+              <div class="sr-checks" role="group" aria-label="${escapeHtml(section.title)}">
+                ${section.checks.map((check) => `
+                  <label><input type="checkbox" data-check="${check.id}" ${checks.has(check.id) ? 'checked' : ''} ${review ? 'disabled' : ''}> <span>${escapeHtml(check.text)}</span></label>`).join('')}
+              </div>
+            </details>`).join('')}
+        </div>
+        <p class="sr-ok sr-small" data-check-empty hidden>Everything on the checklist is ticked.</p>
+      </div>
+      ${shared.template.evaluations.map((evaluation) => evaluationCard(evaluation, student, teacher, review, showTeacher, stepHead)).join('')}
       ${review ? `
         <div class="sr-card sr-card--teacher">
           <label class="sr-field"><span class="sr-label">Overall comment for ${escapeHtml(view.personName || 'the student')}</span>
@@ -261,28 +293,95 @@ function renderForm() {
         <button type="submit" class="sr-btn">${review ? 'Save feedback' : 'Save reflection'}</button>
         <span class="sr-small" data-sr="save-status" role="status"></span>
       </div>`;
+    applyCheckFilter();
 }
 
-function evaluationCard(evaluation, student, teacher, review) {
+/** Shows every checklist item or only the unticked ones, then refreshes the counts. */
+function applyCheckFilter() {
+    const form = ref.root.querySelector('[data-sr="form"]');
+    const list = form.querySelector('[data-checklist]');
+    if (list) list.classList.toggle('sr-groups--todo', ref.checkFilter === 'todo');
+    form.querySelectorAll('[data-check-filter]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.checkFilter === ref.checkFilter)));
+    updateProgress();
+}
+
+/** Recounts what is ticked, ranked and written, for the step guide, each section and each checklist group. */
+function updateProgress() {
+    const form = ref.root.querySelector('[data-sr="form"]');
+    const review = ref.mode === 'review';
+    const rankSelector = review ? '[data-trank]' : '[data-rank]';
+    const filled = (elements) => elements.filter((el) => Number(el.value)).length;
+    const setStatus = (id, text, done) => {
+        const status = form.querySelector(`[data-step-status="${id}"]`);
+        if (!status) return;
+        status.textContent = text;
+        status.closest('.sr-stepchip').toggleAttribute('data-done', done);
+    };
+    form.querySelectorAll('[data-eval]').forEach((card) => {
+        card.querySelectorAll('[data-section]').forEach((section) => {
+            const ranks = [...section.querySelectorAll(rankSelector)];
+            const count = section.querySelector('[data-section-count]');
+            count.textContent = `${filled(ranks)} of ${ranks.length} ranked`;
+            count.toggleAttribute('data-done', filled(ranks) === ranks.length);
+        });
+        const ranks = [...card.querySelectorAll(rankSelector)];
+        const texts = [...card.querySelectorAll('[data-text]')];
+        const written = texts.filter((el) => el.value.trim()).length;
+        setStatus(`eval-${card.dataset.eval}`, review
+            ? `${filled(ranks)} of ${ranks.length} ranked by you`
+            : `${filled(ranks)} of ${ranks.length} ranked · ${written} of ${texts.length} written`,
+        filled(ranks) === ranks.length && written === texts.length);
+    });
+    let done = 0;
+    let total = 0;
+    const width = (n, of) => `${of ? Math.round((n / of) * 100) : 0}%`;
+    form.querySelectorAll('.sr-group').forEach((group) => {
+        const boxes = [...group.querySelectorAll('[data-check]')];
+        const ticked = boxes.filter((box) => box.checked).length;
+        done += ticked;
+        total += boxes.length;
+        group.toggleAttribute('data-done', ticked === boxes.length);
+        group.querySelector('[data-group-count]').textContent = `${ticked} of ${boxes.length}`;
+        group.querySelector('.sr-meter > span').style.width = width(ticked, boxes.length);
+    });
+    setStatus('checklist', `${done} of ${total} done`, total > 0 && done === total);
+    if (!total) return;
+    const overall = form.querySelector('[data-check-overall]');
+    overall.setAttribute('aria-valuenow', String(done));
+    overall.firstElementChild.style.width = width(done, total);
+    form.querySelector('[data-check-total]').textContent = `${done} of ${total} done`;
+    form.querySelector('[data-check-empty]').hidden = !(ref.checkFilter === 'todo' && done === total);
+    syncToggleLabel();
+}
+
+function syncToggleLabel() {
+    const groups = [...ref.root.querySelectorAll('.sr-group')];
+    const button = ref.root.querySelector('[data-check-toggle]');
+    if (button) button.textContent = groups.some((group) => !group.open) ? 'Expand all' : 'Collapse all';
+}
+
+function evaluationCard(evaluation, student, teacher, review, showTeacher, stepHead) {
     const levels = Object.fromEntries(evaluation.levels.map((l) => [l.rank, l.name]));
     const rankOptions = (selected) => [0, ...evaluation.levels.map((l) => l.rank)]
         .map((r) => `<option value="${r}" ${r === (selected || 0) ? 'selected' : ''}>${r === 0 ? '0 · not entered' : `${r} · ${escapeHtml(levels[r])}`}</option>`).join('');
     const rankText = (r) => (r ? `${r} · ${escapeHtml(levels[r])}` : '<span class="sr-muted">—</span>');
     return `
-      <div class="sr-card">
-        <h3 class="sr-h3">${escapeHtml(evaluation.title)}</h3>
+      <div class="sr-card" id="sr-step-eval-${evaluation.key}" data-eval="${evaluation.key}">
+        ${stepHead(`eval-${evaluation.key}`, escapeHtml(evaluation.title))}
+        <span class="sr-part">Rank each area</span>
+        ${showTeacher ? '' : '<p class="sr-muted sr-small">Your teacher\'s rank and comments will appear beside yours once they review this sprint.</p>'}
         <details class="sr-levels">
           <summary class="sr-small">What the ranks mean</summary>
           <table class="sr-table sr-table--compact"><tbody>
             ${evaluation.levels.map((l) => `<tr><td><b>${l.rank} · ${escapeHtml(l.name)}</b></td><td>${escapeHtml(l.description)}</td></tr>`).join('')}
           </tbody></table>
-          <p class="sr-muted sr-small">Match compares your rank with your teacher's: − teacher ranked you lower · = the same · + teacher ranked you higher.</p>
+          ${showTeacher ? '<p class="sr-muted sr-small">Match compares your rank with your teacher\'s: − teacher ranked you lower · = the same · + teacher ranked you higher.</p>' : ''}
         </details>
         ${evaluation.sections.map((section) => `
-          <div class="sr-section">
-            <h4 class="sr-h4">${escapeHtml(section.title)}</h4>
+          <div class="sr-section" data-section="${section.key}">
+            <h4 class="sr-h4">${escapeHtml(section.title)} <span class="sr-count" data-section-count></span></h4>
             <div class="sr-table-wrap"><table class="sr-table">
-              <thead><tr><th>ID</th><th>Area</th><th>${review ? 'Student' : 'You'}</th><th>Teacher</th><th>Match</th><th>Teacher comment</th></tr></thead>
+              <thead><tr><th>ID</th><th>Area</th><th>${review ? 'Student' : 'You'}</th>${showTeacher ? '<th>Teacher</th><th>Match</th><th>Teacher comment</th>' : ''}</tr></thead>
               <tbody>${section.items.map((item) => {
                   const self = student.ranks[item.id];
                   const mine = teacher.ranks[item.id];
@@ -291,11 +390,11 @@ function evaluationCard(evaluation, student, teacher, review) {
                     <td class="sr-id">${item.id}</td>
                     <td>${escapeHtml(item.area)}</td>
                     <td>${review ? rankText(self) : `<select class="sr-input sr-input--rank" data-rank="${item.id}" aria-label="Your rank for ${escapeHtml(item.area)}">${rankOptions(self)}</select>`}</td>
-                    <td>${review ? `<select class="sr-input sr-input--rank" data-trank="${item.id}" aria-label="Teacher rank for ${escapeHtml(item.area)}">${rankOptions(mine)}</select>` : rankText(mine)}</td>
+                    ${showTeacher ? `<td>${review ? `<select class="sr-input sr-input--rank" data-trank="${item.id}" aria-label="Teacher rank for ${escapeHtml(item.area)}">${rankOptions(mine)}</select>` : rankText(mine)}</td>
                     <td data-match="${item.id}">${matchCell(self, mine)}</td>
                     <td class="sr-comment">${review
                         ? `<input class="sr-input" maxlength="1000" data-tcomment="${item.id}" value="${escapeHtml(comment)}" placeholder="Comment" aria-label="Comment on ${escapeHtml(item.area)}">`
-                        : (comment ? escapeHtml(comment) : '<span class="sr-muted">—</span>')}</td>
+                        : (comment ? escapeHtml(comment) : '<span class="sr-muted">—</span>')}</td>` : ''}
                   </tr>`;
               }).join('')}</tbody>
             </table></div>
@@ -308,6 +407,7 @@ function evaluationCard(evaluation, student, teacher, review) {
                 ? `<label class="sr-field"><span class="sr-label">Your comment on this summary</span><input class="sr-input" maxlength="1000" data-tcomment="${section.key}" value="${escapeHtml(teacher.comments[section.key] || '')}"></label>`
                 : (teacher.comments[section.key] ? `<p class="sr-teacher-note"><span class="sr-label">Teacher</span>${escapeHtml(teacher.comments[section.key])}</p>` : '')}
           </div>`).join('')}
+        <span class="sr-part sr-part--next">${review ? 'Their reflection' : 'Reflect in writing'}</span>
         <div class="sr-prompts">
           ${evaluation.prompts.map((p, i) => `
             <label class="sr-field"><span class="${i === 0 ? 'sr-h4' : 'sr-label'}">${escapeHtml(p.label)}</span>
@@ -391,12 +491,34 @@ function bindReflection() {
         const status = root.querySelector('[data-sr="save-status"]');
         if (status) { status.className = 'sr-small sr-muted'; status.textContent = 'Unsaved changes'; }
         const id = event.target.dataset.rank || event.target.dataset.trank;
-        if (id) {
+        const match = id && root.querySelector(`[data-match="${id}"]`);
+        if (match) {
             const self = ref.mode === 'review' ? ref.view.student.ranks[id] : Number(event.target.value);
             const teacher = ref.mode === 'review' ? Number(event.target.value) : ref.view.teacher.ranks[id];
-            root.querySelector(`[data-match="${id}"]`).innerHTML = matchCell(self, teacher);
+            match.innerHTML = matchCell(self, teacher);
+        }
+        updateProgress();
+    });
+    // Step guide jumps and the checklist's view controls; none of these change what gets saved.
+    root.addEventListener('click', (event) => {
+        const jump = event.target.closest('[data-jump]');
+        const filter = event.target.closest('[data-check-filter]');
+        if (jump) {
+            const target = document.getElementById(jump.dataset.jump);
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (filter) {
+            ref.checkFilter = filter.dataset.checkFilter;
+            applyCheckFilter();
+        } else if (event.target.closest('[data-check-toggle]')) {
+            const groups = [...root.querySelectorAll('.sr-group')];
+            const open = groups.some((group) => !group.open);
+            groups.forEach((group) => { group.open = open; });
+            syncToggleLabel();
         }
     });
+    root.addEventListener('toggle', (event) => {
+        if (event.target.matches && event.target.matches('.sr-group')) syncToggleLabel();
+    }, true);
     root.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (event.target.matches('[data-sr="form"]')) await save(event.target);
@@ -805,11 +927,40 @@ function injectStyles() {
       .sr-seg button { border: 0; background: transparent; color: inherit; font: inherit; font-size: .85rem; padding: .4rem .8rem; cursor: pointer; }
       .sr-seg button[aria-pressed="true"] { background: #059669; color: #fff; }
       .sr-status-card { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); font-size: .9rem; }
-      .sr-checklist { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: .75rem 1.25rem; }
-      .sr-checks { border: 0; padding: 0; margin: 0; display: grid; gap: .35rem; font-size: .85rem; }
-      .sr-checks legend { font-weight: 600; margin-bottom: .35rem; padding: 0; }
+      .sr-card[id] { scroll-margin-top: 4.5rem; }
+      .sr-step { display: flex; gap: .65rem; align-items: center; }
+      .sr-step-num { flex: none; width: 1.75rem; height: 1.75rem; border-radius: 999px; display: grid; place-items: center; font-weight: 700; font-size: .9rem; background: #059669; color: #fff; }
+      .sr-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .6rem; }
+      .sr-stepchip { display: flex; gap: .65rem; align-items: center; text-align: left; font: inherit; color: inherit; cursor: pointer; padding: .6rem .8rem; border-radius: .75rem;
+        border: 1px solid color-mix(in srgb, currentColor 18%, transparent); background: color-mix(in srgb, currentColor 4%, transparent); }
+      .sr-stepchip:hover, .sr-stepchip:focus-visible { border-color: #059669; outline: none; }
+      .sr-stepchip[data-done] { border-color: color-mix(in srgb, #34d399 55%, transparent); }
+      .sr-stepchip[data-done] [data-step-status] { color: #34d399; opacity: 1; }
+      .sr-stepchip-text { display: grid; gap: .1rem; min-width: 0; }
+      .sr-stepchip-title { font-weight: 600; font-size: .9rem; }
+      .sr-part { display: block; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #34d399; }
+      .sr-part--next { padding-top: .8rem; border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); }
+      .sr-count { font-size: .74rem; font-weight: 500; opacity: .7; margin-left: .4rem; white-space: nowrap; }
+      .sr-count[data-done] { color: #34d399; opacity: 1; }
+      .sr-meter { display: block; flex: 1 1 8rem; min-width: 4rem; height: .45rem; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, currentColor 14%, transparent); }
+      .sr-meter > span { display: block; width: 0; height: 100%; border-radius: inherit; background: #059669; transition: width .2s ease; }
+      .sr-checkbar { display: flex; flex-wrap: wrap; gap: .6rem .9rem; align-items: center; }
+      .sr-groups { display: grid; gap: .5rem; }
+      .sr-group { border: 1px solid color-mix(in srgb, currentColor 14%, transparent); border-radius: .7rem; }
+      .sr-group > summary { display: flex; gap: .8rem; align-items: center; padding: .6rem .85rem; cursor: pointer; font-size: .9rem; font-weight: 600; list-style: none; }
+      .sr-group > summary::-webkit-details-marker { display: none; }
+      .sr-group > summary::before { content: '▸'; opacity: .6; transition: transform .15s ease; }
+      .sr-group[open] > summary::before { transform: rotate(90deg); }
+      .sr-group-title { flex: 1 1 10rem; min-width: 0; }
+      .sr-group .sr-meter { flex: 0 1 8rem; }
+      .sr-group-count { flex: none; min-width: 4rem; text-align: right; font-size: .78rem; font-weight: 500; opacity: .75; white-space: nowrap; }
+      .sr-group[data-done] .sr-group-count { color: #34d399; opacity: 1; }
+      .sr-group[data-done] .sr-group-count::before { content: '✓ '; }
+      .sr-checks { display: grid; gap: .45rem; font-size: .85rem; padding: .1rem .85rem .8rem 2.2rem; }
       .sr-checks label { display: flex; gap: .5rem; align-items: flex-start; cursor: pointer; }
       .sr-checks input { margin-top: .2rem; accent-color: #059669; }
+      .sr-checks input:checked + span { opacity: .6; }
+      .sr-groups--todo .sr-group[data-done], .sr-groups--todo .sr-checks label:has(input:checked) { display: none; }
       .sr-levels summary { cursor: pointer; opacity: .8; }
       .sr-section { display: grid; gap: .6rem; padding-top: .8rem; border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); }
       .sr-prompts { display: grid; gap: .7rem; padding-top: .8rem; border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); }
@@ -846,7 +997,7 @@ function injectStyles() {
       .sr-btn--sm { padding: .2rem .6rem; font-size: .78rem; }
       .sr-btn--link { background: transparent; color: inherit; opacity: .65; font-weight: 400; font-size: .8rem; text-decoration: underline; padding: 0 .3rem; }
       .sr-btn--link:hover { background: transparent; opacity: 1; color: #f87171; }
-      @media (max-width: 520px) { .sr-card { padding: 1rem; } .sr-bar .sr-input { min-width: 0; } }
+      @media (max-width: 520px) { .sr-card { padding: 1rem; } .sr-bar .sr-input { min-width: 0; } .sr-group .sr-meter { display: none; } .sr-checks { padding-left: .85rem; } }
     `;
     document.head.appendChild(style);
 }
