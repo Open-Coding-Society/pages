@@ -7,8 +7,7 @@ title: Oncology Sesh
 description: >
   Capstone project exploring an accessible educational website inspired by OncologySesh,
   helping patients and families understand cancer science, biomarkers, and personalized care.
-categories: [Capstone]
-search_exclude: true
+categories: []
 permalink: /capstone/oncologysesh/
 
 
@@ -17,7 +16,10 @@ capstone_project:
   school_year: "2026-2027"
   title: "Oncology Sesh"
   image: "/images/capstone/oncologysesh-logo.png"
-  description: "CSP"
+  description: >-
+    Making cancer science easier to understand for patients and families through clear,
+    accessible explanations of cancer biology, biomarkers, liquid biopsies, and personalized
+    care, inspired by OncologySesh's work in precision oncology.
   team: "Anika, Salma, Aashi, Jailene"
   links:
     frontend: "https://github.com/CSP-Oncology/OCS-Kit-Pages"
