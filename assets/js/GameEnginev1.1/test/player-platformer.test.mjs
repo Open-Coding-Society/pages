@@ -103,3 +103,48 @@ test('pausing preserves position, jump velocity, and grounded state', () => {
   assert.equal(player.verticalVelocity, 5);
   assert.equal(player.isGrounded, true);
 });
+
+// Platform contacts live in the engine, so a plain PlayerPlatformer can stand on a Barrier.
+async function barrierFixture(touch) {
+  const { default: Barrier } = await import('../essentials/Barrier.js');
+  const { default: Transform } = await import('../essentials/Transform.js');
+  const player = platformerFixture();
+  const platform = Object.create(Barrier.prototype);
+  platform.transform = new Transform(0, 100);
+  Object.assign(platform, { width: 100, height: 20, collisionShape: 'rectangle', canvas: { id: 'platform' } });
+  Object.assign(player, {
+    width: 20,
+    height: 20,
+    hitbox: { widthPercentage: 0.1, heightPercentage: 0.1 },
+    position: { x: 30, y: 85 },
+    gameEnv: { gameObjects: [platform] },
+    collisionData: { touchPoints: { this: touch, other: { id: 'platform' } } },
+  });
+  return player;
+}
+
+test('a falling PlayerPlatformer lands on top of a Barrier and is supported', async () => {
+  const player = await barrierFixture({ top: true });
+  player.verticalVelocity = -1;
+  player.handleCollisionState();
+  assert.equal(player.position.y, 81);
+  assert.equal(player.verticalVelocity, 0);
+  assert.equal(player.hasSupport(), true);
+});
+
+test('a rising PlayerPlatformer stops under a Barrier ceiling', async () => {
+  const player = await barrierFixture({ bottom: true });
+  player.verticalVelocity = 5;
+  player.handleCollisionState();
+  assert.equal(player.position.y, 119);
+  assert.equal(player.verticalVelocity, 0);
+  assert.equal(player.hasSupport(), false);
+});
+
+test('a PlayerPlatformer is stopped by the side of a Barrier', async () => {
+  const player = await barrierFixture({ left: true });
+  player.velocity.x = 5;
+  player.handleCollisionState();
+  assert.equal(player.velocity.x, 0);
+  assert.equal(player.position.x, -19);
+});

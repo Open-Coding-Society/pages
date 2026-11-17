@@ -2,7 +2,7 @@ import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import SplineBarrier from '@assets/js/GameEnginev1.1/essentials/SplineBarrier.js';
-import LapTracker from './LapTracker.js';
+import LapTracker from '@assets/js/GameEnginev1.1/essentials/LapTracker.js';
 
 class TimeLapScreen extends GameObject {
   constructor(data = {}, gameEnv = null) {
