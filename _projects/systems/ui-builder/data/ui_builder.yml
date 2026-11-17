@@ -805,8 +805,14 @@ text:
     deleted: This message was deleted.
     editMessage: Edit message
     deleteMessage: Delete message
+    replyMessage: Reply
     imageFrom: "Image from {name}"
+    openImage: "View image from {name} larger"
+    closeImage: Close image
     imageUnreadable: Could not read that image. Try a different file.
+    imageOnly: Drop an image or screenshot here.
+    imageWhileEditing: "Images can't be added while you edit a message."
+    imageMessage: Image
     today: Today
     yesterday: Yesterday
     fileShared: "{sender} shared a file:"

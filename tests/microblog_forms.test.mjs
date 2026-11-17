@@ -31,6 +31,8 @@ for (const formId of ['microblog-form', 'reply-form']) {
             createPost: write, updatePost: write, createReply: write,
             // A new post saves the open channel and the page's author uids with it
             activeChannel: 'suggestions', pageAuthors: [],
+            // No survey open in the builder
+            readSurveyOptions: () => null,
             closeModal: () => closed++, closeReplyModal: () => closed++,
             renderMicroblogTable: () => {}, alert: message => alerts.push(message)
         });
@@ -62,7 +64,43 @@ test('renderMicroblogTable escapes every post field before it joins the markup',
     const end = html.indexOf('.join(\'\') +', html.indexOf('const messageCell = message.map'));
     const render = html.slice(start, end);
     // Both cells pass the (formatted) value through escapeHtml; a raw `${value}` would be a stored XSS
-    assert.match(render, /return `<div>\$\{escapeHtml\(String\(value\)\)\}<\/div>`;/);
+    assert.match(render, /`<div class='\$\{f\.className\}'>\$\{escapeHtml\(String\(value\)\)\}<\/div>`;/);
     assert.match(render, /value = escapeHtml\(String\(value\)\);\s*if \(f\.key === 'topicPath'\)/);
     assert.doesNotMatch(render, /<span>\$\{post\./);
+});
+
+test('microblog-form: saves an open survey\'s choices with a new post, and keeps the draft when they are unusable', async () => {
+    const start = html.indexOf("document.getElementById('microblog-form').onsubmit");
+    const handler = html.slice(start, html.indexOf('\n};', start) + 3);
+    const button = { disabled: false, textContent: 'Save' };
+    const elements = Object.fromEntries(['microblog-form', 'post-id', 'topic-id', 'content']
+        .map(id => [id, { value: id === 'content' ? 'Best day?' : '', querySelector: () => button }]));
+    const saved = [];
+    const alerts = [];
+    let surveyOptions = () => ['Monday', 'Friday'];
+    vm.runInNewContext(handler, {
+        document: { getElementById: id => elements[id] },
+        createPost: async payload => { saved.push(payload); }, updatePost: async () => {},
+        activeChannel: 'chat', pageAuthors: [],
+        readSurveyOptions: () => surveyOptions(),
+        closeModal() {}, renderMicroblogTable() {}, alert: message => alerts.push(message)
+    });
+    const event = { preventDefault() {} };
+    await elements['microblog-form'].onsubmit(event);
+    assert.deepEqual(JSON.parse(JSON.stringify(saved[0].data.survey)), { options: ['Monday', 'Friday'] });
+    assert.equal(saved[0].content, 'Best day?');
+
+    surveyOptions = () => { throw new Error('A survey needs at least 2 choices.'); };
+    await elements['microblog-form'].onsubmit(event);
+    assert.equal(saved.length, 1, 'nothing is posted');
+    assert.match(alerts[0], /at least 2 choices/);
+    assert.equal(elements.content.value, 'Best day?');
+    assert.equal(button.disabled, false);
+});
+
+test('surveyHtml escapes survey choices and the post id before they join the markup', () => {
+    const start = html.indexOf('function surveyHtml(post, user)');
+    const body = html.slice(start, html.indexOf('\n}\n', start));
+    assert.match(body, /\$\{escapeHtml\(option\.label\)\}/);
+    assert.match(body, /data-post-id='\$\{escapeHtml\(String\(post\.id\)\)\}'/);
 });

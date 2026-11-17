@@ -6,7 +6,8 @@
 // label); with no direct message open (nothing, or a group) the box is hidden.
 import { dayLabel, highlightParts, MAX_SEARCH_RESULTS, MIN_SEARCH_LENGTH } from './messages-model.js';
 
-export function initMessageSearch({ elements, api, me, onPick, debounceMs = 250 }) {
+// cleanExcerpt takes markup-free chat markers (a reply's [[reply:...]]) out of an excerpt.
+export function initMessageSearch({ elements, api, me, onPick, debounceMs = 250, cleanExcerpt = text => text }) {
   const { form, input, panel, status, results } = elements;
   let timer = null;
   let ticket = 0; // a newer query makes an older search that is still loading stop
@@ -30,7 +31,7 @@ export function initMessageSearch({ elements, api, me, onPick, debounceMs = 250 
   function excerptLine(hit, query) {
     const line = document.createElement('small');
     line.className = 'dm__hit-text';
-    highlightParts(hit.excerpt, query).forEach(part => {
+    highlightParts(cleanExcerpt(hit.excerpt ?? ''), query).forEach(part => {
       if (!part.match) {
         line.append(part.text);
         return;

@@ -407,6 +407,49 @@
   @include dm-focus-ring(-1px);
 }
 
+// A reply's quote of the message it answers (chat-reply.js's renderReplyQuote): a
+// slim accent-ruled block above the reply's text. It is a button, so clicking it
+// scrolls to the original and marks it (.is-found).
+.dm .chat-reply-quote {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  max-width: min(100%, var(--dm-measure));
+  margin: 0.15rem 0 0.35rem;
+  padding: 0.3rem 0.6rem;
+  border: 0;
+  border-left: 3px solid var(--dm-accent);
+  border-radius: var(--dm-radius-sm);
+  background: var(--dm-wash);
+  font-family: var(--dm-font);
+  text-align: left;
+  color: var(--dm-ink);
+  cursor: pointer;
+  transition: background-color $transition-fast ease;
+
+  &:hover {
+    background: var(--dm-hover);
+  }
+
+  @include dm-focus-ring;
+}
+
+.dm .chat-reply-quote-sender {
+  font-size: $text-xs;
+  font-weight: 600;
+  color: var(--dm-ink);
+}
+
+.dm .chat-reply-quote-text {
+  overflow: hidden;
+  font-size: $text-sm;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  @include dm-quiet;
+}
+
 // A line that is not a message, such as a shared file.
 .dm .chat-system {
   margin: var(--dm-space-xs) var(--dm-gutter);

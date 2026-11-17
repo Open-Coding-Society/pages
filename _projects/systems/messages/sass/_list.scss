@@ -91,6 +91,15 @@
   }
 }
 
+// "Find a conversation", at the top of the list. It filters the rows in place.
+.dm__find {
+  margin: 0 var(--dm-space-xs) var(--dm-space-md);
+
+  .ocs__input {
+    width: 100%;
+  }
+}
+
 .dm__group {
   & + & {
     margin-top: var(--dm-space-lg);

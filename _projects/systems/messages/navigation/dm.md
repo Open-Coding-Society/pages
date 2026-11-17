@@ -55,6 +55,14 @@ the open conversation each start with a bar of the same height.
         </span>
       </header>
       <div class="dm__aside-scroll">
+        {%- comment -%}
+          Narrows the Groups and Direct messages lists below to the rows whose group
+          name, class, period or people match (messages-model.js's
+          matchesConversationSearch). Searching inside one chat is the box in its header.
+        {%- endcomment -%}
+        <form class="dm__find" role="search" autocomplete="off" onsubmit="return false">
+          <input class="ocs__input" id="messagesConversationSearch" type="search" placeholder="Find a conversation" aria-label="Find a conversation by group or person" disabled>
+        </form>
         <section class="dm__group">
           <div class="dm__group-head">
             <h2 class="dm__group-title">Groups</h2>

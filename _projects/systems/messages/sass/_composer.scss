@@ -240,6 +240,73 @@
   }
 }
 
+// "Replying to …" above the composer (chat-reply.js's createReplyBar), with its Cancel.
+.dm .chat-reply-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--dm-space-sm);
+  flex: none;
+  margin: 0 var(--dm-gutter) var(--dm-space-xs);
+  padding: 0.35rem 0.4rem 0.35rem 0.7rem;
+  border-left: 3px solid var(--dm-accent);
+  border-radius: var(--dm-radius-sm);
+  background: var(--dm-surface);
+  font-family: var(--dm-font);
+
+  &[hidden] {
+    display: none;
+  }
+
+  > i {
+    flex: none;
+    color: var(--dm-accent);
+  }
+}
+
+.dm .chat-reply-bar-text {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+
+  b {
+    font-size: $text-xs;
+    font-weight: 600;
+    color: var(--dm-ink);
+  }
+
+  small {
+    overflow: hidden;
+    font-size: $text-sm;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    @include dm-quiet;
+  }
+}
+
+.dm .chat-reply-bar-cancel {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: none;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--dm-radius-sm);
+  background: none;
+  font-size: $text-lg;
+  line-height: 1;
+  color: var(--dm-ink);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--dm-hover);
+  }
+
+  @include dm-focus-ring(-1px);
+}
+
 .dm__form-status {
   flex: none;
   margin: 0 var(--dm-gutter) var(--dm-space-md);

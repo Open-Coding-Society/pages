@@ -53,7 +53,7 @@ export async function startMessagesPage({ config, richText }) {
 
   const me = await signedInPerson(api, setStatus);
   if (!me) return;
-  const state = { groups: [], conversations: [], active: null };
+  const state = { groups: [], conversations: [], active: null, query: '' };
   let messageSearch = null; // set once the search box is wired up, below
   // The search box in the chat header searches the open direct message, so it is told which.
   const syncSearchScope = () => {
@@ -68,6 +68,21 @@ export async function startMessagesPage({ config, richText }) {
     onOpen: (kind, id) => openConversation(kind, id),
   });
   const render = () => sidebar.render(state);
+  // "Find a conversation" narrows both lists as you type; Escape clears it.
+  const conversationSearch = byId('messagesConversationSearch');
+  if (conversationSearch) {
+    conversationSearch.addEventListener('input', () => {
+      state.query = conversationSearch.value.trim();
+      render();
+    });
+    conversationSearch.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || !conversationSearch.value) return;
+      event.preventDefault();
+      conversationSearch.value = '';
+      state.query = '';
+      render();
+    });
+  }
 
   const socket = createChatSocket(config.javaWebSocketURI, { onClose: () => setStatus('disconnected', 'is-error') });
   const files = initFiles({
@@ -299,6 +314,7 @@ export async function startMessagesPage({ config, richText }) {
     me,
     // The box only searches the open chat, so a match is always in the thread on screen.
     onPick: hit => thread.showMessage(String(hit.id)),
+    cleanExcerpt: typeof richText.stripChatMarkers === 'function' ? richText.stripChatMarkers : undefined,
     elements: {
       form: byId('messagesSearchForm'), input: byId('messagesSearch'), panel: byId('messagesSearchPanel'),
       status: byId('messagesSearchStatus'), results: byId('messagesSearchResults'),
@@ -322,6 +338,7 @@ export async function startMessagesPage({ config, richText }) {
   }
   byId('messagesFindGroup').disabled = false;
   byId('messagesNewChat').disabled = false;
+  if (conversationSearch) conversationSearch.disabled = false;
 
   // The navbar bell's summary keeps the unread counts current, and shows conversations
   // someone else started since the list loaded.
