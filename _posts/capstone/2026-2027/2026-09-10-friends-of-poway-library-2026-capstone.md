@@ -4,9 +4,8 @@ toc: false
 layout: post
 title: Friends of the Poway Library 2026–27
 description: >
-  CSP 2026–27 capstone continuing the Friends of the Poway Library prototype
-  with a searchable bookstore catalog, events, newsletters, volunteer and
-  donation pathways, community history, and library-themed games.
+  CSP 2026–27 capstone focused on a bookstore catalog, events, newsletters,
+  community history, volunteer and contact information, and member profiles.
 categories: [Capstone]
 permalink: /capstone/poway-library-2026-27/
 capstone_project:
@@ -14,11 +13,11 @@ capstone_project:
   school_year: "2026-2027"
   title: "Friends of the Poway Library 2026–27"
   image: "/images/capstone/poway_library.png"
-  description: "A CSP capstone continuing the previous Friends of the Poway Library prototype with a searchable bookstore catalog, events and newsletters, volunteer and donation pathways, community history, profiles, and library-themed games."
-  team: "Arjun Ganesh — Scrum Master; Nathan Trieu — Developer 1; Raadin Ansari — Developer 2"
+  description: "A CSP capstone developing a Friends of the Poway Library website focused on a searchable bookstore catalog, events, newsletters, community history, volunteer and contact information, and member profiles."
+  team: "Pranav Sai — Scrum Master; Nathan Trieu — System Architect; Raadin Ansari — Product Owner; Luke Sanders — Education Liaison"
   links:
-    frontend: "https://github.com/Boolean-Boyz/bb-pages"
-    backend: "https://github.com/Boolean-Boyz/bb-flask"
+    frontend: "https://github.com/FOPL-Team-2026/bb-pages"
+    backend: "https://github.com/FOPL-Team-2026/bb-flask"
 ---
 
 > **Student capstone · In development.** This project continues the 2025–26 Friends of the Poway Library prototype. It is a student-built concept and is not the official Friends of the Poway Library or San Diego County Library website.
@@ -28,13 +27,13 @@ capstone_project:
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>One useful home for the library community</strong>
-        <p>A continuation of the previous website redesign, focused on helping visitors discover used books, find events, support the organization, and return for community resources and activities.</p>
+        <p>A student project developing a useful home for the Friends community, with a bookstore catalog, events, newsletters, community history, volunteer and contact information, and member profiles.</p>
         <p><strong>Experience:</strong> discover → explore → participate → support → return</p>
     </div>
 
     <div class="ocs__grid-cell">
         <img src="{{ '/images/capstone/poway_library.png' | relative_url }}" alt="Friends of the Poway Library capstone project" loading="lazy">
-        <p><strong>Project focus:</strong> bookstore discovery, event access, newsletters, history, volunteering, donations, member profiles, and interactive games.</p>
+        <p><strong>Project focus:</strong> bookstore discovery, events, newsletters, community history, volunteer and contact information, and member profiles.</p>
     </div>
 </div>
 
@@ -44,10 +43,10 @@ capstone_project:
     <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://github.com/FOPL-Team-2026/bb-pages" target="_blank" rel="noreferrer noopener">
         <span>Frontend Repository</span>
     </a>
-    <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noreferrer noopener">
+    <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="https://github.com/FOPL-Team-2026/bb-flask" target="_blank" rel="noreferrer noopener">
         <span>Backend Repository</span>
     </a>
-    <a class="ocs__btn iridescent" href="https://fopl-team-2026.github.io/bb-pages/home" target="_blank" rel="noreferrer noopener">Visit Website ↗</a>
+    <a class="ocs__btn iridescent" href="https://fopl.opencodingsociety.com/home" target="_blank" rel="noreferrer noopener">Previous Prototype ↗</a>
 </div>
 
 <br>
@@ -193,7 +192,7 @@ Sprint work from the team's GitHub project, including planning and frontend issu
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>04 · Learn and return</strong>
-        <p>Explore the library's history and use library-themed games, profiles, and leaderboards that give visitors reasons to come back.</p>
+        <p>Explore the library's history and learn about the Friends and their members.</p>
     </div>
 </div>
 
@@ -213,7 +212,7 @@ Sprint work from the team's GitHub project, including planning and frontend issu
 
     <div class="ocs__grid-cell">
         <strong>Project direction</strong>
-        <p>Continue the prototype as a modern, community-facing website that brings the bookstore catalog, events, newsletters, organizational history, support pathways, and interactive features into one consistent experience.</p>
+        <p>Develop a community-facing website that brings the bookstore catalog, events, newsletters, organizational history, volunteer and contact information, and member profiles into one consistent experience.</p>
     </div>
 </div>
 
@@ -221,7 +220,7 @@ Sprint work from the team's GitHub project, including planning and frontend issu
 
 ---
 
-## Feature foundation from 2025–26
+## 2025–26 prototype feature foundation
 
 <div class="ocs__grid ocs__grid--card">
     <div class="ocs__grid-cell">
@@ -240,8 +239,8 @@ Sprint work from the team's GitHub project, including planning and frontend issu
     </div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>Games and profiles</strong>
-        <p>Six library-themed games supported by user profiles and leaderboards.</p>
+        <strong>Prototype games</strong>
+        <p>The 2025–26 prototype included six library-themed games, user profiles, and leaderboards.</p>
     </div>
 </div>
 
@@ -258,12 +257,12 @@ Sprint work from the team's GitHub project, including planning and frontend issu
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>1 · Visitor interface</strong>
-        <p>Jekyll pages and JavaScript present the catalog, calendar, newsletters, history, games, and support pathways.</p>
+        <p>Jekyll pages and JavaScript present the catalog, events, newsletters, community history, volunteer and contact information, and member profiles.</p>
     </div>
 
     <div class="ocs__grid-cell">
         <strong>2 · User actions</strong>
-        <p>Visitors search, filter, sign in, manage a profile, play games, volunteer, contact the organization, or begin a donation.</p>
+        <p>Visitors can explore the catalog, find events and newsletters, learn about the Friends, and find volunteer and contact information.</p>
     </div>
 
     <div class="ocs__grid-cell">
@@ -296,12 +295,12 @@ Sprint work from the team's GitHub project, including planning and frontend issu
 
     <div class="ocs__grid-cell">
         <strong>Data</strong>
-        <p>Structured records for catalog items, events, users, profiles, game results, and future support workflows.</p>
+        <p>Structured records for catalog items, events, and member profiles.</p>
     </div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Continuation goal</strong>
-        <p>Review the inherited code, confirm nonprofit priorities, and turn the strongest prototype features into a maintainable product direction.</p>
+        <p>Review the inherited code, confirm nonprofit priorities, and develop the catalog, events, newsletters, community history, volunteer and contact information, and member profiles.</p>
     </div>
 </div>
 
@@ -323,15 +322,15 @@ Sprint work from the team's GitHub project, including planning and frontend issu
     </div>
     <div class="ocs__grid-cell">
         <strong>Nathan Trieu</strong>
-        <p>Developer 1</p>
+        <p>System Architect</p>
     </div>
     <div class="ocs__grid-cell">
         <strong>Raadin Ansari</strong>
-        <p>Developer 2</p>
+        <p>Product Owner</p>
     </div>
     <div class="ocs__grid-cell">
         <strong>Luke Sanders</strong>
-        <p>Developer 3</p>
+        <p>Education Liaison</p>
     </div>
 </div>
 
@@ -349,7 +348,7 @@ Sprint work from the team's GitHub project, including planning and frontend issu
 <br>
 
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn large iridescent" href="https://github.com/Boolean-Boyz/bb-pages" target="_blank" rel="noreferrer noopener">View Frontend Repository</a>
-    <a class="ocs__btn large iridescent" href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noreferrer noopener">View Backend Repository</a>
+    <a class="ocs__btn large iridescent" href="https://github.com/FOPL-Team-2026/bb-pages" target="_blank" rel="noreferrer noopener">View Frontend Repository</a>
+    <a class="ocs__btn large iridescent" href="https://github.com/FOPL-Team-2026/bb-flask" target="_blank" rel="noreferrer noopener">View Backend Repository</a>
     <a class="ocs__btn large iridescent" href="{{ '/capstone/poway-library/' | relative_url }}">View 2025–26 Project Page</a>
 </div>
