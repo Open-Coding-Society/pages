@@ -25,6 +25,7 @@ export const THREAD_TEXTS = Object.freeze({
   deleteFailed: 'Could not delete the message. Try again.',
   waitForSave: 'Wait for your message to finish saving first.',
   imageUnreadable: 'Could not read that image. Try a different file.',
+  imageOnly: 'Drop an image or screenshot here.',
   fileShared: '{sender} shared a file:',
   fileSharedBySomeone: 'A file was shared:',
   fileGone: '{filename} is no longer shared with this group.',
@@ -76,6 +77,7 @@ export function createThread({
   let early = []; // frames that arrived before the open conversation's history
   let unseenWhileHidden = false;
   let pendingImage = null; // a data URL attached to the next message, or null
+  let dragDepth = 0;
   let destroyed = false;
 
   // A read-only pane shows the conversation but can't change it: no composer, and no
@@ -137,6 +139,11 @@ export function createThread({
 
   async function pickImage(file) {
     if (!file) return;
+    if (file.type && !file.type.startsWith('image/')) {
+      clearImage();
+      showFormMessage(text.imageOnly);
+      return;
+    }
     try {
       pendingImage = await readImageFile(file);
     } catch (error) {
@@ -401,6 +408,15 @@ export function createThread({
     refreshComposer();
     if (current.catchUp) loadNew(kind, id);
     if (kind === 'dm') markRead(id);
+    if (current.reveal) log.reveal(current.reveal);
+  }
+
+  // Scrolls the open conversation to one message and marks it: what a search result
+  // asks for. Asked while the history is still loading, it happens once that arrives.
+  function showMessage(key) {
+    if (!current) return;
+    if (current.loaded) log.reveal(key);
+    else current.reveal = key;
   }
 
   function close() {
@@ -431,6 +447,8 @@ export function createThread({
     socket.unfollow();
     document.removeEventListener('visibilitychange', onVisibilityChange);
     composer?.destroy();
+    // Takes the image viewer and its Escape listener off the page too.
+    log.destroy();
   }
 
   document.addEventListener('visibilitychange', onVisibilityChange);
@@ -442,6 +460,29 @@ export function createThread({
     });
     elements.cancelEdit.addEventListener('click', resetEdit);
     elements.imageInput?.addEventListener('change', event => pickImage(event.target.files?.[0]));
+    const setDragging = active => {
+      elements.form.classList.toggle('is-dragging', active);
+      if (elements.dropHint) elements.dropHint.setAttribute('aria-hidden', String(!active));
+    };
+    elements.form.addEventListener('dragenter', event => {
+      event.preventDefault();
+      dragDepth += 1;
+      setDragging(true);
+    });
+    elements.form.addEventListener('dragover', event => {
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
+    });
+    elements.form.addEventListener('dragleave', () => {
+      dragDepth = Math.max(0, dragDepth - 1);
+      if (dragDepth === 0) setDragging(false);
+    });
+    elements.form.addEventListener('drop', event => {
+      event.preventDefault();
+      dragDepth = 0;
+      setDragging(false);
+      pickImage(event.dataTransfer?.files?.[0]);
+    });
     elements.imageRemove?.addEventListener('click', () => {
       clearImage();
       refreshComposer();
@@ -457,7 +498,7 @@ export function createThread({
   close();
 
   return {
-    open, close, resume, setHeading, destroy,
+    open, close, resume, setHeading, showMessage, destroy,
     current: () => (current ? { kind: current.kind, id: current.id } : null),
   };
 }

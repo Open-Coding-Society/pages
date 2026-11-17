@@ -8,23 +8,24 @@ same way they reach a direct message.
 
 | File | What it does |
 | --- | --- |
-| `navigation/dm.md` | The page (`/dm`) and its six dialogs, styled by `sass/` under `.dm`. The message list keeps the `chat-*` class names the course chats use, but none of their `.announcement-chat` rules. |
+| `navigation/dm.md` | The page (`/dm`) and its six dialogs, styled by `sass/` under `.dm`. It fills the window under the site header: `full_width: true` widens the layout, and a few lines of inline script measure the header into `--dm-top` and, on a phone, swap the list for the open conversation. The message list keeps the `chat-*` class names the course chats use, but none of their `.announcement-chat` rules. |
 | `navigation/groups-redirect.md`, `navigation/group-dashboard-redirect.md` | `/student/groups/` and `/student/groups/dashboard/` send people to `/dm`. |
 | `js/messages-page.js` | Starts the page: who is signed in, the two lists, opening a conversation, the group header buttons, the socket. |
 | `js/conversation-embed.js` | One group chat or direct message inside another page, such as a UI Builder page. See [Embedding a conversation](#embedding-a-conversation). |
 | `js/thread.js` | The open conversation: loads it, follows its socket topic, sends, edits and deletes, and keeps DM read state. An embed's pane can also be read-only, use the host's wording and be destroyed. |
 | `js/message-log.js` | Draws the messages: day dividers, avatars, edit and delete buttons. Also the small text helpers the pane and the embed share. |
-| `js/sidebar.js` | The Groups and Direct messages lists, as `ocs__nav-card` links. |
+| `js/sidebar.js` | The Groups and Direct messages lists, as `ocs__nav-card` links, each starting with an `ocs__avatar` of the name's initials. |
 | `js/new-chat.js` | The New chat dialog. |
 | `js/group-dialogs.js` | Find a group (search, join, make a group), Members (with Delete group at the bottom, for admins), and Files. |
 | `js/delete-group.js` | The Delete group dialog: says what deleting takes away, and waits for the group's name. |
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
 | `js/messages-api.js` | Every Spring and Flask request. |
+| `js/message-search.js` | The search box in a direct message's header: debounced query for that chat, matches listed under the header with the match marked, and jumping to the one picked. |
 | `js/chat-socket.js` | The STOMP-over-SockJS connection to Spring's `/ws-chat`, one for `/dm` and one for each embed. |
 | `js/messages-model.js` | Pure functions: one message shape for DMs and groups, labels, roles. |
 | `js/formation-model.js` | Pure functions: the steps of forming groups. |
-| `sass/` | The `/dm` skin, scoped under `.dm`; `.dm--embed` in `_layout.scss` fits an embed into its host's column. |
+| `sass/` | The `/dm` skin, scoped under `.dm`; `.dm--embed` in `_layout.scss` fits an embed into its host's column. It has no palette or scale of its own: `_tokens.scss` aliases the site's theme tokens and the shared scale in `_sass/open-coding/mixins/_variables.scss`, and no partial holds a literal colour. See [Styling under a user theme](#styling-under-a-user-theme). |
 | `tests/*.test.mjs` | Node tests: the two model files, the sidebar, the message log, the pane, the embed, and the shared composer's `enterKey` and `destroy()`. |
 | `tests/fake-dom.mjs` | A small stand-in for the browser DOM that the pane, log, embed and composer tests run on. |
 
@@ -137,6 +138,7 @@ back the listeners the pane and its composer put on `document` and `window`, and
 | `you`, `edited`, `deleted` | You; (edited); This message was deleted. |
 | `editMessage`, `deleteMessage` | Edit message; Delete message (button labels) |
 | `imageFrom` | Image from {name} |
+| `openImage`, `closeImage` | View image from {name} larger; Close image (the image viewer) |
 | `today`, `yesterday` | Today; Yesterday (day dividers; older days use the browser's date format) |
 | `fileShared`, `fileSharedBySomeone` | {sender} shared a file:; A file was shared: |
 | `fileGone`, `fileFailed` | {filename} is no longer shared with this group.; Could not download {filename}. Try again. |
@@ -163,6 +165,9 @@ Things to know:
 - An embed has no image attach and no Members or Files dialog (`createDialog` in
   `dialogs.js` leaves a `document` listener it can't take back). A shared-file line in the
   log still downloads the file.
+- Clicking an image in an embed opens it in the log's own viewer, not a new tab. The
+  viewer is built on the first click inside the embed's `.dm` root, and `destroy()` takes
+  it and its Escape listener off the page, so unlike the dialogs it leaves nothing behind.
 - If the connection drops, the embed says live updates are off and, like `/dm`, doesn't
   reconnect. Sending still works, and fetches the conversation afterwards.
 - The composer toolbar's labels come from `rich-text.js` and read the same in every chat.
@@ -173,7 +178,10 @@ Spring:
 
 - `GET /api/person/get`, `GET /api/people/search?query=`
 - `/api/dm/conversations` (list, start), `/api/dm/conversations/{id}/messages` (read,
-  send, edit, delete), `POST /api/dm/conversations/{id}/read`
+  send, edit, delete), `POST /api/dm/conversations/{id}/read`,
+  `GET /api/dm/search?q=` (your direct messages only, 2-100 characters, newest 50;
+  add `&conversationId=` for one chat, which is what the page does; group chats are
+  not searched)
 - `GET /api/groups/person/{personId}` (your groups), `GET /api/groups/search?name=`,
   `GET /api/groups` (Form groups only), `POST /api/groups`, `DELETE /api/groups/{id}`,
   `POST` and `DELETE /api/groups/{id}/members/{personId}`
@@ -214,6 +222,27 @@ Flask, for Form groups: `POST /api/persona/evaluate-group`, `POST /api/persona/f
   new chat file, but it lists the old group's files.
 - Group names are unique across the site, and group chat history is stored by group
   name.
+
+## Styling under a user theme
+
+A student's theme (`assets/js/user-preferences.js`, `_sass/open-coding/theme/user-preferences.scss`)
+overrides more than colours, and three of its rules decide how `sass/` is written:
+
+- Every `p`, `span`, `div`, `small`, `label`, `li` and heading gets the text colour with
+  `!important`, so a muted colour on one of them does nothing. Secondary text uses the
+  `dm-quiet` mixin instead, which keeps the text colour and lowers the opacity; it reads
+  the same with a theme and without one. Elements the theme leaves alone (`strong`,
+  `time`, `abbr`, `kbd`, buttons) can still take a colour.
+- Every `button` gets the panel background and an accent border from
+  `.user-theme-active button`, and `color: inherit !important`. Button rules here start
+  with `.dm ` to outrank the first, and Send sets its label colour with `!important` so
+  the page colour, not the text colour, sits on the accent.
+- The grammar turns every `ocs__nav-card-title` to the accent with `!important`. In a
+  list of people that colours every name, so the list sets them back to the text colour
+  and keeps the accent for the selected row and the unread count.
+
+The image viewer's `z-index` is one above the site header's (`_sass/open-coding/navbar.scss`),
+because it is modal and the header would otherwise sit over its close button.
 
 ## Build and test
 

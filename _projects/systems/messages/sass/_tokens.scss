@@ -3,9 +3,12 @@
 // Every rule in this folder is compiled into the site-wide stylesheet via
 // _sass/projects/_all.scss, so all of it stays under `.dm`.
 //
-// Colours are aliased from the site palette (_sass/open-coding/theme/legacy/) rather
-// than pinned here, so /dm follows the site theme. Swapping the page to its own
-// palette means editing only this block.
+// Nothing here is a palette or a scale of its own. Colours are scoped aliases of the
+// site's theme tokens, the pattern _sass/open-coding/README.md describes for a page
+// ("Color and preferences"), and sizes come from the shared scale in
+// _sass/open-coding/mixins/_variables.scss. There is no literal colour in this folder:
+// every surface, line and shade is the theme's text or accent mixed into its background,
+// so the page reads in any theme a student picks.
 
 @mixin dm-below($width) {
   @media (max-width: $width) {
@@ -21,50 +24,95 @@
   }
 }
 
+// Secondary text: timestamps, subtitles, labels, hints.
+//
+// An active user theme sets `color: var(--pref-text-color) !important` on every p, span,
+// div, small, label and heading (_sass/open-coding/theme/user-preferences.scss), so a
+// muted colour on one of those is simply ignored and the whole page comes out at one
+// weight. Opacity is not overridden, so the hierarchy is drawn with it instead: the text
+// stays the theme's text colour and steps back by this much, themed or not. Use it on
+// text only -- it dims whatever is inside the element too.
+@mixin dm-quiet($level: var(--dm-quiet)) {
+  color: var(--dm-ink);
+  opacity: $level;
+}
+
+// A quiet rectangular button: the list headers' actions, the thread's group actions,
+// the composer's Cancel and Add image. Square corners from the shared radius scale.
+@mixin dm-quiet-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--dm-rule);
+  border-radius: var(--dm-radius);
+  background: transparent;
+  font-family: var(--dm-font);
+  font-size: $text-sm;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--dm-ink);
+  cursor: pointer;
+  transition: border-color $transition-fast ease, background-color $transition-fast ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--dm-rule-strong);
+    background: var(--dm-hover);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  @include dm-focus-ring(1px);
+}
+
 .dm {
   // Ink and paper. These point at the custom properties root-color-map.scss publishes
-  // on :root, rather than at the SCSS variables behind them, so the page follows the
-  // site palette without this file restating it -- and without a second copy of that
-  // :root block landing in the compiled CSS.
+  // on :root and the preference engine rewrites, so the page follows a chosen theme and
+  // still matches the page background for a visitor who has none (where
+  // --pref-bg-color keeps its stylesheet default and is not what the body shows).
   --dm-bg: var(--background);
   --dm-ink: var(--text);
   --dm-muted: var(--text-muted);
-  // 55%, not less: this carries the timestamps, labels and hints, which are the
-  // smallest text on the page. Over the site's #121212 that lands near 5.6:1, where
-  // 45% measured 4.1:1 and missed AA for small text.
+  // 55%, not less: this carries the smallest text on the page. Over the site's #121212
+  // that lands near 5.6:1, where 45% measured 4.1:1 and missed AA for small text.
   --dm-faint: color-mix(in srgb, var(--text) 55%, transparent);
-  // The user themes (assets/js/user-preferences.js) rewrite --background, --text,
-  // --text-muted and --bg-3 on :root, so everything above follows a theme for free.
-  // They do NOT rewrite --accent -- they publish the chosen accent as
-  // --pref-accent-color instead -- so this has to ask for that first or /dm keeps the
-  // stock blue while the rest of the page turns Cyberpunk pink.
+  // The user themes do not rewrite --accent; they publish the chosen accent as
+  // --pref-accent-color, so that is asked for first.
   --dm-accent: var(--pref-accent-color, var(--accent));
-
   // Not themed on purpose: a destructive action should stay red whatever the palette.
   --dm-alert: var(--red);
 
-  // Two weights of line, deliberately. --dm-rule is a decorative divider between rows
-  // and sections. --dm-edge is the visible boundary of a control (inputs, buttons,
-  // the composer) and so is held at ~3.5:1 for WCAG 1.4.11; $bg-3, which this used at
-  // first, measured 1.3:1 and read as no border at all.
-  --dm-rule: color-mix(in srgb, var(--text) 14%, transparent);
-  --dm-rule-strong: color-mix(in srgb, var(--text) 40%, transparent);
-  --dm-wash: color-mix(in srgb, var(--text) 3%, transparent);
+  // The two opacity steps dm-quiet uses. 0.72 of the text colour keeps secondary text
+  // above 7:1 on the site's dark page and above 4.5:1 on a white one; 0.58 is for the
+  // very smallest labels and stays above 4.5:1 on both.
+  --dm-quiet: 0.72;
+  --dm-quieter: 0.58;
 
-  // One family, matching the rest of the site: `body` is set to 'JetBrains Mono',
-  // monospace, so everything here is monospace too rather than importing a typeface
-  // of its own. Source Code Pro sits next in the stack because the site's <head>
-  // actually loads it and JetBrains Mono is not loaded anywhere -- without it this
-  // drops straight to Consolas. Hierarchy comes from size, weight and letter-spacing.
-  // A theme sets body's font with !important, but `.dm` declares its own font and so
-  // would ignore it. Asking for --pref-font-family first keeps /dm in step with a
-  // chosen theme, and falls back to the site's monospace when no theme is active.
+  // Lines. --dm-rule divides rows and panes. --dm-rule-strong is the visible edge of a
+  // control (the composer, a button on hover) and is held near 3.5:1 for WCAG 1.4.11.
+  --dm-rule: color-mix(in srgb, var(--text) 12%, transparent);
+  --dm-rule-strong: color-mix(in srgb, var(--text) 38%, transparent);
+
+  // Surfaces, each a little of the text colour laid over the page: the conversation
+  // list, a hovered row, and the selected conversation, which takes the accent instead.
+  --dm-wash: color-mix(in srgb, var(--text) 3%, transparent);
+  --dm-surface: color-mix(in srgb, var(--text) 4%, var(--background));
+  --dm-hover: color-mix(in srgb, var(--text) 7%, transparent);
+  --dm-selected: color-mix(in srgb, var(--dm-accent) 16%, transparent);
+  // What sits over the page while an image is open or being dropped: the page's own
+  // colour, nearly opaque, so it is dark in a dark theme and light in a light one.
+  --dm-scrim: color-mix(in srgb, var(--background) 88%, transparent);
+
+  // One family, the site's: a chosen theme's font first, then the site's monospace.
   --dm-font: var(--pref-font-family, 'JetBrains Mono', 'Source Code Pro', ui-monospace, Consolas, monospace);
 
   // A readable measure for message text: 60-70 characters.
-  --dm-measure: 66ch;
+  --dm-measure: 68ch;
 
-  // Spacing, aliased from the shared scale so /dm keeps the site's rhythm.
+  // Spacing and radius, aliased from the shared scale so /dm keeps the site's rhythm.
   --dm-space-xs: #{$spacing-xxs};
   --dm-space-sm: #{$spacing-sm};
   --dm-space-md: #{$spacing-md};
@@ -74,7 +122,11 @@
   --dm-radius: #{$radius-xs};
   --dm-radius-sm: #{$radius-xxs};
 
-  // How tall the two scrolling panes are. Clamped so the page still works on a
-  // short laptop screen and does not stretch absurdly on a tall monitor.
-  --dm-shell-height: clamp(30rem, calc(100dvh - 15rem), 54rem);
+  // The page's own geometry. The bar is the strip across the top of each pane (the
+  // page title on one side, the open conversation's name on the other): one height, so
+  // the line under both runs straight across the window. The gutter is the space
+  // between a pane's edge and its content; an embed sets it to zero.
+  --dm-bar: 3.75rem;
+  --dm-gutter: #{$spacing-lg};
+  --dm-aside-width: clamp(16rem, 24vw, 21rem);
 }
