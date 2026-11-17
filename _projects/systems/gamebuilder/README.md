@@ -37,7 +37,10 @@ original `/gamebuilder/` page. Other documentation is published from `docs/`.
   which also remains visible in the preview. Cards can hide or show a barrier;
   hidden barriers are invisible but retain their player collision behavior.
   Generated levels create independent `SplineBarrier` objects from the shared
-  GameEngine.
+  GameEngine. The barrier panel is its own form below the game type panels:
+  RPG always shows it, and so does any game type with `"barriers": true` in
+  `game-templates.json` (Racing). Each game type keeps its own barrier list,
+  RPG in its builder state and the others in their options as `barriers`.
 - `docs/` retains the existing asset guidance, workbench page, and GameBuilder
   v2 proposal.
 - `images/` is reserved for GameBuilder system-owned images. Game/project art
@@ -82,9 +85,10 @@ background, a `PlayerDriver` car on WASD (plus a second car on the arrow keys
 when chosen), one `Character` per obstacle, and the engine's `LapRace`, which
 draws the finish line, lap counter, timer and winner banner. Each track item in
 the JSON carries its finish line, checkpoint and start position, copied from
-the racing game's levels; each car item carries its sprite sheet layout. Cars
-can leave the road for now: the tracks have no walls yet, but the checkpoint
-still stops shortcut laps.
+the racing game's levels; each car item carries its sprite sheet layout. To
+keep cars on the road, draw spline barriers along the track edges (Push and Run
+first so the track shows in the preview); each becomes a `SplineBarrier` wall
+that pushes cars back. The checkpoint also stops shortcut laps.
 
 Platform (`generators/platform.mjs`) builds the background, an invisible floor,
 one `Barrier` per platform (X/Y is the top-left corner), a `PlayerPlatformer`

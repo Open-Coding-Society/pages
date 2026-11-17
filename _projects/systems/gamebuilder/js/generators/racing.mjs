@@ -1,10 +1,12 @@
 /**
  * @module generators/racing
  * @description Turns the Racing panel settings into a playable GameEngine
- * level: a track, one or two cars, optional obstacles, and a lap race.
+ * level: a track, one or two cars, optional obstacles, spline barrier walls
+ * that keep cars on the road, and a lap race.
  * @data Uses the Racing pictures from game-templates.json. Each track brings
  * its finish line, checkpoint and start position; each car brings its sprite
- * sheet layout. Positions are 0–1 proportions of the canvas.
+ * sheet layout. Positions are 0–1 proportions of the canvas. Barriers are the
+ * shared builder records `{ id, name, visible, points }`, drawn on the preview.
  * @usage `generateRacingCode(options, images)` returns `{ code, errors }`;
  * errors are `{ field, message }` and leave `code` empty.
  */
@@ -35,6 +37,12 @@ function checkOptions(options, images) {
     const placed = isBetween(obstacle.x, 0, 1) && isBetween(obstacle.y, 0, 1);
     if (!images.get('obstacles').has(obstacle.spriteKey) || !placed) {
       errors.push({ field: `obstacles.${index}`, message: `Obstacle ${index + 1} needs a picture and X/Y from 0 to 1.` });
+    }
+  });
+  (options.barriers ?? []).forEach((barrier, index) => {
+    const points = Array.isArray(barrier.points) ? barrier.points : [];
+    if (points.length < 2 || !points.every((point) => isBetween(point?.x, 0, 1) && isBetween(point?.y, 0, 1))) {
+      errors.push({ field: `barriers.${index}`, message: `Barrier ${index + 1} needs at least two points from 0 to 1.` });
     }
   });
   return errors;
@@ -92,6 +100,17 @@ export function generateRacingCode(options, images) {
       }
     });
   });
+  for (const barrier of options.barriers ?? []) {
+    classes.push({
+      class: code('SplineBarrier'),
+      data: {
+        id: barrier.id,
+        coordinateSpace: 'normalized',
+        visible: barrier.visible !== false,
+        splinePoints: barrier.points.map(({ x, y }) => ({ x, y }))
+      }
+    });
+  }
   classes.push({
     class: code('LapRace'),
     data: { totalLaps: options.laps, finishLine: track.finishLine, checkpoint: track.checkpoint }
@@ -104,6 +123,7 @@ export function generateRacingCode(options, images) {
     LapRace: 'LapRace.js'
   };
   if ((options.obstacles ?? []).length > 0) imports.Character = 'Character.js';
+  if ((options.barriers ?? []).length > 0) imports.SplineBarrier = 'SplineBarrier.js';
 
   return {
     code: levelModule({ imports, className: 'GameLevelRacing', displayName: options.name.trim(), body: '', classes }),

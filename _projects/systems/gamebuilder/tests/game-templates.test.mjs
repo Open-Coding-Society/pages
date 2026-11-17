@@ -74,6 +74,12 @@ test('starter settings use the data defaults and each field\'s first picture', (
   assert.equal(platform.playerSpriteKey, 'astronaut');
 });
 
+test('only Racing adds the spline barrier panel, and its barriers start empty', () => {
+  assert.deepEqual(templateData.filter((template) => template.barriers).map((template) => template.id), ['racing']);
+  assert.deepEqual(createTemplateOptions(byId.get('racing'), imagesFor('racing')).barriers, []);
+  assert.equal('barriers' in createTemplateOptions(byId.get('platform'), imagesFor('platform')), false);
+});
+
 test('new list items get unique ids even after removals, and pictures from their own group', () => {
   const list = byId.get('platform').sections.find((section) => section.list?.id === 'enemies').list;
   const first = createListItem(list, [], imagesFor('platform'));
@@ -100,7 +106,8 @@ test('malformed template data is rejected before any panel is drawn', () => {
     withField({ id: 'i', label: 'I', type: 'image', assetGroup: 'pics' }, { pics: [{ name: 'A', src: '../secret.png' }] }),
     withField({ id: 'i', label: 'I', type: 'image', assetGroup: 'pics' }, { pics: [{ name: 'A', src: '//evil.example/a.png' }] }),
     withField({ id: 'i', label: 'I', type: 'image', assetGroup: 'pics' }, { pics: [] }),
-    [rpg, { id: 'x', name: 'X', description: '', codeReady: false, assets, sections: [{ legend: 'A' }] }]
+    [rpg, { id: 'x', name: 'X', description: '', codeReady: false, assets, sections: [{ legend: 'A' }] }],
+    [rpg, { id: 'x', name: 'X', description: '', codeReady: false, barriers: 'yes', assets, sections: [{ legend: 'A', fields: [] }] }]
   ]) {
     assert.throws(() => validateGameTemplates(data), /Invalid game templates/);
   }

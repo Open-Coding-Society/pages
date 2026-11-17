@@ -60,6 +60,19 @@ test('unfinished forms and an active barrier retain undo/cancel recovery state',
   assert.deepEqual(parseWorkspace(serializeWorkspace(document)), document);
 });
 
+test('Racing keeps its own spline barriers, including one being drawn', () => {
+  const document = workspace();
+  const wall = { id: 'barrier-2', name: 'Barrier 2', visible: true, points: [{ x: 0.2, y: 0.3 }] };
+  document.template = { id: 'racing', options: { racing: { laps: 3, obstacles: [], barriers: [wall] } } };
+  document.editing.activeBarrierId = 'barrier-2';
+  document.editing.barrierEditSnapshot = [];
+  assert.deepEqual(parseWorkspace(serializeWorkspace(document)), document);
+
+  // The RPG barrier is not the one being edited while Racing is open.
+  document.editing.activeBarrierId = 'barrier-1';
+  assert.throws(() => serializeWorkspace(document), /Invalid workspace/);
+});
+
 test('rejects malformed, unsupported and unknown fields without conversion', () => {
   assert.throws(() => parseWorkspace('{'), SyntaxError);
   for (const change of [
@@ -75,7 +88,9 @@ test('rejects malformed, unsupported and unknown fields without conversion', () 
     (doc) => { doc.builderState.player.position.x = null; },
     (doc) => { doc.builderState.player.GRAVITY = true; },
     (doc) => { doc.editing.activeBarrierId = 'missing'; },
-    (doc) => { doc.builderState.barriers[0].points[0].x = 5; }
+    (doc) => { doc.builderState.barriers[0].points[0].x = 5; },
+    (doc) => { doc.template.options = { racing: { barriers: [{ id: 'a', name: 'A', points: [{ x: 2, y: 0 }] }] } }; },
+    (doc) => { doc.template.options = { racing: { barriers: 'none' } }; }
   ]) {
     const document = workspace();
     change(document);

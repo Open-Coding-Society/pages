@@ -13,7 +13,9 @@
  * choice and image. Each template lists its own pictures in `assets`, as
  * named groups of `{ name, src }` (for example Racing's `tracks` and `cars`);
  * `src` is a site path to an image the base game already publishes. An image
- * field names the group it chooses from with `assetGroup`.
+ * field names the group it chooses from with `assetGroup`. A template with
+ * `barriers: true` also uses the shared spline barrier panel; its options then
+ * hold a `barriers` list like the RPG builder's.
  *
  * @usage
  * Call `validateGameTemplates(data)` once after loading the JSON, then
@@ -80,6 +82,7 @@ export function validateGameTemplates(data) {
     templateIds.add(template.id);
     if (typeof template.name !== 'string' || typeof template.description !== 'string'
       || typeof template.codeReady !== 'boolean') fail(`${template.id} needs a name, description and codeReady`);
+    if (template.barriers !== undefined && typeof template.barriers !== 'boolean') fail(`${template.id} barriers must be true or false`);
     if (template.panel === 'rpg') continue;
     if (!Array.isArray(template.sections) || template.sections.length === 0) fail(`${template.id} needs sections`);
     checkAssets(template);
@@ -145,5 +148,7 @@ export function createTemplateOptions(template, images) {
       for (const field of section.fields) options[field.id] = fieldDefault(field, images);
     }
   }
+  // Spline barriers are drawn on the preview, so they start empty.
+  if (template.barriers) options.barriers = [];
   return options;
 }

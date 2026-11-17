@@ -5,6 +5,7 @@
     "name": "Racing",
     "description": "Drive a car around a track and finish the laps first.",
     "codeReady": true,
+    "barriers": true,
     "assets": {
       "tracks": [
         {
