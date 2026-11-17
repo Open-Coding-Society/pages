@@ -90,6 +90,13 @@ classes with `{ totalLaps, finishLine, checkpoint }` and it tracks every
 once one wins. GameBuilder's Racing template uses it. `PlayerDriver` cars with
 `rotateWithHeading: true` draw their `up` frame turned to face their heading.
 
+`essentials/PlatformChallenge.js` adds coins and enemies to a platform level:
+give it `{ coins, enemies }`, each item `{ src, x, y, size }` in 0–1 canvas
+coordinates (enemies may add `patrol`). It draws them and a score panel,
+collects coins a `PlayerPlatformer` touches, declares a win when every coin is
+collected, and sends the player back to their start when they touch an enemy.
+GameBuilder's Platform template uses it.
+
 The platformer game extends it in
 `_projects/games/platformer/levels/PlatformerPlayer.js` only for its jump sound
 and debug hitbox overlay.

@@ -72,7 +72,7 @@ picture, so Clicker offers plain background colours. A test checks that every
 listed picture exists in the repository.
 
 Each game type keeps its own settings in the workspace, so switching types does
-not lose work. Only types with `"codeReady": true` (RPG and Racing today) can
+not lose work. Only types with `"codeReady": true` (RPG, Racing and Platform today) can
 **Push →**; the others report that code generation is coming.
 
 Each code-ready type other than RPG has a generator in `js/generators/` that
@@ -85,6 +85,14 @@ the JSON carries its finish line, checkpoint and start position, copied from
 the racing game's levels; each car item carries its sprite sheet layout. Cars
 can leave the road for now: the tracks have no walls yet, but the checkpoint
 still stops shortcut laps.
+
+Platform (`generators/platform.mjs`) builds the background, an invisible floor,
+one `Barrier` per platform (X/Y is the top-left corner), a `PlayerPlatformer`
+that jumps with W and uses the panel's gravity and jump strength, and the
+engine's `PlatformChallenge` with the coins and enemies (X/Y is their centre).
+Collecting every coin wins; touching an enemy sends the player back to the
+start, and enemies walk a short way left and right. Player pictures carry their
+sprite sheet layout in the JSON; enemy and coin pictures carry their size.
 
 ## Protecting workspace work
 
