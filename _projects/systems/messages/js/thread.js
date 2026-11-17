@@ -438,6 +438,8 @@ export function createThread({
     socket.unfollow();
     document.removeEventListener('visibilitychange', onVisibilityChange);
     composer?.destroy();
+    // Takes the image viewer and its Escape listener off the page too.
+    log.destroy();
   }
 
   document.addEventListener('visibilitychange', onVisibilityChange);

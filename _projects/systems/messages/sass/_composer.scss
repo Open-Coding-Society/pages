@@ -3,31 +3,50 @@
 // .rt-emoji-panel is attached to <body>, not to the form, and is styled globally in
 // _projects/systems/courses/sass/main.scss -- it is deliberately left alone.
 
+// The form is the box: one bordered field holding the formatting bar, the text, and
+// under them a single row with the controls at its right-hand end.
+// It wraps, and the editor asks for the whole first row, so the same rules lay out /dm
+// (Add image, Cancel, Send) and an embed (Cancel and Send alone) without either
+// needing to know what the other has. `order` puts the row in reading order whatever
+// order the controls come in: thread.js inserts the editor in front of Cancel.
 .dm__composer {
   position: relative;
   display: flex;
-  align-items: flex-end;
-  gap: var(--dm-space-sm);
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--dm-space-xs);
   flex: none;
-  padding: var(--dm-space-md) 0 var(--dm-space-lg);
-  border-top: 1px solid var(--dm-rule);
+  flex-wrap: wrap;
+  margin: 0 var(--dm-gutter) var(--dm-space-md);
+  padding: 0 var(--dm-space-xs) var(--dm-space-xs);
+  border: 1px solid var(--dm-rule-strong);
+  border-radius: $radius-sm;
+  background: var(--dm-surface);
+  transition: border-color $transition-base ease, box-shadow $transition-base ease;
+
+  // The whole box answers for the editor inside it.
+  &:focus-within {
+    border-color: var(--dm-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--dm-accent) 20%, transparent);
+  }
 }
 
+// Dragging an image over the composer covers it with where to let go.
 .dm__drop-hint {
   position: absolute;
-  inset: 0 0 var(--dm-space-sm);
+  inset: -1px;
   z-index: 3;
   display: none;
   align-items: center;
   justify-content: center;
   gap: var(--dm-space-sm);
   border: 2px dashed var(--dm-accent);
-  border-radius: var(--dm-radius);
-  background: color-mix(in srgb, var(--dm-bg) 88%, var(--dm-accent));
-  color: var(--dm-ink);
+  border-radius: $radius-sm;
+  background: color-mix(in srgb, var(--dm-accent) 14%, var(--dm-bg));
   font-family: var(--dm-font);
-  font-size: 0.875rem;
+  font-size: $text-md;
   font-weight: 600;
+  color: var(--dm-ink);
   pointer-events: none;
 }
 
@@ -35,19 +54,15 @@
   display: flex;
 }
 
+// Wider than the box's own padding, so the formatting bar's rule runs edge to edge.
 .dm .rt-composer {
+  order: 0;
   min-width: 0;
-  flex: 1;
-  border: 1px solid var(--dm-rule-strong);
-  border-radius: var(--dm-radius);
-  background: var(--dm-wash);
-  transition: border-color $transition-base ease;
-
-  // The page's single soft shadow, and only while the composer has the cursor.
-  &:focus-within {
-    border-color: var(--dm-ink);
-    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.18);
-  }
+  flex: 1 0 calc(100% + var(--dm-space-xs) * 2);
+  margin-inline: calc(var(--dm-space-xs) * -1);
+  border: 0;
+  border-radius: 0;
+  background: none;
 }
 
 .dm .rt-toolbar {
@@ -61,21 +76,21 @@
 
 .dm .rt-btn {
   display: grid;
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 1.75rem;
+  height: 1.75rem;
   place-items: center;
   padding: 0;
   border: 0;
   border-radius: var(--dm-radius-sm);
   background: none;
-  font-size: 0.75rem;
-  color: var(--dm-faint);
+  font-size: $text-sm;
+  color: var(--dm-muted);
   cursor: pointer;
   transition: color $transition-fast ease, background-color $transition-fast ease;
 
   &:hover,
   &.is-active {
-    background: var(--dm-wash);
+    background: var(--dm-hover);
     color: var(--dm-ink);
   }
 
@@ -84,13 +99,21 @@
 
 .dm .rt-select {
   max-width: 7.5rem;
-  padding: 0.15rem 0.2rem;
+  height: 1.75rem;
+  padding: 0 0.3rem;
   border: 0;
+  border-radius: var(--dm-radius-sm);
   background: none;
+  filter: none;
   font-family: var(--dm-font);
-  font-size: 0.6875rem;
+  font-size: $text-sm;
   color: var(--dm-muted);
   cursor: pointer;
+
+  &:hover {
+    background: var(--dm-hover);
+    color: var(--dm-ink);
+  }
 
   @include dm-focus-ring(-1px);
 }
@@ -103,12 +126,12 @@
 }
 
 .dm .rt-editor {
-  max-height: 11rem;
-  min-height: 3rem;
+  max-height: 12rem;
+  min-height: 3.25rem;
   overflow-y: auto;
-  padding: 0.65rem 0.75rem;
+  padding: 0.7rem var(--dm-space-sm);
   font-family: var(--dm-font);
-  font-size: 0.9375rem;
+  font-size: $text-md;
   line-height: 1.6;
   color: var(--dm-ink);
 
@@ -118,58 +141,19 @@
   }
 
   &:focus {
-    outline: none; // the ring sits on .rt-composer via :focus-within
+    outline: none; // the ring sits on the box via :focus-within
   }
-}
-
-// Send, and the Cancel that appears while editing.
-.dm__send {
-  flex: none;
-  padding: 0.55rem 1.1rem;
-  border: 1px solid var(--dm-rule-strong);
-  border-radius: var(--dm-radius);
-  background: none;
-  font-family: var(--dm-font);
-  font-size: 0.8125rem;
-  line-height: 1.45;
-  color: var(--dm-ink);
-  cursor: pointer;
-  transition: background-color $transition-fast ease, border-color $transition-fast ease,
-    opacity $transition-fast ease;
-
-  i {
-    margin-right: 0.35rem;
-    font-size: 0.75rem;
-  }
-
-  &:hover:not(:disabled) {
-    border-color: var(--dm-ink);
-    background: var(--dm-wash);
-  }
-
-  &:disabled {
-    opacity: 0.35;
-    cursor: default;
-  }
-
-  @include dm-focus-ring;
-}
-
-// Cancel is a .dm__action, which now carries its own padding; the extra bottom padding
-// this used to need was propping up a borderless button that no longer exists.
-.dm .dm-cancel-edit {
-  flex: none;
 }
 
 // ── Attaching an image ─────────────────────────────────────────────────────────
 .dm__attach {
+  order: 2;
   display: inline-flex;
   flex: none;
   align-items: center;
 }
 
-.dm__image-action i {
-  margin-right: 0.3rem;
+.dm .dm__image-action i {
   color: var(--dm-accent);
 }
 
@@ -185,41 +169,81 @@
 }
 
 // Keyboard focus lands on the hidden input, so the ring has to be drawn on its label.
-.dm__file-input:focus-visible + label,
-.dm__attach label:hover {
-  color: var(--dm-ink);
-}
-
 .dm__file-input:focus-visible + label {
   outline: 2px solid var(--dm-accent);
   outline-offset: 1px;
 }
 
+// Cancel, which appears while editing a message.
+.dm .dm-cancel-edit {
+  order: 3;
+  flex: none;
+}
+
+// Send: the one filled control on the page, in the accent with the page colour on it,
+// the pairing every preset theme keeps readable.
+.dm .dm__send {
+  order: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: none;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--dm-accent);
+  border-radius: var(--dm-radius);
+  background: var(--dm-accent);
+  font-family: var(--dm-font);
+  font-size: $text-sm;
+  font-weight: 700;
+  line-height: 1.45;
+  // !important: a user theme sets `color: inherit !important` on every button
+  // (assets/js/user-preferences.js), which would put the text colour on the accent --
+  // maroon on blue in the Light preset. Page colour on accent is the readable pair.
+  color: var(--dm-bg) !important;
+  cursor: pointer;
+  transition: opacity $transition-fast ease;
+
+  i {
+    font-size: $text-xs;
+  }
+
+  &:hover:not(:disabled) {
+    opacity: 0.88;
+  }
+
+  // Nothing to send yet: the outline of the button, waiting.
+  &:disabled {
+    border-color: var(--dm-rule-strong);
+    background: transparent;
+    color: var(--dm-ink) !important;
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  @include dm-focus-ring;
+}
+
+// The image waiting to go with the next message, shown just above the composer.
 .dm__attach-preview {
   display: flex;
   align-items: center;
   gap: var(--dm-space-sm);
-  margin-bottom: var(--dm-space-md);
+  flex: none;
+  margin: 0 var(--dm-gutter) var(--dm-space-xs);
 
   img {
-    width: 3rem;
-    height: 3rem;
+    width: 3.5rem;
+    height: 3.5rem;
     object-fit: cover;
-    border: 1px solid var(--dm-rule);
-    border-radius: var(--dm-radius-sm);
+    border: 1px solid var(--dm-rule-strong);
+    border-radius: var(--dm-radius);
   }
 }
 
-.dm__hint {
-  margin: 0 0 var(--dm-space-sm);
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  color: var(--dm-muted);
-}
-
 .dm__form-status {
-  margin: 0 0 var(--dm-space-md);
-  font-size: 0.8125rem;
+  flex: none;
+  margin: 0 var(--dm-gutter) var(--dm-space-md);
+  font-size: $text-sm;
   line-height: 1.5;
-  color: var(--dm-accent);
+  color: var(--dm-ink);
 }

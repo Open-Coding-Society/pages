@@ -1,5 +1,6 @@
 // The Groups and Direct messages lists. Rows are built by js/sidebar.js as
-// .ocs__nav-card links, so the grammar's class names are what gets styled here.
+// .ocs__nav-card links holding an .ocs__avatar, so the grammar's class names are what
+// gets styled here.
 
 .dm__group {
   & + & {
@@ -7,147 +8,171 @@
   }
 }
 
-// Centre, not baseline: the action is a padded box now, so baseline alignment pushed
-// it out of line with the heading beside it.
 .dm__group-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--dm-space-sm);
-  padding-bottom: 0.4rem;
+  padding: 0 var(--dm-space-xs) 0.4rem;
 }
 
 .dm__group-title {
   margin: 0;
   font-family: var(--dm-font);
-  font-size: 0.6875rem;
-  font-weight: 400;
-  letter-spacing: 0.12em;
+  font-size: $text-xs;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--dm-faint);
+
+  @include dm-quiet(var(--dm-quieter));
 }
 
-// A quiet text button. Used for the list headers and the thread's group actions.
+// A quiet rectangular button, used for the list headers, the thread's group actions and
+// the composer's Cancel and Add image.
 //
-// The horizontal padding is load-bearing. With none, the focus ring (and the border a
-// user theme paints onto every button) closed right up against the glyphs, which is
-// what made these read as cramped boxes rather than buttons. line-height does the same
-// job vertically: without it the ring sat on the ascenders.
-.dm__action {
-  padding: 0.35rem 0.6rem;
-  border: 1px solid transparent;
-  border-radius: var(--dm-radius-sm);
-  background: none;
-  font-family: var(--dm-font);
-  font-size: 0.8125rem;
-  line-height: 1.45;
-  color: var(--dm-muted);
-  cursor: pointer;
-  transition: color $transition-fast ease, border-color $transition-fast ease,
-    background-color $transition-fast ease;
-
-  &:hover:not(:disabled) {
-    border-color: var(--dm-rule);
-    background: var(--dm-wash);
-    color: var(--dm-ink);
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-
-  @include dm-focus-ring(1px);
+// `.dm .dm__action`, not `.dm__action` alone: a user theme paints every button with the
+// panel colour and an accent border from `.user-theme-active button`, which outranks a
+// single class. Two classes put the page's own button back in charge.
+.dm .dm__action {
+  @include dm-quiet-button;
 }
 
 // The full-width variant, used for "Form groups for a class" at the foot of the Find
-// or make dialog. It keeps the shared box rather than adding a border-top of its own,
-// which would have collided with the base border now that one exists.
-.dm__action--block {
-  display: block;
+// or make dialog.
+.dm .dm__action--block {
+  display: flex;
   width: 100%;
   margin-top: var(--dm-space-xs);
-  border-color: var(--dm-rule);
-  text-align: left;
 }
 
-.dm__list {
+.dm .dm__list {
   display: flex;
   flex-direction: column;
+  gap: 1px;
 
   // Empty-state line, rendered as a plain <p class="ocs__text"> by sidebar.js.
   > .ocs__text {
     margin: 0;
-    padding: 0.5rem 0;
-    font-size: 0.8125rem;
+    padding: 0.4rem var(--dm-space-xs);
+    font-size: $text-sm;
     line-height: 1.6;
-    color: var(--dm-faint);
+
+    @include dm-quiet;
   }
 }
 
+// One conversation: its avatar, its name over an optional second line, and on the far
+// side how many messages are waiting. The avatar and the count span both lines; a row
+// with no second line is simply one line tall.
 .dm .ocs__nav-card {
   display: grid;
-  gap: 0.15rem;
-  padding: 0.7rem 0.75rem 0.7rem 0.8rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 0.65rem;
+  row-gap: 0.1rem;
+  padding: 0.45rem var(--dm-space-xs);
   border: 0;
-  margin-block: 0.15rem;
-  border: 1px solid transparent;
-  border-left: 3px solid transparent;
   border-radius: var(--dm-radius);
   background: none;
   text-decoration: none;
-  color: var(--dm-muted);
-  transition: border-color $transition-fast ease, color $transition-fast ease,
-    background-color $transition-fast ease;
+  transition: background-color $transition-fast ease;
 
   &:hover {
-    border-left-color: var(--dm-rule-strong);
-    background: var(--dm-wash);
-    color: var(--dm-ink);
+    background: var(--dm-hover);
+    transform: none;
   }
 
   &.is-active {
-    border-left-color: var(--dm-accent);
-    border-block-color: var(--dm-rule);
-    border-right-color: var(--dm-rule);
-    background: var(--dm-wash);
-    color: var(--dm-ink);
+    background: var(--dm-selected);
   }
 
   @include dm-focus-ring(-2px);
 }
 
-.dm .ocs__nav-card-title {
+// The shared avatar, at the size of a list row. A person is round, as the grammar draws
+// it; a group takes the square corners everything else on the page has, so the two
+// lists can be told apart before a name is read.
+.dm .ocs__nav-card .ocs__avatar {
+  grid-row: 1 / span 2;
+  width: 2rem;
+  height: 2rem;
+  border-color: color-mix(in srgb, var(--dm-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--dm-accent) 12%, transparent);
   font-family: var(--dm-font);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.35;
+  font-size: $text-xs;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   color: var(--dm-ink);
 }
 
-// The row's secondary line (a group's class and period).
-.dm .ocs__nav-card > .ocs__text {
-  font-family: var(--dm-font);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  color: var(--dm-faint);
+.dm .ocs__nav-card[data-kind='group'] .ocs__avatar {
+  border-radius: var(--dm-radius);
 }
 
-// The unread count. The one place the accent earns its keep.
-.dm .ocs__nav-card-cta {
-  justify-self: start;
-  margin-top: 0.3rem;
-  padding: 0.18rem 0.48rem;
-  border-radius: 999px;
+.dm .ocs__nav-card.is-active .ocs__avatar {
+  border-color: var(--dm-accent);
   background: var(--dm-accent);
-  font-family: var(--dm-font);
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
   color: var(--dm-bg);
 }
 
-// An unread row reads a shade louder than a read one.
-.dm .ocs__nav-card:has(.ocs__nav-card-cta) .ocs__nav-card-title {
+.dm .ocs__nav-card .ocs__nav-card-title {
+  grid-column: 2;
+  overflow: hidden;
+  font-family: var(--dm-font);
+  font-size: $text-md;
   font-weight: 500;
-  color: var(--dm-ink);
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  // !important because the grammar turns every nav-card title to the accent, with
+  // !important, once a user theme is active. That suits a hub's few cards; in a list of
+  // people it colours every name, and the accent stops meaning "selected" or "unread".
+  color: var(--dm-ink) !important;
+}
+
+// A row with no second line (a direct message) is one line tall, so its name takes
+// both rows and sits level with the middle of the avatar.
+.dm .ocs__nav-card:not(:has(> .ocs__text)) .ocs__nav-card-title {
+  grid-row: 1 / span 2;
+}
+
+// The row's second line (a group's class and period).
+.dm .ocs__nav-card > .ocs__text {
+  grid-column: 2;
+  grid-row: 2;
+  overflow: hidden;
+  font-family: var(--dm-font);
+  font-size: $text-sm;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @include dm-quiet;
+}
+
+// How many are waiting: the accent as a small solid tag. Square-cornered like the
+// buttons, and the one filled thing in the list, so an unread conversation is found at
+// a glance.
+.dm .ocs__nav-card-cta {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  margin: 0;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--dm-radius-sm);
+  background: var(--dm-accent);
+  font-family: var(--dm-font);
+  font-size: $text-xs;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  // !important because the count is a <small>, which a user theme holds to the text
+  // colour with !important of its own; on the accent it has to be the page colour, the
+  // pairing every preset keeps at 4.5:1.
+  color: var(--dm-bg) !important;
+}
+
+// An unread row's name is heavier than a read one's.
+.dm .ocs__nav-card:has(.ocs__nav-card-cta) .ocs__nav-card-title {
+  font-weight: 700;
 }

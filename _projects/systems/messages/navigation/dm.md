@@ -4,6 +4,7 @@ title: Messages
 description: Your groups and direct messages in one place.
 permalink: /dm
 search_exclude: true
+full_width: true
 ---
 {%- comment -%}
 Messages (/dm): your groups and direct messages, side by side.
@@ -20,6 +21,12 @@ js/messages-page.js -- renaming one silently breaks a control.
 
 The behaviour is in _projects/systems/messages/js/, started by messages-page.js at the
 bottom; README.md in that folder explains how it fits together.
+
+The page fills the window under the site header instead of sitting in the reading
+column: `full_width: true` above is the site's own switch for that (it widens the
+layout's wrapper), and sass/_layout.scss takes the rest of the room. The page title
+and the connection status live at the top of the conversation list, so the list and
+the open conversation each start with a bar of the same height.
 {%- endcomment -%}
 {%- assign message_courses = "csse,csp,csa,csh" | split: "," -%}
 {%- capture course_options -%}
@@ -34,20 +41,19 @@ bottom; README.md in that folder explains how it fits together.
 
 <div class="dm">
 
-  <header class="dm__masthead">
-    <h1 class="dm__title" id="messagesTitle">Messages</h1>
-    <span class="dm__status" id="messagesStatusPill">
-      <span class="dm__status-dot" aria-hidden="true"></span>
-      <span id="messagesStatus">loading…</span>
-    </span>
-  </header>
-
   <p class="dm__notice" id="messagesSignedOut" hidden>Sign in to see your groups and send messages.</p>
   <p class="dm__notice" id="messagesNotice" role="status"></p>
 
   <div class="dm__shell">
 
     <nav class="dm__aside" aria-label="Conversations">
+      <header class="dm__masthead">
+        <h1 class="dm__title" id="messagesTitle">Messages</h1>
+        <span class="dm__status" id="messagesStatusPill">
+          <span class="dm__status-dot" aria-hidden="true"></span>
+          <span id="messagesStatus">loading…</span>
+        </span>
+      </header>
       <div class="dm__aside-scroll">
         <section class="dm__group">
           <div class="dm__group-head">
@@ -83,12 +89,19 @@ bottom; README.md in that folder explains how it fits together.
 
       <div class="dm__log" id="messagesLog" role="log" aria-live="polite" tabindex="0"></div>
 
+      <div class="dm__attach-preview hidden" id="messagesImagePreview">
+        <img id="messagesImageThumb" alt="Image attached to your next message">
+        <button type="button" class="dm__action" id="messagesImageRemove">Remove</button>
+      </div>
+
       {%- comment -%}
-        thread.js inserts the rich composer before the Cancel button, so the controls
-        below sit to its right. The attach control is a <label> for a visually hidden
-        file input -- a file input cannot be restyled, and a label for it is operable by
-        keyboard and screen reader on its own. thread.js shows it only in conversations
-        that can store an image.
+        The form is the composer's box. thread.js inserts the rich composer before the
+        Cancel button; sass/_composer.scss gives it the box's whole first row and lines the
+        controls up on the right beneath it, whatever order they come in here. The attach
+        control is a <label> for a
+        visually hidden file input -- a file input cannot be restyled, and a label for it
+        is operable by keyboard and screen reader on its own. thread.js shows it only in
+        conversations that can store an image.
       {%- endcomment -%}
       <form class="dm__composer" id="messagesForm" autocomplete="off">
         <span class="dm__drop-hint" id="messagesDropHint" aria-hidden="true">
@@ -109,11 +122,6 @@ bottom; README.md in that folder explains how it fits together.
         </span>
         <button class="dm__send" id="messagesSend" type="submit" disabled>Send</button>
       </form>
-      <p class="dm__hint">Send with Ctrl+Enter (Cmd+Enter on Mac) or the Send button.</p>
-      <div class="dm__attach-preview hidden" id="messagesImagePreview">
-        <img id="messagesImageThumb" alt="Image attached to your next message">
-        <button type="button" class="dm__action" id="messagesImageRemove">Remove</button>
-      </div>
       <p class="dm__form-status" id="messagesFormStatus" role="alert" hidden></p>
     </section>
 
@@ -355,12 +363,32 @@ bottom; README.md in that folder explains how it fits together.
   (function () {
     const page = document.querySelector('.dm');
     if (!page) return;
+    // The page fills the window below the site header. How tall that header is depends
+    // on the width and on the navbar's own content, so it is measured, not assumed:
+    // --dm-top is where the page starts, and sass/_layout.scss takes the rest of the
+    // height. Measured again when the window resizes and once everything has loaded,
+    // since the logo and the fonts can change the header's height after first paint.
+    const fit = () => {
+      page.style.setProperty('--dm-top', `${Math.round(page.getBoundingClientRect().top + window.scrollY)}px`);
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    window.addEventListener('load', fit);
+    // A link straight to a conversation (/dm?dm=4, /dm?group=12) opens on that
+    // conversation, so on a phone it has to start on the thread, not on the list.
+    if (/[?&](dm|group)=/.test(window.location.search)) page.dataset.dmView = 'thread';
+    // In the capture phase, before the row's own handler: opening a conversation redraws
+    // both lists at once, so by the time the click bubbles up here the row that was
+    // pressed is no longer in the page and `closest` cannot find the list it was in.
+    // Listening on the way down sees the row while it is still there.
     page.addEventListener('click', event => {
       if (event.target.closest('[data-dm-back]')) {
         page.removeAttribute('data-dm-view');
         return;
       }
       if (event.target.closest('#messagesGroupList a, #messagesDmList a')) {
+        // A middle click or a modifier key opens the row in a new tab; this one stays put.
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         page.dataset.dmView = 'thread';
         return;
       }
@@ -370,7 +398,7 @@ bottom; README.md in that folder explains how it fits together.
       if (event.target.closest('#messagesFormGroups')) {
         document.getElementById('findGroupDialog')?.classList.add('hidden');
       }
-    });
+    }, true);
   }());
 </script>
 

@@ -1,7 +1,7 @@
 // The two lists beside the conversation: your groups, then your direct messages. Each
 // row is an ocs__nav-card link (/dm?group=<id> or /dm?dm=<id>), so a conversation opens
 // from a bookmark or in a new tab; a plain click opens it in place.
-import { conversationLabel, groupSubtitle } from './messages-model.js';
+import { conversationLabel, groupSubtitle, initialsFor } from './messages-model.js';
 
 export const conversationHref = (kind, id) => `?${kind}=${encodeURIComponent(id)}`;
 
@@ -16,6 +16,13 @@ export function createSidebar({ groupList, dmList, onOpen }) {
       link.classList.add('is-active');
       link.setAttribute('aria-current', 'true');
     }
+    // The shared avatar: initials in an <abbr>, which a preset theme leaves in the accent.
+    // Hidden from assistive technology, because the row's title says the same name.
+    const avatar = document.createElement('abbr');
+    avatar.className = 'ocs__avatar';
+    avatar.setAttribute('aria-hidden', 'true');
+    avatar.textContent = initialsFor(title);
+    link.appendChild(avatar);
     const name = document.createElement('strong');
     name.className = 'ocs__nav-card-title';
     name.textContent = title;

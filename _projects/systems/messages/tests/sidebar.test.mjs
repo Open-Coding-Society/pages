@@ -67,6 +67,25 @@ test('two unread conversations keep their order whatever their counts', () => {
   assert.deepEqual(titles(dmList), ['Ada', 'Blaise']);
 });
 
+test('each row starts with an avatar holding the initials of its name', () => {
+  const groupList = collector();
+  const dmList = collector();
+  const sidebar = createSidebar({ groupList, dmList, onOpen() {} });
+
+  sidebar.render({
+    groups: [{ id: 7, name: 'Team Turing', members: [] }],
+    conversations: [dm(1, 'Grace Hopper', 0), dm(2, 'Aidan', 0)],
+    active: null,
+  });
+
+  const avatars = list => list.rows.map(row => row.children[0]);
+  assert.deepEqual(avatars(dmList).map(avatar => avatar.className), ['ocs__avatar', 'ocs__avatar']);
+  assert.deepEqual(avatars(dmList).map(avatar => avatar.textContent), ['GH', 'A']);
+  assert.equal(avatars(groupList)[0].textContent, 'TT');
+  // An <abbr>, not a span: a user theme recolors every span to the text color.
+  assert.equal(avatars(dmList)[0].tag, 'abbr');
+});
+
 test('render does not reorder the array it was handed', () => {
   const dmList = collector();
   const sidebar = createSidebar({ groupList: collector(), dmList, onOpen() {} });

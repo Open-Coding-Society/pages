@@ -12,7 +12,8 @@ export const LOG_TEXTS = Object.freeze({
   editMessage: 'Edit message',
   deleteMessage: 'Delete message',
   imageFrom: 'Image from {name}',
-  openImage: 'Open image from {name} in a new tab',
+  openImage: 'View image from {name} larger',
+  closeImage: 'Close image',
   deleted: 'This message was deleted.',
   today: 'Today',
   yesterday: 'Yesterday',
@@ -65,6 +66,89 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     element.replaceChildren();
     messages.clear();
     lastDay = null;
+  }
+
+  // Clicking a sent image opens it over the conversation instead of in a new tab. The
+  // backdrop is built once, on the first click, and lives in the `.dm` root rather than
+  // in the log, which scrolls and would clip it; sass/_thread.scss styles it under `.dm`,
+  // so it has to sit inside that root to be styled at all. position:fixed then covers the
+  // viewport from there. Escape is listened for only while it is open, so a log in an
+  // embed leaves no document listener behind once it closes (see destroy()).
+  let viewer = null;
+  let viewerImage = null;
+  // Which message's image is on show, so markDeleted can tell whether it is this one.
+  // The message's key, not its src: an image is usually a data URL, and a browser
+  // reflects a relative href back as an absolute one, so neither compares reliably.
+  let viewerKey = null;
+  let viewerReturnFocus = null;
+
+  function onViewerKeydown(event) {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    closeViewer();
+  }
+
+  function buildViewer() {
+    viewer = document.createElement('div');
+    viewer.className = 'chat-image-viewer hidden';
+    viewer.setAttribute('role', 'dialog');
+    viewer.setAttribute('aria-modal', 'true');
+
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'chat-image-viewer-close';
+    close.setAttribute('aria-label', text.closeImage);
+    close.title = text.closeImage;
+    const glyph = document.createElement('i');
+    glyph.className = 'fas fa-xmark';
+    glyph.setAttribute('aria-hidden', 'true');
+    close.appendChild(glyph);
+    close.addEventListener('click', closeViewer);
+
+    viewerImage = document.createElement('img');
+    viewerImage.className = 'chat-image-viewer-image';
+    // The image closes it too: the cursor over it is a zoom-out magnifier, so clicking
+    // what you just clicked to open is the obvious way back.
+    viewerImage.addEventListener('click', closeViewer);
+
+    // Only the backdrop itself, so a click on the image or the button is not counted twice.
+    viewer.addEventListener('click', event => {
+      if (event.target === viewer) closeViewer();
+    });
+
+    viewer.append(close, viewerImage);
+    (element.closest('.dm') || document.body).appendChild(viewer);
+  }
+
+  function openViewer(source, alt, opener, key) {
+    if (!viewer) buildViewer();
+    viewerKey = key ?? null;
+    viewerImage.src = source;
+    viewerImage.alt = alt;
+    viewer.setAttribute('aria-label', alt);
+    viewer.classList.remove('hidden');
+    viewerReturnFocus = opener || null;
+    document.addEventListener('keydown', onViewerKeydown);
+    viewer.querySelector('.chat-image-viewer-close')?.focus?.();
+  }
+
+  function closeViewer() {
+    if (!viewer || viewer.classList.contains('hidden')) return;
+    viewer.classList.add('hidden');
+    viewerKey = null;
+    document.removeEventListener('keydown', onViewerKeydown);
+    // Back to the thumbnail that opened it, so keyboard focus does not fall to <body>.
+    viewerReturnFocus?.focus?.();
+    viewerReturnFocus = null;
+  }
+
+  // Takes the viewer off the page with its listener. thread.js calls this from its own
+  // destroy(), so an embed that is torn down while an image is open leaves nothing behind.
+  function destroy() {
+    closeViewer();
+    viewer?.remove();
+    viewer = null;
+    viewerImage = null;
   }
 
   function showEmpty(title, hint = '') {
@@ -195,16 +279,35 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
         const imageSource = pfpSrc(message.image);
         const imageLink = document.createElement('a');
         imageLink.className = 'chat-msg-image-link';
+        // Still a real link to the image: middle-click, Ctrl/Cmd-click and the context
+        // menu's "Open in new tab" keep working, and the handler below leaves those alone.
+        // A plain left click is taken over and shows the viewer instead.
         imageLink.href = imageSource;
         imageLink.target = '_blank';
         imageLink.rel = 'noopener noreferrer';
         imageLink.setAttribute('aria-label', fillText(text.openImage, { name: message.senderName }));
         imageLink.title = fillText(text.openImage, { name: message.senderName });
+        imageLink.addEventListener('click', event => {
+          if (event.defaultPrevented) return;
+          if ((event.button ?? 0) !== 0) return;
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+          event.preventDefault();
+          openViewer(imageSource, fillText(text.imageFrom, { name: message.senderName }), imageLink, message.key);
+        });
         const image = document.createElement('img');
         image.className = 'ocs__image-frame';
         image.src = imageSource;
         image.alt = fillText(text.imageFrom, { name: message.senderName });
         image.loading = 'lazy';
+        // An image has no height until it loads, so the scroll to the newest message
+        // below happens before it takes its room and would leave it cut off at the foot
+        // of the log. If the log was at the bottom when the message arrived, go back
+        // there once the image has its size.
+        if (stickToBottom) {
+          image.addEventListener('load', () => {
+            element.scrollTop = element.scrollHeight;
+          }, { once: true });
+        }
         imageLink.appendChild(image);
         main.appendChild(imageLink);
       }
@@ -250,6 +353,9 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
     showDeleted(row.querySelector('.chat-msg-body'));
     row.querySelector('.chat-msg-actions')?.remove();
     row.querySelector('.chat-msg-edited')?.remove();
+    // If the viewer is showing the image of the message just deleted, close it rather
+    // than leave it open over a conversation that no longer has that image.
+    if (viewerKey === key) closeViewer();
     row.querySelector('.chat-msg-image-link')?.remove();
   }
 
@@ -275,8 +381,11 @@ export function createMessageLog(element, { richText, me, onEdit, onDelete, read
   }
 
   return {
-    clear, showEmpty, append, updateBody, markDeleted, note,
+    clear, showEmpty, append, updateBody, markDeleted, note, destroy,
     has: key => messages.has(key),
     get: key => messages.get(key),
+    // For tests and a host that wants to close the viewer itself.
+    isViewerOpen: () => Boolean(viewer) && !viewer.classList.contains('hidden'),
+    closeViewer,
   };
 }

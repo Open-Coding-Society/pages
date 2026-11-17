@@ -136,10 +136,8 @@ export async function startMessagesPage({ config, richText }) {
     render();
     showGroupActions(kind === 'group' ? item : null);
     history.replaceState(null, '', conversationHref(kind, id));
-    // At 768px and below (ocs__split's one-column width) the chat sits under the lists.
-    if (window.matchMedia('(max-width: 768px)').matches) {
-      byId('messagesThreadTitle').scrollIntoView({ block: 'start', behavior: 'smooth' });
-    }
+    // Nothing to scroll to on a phone: the page shows one pane at a time there (dm.md's
+    // inline script swaps the list for the conversation), and the pane fills the window.
     return true;
   }
 

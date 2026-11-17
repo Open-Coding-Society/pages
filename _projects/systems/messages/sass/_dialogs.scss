@@ -6,9 +6,11 @@
 .dm .ocs__modal {
   // Above the thread header and the site's own sticky chrome (the grammar's default of
   // 50 let the open conversation's title paint over the card).
-  z-index: 10000;
+  z-index: $z-modal;
   padding: var(--dm-space-md);
-  background: rgba(0, 0, 0, 0.72);
+  // The page's own colour laid over it, like the image viewer's sheet, so a dialog dims
+  // a dark theme and veils a light one instead of dropping black on both.
+  background: color-mix(in srgb, var(--dm-bg) 76%, transparent);
 }
 
 .dm .ocs__modal-card {
@@ -165,12 +167,18 @@
   height: 1.9rem;
   place-items: center;
   padding: 0;
+  // The grammar rounds a `small` button right off into a circle; this one keeps the
+  // page's corners.
+  border-radius: var(--dm-radius-sm);
   font-size: 1rem;
   line-height: 1;
 }
 
+// The people a search finds are written as the grammar's `pill` buttons by
+// js/new-chat.js and js/group-dialogs.js. On this page they keep the corners every
+// other button has, so a dialog does not introduce a second button shape.
 .dm .ocs__btn.pill {
-  border-radius: 999px;
+  border-radius: var(--dm-radius-sm);
 }
 
 // The confirming action in a dialog is the one place the accent fills a surface.
