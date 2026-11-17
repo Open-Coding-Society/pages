@@ -171,17 +171,33 @@ export async function enablePush() {
   }
 }
 
-export async function disablePush() {
-  remember(false);
+// Unsubscribing in the browser is what stops notifications arriving here, and it needs no
+// answer from Spring, so it always happens first; only then is "on" forgotten. Telling Spring
+// is best effort (it also drops the row the first time a push to it fails), so a slow or
+// unreachable Spring can never leave a browser subscribed with nothing left to clean it up.
+async function unsubscribeHere() {
   const subscription = await currentSubscription().catch(() => null);
-  if (!subscription) return { ok: true, state: 'off', message: STATES.off };
-  try {
-    await spring('/api/push/subscriptions', 'DELETE', { endpoint: subscription.endpoint });
-  } catch (error) {
-    // Spring will drop it anyway the first time a push to it fails.
-    console.warn('Push: Spring did not forget the subscription', error);
+  if (!subscription) {
+    remember(false);
+    return { gone: true, endpoint: null };
   }
-  await subscription.unsubscribe().catch(() => {});
+  const endpoint = subscription.endpoint;
+  const gone = await subscription.unsubscribe().catch(() => false);
+  if (gone) remember(false);
+  return { gone, endpoint };
+}
+
+function tellSpringGone(endpoint) {
+  if (!endpoint) return Promise.resolve();
+  return spring('/api/push/subscriptions', 'DELETE', { endpoint }).catch(error => {
+    console.warn('Push: Spring did not forget the subscription', error);
+  });
+}
+
+export async function disablePush() {
+  const { gone, endpoint } = await unsubscribeHere();
+  await tellSpringGone(endpoint);
+  if (!gone) return { ok: false, state: 'on', message: 'Could not turn phone notifications off. Try again in a moment.' };
   return { ok: true, state: 'off', message: STATES.off };
 }
 
@@ -225,16 +241,20 @@ export async function resyncPush() {
 }
 
 async function dropLocally(subscription) {
-  remember(false);
-  await subscription.unsubscribe().catch(() => {});
+  // "On" is forgotten only once the browser really let go, so a failure is retried next session.
+  if (await subscription.unsubscribe().catch(() => false)) remember(false);
 }
 
 // Called while signing out, before the session ends, so the account leaving stops getting
-// notifications in this browser. Bounded so it can never hold up signing out.
+// notifications in this browser. The local unsubscribe runs to completion first (it is what
+// matters); only telling Spring is cut off after 3 seconds, so signing out is never held up
+// by the network. If the local unsubscribe fails, "on" and its owner stay remembered and the
+// next session's owner check drops the subscription.
 export async function forgetPushOnSignOut() {
   if (!pushSupported() || !remembered()) return;
+  const { endpoint } = await unsubscribeHere();
   await Promise.race([
-    disablePush().catch(() => {}),
+    tellSpringGone(endpoint),
     new Promise(resolve => setTimeout(resolve, 3000)),
   ]);
 }
