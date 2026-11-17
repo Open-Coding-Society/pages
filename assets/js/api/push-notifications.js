@@ -29,13 +29,35 @@ const ENABLED_KEY = 'ocs.push.enabled';
 const SW_URL = `${baseurl}/service-worker.js`;
 const SW_SCOPE = `${baseurl}/`;
 
-function remember(on) {
+// Which account turned notifications on in this browser. A shared computer signed in as
+// someone else must not quietly carry the first person's notifications over to them.
+const OWNER_KEY = 'ocs.push.owner';
+
+function remember(on, owner) {
   try {
-    if (on) localStorage.setItem(ENABLED_KEY, '1');
-    else localStorage.removeItem(ENABLED_KEY);
+    if (on) {
+      localStorage.setItem(ENABLED_KEY, '1');
+      localStorage.setItem(OWNER_KEY, owner);
+    } else {
+      localStorage.removeItem(ENABLED_KEY);
+      localStorage.removeItem(OWNER_KEY);
+    }
   } catch {
     // Private mode or blocked storage: resync just won't run automatically.
   }
+}
+
+function rememberedOwner() {
+  try {
+    return localStorage.getItem(OWNER_KEY);
+  } catch {
+    return null;
+  }
+}
+
+async function signedInUid() {
+  const person = await spring('/api/person/get');
+  return person?.uid || null;
 }
 
 function remembered() {
@@ -134,8 +156,10 @@ export async function enablePush() {
     await navigator.serviceWorker.ready;
     const subscription = await sw.pushManager.getSubscription()
       || await sw.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(config.publicKey) });
+    const uid = await signedInUid();
+    if (!uid) throw Object.assign(new Error('not signed in'), { status: 401 });
     await spring('/api/push/subscriptions', 'POST', subscription.toJSON());
-    remember(true);
+    remember(true, uid);
     return { ok: true, state: 'on', message: STATES.on };
   } catch (error) {
     console.warn('Push: could not turn notifications on', error);
@@ -179,11 +203,40 @@ export async function resyncPush() {
       remember(false);
       return;
     }
+    // Someone else is signed in on this browser now: drop the subscription here (Spring
+    // forgets it the first time a push to it fails) rather than move it to them. They can
+    // turn notifications on for themselves.
+    const uid = await signedInUid();
+    if (uid && uid !== rememberedOwner()) {
+      await dropLocally(subscription);
+      return;
+    }
     await spring('/api/push/subscriptions', 'POST', subscription.toJSON());
   } catch (error) {
-    // Offline or signed out: try again next page load.
+    if (error.status === 409) {
+      // Spring has this browser under another account and won't move it.
+      const subscription = await currentSubscription().catch(() => null);
+      if (subscription) await dropLocally(subscription);
+      return;
+    }
+    // Offline or signed out: try again next session.
     console.debug('Push: resync skipped', error);
   }
+}
+
+async function dropLocally(subscription) {
+  remember(false);
+  await subscription.unsubscribe().catch(() => {});
+}
+
+// Called while signing out, before the session ends, so the account leaving stops getting
+// notifications in this browser. Bounded so it can never hold up signing out.
+export async function forgetPushOnSignOut() {
+  if (!pushSupported() || !remembered()) return;
+  await Promise.race([
+    disablePush().catch(() => {}),
+    new Promise(resolve => setTimeout(resolve, 3000)),
+  ]);
 }
 
 export function sendTestPush() {
