@@ -76,6 +76,14 @@ Override `onJump()` for sound or effects. Positive `verticalVelocity` means
 upward; `gravityAcceleration` and `jumpVelocity` are configurable through data.
 Physics retains the existing game's per-update units, not seconds.
 
+`essentials/LapTracker.js` counts laps for racing games. It is pure logic (no
+drawing or DOM): give it a finish line and a checkpoint, each `{ x, top, bottom }`
+in 0–1 canvas coordinates, and the number of laps, then call
+`update(car, centre)` every frame. A lap counts only when a car crosses the
+finish line moving right after passing the checkpoint on the far side, so
+shortcuts and driving backwards never count. The racing game's lap screens use
+it, as will GameBuilder's Racing template.
+
 The platformer game extends it in
 `_projects/games/platformer/levels/PlatformerPlayer.js` only for its jump sound
 and debug hitbox overlay.
