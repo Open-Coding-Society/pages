@@ -1,0 +1,172 @@
+[
+  {
+    "id": "rpg",
+    "name": "RPG",
+    "description": "Walk a character around a map, meet NPCs and draw walls.",
+    "codeReady": true,
+    "panel": "rpg"
+  },
+  {
+    "id": "racing",
+    "name": "Racing",
+    "description": "Drive a car around a track and finish the laps first.",
+    "codeReady": false,
+    "sections": [
+      {
+        "legend": "Game",
+        "fields": [
+          { "id": "name", "label": "Game name", "type": "text", "default": "My Race" }
+        ]
+      },
+      {
+        "legend": "Track",
+        "help": "Pick a track picture. Track edges will be drawn on the preview, like spline barriers.",
+        "fields": [
+          { "id": "backgroundKey", "label": "Track background", "type": "background" },
+          { "id": "laps", "label": "Laps to win", "type": "number", "min": 1, "max": 10, "step": 1, "default": 3 }
+        ]
+      },
+      {
+        "legend": "Car",
+        "fields": [
+          { "id": "carSpriteKey", "label": "Car", "type": "sprite" },
+          { "id": "topSpeed", "label": "Top speed", "type": "number", "min": 1, "max": 15, "step": 0.5, "default": 6 },
+          { "id": "acceleration", "label": "Acceleration", "type": "number", "min": 0.05, "max": 1, "step": 0.05, "default": 0.2 },
+          { "id": "secondPlayer", "label": "Add a second car (arrow keys)", "type": "checkbox", "default": false }
+        ]
+      },
+      {
+        "legend": "Obstacles",
+        "list": {
+          "id": "obstacles",
+          "itemName": "Obstacle",
+          "fields": [
+            { "id": "spriteKey", "label": "Sprite", "type": "sprite" },
+            { "id": "x", "label": "X position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.5 },
+            { "id": "y", "label": "Y position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.5 }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "platform",
+    "name": "Platform",
+    "description": "Run and jump across platforms, avoid enemies and collect coins.",
+    "codeReady": false,
+    "sections": [
+      {
+        "legend": "Game",
+        "fields": [
+          { "id": "name", "label": "Game name", "type": "text", "default": "My Platformer" }
+        ]
+      },
+      {
+        "legend": "World",
+        "fields": [
+          { "id": "backgroundKey", "label": "Background", "type": "background" },
+          { "id": "gravity", "label": "Gravity", "type": "number", "min": 0.1, "max": 2, "step": 0.05, "default": 0.4 },
+          { "id": "jumpStrength", "label": "Jump strength", "type": "number", "min": 2, "max": 20, "step": 0.5, "default": 8 }
+        ]
+      },
+      {
+        "legend": "Player",
+        "fields": [
+          { "id": "playerName", "label": "Name", "type": "text", "default": "Player" },
+          { "id": "playerSpriteKey", "label": "Sprite", "type": "sprite" },
+          { "id": "playerX", "label": "Start X (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.1 },
+          { "id": "playerY", "label": "Start Y (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.5 }
+        ]
+      },
+      {
+        "legend": "Platforms",
+        "list": {
+          "id": "platforms",
+          "itemName": "Platform",
+          "fields": [
+            { "id": "x", "label": "X (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.3 },
+            { "id": "y", "label": "Y (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.7 },
+            { "id": "width", "label": "Width (0–1)", "type": "number", "min": 0.01, "max": 1, "step": 0.01, "default": 0.2 },
+            { "id": "height", "label": "Height (0–1)", "type": "number", "min": 0.01, "max": 1, "step": 0.01, "default": 0.05 },
+            { "id": "visible", "label": "Show platform", "type": "checkbox", "default": true }
+          ]
+        }
+      },
+      {
+        "legend": "Enemies",
+        "list": {
+          "id": "enemies",
+          "itemName": "Enemy",
+          "fields": [
+            { "id": "name", "label": "Name", "type": "text", "default": "Enemy" },
+            { "id": "spriteKey", "label": "Sprite", "type": "sprite" },
+            { "id": "x", "label": "X position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.6 },
+            { "id": "y", "label": "Y position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.8 }
+          ]
+        }
+      },
+      {
+        "legend": "Coins",
+        "list": {
+          "id": "coins",
+          "itemName": "Coin",
+          "fields": [
+            { "id": "spriteKey", "label": "Sprite", "type": "sprite" },
+            { "id": "x", "label": "X position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.5 },
+            { "id": "y", "label": "Y position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.5 }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "clicker",
+    "name": "Clicker",
+    "description": "Click targets to score points, then spend them on power-ups.",
+    "codeReady": false,
+    "sections": [
+      {
+        "legend": "Game",
+        "fields": [
+          { "id": "name", "label": "Game name", "type": "text", "default": "My Clicker" }
+        ]
+      },
+      {
+        "legend": "Scene",
+        "fields": [
+          { "id": "backgroundKey", "label": "Background", "type": "background" }
+        ]
+      },
+      {
+        "legend": "Target",
+        "fields": [
+          { "id": "targetSpriteKey", "label": "Target image", "type": "sprite", "default": "cookie" },
+          { "id": "targetCount", "label": "Targets on screen", "type": "number", "min": 1, "max": 20, "step": 1, "default": 1 },
+          { "id": "targetSpeed", "label": "Bounce speed (0 stays still)", "type": "number", "min": 0, "max": 5, "step": 0.1, "default": 0 },
+          { "id": "goalScore", "label": "Score to win", "type": "number", "min": 1, "max": 100000, "step": 1, "default": 100 },
+          { "id": "winMessage", "label": "Win message", "type": "text", "default": "You did it!" }
+        ]
+      },
+      {
+        "legend": "Power-ups",
+        "list": {
+          "id": "powerUps",
+          "itemName": "Power-up",
+          "fields": [
+            { "id": "name", "label": "Name", "type": "text", "default": "Power-up" },
+            { "id": "spriteKey", "label": "Image", "type": "sprite" },
+            { "id": "cost", "label": "Cost (points)", "type": "number", "min": 1, "max": 100000, "step": 1, "default": 10 },
+            {
+              "id": "effect", "label": "Effect", "type": "choice", "default": "per-click",
+              "choices": [
+                { "value": "per-click", "label": "Extra points per click" },
+                { "value": "auto-click", "label": "Automatic points every second" }
+              ]
+            },
+            { "id": "amount", "label": "Points added", "type": "number", "min": 1, "max": 1000, "step": 1, "default": 1 }
+          ]
+        }
+      }
+    ]
+  }
+]

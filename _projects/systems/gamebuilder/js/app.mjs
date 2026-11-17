@@ -7,9 +7,11 @@
  *
  * @data
  * Reads background and sprite manifest JSON from the published
- * `/images/projects/gamebuilder/` paths. The form edits a versioned builder
- * document containing `name`, `backgroundKey`, `player`, `npcs`, and open
- * spline barriers. Positions and barrier points use normalized `x`/`y` values
+ * `/images/projects/gamebuilder/` paths, and the game type list from
+ * `game-templates.json` next to this module. The RPG type uses the builder
+ * form below; other types show a data-defined option panel. The RPG form
+ * edits a versioned builder document containing `name`, `backgroundKey`,
+ * `player`, `npcs`, and open spline barriers. Positions and barrier points use normalized `x`/`y` values
  * from 0 to 1.
  *
  * @usage
@@ -23,6 +25,9 @@
 import { createAssetCatalog } from './asset-catalog.mjs';
 import { createBarrierPlacementEditor } from './barrier-editor.mjs';
 import { createDefaultBuilderState, createNpcState } from './builder-state.mjs';
+import { populateSelect, selectAsset } from './form-controls.mjs';
+import { createListItem, createTemplateOptions, validateGameTemplates } from './game-templates.mjs';
+import { readTemplatePanel, renderTemplatePanel } from './template-panel.mjs';
 import { generateLevelCode } from './code-generator.mjs?v=2';
 import { waitForGameRunner } from './runner-bridge.mjs';
 import { createWorkspacePersistence } from './workspace-persistence.mjs';
@@ -46,6 +51,9 @@ const npcEmptyMessage = form.querySelector('[data-role="npc-empty"]');
 const barrierList = form.querySelector('[data-role="barrier-list"]');
 const barrierEmptyMessage = form.querySelector('[data-role="barrier-empty"]');
 const addBarrierButton = form.querySelector('[data-action="add-barrier"]');
+const templateChoices = root.querySelector('[data-role="template-choices"]');
+const templateDescription = root.querySelector('[data-role="template-description"]');
+const templateForm = root.querySelector('[data-role="template-form"]');
 
 const setStatus = createActionFeedback(status);
 
@@ -63,26 +71,6 @@ async function fetchManifest(url, label) {
     throw new TypeError(`${label} manifest must contain a JSON array`);
   }
   return manifest;
-}
-
-function populateSelect(select, entries) {
-  select.replaceChildren();
-  for (const entry of entries.values()) {
-    const option = document.createElement('option');
-    option.value = entry.key;
-    option.textContent = entry.name;
-    select.append(option);
-  }
-}
-
-function selectAsset(select, key) {
-  if (![...select.options].some((option) => option.value === key)) {
-    const missing = document.createElement('option');
-    missing.value = key;
-    missing.textContent = `Unavailable asset: ${key}`;
-    select.append(missing);
-  }
-  select.value = key;
 }
 
 function readForm(state) {
@@ -280,12 +268,15 @@ collapseButton.addEventListener('click', () => {
 });
 
 try {
-  const [backgroundManifest, spriteManifest, runner] = await Promise.all([
+  const [backgroundManifest, spriteManifest, templateList, runner] = await Promise.all([
     fetchManifest(siteUrl('/images/projects/gamebuilder/bg/index.json'), 'Background'),
     fetchManifest(siteUrl('/images/projects/gamebuilder/sprites/index.json'), 'Sprite'),
+    fetchManifest(new URL('./game-templates.json', import.meta.url), 'Game template'),
     waitForGameRunner('gamebuilder-v2')
   ]);
   const catalog = createAssetCatalog(backgroundManifest, spriteManifest);
+  const templates = new Map(validateGameTemplates(templateList).map((template) => [template.id, template]));
+  const rpgTemplateId = templateList.find((template) => template.panel === 'rpg').id;
   styleRunnerIcons(root);
   populateSelect(form.elements.namedItem('background'), catalog.backgrounds);
   populateSelect(form.elements.namedItem('player-sprite'), catalog.sprites);
@@ -301,6 +292,8 @@ try {
   let barrierEditSnapshot = null;
   let lastGeneratedCode = '';
   let persistence = null;
+  let templateId = rpgTemplateId;
+  let templateOptions = {};
   const barrierEditor = createBarrierPlacementEditor(
     root.querySelector('.ocs__gamebuilder-runner .gameContainer'),
     (barrierId, point) => {
@@ -317,6 +310,49 @@ try {
   fillForm(state);
   renderNpcs(state.npcs, catalog.sprites);
   renderBarriers(state.barriers, activeBarrierId);
+  renderTemplateChoices();
+  showTemplate(templateId);
+
+  function renderTemplateChoices() {
+    templateChoices.replaceChildren();
+    for (const template of templates.values()) {
+      const label = document.createElement('label');
+      label.className = 'ocs__gamebuilder-template-choice';
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'game-template';
+      radio.value = template.id;
+      label.append(radio, document.createTextNode(template.name));
+      templateChoices.append(label);
+    }
+  }
+
+  function isRpgTemplate() {
+    return templateId === rpgTemplateId;
+  }
+
+  /** Keeps the open panel's values before switching away or saving. */
+  function storeOpenTemplateOptions() {
+    if (isRpgTemplate()) return;
+    templateOptions[templateId] = readTemplatePanel(templateForm, templates.get(templateId));
+  }
+
+  function showTemplate(id) {
+    templateId = id;
+    const template = templates.get(id);
+    templateChoices.querySelector(`input[value="${id}"]`).checked = true;
+    templateDescription.textContent = template.codeReady
+      ? template.description
+      : `${template.description} Code generation for this game type is coming soon; your settings are saved.`;
+    form.hidden = !isRpgTemplate();
+    templateForm.hidden = isRpgTemplate();
+    if (isRpgTemplate()) {
+      templateForm.replaceChildren();
+      return;
+    }
+    templateOptions[id] ??= createTemplateOptions(template, catalog);
+    renderTemplatePanel(templateForm, template, templateOptions[id], catalog);
+  }
 
   function updateBarrierEditor() {
     addBarrierButton.disabled = Boolean(activeBarrierId);
@@ -336,8 +372,10 @@ try {
   }
 
   function captureWorkspace() {
+    storeOpenTemplateOptions();
     return {
-      schemaVersion: 1,
+      schemaVersion: 2,
+      template: { id: templateId, options: structuredClone(templateOptions) },
       kind: 'ocs-gamebuilder-workspace',
       builderState: readForm(state),
       editorCode: runner.getCode(),
@@ -353,6 +391,9 @@ try {
     state = structuredClone(document.builderState);
     ({ activeBarrierId, barrierEditSnapshot, nextNpcIndex, nextBarrierIndex } = structuredClone(document.editing));
     lastGeneratedCode = document.lastGeneratedCode;
+    templateOptions = structuredClone(document.template.options);
+    const knownTemplate = templates.has(document.template.id);
+    showTemplate(knownTemplate ? document.template.id : rpgTemplateId);
     fillForm(state);
     renderNpcs(state.npcs, catalog.sprites);
     updateBarrierEditor();
@@ -364,6 +405,10 @@ try {
     runner.setCode(document.editorCode);
     const missing = [state.backgroundKey, state.player.spriteKey, ...state.npcs.map((npc) => npc.spriteKey)]
       .filter((key, index) => !(index === 0 ? catalog.backgrounds : catalog.sprites).has(key));
+    if (!knownTemplate) {
+      setStatus(`Game type "${document.template.id}" is no longer available, so the RPG builder is shown. Its saved settings are kept.`, 'error');
+      return;
+    }
     setStatus(missing.length ? `Workspace restored with unavailable assets: ${missing.join(', ')}. Choose replacements before generating.`
       : 'Workspace restored without regenerating code.', missing.length ? 'error' : 'info');
   }
@@ -387,11 +432,22 @@ try {
 
   root.querySelector('[data-action="clear-builder"]').addEventListener('click', () => {
     if (!window.confirm('Reset builder panels to starter settings? Runner code and the saved workspace are kept.')) return;
+    if (!isRpgTemplate()) {
+      templateOptions[templateId] = createTemplateOptions(templates.get(templateId), catalog);
+      showTemplate(templateId);
+      persistence.changed();
+      setStatus(`${templates.get(templateId).name} settings reset. Runner code is unchanged.`);
+      return;
+    }
     replacePanel(createDefaultBuilderState(firstBackground, defaultSprite));
     setStatus('Builder cleared. Runner code is unchanged.');
   });
 
   root.querySelector('[data-action="pull"]').addEventListener('click', () => {
+    if (!isRpgTemplate()) {
+      setStatus(`Pull reads RPG code only for now. Choose the ${templates.get(rpgTemplateId).name} game type to pull.`, 'error');
+      return;
+    }
     try {
       const source = runner.getCode();
       const result = importLevelCode(source, catalog);
@@ -513,6 +569,11 @@ try {
   });
 
   generateButton.addEventListener('click', () => {
+    const template = templates.get(templateId);
+    if (!template.codeReady) {
+      setStatus(`${template.name} code generation is coming soon. Your settings are saved in this workspace.`, 'error');
+      return;
+    }
     state = readForm(state);
     if (activeBarrierId) {
       setStatus('Finish or cancel the active barrier before generating code.', 'error');
@@ -545,6 +606,45 @@ try {
     persistence.changed();
     setStatus('Generated code is synced to GAME_RUNNER. Use its Run button to play.');
   });
+
+  templateChoices.addEventListener('change', (event) => {
+    const nextId = event.target.value;
+    // Barrier points are placed by clicking the preview, so finish that first.
+    if (activeBarrierId) {
+      templateChoices.querySelector(`input[value="${templateId}"]`).checked = true;
+      setStatus('Finish or cancel the active barrier before changing the game type.', 'error');
+      return;
+    }
+    storeOpenTemplateOptions();
+    showTemplate(nextId);
+    persistence.changed();
+    setStatus(`${templates.get(nextId).name} selected. Each game type keeps its own settings.`);
+  });
+
+  templateForm.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-template-action]');
+    if (!button) return;
+    const template = templates.get(templateId);
+    const list = template.sections.find((section) => section.list?.id === button.dataset.listId).list;
+    storeOpenTemplateOptions();
+    const items = templateOptions[templateId][list.id];
+    if (button.dataset.templateAction === 'add-item') {
+      items.push(createListItem(list, items, catalog));
+      setStatus(`${list.itemName} added.`);
+    } else {
+      templateOptions[templateId][list.id] = items.filter((item) => item.id !== button.dataset.itemId);
+      setStatus(`${list.itemName} removed.`);
+    }
+    renderTemplatePanel(templateForm, template, templateOptions[templateId], catalog);
+    persistence.changed();
+  });
+
+  for (const type of ['input', 'change']) {
+    templateForm.addEventListener(type, () => {
+      storeOpenTemplateOptions();
+      persistence.changed();
+    });
+  }
 
   if (!persistence.recovered) {
     if (runner.getCode().trim()) {

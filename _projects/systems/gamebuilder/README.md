@@ -52,6 +52,21 @@ original `/gamebuilder/` page. Other documentation is published from `docs/`.
 Edit these sources under `_projects/systems/gamebuilder/`. The page, JavaScript,
 Sass, and images copied into the site directories are generated output.
 
+## Game types
+
+The **Game type** picker at the top of the builder lists the templates in
+`js/game-templates.json`: RPG, Racing, Platform and Clicker, in that order.
+RPG uses the builder form described above. The other types draw their option
+panels from the data file (`js/template-panel.mjs`), so options, defaults and
+list items (obstacles, platforms, enemies, coins, power-ups) change by editing
+JSON, not code. `js/game-templates.mjs` validates the file when the page loads.
+
+Each game type keeps its own settings in the workspace, so switching types does
+not lose work. Only types with `"codeReady": true` (RPG today) can **Push →**;
+the others report that code generation is coming. Racing, Platform and Clicker
+generation will follow once their engine pieces (lap tracking, platform
+landing) are in `assets/js/GameEnginev1.1/`.
+
 ## Protecting workspace work
 
 The v2 workspace now keeps an automatic browser-local recovery draft of the
@@ -101,7 +116,9 @@ choose replacements before generation. Invalid files do not replace open work.
 Storage failures and cross-tab conflicts stop recovery writes, show an error,
 and retain the last valid stored draft. Export open work before resolving them.
 
-`js/workspace-store.mjs` owns versioned validation and storage.
+`js/workspace-store.mjs` owns versioned validation and storage. Version 2
+workspaces add the chosen game type and each type's settings; version 1 saves,
+drafts and exported JSON open as the RPG type without other changes.
 `js/workspace-persistence.mjs` owns controls and recovery wiring. The shared
 runner controller emits `ocs:runner-saved` after a successful source write,
 exposes its saved snapshot, and awaits GameBuilder's workspace-save hook before
