@@ -123,7 +123,7 @@
     "id": "platform",
     "name": "Platform",
     "description": "Run and jump across platforms, avoid enemies and collect coins.",
-    "codeReady": false,
+    "codeReady": true,
     "assets": {
       "backgrounds": [
         { "name": "Desert", "src": "/images/platformer/backgrounds/desertbg.png" },
@@ -137,24 +137,48 @@
         { "name": "Lava Cave", "src": "/images/platformer/backgrounds/BossBackground.png" }
       ],
       "players": [
-        { "name": "Astronaut", "src": "/images/projects/astronaut-platformer-game/astro.png" },
-        { "name": "Knight", "src": "/images/platformer/sprites/knight.png" },
-        { "name": "Monkey", "src": "/images/platformer/sprites/monkey.png" }
+        {
+          "name": "Astronaut",
+          "src": "/images/projects/astronaut-platformer-game/astro.png",
+          "pixels": { "width": 513, "height": 770 },
+          "orientation": { "rows": 4, "columns": 4 },
+          "down": { "row": 0, "start": 0, "columns": 3 },
+          "left": { "row": 1, "start": 0, "columns": 3 },
+          "right": { "row": 2, "start": 0, "columns": 3 }
+        },
+        {
+          "name": "Knight",
+          "src": "/images/platformer/sprites/knight.png",
+          "pixels": { "width": 3072, "height": 1024 },
+          "orientation": { "rows": 8, "columns": 24 },
+          "down": { "row": 0, "start": 0, "columns": 23 },
+          "left": { "row": 7, "start": 0, "columns": 20 },
+          "right": { "row": 6, "start": 0, "columns": 20 }
+        },
+        {
+          "name": "Monkey",
+          "src": "/images/platformer/sprites/monkey.png",
+          "pixels": { "width": 640, "height": 400 },
+          "orientation": { "rows": 10, "columns": 16 },
+          "down": { "row": 0, "start": 7, "columns": 1 },
+          "left": { "row": 1, "start": 0, "columns": 15 },
+          "right": { "row": 0, "start": 0, "columns": 15 }
+        }
       ],
       "enemies": [
-        { "name": "Alien", "src": "/images/platformer/sprites/alien.png" },
-        { "name": "Penguin", "src": "/images/platformer/sprites/penguin.png" },
-        { "name": "Snowman", "src": "/images/platformer/sprites/snowman.png" },
-        { "name": "Owl", "src": "/images/platformer/sprites/owl.png" },
-        { "name": "Jellyfish", "src": "/images/platformer/sprites/jellyfish.png" },
-        { "name": "Flying UFO", "src": "/images/platformer/sprites/flying-ufo.png" },
-        { "name": "Dragon", "src": "/images/platformer/sprites/dragon.png" },
-        { "name": "Cerberus", "src": "/images/platformer/sprites/cerberus.png" },
-        { "name": "Zombie", "src": "/images/platformer/sprites/zombie.png" }
+        { "name": "Alien", "src": "/images/platformer/sprites/alien.png", "pixels": { "width": 444, "height": 640 } },
+        { "name": "Penguin", "src": "/images/platformer/sprites/penguin.png", "pixels": { "width": 308, "height": 327 } },
+        { "name": "Snowman", "src": "/images/platformer/sprites/snowman.png", "pixels": { "width": 308, "height": 327 } },
+        { "name": "Owl", "src": "/images/platformer/sprites/owl.png", "pixels": { "width": 499, "height": 500 } },
+        { "name": "Jellyfish", "src": "/images/platformer/sprites/jellyfish.png", "pixels": { "width": 499, "height": 500 } },
+        { "name": "Flying UFO", "src": "/images/platformer/sprites/flying-ufo.png", "pixels": { "width": 720, "height": 437 } },
+        { "name": "Dragon", "src": "/images/platformer/sprites/dragon.png", "pixels": { "width": 152, "height": 119 } },
+        { "name": "Cerberus", "src": "/images/platformer/sprites/cerberus.png", "pixels": { "width": 103, "height": 103 } },
+        { "name": "Zombie", "src": "/images/platformer/sprites/zombie.png", "pixels": { "width": 1560, "height": 840 }, "frame": { "rows": 12, "columns": 12, "row": 2, "column": 0 } }
       ],
       "coins": [
-        { "name": "Coin", "src": "/images/platformer/obstacles/coin.png" },
-        { "name": "Diamonds", "src": "/images/platformer/obstacles/dimonds.png" }
+        { "name": "Coin", "src": "/images/platformer/obstacles/coin.png", "pixels": { "width": 400, "height": 300 } },
+        { "name": "Diamonds", "src": "/images/platformer/obstacles/dimonds.png", "pixels": { "width": 225, "height": 225 } }
       ]
     },
     "sections": [
