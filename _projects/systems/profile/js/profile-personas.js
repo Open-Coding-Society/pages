@@ -64,20 +64,15 @@ function pickerGroup(section) {
     return group;
 }
 
-export async function initPersonas({ api, container, progress, editButton, onChange }) {
-    const { pythonURI, fetchOptions } = api;
+export async function initPersonas({ profile, container, progress, editButton, onChange }) {
     let personas = [];
     let selected = {};
     let editing = false;
 
     async function load() {
-        const [allResponse, mineResponse] = await Promise.all([
-            fetch(`${pythonURI}/api/persona`, fetchOptions),
-            fetch(`${pythonURI}/api/user/personas`, fetchOptions),
-        ]);
-        if (!allResponse.ok) throw new Error(`the server answered ${allResponse.status}`);
-        personas = await allResponse.json();
-        selected = mineResponse.ok ? ((await mineResponse.json()).personas ?? {}) : {};
+        const [all, chosen] = await Promise.all([profile.personas(), profile.chosenPersonas()]);
+        personas = all;
+        selected = chosen;
     }
 
     function render() {
@@ -101,13 +96,7 @@ export async function initPersonas({ api, container, progress, editButton, onCha
         card.setAttribute('aria-busy', 'true');
         card.querySelector('.ocs__links')?.prepend(pill('Saving…', 'good'));
         try {
-            const response = await fetch(`${pythonURI}/api/user/persona`, {
-                ...fetchOptions,
-                method: 'POST',
-                body: JSON.stringify({ persona_id: Number(card.dataset.personaId) }),
-            });
-            const data = await response.json().catch(() => ({}));
-            if (!response.ok) throw new Error(data.message || `the server answered ${response.status}`);
+            await profile.choosePersona(Number(card.dataset.personaId));
             await load();
             render();
         } catch (error) {
