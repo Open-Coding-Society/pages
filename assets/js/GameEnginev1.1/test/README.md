@@ -61,22 +61,24 @@ left/right keys move horizontally, up jumps once per press while supported,
 and gravity applies even when moving. Down does not fly or crouch. It keeps
 `Player.js` unchanged and disables its legacy gravity pass.
 
-The platformer game extends it in
-`_projects/games/platformer/levels/PlatformerPlayer.js`, using the engine's
-inherited circular collision detector, with platform contact responses,
-jump sound, and debug overlay local. The shared detector uses circle-to-rectangle
-contact for `Barrier` surfaces (zero reduction by default), so wide floors are
-solid across their full width. Characters remain circular, including at platform
-corners; character-to-character collision is unchanged. Tangent Barrier contact
-counts as support, and contact faces come from the closest surface rather than
-overlapping sprite extents. There is no game-specific detector or support probe.
-A new
-game must supply support/collision handling: override `hasSupport()` when
-needed, position the player on landing, then call `land()`; on an underside
-contact, position the player below the platform and call `hitCeiling()`.
+`PlayerPlatformer` also owns platform contacts: a `Barrier` it touches acts as
+a platform. Falling onto the top lands (`land()`), rising into the underside
+stops at the ceiling (`hitCeiling()`), and touching a side stops horizontal
+movement. Contacts with other objects keep the normal `Player` rules. It uses
+the engine's inherited circular collision detector; the shared detector uses
+circle-to-rectangle contact for `Barrier` surfaces (zero reduction by default),
+so wide floors are solid across their full width. Characters remain circular,
+including at platform corners; character-to-character collision is unchanged.
+Tangent Barrier contact counts as support, and contact faces come from the
+closest surface rather than overlapping sprite extents. A game can still
+override `hasSupport()` or `handleCollisionState()` for special platforms.
 Override `onJump()` for sound or effects. Positive `verticalVelocity` means
 upward; `gravityAcceleration` and `jumpVelocity` are configurable through data.
 Physics retains the existing game's per-update units, not seconds.
+
+The platformer game extends it in
+`_projects/games/platformer/levels/PlatformerPlayer.js` only for its jump sound
+and debug hitbox overlay.
 
 Student extension points include animation states, crouching, jump height,
 and platform contact responses using the shared engine detector. Keep game-specific assets and
