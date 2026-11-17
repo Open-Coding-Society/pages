@@ -74,6 +74,14 @@ Grandma (`/hacks/cookie-clicker/assets/`). The cookie games have no background
 picture, so Clicker offers plain background colours. A test checks that every
 listed picture exists in the repository.
 
+Some list items can be drawn on the preview instead of typed in. A list with
+`"draw": "box"` (Platform's platforms) gets a **Draw … on preview** button:
+drag a box on the preview and a new item gets its X, Y, width and height. A
+list with `"draw": "point"` (Racing's obstacles) places a new item's top-left
+corner where you click. Push and Run first so the background shows. Escape
+cancels. `js/placement-editor.mjs` owns the drawing overlay; values round to
+the panel's 0.01 step.
+
 Each game type keeps its own settings in the workspace, so switching types does
 not lose work. All four types are `"codeReady": true` and can **Push →**; a type marked
 false reports that code generation is coming.

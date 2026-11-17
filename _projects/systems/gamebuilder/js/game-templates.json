@@ -108,9 +108,11 @@
       },
       {
         "legend": "Obstacles",
+        "help": "Push and Run first so the track shows, then use Draw and click where the obstacle’s top-left corner goes.",
         "list": {
           "id": "obstacles",
           "itemName": "Obstacle",
+          "draw": "point",
           "fields": [
             { "id": "spriteKey", "label": "Sprite", "type": "image", "assetGroup": "obstacles" },
             { "id": "x", "label": "X position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.5 },
@@ -208,9 +210,11 @@
       },
       {
         "legend": "Platforms",
+        "help": "Push and Run first so the background shows, then use Draw and drag a box on the preview for each platform.",
         "list": {
           "id": "platforms",
           "itemName": "Platform",
+          "draw": "box",
           "fields": [
             { "id": "x", "label": "X (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.3 },
             { "id": "y", "label": "Y (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.7 },

@@ -14,7 +14,7 @@
  * @usage
  * `renderTemplatePanel(form, template, options, images)` replaces the form's
  * contents; `images` comes from `createTemplateImages(template)`. `readTemplatePanel(form, template)` returns the options shown.
- * Add/remove buttons carry `data-template-action` for the caller to handle.
+ * Add, remove and draw buttons carry `data-template-action` for the caller to handle.
  */
 import { fieldDefault } from './game-templates.mjs';
 import { populateSelect, selectAsset } from './form-controls.mjs';
@@ -84,11 +84,15 @@ function renderList(list, items, images) {
   const wrapper = document.createElement('div');
   wrapper.dataset.templateList = list.id;
   const addButton = createActionButton(`Add ${list.itemName.toLowerCase()}`, 'add-item', list.id);
+  // Lists marked with `draw` can also be placed by drawing on the preview.
+  const drawButton = list.draw
+    ? createActionButton(`Draw ${list.itemName.toLowerCase()} on preview`, 'draw-item', list.id)
+    : null;
   const empty = document.createElement('p');
   empty.className = 'ocs__gamebuilder-form-help';
   empty.textContent = `No ${list.itemName.toLowerCase()}s added yet.`;
   empty.hidden = items.length > 0;
-  wrapper.append(addButton, empty);
+  wrapper.append(...[addButton, drawButton, empty].filter(Boolean));
 
   items.forEach((item, index) => {
     const card = document.createElement('article');
