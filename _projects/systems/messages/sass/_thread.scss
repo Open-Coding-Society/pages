@@ -124,6 +124,15 @@
   }
 }
 
+// The message a search result opened (message-log.js sets .is-found). The wash holds
+// for a moment, then fades, so the eye lands on the message without it staying marked.
+// A row runs the width of the pane and has its own side padding, so the wash is simply
+// its background, in the same place the hover wash goes.
+.dm .chat-msg.is-found {
+  background: color-mix(in srgb, var(--dm-accent) 22%, transparent);
+  animation: dm-found 2.4s ease-out 0.8s both;
+}
+
 // The same avatar the conversation list uses: initials on a tint of the accent.
 .dm .chat-avatar {
   display: grid;
@@ -473,8 +482,17 @@
   }
 }
 
+@keyframes dm-found {
+  to {
+    background-color: transparent;
+    box-shadow: 0 0 0 0.35rem transparent;
+  }
+}
+
+// With no fade, a found message keeps its wash until another one is found.
 @media (prefers-reduced-motion: reduce) {
   .dm .chat-msg,
+  .dm .chat-msg.is-found,
   .dm .chat-empty {
     animation: none;
   }

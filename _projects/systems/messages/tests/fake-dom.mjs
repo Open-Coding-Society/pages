@@ -325,6 +325,9 @@ class FakeElement extends FakeNode {
 
   focus() { this.ownerDocument.activeElement = this; }
 
+  // Nothing scrolls here; the call is kept so a test can see it was asked for.
+  scrollIntoView(options) { this.scrolledIntoView = options ?? {}; }
+
   getBoundingClientRect() {
     return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
   }

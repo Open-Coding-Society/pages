@@ -408,6 +408,15 @@ export function createThread({
     refreshComposer();
     if (current.catchUp) loadNew(kind, id);
     if (kind === 'dm') markRead(id);
+    if (current.reveal) log.reveal(current.reveal);
+  }
+
+  // Scrolls the open conversation to one message and marks it: what a search result
+  // asks for. Asked while the history is still loading, it happens once that arrives.
+  function showMessage(key) {
+    if (!current) return;
+    if (current.loaded) log.reveal(key);
+    else current.reveal = key;
   }
 
   function close() {
@@ -489,7 +498,7 @@ export function createThread({
   close();
 
   return {
-    open, close, resume, setHeading, destroy,
+    open, close, resume, setHeading, showMessage, destroy,
     current: () => (current ? { kind: current.kind, id: current.id } : null),
   };
 }

@@ -80,12 +80,25 @@ the open conversation each start with a bar of the same height.
           <h2 class="dm__thread-title" id="messagesThreadTitle">Pick a conversation</h2>
           <small class="dm__thread-subtitle" id="messagesThreadSubtitle"></small>
         </div>
+        {%- comment -%}
+          Search inside the open direct message. message-search.js shows it only while a
+          DM is open and enables it once someone is signed in; its matches list in the
+          panel under the header.
+        {%- endcomment -%}
+        <form class="dm__search" id="messagesSearchForm" role="search" autocomplete="off" hidden>
+          <input class="ocs__input" id="messagesSearch" type="search" placeholder="Search this chat" aria-label="Search this chat" disabled>
+        </form>
         <div class="dm__thread-actions hidden" id="messagesGroupActions">
           <button type="button" class="dm__action" id="messagesMembers">Members</button>
           <button type="button" class="dm__action" id="messagesFiles">Files</button>
           <button type="button" class="dm__action" id="messagesLeaveGroup">Leave</button>
         </div>
       </header>
+
+      <div class="dm__search-panel" id="messagesSearchPanel" hidden>
+        <p class="dm__search-status" id="messagesSearchStatus" role="status"></p>
+        <div class="dm__list dm__search-results" id="messagesSearchResults"></div>
+      </div>
 
       <div class="dm__log" id="messagesLog" role="log" aria-live="polite" tabindex="0"></div>
 

@@ -6,6 +6,7 @@ import { createChatSocket } from './chat-socket.js';
 import { initDeleteGroup } from './delete-group.js';
 import { initGroupFormation } from './group-formation.js';
 import { initFiles, initFindGroup, initMembers } from './group-dialogs.js';
+import { initMessageSearch } from './message-search.js';
 import { createMessagesApi } from './messages-api.js';
 import {
   canFormGroups, conversationLabel, groupSubtitle, isClassGroup, isCourseChannel, sortGroups,
@@ -53,6 +54,12 @@ export async function startMessagesPage({ config, richText }) {
   const me = await signedInPerson(api, setStatus);
   if (!me) return;
   const state = { groups: [], conversations: [], active: null };
+  let messageSearch = null; // set once the search box is wired up, below
+  // The search box in the chat header searches the open direct message, so it is told which.
+  const syncSearchScope = () => {
+    const open = state.active?.kind === 'dm' ? findItem('dm', state.active.id) : null;
+    messageSearch?.setConversation(open ? open.id : null, open ? conversationLabel(open) : '');
+  };
   const findItem = (kind, id) => (kind === 'group' ? state.groups : state.conversations).find(item => item.id === id);
 
   const sidebar = createSidebar({
@@ -134,6 +141,7 @@ export async function startMessagesPage({ config, richText }) {
     // happens once per open, matching how a DM is marked read.
     if (kind === 'group') markGroupRead(item);
     render();
+    syncSearchScope();
     showGroupActions(kind === 'group' ? item : null);
     history.replaceState(null, '', conversationHref(kind, id));
     // Nothing to scroll to on a phone: the page shows one pane at a time there (dm.md's
@@ -144,6 +152,7 @@ export async function startMessagesPage({ config, richText }) {
   function closeConversation() {
     thread.close();
     state.active = null;
+    syncSearchScope();
     showGroupActions(null);
     history.replaceState(null, '', window.location.pathname);
   }
@@ -285,6 +294,17 @@ export async function startMessagesPage({ config, richText }) {
       status: byId('newChatStatus'), start: byId('newChatStart'),
     },
   });
+  messageSearch = initMessageSearch({
+    api,
+    me,
+    // The box only searches the open chat, so a match is always in the thread on screen.
+    onPick: hit => thread.showMessage(String(hit.id)),
+    elements: {
+      form: byId('messagesSearchForm'), input: byId('messagesSearch'), panel: byId('messagesSearchPanel'),
+      status: byId('messagesSearchStatus'), results: byId('messagesSearchResults'),
+    },
+  });
+  syncSearchScope(); // a conversation opened from the address before the box existed
   if (canFormGroups(me)) {
     initGroupFormation({
       api,

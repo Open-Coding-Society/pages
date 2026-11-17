@@ -2,6 +2,95 @@
 // .ocs__nav-card links holding an .ocs__avatar, so the grammar's class names are what
 // gets styled here.
 
+// Search inside the open direct message: a box in the chat's header (js/message-search.js
+// shows it only while a DM is open) and a panel of matches between the header and the log.
+// The box sits in the bar across the top of the conversation, between its name and a
+// group's actions, and keeps to a fixed width so the name has the rest.
+.dm__search {
+  width: min(100%, 16rem);
+  flex: none;
+  margin: 0;
+}
+
+// On a phone the bar wraps, and the box takes a line of its own under the name.
+@include dm-below($breakpoint-mobile) {
+  .dm__search {
+    width: 100%;
+    flex-basis: 100%;
+  }
+}
+
+// The matches, between the bar and the log, on the list's surface so they read as a
+// drawer over the conversation rather than as part of it.
+.dm__search-panel {
+  max-height: 40%;
+  flex: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--dm-space-sm) calc(var(--dm-gutter) - var(--dm-space-xs));
+  border-bottom: 1px solid var(--dm-rule);
+  background: var(--dm-surface);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.dm__search-status {
+  margin: 0 0 var(--dm-space-xs);
+  padding-inline: var(--dm-space-xs);
+  font-family: var(--dm-font);
+  font-size: $text-sm;
+  line-height: 1.4;
+
+  @include dm-quiet;
+
+  &:empty {
+    display: none;
+  }
+}
+
+// A match is a button, not a link: it scrolls the open chat rather than going anywhere.
+// It is an ocs__nav-card like a conversation row, but it has no avatar and no count, so
+// it lays itself out: who said it and when on one line, then the excerpt across both.
+.dm .ocs__nav-card.dm__hit {
+  grid-template-columns: minmax(0, 1fr) auto;
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dm .ocs__nav-card.dm__hit .ocs__nav-card-title {
+  grid-column: 1;
+  grid-row: 1;
+  font-weight: 600;
+}
+
+.dm .ocs__nav-card.dm__hit > .ocs__text {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+// A result's excerpt. The match keeps the ink colour on an accent tint, the pairing the
+// themes are checked for, rather than the browser's yellow.
+.dm .ocs__nav-card.dm__hit > .dm__hit-text {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  font-family: var(--dm-font);
+  font-size: $text-sm;
+  line-height: 1.5;
+  color: var(--dm-ink);
+  overflow-wrap: anywhere;
+
+  mark {
+    padding: 0 0.15em;
+    border-radius: var(--dm-radius-sm);
+    background: color-mix(in srgb, var(--dm-accent) 32%, transparent);
+    color: var(--dm-ink);
+  }
+}
+
 .dm__group {
   & + & {
     margin-top: var(--dm-space-lg);

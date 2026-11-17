@@ -186,3 +186,25 @@ test('a host can reword the viewer close button', () => {
   assert.equal(close.getAttribute('aria-label'), 'Bild schließen');
   log.destroy();
 });
+
+test('reveal scrolls to a message and marks it, and only the newest find stays marked', () => {
+  const { element, log } = makeLog();
+  log.append(message('m1', 'first'), false);
+  log.append(message('m2', 'second'), false);
+  const first = element.querySelector('[data-key="m1"]');
+  const second = element.querySelector('[data-key="m2"]');
+
+  assert.equal(log.reveal('m1'), true);
+  assert.equal(first.classList.contains('is-found'), true);
+  assert.deepEqual(first.scrolledIntoView, { block: 'center' });
+
+  assert.equal(log.reveal('m2'), true);
+  assert.equal(first.classList.contains('is-found'), false);
+  assert.equal(second.classList.contains('is-found'), true);
+});
+
+test('reveal says when the message is not in the log', () => {
+  const { log } = makeLog();
+  log.append(message('m1', 'first'), false);
+  assert.equal(log.reveal('m9'), false);
+});
