@@ -8,6 +8,7 @@ description: >
   Capstone project exploring an accessible educational website inspired by OncologySesh,
   helping patients and families understand cancer science, biomarkers, and personalized care.
 categories: [Capstone]
+search_exclude: true
 permalink: /capstone/oncologysesh/
 
 
@@ -23,7 +24,12 @@ capstone_project:
     backend: "https://github.com/CSP-Oncology/OCS-Kit-Flask"
 ---
 
-[Visit our OncologySesh website](https://oncologysesh.opencodingsociety.com/)
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
+<div style="text-align: center; margin: 1.5rem 0 2rem;">
+    <a class="ocs__btn large accent fill" href="https://oncologysesh.opencodingsociety.com/" target="_blank" rel="noopener noreferrer">Visit Our OncologySesh Website</a>
+</div>
+<!-- markdownlint-restore -->
 
 
 <div class="ocs__grid ocs__grid--standard cols-2">
