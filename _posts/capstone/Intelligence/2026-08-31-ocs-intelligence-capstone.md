@@ -13,6 +13,7 @@ capstone_project:
   description: "A generously donated 8× GTX 1070 rack becomes a shared open-weight LLM for OCS: live access from student harnesses, every student in mind, electricity as the only ongoing cost."
   team: "Nikhil Maturi, Adi Katre, Mihir Bapat, Yash Parikh, Anvay Vahia, Yash Patil"
 ---
+<!-- markdownlint-capture -->
 <!-- markdownlint-disable -->
 {% assign data = site.data.ocs_intelligence_infograph %}
 {% assign topic = data.Topics[0] %}
@@ -101,7 +102,7 @@ capstone_project:
     <p class="ocs__text">Two pictures: the path from gift to classroom service, and how a student actually reaches it.</p>
     <div class="ocs__diagram-stack">
       <div class="ocs__diagram-block">
-        <h4 class="ocs__diagram-title">From donation to three phases</h4>
+        <h4 class="ocs__diagram-title">From donation to implementation phases</h4>
         <div class="ocs__diagram">
           <pre class="mermaid">flowchart TD
           A[8x GTX 1070 rack] --> P0[Phase 0]
@@ -121,7 +122,11 @@ capstone_project:
           H1 --> P2[Phase 2]
           P2 --> P21[Deploy service]
           P2 --> P22[Monitor load]
-          P2 --> P23[Every student in]</pre>
+          P2 --> P23[Every student in]
+          P2 --> P3[Phase 3]
+          P3 --> P31[Mac mini provisioning]
+          P3 --> P32[Node identity and networking]
+          P3 --> P33[Shared package cache]</pre>
         </div>
       </div>
       <div class="ocs__diagram-block">
@@ -181,8 +186,8 @@ capstone_project:
   {% endfor %}
 
   <div class="ocs__card">
-    <h3 class="ocs__section-title">Three phases, one promise</h3>
-    <p class="ocs__text">The tabs are the implementation path. First we name the problem and pick a direction. Then the gift becomes a live service. Then that service has to survive a class.</p>
+    <h3 class="ocs__section-title">{{ data.stages | size }} phases, one promise</h3>
+    <p class="ocs__text">The tabs are the implementation path. First we name the problem and pick a direction. Then the gift becomes a live service. Then that service has to survive a class. Phase 3 records our recent architecture work preparing the Mac mini pool.</p>
     <div class="ocs__nav-grid ocs__nav-grid--in-card">
       {% for stage in data.stages %}
       <a href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/" class="ocs__nav-card">
@@ -197,6 +202,8 @@ capstone_project:
 
   <div class="ocs__card">
     <h3 class="ocs__section-title">Team split</h3>
+    <p class="ocs__text"><strong>Mentor:</strong> {{ data.mentor | escape }}</p>
+    <p class="ocs__text">{{ data.mentorContribution | escape }}</p>
     <div class="ocs__split">
       {% for team in data.teams %}
       <div class="ocs__visual">
@@ -327,4 +334,4 @@ capstone_project:
     </div>
   </div>
 </div>
-<!-- markdownlint-enable -->
+<!-- markdownlint-restore -->
