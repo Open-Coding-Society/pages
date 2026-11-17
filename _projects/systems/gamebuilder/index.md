@@ -33,6 +33,11 @@ permalink: /gamebuilder/v2/
           <p class="ocs__gamebuilder-status ocs__gamebuilder-action-feedback" data-role="status" role="status" aria-live="polite"></p>
         </div>
       </header>
+      <fieldset class="ocs__gamebuilder-template-picker">
+        <legend>Game type</legend>
+        <div class="ocs__gamebuilder-template-choices" data-role="template-choices"></div>
+        <p class="ocs__gamebuilder-form-help" data-role="template-description"></p>
+      </fieldset>
       <form class="ocs__gamebuilder-form" data-role="builder-form">
         <label>
           Game name
@@ -79,6 +84,7 @@ permalink: /gamebuilder/v2/
         </fieldset>
         <p class="ocs__gamebuilder-form-help">Player and NPC positions use proportions of the runner canvas. Movement uses WASD.</p>
       </form>
+      <form class="ocs__gamebuilder-form" data-role="template-form" hidden></form>
     </section>
 
     <section class="ocs__gamebuilder-runner" aria-label="Game code and preview">

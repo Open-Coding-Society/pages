@@ -62,5 +62,13 @@
     "cols": 3,
     "scaleFactor": 5,
     "movementPreset": "four-row-8way"
+  },
+  {
+    "name": "Cookie",
+    "src": "cookie.png",
+    "rows": 1,
+    "cols": 1,
+    "scaleFactor": 7,
+    "movementPreset": "single-row"
   }
 ]
