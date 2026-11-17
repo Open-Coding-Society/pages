@@ -29,6 +29,7 @@ import { populateSelect, selectAsset } from './form-controls.mjs';
 import { createListItem, createTemplateImages, createTemplateOptions, validateGameTemplates } from './game-templates.mjs';
 import { readTemplatePanel, renderTemplatePanel } from './template-panel.mjs';
 import { generateLevelCode } from './code-generator.mjs?v=2';
+import { generateRacingCode } from './generators/racing.mjs';
 import { waitForGameRunner } from './runner-bridge.mjs';
 import { createWorkspacePersistence } from './workspace-persistence.mjs';
 import { createActionFeedback } from './action-feedback.mjs';
@@ -56,6 +57,11 @@ const templateDescription = root.querySelector('[data-role="template-description
 const templateForm = root.querySelector('[data-role="template-form"]');
 
 const setStatus = createActionFeedback(status);
+
+// Code generators for the data-defined game types, by template id.
+const templateGenerators = {
+  racing: generateRacingCode
+};
 
 function siteUrl(path) {
   return `${root.dataset.baseUrl || ''}${path}`;
@@ -570,39 +576,48 @@ try {
     persistence.changed();
   });
 
+  function generateCode() {
+    if (isRpgTemplate()) {
+      state = readForm(state);
+      return generateLevelCode(state, catalog);
+    }
+    storeOpenTemplateOptions();
+    return templateGenerators[templateId](templateOptions[templateId], templateImages.get(templateId));
+  }
+
+  /** Code that GameBuilder did not just generate is replaced only if the panels could rebuild it. */
+  function isSafeToReplace(currentCode) {
+    const isGeneratedOrEmpty = !currentCode.trim() || currentCode === lastGeneratedCode;
+    if (isGeneratedOrEmpty) return true;
+    try {
+      if (importLevelCode(currentCode, catalog).canRegenerate) return true;
+      setStatus('Push blocked: current source contains code the panels cannot preserve. Export it first; Clear the runner only when you intend to replace it.', 'error');
+    } catch (error) {
+      setStatus(`Push blocked: ${error.message}. Export the code before explicitly clearing it.`, 'error');
+    }
+    return false;
+  }
+
   generateButton.addEventListener('click', () => {
     const template = templates.get(templateId);
     if (!template.codeReady) {
       setStatus(`${template.name} code generation is coming soon. Your settings are saved in this workspace.`, 'error');
       return;
     }
-    state = readForm(state);
     if (activeBarrierId) {
       setStatus('Finish or cancel the active barrier before generating code.', 'error');
       return;
     }
-    const result = generateLevelCode(state, catalog);
+    const result = generateCode();
     if (result.errors.length > 0) {
       setStatus(result.errors.map((error) => error.message).join(' '), 'error');
       return;
     }
 
     const currentCode = runner.getCode();
-    if (currentCode.trim()) {
-      try {
-        if (!importLevelCode(currentCode, catalog).canRegenerate) {
-          setStatus('Push blocked: current source contains code the panels cannot preserve. Export it first; Clear the runner only when you intend to replace it.', 'error');
-          return;
-        }
-      } catch (error) {
-        setStatus(`Push blocked: ${error.message}. Export the code before explicitly clearing it.`, 'error');
-        return;
-      }
-    }
-    if (currentCode.trim() && currentCode !== lastGeneratedCode) {
-      const confirmed = window.confirm('Replace the code currently in GAME_RUNNER with generated code?');
-      if (!confirmed) return;
-    }
+    if (!isSafeToReplace(currentCode)) return;
+    const needsConfirmation = currentCode.trim() && currentCode !== lastGeneratedCode;
+    if (needsConfirmation && !window.confirm('Replace the code currently in GAME_RUNNER with generated code?')) return;
     runner.setCode(result.code);
     lastGeneratedCode = result.code;
     persistence.changed();

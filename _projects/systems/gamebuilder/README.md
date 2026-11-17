@@ -72,10 +72,19 @@ picture, so Clicker offers plain background colours. A test checks that every
 listed picture exists in the repository.
 
 Each game type keeps its own settings in the workspace, so switching types does
-not lose work. Only types with `"codeReady": true` (RPG today) can **Push →**;
-the others report that code generation is coming. Racing, Platform and Clicker
-generation will follow once their engine pieces (lap tracking, platform
-landing) are in `assets/js/GameEnginev1.1/`.
+not lose work. Only types with `"codeReady": true` (RPG and Racing today) can
+**Push →**; the others report that code generation is coming.
+
+Each code-ready type other than RPG has a generator in `js/generators/` that
+turns its panel settings into a level module (`generators/source.mjs` holds the
+shared printing helpers). Racing (`generators/racing.mjs`) builds the track
+background, a `PlayerDriver` car on WASD (plus a second car on the arrow keys
+when chosen), one `Character` per obstacle, and the engine's `LapRace`, which
+draws the finish line, lap counter, timer and winner banner. Each track item in
+the JSON carries its finish line, checkpoint and start position, copied from
+the racing game's levels; each car item carries its sprite sheet layout. Cars
+can leave the road for now: the tracks have no walls yet, but the checkpoint
+still stops shortcut laps.
 
 ## Protecting workspace work
 

@@ -107,11 +107,15 @@ export function validateGameTemplates(data) {
   return data;
 }
 
-/** Picture choices for one template: a Map of group id to a Map of key → { key, name, src }. */
+/**
+ * Picture choices for one template: a Map of group id to a Map of key → the
+ * picture's data (`name`, `src`, any extra details such as a track's finish
+ * line) plus its `key`.
+ */
 export function createTemplateImages(template) {
   const groups = new Map();
   for (const [groupId, items] of Object.entries(template.assets ?? {})) {
-    const entries = items.map((item) => [toKey(item.name), { key: toKey(item.name), name: item.name, src: item.src }]);
+    const entries = items.map((item) => [toKey(item.name), { ...item, key: toKey(item.name) }]);
     groups.set(groupId, new Map(entries));
   }
   return groups;

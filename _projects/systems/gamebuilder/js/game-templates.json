@@ -4,31 +4,93 @@
     "id": "racing",
     "name": "Racing",
     "description": "Drive a car around a track and finish the laps first.",
-    "codeReady": false,
+    "codeReady": true,
     "assets": {
       "tracks": [
-        { "name": "Tutorial Mud Track", "src": "/images/projects/racing-game/Tutorial_Mud_Track.png" },
-        { "name": "Autumn Mud Track", "src": "/images/projects/racing-game/Autumn_Mud_track.png" },
-        { "name": "Winter Track", "src": "/images/projects/racing-game/Winter_Track.png" },
-        { "name": "Spring Track", "src": "/images/projects/racing-game/Spring_track.jpg" },
-        { "name": "Secret Track", "src": "/images/projects/racing-game/Secret_Track.png" },
-        { "name": "Night City", "src": "/images/projects/racing-game/nightcitylevel.png" }
+        {
+          "name": "Tutorial Mud Track",
+          "src": "/images/projects/racing-game/Tutorial_Mud_Track.png",
+          "finishLine": { "x": 0.5, "top": 0.696, "bottom": 0.878 },
+          "checkpoint": { "x": 0.5, "top": 0.12, "bottom": 0.3 },
+          "start": { "x": 0.497, "y": 0.733 }
+        },
+        {
+          "name": "Autumn Mud Track",
+          "src": "/images/projects/racing-game/Autumn_Mud_track.png",
+          "finishLine": { "x": 0.453, "top": 0.794, "bottom": 0.941 },
+          "checkpoint": { "x": 0.453, "top": 0.19, "bottom": 0.33 },
+          "start": { "x": 0.4, "y": 0.77 }
+        },
+        {
+          "name": "Winter Track",
+          "src": "/images/projects/racing-game/Winter_Track.png",
+          "finishLine": { "x": 0.5, "top": 0.764, "bottom": 0.864 },
+          "checkpoint": { "x": 0.5, "top": 0.21, "bottom": 0.28 },
+          "start": { "x": 0.44, "y": 0.775 }
+        },
+        {
+          "name": "Spring Track",
+          "src": "/images/projects/racing-game/Spring_track.jpg",
+          "finishLine": { "x": 0.46, "top": 0.72, "bottom": 0.82 },
+          "checkpoint": { "x": 0.46, "top": 0.12, "bottom": 0.25 },
+          "start": { "x": 0.46, "y": 0.77 }
+        },
+        {
+          "name": "Secret Track",
+          "src": "/images/projects/racing-game/Secret_Track.png",
+          "finishLine": { "x": 0.568, "top": 0.841, "bottom": 0.939 },
+          "checkpoint": { "x": 0.568, "top": 0.1, "bottom": 0.22 },
+          "start": { "x": 0.48, "y": 0.877 }
+        },
+        {
+          "name": "Night City",
+          "src": "/images/projects/racing-game/nightcitylevel.png",
+          "finishLine": { "x": 0.5, "top": 0.7, "bottom": 0.85 },
+          "checkpoint": { "x": 0.5, "top": 0.22, "bottom": 0.34 },
+          "start": { "x": 0.47, "y": 0.76 }
+        }
       ],
       "cars": [
-        { "name": "Red Car", "src": "/images/projects/racing-game/Directions_red_car.png" },
-        { "name": "Blue Car", "src": "/images/projects/racing-game/Directions_blue_car.png" }
+        {
+          "name": "Red Car",
+          "src": "/images/projects/racing-game/Directions_red_car.png",
+          "pixels": { "width": 1536, "height": 1024 },
+          "rows": 4,
+          "cols": 4,
+          "up": { "row": 3, "start": 0 }
+        },
+        {
+          "name": "Blue Car",
+          "src": "/images/projects/racing-game/Directions_blue_car.png",
+          "pixels": { "width": 1536, "height": 1024 },
+          "rows": 4,
+          "cols": 4,
+          "up": { "row": 3, "start": 0 }
+        }
       ],
       "obstacles": [
-        { "name": "Boxes", "src": "/images/projects/racing-game/BoxObstacle.png" },
-        { "name": "Cone", "src": "/images/projects/racing-game/ConeObstacle.png" },
-        { "name": "Cones", "src": "/images/projects/racing-game/ConesObstacle.png" }
+        {
+          "name": "Boxes",
+          "src": "/images/projects/racing-game/BoxObstacle.png",
+          "pixels": { "width": 676, "height": 369 }
+        },
+        {
+          "name": "Cone",
+          "src": "/images/projects/racing-game/ConeObstacle.png",
+          "pixels": { "width": 676, "height": 369 }
+        },
+        {
+          "name": "Cones",
+          "src": "/images/projects/racing-game/ConesObstacle.png",
+          "pixels": { "width": 676, "height": 369 }
+        }
       ]
     },
     "sections": [
       { "legend": "Game", "fields": [{ "id": "name", "label": "Game name", "type": "text", "default": "My Race" }] },
       {
         "legend": "Track",
-        "help": "Pick a track picture. Track edges will be drawn on the preview, like spline barriers.",
+        "help": "Each track has its own finish line. Drive right over it to count a lap.",
         "fields": [
           { "id": "backgroundKey", "label": "Track background", "type": "image", "assetGroup": "tracks" },
           { "id": "laps", "label": "Laps to win", "type": "number", "min": 1, "max": 10, "step": 1, "default": 3 }
