@@ -24,6 +24,7 @@
  */
 import { createAssetCatalog } from './asset-catalog.mjs';
 import { createBarrierPlacementEditor } from './barrier-editor.mjs';
+import { createPlacementEditor } from './placement-editor.mjs';
 import { createDefaultBuilderState, createNpcState } from './builder-state.mjs';
 import { populateSelect, selectAsset } from './form-controls.mjs';
 import { createListItem, createTemplateImages, createTemplateOptions, validateGameTemplates } from './game-templates.mjs';
@@ -320,6 +321,16 @@ try {
       setStatus(`${barrier.name}: point ${barrier.points.length} added.`);
     }
   );
+  // The list whose next item is being drawn on the preview, if any.
+  let drawingListId = null;
+  const placementEditor = createPlacementEditor(
+    root.querySelector('.ocs__gamebuilder-runner .gameContainer'),
+    (placed) => addDrawnItem(placed),
+    () => {
+      drawingListId = null;
+      setStatus('Drawing canceled.');
+    }
+  );
   fillForm(state);
   renderNpcs(state.npcs, catalog.sprites);
   renderTemplateChoices();
@@ -362,7 +373,29 @@ try {
     templateOptions[templateId] = options;
   }
 
+  function listFor(id) {
+    return templates.get(templateId).sections.find((section) => section.list?.id === id).list;
+  }
+
+  /** Adds an item to the list being drawn, at the box or point drawn on the preview. */
+  function addDrawnItem(placed) {
+    const list = listFor(drawingListId);
+    drawingListId = null;
+    storeOpenTemplateOptions();
+    const items = templateOptions[templateId][list.id];
+    const item = createListItem(list, items, templateImages.get(templateId));
+    for (const [key, value] of Object.entries(placed)) {
+      const field = list.fields.find((entry) => entry.id === key);
+      item[key] = Math.min(field.max, Math.max(field.min, value));
+    }
+    items.push(item);
+    renderTemplatePanel(templateForm, templates.get(templateId), templateOptions[templateId], templateImages.get(templateId));
+    persistence.changed();
+    setStatus(`${list.itemName} ${items.length} drawn. Draw another, adjust its numbers, or Push to see it.`);
+  }
+
   function showTemplate(id) {
+    placementEditor.cancel();
     templateId = id;
     const template = templates.get(id);
     templateChoices.querySelector(`input[value="${id}"]`).checked = true;
@@ -522,6 +555,7 @@ try {
     if (isRpgTemplate()) state = readForm(state);
     else storeOpenTemplateOptions();
 
+    placementEditor.cancel();
     if (button.dataset.action === 'add-barrier') {
       if (activeBarrierId) return;
       while (barrierOwner().barriers.some((barrier) => barrier.id === `barrier-${nextBarrierIndex + 1}`)) nextBarrierIndex++;
@@ -672,9 +706,20 @@ try {
     const button = event.target.closest('[data-template-action]');
     if (!button) return;
     const template = templates.get(templateId);
-    const list = template.sections.find((section) => section.list?.id === button.dataset.listId).list;
+    const list = listFor(button.dataset.listId);
     storeOpenTemplateOptions();
     const items = templateOptions[templateId][list.id];
+    if (button.dataset.templateAction === 'draw-item') {
+      if (activeBarrierId) {
+        setStatus('Finish or cancel the active barrier before drawing.', 'error');
+        return;
+      }
+      drawingListId = list.id;
+      placementEditor.start(list.draw, items);
+      const how = list.draw === 'box' ? 'Drag a box on the preview' : 'Click the preview';
+      setStatus(`${how} to place a ${list.itemName.toLowerCase()}. Press Escape to cancel.`);
+      return;
+    }
     if (button.dataset.templateAction === 'add-item') {
       items.push(createListItem(list, items, templateImages.get(templateId)));
       setStatus(`${list.itemName} added.`);

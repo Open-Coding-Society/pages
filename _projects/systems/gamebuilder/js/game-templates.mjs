@@ -15,7 +15,9 @@
  * `src` is a site path to an image the base game already publishes. An image
  * field names the group it chooses from with `assetGroup`. A template with
  * `barriers: true` also uses the shared spline barrier panel; its options then
- * hold a `barriers` list like the RPG builder's.
+ * hold a `barriers` list like the RPG builder's. A list may set `draw` to
+ * "box" (needs x, y, width, height number fields) or "point" (needs x, y) so
+ * its items can be drawn on the preview.
  *
  * @usage
  * Call `validateGameTemplates(data)` once after loading the JSON, then
@@ -27,6 +29,8 @@ import { toKey } from './asset-catalog.mjs';
 
 const ID_PATTERN = /^[a-z][A-Za-z0-9-]*$/;
 const FIELD_TYPES = ['text', 'number', 'checkbox', 'choice', 'image'];
+// A list item that can be drawn on the preview needs number fields for what the drawing sets.
+const DRAW_FIELDS = { box: ['x', 'y', 'width', 'height'], point: ['x', 'y'] };
 
 function fail(message) {
   throw new TypeError(`Invalid game templates: ${message}`);
@@ -104,6 +108,11 @@ export function validateGameTemplates(data) {
       if (typeof list.itemName !== 'string' || !Array.isArray(list.fields)) fail(`${list.id} needs itemName and fields`);
       const itemIds = new Set(['id']);
       list.fields.forEach((field) => checkField(field, itemIds, `${template.id}.${list.id}`, template.assets));
+      if (list.draw !== undefined) {
+        const needed = DRAW_FIELDS[list.draw];
+        const numberIds = list.fields.filter((field) => field.type === 'number').map((field) => field.id);
+        if (!needed || !needed.every((id) => numberIds.includes(id))) fail(`${list.id} draw needs "box" or "point" and its number fields`);
+      }
     }
   }
   if (!data.some((template) => template.panel === 'rpg')) fail('the RPG template is required');

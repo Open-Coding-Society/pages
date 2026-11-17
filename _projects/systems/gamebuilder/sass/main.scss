@@ -552,6 +552,42 @@
   vector-effect: non-scaling-stroke;
 }
 
+/// Drawing list items (platforms, obstacles) on the preview
+/// Purpose: `placement-editor.mjs` overlays the runner preview while a box or
+/// point is being drawn; existing items show faintly for reference.
+/// Usage: the overlay only takes pointer input while it has `is-active`.
+/// @group gamebuilder-placement
+.ocs__gamebuilder-placement-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 31;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ocs__gamebuilder-placement-overlay.is-active {
+  cursor: crosshair;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.ocs__gamebuilder-placement-existing,
+.ocs__gamebuilder-placement-draft {
+  fill: var(--pref-accent-color);
+  fill-opacity: 0.25;
+  stroke: var(--pref-accent-color);
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.ocs__gamebuilder-placement-draft {
+  fill-opacity: 0.45;
+  stroke-dasharray: 6 4;
+}
+
 /// Narrow-screen layout adjustments
 ///
 /// Purpose: Reduce page chrome and stack the builder and runner when the
