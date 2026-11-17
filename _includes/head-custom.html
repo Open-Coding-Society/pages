@@ -1,3 +1,9 @@
+<!-- Web app manifest: lets phones add the site to the Home Screen. iPhone and iPad only show
+     web push notifications (new direct messages) from a Home Screen web app. -->
+<link rel="manifest" href="{{ '/manifest.json' | relative_url }}">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="OCS">
+
 <!-- Favicon for browser tabs and bookmarks -->
 <link rel="icon" href="{{ '/favicon.ico' | relative_url }}" type="image/x-icon">
 

@@ -12,6 +12,7 @@ import {
   canFormGroups, conversationLabel, groupSubtitle, isClassGroup, isCourseChannel, sortGroups,
 } from './messages-model.js';
 import { initNewChat } from './new-chat.js';
+import { initNotifyButton } from './notify-button.js';
 import { conversationHref, createSidebar } from './sidebar.js';
 import { createThread } from './thread.js';
 
@@ -45,7 +46,7 @@ async function signedInPerson(api, setStatus) {
   return null;
 }
 
-export async function startMessagesPage({ config, richText }) {
+export async function startMessagesPage({ config, richText, push }) {
   const api = createMessagesApi(config);
   const setStatus = createStatus();
   const notice = byId('messagesNotice');
@@ -338,6 +339,7 @@ export async function startMessagesPage({ config, richText }) {
   }
   byId('messagesFindGroup').disabled = false;
   byId('messagesNewChat').disabled = false;
+  initNotifyButton({ push, button: byId('messagesNotify'), notice });
   if (conversationSearch) conversationSearch.disabled = false;
 
   // The navbar bell's summary keeps the unread counts current, and shows conversations
