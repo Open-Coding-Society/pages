@@ -82,7 +82,13 @@ in 0–1 canvas coordinates, and the number of laps, then call
 `update(car, centre)` every frame. A lap counts only when a car crosses the
 finish line moving right after passing the checkpoint on the far side, so
 shortcuts and driving backwards never count. The racing game's lap screens use
-it, as will GameBuilder's Racing template.
+it directly.
+
+`essentials/LapRace.js` is a ready-made race built on it: add it to a level's
+classes with `{ totalLaps, finishLine, checkpoint }` and it tracks every
+`PlayerDriver`, draws the finish line, timer and lap panel, and stops all cars
+once one wins. GameBuilder's Racing template uses it. `PlayerDriver` cars with
+`rotateWithHeading: true` draw their `up` frame turned to face their heading.
 
 The platformer game extends it in
 `_projects/games/platformer/levels/PlatformerPlayer.js` only for its jump sound
