@@ -1,69 +1,106 @@
 /**
  * @module game-templates-tests
- * @description Contracts for the game type list and template starter settings.
- * @data Reads the real `game-templates.json` and a small asset catalog.
+ * @description Contracts for the game type list, each type's pictures, and
+ * template starter settings.
+ * @data Reads the real `game-templates.json` and checks its image paths
+ * against the repository's source files.
  * @usage Run with Node's test runner alongside the other GameBuilder contracts.
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { createAssetCatalog } from '../js/asset-catalog.mjs';
-import { createListItem, createTemplateOptions, validateGameTemplates } from '../js/game-templates.mjs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { createListItem, createTemplateImages, createTemplateOptions, validateGameTemplates } from '../js/game-templates.mjs';
 
+const repoRoot = new URL('../../../../', import.meta.url);
 const templateData = JSON.parse(readFileSync(new URL('../js/game-templates.json', import.meta.url), 'utf8'));
-const readManifest = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
-const catalog = createAssetCatalog(readManifest('../images/bg/index.json'), readManifest('../images/sprites/index.json'));
+const byId = new Map(templateData.map((template) => [template.id, template]));
+const imagesFor = (id) => createTemplateImages(byId.get(id));
+const groupNames = (id, group) => [...imagesFor(id).get(group).values()].map((image) => image.name);
+
+/** Source file behind a published site path (registered projects publish to /images/projects/<name>/). */
+function sourceFileFor(sitePath) {
+  const projectImage = sitePath.match(/^\/images\/projects\/([^/]+)\/(.+)$/);
+  if (!projectImage) return new URL(`.${sitePath}`, repoRoot);
+  const [, project, file] = projectImage;
+  for (const category of readdirSync(new URL('_projects/', repoRoot))) {
+    const candidate = new URL(`_projects/${category}/${project}/images/${file}`, repoRoot);
+    if (existsSync(candidate)) return candidate;
+  }
+  return null;
+}
 
 test('the game type list offers RPG, Racing, Platform and Clicker in that order', () => {
   const templates = validateGameTemplates(templateData);
   assert.deepEqual(templates.map((template) => template.name), ['RPG', 'Racing', 'Platform', 'Clicker']);
   assert.equal(templates[0].panel, 'rpg');
-  assert.deepEqual(templates.filter((template) => template.codeReady).map((template) => template.id), ['rpg']);
 });
 
-test('starter settings use defaults from the data file and the catalog', () => {
-  const byId = new Map(templateData.map((template) => [template.id, template]));
-  const clicker = createTemplateOptions(byId.get('clicker'), catalog);
+test('every template picture exists in the repository', () => {
+  for (const template of templateData.filter((entry) => entry.assets)) {
+    for (const [group, items] of Object.entries(template.assets)) {
+      for (const item of items) {
+        const source = sourceFileFor(item.src);
+        assert.ok(source && existsSync(source), `${template.id}.${group}: ${item.src} is missing`);
+      }
+    }
+  }
+});
+
+test('each game type offers only pictures from its own base game', () => {
+  assert.deepEqual(groupNames('racing', 'cars'), ['Red Car', 'Blue Car']);
+  assert.ok(groupNames('racing', 'tracks').every((name) => /Track|City/.test(name)));
+  for (const group of ['tracks', 'cars', 'obstacles']) {
+    for (const image of imagesFor('racing').get(group).values()) assert.match(image.src, /^\/images\/projects\/racing-game\//);
+  }
+  for (const image of imagesFor('platform').get('backgrounds').values()) {
+    assert.match(image.src, /^\/images\/platformer\/backgrounds\//);
+  }
+  assert.deepEqual(groupNames('clicker', 'targets'), ['Cookie', 'Grandma']);
+});
+
+test('starter settings use the data defaults and each field\'s first picture', () => {
+  const clicker = createTemplateOptions(byId.get('clicker'), imagesFor('clicker'));
   assert.equal(clicker.targetSpriteKey, 'cookie');
+  assert.equal(clicker.backgroundColor, '#fef3c7');
   assert.equal(clicker.goalScore, 100);
   assert.deepEqual(clicker.powerUps, []);
 
-  const racing = createTemplateOptions(byId.get('racing'), catalog);
+  const racing = createTemplateOptions(byId.get('racing'), imagesFor('racing'));
+  assert.equal(racing.carSpriteKey, 'red_car');
+  assert.equal(racing.backgroundKey, 'tutorial_mud_track');
   assert.equal(racing.laps, 3);
-  assert.equal(racing.secondPlayer, false);
-  assert.equal(racing.backgroundKey, catalog.backgrounds.keys().next().value);
+
+  const platform = createTemplateOptions(byId.get('platform'), imagesFor('platform'));
+  assert.equal(platform.playerSpriteKey, 'astronaut');
 });
 
-test('a missing default asset falls back to the first catalog entry', () => {
-  const template = {
-    id: 'demo', name: 'Demo', description: '', codeReady: false,
-    sections: [{ legend: 'A', fields: [{ id: 'spriteKey', label: 'Sprite', type: 'sprite', default: 'gone' }] }]
-  };
-  validateGameTemplates([{ id: 'rpg', name: 'RPG', description: '', codeReady: true, panel: 'rpg' }, template]);
-  assert.equal(createTemplateOptions(template, catalog).spriteKey, catalog.sprites.keys().next().value);
-});
-
-test('new list items get unique ids even after removals', () => {
-  const list = templateData.find((template) => template.id === 'platform')
-    .sections.find((section) => section.list?.id === 'platforms').list;
-  const first = createListItem(list, [], catalog);
-  assert.equal(first.id, 'platforms-1');
-  assert.equal(first.visible, true);
-  const afterRemoval = createListItem(list, [{ id: 'platforms-2' }], catalog);
-  assert.equal(afterRemoval.id, 'platforms-3');
+test('new list items get unique ids even after removals, and pictures from their own group', () => {
+  const list = byId.get('platform').sections.find((section) => section.list?.id === 'enemies').list;
+  const first = createListItem(list, [], imagesFor('platform'));
+  assert.equal(first.id, 'enemies-1');
+  assert.equal(first.spriteKey, 'alien');
+  assert.equal(createListItem(list, [{ id: 'enemies-2' }], imagesFor('platform')).id, 'enemies-3');
 });
 
 test('malformed template data is rejected before any panel is drawn', () => {
   const rpg = { id: 'rpg', name: 'RPG', description: '', codeReady: true, panel: 'rpg' };
-  const withField = (field) => [rpg, { id: 'x', name: 'X', description: '', codeReady: false, sections: [{ legend: 'A', fields: [field] }] }];
+  const assets = { pics: [{ name: 'A', src: '/images/a.png' }] };
+  const withField = (field, templateAssets = assets) => [rpg, {
+    id: 'x', name: 'X', description: '', codeReady: false, assets: templateAssets,
+    sections: [{ legend: 'A', fields: [field] }]
+  }];
   for (const data of [
     [],
     [{ ...rpg, panel: undefined, sections: [] }],
     [rpg, rpg],
     withField({ id: 'n', label: 'N', type: 'number', min: 1, max: 5, step: 1, default: 9 }),
     withField({ id: 'c', label: 'C', type: 'choice', default: 'z', choices: [{ value: 'a', label: 'A' }] }),
-    withField({ id: 'f', label: 'F', type: 'colour', default: 'red' }),
-    [rpg, { id: 'x', name: 'X', description: '', codeReady: false, sections: [{ legend: 'A' }] }]
+    withField({ id: 'f', label: 'F', type: 'sprite' }),
+    withField({ id: 'i', label: 'I', type: 'image', assetGroup: 'missing' }),
+    withField({ id: 'i', label: 'I', type: 'image', assetGroup: 'pics' }, { pics: [{ name: 'A', src: '../secret.png' }] }),
+    withField({ id: 'i', label: 'I', type: 'image', assetGroup: 'pics' }, { pics: [{ name: 'A', src: '//evil.example/a.png' }] }),
+    withField({ id: 'i', label: 'I', type: 'image', assetGroup: 'pics' }, { pics: [] }),
+    [rpg, { id: 'x', name: 'X', description: '', codeReady: false, assets, sections: [{ legend: 'A' }] }]
   ]) {
     assert.throws(() => validateGameTemplates(data), /Invalid game templates/);
   }

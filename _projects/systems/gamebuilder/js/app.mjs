@@ -26,7 +26,7 @@ import { createAssetCatalog } from './asset-catalog.mjs';
 import { createBarrierPlacementEditor } from './barrier-editor.mjs';
 import { createDefaultBuilderState, createNpcState } from './builder-state.mjs';
 import { populateSelect, selectAsset } from './form-controls.mjs';
-import { createListItem, createTemplateOptions, validateGameTemplates } from './game-templates.mjs';
+import { createListItem, createTemplateImages, createTemplateOptions, validateGameTemplates } from './game-templates.mjs';
 import { readTemplatePanel, renderTemplatePanel } from './template-panel.mjs';
 import { generateLevelCode } from './code-generator.mjs?v=2';
 import { waitForGameRunner } from './runner-bridge.mjs';
@@ -277,6 +277,8 @@ try {
   const catalog = createAssetCatalog(backgroundManifest, spriteManifest);
   const templates = new Map(validateGameTemplates(templateList).map((template) => [template.id, template]));
   const rpgTemplateId = templateList.find((template) => template.panel === 'rpg').id;
+  // Each game type offers only the pictures its base game uses.
+  const templateImages = new Map(templateList.map((template) => [template.id, createTemplateImages(template)]));
   styleRunnerIcons(root);
   populateSelect(form.elements.namedItem('background'), catalog.backgrounds);
   populateSelect(form.elements.namedItem('player-sprite'), catalog.sprites);
@@ -350,8 +352,8 @@ try {
       templateForm.replaceChildren();
       return;
     }
-    templateOptions[id] ??= createTemplateOptions(template, catalog);
-    renderTemplatePanel(templateForm, template, templateOptions[id], catalog);
+    templateOptions[id] ??= createTemplateOptions(template, templateImages.get(id));
+    renderTemplatePanel(templateForm, template, templateOptions[id], templateImages.get(id));
   }
 
   function updateBarrierEditor() {
@@ -433,7 +435,7 @@ try {
   root.querySelector('[data-action="clear-builder"]').addEventListener('click', () => {
     if (!window.confirm('Reset builder panels to starter settings? Runner code and the saved workspace are kept.')) return;
     if (!isRpgTemplate()) {
-      templateOptions[templateId] = createTemplateOptions(templates.get(templateId), catalog);
+      templateOptions[templateId] = createTemplateOptions(templates.get(templateId), templateImages.get(templateId));
       showTemplate(templateId);
       persistence.changed();
       setStatus(`${templates.get(templateId).name} settings reset. Runner code is unchanged.`);
@@ -629,13 +631,13 @@ try {
     storeOpenTemplateOptions();
     const items = templateOptions[templateId][list.id];
     if (button.dataset.templateAction === 'add-item') {
-      items.push(createListItem(list, items, catalog));
+      items.push(createListItem(list, items, templateImages.get(templateId)));
       setStatus(`${list.itemName} added.`);
     } else {
       templateOptions[templateId][list.id] = items.filter((item) => item.id !== button.dataset.itemId);
       setStatus(`${list.itemName} removed.`);
     }
-    renderTemplatePanel(templateForm, template, templateOptions[templateId], catalog);
+    renderTemplatePanel(templateForm, template, templateOptions[templateId], templateImages.get(templateId));
     persistence.changed();
   });
 

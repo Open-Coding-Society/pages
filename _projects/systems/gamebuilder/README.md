@@ -61,6 +61,16 @@ panels from the data file (`js/template-panel.mjs`), so options, defaults and
 list items (obstacles, platforms, enemies, coins, power-ups) change by editing
 JSON, not code. `js/game-templates.mjs` validates the file when the page loads.
 
+Each game type offers only pictures from its own base game, listed under that
+type's `assets` in the same file and referenced where the base game already
+publishes them (no copies): Racing uses the racing game's tracks, cars and
+obstacles (`/images/projects/racing-game/`); Platform uses the platformer
+backgrounds, players, enemies and coins (`/images/platformer/` and the
+astronaut platformer's astronaut); Clicker uses the cookie clicker's Cookie and
+Grandma (`/hacks/cookie-clicker/assets/`). The cookie games have no background
+picture, so Clicker offers plain background colours. A test checks that every
+listed picture exists in the repository.
+
 Each game type keeps its own settings in the workspace, so switching types does
 not lose work. Only types with `"codeReady": true` (RPG today) can **Push →**;
 the others report that code generation is coming. Racing, Platform and Clicker
