@@ -11,41 +11,7 @@ active_tab: analytics
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" referrerpolicy="no-referrer">
 <div class="ocs__analytics-page">
     <div class="ocs__stack ocs__stack--wide">
-        <div class="ocs__tabs">
-            <ul class="ocs__tabs-list" id="tab-bar">
-                <li>
-                    <a href="#" id="tab-ocs-analytics"
-                        class="tab-btn active ocs__tabs-btn"
-                        aria-current="page">
-                        OCS Analytics
-                    </a>
-                </li>
-                <li>
-                    <a href="#" id="tab-github"
-                        class="tab-btn ocs__tabs-btn">
-                        GitHub Analytics
-                    </a>
-                </li>
-                <li>
-                    <a href="#" id="tab-grade"
-                        class="tab-btn ocs__tabs-btn">
-                        Grade Predictor
-                    </a>
-                </li>
-                <li>
-                    <a href="#" id="tab-skill-passport"
-                        class="tab-btn ocs__tabs-btn">
-                        Skill Passport
-                    </a>
-                </li>
-            </ul>
-            <!-- sliding underline indicator -->
-            <div id="tab-underline" class="ocs__tabs-underline"
-                style="position:absolute;bottom:0;left:0;height:2px;width:0;transition:all 0.3s cubic-bezier(.4,0,.2,1);border-radius:2px;">
-            </div>
-        </div>
-
-        <!-- tab content container -->
+        <!-- sections, one shown at a time (see showSection) -->
         <div id="tab-content-container" class="ocs__tabs-panels">
 
             <!-- OCS Analytics tab content -->
