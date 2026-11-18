@@ -3,6 +3,11 @@
   the Grades pages use grades_sidebar. Without it, the Profile sidebar shows.
   The layout includes it twice, beside the page and in the phone menu, so the
   phone copy passes id_prefix to keep its link ids unique.
+
+  An item's `children` are sections of its page, listed under it as an
+  ocs__tree. Each links to the page with `#section`; on the current page the
+  links carry data-sidebar-section, and the page sets aria-current on the one
+  it shows.
 {% endcomment %}
 {% assign sidebar_name = page.sidebar | default: "aesthetihawk_sidebar" %}
 <ul class="flex flex-col py-4 space-y-1">
@@ -32,6 +37,17 @@
           </span>
           <span class="ml-2 text-sm tracking-wide truncate">{{ item.title }}</span>
         </a>
+        {% if item.children %}
+          <ul class="ocs__tree ml-7 mr-4 my-1">
+            {% for child in item.children %}
+              <li>
+                <a href="{{ site.baseurl }}{{ item.url }}#{{ child.section }}"
+                   {% if current == item_id %}data-sidebar-section="{{ child.section }}"{% endif %}
+                   class="nav-item flex flex-row items-center gap-2 h-9 pl-3 pr-2 text-sm tracking-wide text-neutral-600 hover:text-neutral-50 aria-[current=true]:bg-neutral-700 aria-[current=true]:text-neutral-50">{{ child.title }}{% if child.audience %}<small class="ocs__status-pill ocs__status-pill--neutral">{{ child.audience }}</small>{% endif %}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
       </li>
     {% endfor %}
   {% endfor %}
