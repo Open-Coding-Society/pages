@@ -2,11 +2,11 @@
 //
 // Teachers and admins open sprints; for each one a student ranks the Ground 0 evaluation items
 // (T01-T12 technical, P01-P10 professional, 0 = not entered, 1-5), writes a summary per section,
-// answers the retrospective questions and ticks the Ground 0 checklist. The teacher adds their own
-// rank and a comment beside every item, and the student sees both. The reflection reads as numbered
-// steps with a progress line each, and the checklist is one collapsible group per heading with a bar
-// each, so nobody faces every checkbox at once. Growth Over Time charts each item across the year's sprints. Everything is stored in Spring (/api/sprint-retros); the items
-// come from SprintRetroTemplate there, so this file only relies on their ids.
+// and answers the retrospective questions. The teacher adds their own rank and a comment beside
+// every item, and the student sees both. The reflection reads as numbered steps with a progress
+// line each. Growth Over Time charts each item across the year's sprints. Everything is stored in
+// Spring (/api/sprint-retros); the items come from SprintRetroTemplate there, so this file only
+// relies on their ids.
 import { javaURI, fetchOptions } from '../api/config.js';
 
 const api = `${javaURI}/api/sprint-retros`;
@@ -18,7 +18,7 @@ const STORY_KEYS = ['techRetro', 'proRetro', 'techGoal', 'commitBehavior'];
 class SignedOut extends Error {}
 
 const shared = { loaded: null, template: null, sprints: [], canManage: false };
-const ref = { root: null, sprintId: null, mode: 'mine', studentId: null, roster: [], view: null, dirty: false, editingId: null, checkFilter: 'all' };
+const ref = { root: null, sprintId: null, mode: 'mine', studentId: null, roster: [], view: null, dirty: false, editingId: null };
 const growth = { root: null, personId: null, progress: null, chart: null, viewKey: 'sections', perspective: 'self' };
 
 // ---------- shared ----------
@@ -218,22 +218,12 @@ function renderForm() {
     const review = ref.mode === 'review';
     const student = view.student;
     const teacher = view.teacher;
-    const checks = new Set(student.checks);
-    const totalChecks = shared.template.checklist.reduce((n, s) => n + s.checks.length, 0);
     const form = ref.root.querySelector('[data-sr="form"]');
     const ranked = Object.keys(student.ranks).length;
     const totalItems = sections().reduce((n, s) => n + s.items.length, 0);
-    const checklist = shared.template.checklist;
     // The teacher's columns stay out of a student's way until there is feedback to put in them.
     const showTeacher = review || Boolean(view.teacherUpdatedAt);
-    // Groups left open survive a re-render (a save); a fresh view opens the first unfinished one.
-    const previous = [...form.querySelectorAll('.sr-group')];
-    const firstOpen = checklist.findIndex((section) => section.checks.some((check) => !checks.has(check.id)));
-    const isOpen = (i) => (previous.length ? Boolean(previous[i] && previous[i].open) : !review && i === firstOpen);
-    const steps = [
-        { id: 'checklist', title: 'Ground 0 checklist' },
-        ...shared.template.evaluations.map((evaluation) => ({ id: `eval-${evaluation.key}`, title: evaluation.title })),
-    ];
+    const steps = shared.template.evaluations.map((evaluation) => ({ id: `eval-${evaluation.key}`, title: evaluation.title }));
     const stepHead = (id, title) => `<div class="sr-step"><span class="sr-step-num">${steps.findIndex((step) => step.id === id) + 1}</span><h3 class="sr-h3">${title}</h3></div>`;
 
     const who = review ? escapeHtml(view.personName || 'This student') : 'You';
@@ -259,30 +249,6 @@ function renderForm() {
           <span class="sr-label">Overall comment from your teacher</span>
           <p class="sr-quote">${escapeHtml(teacher.overall)}</p>
         </div>` : ''}
-      <div class="sr-card" id="sr-step-checklist">
-        ${stepHead('checklist', 'Ground 0 checklist')}
-        <p class="sr-muted sr-small">Check your starting position before you rank yourself. Open one group at a time.</p>
-        <div class="sr-checkbar">
-          <div class="sr-meter" data-check-overall role="progressbar" aria-label="Checklist progress" aria-valuemin="0" aria-valuemax="${totalChecks}"><span></span></div>
-          <span class="sr-small" data-check-total></span>
-          <div class="sr-seg" role="group" aria-label="Which items to show">
-            <button type="button" data-check-filter="all">All</button>
-            <button type="button" data-check-filter="todo">To do</button>
-          </div>
-          <button type="button" class="sr-btn sr-btn--ghost sr-btn--sm" data-check-toggle>Expand all</button>
-        </div>
-        <div class="sr-groups" data-checklist>
-          ${checklist.map((section, i) => `
-            <details class="sr-group" ${isOpen(i) ? 'open' : ''}>
-              <summary><span class="sr-group-title">${escapeHtml(section.title)}</span><span class="sr-meter"><span></span></span><span class="sr-group-count" data-group-count></span></summary>
-              <div class="sr-checks" role="group" aria-label="${escapeHtml(section.title)}">
-                ${section.checks.map((check) => `
-                  <label><input type="checkbox" data-check="${check.id}" ${checks.has(check.id) ? 'checked' : ''} ${review ? 'disabled' : ''}> <span>${escapeHtml(check.text)}</span></label>`).join('')}
-              </div>
-            </details>`).join('')}
-        </div>
-        <p class="sr-ok sr-small" data-check-empty hidden>Everything on the checklist is ticked.</p>
-      </div>
       ${shared.template.evaluations.map((evaluation) => evaluationCard(evaluation, student, teacher, review, showTeacher, stepHead)).join('')}
       ${review ? `
         <div class="sr-card sr-card--teacher">
@@ -293,19 +259,10 @@ function renderForm() {
         <button type="submit" class="sr-btn">${review ? 'Save feedback' : 'Save reflection'}</button>
         <span class="sr-small" data-sr="save-status" role="status"></span>
       </div>`;
-    applyCheckFilter();
-}
-
-/** Shows every checklist item or only the unticked ones, then refreshes the counts. */
-function applyCheckFilter() {
-    const form = ref.root.querySelector('[data-sr="form"]');
-    const list = form.querySelector('[data-checklist]');
-    if (list) list.classList.toggle('sr-groups--todo', ref.checkFilter === 'todo');
-    form.querySelectorAll('[data-check-filter]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.checkFilter === ref.checkFilter)));
     updateProgress();
 }
 
-/** Recounts what is ticked, ranked and written, for the step guide, each section and each checklist group. */
+/** Recounts what is ranked and written, for the step guide and each section. */
 function updateProgress() {
     const form = ref.root.querySelector('[data-sr="form"]');
     const review = ref.mode === 'review';
@@ -332,32 +289,6 @@ function updateProgress() {
             : `${filled(ranks)} of ${ranks.length} ranked · ${written} of ${texts.length} written`,
         filled(ranks) === ranks.length && written === texts.length);
     });
-    let done = 0;
-    let total = 0;
-    const width = (n, of) => `${of ? Math.round((n / of) * 100) : 0}%`;
-    form.querySelectorAll('.sr-group').forEach((group) => {
-        const boxes = [...group.querySelectorAll('[data-check]')];
-        const ticked = boxes.filter((box) => box.checked).length;
-        done += ticked;
-        total += boxes.length;
-        group.toggleAttribute('data-done', ticked === boxes.length);
-        group.querySelector('[data-group-count]').textContent = `${ticked} of ${boxes.length}`;
-        group.querySelector('.sr-meter > span').style.width = width(ticked, boxes.length);
-    });
-    setStatus('checklist', `${done} of ${total} done`, total > 0 && done === total);
-    if (!total) return;
-    const overall = form.querySelector('[data-check-overall]');
-    overall.setAttribute('aria-valuenow', String(done));
-    overall.firstElementChild.style.width = width(done, total);
-    form.querySelector('[data-check-total]').textContent = `${done} of ${total} done`;
-    form.querySelector('[data-check-empty]').hidden = !(ref.checkFilter === 'todo' && done === total);
-    syncToggleLabel();
-}
-
-function syncToggleLabel() {
-    const groups = [...ref.root.querySelectorAll('.sr-group')];
-    const button = ref.root.querySelector('[data-check-toggle]');
-    if (button) button.textContent = groups.some((group) => !group.open) ? 'Expand all' : 'Collapse all';
 }
 
 function evaluationCard(evaluation, student, teacher, review, showTeacher, stepHead) {
@@ -438,8 +369,7 @@ function collect(form) {
     const text = {};
     form.querySelectorAll('[data-rank]').forEach((el) => { if (value(el)) ranks[el.dataset.rank] = value(el); });
     form.querySelectorAll('[data-text]').forEach((el) => { if (el.value.trim()) text[el.dataset.text] = el.value; });
-    const checks = [...form.querySelectorAll('[data-check]:checked')].map((el) => el.dataset.check);
-    return { ranks, text, checks };
+    return { ranks, text };
 }
 
 async function save(form) {
@@ -499,26 +429,13 @@ function bindReflection() {
         }
         updateProgress();
     });
-    // Step guide jumps and the checklist's view controls; none of these change what gets saved.
+    // Step guide jumps; they do not change what gets saved.
     root.addEventListener('click', (event) => {
         const jump = event.target.closest('[data-jump]');
-        const filter = event.target.closest('[data-check-filter]');
-        if (jump) {
-            const target = document.getElementById(jump.dataset.jump);
-            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else if (filter) {
-            ref.checkFilter = filter.dataset.checkFilter;
-            applyCheckFilter();
-        } else if (event.target.closest('[data-check-toggle]')) {
-            const groups = [...root.querySelectorAll('.sr-group')];
-            const open = groups.some((group) => !group.open);
-            groups.forEach((group) => { group.open = open; });
-            syncToggleLabel();
-        }
+        if (!jump) return;
+        const target = document.getElementById(jump.dataset.jump);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-    root.addEventListener('toggle', (event) => {
-        if (event.target.matches && event.target.matches('.sr-group')) syncToggleLabel();
-    }, true);
     root.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (event.target.matches('[data-sr="form"]')) await save(event.target);
@@ -942,25 +859,6 @@ function injectStyles() {
       .sr-part--next { padding-top: .8rem; border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); }
       .sr-count { font-size: .74rem; font-weight: 500; opacity: .7; margin-left: .4rem; white-space: nowrap; }
       .sr-count[data-done] { color: #34d399; opacity: 1; }
-      .sr-meter { display: block; flex: 1 1 8rem; min-width: 4rem; height: .45rem; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, currentColor 14%, transparent); }
-      .sr-meter > span { display: block; width: 0; height: 100%; border-radius: inherit; background: #059669; transition: width .2s ease; }
-      .sr-checkbar { display: flex; flex-wrap: wrap; gap: .6rem .9rem; align-items: center; }
-      .sr-groups { display: grid; gap: .5rem; }
-      .sr-group { border: 1px solid color-mix(in srgb, currentColor 14%, transparent); border-radius: .7rem; }
-      .sr-group > summary { display: flex; gap: .8rem; align-items: center; padding: .6rem .85rem; cursor: pointer; font-size: .9rem; font-weight: 600; list-style: none; }
-      .sr-group > summary::-webkit-details-marker { display: none; }
-      .sr-group > summary::before { content: '▸'; opacity: .6; transition: transform .15s ease; }
-      .sr-group[open] > summary::before { transform: rotate(90deg); }
-      .sr-group-title { flex: 1 1 10rem; min-width: 0; }
-      .sr-group .sr-meter { flex: 0 1 8rem; }
-      .sr-group-count { flex: none; min-width: 4rem; text-align: right; font-size: .78rem; font-weight: 500; opacity: .75; white-space: nowrap; }
-      .sr-group[data-done] .sr-group-count { color: #34d399; opacity: 1; }
-      .sr-group[data-done] .sr-group-count::before { content: '✓ '; }
-      .sr-checks { display: grid; gap: .45rem; font-size: .85rem; padding: .1rem .85rem .8rem 2.2rem; }
-      .sr-checks label { display: flex; gap: .5rem; align-items: flex-start; cursor: pointer; }
-      .sr-checks input { margin-top: .2rem; accent-color: #059669; }
-      .sr-checks input:checked + span { opacity: .6; }
-      .sr-groups--todo .sr-group[data-done], .sr-groups--todo .sr-checks label:has(input:checked) { display: none; }
       .sr-levels summary { cursor: pointer; opacity: .8; }
       .sr-section { display: grid; gap: .6rem; padding-top: .8rem; border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); }
       .sr-prompts { display: grid; gap: .7rem; padding-top: .8rem; border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); }
@@ -997,7 +895,7 @@ function injectStyles() {
       .sr-btn--sm { padding: .2rem .6rem; font-size: .78rem; }
       .sr-btn--link { background: transparent; color: inherit; opacity: .65; font-weight: 400; font-size: .8rem; text-decoration: underline; padding: 0 .3rem; }
       .sr-btn--link:hover { background: transparent; opacity: 1; color: #f87171; }
-      @media (max-width: 520px) { .sr-card { padding: 1rem; } .sr-bar .sr-input { min-width: 0; } .sr-group .sr-meter { display: none; } .sr-checks { padding-left: .85rem; } }
+      @media (max-width: 520px) { .sr-card { padding: 1rem; } .sr-bar .sr-input { min-width: 0; } }
     `;
     document.head.appendChild(style);
 }
