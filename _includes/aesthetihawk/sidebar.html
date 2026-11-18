@@ -1,6 +1,8 @@
 {% comment %}
   A page picks its sidebar with `sidebar: <data file>` in its front matter;
   the Grades pages use grades_sidebar. Without it, the Profile sidebar shows.
+  The layout includes it twice, beside the page and in the phone menu, so the
+  phone copy passes id_prefix to keep its link ids unique.
 {% endcomment %}
 {% assign sidebar_name = page.sidebar | default: "aesthetihawk_sidebar" %}
 <ul class="flex flex-col py-4 space-y-1">
@@ -15,7 +17,7 @@
     {% for item in section.items %}
       {% assign item_id = item.id | strip %}
       <li>
-        <a id="sidebar-{{ item_id }}" href="{{ site.baseurl }}{{ item.url }}"
+        <a id="{{ include.id_prefix }}sidebar-{{ item_id }}" href="{{ site.baseurl }}{{ item.url }}"
            class="nav-item relative flex flex-row items-center h-11 focus:outline-none pr-6 border-l-4
            {% if current == item_id %}
              bg-neutral-700 text-neutral-50 border-indigo-500
