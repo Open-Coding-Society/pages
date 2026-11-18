@@ -6,26 +6,41 @@ active_tab: retrospective
 
 <!-- Fonts loaded globally via head-custom.html -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css" />
+<style>
+    /* Page chrome only; the panels style themselves (sr-* and fr-*). */
+    .retro-intro { margin: 0; max-width: 62rem; font-size: .92rem; opacity: .75; }
+    .retro-tab { gap: .6rem; text-align: left; }
+    .retro-tab-num { flex: none; width: 1.5rem; height: 1.5rem; border-radius: 999px; display: grid; place-items: center;
+        font-size: .78rem; font-weight: 700; border: 1px solid currentColor; opacity: .7; }
+    .retro-tab.active .retro-tab-num { background: #3b82f6; border-color: #3b82f6; color: #fff; opacity: 1; }
+    .retro-tab-text { display: grid; line-height: 1.25; }
+    .retro-tab-hint { font-size: .72rem; font-weight: 400; opacity: .7; }
+    @media (max-width: 640px) { .retro-tab-hint { display: none; } }
+</style>
 <div class="w-full">
     <div class="space-y-4 sm:space-y-6">
+        <p class="retro-intro">Three views of the same loop: reflect on the sprint you just finished, see how your ranks move across the year, then check your forecasts against what happened.</p>
         <div class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700 relative">
             <ul class="flex flex-wrap -mb-px relative" id="retro-tab-bar">
                 <li class="me-2">
                     <a href="#sprint" id="retro-tab-sprint" data-panel="sprint"
-                        class="retro-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
-                        Sprint Reflection
+                        class="retro-tab inline-flex items-center p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        <span class="retro-tab-num" aria-hidden="true">1</span>
+                        <span class="retro-tab-text">Sprint Reflection<span class="retro-tab-hint">Look back on this sprint</span></span>
                     </a>
                 </li>
                 <li class="me-2">
                     <a href="#growth" id="retro-tab-growth" data-panel="growth"
-                        class="retro-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
-                        Growth Over Time
+                        class="retro-tab inline-flex items-center p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        <span class="retro-tab-num" aria-hidden="true">2</span>
+                        <span class="retro-tab-text">Growth Over Time<span class="retro-tab-hint">Your ranks across the year</span></span>
                     </a>
                 </li>
                 <li class="me-2">
                     <a href="#forecast" id="retro-tab-forecast" data-panel="forecast"
-                        class="retro-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
-                        Forecast Retrospective
+                        class="retro-tab inline-flex items-center p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        <span class="retro-tab-num" aria-hidden="true">3</span>
+                        <span class="retro-tab-text">Forecast Retrospective<span class="retro-tab-hint">Goals and predictions</span></span>
                     </a>
                 </li>
             </ul>
@@ -42,6 +57,8 @@ active_tab: retrospective
     </div>
 </div>
 
+<!-- The calendar's weeks, so a teacher's visit can add the calendar's sprints; sprints can also be added by hand -->
+<script type="application/json" id="retro-school-calendar">{{ site.data.school_calendar.weeks | jsonify }}</script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"></script>
 <script type="module">
     import { initSprintReflection, initGrowthOverTime } from '{{ site.baseurl }}/assets/js/analytics/sprint-retrospective.js';
