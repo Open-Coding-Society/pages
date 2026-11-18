@@ -300,7 +300,8 @@ Common tree classes:
 
 See [`elements/trees`](elements/trees). The course sidebar
 (`_projects/systems/courses/_includes/lesson-sidebar-nav.html`) nests each
-week's lessons and chat this way.
+week's lessons and chat this way, and the sidebar layout's sidebar
+(`_includes/aesthetihawk/sidebar.html`) lists a page's sections under it.
 
 ### One-line text
 
