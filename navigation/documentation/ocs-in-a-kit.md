@@ -2,7 +2,7 @@
 layout: opencs
 permalink: /documentation/ocs-in-a-kit
 title: OCS-in-a-Kit
-description: What OCS-in-a-Kit contains, how the system works, every feature in each kit, and how to set it up.
+description: Start with a prototype, move into production, and add application services as needed. Explore the OCS-in-a-Kit features and setup guide.
 ---
 
 <div class="api-docs" markdown="1">
@@ -15,7 +15,43 @@ description: What OCS-in-a-Kit contains, how the system works, every feature in 
 
 <div class="api-content" markdown="1">
 
-OCS-in-a-Kit packages the Open Coding Society platform so any school or organization can run its own copy. It is a website plus two backend servers, with features grouped into three kits and switched on or off from one feature catalog. This page explains what it contains, how the parts work together, and how to set it up.
+OCS-in-a-Kit gives schools and organizations a place to build an application and a path to putting it into production. Start with a prototype, then add production infrastructure and shared application services when you need them.
+
+## What you can build and deploy
+
+### OCS-in-a-Kit Prototype
+
+**A place to start building.** Get a working website and application foundation for exploring an idea, building a proof of concept, or creating a working demonstration.
+
+- A Jekyll website hosted on GitHub Pages
+- OCS GameEngine for games and other interactive experiences
+- A Flask backend for application data and services
+- A workflow from local development to deployment
+
+### OCS-in-a-Kit Production
+
+**Take your prototype into production.** Build on the prototype foundation with the infrastructure and services needed to operate your application as your organization is ready to go live.
+
+- Production hosting and deployment
+- Managed databases with Amazon RDS
+- File and object storage with Amazon S3
+- Backup and recovery
+- Email delivery with Amazon SES
+- Migration of domain and DNS services
+
+**Hosting offer:** Up to 12 months of free hosting.
+
+### OCS-in-a-Kit Extended Application Services
+
+**Add the capabilities your organization needs.** These optional services are built with Java and Spring Boot and can be added independently.
+
+- **OCS Chat:** Real-time messaging and collaboration
+- **OCS Calendar:** Events, scheduling, and shared calendars
+- **OCS Email:** Application email and organizational communication
+
+## Technical reference
+
+Prototype and Production describe how you build and deploy. Vanilla, Education, and Business are installer presets that determine which features are enabled by default.
 
 ## At a glance
 
