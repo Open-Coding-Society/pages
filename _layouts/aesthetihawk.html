@@ -45,6 +45,12 @@
 
         <!-- Main Content Area -->
         <div class="p-4 min-[769px]:ml-64 min-[769px]:p-8 lesson-main">
+            <!-- Phones: the side column is hidden, so its links fold into a menu above the page -->
+            <details class="ocs__card mb-6 min-[769px]:hidden">
+                <summary class="cursor-pointer font-medium">Menu</summary>
+                {%- include aesthetihawk/sidebar.html id_prefix="phone-" -%}
+            </details>
+
             <div class="flex justify-between items-center mb-8">
                 <h1 class="text-2xl font-bold">{{page.title}}</h1>
             </div>
