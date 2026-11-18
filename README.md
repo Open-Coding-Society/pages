@@ -332,8 +332,16 @@ This requires running terminal commands `make`, `make stop`, `make clean`, or `m
 
 Start the server, this is the best choice for initial and iterative development.  Note. after the initial `make`, you should see files automatically refresh in the terminal on VSCode save.
 
+Full Build
+
   ```bash
   make
+  ```
+
+Fast Build
+
+  ```bash
+  make dev
   ```
 
 For easier build failure logging, run:
