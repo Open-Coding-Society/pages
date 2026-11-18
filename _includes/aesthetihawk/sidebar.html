@@ -6,8 +6,8 @@
 
   An item's `children` are sections of its page, listed under it as an
   ocs__tree. Each links to the page with `#section`; on the current page the
-  links carry data-sidebar-section, and the page sets aria-current on the one
-  it shows.
+  links are only `#section` and carry data-sidebar-section, and the page sets
+  aria-current on the one it shows.
 {% endcomment %}
 {% assign sidebar_name = page.sidebar | default: "aesthetihawk_sidebar" %}
 <ul class="flex flex-col py-4 space-y-1">
@@ -41,8 +41,8 @@
           <ul class="ocs__tree ml-7 mr-4 my-1">
             {% for child in item.children %}
               <li>
-                <a href="{{ site.baseurl }}{{ item.url }}#{{ child.section }}"
-                   {% if current == item_id %}data-sidebar-section="{{ child.section }}"{% endif %}
+                {%- comment -%} On its own page a section link is just #section, so it never reloads the page. {%- endcomment %}
+                <a {% if current == item_id %}href="#{{ child.section }}" data-sidebar-section="{{ child.section }}"{% else %}href="{{ site.baseurl }}{{ item.url }}#{{ child.section }}"{% endif %}
                    class="nav-item flex flex-row flex-wrap items-center gap-x-2 min-h-9 py-1.5 pl-3 pr-2 leading-snug text-sm tracking-wide text-neutral-600 hover:text-neutral-50 aria-[current=true]:bg-neutral-700 aria-[current=true]:text-neutral-50">{{ child.title }}{% if child.audience %}<small class="ocs__status-pill ocs__status-pill--neutral">{{ child.audience }}</small>{% endif %}</a>
               </li>
             {% endfor %}
