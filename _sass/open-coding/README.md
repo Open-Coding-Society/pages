@@ -342,8 +342,7 @@ rows and the phone menu use both classes. The sidebar's week titles use
 - `ocs__tabs-underline`: optional sliding indicator under the active tab
 - `ocs__tabs-panels`, `ocs__tabs-panel`: the swapped content area
 
-See [`elements/tabs`](elements/tabs). Dashboard, Analytics Dashboard, and
-Submissions all use this for their tab bars.
+See [`elements/tabs`](elements/tabs). The Dashboard uses this for its tab bar.
 
 ### Modals
 
