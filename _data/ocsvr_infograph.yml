@@ -1,0 +1,108 @@
+# Data for the OCS VR capstone page.
+# Read by _posts/capstone/2026-2027/2026-11-17-ocsvr-capstone.md. Edit here to change the intro, team,
+# modules, or build-plan status. The page uses only the shared ocs__ grammar (_sass/open-coding/elements),
+# so there is no page-specific CSS.
+Title: "OCS VR"
+TeamName: "OCS VR Team"
+Tagline: "AP CSP Unit 4 training you can stand inside: build a computer, then build a network, in VR."
+Description: "OCS VR turns AP Computer Science Principles Unit 4 (Computer Systems and Networks) into hands-on training missions for the Meta Quest. Students assemble a computer and then build a network step by step. The game checks each step, scores it, and saves the result to our Flask backend, so progress can be tracked per student."
+Team: ["Aryan M", "Aaditya P", "Kashyap T", "Chetan T"]
+Stack: ["Godot 4", "OpenXR", "Meta Quest", "Flask", "Jekyll"]
+
+# The team's GitHub project board, shown live under the intro (_includes/ocs_kanban_board.html)
+Board:
+  url: "https://github.com/orgs/OCSVR/projects/1"
+  title: "OCS VR Kanban Board"
+
+# Repositories and links shown as buttons under the intro
+Links:
+  - label: "OCSVR on GitHub"
+    url: "https://github.com/OCSVR"
+  - label: "Backend repo"
+    url: "https://github.com/OCSVR/backend"
+  - label: "Frontend repo"
+    url: "https://github.com/OCSVR/frontend_pages"
+
+# The two training modules (Mr. Mortensen's plan, Nov 13)
+Modules:
+  - title: "Module 1: Build a Computer"
+    lead: "Understand how the pieces work together to make a computing system."
+    missions:
+      - name: "Identify components"
+        goal: "CPU, memory, storage, input and output"
+      - name: "Assemble the system"
+        goal: "The role of each component"
+      - name: "Execute a task"
+        goal: "How data moves through the system"
+      - name: "Add processing capacity (advanced)"
+        goal: "CPU and GPU workloads compared"
+      - name: "Diagnose a failure (advanced)"
+        goal: "How a failed part affects the system"
+  - title: "Module 2: Build a Network"
+    lead: "Start with two computers and grow them into a network."
+    missions:
+      - name: "Connect two computers"
+        goal: "Network communication"
+      - name: "Introduce a switch"
+        goal: "Local network topology"
+      - name: "Add a router"
+        goal: "Connecting networks"
+      - name: "Send data"
+        goal: "Packets and routing"
+      - name: "Interrupt a connection"
+        goal: "Network failures"
+      - name: "Add redundancy"
+        goal: "Fault tolerance"
+      - name: "Distribute a workload"
+        goal: "Parallel and distributed computing"
+
+# AP CSP Unit 4 topics the missions cover
+Topics: ["4.1 The Internet", "4.2 Fault tolerance", "4.3 Parallel and distributed computing"]
+
+# The team build plan (laptop first). status: done, active or next
+BuildPlan:
+  - step: "0"
+    name: "Headset baseline"
+    detail: "Developer Mode, test app, frame rate, comfortable sizes and reach"
+    status: "next"
+  - step: "1"
+    name: "Laptop workbench"
+    detail: "One snap task with 3D shapes"
+    status: "next"
+  - step: "2"
+    name: "One full mission"
+    detail: "On the laptop, with UI on 3D panels"
+    status: "next"
+  - step: "3"
+    name: "Quest check"
+    detail: "Run the mission on the headset, fix on the laptop"
+    status: "next"
+  - step: "4"
+    name: "Training manager"
+    detail: "Module registry and the module_completed signal"
+    status: "next"
+  - step: "5"
+    name: "Flask training API"
+    detail: "Sessions and learner progress (merged early, Nov 17)"
+    status: "done"
+  - step: "6"
+    name: "3D models"
+    detail: "Rough versions early, detailed after the Quest check"
+    status: "next"
+  - step: "7"
+    name: "Second module"
+    detail: "Build a Network"
+    status: "next"
+  - step: "8"
+    name: "Polish"
+    detail: "Retest on the Quest after each module"
+    status: "next"
+
+# Backend endpoints the headset calls
+Api:
+  - route: "POST /api/sessions/start"
+    use: "Starts a mission session"
+  - route: "POST /api/sessions/complete"
+    use: "Saves the score, attempts and time"
+  - route: "GET /api/learners/<uid>/progress"
+    use: "A learner's progress for the dashboard"
