@@ -43,7 +43,7 @@
               <li>
                 <a href="{{ site.baseurl }}{{ item.url }}#{{ child.section }}"
                    {% if current == item_id %}data-sidebar-section="{{ child.section }}"{% endif %}
-                   class="nav-item flex flex-row items-center gap-2 h-9 pl-3 pr-2 text-sm tracking-wide text-neutral-600 hover:text-neutral-50 aria-[current=true]:bg-neutral-700 aria-[current=true]:text-neutral-50">{{ child.title }}{% if child.audience %}<small class="ocs__status-pill ocs__status-pill--neutral">{{ child.audience }}</small>{% endif %}</a>
+                   class="nav-item flex flex-row flex-wrap items-center gap-x-2 min-h-9 py-1.5 pl-3 pr-2 leading-snug text-sm tracking-wide text-neutral-600 hover:text-neutral-50 aria-[current=true]:bg-neutral-700 aria-[current=true]:text-neutral-50">{{ child.title }}{% if child.audience %}<small class="ocs__status-pill ocs__status-pill--neutral">{{ child.audience }}</small>{% endif %}</a>
               </li>
             {% endfor %}
           </ul>
