@@ -19,7 +19,7 @@ endif
 ifneq ($(GEM_HOME),)
   export PATH := $(GEM_HOME)/bin:$(PATH)
 endif
-export LC_ALL ?= C.utf8
+export LC_ALL ?= C.UTF-8
 
 
 DESTINATION_DIRECTORY = _posts

@@ -188,6 +188,11 @@ git merge upstream/main --allow-unrelated-histories -X theirs # destructive reso
 - Build localhost server:  `make`
 - Look for and click on server line output, perhaps `Server address: http://localhost:4500/portfolio/`.  The Port and baseurl may change.```
 
+Make defaults to `LC_ALL=C.UTF-8` for Ruby Sass, including on macOS, where
+`C.utf8` is not recognized. If Sass reports `Invalid US-ASCII character`, remove
+an inherited non-UTF-8 `LC_ALL` or run `LC_ALL=C.UTF-8 make`.
+Regression test: `bundle exec ruby scripts/test_make_locale.rb`.
+
 ### Verify Your Environment
 
 Run this after cloning and before starting any sprint work:
