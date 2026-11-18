@@ -1,6 +1,6 @@
 # Checks the Grades hub (/grades/): every link in data/grades_hub.yml opens a
 # page that has a source, every #name opens a section that page really has, and the
-# top nav lists the hub. Run: bundle exec ruby scripts/test_grades_hub.rb
+# top nav lists the hub; every section the Grades sidebar lists exists too. Run: bundle exec ruby scripts/test_grades_hub.rb
 require "minitest/autorun"
 require "yaml"
 
@@ -9,6 +9,7 @@ class GradesHubTest < Minitest::Test
   SYSTEM = File.expand_path("..", __dir__)
   SECTIONS = YAML.load_file(File.join(SYSTEM, "data/grades_hub.yml"))
   LINKS = SECTIONS.flat_map { |section| section.fetch("links") }
+  SIDEBAR_ITEMS = YAML.load_file(File.join(SYSTEM, "data/grades_sidebar.yml")).flat_map { |section| section.fetch("items") }
 
   # Front matter of page sources (committed or new), keyed by permalink without a trailing slash.
   def pages_by_permalink
@@ -55,6 +56,17 @@ class GradesHubTest < Minitest::Test
 
   def test_every_link_opens_an_existing_page_and_section
     LINKS.select { |link| link["url"] }.each { |link| assert_opens_section(link["title"], link["url"]) }
+  end
+
+  def test_sidebar_sections_open_sections_of_their_page
+    with_sections = SIDEBAR_ITEMS.select { |item| item["children"] }
+    assert_equal %w[analytics retrospective submissions], with_sections.map { |item| item["id"] }
+    with_sections.each do |item|
+      item["children"].each do |child|
+        refute_empty child["title"].to_s.strip, "#{item['title']}: every section needs a title"
+        assert_opens_section("#{item['title']} > #{child['title']}", "#{item['url']}##{child['section']}")
+      end
+    end
   end
 
   def test_spring_links_are_paths_on_the_spring_backend
