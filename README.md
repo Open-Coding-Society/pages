@@ -338,7 +338,7 @@ Full Build
   make
   ```
 
-  Fast Build
+Fast Build
 
   ```bash
   make dev
