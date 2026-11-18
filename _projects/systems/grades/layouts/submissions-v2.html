@@ -34,7 +34,7 @@ active_tab: submissions
         <div id="tab-content-container" class="ocs__tabs-panels">
 
             <!-- My Submissions tab content -->
-            <div id="tab-content-my-submissions" class="tab-content block ocs__tabs-panel">
+            <div id="tab-content-my-submissions" data-section="my-submissions" class="tab-content block ocs__tabs-panel">
                 <div id="my-submissions-loading" class="ocs__loading">
                     <div class="ocs__spinner"></div>
                     <p class="ocs__text">Loading submissions...</p>
@@ -45,7 +45,7 @@ active_tab: submissions
             {% include submissions/creator-dashboard.html %}
 
             <!-- All Submissions tab content (Admin only) -->
-            <section id="tab-content-all-submissions" class="tab-content ocs__admin-submissions hidden">
+            <section id="tab-content-all-submissions" data-section="all-submissions" class="tab-content ocs__admin-submissions hidden">
                 <header class="ocs__admin-submissions-header">
                     <div>
                         <p class="ocs__admin-submissions-eyebrow">Administrator workspace</p>
@@ -188,6 +188,7 @@ active_tab: submissions
         applyGradingState, canPetition, clearManualGrade, filePetition, gradePills, hasManualOverride, isFinal,
         parseGradeInput, readGradingResponse, requestAiRegrade, saveManualGrade, showGradingHistory
     } from '{{ site.baseurl }}/assets/js/submissions/grading.js';
+    import { followSectionHash } from '{{ site.baseurl }}/assets/js/grades/page-sections.js';
 
     const apiUrl = `${javaURI}/api/assignment-submission-view/list`;
     const userInfoUrl = `${javaURI}/api/assignment-submission-view/user-info`;
@@ -230,8 +231,8 @@ active_tab: submissions
     async function init() {
         try {
             await checkAdminStatus();
+            setupSections();
             await Promise.all([loadSubmissions(), creatorDashboard.load(currentUsername, { isTeacher: isAdmin })]);
-            setupTabSwitcher();
             setupFilters();
             setupEditModal();
             setupSummarizeButton();
@@ -266,11 +267,6 @@ active_tab: submissions
                     } catch (personError) {
                         console.error('Error resolving current user id:', personError);
                     }
-                }
-
-                // Show admin tab only for admins
-                if (isAdmin) {
-                    document.getElementById('tab-all-submissions').style.display = 'block';
                 }
             } else {
                 console.warn('Could not fetch user info, status:', response.status);
@@ -1170,45 +1166,18 @@ active_tab: submissions
         if (allContainer) allContainer.innerHTML = errorHTML;
     }
 
-    function setupTabSwitcher() {
-        const tabs = document.querySelectorAll('.tab-btn');
-        const tabContents = document.querySelectorAll('.tab-content');
-        const underline = document.getElementById('tab-underline');
-
-        function setUnderline(el) {
-            const rect = el.getBoundingClientRect();
-            const parentRect = el.parentElement.parentElement.getBoundingClientRect();
-            underline.style.width = `${rect.width}px`;
-            underline.style.left = `${rect.left - parentRect.left}px`;
-        }
-
-        tabs.forEach((tab) => {
-            tab.addEventListener('click', (e) => {
-                e.preventDefault();
-                tabs.forEach(t => t.classList.remove('active', 'text-blue-500', 'border-blue-500'));
-                tabContents.forEach(c => c.classList.add('hidden'));
-                tabContents.forEach(c => c.classList.remove('block'));
-
-                const targetId = `tab-content-${tab.id.replace('tab-', '')}`;
-                document.getElementById(targetId).classList.remove('hidden');
-                document.getElementById(targetId).classList.add('block');
-
-                tab.classList.add('active', 'text-blue-500', 'border-blue-500');
-                setUnderline(tab);
-            });
+    // One section shows at a time. The URL hash picks it: the sidebar's Submissions
+    // links and the Grades hub open one. All Submissions is for admins, so a link
+    // to it leaves anyone else on My Submissions.
+    function setupSections() {
+        const sections = document.querySelectorAll('.tab-content');
+        const show = (name) => sections.forEach((section) => {
+            const shown = section.dataset.section === name;
+            section.classList.toggle('hidden', !shown);
+            section.classList.toggle('block', shown);
         });
-
-        // Initialize underline
-        const activeTab = document.querySelector('.tab-btn.active');
-        if (activeTab) setUnderline(activeTab);
-
-        // A link such as /submissions#all-submissions opens that tab; the Grades
-        // hub links to each tab this way. All Submissions stays hidden for
-        // non-admins, so a link to it leaves them on My Submissions.
-        const linkedTab = document.getElementById(`tab-${location.hash.slice(1)}`);
-        if (linkedTab?.classList.contains('tab-btn') && linkedTab.style.display !== 'none') {
-            linkedTab.click();
-        }
+        followSectionHash([...sections].map((section) => section.dataset.section), show,
+            (name) => name !== 'all-submissions' || isAdmin);
     }
 
     function setupFilters() {
