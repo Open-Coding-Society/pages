@@ -533,6 +533,30 @@ See [`elements/kanban`](elements/kanban) and
 [`ocs_kanban_board.html`](../../_includes/ocs_kanban_board.html). The
 Communication Systems capstone shows the UGRC-CSA board this way.
 
+### Section bands
+
+A band is a padded, rounded surface behind a whole section, the way a site builder gives each
+section its own look. Add it to an element that already lays out its children (`ocs__stack`,
+`ocs__split`, `ocs__facts`); it only paints and pads.
+
+```html
+<section class="ocs__stack ocs__band ocs__band--tint">
+  <h2 class="ocs__section-title">Roadmap</h2>
+  ...
+</section>
+```
+
+- `ocs__band`: the padding, radius and text color.
+- `ocs__band--card`: a framed panel.
+- `ocs__band--tint`: a light wash of the accent (12% over the page background, not the panel,
+  so links keep their contrast).
+- `ocs__band--outline`: the panel framed in the accent.
+
+The colors are `color-mix()` over the theme variables, so a saved preset still recolors them.
+In every preset, text on every look stays above 6:1 and links above 4.5:1 (lowest: a link on
+Light's card, 4.6:1, the same as on any panel). The UI Builder's Section style writes these
+classes. See [`elements/bands`](elements/bands).
+
 ## Theme file reference
 
 `user-preferences.scss` defines the current user-selectable theme contract.

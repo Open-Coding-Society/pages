@@ -76,7 +76,7 @@ Edit the sources here, never the published copies. The modules import each other
 | Kanban (root) | `kanban-board.js` `createKanbanSection` / `mountKanbanBoard` / `parseBoardUrl`, `ocs_kanban_board.html template=true`, `ocs_kanban_board_data.html` |
 | Flask microblog | `microblog.js` `createPost` to post feedback; Flask's public `GET /api/microblog/page/<key>` to read it |
 | Chat rich text | `rich-text.js` `createRichComposer({enterKey: 'newline'})`, `renderRichMessage` |
-| Grammar | `ocs__split--aside-end` and `ocs__embed` (added for this system) |
+| Grammar | `ocs__split--aside-end`, `ocs__embed` and `ocs__band` (added for this system) |
 
 ## A page presents a project; it isn't the project
 
