@@ -1,0 +1,25 @@
+// Public grammar (the UI Builder's render.js writes it from a section's style):
+//   .ocs__band            a padded, rounded surface behind a whole section
+//   .ocs__band--card      the band as a framed panel
+//   .ocs__band--tint      the band in a light wash of the accent color
+//   .ocs__band--outline   the band framed in the accent color
+//
+// A band goes on an element that already lays out its children (ocs__stack, ocs__split,
+// ocs__facts), so it sets no display or gap of its own.
+
+.ocs__band {
+  @extend %band-box;
+}
+
+@each $name, $look in $band-looks {
+  .ocs__band--#{$name} {
+    background: band-background($look);
+    border: map-get($look, border-width) solid band-border-color($look);
+  }
+}
+
+@media (max-width: $band-phone) {
+  .ocs__band {
+    padding: map-get($band-box, padding-phone);
+  }
+}

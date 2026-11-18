@@ -1,11 +1,15 @@
 // Sprint Reflection and Growth Over Time, the first two tabs of the Retrospective page (/retrospective).
 //
-// Teachers and admins open sprints; for each one a student ranks the Ground 0 evaluation items
+// Sprints come from the school calendar (_data/school_calendar.yml, embedded by the layout): when a
+// teacher opens the page, any calendar sprint that is missing or whose dates moved is saved to
+// Spring. Teachers and admins can also add, edit and delete sprints by hand under Manage sprints.
+// For each sprint a student ranks the Ground 0 evaluation items
 // (T01-T12 technical, P01-P10 professional, 0 = not entered, 1-5), writes a summary per section,
-// answers the retrospective questions and ticks the Ground 0 checklist. The teacher adds their own
-// rank and a comment beside every item, and the student sees both. Growth Over Time charts each
-// item across the year's sprints. Everything is stored in Spring (/api/sprint-retros); the items
-// come from SprintRetroTemplate there, so this file only relies on their ids.
+// and answers the retrospective questions. The teacher adds their own rank and a comment beside
+// every item, and the student sees both. The reflection reads as numbered steps with a progress
+// line each. Growth Over Time charts each item across the year's sprints. Everything is stored in
+// Spring (/api/sprint-retros); the items come from SprintRetroTemplate there, so this file only
+// relies on their ids.
 import { javaURI, fetchOptions } from '../api/config.js';
 
 const api = `${javaURI}/api/sprint-retros`;
@@ -16,7 +20,7 @@ const STORY_KEYS = ['techRetro', 'proRetro', 'techGoal', 'commitBehavior'];
 
 class SignedOut extends Error {}
 
-const shared = { loaded: null, template: null, sprints: [], canManage: false };
+const shared = { loaded: null, template: null, sprints: [], canManage: false, calendarNames: new Set() };
 const ref = { root: null, sprintId: null, mode: 'mine', studentId: null, roster: [], view: null, dirty: false, editingId: null };
 const growth = { root: null, personId: null, progress: null, chart: null, viewKey: 'sections', perspective: 'self' };
 
@@ -33,13 +37,60 @@ async function call(path, options = {}) {
     return res.status === 204 ? null : res.json();
 }
 
+/**
+ * The sprints in the school calendar: each starts the Monday of its "Sprint N Start" week and ends
+ * the Friday of its "Sprint N Retrospective" week. weeks is the calendar file's weeks map.
+ */
+export function calendarSprints(weeks) {
+    const found = new Map();
+    Object.keys(weeks || {}).map(Number).sort((a, b) => a - b).forEach((number) => {
+        const week = weeks[number];
+        const match = /Sprint (\d+) (Start|Retrospective)/.exec(week.notes || '');
+        if (!match) return;
+        const name = `Sprint ${match[1]}`;
+        const sprint = found.get(name) || { name };
+        if (match[2] === 'Start') sprint.startDate = week.monday;
+        else sprint.endDate = week.friday;
+        found.set(name, sprint);
+    });
+    return [...found.values()].filter((sprint) => sprint.startDate && sprint.endDate);
+}
+
+function readCalendar() {
+    const element = document.getElementById('retro-school-calendar');
+    try {
+        return calendarSprints(element ? JSON.parse(element.textContent) : {});
+    } catch (e) {
+        console.warn('Could not read the school calendar:', e);
+        return [];
+    }
+}
+
+/**
+ * A teacher's visit saves any calendar sprint that is missing or whose dates moved. Spring matches
+ * by name and never deletes, so sprints added by hand are kept. Returns every stored sprint.
+ */
+async function syncedSprints(stored, calendar) {
+    const inStep = calendar.every((entry) => stored.some((s) => s.name === entry.name
+        && s.startDate === entry.startDate && s.endDate === entry.endDate));
+    if (inStep) return stored;
+    try {
+        return await call('/calendar', { method: 'PUT', body: JSON.stringify({ sprints: calendar }) });
+    } catch (e) {
+        console.warn('Could not update the sprints from the calendar:', e);
+        return stored;
+    }
+}
+
 /** Loads the template and sprint list once per page, or again when force is true. */
 async function loadShared(force = false) {
     if (!shared.loaded || force) {
-        shared.loaded = Promise.all([call('/template'), call('')]).then(([template, list]) => {
+        shared.loaded = Promise.all([call('/template'), call('')]).then(async ([template, list]) => {
+            const calendar = readCalendar();
             shared.template = template;
-            shared.sprints = list.sprints;
             shared.canManage = list.canManage;
+            shared.calendarNames = new Set(calendar.map((entry) => entry.name));
+            shared.sprints = list.canManage && calendar.length ? await syncedSprints(list.sprints, calendar) : list.sprints;
         });
         shared.loaded.catch(() => { shared.loaded = null; });
     }
@@ -109,7 +160,7 @@ export async function initSprintReflection(root) {
       <section class="sr">
         <header>
           <h2 class="sr-title">Sprint Reflection</h2>
-          <p class="sr-muted">Rank yourself on each Ground 0 item, write about the evidence behind your ranks, and compare them with your teacher's. 0 means not entered yet.</p>
+          <p class="sr-muted">Rank yourself on each item, write about the evidence behind your ranks, and compare them with your teacher's. 0 means not entered yet.</p>
         </header>
         <p class="sr-muted" data-sr="status">Loading…</p>
         <div class="sr-stack" data-sr="body" hidden>
@@ -126,7 +177,7 @@ export async function initSprintReflection(root) {
               </div>
               <p class="sr-small" data-sr="manage-status" role="status"></p>
             </form>
-            <p class="sr-muted sr-small">Every sprint uses the Ground 0 items, so students can compare their ranks across the year. A sprint students have reflected on cannot be deleted.</p>
+            <p class="sr-muted sr-small">Every sprint uses the Ground 0 items, so students can compare their ranks across the year. A sprint students have reflected on cannot be deleted. Sprints marked School calendar are added from the school calendar each time a teacher opens this page, and their dates follow it; add a sprint by hand for anything the calendar does not list.</p>
           </details>
           <div class="sr-card sr-bar">
             <label class="sr-field"><span class="sr-label">Sprint</span><select class="sr-input" data-sr="sprint"></select></label>
@@ -217,11 +268,13 @@ function renderForm() {
     const review = ref.mode === 'review';
     const student = view.student;
     const teacher = view.teacher;
-    const checks = new Set(student.checks);
-    const totalChecks = shared.template.checklist.reduce((n, s) => n + s.checks.length, 0);
     const form = ref.root.querySelector('[data-sr="form"]');
     const ranked = Object.keys(student.ranks).length;
     const totalItems = sections().reduce((n, s) => n + s.items.length, 0);
+    // The teacher's columns stay out of a student's way until there is feedback to put in them.
+    const showTeacher = review || Boolean(view.teacherUpdatedAt);
+    const steps = shared.template.evaluations.map((evaluation) => ({ id: `eval-${evaluation.key}`, title: evaluation.title }));
+    const stepHead = (id, title) => `<div class="sr-step"><span class="sr-step-num">${steps.findIndex((step) => step.id === id) + 1}</span><h3 class="sr-h3">${title}</h3></div>`;
 
     const who = review ? escapeHtml(view.personName || 'This student') : 'You';
     const savedLine = view.updatedAt ? `${who} saved ${fmtWhen(view.updatedAt)} · ${ranked} of ${totalItems} ranked` : `${who} ${review ? 'has' : 'have'} not saved this reflection yet`;
@@ -234,24 +287,19 @@ function renderForm() {
         <div><span class="sr-label">${review ? 'Student' : 'Your reflection'}</span><span>${savedLine}</span></div>
         <div><span class="sr-label">Teacher</span><span>${feedbackLine}</span></div>
       </div>
+      <nav class="sr-steps" aria-label="Parts of this reflection">
+        ${steps.map((step, i) => `
+          <button type="button" class="sr-stepchip" data-jump="sr-step-${step.id}">
+            <span class="sr-step-num">${i + 1}</span>
+            <span class="sr-stepchip-text"><span class="sr-stepchip-title">${escapeHtml(step.title)}</span><span class="sr-small sr-muted" data-step-status="${step.id}"></span></span>
+          </button>`).join('')}
+      </nav>
       ${!review && teacher.overall ? `
         <div class="sr-card sr-card--teacher">
           <span class="sr-label">Overall comment from your teacher</span>
           <p class="sr-quote">${escapeHtml(teacher.overall)}</p>
         </div>` : ''}
-      <details class="sr-card" ${review ? '' : 'open'}>
-        <summary class="sr-summary">Ground 0 checklist <span class="sr-pill">${checks.size} of ${totalChecks}</span></summary>
-        <p class="sr-muted sr-small">Check your starting position before you rank yourself.</p>
-        <div class="sr-checklist">
-          ${shared.template.checklist.map((section) => `
-            <fieldset class="sr-checks">
-              <legend>${escapeHtml(section.title)}</legend>
-              ${section.checks.map((check) => `
-                <label><input type="checkbox" data-check="${check.id}" ${checks.has(check.id) ? 'checked' : ''} ${review ? 'disabled' : ''}> <span>${escapeHtml(check.text)}</span></label>`).join('')}
-            </fieldset>`).join('')}
-        </div>
-      </details>
-      ${shared.template.evaluations.map((evaluation) => evaluationCard(evaluation, student, teacher, review)).join('')}
+      ${shared.template.evaluations.map((evaluation) => evaluationCard(evaluation, student, teacher, review, showTeacher, stepHead)).join('')}
       ${review ? `
         <div class="sr-card sr-card--teacher">
           <label class="sr-field"><span class="sr-label">Overall comment for ${escapeHtml(view.personName || 'the student')}</span>
@@ -261,28 +309,60 @@ function renderForm() {
         <button type="submit" class="sr-btn">${review ? 'Save feedback' : 'Save reflection'}</button>
         <span class="sr-small" data-sr="save-status" role="status"></span>
       </div>`;
+    updateProgress();
 }
 
-function evaluationCard(evaluation, student, teacher, review) {
+/** Recounts what is ranked and written, for the step guide and each section. */
+function updateProgress() {
+    const form = ref.root.querySelector('[data-sr="form"]');
+    const review = ref.mode === 'review';
+    const rankSelector = review ? '[data-trank]' : '[data-rank]';
+    const filled = (elements) => elements.filter((el) => Number(el.value)).length;
+    const setStatus = (id, text, done) => {
+        const status = form.querySelector(`[data-step-status="${id}"]`);
+        if (!status) return;
+        status.textContent = text;
+        status.closest('.sr-stepchip').toggleAttribute('data-done', done);
+    };
+    form.querySelectorAll('[data-eval]').forEach((card) => {
+        card.querySelectorAll('[data-section]').forEach((section) => {
+            const ranks = [...section.querySelectorAll(rankSelector)];
+            const count = section.querySelector('[data-section-count]');
+            count.textContent = `${filled(ranks)} of ${ranks.length} ranked`;
+            count.toggleAttribute('data-done', filled(ranks) === ranks.length);
+        });
+        const ranks = [...card.querySelectorAll(rankSelector)];
+        const texts = [...card.querySelectorAll('[data-text]')];
+        const written = texts.filter((el) => el.value.trim()).length;
+        setStatus(`eval-${card.dataset.eval}`, review
+            ? `${filled(ranks)} of ${ranks.length} ranked by you`
+            : `${filled(ranks)} of ${ranks.length} ranked · ${written} of ${texts.length} written`,
+        filled(ranks) === ranks.length && written === texts.length);
+    });
+}
+
+function evaluationCard(evaluation, student, teacher, review, showTeacher, stepHead) {
     const levels = Object.fromEntries(evaluation.levels.map((l) => [l.rank, l.name]));
     const rankOptions = (selected) => [0, ...evaluation.levels.map((l) => l.rank)]
         .map((r) => `<option value="${r}" ${r === (selected || 0) ? 'selected' : ''}>${r === 0 ? '0 · not entered' : `${r} · ${escapeHtml(levels[r])}`}</option>`).join('');
     const rankText = (r) => (r ? `${r} · ${escapeHtml(levels[r])}` : '<span class="sr-muted">—</span>');
     return `
-      <div class="sr-card">
-        <h3 class="sr-h3">${escapeHtml(evaluation.title)}</h3>
+      <div class="sr-card" id="sr-step-eval-${evaluation.key}" data-eval="${evaluation.key}">
+        ${stepHead(`eval-${evaluation.key}`, escapeHtml(evaluation.title))}
+        <span class="sr-part">Rank each area</span>
+        ${showTeacher ? '' : '<p class="sr-muted sr-small">Your teacher\'s rank and comments will appear beside yours once they review this sprint.</p>'}
         <details class="sr-levels">
           <summary class="sr-small">What the ranks mean</summary>
           <table class="sr-table sr-table--compact"><tbody>
             ${evaluation.levels.map((l) => `<tr><td><b>${l.rank} · ${escapeHtml(l.name)}</b></td><td>${escapeHtml(l.description)}</td></tr>`).join('')}
           </tbody></table>
-          <p class="sr-muted sr-small">Match compares your rank with your teacher's: − teacher ranked you lower · = the same · + teacher ranked you higher.</p>
+          ${showTeacher ? '<p class="sr-muted sr-small">Match compares your rank with your teacher\'s: − teacher ranked you lower · = the same · + teacher ranked you higher.</p>' : ''}
         </details>
         ${evaluation.sections.map((section) => `
-          <div class="sr-section">
-            <h4 class="sr-h4">${escapeHtml(section.title)}</h4>
+          <div class="sr-section" data-section="${section.key}">
+            <h4 class="sr-h4">${escapeHtml(section.title)} <span class="sr-count" data-section-count></span></h4>
             <div class="sr-table-wrap"><table class="sr-table">
-              <thead><tr><th>ID</th><th>Area</th><th>${review ? 'Student' : 'You'}</th><th>Teacher</th><th>Match</th><th>Teacher comment</th></tr></thead>
+              <thead><tr><th>ID</th><th>Area</th><th>${review ? 'Student' : 'You'}</th>${showTeacher ? '<th>Teacher</th><th>Match</th><th>Teacher comment</th>' : ''}</tr></thead>
               <tbody>${section.items.map((item) => {
                   const self = student.ranks[item.id];
                   const mine = teacher.ranks[item.id];
@@ -291,11 +371,11 @@ function evaluationCard(evaluation, student, teacher, review) {
                     <td class="sr-id">${item.id}</td>
                     <td>${escapeHtml(item.area)}</td>
                     <td>${review ? rankText(self) : `<select class="sr-input sr-input--rank" data-rank="${item.id}" aria-label="Your rank for ${escapeHtml(item.area)}">${rankOptions(self)}</select>`}</td>
-                    <td>${review ? `<select class="sr-input sr-input--rank" data-trank="${item.id}" aria-label="Teacher rank for ${escapeHtml(item.area)}">${rankOptions(mine)}</select>` : rankText(mine)}</td>
+                    ${showTeacher ? `<td>${review ? `<select class="sr-input sr-input--rank" data-trank="${item.id}" aria-label="Teacher rank for ${escapeHtml(item.area)}">${rankOptions(mine)}</select>` : rankText(mine)}</td>
                     <td data-match="${item.id}">${matchCell(self, mine)}</td>
                     <td class="sr-comment">${review
                         ? `<input class="sr-input" maxlength="1000" data-tcomment="${item.id}" value="${escapeHtml(comment)}" placeholder="Comment" aria-label="Comment on ${escapeHtml(item.area)}">`
-                        : (comment ? escapeHtml(comment) : '<span class="sr-muted">—</span>')}</td>
+                        : (comment ? escapeHtml(comment) : '<span class="sr-muted">—</span>')}</td>` : ''}
                   </tr>`;
               }).join('')}</tbody>
             </table></div>
@@ -308,6 +388,7 @@ function evaluationCard(evaluation, student, teacher, review) {
                 ? `<label class="sr-field"><span class="sr-label">Your comment on this summary</span><input class="sr-input" maxlength="1000" data-tcomment="${section.key}" value="${escapeHtml(teacher.comments[section.key] || '')}"></label>`
                 : (teacher.comments[section.key] ? `<p class="sr-teacher-note"><span class="sr-label">Teacher</span>${escapeHtml(teacher.comments[section.key])}</p>` : '')}
           </div>`).join('')}
+        <span class="sr-part sr-part--next">${review ? 'Their reflection' : 'Reflect in writing'}</span>
         <div class="sr-prompts">
           ${evaluation.prompts.map((p, i) => `
             <label class="sr-field"><span class="${i === 0 ? 'sr-h4' : 'sr-label'}">${escapeHtml(p.label)}</span>
@@ -338,8 +419,7 @@ function collect(form) {
     const text = {};
     form.querySelectorAll('[data-rank]').forEach((el) => { if (value(el)) ranks[el.dataset.rank] = value(el); });
     form.querySelectorAll('[data-text]').forEach((el) => { if (el.value.trim()) text[el.dataset.text] = el.value; });
-    const checks = [...form.querySelectorAll('[data-check]:checked')].map((el) => el.dataset.check);
-    return { ranks, text, checks };
+    return { ranks, text };
 }
 
 async function save(form) {
@@ -391,11 +471,20 @@ function bindReflection() {
         const status = root.querySelector('[data-sr="save-status"]');
         if (status) { status.className = 'sr-small sr-muted'; status.textContent = 'Unsaved changes'; }
         const id = event.target.dataset.rank || event.target.dataset.trank;
-        if (id) {
+        const match = id && root.querySelector(`[data-match="${id}"]`);
+        if (match) {
             const self = ref.mode === 'review' ? ref.view.student.ranks[id] : Number(event.target.value);
             const teacher = ref.mode === 'review' ? Number(event.target.value) : ref.view.teacher.ranks[id];
-            root.querySelector(`[data-match="${id}"]`).innerHTML = matchCell(self, teacher);
+            match.innerHTML = matchCell(self, teacher);
         }
+        updateProgress();
+    });
+    // Step guide jumps; they do not change what gets saved.
+    root.addEventListener('click', (event) => {
+        const jump = event.target.closest('[data-jump]');
+        if (!jump) return;
+        const target = document.getElementById(jump.dataset.jump);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     root.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -427,7 +516,7 @@ function renderManageList() {
         <thead><tr><th>Sprint</th><th>Dates</th><th></th></tr></thead>
         <tbody>${shared.sprints.map((s) => `
           <tr>
-            <td>${escapeHtml(s.name)}</td>
+            <td>${escapeHtml(s.name)}${shared.calendarNames.has(s.name) ? ' <span class="sr-pill">School calendar</span>' : ''}</td>
             <td>${sprintDates(s)}</td>
             <td class="sr-actions">
               <button type="button" class="sr-btn sr-btn--ghost sr-btn--sm" data-edit-sprint="${s.id}">Edit</button>
@@ -805,11 +894,21 @@ function injectStyles() {
       .sr-seg button { border: 0; background: transparent; color: inherit; font: inherit; font-size: .85rem; padding: .4rem .8rem; cursor: pointer; }
       .sr-seg button[aria-pressed="true"] { background: #059669; color: #fff; }
       .sr-status-card { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); font-size: .9rem; }
-      .sr-checklist { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: .75rem 1.25rem; }
-      .sr-checks { border: 0; padding: 0; margin: 0; display: grid; gap: .35rem; font-size: .85rem; }
-      .sr-checks legend { font-weight: 600; margin-bottom: .35rem; padding: 0; }
-      .sr-checks label { display: flex; gap: .5rem; align-items: flex-start; cursor: pointer; }
-      .sr-checks input { margin-top: .2rem; accent-color: #059669; }
+      .sr-card[id] { scroll-margin-top: 4.5rem; }
+      .sr-step { display: flex; gap: .65rem; align-items: center; }
+      .sr-step-num { flex: none; width: 1.75rem; height: 1.75rem; border-radius: 999px; display: grid; place-items: center; font-weight: 700; font-size: .9rem; background: #059669; color: #fff; }
+      .sr-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .6rem; }
+      .sr-stepchip { display: flex; gap: .65rem; align-items: center; text-align: left; font: inherit; color: inherit; cursor: pointer; padding: .6rem .8rem; border-radius: .75rem;
+        border: 1px solid color-mix(in srgb, currentColor 18%, transparent); background: color-mix(in srgb, currentColor 4%, transparent); }
+      .sr-stepchip:hover, .sr-stepchip:focus-visible { border-color: #059669; outline: none; }
+      .sr-stepchip[data-done] { border-color: color-mix(in srgb, #34d399 55%, transparent); }
+      .sr-stepchip[data-done] [data-step-status] { color: #34d399; opacity: 1; }
+      .sr-stepchip-text { display: grid; gap: .1rem; min-width: 0; }
+      .sr-stepchip-title { font-weight: 600; font-size: .9rem; }
+      .sr-part { display: block; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #34d399; }
+      .sr-part--next { padding-top: .8rem; border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); }
+      .sr-count { font-size: .74rem; font-weight: 500; opacity: .7; margin-left: .4rem; white-space: nowrap; }
+      .sr-count[data-done] { color: #34d399; opacity: 1; }
       .sr-levels summary { cursor: pointer; opacity: .8; }
       .sr-section { display: grid; gap: .6rem; padding-top: .8rem; border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); }
       .sr-prompts { display: grid; gap: .7rem; padding-top: .8rem; border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); }

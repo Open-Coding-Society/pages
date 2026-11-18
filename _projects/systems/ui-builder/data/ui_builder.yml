@@ -50,9 +50,19 @@ frames:
   stack:
     label: One column
     help: Blocks stacked from top to bottom.
-    code_note: "A section with ocs__stack: its blocks sit one under another, with even gaps and no margins."
+    code_note: "A section with ocs__stack: its blocks sit one under another, with even gaps and no margins. A section style adds ocs__band and its look (--card, --tint or --outline)."
     icon: fa-bars
-    fields: []
+    fields:
+      - id: style
+        type: choice
+        label: Section style
+        help: A background behind the whole section. Made from the theme's colors, so it reads in every theme.
+        default: plain
+        options:
+          - { value: plain, label: Plain }
+          - { value: card, label: Card }
+          - { value: tint, label: Tinted }
+          - { value: outline, label: Accent outline }
   columns:
     label: Columns
     help: Two or three columns side by side. They stack on phones.
@@ -68,6 +78,16 @@ frames:
           - { value: thirds, label: Three equal columns }
           - { value: sidebar_left, label: Narrow column on the left }
           - { value: sidebar_right, label: Narrow column on the right }
+      - id: style
+        type: choice
+        label: Section style
+        help: A background behind the whole section. Made from the theme's colors, so it reads in every theme.
+        default: plain
+        options:
+          - { value: plain, label: Plain }
+          - { value: card, label: Card }
+          - { value: tint, label: Tinted }
+          - { value: outline, label: Accent outline }
 
 # Each columns layout and the grammar classes that draw it (see _sass/open-coding/README.md).
 layouts:
@@ -545,6 +565,10 @@ text:
     ocs__embed--short: "a frame 320 pixels tall"
     ocs__embed--medium: "a frame 480 pixels tall"
     ocs__embed--tall: "a frame 720 pixels tall"
+    ocs__band: "a padded, rounded background behind a whole section"
+    ocs__band--card: "the band as a framed panel"
+    ocs__band--tint: "the band in a light wash of the accent color"
+    ocs__band--outline: "the band framed in the accent color"
   blocks:
     untitled: Untitled page
     unknown_block: "This block type isn't available: {type}."

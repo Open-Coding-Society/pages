@@ -1,0 +1,6 @@
+// Band element: a padded, rounded background behind a whole page section, the way a website
+// builder gives each section its own look. The UI Builder's "Section style" adds it to a
+// section that is already an ocs__stack or a column grid (ocs__split, ocs__facts), so the band
+// only paints and pads; the layout stays the grammar's.
+@import "tokens";
+@import "common";
