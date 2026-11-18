@@ -193,6 +193,18 @@ Make defaults to `LC_ALL=C.UTF-8` for Ruby Sass, including on macOS, where
 an inherited non-UTF-8 `LC_ALL` or run `LC_ALL=C.UTF-8 make`.
 Regression test: `bundle exec ruby scripts/test_make_locale.rb`.
 
+#### DOCX conversion diagnostics
+
+Normal builds keep DOCX conversion parallel and summarize conversion warnings
+per document. Errors remain visible. Explicit `make convert` and
+`make convert-docx` show individual warnings, grouped by source document.
+Unchanged documents are still skipped; to see all diagnostics again, run
+`make convert-docx DOCX_FLAGS=--force`. To request detailed warnings during a
+normal build, use `make DOCX_FLAGS=--verbose`.
+
+These settings only change diagnostics, not how Word styles are converted.
+Test: `venv/bin/python -m unittest discover -s tests -p test_convert_docx.py`.
+
 ### Verify Your Environment
 
 Run this after cloning and before starting any sprint work:

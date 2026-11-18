@@ -42,7 +42,7 @@ except ImportError:
     sys.exit(1)
 
 class DocxConverter:
-    def __init__(self, docx_dir="_docx", posts_dir="_posts", images_dir="images/docx"):
+    def __init__(self, docx_dir="_docx", posts_dir="_posts", images_dir="images/docx", verbose=False):
         """
         Initialize DocxConverter
         
@@ -50,11 +50,13 @@ class DocxConverter:
             docx_dir: Directory containing DOCX files (supports subdirectories)
             posts_dir: Jekyll posts directory  
             images_dir: Directory for extracted images
+            verbose: Show individual conversion warnings rather than a summary
         """
         self.base_dir = Path.cwd()
         self.docx_dir = self.base_dir / docx_dir
         self.posts_dir = self.base_dir / posts_dir
         self.images_dir = self.base_dir / images_dir
+        self.verbose = verbose
         
         # Initialize FrontMatterManager
         if FrontMatterManager:
@@ -345,6 +347,24 @@ class DocxConverter:
         # This avoids complex custom table parsing that was causing issues
         return []
 
+    def report_conversion_messages(self, docx_path, messages):
+        if not messages:
+            return
+
+        lines = [f"  DOCX conversion messages for {docx_path.name}:"]
+        warning_count = sum(message.type == "warning" for message in messages)
+        if warning_count and not self.verbose:
+            lines.append(
+                f"    {warning_count} warnings; details: make convert-docx DOCX_FLAGS=--force"
+            )
+        lines.extend(
+            f"    {message.type}: {message.message}"
+            for message in messages
+            if self.verbose or message.type != "warning"
+        )
+        # One write keeps each document's diagnostics together during parallel conversion.
+        print("\n".join(lines))
+
 
 
     def convert_docx_to_markdown(self, docx_path):
@@ -433,10 +453,7 @@ class DocxConverter:
                     )
                     markdown_content = result_md.value
                 
-                if result.messages:
-                    print(f"  Conversion messages: {len(result.messages)} items")
-                    for msg in result.messages:
-                        print(f"    {msg.message}")
+                self.report_conversion_messages(docx_path, result.messages)
                         
                 # Count images in the converted content
                 import re
@@ -746,11 +763,15 @@ def main():
                        help='Specific subdirectory within _docx to target for conversion')
     parser.add_argument('--config-changed', '-c', type=str,
                        help='Config file that changed (automatically determines target directory)')
+    parser.add_argument('--verbose', action='store_true',
+                       help='Show individual conversion warnings (errors are always shown)')
+    parser.add_argument('--force', action='store_true',
+                       help='Convert even when generated documents are up-to-date')
     
     args = parser.parse_args()
     
     target_dir = None
-    force_regeneration = False
+    force_regeneration = args.force
     
     if args.config_changed:
         # Extract directory from config file path
@@ -771,7 +792,7 @@ def main():
     elif args.target_dir:
         target_dir = args.target_dir
     
-    converter = DocxConverter()
+    converter = DocxConverter(verbose=args.verbose)
     results = converter.convert_all_docx(target_dir, force_regeneration)
     
     # Only count files that were actually converted (not skipped)
