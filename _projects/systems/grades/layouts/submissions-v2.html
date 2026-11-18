@@ -6,31 +6,7 @@ active_tab: submissions
 
 <div class="ocs__submissions-v2-page">
     <div class="ocs__submissions-v2-stack">
-        <div class="ocs__tabs">
-            <ul class="ocs__tabs-list" id="tab-bar">
-                <li>
-                    <button id="tab-my-submissions" class="tab-btn active ocs__tabs-btn">
-                        My Submissions
-                    </button>
-                </li>
-                <li>
-                    <button id="tab-created-assignments" class="tab-btn ocs__tabs-btn">
-                        Assignments You Created
-                    </button>
-                </li>
-                <li>
-                    <button id="tab-all-submissions" class="tab-btn ocs__tabs-btn" style="display: none;">
-                        All Submissions
-                    </button>
-                </li>
-            </ul>
-            <!-- sliding underline indicator -->
-            <div id="tab-underline" class="ocs__tabs-underline"
-                style="position:absolute;bottom:0;left:0;height:2px;width:0;transition:all 0.3s cubic-bezier(.4,0,.2,1);border-radius:2px;">
-            </div>
-        </div>
-
-        <!-- tab content container -->
+        <!-- sections, one shown at a time (see setupSections) -->
         <div id="tab-content-container" class="ocs__tabs-panels">
 
             <!-- My Submissions tab content -->
