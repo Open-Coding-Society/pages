@@ -1,6 +1,9 @@
 // Sprint Reflection and Growth Over Time, the first two tabs of the Retrospective page (/retrospective).
 //
-// Teachers and admins open sprints; for each one a student ranks the Ground 0 evaluation items
+// Sprints come from the school calendar (_data/school_calendar.yml, embedded by the layout): when a
+// teacher opens the page, any calendar sprint that is missing or whose dates moved is saved to
+// Spring. Teachers and admins can also add, edit and delete sprints by hand under Manage sprints.
+// For each sprint a student ranks the Ground 0 evaluation items
 // (T01-T12 technical, P01-P10 professional, 0 = not entered, 1-5), writes a summary per section,
 // and answers the retrospective questions. The teacher adds their own rank and a comment beside
 // every item, and the student sees both. The reflection reads as numbered steps with a progress
@@ -17,7 +20,7 @@ const STORY_KEYS = ['techRetro', 'proRetro', 'techGoal', 'commitBehavior'];
 
 class SignedOut extends Error {}
 
-const shared = { loaded: null, template: null, sprints: [], canManage: false };
+const shared = { loaded: null, template: null, sprints: [], canManage: false, calendarNames: new Set() };
 const ref = { root: null, sprintId: null, mode: 'mine', studentId: null, roster: [], view: null, dirty: false, editingId: null };
 const growth = { root: null, personId: null, progress: null, chart: null, viewKey: 'sections', perspective: 'self' };
 
@@ -34,13 +37,60 @@ async function call(path, options = {}) {
     return res.status === 204 ? null : res.json();
 }
 
+/**
+ * The sprints in the school calendar: each starts the Monday of its "Sprint N Start" week and ends
+ * the Friday of its "Sprint N Retrospective" week. weeks is the calendar file's weeks map.
+ */
+export function calendarSprints(weeks) {
+    const found = new Map();
+    Object.keys(weeks || {}).map(Number).sort((a, b) => a - b).forEach((number) => {
+        const week = weeks[number];
+        const match = /Sprint (\d+) (Start|Retrospective)/.exec(week.notes || '');
+        if (!match) return;
+        const name = `Sprint ${match[1]}`;
+        const sprint = found.get(name) || { name };
+        if (match[2] === 'Start') sprint.startDate = week.monday;
+        else sprint.endDate = week.friday;
+        found.set(name, sprint);
+    });
+    return [...found.values()].filter((sprint) => sprint.startDate && sprint.endDate);
+}
+
+function readCalendar() {
+    const element = document.getElementById('retro-school-calendar');
+    try {
+        return calendarSprints(element ? JSON.parse(element.textContent) : {});
+    } catch (e) {
+        console.warn('Could not read the school calendar:', e);
+        return [];
+    }
+}
+
+/**
+ * A teacher's visit saves any calendar sprint that is missing or whose dates moved. Spring matches
+ * by name and never deletes, so sprints added by hand are kept. Returns every stored sprint.
+ */
+async function syncedSprints(stored, calendar) {
+    const inStep = calendar.every((entry) => stored.some((s) => s.name === entry.name
+        && s.startDate === entry.startDate && s.endDate === entry.endDate));
+    if (inStep) return stored;
+    try {
+        return await call('/calendar', { method: 'PUT', body: JSON.stringify({ sprints: calendar }) });
+    } catch (e) {
+        console.warn('Could not update the sprints from the calendar:', e);
+        return stored;
+    }
+}
+
 /** Loads the template and sprint list once per page, or again when force is true. */
 async function loadShared(force = false) {
     if (!shared.loaded || force) {
-        shared.loaded = Promise.all([call('/template'), call('')]).then(([template, list]) => {
+        shared.loaded = Promise.all([call('/template'), call('')]).then(async ([template, list]) => {
+            const calendar = readCalendar();
             shared.template = template;
-            shared.sprints = list.sprints;
             shared.canManage = list.canManage;
+            shared.calendarNames = new Set(calendar.map((entry) => entry.name));
+            shared.sprints = list.canManage && calendar.length ? await syncedSprints(list.sprints, calendar) : list.sprints;
         });
         shared.loaded.catch(() => { shared.loaded = null; });
     }
@@ -110,7 +160,7 @@ export async function initSprintReflection(root) {
       <section class="sr">
         <header>
           <h2 class="sr-title">Sprint Reflection</h2>
-          <p class="sr-muted">Rank yourself on each Ground 0 item, write about the evidence behind your ranks, and compare them with your teacher's. 0 means not entered yet.</p>
+          <p class="sr-muted">Rank yourself on each item, write about the evidence behind your ranks, and compare them with your teacher's. 0 means not entered yet.</p>
         </header>
         <p class="sr-muted" data-sr="status">Loading…</p>
         <div class="sr-stack" data-sr="body" hidden>
@@ -127,7 +177,7 @@ export async function initSprintReflection(root) {
               </div>
               <p class="sr-small" data-sr="manage-status" role="status"></p>
             </form>
-            <p class="sr-muted sr-small">Every sprint uses the Ground 0 items, so students can compare their ranks across the year. A sprint students have reflected on cannot be deleted.</p>
+            <p class="sr-muted sr-small">Every sprint uses the Ground 0 items, so students can compare their ranks across the year. A sprint students have reflected on cannot be deleted. Sprints marked School calendar are added from the school calendar each time a teacher opens this page, and their dates follow it; add a sprint by hand for anything the calendar does not list.</p>
           </details>
           <div class="sr-card sr-bar">
             <label class="sr-field"><span class="sr-label">Sprint</span><select class="sr-input" data-sr="sprint"></select></label>
@@ -466,7 +516,7 @@ function renderManageList() {
         <thead><tr><th>Sprint</th><th>Dates</th><th></th></tr></thead>
         <tbody>${shared.sprints.map((s) => `
           <tr>
-            <td>${escapeHtml(s.name)}</td>
+            <td>${escapeHtml(s.name)}${shared.calendarNames.has(s.name) ? ' <span class="sr-pill">School calendar</span>' : ''}</td>
             <td>${sprintDates(s)}</td>
             <td class="sr-actions">
               <button type="button" class="sr-btn sr-btn--ghost sr-btn--sm" data-edit-sprint="${s.id}">Edit</button>

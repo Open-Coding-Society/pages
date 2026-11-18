@@ -57,6 +57,8 @@ active_tab: retrospective
     </div>
 </div>
 
+<!-- The calendar's weeks, so a teacher's visit can add the calendar's sprints; sprints can also be added by hand -->
+<script type="application/json" id="retro-school-calendar">{{ site.data.school_calendar.weeks | jsonify }}</script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"></script>
 <script type="module">
     import { initSprintReflection, initGrowthOverTime } from '{{ site.baseurl }}/assets/js/analytics/sprint-retrospective.js';
