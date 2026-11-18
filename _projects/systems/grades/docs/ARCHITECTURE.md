@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Grades Architecture
-description: How the Grades pages, their sidebar and their tab links fit together, and which grading files other systems load.
+description: How the Grades pages, their sidebar and their section links fit together, and which grading files other systems load.
 permalink: /systems/grades/architecture/
 show_reading_time: false
 ---
@@ -11,7 +11,7 @@ show_reading_time: false
 The top nav's **Grades** link (`navigation/grades.html` in `_config.yml`'s
 `nav_pages`) opens `/grades/`. That hub page loops over `data/grades_hub.yml`
 and shows three cards, Grade, Reflect and Submissions, of links to the pages and
-tabs that already exist. It builds no page of its own for any of them.
+sections that already exist. It builds no page of its own for any of them.
 
 ## Sidebar
 
@@ -28,19 +28,45 @@ sidebar. The `sidebar:` must be in the page's own front matter, not its layout's
 because Liquid's `page` doesn't see layout front matter. The same goes for
 `active_tab`, which is why `pages/retrospective.md` sets it itself.
 
-## Tab links
+## Sections
 
-A hub link can name a tab with `#name`:
+Analytics Dashboard, Retrospective and Submissions show one section at a time and
+have no tab bar. The sidebar lists an item's `children` under it as an `ocs__tree`:
 
-| Page | How `#name` opens the tab |
-|---|---|
-| `/retrospective` | its script shows the panel whose `data-panel` is `name` |
-| `/analytics-dashboard` | on load, clicks the button with id `tab-<name>` |
-| `/submissions` | after the admin check, clicks the button with id `tab-<name>` unless it is still hidden |
+```yaml
+- id: retrospective
+  title: Retrospective
+  url: /retrospective
+  children:
+    - section: growth
+      title: Growth Over Time
+```
 
-So `/submissions#all-submissions` leaves a student on My Submissions, because that
-tab stays hidden for non-admins. Each page checks the viewer's role itself; the hub
-only labels teacher and admin links (`audience` in `data/grades_hub.yml`).
+Each child links to `url#section`, and the hub links the same way
+(`/analytics-dashboard#grade`). On the page, every section element carries
+`data-section="<name>"`, and `js/page-sections.js` does the rest:
+
+1. `followSectionHash(names, show, canOpen)` calls the page's `show(name)` for the
+   section `location.hash` names, then again on every `hashchange`. A sidebar click
+   on the same page changes only the hash, so the page doesn't reload.
+2. An unknown name, or one `canOpen` refuses, opens the first section. Submissions
+   passes `name !== "all-submissions" || isAdmin` after its admin check, so
+   `/submissions#all-submissions` leaves a student on My Submissions.
+3. The sidebar include puts `data-sidebar-section` only on the current page's
+   links, so `markSidebarSection` sets `aria-current` on the shown one, in both
+   the side column and the phone menu. Tailwind's `aria-[current=true]:` classes
+   highlight it.
+
+Each page still checks the viewer's role itself; the hub and the sidebar only label
+teacher links (`audience`). For teachers, `creator-dashboard.js` renames the
+"Assignments You Created" sidebar links to "Teacher Dashboard".
+
+## Phones
+
+`_layouts/aesthetihawk.html` has a viewport tag. At 768px and below it hides the
+side column (`max-[768px]:hidden`) and drops its 16rem margin, and a `<details>`
+**Menu** above the page holds a second copy of the sidebar include. That copy
+passes `id_prefix="phone-"`, so no link id repeats.
 
 ## Spring links
 
