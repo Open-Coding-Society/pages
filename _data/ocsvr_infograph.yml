@@ -6,7 +6,7 @@ Title: "OCS VR"
 TeamName: "OCS VR Team"
 Tagline: "AP CSP Unit 4 training you can stand inside: build a computer, then build a network, in VR."
 Description: "OCS VR turns AP Computer Science Principles Unit 4 (Computer Systems and Networks) into hands-on training missions for the Meta Quest. Students assemble a computer and then build a network step by step. The game checks each step, scores it, and saves the result to our Flask backend, so progress can be tracked per student."
-Team: ["Aryan M", "Aaditya P", "Kashyap T", "Chetan T"]
+Team: ["Aryan M", "Aaditya P", "Chetan T", "Ishaan S", "Jake R", "Kashyap T", "Ryden B", "Yash P"]
 Stack: ["Godot 4", "OpenXR", "Meta Quest", "Flask", "Jekyll"]
 
 # The team's GitHub project board, shown live under the intro (_includes/ocs_kanban_board.html)
