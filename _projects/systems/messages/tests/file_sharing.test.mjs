@@ -12,6 +12,7 @@ const { createAttachments, entriesFromDrop } = await import('../js/attachments.j
 const { createThread } = await import('../js/thread.js');
 const { GroupFiles } = await import('../js/group-files.js');
 const { addFilesMarker, MAX_LOOSE_FILES } = await import('../js/files-model.js');
+const { createFileActions } = await import('../js/file-actions.js');
 
 const me = { id: 1, uid: 'ada', name: 'Ada Lovelace', pfp: null };
 const richText = {
@@ -79,6 +80,24 @@ test('deleting a share’s message takes its files off it', () => {
 });
 
 const file = (name, size = 4, type = '') => new File(['x'.repeat(size)], name, { type });
+
+test('a folder’s .zip is refused by the size of its files, whatever its message says', async () => {
+  const big = 600 * 1024 * 1024;
+  let fetched = 0;
+  const files = new GroupFiles({
+    api: {
+      groupFileIndex: async () => [{ path: 'videos/a.mp4', size: big }, { path: 'videos/b.mp4', size: big }],
+      groupFileContent: async () => { fetched += 1; return new Blob(['x']); },
+    },
+    groupId: 7,
+  });
+  const said = [];
+  const actions = createFileActions({ filesFor: () => files, viewer: null, notify: message => said.push(message) });
+  // Anyone can type a marker: this one says the folder holds nothing.
+  await actions.handle('zip', { type: 'folder', path: 'videos', count: 2, size: 0 });
+  assert.equal(fetched, 0);
+  assert.match(said.at(-1), /videos is too big to download as one \.zip \(1\.2 GB\)/);
+});
 
 test('the tray lists what waits by file and folder, and Remove takes one out', () => {
   const tray = document.createElement('div');

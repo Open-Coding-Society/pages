@@ -142,6 +142,16 @@ test('cancel stops the uploads that have not started and aborts the rest', async
   assert.deepEqual(result.done, []);
 });
 
+test('folderEntries refuses a folder over maxBytes by the index’s sizes, before fetching a file', async () => {
+  const api = fakeApi({ index: [{ path: 'v/a.mp4', size: 700 }, { path: 'v/b.mp4', size: 700 }, { path: 'other.mp4', size: 5000 }] });
+  const fetched = [];
+  api.groupFileContent = async (groupId, path) => { fetched.push(path); return new Blob(['x']); };
+  const files = new GroupFiles({ api, groupId: 7 });
+  await assert.rejects(files.folderEntries('v', { maxBytes: 1000 }), error => error instanceof RangeError && error.size === 1400);
+  assert.deepEqual(fetched, []);
+  assert.equal((await files.folderEntries('v', { maxBytes: 1400 })).length, 2);
+});
+
 test('folderEntries fetches every file under a folder for a ZIP', async () => {
   const api = fakeApi({ index: [{ path: 'p/a.txt', size: 1 }, { path: 'p/q/b.txt', size: 1 }, { path: 'other.txt', size: 1 }] });
   const files = new GroupFiles({ api, groupId: 7 });

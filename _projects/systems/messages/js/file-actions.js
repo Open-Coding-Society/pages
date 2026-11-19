@@ -32,14 +32,20 @@ export function createFileActions({ filesFor, viewer, notify, onOpenFolder = nul
     await viewer.show({ name: item.path, blob, onDownload: () => saveBlob(blob, nameOf(item.path)) }, control);
   }
 
+  // The folder's size comes from the group's list of files, not the message: anyone can type
+  // a marker, and one that understated a folder would load all of it into memory.
   async function zip(files, item) {
-    if (item.size > MAX_ZIP_BYTES) {
-      notify(fill(text.zipTooBig, { filename: nameOf(item.path), size: formatBytes(item.size) }));
+    let entries;
+    try {
+      entries = await files.folderEntries(item.path, {
+        maxBytes: MAX_ZIP_BYTES,
+        onProgress: (done, total) => notify(fill(text.zipping, { filename: nameOf(item.path), done, total })),
+      });
+    } catch (error) {
+      if (!(error instanceof RangeError)) throw error;
+      notify(fill(text.zipTooBig, { filename: nameOf(item.path), size: formatBytes(error.size) }));
       return;
     }
-    const entries = await files.folderEntries(item.path, {
-      onProgress: (done, total) => notify(fill(text.zipping, { filename: nameOf(item.path), done, total })),
-    });
     saveBlob(new Blob([zipStore(entries)], { type: 'application/zip' }), `${nameOf(item.path)}.zip`);
     notify('');
   }
