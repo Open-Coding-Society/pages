@@ -105,6 +105,15 @@ export async function startMessagesPage({ config, richText }) {
     me,
     groupFiles,
     viewer,
+    runCode: (language, code) => api.runCode(language, code),
+    profileUrl: `${config.baseurl || ''}/profile`,
+    // The commands that open something on the page rather than in the composer.
+    onCommand: name => {
+      if (['files', 'media', 'links', 'pinned'].includes(name)) openPanel({ tab: name });
+      else if (name === 'members') byId('messagesMembers').click();
+      else if (name === 'search') byId('messagesSearch')?.focus();
+      else if (name === 'help') thread.showCommands();
+    },
     onOpenFolder: (groupId, path) => {
       const group = findItem('group', groupId);
       if (group) panel.open({ kind: 'group', id: group.id, name: group.name }, byId('messagesSharedButton'), { tab: 'files', folderPath: path });
@@ -118,6 +127,7 @@ export async function startMessagesPage({ config, richText }) {
       attachButton: byId('messagesAttachButton'), attachMenuHost: byId('messagesAttach'),
       filesInput: byId('messagesFiles'), folderInput: byId('messagesFolder'), tray: byId('messagesAttachTray'),
       dropZone: document.querySelector('.dm__thread'), dropHint: byId('messagesDropHint'),
+      commandHost: byId('messagesCommandHost'), codeHost: byId('messagesCodeHost'),
     },
     onDmRead: id => {
       const conversation = findItem('dm', id);

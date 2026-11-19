@@ -27,6 +27,10 @@ same way they reach a direct message.
 | `js/file-actions.js`, `js/file-viewer.js` | What a shared file's buttons do (download, preview, open a folder, .zip), and the preview: an image, video, sound, PDF or the start of a text file. |
 | `js/zip-store.js` | A stored (uncompressed) ZIP writer, so a shared folder downloads as one file. |
 | `js/popup-menu.js` | A menu a button opens (`ocs__menu`), with the arrow keys, Escape and click-away. |
+| `js/slash-commands.js` | The slash commands, grouped, and matching what's typed against them. |
+| `js/command-menu.js` | The slash-command menu over the composer (`ocs__menu`, `role="listbox"`): ↑ ↓, Enter or Tab, Escape. |
+| `js/code-model.js`, `js/code-composer.js` | The `[[code:…]]` marker and its languages, and the code box `/code` and `/gist` open above the composer. |
+| `js/github-links.js` | Reading GitHub links (issues, pull requests, commits, repos, gists) and building one from "owner/repo#12". |
 | `js/delete-group.js` | The Delete group dialog: says what deleting takes away, and waits for the group's name. |
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
@@ -120,6 +124,36 @@ direct message only an image can be attached: Spring stores shared files for gro
   messages the conversation already loaded, so opening them asks Spring for nothing.
   Show in the chat closes the panel and marks the message.
 
+## Slash commands and code
+
+Typing `/` at the start of a message opens the command menu, grouped and narrowed as you
+type (a command's keywords count too: `/upload` finds `/file` and `/folder`). ↑ ↓ move,
+Enter or Tab picks, Escape closes. A command that needs words (`/issue owner/repo#12`)
+is filled in for you to finish, and Enter (or Send) then runs it instead of sending it.
+
+| Group | Commands |
+| --- | --- |
+| Share | `/file`, `/folder` (groups), `/image`, `/code [language]`, `/gist [file name]` |
+| GitHub | `/issue`, `/pr`, `/commit`, `/repo` post the link (`owner/repo#12`, `owner/repo@sha`, `owner/repo`; after one, `#12` is enough in that chat), `/newissue owner/repo title` opens GitHub's new-issue form filled in |
+| This chat | `/files` (groups), `/media`, `/links`, `/pinned`, `/members` (groups), `/search` (direct messages), `/help` |
+| Message | `/me text` (in italics), `/shrug [text]` |
+
+- **Code blocks.** `/code` opens a code box above the composer (a language, Tab
+  indents, Ctrl or Cmd+Enter sends); the message's text goes with it as a caption. The
+  code travels as `[[code:<language>|<code>]]` with `%`, `[`, `]`, `|`, `<`, `>`, `&` and
+  control characters escaped, and the log draws it as text in a `pre`, never as markup.
+  Each block has Copy, Save as gist, and for Python, Java and JavaScript, Run: the same
+  `/run/python`, `/run/javascript` (Flask) and `/run/java` (Spring) routes the lesson
+  code runners use, with the output shown under it. A direct message holds 2,000
+  characters, so longer code there should be a gist.
+- **Gists.** `/gist` and Save as gist call `POST /api/grades/create-gist` with the
+  student's own GitHub token (Profile's GitHub Gist connection), making a secret gist.
+  Without a token Spring answers 409 and the page links to that card.
+- **The repository a chat last named** is kept in this browser's localStorage
+  (`ocs-messages-repo:<kind>:<id>`), a convenience only.
+- The course announcement chats have their own `/event` commands (Courses'
+  `calendar-command.js`), unchanged.
+
 ## Embedding a conversation
 
 `js/conversation-embed.js` shows one conversation inside another page: a group's chat
@@ -200,6 +234,8 @@ back the listeners the pane and its composer put on `document` and `window`, and
 | `pinMessage`, `unpinMessage`, `pinned` | Pin; Unpin; Pinned |
 | `pinnedNote`, `unpinnedNote`, `aMessage` | {name} pinned a message:; {name} unpinned a message:; a message |
 | `pinFailed` | Could not change the pin. Try again. |
+| `copyCode`, `copied`, `copyFailed`, `runCode`, `running`, `output`, `runFailed`, `noOutput`, `saveGist`, `savedGist` | A code block's buttons and its output |
+| `codeMessage`, `badGitHubRef`, `newIssueNeedsRepo`, `newIssueBody`, `tooLongForDm`, `gistConnect`, `gistConnectLink`, `gistFailed` | Slash commands' and gists' messages |
 | `openImage`, `closeImage` | View image from {name} larger; Close image (the image viewer) |
 | `today`, `yesterday` | Today; Yesterday (day dividers; older days use the browser's date format) |
 
@@ -255,6 +291,10 @@ Spring:
 - STOMP over SockJS at `/ws-chat` (port 8589 on localhost)
 
 Flask, for Form groups: `POST /api/persona/evaluate-group`, `POST /api/persona/form-groups`.
+
+Code blocks' Run: `POST {pythonURI}/run/python`, `POST {pythonURI}/run/javascript` and
+`POST {javaURI}/run/java` with `{ code }`, answered `{ output }` (the lesson runners' routes).
+Gists: `POST /api/grades/create-gist` (Spring). GitHub cards read `api.github.com` directly.
 
 ## Groups the page leaves alone
 

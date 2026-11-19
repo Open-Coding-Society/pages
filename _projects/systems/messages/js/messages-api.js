@@ -116,6 +116,18 @@ export function createMessagesApi({
       `/api/groups/chat/${part(groupId)}/files`, { filename, base64Data }, options,
     ),
 
+    // Runs a code block on the same routes the lesson code runners use: Flask runs Python and
+    // JavaScript, Spring runs Java. Resolves the program's output.
+    runCode: async (language, code) => {
+      const [base, path] = language === 'java' ? [javaURI, '/run/java'] : [pythonURI, `/run/${part(language)}`];
+      const result = await request(base, path, 'POST', { code });
+      return String(result?.output ?? '');
+    },
+    // A secret gist made with the signed-in student's GitHub token, which Spring keeps (Profile's
+    // Gist card): files is { name: { content } }. Resolves { success, url }; 409 when no token
+    // is connected.
+    createGist: (files, description) => spring('/api/grades/create-gist', 'POST', { files, description }),
+
     personaCoverage: userUids => flask('/api/persona/evaluate-group', 'POST', { user_uids: userUids }),
     formGroups: (userUids, groupSize, feedbackRows = []) => flask('/api/persona/form-groups', 'POST', {
       user_uids: userUids,

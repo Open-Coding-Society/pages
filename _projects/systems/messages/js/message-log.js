@@ -3,6 +3,7 @@
 // with its avatar, sender and time, a Reply button, and edit and delete buttons on your
 // own messages (none in a read-only log). A reply shows a quote of the message it
 // answers, from the [[reply:...]] marker at the start of its body (assets/js/chat/chat-reply.js).
+import { extractCodeMarker, isRunnable, languageOf } from './code-model.js';
 import { currentPins, extractPinMarker, plainText } from './conversation-model.js';
 import { countFiles, extractFilesMarker, fileKind, formatBytes } from './files-model.js';
 import { dayKey, dayLabel, initialsFor, pfpSrc, tintFor } from './messages-model.js';
@@ -33,6 +34,16 @@ export const LOG_TEXTS = Object.freeze({
   pinnedNote: '{name} pinned a message:',
   unpinnedNote: '{name} unpinned a message:',
   aMessage: 'a message',
+  copyCode: 'Copy',
+  copied: 'Copied',
+  copyFailed: 'Select and copy it',
+  runCode: 'Run',
+  running: 'Running…',
+  output: 'Output',
+  runFailed: 'Could not run it: {reason}',
+  noOutput: '(no output)',
+  saveGist: 'Save as gist',
+  savedGist: 'Saved to your gists:',
 });
 
 // Up to this many images in one share show small previews under the message; a bigger
@@ -83,9 +94,11 @@ function splitReply(richText, body) {
 // 'download', 'folder', 'zip'); thumbnail(item) resolves a URL for an image's inline preview.
 // onPin(message), when given, adds Pin/Unpin to each message; the log works out which
 // messages are pinned from the [[pin:…]] messages it holds (conversation-model.js).
+// runCode(language, code) resolves a code block's output (the /run routes the lesson runners
+// use); saveGist(language, code) resolves the URL of a secret gist made from it.
 export function createMessageLog(element, {
   richText, me, onEdit, onDelete, onReply = null, readOnly = false, texts = {}, formatBody = null,
-  onFile = null, thumbnail = null, onPin = null,
+  onFile = null, thumbnail = null, onPin = null, runCode = null, saveGist = null,
 }) {
   if (formatBody !== null && typeof formatBody !== 'function') {
     throw new TypeError('createMessageLog: formatBody must be a function or null');
@@ -351,20 +364,118 @@ export function createMessageLog(element, {
     }
   }
 
+  // A labelled button in a code block's bar: icon and words straight in the button.
+  function codeButton(icon, label, onClick) {
+    const control = document.createElement('button');
+    control.type = 'button';
+    control.className = 'ocs__btn small ocs__btn--icon';
+    const glyph = document.createElement('i');
+    glyph.className = `fas ${icon}`;
+    glyph.setAttribute('aria-hidden', 'true');
+    control.append(glyph, label);
+    control.addEventListener('click', () => onClick(control));
+    return control;
+  }
+
+  // Shows a word on a button for a moment (Copied), then puts its label back.
+  function flash(control, word, label) {
+    control.lastChild.textContent = word;
+    setTimeout(() => { control.lastChild.textContent = label; }, 1500);
+  }
+
+  // A code block: its language and buttons over the code, drawn as text, never as markup.
+  // Run shows the runner's output under it; Save as gist keeps a copy in your gists.
+  function codeBlock(language, code) {
+    const figure = document.createElement('figure');
+    figure.className = 'chat-code';
+    const head = document.createElement('figcaption');
+    head.className = 'chat-code-head';
+    const label = document.createElement('b');
+    label.textContent = languageOf(language)?.label || language;
+    const actions = document.createElement('div');
+    actions.className = 'chat-code-actions';
+    const pre = document.createElement('pre');
+    pre.className = 'chat-code-body';
+    const source = document.createElement('code');
+    source.textContent = code;
+    pre.appendChild(source);
+    const output = document.createElement('pre');
+    output.className = 'chat-code-output';
+    output.hidden = true;
+    const note = document.createElement('p');
+    note.className = 'chat-code-note';
+    note.hidden = true;
+
+    const copy = codeButton('fa-copy', text.copyCode, async control => {
+      try {
+        await navigator.clipboard.writeText(code);
+        flash(control, text.copied, text.copyCode);
+      } catch {
+        flash(control, text.copyFailed, text.copyCode);
+      }
+    });
+    actions.appendChild(copy);
+    if (runCode && isRunnable(language)) {
+      actions.appendChild(codeButton('fa-play', text.runCode, async control => {
+        control.disabled = true;
+        output.hidden = false;
+        output.dataset.label = text.output;
+        output.textContent = text.running;
+        try {
+          const result = await runCode(language, code);
+          output.textContent = result === '' ? text.noOutput : result;
+        } catch (error) {
+          output.textContent = fillText(text.runFailed, { reason: error?.message || 'unknown error' });
+        } finally {
+          control.disabled = false;
+        }
+      }));
+    }
+    if (saveGist) {
+      actions.appendChild(codeButton('fa-file-code', text.saveGist, async control => {
+        control.disabled = true;
+        try {
+          const url = await saveGist(language, code);
+          if (url) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = url.replace(/^https:\/\//, '');
+            note.replaceChildren(`${text.savedGist} `, link);
+            note.hidden = false;
+          }
+        } finally {
+          control.disabled = false;
+        }
+      }));
+    }
+    head.append(label, actions);
+    figure.append(head, pre, output, note);
+    return figure;
+  }
+
   // The body's reply quote (if any) goes just before the body; formatBody sees the rest.
   // Clicking the quote scrolls to the original and marks it, as a search result does.
-  // Files shared with the message are listed after the body.
+  // A code block goes after the body, then the files shared with the message.
   function renderBody(body, stored) {
     const { reply, html: withFiles } = splitReply(richText, stored.body);
-    const { items, html } = extractFilesMarker(withFiles);
+    const { items, html: withCode } = extractFilesMarker(withFiles);
+    const { language, code, html } = extractCodeMarker(withCode);
     const main = body.parentNode;
     main.querySelector('.chat-reply-quote')?.remove();
+    main.querySelector('.chat-code')?.remove();
     if (reply && typeof richText.renderReplyQuote === 'function') {
       main.insertBefore(richText.renderReplyQuote(reply, { onJump: id => reveal(String(id)) }), body);
     }
     body.replaceChildren();
     richText.renderRichMessage(body, shownBody({ ...stored, body: html }, formatBody));
-    renderFiles(main, body, items, stored);
+    let after = body;
+    if (code !== null) {
+      after = codeBlock(language, code);
+      main.insertBefore(after, body.nextSibling);
+    }
+    renderFiles(main, after, items, stored);
   }
 
   function actionButton(icon, label, handler) {
@@ -587,6 +698,7 @@ export function createMessageLog(element, {
     row.querySelector('.chat-reply-quote')?.remove();
     row.querySelector('.chat-files')?.remove();
     row.querySelector('.chat-file-gallery')?.remove();
+    row.querySelector('.chat-code')?.remove();
     row.querySelector('.chat-msg-actions')?.remove();
     row.querySelector('.chat-msg-edited')?.remove();
     // If the viewer is showing the image of the message just deleted, close it rather

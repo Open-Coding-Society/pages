@@ -7,7 +7,11 @@
 // Replies carry a [[reply:...]] marker at the start of their body (chat-reply.js,
 // reached through `richText`); an image pasted into the composer is attached like one
 // picked with the Image control or dropped on the composer.
+import { addCodeMarker, languageOf, MAX_CODE_LENGTH } from './code-model.js';
+import { createCodeComposer } from './code-composer.js';
+import { createCommandMenu } from './command-menu.js';
 import { createComposerFiles } from './composer-files.js';
+import { githubUrlFor, newIssueUrl, parseGitHubUrl, repoOf } from './github-links.js';
 import { readImageFile } from './dialogs.js';
 import { createFileActions } from './file-actions.js';
 import { createFileViewer } from './file-viewer.js';
@@ -39,7 +43,19 @@ export const THREAD_TEXTS = Object.freeze({
   filesMessage: '📎 Files',
   sharedButNotSent: 'Your files are shared, but the message didn’t send. Press Send to try again.',
   pinFailed: 'Could not change the pin. Try again.',
+  codeMessage: '💻 Code',
+  badGitHubRef: 'Write it like owner/repo#12, owner/repo@abc1234 or owner/repo, or paste a GitHub link.',
+  newIssueNeedsRepo: 'Say which repository first: /newissue owner/repo What went wrong',
+  newIssueBody: 'From the OCS chat “{chat}”: {link}',
+  tooLongForDm: 'That’s too long for a direct message. Save it as a gist instead (/gist).',
+  gistConnect: 'Connect GitHub on your Profile to save gists:',
+  gistConnectLink: 'GitHub Gist connection',
+  gistFailed: 'Could not save the gist. Try again.',
 });
+
+// A direct message holds at most this much (Spring's DirectMessage body column).
+const DM_MAX_LENGTH = 2000;
+const escapeHtml = value => String(value).replace(/[&<>"']/g, character => `&#${character.charCodeAt(0)};`);
 
 // What an open conversation with no messages says, unless the host passes `emptyState`.
 export const EMPTY_STATES = Object.freeze({
@@ -55,6 +71,7 @@ export function createThread({
   onDmRead = () => {}, onGroupRead = () => {}, onFileShared = () => {},
   readOnly = false, emptyState = null, texts = {}, formatBody = null,
   groupFiles = null, onOpenFolder = null, viewer: sharedViewer = null,
+  runCode = null, onCommand = () => {}, profileUrl = '/profile',
 }) {
   if (emptyState !== null && (typeof emptyState !== 'object' || typeof emptyState.title !== 'string')) {
     throw new TypeError('createThread: emptyState must be null or { title, hint }');
@@ -117,6 +134,8 @@ export function createThread({
     onFile: fileActions ? (action, item, control) => fileActions.handle(action, item, control) : null,
     thumbnail: fileActions ? item => fileActions.thumbnail(item) : null,
     onPin: readOnly ? null : (message, pinned) => togglePin(message, pinned),
+    runCode,
+    saveGist: readOnly || !api.createGist ? null : (language, code) => saveAsGist(language, code, `snippet.${languageOf(language)?.extension || 'txt'}`),
   });
   // Pasted images go where the Image control's would, so only where that control exists.
   const composer = readOnly
@@ -139,6 +158,19 @@ export function createThread({
     groupFiles,
     onImage: file => pasteImage(file),
     showMessage: message => showFormMessage(message),
+  }) : null;
+
+  // The code box (/code, /gist) and the slash-command menu sit above the composer too.
+  const codeBox = composer && elements.codeHost ? createCodeComposer({
+    host: elements.codeHost,
+    onSubmit: () => submit(),
+    onClose: () => composer.focus(),
+  }) : null;
+  const commandMenu = composer && elements.commandHost ? createCommandMenu({
+    composer,
+    host: elements.commandHost,
+    kindOf: () => (current?.loaded && !editing ? current.kind : null),
+    onRun: (command, args) => runCommand(command, args),
   }) : null;
 
   // "Replying to …" sits just above the composer.
@@ -234,7 +266,8 @@ export function createThread({
       sender: message.isSelf ? me.name : message.senderName,
       excerpt: richText.replyExcerpt(html)
         || (message.image ? text.imageMessage : '')
-        || (extractFilesMarker(html).items.length ? text.filesMessage : ''),
+        || (extractFilesMarker(html).items.length ? text.filesMessage : '')
+        || (/\[\[code:/.test(html) ? text.codeMessage : ''),
     };
     replyBar.show(replyingTo);
     showFormMessage('');
@@ -296,12 +329,20 @@ export function createThread({
   }
 
   async function submit() {
-    // An image or files on their own are a message, so an empty composer is only a reason
-    // to stop when nothing is attached. Editing stays text-only.
+    // A finished slash command runs instead of sending ("/issue a/b#3" from the Send button).
+    const typed = !editing ? commandMenu?.typedCommand() : null;
+    if (typed && !pending && current?.loaded) {
+      composer.clear();
+      runCommand(typed.command, typed.args);
+      return;
+    }
+    // An image, files or a code block on their own are a message, so an empty composer is
+    // only a reason to stop when nothing is attached. Editing stays text-only.
     const sendingImage = !editing && pendingImage;
     const sendingFiles = !editing && (Boolean(unsentFiles) || Boolean(composerFiles?.hasFiles()));
+    const code = !editing ? codeBox?.value() : null;
     if (pending || !current?.loaded || composer.isOverLimit()) return;
-    if (composer.isEmpty() && !sendingImage && !sendingFiles) return;
+    if (composer.isEmpty() && !sendingImage && !sendingFiles && !code) return;
     if (sendingFiles && composerFiles?.problem()) return; // the tray says why
     const { kind, id } = current;
     const target = editing;
@@ -319,8 +360,27 @@ export function createThread({
       refreshComposer();
       return;
     }
-    const withFiles = addFilesMarker(html, files);
+    let withCode = html;
+    if (code?.mode === 'code') {
+      withCode = addCodeMarker(html, code.language, code.code);
+    } else if (code?.mode === 'gist') {
+      const url = await saveAsGist(code.language, code.code, code.filename);
+      if (destroyed) return;
+      if (!url) {
+        pending = null;
+        refreshComposer();
+        return;
+      }
+      withCode = html ? `${html} ${url}` : url;
+    }
+    const withFiles = addFilesMarker(withCode, files);
     const outgoing = reply ? richText.addReplyMarker(withFiles, reply) : withFiles;
+    if (kind === 'dm' && outgoing.length > DM_MAX_LENGTH) {
+      pending = null;
+      refreshComposer();
+      showFormMessage(text.tooLongForDm);
+      return;
+    }
     let saved = null;
     try {
       if (target) await kinds[kind].edit(id, target.id, outgoing);
@@ -343,6 +403,7 @@ export function createThread({
       return;
     }
     unsentFiles = null;
+    if (code) codeBox.close();
     // A pane destroyed while the message was saving has nothing left to update or fetch.
     if (destroyed) return;
     pending = null;
@@ -363,6 +424,118 @@ export function createThread({
     // nothing comes back, so fetch it.
     showSaved(kind, id, saved);
     if (!socket.isConnected()) loadNew(kind, id);
+  }
+
+  // ── Slash commands ─────────────────────────────────────────────────────────────
+  // The repository a conversation last named, so "/pr 12" works after "/pr a/b#11". Kept in
+  // this browser only: a convenience, not data anyone else needs.
+  const repoKey = () => `ocs-messages-repo:${current?.kind}:${current?.id}`;
+  function knownRepo() {
+    try {
+      return localStorage.getItem(repoKey());
+    } catch {
+      return null;
+    }
+  }
+  function rememberRepo(url) {
+    const repo = repoOf(parseGitHubUrl(url));
+    if (!repo) return;
+    try {
+      localStorage.setItem(repoKey(), repo);
+    } catch {
+      // Without storage, the next command just needs the repository again.
+    }
+  }
+
+  // Puts html in the composer and sends it, like typing it and pressing Send.
+  function sendHtml(html) {
+    composer.setHTML(html);
+    submit();
+  }
+
+  function runCommand(command, args) {
+    const kind = current?.kind;
+    showFormMessage('');
+    switch (command.name) {
+      case 'file':
+        elements.filesInput?.click();
+        break;
+      case 'folder':
+        elements.folderInput?.click();
+        break;
+      case 'image':
+        elements.imageInput?.click();
+        break;
+      case 'code':
+      case 'gist':
+        codeBox?.open(command.name, {
+          language: command.name === 'code' ? args : '',
+          filename: command.name === 'gist' ? args : '',
+          maxLength: kind === 'dm' ? DM_MAX_LENGTH - 200 : MAX_CODE_LENGTH,
+        });
+        break;
+      case 'issue':
+      case 'pr':
+      case 'commit':
+      case 'repo': {
+        const url = githubUrlFor(command.name, args, knownRepo());
+        if (!url) {
+          showFormMessage(text.badGitHubRef);
+          composer.setHTML(`/${command.name}&nbsp;${escapeHtml(args)}`);
+          break;
+        }
+        rememberRepo(url);
+        sendHtml(url);
+        break;
+      }
+      case 'newissue': {
+        const [first = '', ...rest] = args.split(/\s+/);
+        const named = /^[\w.-]+\/[\w.-]+$/.test(first);
+        const repo = named ? first : knownRepo();
+        const title = (named ? rest.join(' ') : args).trim();
+        const url = repo ? newIssueUrl(repo, {
+          title,
+          body: text.newIssueBody.replace('{chat}', elements.title.textContent).replace('{link}', window.location.href),
+        }) : null;
+        if (!url) {
+          showFormMessage(text.newIssueNeedsRepo);
+          break;
+        }
+        rememberRepo(`https://github.com/${repo}`);
+        window.open(url, '_blank', 'noopener');
+        break;
+      }
+      case 'me':
+        if (args) sendHtml(`<i>${escapeHtml(args)}</i>`);
+        break;
+      case 'shrug':
+        sendHtml(`${escapeHtml(args)} ¯\\_(ツ)_/¯`.trim());
+        break;
+      default:
+        onCommand(command.name, args);
+    }
+  }
+
+  // Saves code as a secret gist with the student's own GitHub token (Spring keeps it, from
+  // Profile's Gist card). Resolves the gist's URL, or null after saying why it couldn't.
+  async function saveAsGist(language, code, filename) {
+    try {
+      const result = await api.createGist({ [filename]: { content: code } }, `Shared in OCS Messages: ${elements.title.textContent}`);
+      if (!result?.url) throw new Error('Spring returned no gist URL');
+      return result.url;
+    } catch (error) {
+      console.warn('Messages: could not save the gist', error);
+      if (error?.status === 409) {
+        const link = document.createElement('a');
+        link.href = `${profileUrl}#gist-connection-heading`;
+        link.textContent = text.gistConnectLink;
+        elements.formStatus.replaceChildren(`${text.gistConnect} `, link);
+        elements.formStatus.hidden = false;
+      } else {
+        showFormMessage(text.gistFailed);
+      }
+      return null;
+    }
   }
 
   // Pins and unpins are messages of their own ([[pin:<id>]]), so every member sees them.
@@ -569,6 +742,8 @@ export function createThread({
     document.removeEventListener('visibilitychange', onVisibilityChange);
     composer?.destroy();
     composerFiles?.destroy();
+    commandMenu?.destroy();
+    codeBox?.destroy();
     fileActions?.clear();
     // A viewer the page handed in is the page's to keep.
     if (!sharedViewer) viewer?.destroy();
@@ -635,6 +810,8 @@ export function createThread({
 
   return {
     open, close, resume, setHeading, showMessage, destroy, togglePin,
+    // Opens the command menu with every command, as typing "/" does (for /help and a button).
+    showCommands: () => commandMenu?.open(),
     current: () => (current ? { kind: current.kind, id: current.id } : null),
     // The open conversation's messages as loaded, oldest first; the conversation panel
     // reads its media, links and pins from them.
