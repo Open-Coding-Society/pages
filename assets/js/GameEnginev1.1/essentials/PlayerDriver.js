@@ -23,7 +23,37 @@ export default class PlayerDriver extends Player {
     this.speed = 0;
     this.heading = Number.isFinite(data.heading) ? data.heading : 0;
     this.gravity = false;
+    // Top-down cars turn their 'up' sprite frame to face their heading.
+    this.rotateWithHeading = data.rotateWithHeading === true;
     this.updateDirection();
+  }
+
+  drawSprite() {
+    if (!this.rotateWithHeading || !this.spriteReady) {
+      super.drawSprite();
+      return;
+    }
+    const pixels = this.spriteData.pixels || {
+      width: this.spriteSheet.naturalWidth,
+      height: this.spriteSheet.naturalHeight,
+    };
+    const orientation = this.spriteData.orientation || { rows: 1, columns: 1 };
+    const frameWidth = Math.max(1, Math.round(pixels.width / orientation.columns));
+    const frameHeight = Math.max(1, Math.round(pixels.height / orientation.rows));
+    const upFrame = this.spriteData.up || {};
+    const canvasSize = Math.max(frameWidth, frameHeight);
+
+    this.canvas.width = canvasSize;
+    this.canvas.height = canvasSize;
+    this.ctx.save();
+    this.ctx.translate(canvasSize / 2, canvasSize / 2);
+    this.ctx.rotate(this.heading);
+    this.ctx.drawImage(
+      this.spriteSheet,
+      (upFrame.start || 0) * frameWidth, (upFrame.row || 0) * frameHeight, frameWidth, frameHeight,
+      -canvasSize / 2, -canvasSize / 2, canvasSize, canvasSize
+    );
+    this.ctx.restore();
   }
 
   updateDirection() {

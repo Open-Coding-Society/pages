@@ -30,8 +30,8 @@ export class GameEnvBackground extends GameObject {
             // Draw the background image scaled to the canvas size
             ctx.drawImage(this.image, 0, 0, width, height);
         } else {
-            // Fill the canvas with fillstyle color if no image is provided
-            ctx.fillStyle = '#063970';
+            // Fill the canvas with the data's color (or the default blue) if no image is provided
+            ctx.fillStyle = this.data?.color || '#063970';
             ctx.fillRect(0, 0, width, height);
         }
     }

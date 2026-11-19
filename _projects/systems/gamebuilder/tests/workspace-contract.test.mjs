@@ -22,7 +22,8 @@ function workspace() {
     points: [{ x: 0.1, y: 0.2 }, { x: 0.8, y: 0.4 }]
   }];
   return {
-    schemaVersion: 1, kind: 'ocs-gamebuilder-workspace', builderState,
+    schemaVersion: 2, kind: 'ocs-gamebuilder-workspace', builderState,
+    template: { id: 'rpg', options: {} },
     editorCode: '// My manually edited code\n', lastGeneratedCode: '// Generated code\n',
     engineVersion: 'GameEnginev1.1', collapsed: false,
     editing: { activeBarrierId: null, barrierEditSnapshot: null, nextNpcIndex: 2, nextBarrierIndex: 1 }
@@ -59,22 +60,77 @@ test('unfinished forms and an active barrier retain undo/cancel recovery state',
   assert.deepEqual(parseWorkspace(serializeWorkspace(document)), document);
 });
 
+test('Racing keeps its own spline barriers, including one being drawn', () => {
+  const document = workspace();
+  const wall = { id: 'barrier-2', name: 'Barrier 2', visible: true, points: [{ x: 0.2, y: 0.3 }] };
+  document.template = { id: 'racing', options: { racing: { laps: 3, obstacles: [], barriers: [wall] } } };
+  document.editing.activeBarrierId = 'barrier-2';
+  document.editing.barrierEditSnapshot = [];
+  assert.deepEqual(parseWorkspace(serializeWorkspace(document)), document);
+
+  // The RPG barrier is not the one being edited while Racing is open.
+  document.editing.activeBarrierId = 'barrier-1';
+  assert.throws(() => serializeWorkspace(document), /Invalid workspace/);
+});
+
 test('rejects malformed, unsupported and unknown fields without conversion', () => {
   assert.throws(() => parseWorkspace('{'), SyntaxError);
   for (const change of [
-    (doc) => { doc.schemaVersion = 2; },
+    (doc) => { doc.schemaVersion = 3; },
+    (doc) => { doc.template.id = 'bad"id'; },
+    (doc) => { doc.template.options = { racing: { laps: null } }; },
+    (doc) => { doc.template.options = { racing: { obstacles: [{ id: 'a' }, { id: 'a' }] } }; },
+    (doc) => { doc.template.options = { racing: { obstacles: [{ id: 'a', nested: {} }] } }; },
+    (doc) => { doc.template.extra = true; },
     (doc) => { doc.editorCode = null; },
     (doc) => { doc.builderState.npcs[0].id = 'bad"selector'; },
     (doc) => { doc.builderState.npcs.push(doc.builderState.npcs[0]); },
     (doc) => { doc.builderState.player.position.x = null; },
     (doc) => { doc.builderState.player.GRAVITY = true; },
     (doc) => { doc.editing.activeBarrierId = 'missing'; },
-    (doc) => { doc.builderState.barriers[0].points[0].x = 5; }
+    (doc) => { doc.builderState.barriers[0].points[0].x = 5; },
+    (doc) => { doc.template.options = { racing: { barriers: [{ id: 'a', name: 'A', points: [{ x: 2, y: 0 }] }] } }; },
+    (doc) => { doc.template.options = { racing: { barriers: 'none' } }; }
   ]) {
     const document = workspace();
     change(document);
     assert.throws(() => serializeWorkspace(document), /Invalid workspace/);
   }
+});
+
+function version1Workspace() {
+  const document = workspace();
+  delete document.template;
+  document.schemaVersion = 1;
+  return document;
+}
+
+test('workspaces saved before game templates open as RPG without losing anything', () => {
+  const migrated = parseWorkspace(JSON.stringify(version1Workspace()));
+  assert.deepEqual(migrated, workspace());
+
+  const values = storage();
+  const key = 'ocs:gamebuilder:/gamebuilder/v2/:workspace-v1';
+  values.setItem(`${key}:saved`, JSON.stringify({
+    revision: 'old', savedAt: '2026-11-01T00:00:00.000Z', document: version1Workspace()
+  }));
+  const store = createWorkspaceStore(values, key);
+  assert.deepEqual(store.read('saved').document, workspace());
+  // The next write stores the migrated version 2 document.
+  store.write('saved', store.read('saved').document);
+  assert.equal(JSON.parse(values.getItem(`${key}:saved`)).document.schemaVersion, 2);
+});
+
+test('each game type keeps its own panel settings, including unfinished values', () => {
+  const document = workspace();
+  document.template = {
+    id: 'clicker',
+    options: {
+      racing: { name: 'Race', laps: 3, secondPlayer: true, obstacles: [{ id: 'obstacles-1', spriteKey: 'cookie', x: 0.2, y: '' }] },
+      clicker: { name: '', targetCount: '', powerUps: [] }
+    }
+  };
+  assert.deepEqual(parseWorkspace(serializeWorkspace(document)), document);
 });
 
 test('draft changes do not overwrite the explicit save', () => {

@@ -23,7 +23,7 @@ const ASSET_TYPES = {
   sprites: { directory: 'sprites', needsAnimation: true }
 };
 
-function toKey(name) {
+export function toKey(name) {
   return name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
 }
 

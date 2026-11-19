@@ -234,6 +234,11 @@
   gap: 0.85rem;
 }
 
+// The display rule above would otherwise override the hidden attribute.
+.ocs__gamebuilder-form[hidden] {
+  display: none;
+}
+
 .ocs__gamebuilder-form fieldset {
   display: grid;
   gap: 0.75rem;
@@ -263,14 +268,15 @@
   line-height: 1.4;
 }
 
-/// Repeatable NPC cards
+/// Repeatable NPC and template list cards
 ///
-/// Purpose: Present a flexible list of independently configured NPC forms,
+/// Purpose: Present a flexible list of independently configured items (NPCs,
+/// and template lists such as obstacles, platforms, enemies and power-ups),
 /// including the empty-list message and per-card removal action.
-/// Reuse: The card treatment is intentionally scoped to NPCs; use standard
-/// OCS card/button patterns for unrelated workbench content.
-/// Usage: `app.mjs` creates `.ocs__gamebuilder-npc` articles dynamically and
-/// uses the child header/fields classes for their responsive layout.
+/// Reuse: Use these classes for repeatable builder items; use standard OCS
+/// card/button patterns for unrelated workbench content.
+/// Usage: `app.mjs` and `template-panel.mjs` create `.ocs__gamebuilder-npc`
+/// articles dynamically and use the child header/fields classes for layout.
 /// @group gamebuilder-npcs
 .ocs__gamebuilder-npc-list {
   display: grid;
@@ -324,6 +330,61 @@
 
 .ocs__gamebuilder-npc-fields label:last-child {
   grid-column: 1 / -1;
+}
+
+/// Game type picker and template option panels
+///
+/// Purpose: Let the builder choose RPG, Racing, Platform or Clicker, and lay
+/// out checkbox fields in the data-defined template panels.
+/// Usage: `app.mjs` fills `.ocs__gamebuilder-template-choices` with radio
+/// labels from `game-templates.json`.
+/// @group gamebuilder-templates
+.ocs__gamebuilder-template-picker {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+  margin: 0 0 0.85rem;
+  padding: 0.75rem 1rem 1rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.75rem;
+}
+
+.ocs__gamebuilder-template-picker legend {
+  padding: 0 0.4rem;
+  color: var(--pref-accent-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ocs__gamebuilder-template-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ocs__gamebuilder-template-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  color: var(--pref-text-color);
+  cursor: pointer;
+}
+
+.ocs__gamebuilder-template-choice:has(input:checked) {
+  border-color: var(--pref-accent-color);
+  color: var(--pref-accent-color);
+  font-weight: 700;
+}
+
+.ocs__gamebuilder-form label.ocs__gamebuilder-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /// Point-placed spline barrier controls and preview marks
@@ -489,6 +550,42 @@
   stroke-width: 3px;
   pointer-events: none;
   vector-effect: non-scaling-stroke;
+}
+
+/// Drawing list items (platforms, obstacles) on the preview
+/// Purpose: `placement-editor.mjs` overlays the runner preview while a box or
+/// point is being drawn; existing items show faintly for reference.
+/// Usage: the overlay only takes pointer input while it has `is-active`.
+/// @group gamebuilder-placement
+.ocs__gamebuilder-placement-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 31;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ocs__gamebuilder-placement-overlay.is-active {
+  cursor: crosshair;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.ocs__gamebuilder-placement-existing,
+.ocs__gamebuilder-placement-draft {
+  fill: var(--pref-accent-color);
+  fill-opacity: 0.25;
+  stroke: var(--pref-accent-color);
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.ocs__gamebuilder-placement-draft {
+  fill-opacity: 0.45;
+  stroke-dasharray: 6 4;
 }
 
 /// Narrow-screen layout adjustments

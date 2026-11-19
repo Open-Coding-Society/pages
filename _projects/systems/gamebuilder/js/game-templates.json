@@ -1,0 +1,320 @@
+[
+  { "id": "rpg", "name": "RPG", "description": "Walk a character around a map, meet NPCs and draw walls.", "codeReady": true, "panel": "rpg" },
+  {
+    "id": "racing",
+    "name": "Racing",
+    "description": "Drive a car around a track and finish the laps first.",
+    "codeReady": true,
+    "barriers": true,
+    "assets": {
+      "tracks": [
+        {
+          "name": "Tutorial Mud Track",
+          "src": "/images/projects/racing-game/Tutorial_Mud_Track.png",
+          "finishLine": { "x": 0.5, "top": 0.696, "bottom": 0.878 },
+          "checkpoint": { "x": 0.5, "top": 0.12, "bottom": 0.3 },
+          "start": { "x": 0.497, "y": 0.733 }
+        },
+        {
+          "name": "Autumn Mud Track",
+          "src": "/images/projects/racing-game/Autumn_Mud_track.png",
+          "finishLine": { "x": 0.453, "top": 0.794, "bottom": 0.941 },
+          "checkpoint": { "x": 0.453, "top": 0.19, "bottom": 0.33 },
+          "start": { "x": 0.4, "y": 0.77 }
+        },
+        {
+          "name": "Winter Track",
+          "src": "/images/projects/racing-game/Winter_Track.png",
+          "finishLine": { "x": 0.5, "top": 0.764, "bottom": 0.864 },
+          "checkpoint": { "x": 0.5, "top": 0.21, "bottom": 0.28 },
+          "start": { "x": 0.44, "y": 0.775 }
+        },
+        {
+          "name": "Spring Track",
+          "src": "/images/projects/racing-game/Spring_track.jpg",
+          "finishLine": { "x": 0.46, "top": 0.72, "bottom": 0.82 },
+          "checkpoint": { "x": 0.46, "top": 0.12, "bottom": 0.25 },
+          "start": { "x": 0.46, "y": 0.77 }
+        },
+        {
+          "name": "Secret Track",
+          "src": "/images/projects/racing-game/Secret_Track.png",
+          "finishLine": { "x": 0.568, "top": 0.841, "bottom": 0.939 },
+          "checkpoint": { "x": 0.568, "top": 0.1, "bottom": 0.22 },
+          "start": { "x": 0.48, "y": 0.877 }
+        },
+        {
+          "name": "Night City",
+          "src": "/images/projects/racing-game/nightcitylevel.png",
+          "finishLine": { "x": 0.5, "top": 0.7, "bottom": 0.85 },
+          "checkpoint": { "x": 0.5, "top": 0.22, "bottom": 0.34 },
+          "start": { "x": 0.47, "y": 0.76 }
+        }
+      ],
+      "cars": [
+        {
+          "name": "Red Car",
+          "src": "/images/projects/racing-game/Directions_red_car.png",
+          "pixels": { "width": 1536, "height": 1024 },
+          "rows": 4,
+          "cols": 4,
+          "up": { "row": 3, "start": 0 }
+        },
+        {
+          "name": "Blue Car",
+          "src": "/images/projects/racing-game/Directions_blue_car.png",
+          "pixels": { "width": 1536, "height": 1024 },
+          "rows": 4,
+          "cols": 4,
+          "up": { "row": 3, "start": 0 }
+        }
+      ],
+      "obstacles": [
+        {
+          "name": "Boxes",
+          "src": "/images/projects/racing-game/BoxObstacle.png",
+          "pixels": { "width": 676, "height": 369 }
+        },
+        {
+          "name": "Cone",
+          "src": "/images/projects/racing-game/ConeObstacle.png",
+          "pixels": { "width": 676, "height": 369 }
+        },
+        {
+          "name": "Cones",
+          "src": "/images/projects/racing-game/ConesObstacle.png",
+          "pixels": { "width": 676, "height": 369 }
+        }
+      ]
+    },
+    "sections": [
+      { "legend": "Game", "fields": [{ "id": "name", "label": "Game name", "type": "text", "default": "My Race" }] },
+      {
+        "legend": "Track",
+        "help": "Each track has its own finish line. Drive right over it to count a lap.",
+        "fields": [
+          { "id": "backgroundKey", "label": "Track background", "type": "image", "assetGroup": "tracks" },
+          { "id": "laps", "label": "Laps to win", "type": "number", "min": 1, "max": 10, "step": 1, "default": 3 }
+        ]
+      },
+      {
+        "legend": "Car",
+        "fields": [
+          { "id": "carSpriteKey", "label": "Car", "type": "image", "assetGroup": "cars" },
+          { "id": "topSpeed", "label": "Top speed", "type": "number", "min": 1, "max": 15, "step": 0.5, "default": 6 },
+          { "id": "acceleration", "label": "Acceleration", "type": "number", "min": 0.05, "max": 1, "step": 0.05, "default": 0.2 },
+          { "id": "secondPlayer", "label": "Add a second car (arrow keys)", "type": "checkbox", "default": false }
+        ]
+      },
+      {
+        "legend": "Obstacles",
+        "help": "Push and Run first so the track shows, then use Draw and click where the obstacle’s top-left corner goes.",
+        "list": {
+          "id": "obstacles",
+          "itemName": "Obstacle",
+          "draw": "point",
+          "fields": [
+            { "id": "spriteKey", "label": "Sprite", "type": "image", "assetGroup": "obstacles" },
+            { "id": "x", "label": "X position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.5 },
+            { "id": "y", "label": "Y position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.5 }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "platform",
+    "name": "Platform",
+    "description": "Run and jump across platforms, avoid enemies and collect coins.",
+    "codeReady": true,
+    "assets": {
+      "backgrounds": [
+        { "name": "Desert", "src": "/images/platformer/backgrounds/desertbg.png" },
+        { "name": "Mountains", "src": "/images/platformer/backgrounds/mountains.jpg" },
+        { "name": "Planet", "src": "/images/platformer/backgrounds/planet.jpg" },
+        { "name": "Alien Planet", "src": "/images/platformer/backgrounds/alien_planet2.jpg" },
+        { "name": "Winter", "src": "/images/platformer/backgrounds/winter.png" },
+        { "name": "Moon", "src": "/images/platformer/backgrounds/moon.jpg" },
+        { "name": "Greek Hills", "src": "/images/platformer/backgrounds/greek.png" },
+        { "name": "Underwater", "src": "/images/platformer/backgrounds/water.png" },
+        { "name": "Lava Cave", "src": "/images/platformer/backgrounds/BossBackground.png" }
+      ],
+      "players": [
+        {
+          "name": "Astronaut",
+          "src": "/images/projects/astronaut-platformer-game/astro.png",
+          "pixels": { "width": 513, "height": 770 },
+          "orientation": { "rows": 4, "columns": 4 },
+          "down": { "row": 0, "start": 0, "columns": 3 },
+          "left": { "row": 1, "start": 0, "columns": 3 },
+          "right": { "row": 2, "start": 0, "columns": 3 }
+        },
+        {
+          "name": "Knight",
+          "src": "/images/platformer/sprites/knight.png",
+          "pixels": { "width": 3072, "height": 1024 },
+          "orientation": { "rows": 8, "columns": 24 },
+          "down": { "row": 0, "start": 0, "columns": 23 },
+          "left": { "row": 7, "start": 0, "columns": 20 },
+          "right": { "row": 6, "start": 0, "columns": 20 }
+        },
+        {
+          "name": "Monkey",
+          "src": "/images/platformer/sprites/monkey.png",
+          "pixels": { "width": 640, "height": 400 },
+          "orientation": { "rows": 10, "columns": 16 },
+          "down": { "row": 0, "start": 7, "columns": 1 },
+          "left": { "row": 1, "start": 0, "columns": 15 },
+          "right": { "row": 0, "start": 0, "columns": 15 }
+        }
+      ],
+      "enemies": [
+        { "name": "Alien", "src": "/images/platformer/sprites/alien.png", "pixels": { "width": 444, "height": 640 } },
+        { "name": "Penguin", "src": "/images/platformer/sprites/penguin.png", "pixels": { "width": 308, "height": 327 } },
+        { "name": "Snowman", "src": "/images/platformer/sprites/snowman.png", "pixels": { "width": 308, "height": 327 } },
+        { "name": "Owl", "src": "/images/platformer/sprites/owl.png", "pixels": { "width": 499, "height": 500 } },
+        { "name": "Jellyfish", "src": "/images/platformer/sprites/jellyfish.png", "pixels": { "width": 499, "height": 500 } },
+        { "name": "Flying UFO", "src": "/images/platformer/sprites/flying-ufo.png", "pixels": { "width": 720, "height": 437 } },
+        { "name": "Dragon", "src": "/images/platformer/sprites/dragon.png", "pixels": { "width": 152, "height": 119 } },
+        { "name": "Cerberus", "src": "/images/platformer/sprites/cerberus.png", "pixels": { "width": 103, "height": 103 } },
+        { "name": "Zombie", "src": "/images/platformer/sprites/zombie.png", "pixels": { "width": 1560, "height": 840 }, "frame": { "rows": 12, "columns": 12, "row": 2, "column": 0 } }
+      ],
+      "coins": [
+        { "name": "Coin", "src": "/images/platformer/obstacles/coin.png", "pixels": { "width": 400, "height": 300 } },
+        { "name": "Diamonds", "src": "/images/platformer/obstacles/dimonds.png", "pixels": { "width": 225, "height": 225 } }
+      ]
+    },
+    "sections": [
+      {
+        "legend": "Game",
+        "fields": [
+          { "id": "name", "label": "Game name", "type": "text", "default": "My Platformer" }
+        ]
+      },
+      {
+        "legend": "World",
+        "fields": [
+          { "id": "backgroundKey", "label": "Background", "type": "image", "assetGroup": "backgrounds" },
+          { "id": "gravity", "label": "Gravity", "type": "number", "min": 0.1, "max": 2, "step": 0.05, "default": 0.4 },
+          { "id": "jumpStrength", "label": "Jump strength", "type": "number", "min": 2, "max": 20, "step": 0.5, "default": 8 }
+        ]
+      },
+      {
+        "legend": "Player",
+        "fields": [
+          { "id": "playerName", "label": "Name", "type": "text", "default": "Player" },
+          { "id": "playerSpriteKey", "label": "Sprite", "type": "image", "assetGroup": "players" },
+          { "id": "playerX", "label": "Start X (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.1 },
+          { "id": "playerY", "label": "Start Y (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.5 }
+        ]
+      },
+      {
+        "legend": "Platforms",
+        "help": "Push and Run first so the background shows, then use Draw and drag a box on the preview for each platform.",
+        "list": {
+          "id": "platforms",
+          "itemName": "Platform",
+          "draw": "box",
+          "fields": [
+            { "id": "x", "label": "X (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.3 },
+            { "id": "y", "label": "Y (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.7 },
+            { "id": "width", "label": "Width (0–1)", "type": "number", "min": 0.01, "max": 1, "step": 0.01, "default": 0.2 },
+            { "id": "height", "label": "Height (0–1)", "type": "number", "min": 0.01, "max": 1, "step": 0.01, "default": 0.05 },
+            { "id": "visible", "label": "Show platform", "type": "checkbox", "default": true }
+          ]
+        }
+      },
+      {
+        "legend": "Enemies",
+        "list": {
+          "id": "enemies",
+          "itemName": "Enemy",
+          "fields": [
+            { "id": "name", "label": "Name", "type": "text", "default": "Enemy" },
+            { "id": "spriteKey", "label": "Sprite", "type": "image", "assetGroup": "enemies" },
+            { "id": "x", "label": "X position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.6 },
+            { "id": "y", "label": "Y position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.8 }
+          ]
+        }
+      },
+      {
+        "legend": "Coins",
+        "list": {
+          "id": "coins",
+          "itemName": "Coin",
+          "fields": [
+            { "id": "spriteKey", "label": "Sprite", "type": "image", "assetGroup": "coins" },
+            { "id": "x", "label": "X position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.5 },
+            { "id": "y", "label": "Y position (0–1)", "type": "number", "min": 0, "max": 1, "step": 0.01, "default": 0.5 }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "clicker",
+    "name": "Clicker",
+    "description": "Click targets to score points, then spend them on power-ups.",
+    "codeReady": true,
+    "assets": {
+      "targets": [
+        { "name": "Cookie", "src": "/hacks/cookie-clicker/assets/baseCookie.png" },
+        { "name": "Grandma", "src": "/hacks/cookie-clicker/assets/grandma.png" }
+      ]
+    },
+    "sections": [
+      { "legend": "Game", "fields": [{ "id": "name", "label": "Game name", "type": "text", "default": "My Clicker" }] },
+      {
+        "legend": "Scene",
+        "fields": [
+          {
+            "id": "backgroundColor",
+            "label": "Background colour",
+            "type": "choice",
+            "default": "#fef3c7",
+            "choices": [
+              { "value": "#fef3c7", "label": "Cookie cream" },
+              { "value": "#1f2937", "label": "Night" },
+              { "value": "#bae6fd", "label": "Sky blue" },
+              { "value": "#bbf7d0", "label": "Mint" }
+            ]
+          }
+        ],
+        "help": "The cookie games in the repo have no background picture, so this is a plain colour."
+      },
+      {
+        "legend": "Target",
+        "fields": [
+          { "id": "targetSpriteKey", "label": "Target image", "type": "image", "assetGroup": "targets" },
+          { "id": "targetCount", "label": "Targets on screen", "type": "number", "min": 1, "max": 20, "step": 1, "default": 1 },
+          { "id": "targetSpeed", "label": "Bounce speed (0 stays still)", "type": "number", "min": 0, "max": 5, "step": 0.1, "default": 0 },
+          { "id": "goalScore", "label": "Score to win", "type": "number", "min": 1, "max": 100000, "step": 1, "default": 100 },
+          { "id": "winMessage", "label": "Win message", "type": "text", "default": "You did it!" }
+        ]
+      },
+      {
+        "legend": "Power-ups",
+        "list": {
+          "id": "powerUps",
+          "itemName": "Power-up",
+          "fields": [
+            { "id": "name", "label": "Name", "type": "text", "default": "Power-up" },
+            { "id": "spriteKey", "label": "Image", "type": "image", "assetGroup": "targets" },
+            { "id": "cost", "label": "Cost (points)", "type": "number", "min": 1, "max": 100000, "step": 1, "default": 10 },
+            {
+              "id": "effect",
+              "label": "Effect",
+              "type": "choice",
+              "default": "per-click",
+              "choices": [
+                { "value": "per-click", "label": "Extra points per click" },
+                { "value": "auto-click", "label": "Automatic points every second" }
+              ]
+            },
+            { "id": "amount", "label": "Points added", "type": "number", "min": 1, "max": 1000, "step": 1, "default": 1 }
+          ]
+        }
+      }
+    ]
+  }
+]

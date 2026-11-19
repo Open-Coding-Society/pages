@@ -1,4 +1,5 @@
 import Player from './Player.js';
+import Barrier from './Barrier.js';
 
 export default class PlayerPlatformer extends Player {
   constructor(data = {}, gameEnv = null) {
@@ -33,6 +34,78 @@ export default class PlayerPlatformer extends Player {
   hitCeiling() {
     this.verticalVelocity = 0;
     this.velocity.y = 0;
+  }
+
+  /** Hitbox insets on each side, from the player's hitbox percentages. */
+  getCollisionInsets() {
+    return {
+      left: this.width * (this.hitbox?.widthPercentage || 0) / 2,
+      right: this.width * (this.hitbox?.widthPercentage || 0) / 2,
+      top: this.height * (this.hitbox?.heightPercentage || 0) / 2,
+      bottom: this.height * (this.hitbox?.heightPercentage || 0) / 2,
+    };
+  }
+
+  getWorldCollisionBounds() {
+    const insets = this.getCollisionInsets();
+    return {
+      left: this.position.x + insets.left,
+      right: this.position.x + this.width - insets.right,
+      top: this.position.y + insets.top,
+      bottom: this.position.y + this.height - insets.bottom,
+    };
+  }
+
+  /** The game object the latest collision touched, if it is still in the level. */
+  getCollidedObject() {
+    const otherId = this.collisionData?.touchPoints?.other?.id;
+    if (!otherId || !this.gameEnv?.gameObjects) return null;
+    return this.gameEnv.gameObjects.find((obj) => obj?.canvas?.id === otherId) || null;
+  }
+
+  /**
+   * Barrier contacts act as platforms: land on top, stop under a ceiling, and
+   * stop at a side wall. Other objects keep the normal Player collision rules.
+   */
+  handleCollisionState() {
+    const touchPoints = this.collisionData?.touchPoints?.this;
+    if (!touchPoints) return;
+
+    const platform = this.getCollidedObject();
+    if (!(platform instanceof Barrier)) {
+      super.handleCollisionState();
+      return;
+    }
+
+    const bounds = this.getWorldCollisionBounds();
+    const radius = Math.min(bounds.right - bounds.left, bounds.bottom - bounds.top)
+      * (this.hitbox?.radiusPercentage ?? 0.5);
+    const isFallingOrResting = this.verticalVelocity <= 0;
+    const isRising = this.verticalVelocity > 0;
+
+    // Resolve one contact face; overlapping top/side extents must not cancel a jump.
+    if (touchPoints.top) {
+      if (isFallingOrResting) {
+        this.position.y = platform.y - this.height / 2 - radius;
+        this.land();
+      }
+    } else if (touchPoints.bottom && isRising) {
+      this.position.y = platform.y + platform.height - this.height / 2 + radius;
+      this.hitCeiling();
+    } else if (touchPoints.left) {
+      this.velocity.x = 0;
+      this.position.x = platform.x - this.width / 2 - radius;
+    } else if (touchPoints.right) {
+      this.velocity.x = 0;
+      this.position.x = platform.x + platform.width - this.width / 2 + radius;
+    }
+    this.setupCanvas();
+  }
+
+  handleCollisionReaction(other) {
+    // Platforms are handled in handleCollisionState, not as a bump reaction.
+    if (this.getCollidedObject() instanceof Barrier) return;
+    super.handleCollisionReaction(other);
   }
 
   updateVelocity() {
