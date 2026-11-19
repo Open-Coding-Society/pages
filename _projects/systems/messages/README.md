@@ -13,7 +13,7 @@ same way they reach a direct message.
 | `js/messages-page.js` | Starts the page: who is signed in, the two lists, opening a conversation, the group header buttons, the socket. |
 | `js/conversation-embed.js` | One group chat or direct message inside another page, such as a UI Builder page. See [Embedding a conversation](#embedding-a-conversation). |
 | `js/thread.js` | The open conversation: loads it, follows its socket topic, sends, edits and deletes, and keeps DM read state. An embed's pane can also be read-only, use the host's wording and be destroyed. |
-| `js/message-log.js` | Draws the messages: day dividers, avatars, edit and delete buttons. Also the small text helpers the pane and the embed share. |
+| `js/message-log.js` | Draws the messages: day dividers, avatars, reply, pin, edit and delete buttons, pin notes, and the image viewer; code blocks, shared files and link cards come from the modules below. Also the small text helpers the pane and the embed share. |
 | `js/sidebar.js` | The Groups and Direct messages lists, as `ocs__nav-card` links, each starting with an `ocs__avatar` of the name's initials. |
 | `js/new-chat.js` | The New chat dialog. |
 | `js/group-dialogs.js` | Find a group (search, join, make a group) and Members (with Delete group at the bottom, for admins). |
@@ -30,6 +30,10 @@ same way they reach a direct message.
 | `js/slash-commands.js` | The slash commands, grouped, and matching what's typed against them. |
 | `js/command-menu.js` | The slash-command menu over the composer (`ocs__menu`, `role="listbox"`): ↑ ↓, Enter or Tab, Escape. |
 | `js/code-model.js`, `js/code-composer.js` | The `[[code:…]]` marker and its languages, and the code box `/code` and `/gist` open above the composer. |
+| `js/chat-commands.js` | `ChatCommands`: what the slash commands and a message's More menu do in the open conversation (GitHub links, `/newissue`, gists, `/me`, `/shrug`), and the repository each chat last named. |
+| `js/code-block.js` | A code block in the log: the code as text, Copy, Run and Save as gist. |
+| `js/file-rows.js` | The files a message shares, as `ocs__file` rows with their buttons, and small previews for a few images. |
+| `js/message-more.js` | A message's More menu (Copy text, New GitHub issue). |
 | `js/github-links.js` | Reading GitHub links (issues, pull requests, commits, repos, gists) and building one from "owner/repo#12". |
 | `js/shortcuts.js`, `js/help-dialog.js` | The keyboard shortcuts, and `/help`'s list of them and of every slash command, drawn from the same lists the page runs on. |
 | `js/github-cards.js` | Live cards (`ocs__link-card`) for the GitHub links in a message: an issue's or pull request's title, state, author, size and checks; a commit; a repository; a gist. |
@@ -160,8 +164,8 @@ is filled in for you to finish, and Enter (or Send) then runs it instead of send
 
 | Keys | What it does |
 | --- | --- |
-| Ctrl or ⌘ + K | Find a conversation |
-| Alt or ⌥ + ↑ / ↓ | The conversation above or below, in the sidebar's order (left to a field being typed in, except an empty message box) |
+| Ctrl or ⌘ + K | Find a conversation: type, then Enter opens the first match |
+| Alt or ⌥ + ↑ / ↓ | The conversation above or below, in the sidebar's order (left to a field being typed in, except the conversation search and an empty message box) |
 | Ctrl or ⌘ + / | Show every slash command |
 | Enter / Shift+Enter / Ctrl or ⌘+Enter | Send / new line / send even from a list or the code box |
 | Esc | Close a menu, a reply or an edit |

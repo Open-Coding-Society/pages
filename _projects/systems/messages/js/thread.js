@@ -7,15 +7,15 @@
 // Replies carry a [[reply:...]] marker at the start of their body (chat-reply.js,
 // reached through `richText`); an image pasted into the composer is attached like one
 // picked with the Image control or dropped on the composer.
-import { addCodeMarker, languageOf, MAX_CODE_LENGTH } from './code-model.js';
+import { ChatCommands, DM_MAX_LENGTH } from './chat-commands.js';
+import { addCodeMarker, languageOf } from './code-model.js';
 import { createCodeComposer } from './code-composer.js';
 import { createCommandMenu } from './command-menu.js';
 import { createComposerFiles } from './composer-files.js';
-import { findGitHubLinks, githubUrlFor, newIssueUrl, parseGitHubUrl, repoOf } from './github-links.js';
 import { readImageFile } from './dialogs.js';
 import { createFileActions } from './file-actions.js';
 import { createFileViewer } from './file-viewer.js';
-import { pinMarker, plainText, unpinMarker } from './conversation-model.js';
+import { pinMarker, unpinMarker } from './conversation-model.js';
 import { addFilesMarker, extractFilesMarker } from './files-model.js';
 import { classifyDmEvent, classifyGroupEvent, dmMessage, groupMessage } from './messages-model.js';
 import { createMessageLog, withTexts } from './message-log.js';
@@ -57,9 +57,7 @@ export const THREAD_TEXTS = Object.freeze({
   issueNeedsRepo: 'Put the repository after /newissue (owner/repo), then press Enter.',
 });
 
-// A direct message holds at most this much (Spring's DirectMessage body column).
-const DM_MAX_LENGTH = 2000;
-const escapeHtml = value => String(value).replace(/[&<>"']/g, character => `&#${character.charCodeAt(0)};`);
+
 
 // What an open conversation with no messages says, unless the host passes `emptyState`.
 export const EMPTY_STATES = Object.freeze({
@@ -114,7 +112,6 @@ export function createThread({
   let replyingTo = null; // { id, sender, excerpt } the next message replies to
   let editingReply = null; // the reply marker of the message being edited, kept on save
   let unsentFiles = null; // files already shared whose message didn't send yet
-  let issueQuote = null; // the message a /newissue was started from, quoted in the issue
   let dragDepth = 0;
   let destroyed = false;
 
@@ -140,9 +137,9 @@ export function createThread({
     thumbnail: fileActions ? item => fileActions.thumbnail(item) : null,
     onPin: readOnly ? null : (message, pinned) => togglePin(message, pinned),
     runCode,
-    saveGist: readOnly || !api.createGist ? null : (language, code) => saveAsGist(language, code, `snippet.${languageOf(language)?.extension || 'txt'}`),
+    saveGist: readOnly || !api.createGist ? null : (language, code) => commands.saveGist(language, code, `snippet.${languageOf(language)?.extension || 'txt'}`),
     linkCards,
-    onMore: readOnly ? null : (action, message) => moreAction(action, message),
+    onMore: readOnly ? null : (action, message) => commands.more(action, message),
   });
   // Pasted images go where the Image control's would, so only where that control exists.
   const composer = readOnly
@@ -177,7 +174,14 @@ export function createThread({
     composer,
     host: elements.commandHost,
     kindOf: () => (current?.loaded && !editing ? current.kind : null),
-    onRun: (command, args) => runCommand(command, args),
+    onRun: (command, args) => commands.run(command, args),
+  }) : null;
+  // What the slash commands and a message's More menu do (chat-commands.js).
+  const commands = composer ? new ChatCommands({
+    elements, composer, codeBox, api, me, text, profileUrl, onCommand,
+    conversation: () => (current ? { kind: current.kind, id: current.id } : null),
+    send: html => sendHtml(html),
+    say: message => showFormMessage(message),
   }) : null;
 
   // "Replying to …" sits just above the composer.
@@ -340,9 +344,10 @@ export function createThread({
     const typed = !editing ? commandMenu?.typedCommand() : null;
     if (typed && !pending && current?.loaded) {
       composer.clear();
-      runCommand(typed.command, typed.args);
+      commands.run(typed.command, typed.args);
       return;
     }
+    commands?.clearQuote();
     // An image, files or a code block on their own are a message, so an empty composer is
     // only a reason to stop when nothing is attached. Editing stays text-only.
     const sendingImage = !editing && pendingImage;
@@ -371,7 +376,7 @@ export function createThread({
     if (code?.mode === 'code') {
       withCode = addCodeMarker(html, code.language, code.code);
     } else if (code?.mode === 'gist') {
-      const url = await saveAsGist(code.language, code.code, code.filename);
+      const url = await commands.saveGist(code.language, code.code, code.filename);
       if (destroyed) return;
       if (!url) {
         pending = null;
@@ -433,144 +438,10 @@ export function createThread({
     if (!socket.isConnected()) loadNew(kind, id);
   }
 
-  // ── Slash commands ─────────────────────────────────────────────────────────────
-  // The repository a conversation last named, so "/pr 12" works after "/pr a/b#11". Kept in
-  // this browser only: a convenience, not data anyone else needs.
-  const repoKey = () => `ocs-messages-repo:${current?.kind}:${current?.id}`;
-  function knownRepo() {
-    try {
-      return localStorage.getItem(repoKey());
-    } catch {
-      return null;
-    }
-  }
-  function rememberRepo(url) {
-    const repo = repoOf(parseGitHubUrl(url));
-    if (!repo) return;
-    try {
-      localStorage.setItem(repoKey(), repo);
-    } catch {
-      // Without storage, the next command just needs the repository again.
-    }
-  }
-
   // Puts html in the composer and sends it, like typing it and pressing Send.
   function sendHtml(html) {
     composer.setHTML(html);
     submit();
-  }
-
-  function runCommand(command, args) {
-    const kind = current?.kind;
-    showFormMessage('');
-    switch (command.name) {
-      case 'file':
-        elements.filesInput?.click();
-        break;
-      case 'folder':
-        elements.folderInput?.click();
-        break;
-      case 'image':
-        elements.imageInput?.click();
-        break;
-      case 'code':
-      case 'gist':
-        codeBox?.open(command.name, {
-          language: command.name === 'code' ? args : '',
-          filename: command.name === 'gist' ? args : '',
-          maxLength: kind === 'dm' ? DM_MAX_LENGTH - 200 : MAX_CODE_LENGTH,
-        });
-        break;
-      case 'issue':
-      case 'pr':
-      case 'commit':
-      case 'repo': {
-        const url = githubUrlFor(command.name, args, knownRepo());
-        if (!url) {
-          showFormMessage(text.badGitHubRef);
-          composer.setHTML(`/${command.name}&nbsp;${escapeHtml(args)}`);
-          break;
-        }
-        rememberRepo(url);
-        sendHtml(url);
-        break;
-      }
-      case 'newissue': {
-        const [first = '', ...rest] = args.split(/\s+/);
-        const named = /^[\w.-]+\/[\w.-]+$/.test(first);
-        const repo = named ? first : knownRepo();
-        const title = (named ? rest.join(' ') : args).trim();
-        const link = window.location.href;
-        const chat = elements.title.textContent;
-        const body = issueQuote
-          ? text.issueQuote.replace('{text}', plainText(issueQuote.body).replace(/\n/g, '\n> ')).replace('{sender}', issueQuote.isSelf ? me.name : issueQuote.senderName).replace('{chat}', chat).replace('{link}', link)
-          : text.newIssueBody.replace('{chat}', chat).replace('{link}', link);
-        const url = repo ? newIssueUrl(repo, { title, body }) : null;
-        if (!url) {
-          showFormMessage(text.newIssueNeedsRepo);
-          break;
-        }
-        issueQuote = null;
-        rememberRepo(`https://github.com/${repo}`);
-        window.open(url, '_blank', 'noopener');
-        break;
-      }
-      case 'me':
-        if (args) sendHtml(`<i>${escapeHtml(args)}</i>`);
-        break;
-      case 'shrug':
-        sendHtml(`${escapeHtml(args)} ¯\\_(ツ)_/¯`.trim());
-        break;
-      default:
-        onCommand(command.name, args);
-    }
-  }
-
-  // A message's More menu: copy its words, or start a GitHub issue from it. The issue starts
-  // as "/newissue owner/repo <its words>" in the composer, so it can be checked first; Enter
-  // opens GitHub's form with the message quoted.
-  async function moreAction(action, message) {
-    if (!message) return;
-    if (action === 'copy') {
-      try {
-        await navigator.clipboard.writeText(plainText(message.body));
-        showFormMessage(text.copiedMessage);
-      } catch {
-        showFormMessage(text.copyMessageFailed);
-      }
-      return;
-    }
-    if (action === 'issue') {
-      issueQuote = message;
-      // The chat's last repository, or the one the message itself links to.
-      const repo = knownRepo() || repoOf(findGitHubLinks(message.body)[0]);
-      const title = plainText(message.body).slice(0, 120);
-      composer.setHTML(`/newissue&nbsp;${repo ? `${escapeHtml(repo)}&nbsp;` : ''}${escapeHtml(title)}`);
-      composer.focus();
-      showFormMessage(repo ? '' : text.issueNeedsRepo);
-    }
-  }
-
-  // Saves code as a secret gist with the student's own GitHub token (Spring keeps it, from
-  // Profile's Gist card). Resolves the gist's URL, or null after saying why it couldn't.
-  async function saveAsGist(language, code, filename) {
-    try {
-      const result = await api.createGist({ [filename]: { content: code } }, `Shared in OCS Messages: ${elements.title.textContent}`);
-      if (!result?.url) throw new Error('Spring returned no gist URL');
-      return result.url;
-    } catch (error) {
-      console.warn('Messages: could not save the gist', error);
-      if (error?.status === 409) {
-        const link = document.createElement('a');
-        link.href = `${profileUrl}#gist-connection-heading`;
-        link.textContent = text.gistConnectLink;
-        elements.formStatus.replaceChildren(`${text.gistConnect} `, link);
-        elements.formStatus.hidden = false;
-      } else {
-        showFormMessage(text.gistFailed);
-      }
-      return null;
-    }
   }
 
   // Pins and unpins are messages of their own ([[pin:<id>]]), so every member sees them.
@@ -701,6 +572,7 @@ export function createThread({
     const ticket = ++openCount;
     current = { kind, id, loaded: false, catchUp: false };
     unsentFiles = null;
+    commands?.clearQuote();
     fileActions?.clear();
     early = [];
     unseenWhileHidden = false;

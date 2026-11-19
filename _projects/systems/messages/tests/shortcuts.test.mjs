@@ -24,7 +24,7 @@ function setup(activeItem = { kind: 'group', id: 7 }) {
     open: (kind, id) => { calls.push(['open', kind, id]); active = { kind, id }; return true; },
     findConversation: () => calls.push(['find']),
     showCommands: () => calls.push(['commands']),
-    isEmptyComposer: target => target.dataset.empty === 'yes',
+    canSwitchFrom: target => target.dataset.empty === 'yes',
   });
   return { calls, shortcuts };
 }

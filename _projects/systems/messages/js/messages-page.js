@@ -84,6 +84,12 @@ export async function startMessagesPage({ config, richText }) {
       render();
     });
     conversationSearch.addEventListener('keydown', event => {
+      // Enter opens the first conversation the search leaves, as a quick switcher does.
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        document.querySelector('#messagesGroupList a, #messagesDmList a')?.click();
+        return;
+      }
       if (event.key !== 'Escape' || !conversationSearch.value) return;
       event.preventDefault();
       conversationSearch.value = '';
@@ -200,7 +206,9 @@ export async function startMessagesPage({ config, richText }) {
       conversationSearch?.focus();
     },
     showCommands: () => thread.showCommands(),
-    isEmptyComposer: target => Boolean(target.closest?.('.rt-editor')) && !target.closest('.rt-editor').textContent.trim(),
+    // From the conversation search, and from an empty message box.
+    canSwitchFrom: target => target === conversationSearch
+      || (Boolean(target.closest?.('.rt-editor')) && !target.closest('.rt-editor').textContent.trim()),
   });
 
   // The panel for the open conversation, on whichever tab is asked for.

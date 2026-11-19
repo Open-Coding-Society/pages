@@ -3,9 +3,12 @@
 // with its avatar, sender and time, a Reply button, and edit and delete buttons on your
 // own messages (none in a read-only log). A reply shows a quote of the message it
 // answers, from the [[reply:...]] marker at the start of its body (assets/js/chat/chat-reply.js).
-import { extractCodeMarker, isRunnable, languageOf } from './code-model.js';
+import { renderCodeBlock } from './code-block.js';
+import { extractCodeMarker } from './code-model.js';
 import { currentPins, extractPinMarker, plainText } from './conversation-model.js';
-import { countFiles, extractFilesMarker, fileKind, formatBytes } from './files-model.js';
+import { createFileRows } from './file-rows.js';
+import { createMoreMenu } from './message-more.js';
+import { extractFilesMarker } from './files-model.js';
 import { dayKey, dayLabel, initialsFor, pfpSrc, tintFor } from './messages-model.js';
 
 // What the log says, worded for /dm. A host passes its own wording for any of these in
@@ -49,9 +52,6 @@ export const LOG_TEXTS = Object.freeze({
   newIssue: 'New GitHub issue',
 });
 
-// Up to this many images in one share show small previews under the message; a bigger
-// share lists them like any other file.
-export const INLINE_IMAGE_PREVIEWS = 4;
 
 // Fills a text's {slot}s, the way the UI Builder's registry text marks them. A slot with
 // no value stays as written, so a missing value shows instead of vanishing.
@@ -111,6 +111,7 @@ export function createMessageLog(element, {
   const text = withTexts(LOG_TEXTS, texts);
   const messages = new Map();
   let lastDay = null;
+  const fileRows = createFileRows({ onFile, thumbnail, text });
 
   const rowFor = key => element.querySelector(`[data-key="${CSS.escape(key)}"]`);
   const isNearBottom = () => element.scrollHeight - element.scrollTop - element.clientHeight < 40;
@@ -198,7 +199,7 @@ export function createMessageLog(element, {
   // Takes the viewer off the page with its listener. thread.js calls this from its own
   // destroy(), so an embed that is torn down while an image is open leaves nothing behind.
   function destroy() {
-    closeMore();
+    more?.close();
     closeViewer();
     viewer?.remove();
     viewer = null;
@@ -286,181 +287,6 @@ export function createMessageLog(element, {
     body.classList.add('is-deleted');
   }
 
-  // A shared file or folder's row: its icon, name and size, and its buttons.
-  function fileButton(icon, label, action, item) {
-    const control = actionButton(icon, label, () => onFile(action, item, control));
-    control.className = 'ocs__btn small';
-    return control;
-  }
-
-  function fileRow(item) {
-    const isFolder = item.type === 'folder';
-    const name = item.path.slice(item.path.lastIndexOf('/') + 1);
-    const kind = fileKind(item.path);
-    const row = document.createElement('li');
-    row.className = 'ocs__file';
-    const icon = document.createElement('i');
-    icon.className = `fas ${isFolder ? 'fa-folder' : kind.icon} ocs__file-icon`;
-    icon.setAttribute('aria-hidden', 'true');
-    const textBox = document.createElement('div');
-    textBox.className = 'ocs__file-text';
-    const title = document.createElement('b');
-    title.className = 'ocs__file-name';
-    title.textContent = name;
-    title.title = item.path;
-    const meta = document.createElement('em');
-    meta.className = 'ocs__file-meta';
-    meta.textContent = isFolder
-      ? fillText(text.folderFiles, { files: countFiles(item.count), size: formatBytes(item.size) })
-      : formatBytes(item.size);
-    textBox.append(title, meta);
-    row.append(icon, textBox);
-    if (onFile) {
-      const actions = document.createElement('div');
-      actions.className = 'ocs__file-actions';
-      if (isFolder) {
-        actions.append(
-          fileButton('fa-folder-open', fillText(text.openFolder, { name }), 'folder', item),
-          fileButton('fa-file-zipper', fillText(text.zipFolder, { name }), 'zip', item),
-        );
-      } else {
-        if (kind.preview) actions.appendChild(fileButton('fa-eye', fillText(text.previewFile, { name }), 'preview', item));
-        actions.appendChild(fileButton('fa-download', fillText(text.downloadFile, { name }), 'download', item));
-      }
-      row.appendChild(actions);
-    }
-    return row;
-  }
-
-  // A few shared images show small previews above the list, fetched with the page's sign-in.
-  // Each opens the file viewer, like its row's Preview button.
-  function gallery(images, sender) {
-    const strip = document.createElement('div');
-    strip.className = 'chat-file-gallery';
-    images.forEach(item => {
-      const name = item.path.slice(item.path.lastIndexOf('/') + 1);
-      const open = document.createElement('button');
-      open.type = 'button';
-      open.className = 'chat-file-thumb-button';
-      open.setAttribute('aria-label', fillText(text.previewFile, { name }));
-      const image = document.createElement('img');
-      image.className = 'ocs__file-preview chat-file-thumb';
-      image.alt = fillText(text.imagePreview, { name, sender });
-      image.loading = 'lazy';
-      thumbnail(item).then(url => { image.src = url; }, () => open.remove());
-      open.appendChild(image);
-      if (onFile) open.addEventListener('click', () => onFile('preview', item, open));
-      strip.appendChild(open);
-    });
-    return strip;
-  }
-
-  function renderFiles(main, after, items, stored) {
-    main.querySelector('.chat-file-gallery')?.remove();
-    main.querySelector('.chat-files')?.remove();
-    if (!items.length) return;
-    const sender = stored.isSelf ? text.you : stored.senderName;
-    const list = document.createElement('ul');
-    list.className = 'ocs__file-list chat-files';
-    items.forEach(item => list.appendChild(fileRow(item)));
-    main.insertBefore(list, after.nextSibling);
-    const images = items.filter(item => item.type === 'file' && fileKind(item.path).preview === 'image');
-    if (thumbnail && images.length && images.length <= INLINE_IMAGE_PREVIEWS) {
-      main.insertBefore(gallery(images, sender), list);
-    }
-  }
-
-  // A labelled button in a code block's bar: icon and words straight in the button.
-  function codeButton(icon, label, onClick) {
-    const control = document.createElement('button');
-    control.type = 'button';
-    control.className = 'ocs__btn small ocs__btn--icon';
-    const glyph = document.createElement('i');
-    glyph.className = `fas ${icon}`;
-    glyph.setAttribute('aria-hidden', 'true');
-    control.append(glyph, label);
-    control.addEventListener('click', () => onClick(control));
-    return control;
-  }
-
-  // Shows a word on a button for a moment (Copied), then puts its label back.
-  function flash(control, word, label) {
-    control.lastChild.textContent = word;
-    setTimeout(() => { control.lastChild.textContent = label; }, 1500);
-  }
-
-  // A code block: its language and buttons over the code, drawn as text, never as markup.
-  // Run shows the runner's output under it; Save as gist keeps a copy in your gists.
-  function codeBlock(language, code) {
-    const figure = document.createElement('figure');
-    figure.className = 'chat-code';
-    const head = document.createElement('figcaption');
-    head.className = 'chat-code-head';
-    const label = document.createElement('b');
-    label.textContent = languageOf(language)?.label || language;
-    const actions = document.createElement('div');
-    actions.className = 'chat-code-actions';
-    const pre = document.createElement('pre');
-    pre.className = 'chat-code-body';
-    const source = document.createElement('code');
-    source.textContent = code;
-    pre.appendChild(source);
-    const output = document.createElement('pre');
-    output.className = 'chat-code-output';
-    output.hidden = true;
-    const note = document.createElement('p');
-    note.className = 'chat-code-note';
-    note.hidden = true;
-
-    const copy = codeButton('fa-copy', text.copyCode, async control => {
-      try {
-        await navigator.clipboard.writeText(code);
-        flash(control, text.copied, text.copyCode);
-      } catch {
-        flash(control, text.copyFailed, text.copyCode);
-      }
-    });
-    actions.appendChild(copy);
-    if (runCode && isRunnable(language)) {
-      actions.appendChild(codeButton('fa-play', text.runCode, async control => {
-        control.disabled = true;
-        output.hidden = false;
-        output.dataset.label = text.output;
-        output.textContent = text.running;
-        try {
-          const result = await runCode(language, code);
-          output.textContent = result === '' ? text.noOutput : result;
-        } catch (error) {
-          output.textContent = fillText(text.runFailed, { reason: error?.message || 'unknown error' });
-        } finally {
-          control.disabled = false;
-        }
-      }));
-    }
-    if (saveGist) {
-      actions.appendChild(codeButton('fa-file-code', text.saveGist, async control => {
-        control.disabled = true;
-        try {
-          const url = await saveGist(language, code);
-          if (url) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            link.textContent = url.replace(/^https:\/\//, '');
-            note.replaceChildren(`${text.savedGist} `, link);
-            note.hidden = false;
-          }
-        } finally {
-          control.disabled = false;
-        }
-      }));
-    }
-    head.append(label, actions);
-    figure.append(head, pre, output, note);
-    return figure;
-  }
-
   // The body's reply quote (if any) goes just before the body; formatBody sees the rest.
   // Clicking the quote scrolls to the original and marks it, as a search result does.
   // A code block goes after the body, then the files shared with the message.
@@ -478,10 +304,10 @@ export function createMessageLog(element, {
     richText.renderRichMessage(body, shownBody({ ...stored, body: html }, formatBody));
     let after = body;
     if (code !== null) {
-      after = codeBlock(language, code);
+      after = renderCodeBlock(language, code, { runCode, saveGist, text });
       main.insertBefore(after, body.nextSibling);
     }
-    renderFiles(main, after, items, stored);
+    fileRows.render(main, after, items, stored.isSelf ? text.you : stored.senderName);
     // Previews of the links in it (GitHub cards), last.
     main.querySelector('.chat-cards')?.remove();
     const cards = linkCards ? linkCards(html) : null;
@@ -507,65 +333,8 @@ export function createMessageLog(element, {
     return button;
   }
 
-  // More actions on a message: a small ocs__menu under its button. One open at a time; it
-  // closes on a pick, Escape, or a click anywhere else.
-  let openMore = null;
-  function closeMore() {
-    if (!openMore) return;
-    openMore.menu.remove();
-    openMore.button.setAttribute('aria-expanded', 'false');
-    document.removeEventListener('click', onOutsideMore, true);
-    document.removeEventListener('keydown', onMoreKey);
-    openMore = null;
-  }
-  function onOutsideMore(event) {
-    if (openMore && !openMore.menu.contains(event.target) && !openMore.button.contains(event.target)) closeMore();
-  }
-  function onMoreKey(event) {
-    if (event.key !== 'Escape' || !openMore) return;
-    const { button } = openMore;
-    closeMore();
-    button.focus?.();
-  }
-  function moreButton(key, actions) {
-    const button = actionButton('fa-ellipsis', text.moreActions, () => {
-      if (openMore?.button === button) {
-        closeMore();
-        return;
-      }
-      closeMore();
-      const menu = document.createElement('div');
-      menu.className = 'ocs__menu chat-more-menu';
-      menu.setAttribute('role', 'menu');
-      [['copy', 'fa-copy', text.copyText], ['issue', 'fa-circle-dot', text.newIssue]].forEach(([action, icon, label]) => {
-        const item = document.createElement('button');
-        item.type = 'button';
-        item.className = 'ocs__menu-item';
-        item.setAttribute('role', 'menuitem');
-        const glyph = document.createElement('i');
-        glyph.className = `fas ${icon} ocs__menu-icon`;
-        glyph.setAttribute('aria-hidden', 'true');
-        const name = document.createElement('strong');
-        name.className = 'ocs__menu-name';
-        name.textContent = label;
-        item.append(glyph, name);
-        item.addEventListener('click', () => {
-          closeMore();
-          onMore(action, messages.get(key));
-        });
-        menu.appendChild(item);
-      });
-      actions.appendChild(menu);
-      button.setAttribute('aria-expanded', 'true');
-      openMore = { button, menu };
-      document.addEventListener('click', onOutsideMore, true);
-      document.addEventListener('keydown', onMoreKey);
-      menu.querySelector('button')?.focus?.();
-    });
-    button.setAttribute('aria-haspopup', 'menu');
-    button.setAttribute('aria-expanded', 'false');
-    return button;
-  }
+  // A message's More menu (message-more.js), one open at a time.
+  const more = onMore ? createMoreMenu({ text, onMore, makeButton: actionButton }) : null;
 
   // Which messages are pinned, from the pin messages in the log: refreshed after every
   // change, so each message's Pin button and Pinned mark stay right.
@@ -727,7 +496,7 @@ export function createMessageLog(element, {
         pinButton.setAttribute('aria-pressed', 'false');
         actions.append(pinButton);
       }
-      if (onMore) actions.append(moreButton(message.key, actions));
+      if (more) actions.append(more.button(actions, () => messages.get(message.key)));
       if (isSelf) {
         actions.append(
           actionButton('fa-pen', text.editMessage, () => onEdit(messages.get(message.key))),
