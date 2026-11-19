@@ -31,6 +31,7 @@ same way they reach a direct message.
 | `js/command-menu.js` | The slash-command menu over the composer (`ocs__menu`, `role="listbox"`): ↑ ↓, Enter or Tab, Escape. |
 | `js/code-model.js`, `js/code-composer.js` | The `[[code:…]]` marker and its languages, and the code box `/code` and `/gist` open above the composer. |
 | `js/github-links.js` | Reading GitHub links (issues, pull requests, commits, repos, gists) and building one from "owner/repo#12". |
+| `js/github-cards.js` | Live cards (`ocs__link-card`) for the GitHub links in a message: an issue's or pull request's title, state, author, size and checks; a commit; a repository; a gist. |
 | `js/delete-group.js` | The Delete group dialog: says what deleting takes away, and waits for the group's name. |
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
@@ -154,6 +155,30 @@ is filled in for you to finish, and Enter (or Send) then runs it instead of send
 - The course announcement chats have their own `/event` commands (Courses'
   `calendar-command.js`), unchanged.
 
+## GitHub cards
+
+Up to three GitHub links in a message get a card under it (`ocs__link-card`, in
+`_sass/open-coding/elements/link-cards`). The card is drawn from the link at once
+(`owner/repo #12`) and filled in when it scrolls near the screen: an issue's title, state
+(Open, Closed, Not planned), author, comments and labels; a pull request's title, state
+(Open, Draft, Merged, Closed), author, files and lines changed, and for an open one its
+checks (passed, failed, running); a commit's first line, author and lines; a repository's
+description, language, stars, forks and open issues; a gist's description and files.
+
+- **GitHub's limit.** Without a token GitHub allows 60 requests an hour for a whole
+  network, and a school is one network. So an item is fetched once, kept 10 minutes in
+  memory and in localStorage (`ocs-github:<path>`), asked for only when on screen, and an
+  open pull request's checks are the only second request. After a 403 or 429 for the limit
+  (its headers, which GitHub's CORS exposes, or the body's "rate limit"), no card asks
+  again until GitHub's reset time (`ocs-github:limited-until`), and each says when details
+  come back. A private or missing item says so.
+- **Gists** are read through Spring's `GET /api/grades/read-gist/{id}`, which uses the
+  server's token and doesn't count against the network.
+- **More** on a message: Copy text, and New GitHub issue, which puts
+  `/newissue owner/repo <the message's words>` in the composer (the repository the chat
+  last named, or the one the message links to). Enter opens GitHub's new-issue form with the
+  message quoted and a link back, and the student submits it as themselves.
+
 ## Embedding a conversation
 
 `js/conversation-embed.js` shows one conversation inside another page: a group's chat
@@ -236,6 +261,7 @@ back the listeners the pane and its composer put on `document` and `window`, and
 | `pinFailed` | Could not change the pin. Try again. |
 | `copyCode`, `copied`, `copyFailed`, `runCode`, `running`, `output`, `runFailed`, `noOutput`, `saveGist`, `savedGist` | A code block's buttons and its output |
 | `codeMessage`, `badGitHubRef`, `newIssueNeedsRepo`, `newIssueBody`, `tooLongForDm`, `gistConnect`, `gistConnectLink`, `gistFailed` | Slash commands' and gists' messages |
+| `moreActions`, `copyText`, `newIssue`, `copiedMessage`, `copyMessageFailed`, `issueQuote`, `issueNeedsRepo` | A message's More menu |
 | `openImage`, `closeImage` | View image from {name} larger; Close image (the image viewer) |
 | `today`, `yesterday` | Today; Yesterday (day dividers; older days use the browser's date format) |
 

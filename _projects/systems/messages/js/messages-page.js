@@ -7,6 +7,8 @@ import { initDeleteGroup } from './delete-group.js';
 import { createFileActions } from './file-actions.js';
 import { createFileViewer } from './file-viewer.js';
 import { createConversationPanel } from './conversation-panel.js';
+import { createGitHubCards } from './github-cards.js';
+import { findGitHubLinks } from './github-links.js';
 import { GroupFiles } from './group-files.js';
 import { initGroupFormation } from './group-formation.js';
 import { initFindGroup, initMembers } from './group-dialogs.js';
@@ -97,6 +99,22 @@ export async function startMessagesPage({ config, richText }) {
     return filesByGroup.get(id);
   };
   const viewer = createFileViewer({ root: document.querySelector('.dm') || document.body });
+  // GitHub previews for the links in messages: GitHub's API from the browser, gists through
+  // Spring. localStorage holds their 10-minute cache, where the browser allows it.
+  let storage = null;
+  try {
+    storage = window.localStorage;
+  } catch {
+    storage = null;
+  }
+  const githubCards = createGitHubCards({ readGist: id => api.readGist(id), storage });
+  const linkCards = html => {
+    const links = findGitHubLinks(html);
+    if (!links.length) return null;
+    const box = document.createElement('div');
+    links.forEach(link => box.appendChild(githubCards.render(link)));
+    return box;
+  };
   let panel = null; // the conversation panel, made once the thread exists (it reads the thread)
   const thread = createThread({
     api,
@@ -106,6 +124,7 @@ export async function startMessagesPage({ config, richText }) {
     groupFiles,
     viewer,
     runCode: (language, code) => api.runCode(language, code),
+    linkCards,
     profileUrl: `${config.baseurl || ''}/profile`,
     // The commands that open something on the page rather than in the composer.
     onCommand: name => {

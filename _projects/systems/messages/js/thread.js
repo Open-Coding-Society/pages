@@ -11,11 +11,11 @@ import { addCodeMarker, languageOf, MAX_CODE_LENGTH } from './code-model.js';
 import { createCodeComposer } from './code-composer.js';
 import { createCommandMenu } from './command-menu.js';
 import { createComposerFiles } from './composer-files.js';
-import { githubUrlFor, newIssueUrl, parseGitHubUrl, repoOf } from './github-links.js';
+import { findGitHubLinks, githubUrlFor, newIssueUrl, parseGitHubUrl, repoOf } from './github-links.js';
 import { readImageFile } from './dialogs.js';
 import { createFileActions } from './file-actions.js';
 import { createFileViewer } from './file-viewer.js';
-import { pinMarker, unpinMarker } from './conversation-model.js';
+import { pinMarker, plainText, unpinMarker } from './conversation-model.js';
 import { addFilesMarker, extractFilesMarker } from './files-model.js';
 import { classifyDmEvent, classifyGroupEvent, dmMessage, groupMessage } from './messages-model.js';
 import { createMessageLog, withTexts } from './message-log.js';
@@ -51,6 +51,10 @@ export const THREAD_TEXTS = Object.freeze({
   gistConnect: 'Connect GitHub on your Profile to save gists:',
   gistConnectLink: 'GitHub Gist connection',
   gistFailed: 'Could not save the gist. Try again.',
+  copiedMessage: 'Copied the message.',
+  copyMessageFailed: 'Could not copy it. Select the text and copy it instead.',
+  issueQuote: '> {text}\n\n{sender}, in the OCS chat “{chat}”: {link}',
+  issueNeedsRepo: 'Put the repository after /newissue (owner/repo), then press Enter.',
 });
 
 // A direct message holds at most this much (Spring's DirectMessage body column).
@@ -71,7 +75,7 @@ export function createThread({
   onDmRead = () => {}, onGroupRead = () => {}, onFileShared = () => {},
   readOnly = false, emptyState = null, texts = {}, formatBody = null,
   groupFiles = null, onOpenFolder = null, viewer: sharedViewer = null,
-  runCode = null, onCommand = () => {}, profileUrl = '/profile',
+  runCode = null, onCommand = () => {}, profileUrl = '/profile', linkCards = null,
 }) {
   if (emptyState !== null && (typeof emptyState !== 'object' || typeof emptyState.title !== 'string')) {
     throw new TypeError('createThread: emptyState must be null or { title, hint }');
@@ -110,6 +114,7 @@ export function createThread({
   let replyingTo = null; // { id, sender, excerpt } the next message replies to
   let editingReply = null; // the reply marker of the message being edited, kept on save
   let unsentFiles = null; // files already shared whose message didn't send yet
+  let issueQuote = null; // the message a /newissue was started from, quoted in the issue
   let dragDepth = 0;
   let destroyed = false;
 
@@ -136,6 +141,8 @@ export function createThread({
     onPin: readOnly ? null : (message, pinned) => togglePin(message, pinned),
     runCode,
     saveGist: readOnly || !api.createGist ? null : (language, code) => saveAsGist(language, code, `snippet.${languageOf(language)?.extension || 'txt'}`),
+    linkCards,
+    onMore: readOnly ? null : (action, message) => moreAction(action, message),
   });
   // Pasted images go where the Image control's would, so only where that control exists.
   const composer = readOnly
@@ -493,14 +500,17 @@ export function createThread({
         const named = /^[\w.-]+\/[\w.-]+$/.test(first);
         const repo = named ? first : knownRepo();
         const title = (named ? rest.join(' ') : args).trim();
-        const url = repo ? newIssueUrl(repo, {
-          title,
-          body: text.newIssueBody.replace('{chat}', elements.title.textContent).replace('{link}', window.location.href),
-        }) : null;
+        const link = window.location.href;
+        const chat = elements.title.textContent;
+        const body = issueQuote
+          ? text.issueQuote.replace('{text}', plainText(issueQuote.body).replace(/\n/g, '\n> ')).replace('{sender}', issueQuote.isSelf ? me.name : issueQuote.senderName).replace('{chat}', chat).replace('{link}', link)
+          : text.newIssueBody.replace('{chat}', chat).replace('{link}', link);
+        const url = repo ? newIssueUrl(repo, { title, body }) : null;
         if (!url) {
           showFormMessage(text.newIssueNeedsRepo);
           break;
         }
+        issueQuote = null;
         rememberRepo(`https://github.com/${repo}`);
         window.open(url, '_blank', 'noopener');
         break;
@@ -513,6 +523,31 @@ export function createThread({
         break;
       default:
         onCommand(command.name, args);
+    }
+  }
+
+  // A message's More menu: copy its words, or start a GitHub issue from it. The issue starts
+  // as "/newissue owner/repo <its words>" in the composer, so it can be checked first; Enter
+  // opens GitHub's form with the message quoted.
+  async function moreAction(action, message) {
+    if (!message) return;
+    if (action === 'copy') {
+      try {
+        await navigator.clipboard.writeText(plainText(message.body));
+        showFormMessage(text.copiedMessage);
+      } catch {
+        showFormMessage(text.copyMessageFailed);
+      }
+      return;
+    }
+    if (action === 'issue') {
+      issueQuote = message;
+      // The chat's last repository, or the one the message itself links to.
+      const repo = knownRepo() || repoOf(findGitHubLinks(message.body)[0]);
+      const title = plainText(message.body).slice(0, 120);
+      composer.setHTML(`/newissue&nbsp;${repo ? `${escapeHtml(repo)}&nbsp;` : ''}${escapeHtml(title)}`);
+      composer.focus();
+      showFormMessage(repo ? '' : text.issueNeedsRepo);
     }
   }
 

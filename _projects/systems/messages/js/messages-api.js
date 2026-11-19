@@ -127,6 +127,9 @@ export function createMessagesApi({
     // Gist card): files is { name: { content } }. Resolves { success, url }; 409 when no token
     // is connected.
     createGist: (files, description) => spring('/api/grades/create-gist', 'POST', { files, description }),
+    // A gist's description and files, read by Spring (public, and it doesn't use up the
+    // network's GitHub requests): { success, files: { name: { content } }, description }.
+    readGist: id => spring(`/api/grades/read-gist/${part(id)}`),
 
     personaCoverage: userUids => flask('/api/persona/evaluate-group', 'POST', { user_uids: userUids }),
     formGroups: (userUids, groupSize, feedbackRows = []) => flask('/api/persona/form-groups', 'POST', {

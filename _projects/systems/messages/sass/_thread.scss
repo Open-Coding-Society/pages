@@ -684,3 +684,21 @@
   font-family: var(--dm-font);
   font-size: $text-sm;
 }
+
+// ── GitHub cards and the More menu ─────────────────────────────────────────────────
+// ocs__link-card previews (elements/link-cards) under a message, one under another.
+.dm .chat-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dm-space-xs);
+  margin-top: var(--dm-space-xs);
+}
+
+// A message's More menu (ocs__menu) opens under its action buttons.
+.dm .chat-more-menu {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  z-index: 6;
+  min-width: 15rem;
+}

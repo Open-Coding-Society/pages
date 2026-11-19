@@ -455,6 +455,29 @@ Write headings, names and hints as `<b>`, `<strong>` and `<em>`, not spans. See
 [`elements/menus`](elements/menus). Messages uses it for the attach menu and the
 slash-command picker.
 
+### Link cards
+
+```html
+<article class="ocs__link-card">
+  <div class="ocs__link-card-head">
+    <i class="fas fa-code-pull-request ocs__link-card-icon" aria-hidden="true"></i>
+    <em class="ocs__link-card-source">Open-Coding-Society/pages #2031</em>
+    <b class="ocs__status-pill ocs__status-pill--good">Open</b>
+  </div>
+  <a class="ocs__link-card-title" href="https://github.com/Open-Coding-Society/pages/pull/2031">Messages page redesign</a>
+  <em class="ocs__link-card-meta">syowns opened 2 days ago · 9 files +1,200 −300</em>
+</article>
+```
+
+- `ocs__link-card`: a preview of a link, with an accent edge on the left
+- `ocs__link-card-head`, `ocs__link-card-icon`, `ocs__link-card-source`: where it points,
+  with `ocs__status-pill`s after it
+- `ocs__link-card-title`: the link itself; `ocs__link-card-body`: an optional description
+- `ocs__link-card-meta`: muted details. Write the source and details as `<em>`
+
+See [`elements/link-cards`](elements/link-cards). Messages (`/dm`) shows GitHub issues,
+pull requests, commits, repositories and gists linked in a chat this way.
+
 ### Card headers
 
 ```html

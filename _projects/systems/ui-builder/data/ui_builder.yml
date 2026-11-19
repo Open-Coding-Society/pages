@@ -872,5 +872,12 @@ text:
     gistConnect: "Connect GitHub on your Profile to save gists:"
     gistConnectLink: GitHub Gist connection
     gistFailed: Could not save the gist. Try again.
+    moreActions: More actions
+    copyText: Copy text
+    newIssue: New GitHub issue
+    copiedMessage: Copied the message.
+    copyMessageFailed: Could not copy it. Select the text and copy it instead.
+    issueQuote: "> {text}\n\n{sender}, in the OCS chat “{chat}”: {link}"
+    issueNeedsRepo: Put the repository after /newissue (owner/repo), then press Enter.
     idleTitle: Pick a conversation
     idleHint: Or start a new chat, or find a group to join.

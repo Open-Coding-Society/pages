@@ -44,6 +44,9 @@ export const LOG_TEXTS = Object.freeze({
   noOutput: '(no output)',
   saveGist: 'Save as gist',
   savedGist: 'Saved to your gists:',
+  moreActions: 'More actions',
+  copyText: 'Copy text',
+  newIssue: 'New GitHub issue',
 });
 
 // Up to this many images in one share show small previews under the message; a bigger
@@ -96,9 +99,11 @@ function splitReply(richText, body) {
 // messages are pinned from the [[pin:…]] messages it holds (conversation-model.js).
 // runCode(language, code) resolves a code block's output (the /run routes the lesson runners
 // use); saveGist(language, code) resolves the URL of a secret gist made from it.
+// linkCards(html) returns an element of previews for the links in a body (GitHub cards), or
+// null; onMore(action, message) adds a More menu ('copy', 'issue') to each message.
 export function createMessageLog(element, {
   richText, me, onEdit, onDelete, onReply = null, readOnly = false, texts = {}, formatBody = null,
-  onFile = null, thumbnail = null, onPin = null, runCode = null, saveGist = null,
+  onFile = null, thumbnail = null, onPin = null, runCode = null, saveGist = null, linkCards = null, onMore = null,
 }) {
   if (formatBody !== null && typeof formatBody !== 'function') {
     throw new TypeError('createMessageLog: formatBody must be a function or null');
@@ -193,6 +198,7 @@ export function createMessageLog(element, {
   // Takes the viewer off the page with its listener. thread.js calls this from its own
   // destroy(), so an embed that is torn down while an image is open leaves nothing behind.
   function destroy() {
+    closeMore();
     closeViewer();
     viewer?.remove();
     viewer = null;
@@ -476,6 +482,15 @@ export function createMessageLog(element, {
       main.insertBefore(after, body.nextSibling);
     }
     renderFiles(main, after, items, stored);
+    // Previews of the links in it (GitHub cards), last.
+    main.querySelector('.chat-cards')?.remove();
+    const cards = linkCards ? linkCards(html) : null;
+    if (cards) {
+      cards.classList.add('chat-cards');
+      const actions = main.querySelector('.chat-msg-actions');
+      if (actions) main.insertBefore(cards, actions);
+      else main.appendChild(cards);
+    }
   }
 
   function actionButton(icon, label, handler) {
@@ -489,6 +504,66 @@ export function createMessageLog(element, {
     glyph.setAttribute('aria-hidden', 'true');
     button.appendChild(glyph);
     button.addEventListener('click', () => handler(button));
+    return button;
+  }
+
+  // More actions on a message: a small ocs__menu under its button. One open at a time; it
+  // closes on a pick, Escape, or a click anywhere else.
+  let openMore = null;
+  function closeMore() {
+    if (!openMore) return;
+    openMore.menu.remove();
+    openMore.button.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('click', onOutsideMore, true);
+    document.removeEventListener('keydown', onMoreKey);
+    openMore = null;
+  }
+  function onOutsideMore(event) {
+    if (openMore && !openMore.menu.contains(event.target) && !openMore.button.contains(event.target)) closeMore();
+  }
+  function onMoreKey(event) {
+    if (event.key !== 'Escape' || !openMore) return;
+    const { button } = openMore;
+    closeMore();
+    button.focus?.();
+  }
+  function moreButton(key, actions) {
+    const button = actionButton('fa-ellipsis', text.moreActions, () => {
+      if (openMore?.button === button) {
+        closeMore();
+        return;
+      }
+      closeMore();
+      const menu = document.createElement('div');
+      menu.className = 'ocs__menu chat-more-menu';
+      menu.setAttribute('role', 'menu');
+      [['copy', 'fa-copy', text.copyText], ['issue', 'fa-circle-dot', text.newIssue]].forEach(([action, icon, label]) => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'ocs__menu-item';
+        item.setAttribute('role', 'menuitem');
+        const glyph = document.createElement('i');
+        glyph.className = `fas ${icon} ocs__menu-icon`;
+        glyph.setAttribute('aria-hidden', 'true');
+        const name = document.createElement('strong');
+        name.className = 'ocs__menu-name';
+        name.textContent = label;
+        item.append(glyph, name);
+        item.addEventListener('click', () => {
+          closeMore();
+          onMore(action, messages.get(key));
+        });
+        menu.appendChild(item);
+      });
+      actions.appendChild(menu);
+      button.setAttribute('aria-expanded', 'true');
+      openMore = { button, menu };
+      document.addEventListener('click', onOutsideMore, true);
+      document.addEventListener('keydown', onMoreKey);
+      menu.querySelector('button')?.focus?.();
+    });
+    button.setAttribute('aria-haspopup', 'menu');
+    button.setAttribute('aria-expanded', 'false');
     return button;
   }
 
@@ -652,6 +727,7 @@ export function createMessageLog(element, {
         pinButton.setAttribute('aria-pressed', 'false');
         actions.append(pinButton);
       }
+      if (onMore) actions.append(moreButton(message.key, actions));
       if (isSelf) {
         actions.append(
           actionButton('fa-pen', text.editMessage, () => onEdit(messages.get(message.key))),
@@ -699,6 +775,7 @@ export function createMessageLog(element, {
     row.querySelector('.chat-files')?.remove();
     row.querySelector('.chat-file-gallery')?.remove();
     row.querySelector('.chat-code')?.remove();
+    row.querySelector('.chat-cards')?.remove();
     row.querySelector('.chat-msg-actions')?.remove();
     row.querySelector('.chat-msg-edited')?.remove();
     // If the viewer is showing the image of the message just deleted, close it rather

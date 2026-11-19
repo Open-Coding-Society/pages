@@ -126,7 +126,7 @@ function commandThread(kind = 'group') {
     richText: { renderRichMessage(container, raw) { container.appendChild(document.createTextNode(String(raw))); }, createRichComposer: () => composer },
     onCommand: name => commands.push(name),
   });
-  return { thread, elements, composer, sent, gists, commands, kind };
+  return { thread, elements, composer, sent, gists, commands, kind, api };
 }
 
 test('GitHub commands post the link, and remember the repository for next time', async () => {
@@ -231,4 +231,21 @@ test('a code block draws its code as text, with Copy, and Run for a language the
   assert.equal(output.hidden, false);
   assert.equal(output.textContent, 'Hello');
   assert.match(host.textContent, /caption/);
+});
+
+test('“New GitHub issue” drafts /newissue, and Enter opens the form quoting the message', async () => {
+  const { thread, composer, elements, api } = commandThread();
+  api.groupMessages = async () => [{ id: 'g1', author: 'Grace Hopper', author_uid: 'grace', message: 'Scoreboard resets twice', date: '2026-11-18T10:00:00Z' }];
+  localStorage.setItem('ocs-messages-repo:group:12', 'Open-Coding-Society/pages');
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  const row = elements.messages.querySelector('[data-key="g1"]');
+  row.querySelectorAll('button').find(button => button.getAttribute('aria-label') === 'More actions').dispatchEvent(fakeEvent('click'));
+  row.querySelectorAll('.ocs__menu-item')[1].dispatchEvent(fakeEvent('click'));
+  assert.equal(composer.editor.textContent, '/newissue\u00a0Open-Coding-Society/pages\u00a0Scoreboard resets twice');
+  key(composer.element, 'Enter');
+  const url = new URL(opened.at(-1)[0]);
+  assert.equal(url.pathname, '/Open-Coding-Society/pages/issues/new');
+  assert.equal(url.searchParams.get('title'), 'Scoreboard resets twice');
+  assert.match(url.searchParams.get('body'), /^> Scoreboard resets twice\n\nGrace Hopper, in the OCS chat “Team Turing”: https:\/\/pages\.example/);
 });

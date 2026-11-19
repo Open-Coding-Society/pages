@@ -1,0 +1,72 @@
+// A preview of a link: where it points, a title that opens it, an optional line of
+// description, and muted details, with status pills in its head. A GitHub issue or pull
+// request in a chat, a repository on a profile. Write the source and details as <em> and
+// the title as an <a>: preset themes recolor span, small and div.
+
+.ocs__link-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+  max-width: 34rem;
+  min-width: 0;
+  margin: 0;
+  padding: $spacing-xxxs $spacing-xs;
+  border: 1px solid var(--ui-border);
+  border-left: 3px solid var(--pref-accent-color);
+  border-radius: $radius-sm;
+  background: var(--panel);
+  color: var(--pref-text-color);
+}
+
+.ocs__link-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-xxxs;
+  min-width: 0;
+  font-size: 0.85em;
+}
+
+.ocs__link-card-icon {
+  flex: none;
+  color: var(--pref-accent-color);
+}
+
+.ocs__link-card-source {
+  min-width: 0;
+  overflow: hidden;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
+.ocs__link-card-head .ocs__status-pill {
+  font-size: 0.85em;
+}
+
+.ocs__link-card-title {
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
+}
+
+.ocs__link-card-body {
+  margin: 0;
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+
+.ocs__link-card-meta {
+  font-size: 0.85em;
+  font-style: normal;
+  overflow-wrap: anywhere;
+  color: var(--text-muted);
+}
