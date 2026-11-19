@@ -64,6 +64,25 @@ test('saving sends the event once, closes, and reports where it went', async () 
   assert.deepEqual(done, ['Added “Sprint review · 3:00 PM” to your calendar for Fri, Nov 20.']);
 });
 
+// What the dialog does end to end with a message that tries to put markup in the calendar:
+// the title box shows plain text, and the saved description holds no "<". The second body
+// is the one that got through when the dialog converted a message and the model did it again.
+test('a message that spells out markup is saved as text, not as markup', async () => {
+  for (const body of [
+    '<p>Lunch Friday? &lt;img src=x onerror=&quot;go()&quot;&gt;</p>',
+    '<p>Lunch Friday? &amp;lt;img src=x onerror=&amp;quot;go()&amp;quot;&amp;gt;</p>',
+  ]) {
+    const { elements, sent, dialog, submit } = makeDialog({ addCalendarEvent: async () => ({}) });
+    dialog.open(message(body));
+    assert.equal(elements.title.value, 'Lunch Friday?');
+    submit();
+    await settle();
+    assert.equal(sent.length, 1);
+    assert.ok(!sent[0].description.includes('<'), `no raw "<" in ${JSON.stringify(sent[0].description)}`);
+    assert.ok(!sent[0].title.includes('<'));
+  }
+});
+
 test('an empty title is refused without asking Spring', async () => {
   const { elements, sent, dialog, submit } = makeDialog({ addCalendarEvent: async () => ({}) });
   dialog.open(message('hello'));

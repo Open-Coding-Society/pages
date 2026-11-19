@@ -130,7 +130,18 @@ export function dateLabel(key) {
 
 const clip = (value, limit) => (value.length <= limit ? value : `${value.slice(0, limit - 1).trimEnd()}…`);
 
+// The calendar page shows an event's description as HTML, so a "<" in it can start a tag.
+// What this feature writes is plain text for people to read, so each "<" is written as the
+// entity the page's own editor stores for one. Nothing else needs it: only a "<" starts a
+// tag, and an entity never does. Every "<" grows by this many characters.
+const LT_ENTITY = '&lt;';
+const LT_GROWTH = LT_ENTITY.length - 1;
+const noMarkup = value => value.replace(/</g, LT_ENTITY);
+
 // A starting title: the message's first sentence, or all of it when that is short.
+// `text` is a stored message body, HTML or plain, and is turned into text here, once: pass
+// the body itself, never text that has already been through plainText(), because a second
+// pass decodes what the first one left behind ("&amp;lt;" becomes "&lt;", then "<").
 export function suggestTitle(text, limit = 80) {
   const flat = plainText(text).replace(/\s+/g, ' ').trim();
   if (!flat) return '';
@@ -141,6 +152,8 @@ export function suggestTitle(text, limit = 80) {
 // The body of Spring's POST /api/calendar/add_event for one message. `individual` is
 // left out on purpose: left out, Spring files the event under whoever is signed in; set
 // to '' it would show the event to everyone, which a private message must never do.
+// `text` is the stored message body, converted here once (see suggestTitle). The note
+// that comes out of it never holds a raw "<", whatever the message said.
 export function buildCalendarEvent({ title, date, time = '', text = '', chatUrl = '' }) {
   const cleanTitle = String(title ?? '').replace(/\s+/g, ' ').trim();
   if (!cleanTitle) throw new Error('An event needs a title.');
@@ -151,7 +164,10 @@ export function buildCalendarEvent({ title, date, time = '', text = '', chatUrl 
   const tail = chatUrl ? `From a chat: ${chatUrl}` : '';
   const overhead = [head, tail].filter(Boolean).join('\n\n').length + (head && tail ? 0 : 0);
   const room = Math.max(0, FIELD_LIMIT - overhead - 4); // 4 for the blank lines between parts
-  const note = clip(plainText(text).replace(/\s+/g, ' '), room);
+  const flat = plainText(text).replace(/\s+/g, ' ');
+  // Escaping makes the note longer, so the cut leaves room for every "<" there might be.
+  const noteRoom = room - LT_GROWTH * (flat.match(/</g) || []).length;
+  const note = noteRoom < 1 ? '' : noMarkup(clip(flat, noteRoom));
 
   return {
     title: clip(clock ? `${cleanTitle} · ${clock}` : cleanTitle, FIELD_LIMIT),

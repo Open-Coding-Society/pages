@@ -95,6 +95,39 @@ test('title and description stay inside the 255 characters Spring stores', () =>
   assert.ok(MAX_TITLE_LENGTH <= 255);
 });
 
+// The calendar page shows a description as HTML. A "<" is the only thing that starts a tag,
+// so none may reach it, however many times the message was escaped.
+test('a description never holds a "<", whether the message typed one or only looked like one', () => {
+  const stored = [
+    '<p>Lunch Friday? &lt;img src=x onerror=&quot;go()&quot;&gt;</p>', // typed <img ...>
+    '<p>Lunch Friday? &amp;lt;img src=x onerror=&amp;quot;go()&amp;quot;&amp;gt;</p>', // typed &lt;img ...&gt;
+    '<p>1 < 2 and 3 <b>bold</b></p>',
+  ];
+  for (const body of stored) {
+    const { description } = buildCalendarEvent({ title: 'Lunch', date: '2026-11-20', text: body, chatUrl: 'https://x.test/dm?dm=5' });
+    assert.ok(!description.includes('<'), `no raw "<" from ${body}\n  got ${JSON.stringify(description)}`);
+  }
+  // The words are all still there: a "<" is only written another way.
+  const typed = buildCalendarEvent({ title: 'x', date: '2026-11-20', text: '<p>a &lt; b</p>' });
+  assert.equal(typed.description, 'a &lt; b');
+});
+
+test('a message is turned into text once: what it escaped is not unescaped a second time', () => {
+  // Typed as the characters &lt;b&gt; and stored with the & escaped. Once gives back what was typed.
+  const event = buildCalendarEvent({ title: 'x', date: '2026-11-20', text: '<p>&amp;lt;b&amp;gt;</p>' });
+  assert.equal(event.description, '&lt;b&gt;');
+  assert.equal(suggestTitle('<p>&amp;lt;b&amp;gt; is a tag</p>'), '&lt;b&gt; is a tag');
+});
+
+test('a note full of "<" still fits the 255 characters Spring stores', () => {
+  const event = buildCalendarEvent({
+    title: 'x', date: '2026-11-20', time: '09:00', text: '&lt;'.repeat(300), chatUrl: `https://x.test/${'z'.repeat(40)}`,
+  });
+  assert.ok(event.description.length <= 255, `${event.description.length} characters`);
+  assert.ok(!event.description.includes('<'));
+  assert.ok(event.description.endsWith(`https://x.test/${'z'.repeat(40)}`));
+});
+
 test('an event needs a title and a real day', () => {
   assert.throws(() => buildCalendarEvent({ title: '  ', date: '2026-11-20' }), /title/);
   assert.throws(() => buildCalendarEvent({ title: 'a', date: '2026-02-30' }), /date/);

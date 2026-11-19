@@ -16,11 +16,15 @@ export function initScheduleDialog({ elements, api, chatUrl = () => '', onSchedu
   }
 
   function open(source, opener) {
-    const text = plainText(source.body);
-    message = { ...source, text };
+    // The message's body as stored. suggestTitle and buildCalendarEvent turn it into text
+    // themselves, once, so it is handed to them as it is and not as `text`: converting it
+    // here as well would decode it twice, and "&amp;lt;" would come out as a real "<".
+    const body = String(source.body ?? '');
+    const text = plainText(body); // only for finding a day and a time in it
+    message = { ...source, body };
     saving = false;
     elements.title.maxLength = MAX_TITLE_LENGTH;
-    elements.title.value = suggestTitle(text, MAX_TITLE_LENGTH);
+    elements.title.value = suggestTitle(body, MAX_TITLE_LENGTH);
     // No date mentioned: today, so the form is never empty and Save works after a title tweak.
     elements.date.value = guessEventDate(text, now()) || dateKey(now());
     elements.time.value = guessEventTime(text) || '';
@@ -38,7 +42,7 @@ export function initScheduleDialog({ elements, api, chatUrl = () => '', onSchedu
         title: elements.title.value,
         date: elements.date.value,
         time: elements.time.value,
-        text: message.text,
+        text: message.body,
         chatUrl: chatUrl(),
       });
     } catch (error) {
