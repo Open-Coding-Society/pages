@@ -24,6 +24,11 @@
   background: var(--dm-bg);
 }
 
+// The grammar's wide card, which the rule above would otherwise hold to 34rem.
+.dm .ocs__modal-card--wide {
+  max-width: 48rem;
+}
+
 .dm .ocs__modal-header {
   margin-bottom: var(--dm-space-md);
   padding-bottom: var(--dm-space-sm);
@@ -367,4 +372,33 @@
     flex: 1;
     background: var(--dm-rule);
   }
+}
+
+// ── The Files panel (js/files-panel.js) ─────────────────────────────────────────
+.dm__files-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dm-space-xs);
+}
+
+.dm .dm__files-filter {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.dm__files-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dm-space-xs);
+  min-width: 0;
+}
+
+.dm .dm__crumbs {
+  align-items: center;
+  gap: var(--dm-space-xs);
+}
+
+.dm__crumbs-summary {
+  margin-left: auto;
 }

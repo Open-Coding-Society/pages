@@ -76,6 +76,17 @@ export function fileKind(name) {
     : { kind: 'file', icon: 'fa-file', preview: null };
 }
 
+// The type a preview needs: Spring sends every file as application/octet-stream, and a
+// browser won't show a PDF, an SVG or most video from a blob with no type.
+const MIME_TYPES = {
+  png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml',
+  bmp: 'image/bmp', avif: 'image/avif', mp4: 'video/mp4', m4v: 'video/mp4', webm: 'video/webm', mov: 'video/quicktime',
+  ogv: 'video/ogg', mp3: 'audio/mpeg', wav: 'audio/wav', ogg: 'audio/ogg', oga: 'audio/ogg', m4a: 'audio/mp4',
+  aac: 'audio/aac', flac: 'audio/flac', pdf: 'application/pdf',
+};
+
+export const mimeFor = name => MIME_TYPES[extensionOf(nameOf(name))] || 'application/octet-stream';
+
 // 1536 → "1.5 KB": one decimal under 10 of a unit, none above, the way a file manager reads.
 export function formatBytes(bytes) {
   let value = Math.max(0, Number(bytes) || 0);
@@ -216,12 +227,28 @@ export function extractFilesMarker(raw) {
   return { items, html: text.slice(match[0].length) };
 }
 
+// The marker's items for what actually went up: a planShare result's items, with a folder's
+// count and size cut to the files that were shared, and anything with none left out.
+export function sharedItems(share, donePaths) {
+  const done = new Set(donePaths);
+  const sizes = new Map(share.uploads.map(upload => [upload.path, upload.file?.size || 0]));
+  return share.items.flatMap(item => {
+    if (item.type === 'file') return done.has(item.path) ? [item] : [];
+    const inside = [...done].filter(path => path.startsWith(`${item.path}/`));
+    if (!inside.length) return [];
+    return [{ ...item, count: inside.length, size: inside.reduce((total, path) => total + sizes.get(path), 0) }];
+  });
+}
+
+// "1 file", "3 files".
+export const countFiles = count => `${count} file${count === 1 ? '' : 's'}`;
+
 // "proj · 3 files · 3 MB" for one folder, "a.pdf · 2 KB" for one file, "4 files · 9 MB" otherwise.
 export function shareSummary(items) {
   const files = items.reduce((total, item) => total + (item.type === 'folder' ? item.count : 1), 0);
   const size = formatBytes(items.reduce((total, item) => total + item.size, 0));
   if (items.length === 1 && items[0].type === 'file') return `${nameOf(items[0].path)} · ${size}`;
-  const filesText = `${files} file${files === 1 ? '' : 's'}`;
+  const filesText = countFiles(files);
   if (items.length === 1) return `${nameOf(items[0].path)} · ${filesText} · ${size}`;
   return `${filesText} · ${size}`;
 }

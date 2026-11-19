@@ -3,6 +3,7 @@
 // with its avatar, sender and time, a Reply button, and edit and delete buttons on your
 // own messages (none in a read-only log). A reply shows a quote of the message it
 // answers, from the [[reply:...]] marker at the start of its body (assets/js/chat/chat-reply.js).
+import { countFiles, extractFilesMarker, fileKind, formatBytes } from './files-model.js';
 import { dayKey, dayLabel, initialsFor, pfpSrc, tintFor } from './messages-model.js';
 
 // What the log says, worded for /dm. A host passes its own wording for any of these in
@@ -19,7 +20,17 @@ export const LOG_TEXTS = Object.freeze({
   deleted: 'This message was deleted.',
   today: 'Today',
   yesterday: 'Yesterday',
+  folderFiles: '{files} · {size}',
+  previewFile: 'Preview {name}',
+  downloadFile: 'Download {name}',
+  openFolder: 'Open {name} in Files',
+  zipFolder: 'Download {name} as a .zip',
+  imagePreview: '{name}, shared by {sender}',
 });
+
+// Up to this many images in one share show small previews under the message; a bigger
+// share lists them like any other file.
+export const INLINE_IMAGE_PREVIEWS = 4;
 
 // Fills a text's {slot}s, the way the UI Builder's registry text marks them. A slot with
 // no value stays as written, so a missing value shows instead of vanishing.
@@ -61,8 +72,11 @@ function splitReply(richText, body) {
     : { reply: null, html: body };
 }
 
+// onFile(action, item, control), when given, is what a shared file's buttons do ('preview',
+// 'download', 'folder', 'zip'); thumbnail(item) resolves a URL for an image's inline preview.
 export function createMessageLog(element, {
   richText, me, onEdit, onDelete, onReply = null, readOnly = false, texts = {}, formatBody = null,
+  onFile = null, thumbnail = null,
 }) {
   if (formatBody !== null && typeof formatBody !== 'function') {
     throw new TypeError('createMessageLog: formatBody must be a function or null');
@@ -244,10 +258,96 @@ export function createMessageLog(element, {
     body.classList.add('is-deleted');
   }
 
+  // A shared file or folder's row: its icon, name and size, and its buttons.
+  function fileButton(icon, label, action, item) {
+    const control = actionButton(icon, label, () => onFile(action, item, control));
+    control.className = 'ocs__btn small';
+    return control;
+  }
+
+  function fileRow(item) {
+    const isFolder = item.type === 'folder';
+    const name = item.path.slice(item.path.lastIndexOf('/') + 1);
+    const kind = fileKind(item.path);
+    const row = document.createElement('li');
+    row.className = 'ocs__file';
+    const icon = document.createElement('i');
+    icon.className = `fas ${isFolder ? 'fa-folder' : kind.icon} ocs__file-icon`;
+    icon.setAttribute('aria-hidden', 'true');
+    const textBox = document.createElement('div');
+    textBox.className = 'ocs__file-text';
+    const title = document.createElement('b');
+    title.className = 'ocs__file-name';
+    title.textContent = name;
+    title.title = item.path;
+    const meta = document.createElement('em');
+    meta.className = 'ocs__file-meta';
+    meta.textContent = isFolder
+      ? fillText(text.folderFiles, { files: countFiles(item.count), size: formatBytes(item.size) })
+      : formatBytes(item.size);
+    textBox.append(title, meta);
+    row.append(icon, textBox);
+    if (onFile) {
+      const actions = document.createElement('div');
+      actions.className = 'ocs__file-actions';
+      if (isFolder) {
+        actions.append(
+          fileButton('fa-folder-open', fillText(text.openFolder, { name }), 'folder', item),
+          fileButton('fa-file-zipper', fillText(text.zipFolder, { name }), 'zip', item),
+        );
+      } else {
+        if (kind.preview) actions.appendChild(fileButton('fa-eye', fillText(text.previewFile, { name }), 'preview', item));
+        actions.appendChild(fileButton('fa-download', fillText(text.downloadFile, { name }), 'download', item));
+      }
+      row.appendChild(actions);
+    }
+    return row;
+  }
+
+  // A few shared images show small previews above the list, fetched with the page's sign-in.
+  // Each opens the file viewer, like its row's Preview button.
+  function gallery(images, sender) {
+    const strip = document.createElement('div');
+    strip.className = 'chat-file-gallery';
+    images.forEach(item => {
+      const name = item.path.slice(item.path.lastIndexOf('/') + 1);
+      const open = document.createElement('button');
+      open.type = 'button';
+      open.className = 'chat-file-thumb-button';
+      open.setAttribute('aria-label', fillText(text.previewFile, { name }));
+      const image = document.createElement('img');
+      image.className = 'ocs__file-preview chat-file-thumb';
+      image.alt = fillText(text.imagePreview, { name, sender });
+      image.loading = 'lazy';
+      thumbnail(item).then(url => { image.src = url; }, () => open.remove());
+      open.appendChild(image);
+      if (onFile) open.addEventListener('click', () => onFile('preview', item, open));
+      strip.appendChild(open);
+    });
+    return strip;
+  }
+
+  function renderFiles(main, after, items, stored) {
+    main.querySelector('.chat-file-gallery')?.remove();
+    main.querySelector('.chat-files')?.remove();
+    if (!items.length) return;
+    const sender = stored.isSelf ? text.you : stored.senderName;
+    const list = document.createElement('ul');
+    list.className = 'ocs__file-list chat-files';
+    items.forEach(item => list.appendChild(fileRow(item)));
+    main.insertBefore(list, after.nextSibling);
+    const images = items.filter(item => item.type === 'file' && fileKind(item.path).preview === 'image');
+    if (thumbnail && images.length && images.length <= INLINE_IMAGE_PREVIEWS) {
+      main.insertBefore(gallery(images, sender), list);
+    }
+  }
+
   // The body's reply quote (if any) goes just before the body; formatBody sees the rest.
   // Clicking the quote scrolls to the original and marks it, as a search result does.
+  // Files shared with the message are listed after the body.
   function renderBody(body, stored) {
-    const { reply, html } = splitReply(richText, stored.body);
+    const { reply, html: withFiles } = splitReply(richText, stored.body);
+    const { items, html } = extractFilesMarker(withFiles);
     const main = body.parentNode;
     main.querySelector('.chat-reply-quote')?.remove();
     if (reply && typeof richText.renderReplyQuote === 'function') {
@@ -255,6 +355,7 @@ export function createMessageLog(element, {
     }
     body.replaceChildren();
     richText.renderRichMessage(body, shownBody({ ...stored, body: html }, formatBody));
+    renderFiles(main, body, items, stored);
   }
 
   function actionButton(icon, label, handler) {
@@ -393,6 +494,8 @@ export function createMessageLog(element, {
     if (!row) return;
     showDeleted(row.querySelector('.chat-msg-body'));
     row.querySelector('.chat-reply-quote')?.remove();
+    row.querySelector('.chat-files')?.remove();
+    row.querySelector('.chat-file-gallery')?.remove();
     row.querySelector('.chat-msg-actions')?.remove();
     row.querySelector('.chat-msg-edited')?.remove();
     // If the viewer is showing the image of the message just deleted, close it rather

@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   FILE_LIMIT_BYTES, MAX_LOOSE_FILES, MAX_SHARE_FILES, addFilesMarker, buildTree, cleanPath, encodeFilesMarker,
-  extractFilesMarker, fileKind, filesUnder, formatBytes, isSkipped, planShare, shareSummary, topNames, uniqueName,
+  extractFilesMarker, fileKind, filesUnder, formatBytes, isSkipped, mimeFor, planShare, shareSummary, sharedItems, topNames, uniqueName,
 } from '../js/files-model.js';
 
 const entry = (path, size = 10) => ({ path, file: { size } });
@@ -145,4 +145,20 @@ test('shareSummary says what a share holds in a few words', () => {
   assert.equal(shareSummary([{ type: 'file', path: 'a.pdf', size: 2048 }]), 'a.pdf · 2 KB');
   assert.equal(shareSummary([{ type: 'folder', path: 'proj', count: 3, size: 3 * 1024 * 1024 }]), 'proj · 3 files · 3 MB');
   assert.equal(shareSummary([{ type: 'file', path: 'a', size: 1 }, { type: 'file', path: 'b', size: 1 }]), '2 files · 2 B');
+});
+
+test('sharedItems lists only what went up, with a folder cut to its shared files', () => {
+  const share = planShare([entry('a.pdf', 5), entry('b.pdf', 6), entry('proj/x.js', 10), entry('proj/y.js', 20)], new Set());
+  assert.deepEqual(sharedItems(share, ['a.pdf', 'proj/y.js']), [
+    { type: 'file', path: 'a.pdf', size: 5 },
+    { type: 'folder', path: 'proj', count: 1, size: 20 },
+  ]);
+  assert.deepEqual(sharedItems(share, []), []);
+});
+
+test('mimeFor gives a preview the type Spring leaves off', () => {
+  assert.equal(mimeFor('deck.PDF'), 'application/pdf');
+  assert.equal(mimeFor('logo.svg'), 'image/svg+xml');
+  assert.equal(mimeFor('clip.mov'), 'video/quicktime');
+  assert.equal(mimeFor('notes.txt'), 'application/octet-stream');
 });

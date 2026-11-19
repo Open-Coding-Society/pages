@@ -4,8 +4,12 @@
 // here only import each other, with ./ paths.
 import { createChatSocket } from './chat-socket.js';
 import { initDeleteGroup } from './delete-group.js';
+import { createFileActions } from './file-actions.js';
+import { createFileViewer } from './file-viewer.js';
+import { createFilesPanel } from './files-panel.js';
+import { GroupFiles } from './group-files.js';
 import { initGroupFormation } from './group-formation.js';
-import { initFiles, initFindGroup, initMembers } from './group-dialogs.js';
+import { initFindGroup, initMembers } from './group-dialogs.js';
 import { initMessageSearch } from './message-search.js';
 import { createMessagesApi } from './messages-api.js';
 import {
@@ -85,25 +89,41 @@ export async function startMessagesPage({ config, richText }) {
   }
 
   const socket = createChatSocket(config.javaWebSocketURI, { onClose: () => setStatus('disconnected', 'is-error') });
-  const files = initFiles({
-    api,
-    elements: {
-      dialog: byId('filesDialog'), title: byId('filesTitle'), list: byId('filesList'), table: byId('filesTable'),
-      form: byId('filesForm'), input: byId('filesInput'), upload: byId('filesUpload'), status: byId('filesStatus'),
-    },
+  // One GroupFiles per group, so a group's file list is fetched once and shared by the
+  // thread, the files under its messages and the Files panel.
+  const filesByGroup = new Map();
+  const groupFiles = id => {
+    if (!filesByGroup.has(id)) filesByGroup.set(id, new GroupFiles({ api, groupId: id }));
+    return filesByGroup.get(id);
+  };
+  const viewer = createFileViewer({ root: document.querySelector('.dm') || document.body });
+  const filesPanel = createFilesPanel({
+    elements: { dialog: byId('filesDialog'), title: byId('filesTitle'), body: byId('filesBody'), status: byId('filesStatus') },
+    groupFilesFor: groupFiles,
+    makeFileActions: ({ filesFor, notify }) => createFileActions({ filesFor, viewer, notify }),
+    // Sharing starts from the composer, so the chat says what was shared.
+    onShare: () => byId('messagesAttachButton').click(),
   });
   const thread = createThread({
     api,
     socket,
     richText,
     me,
+    groupFiles,
+    viewer,
+    onOpenFolder: (groupId, path) => {
+      const group = findItem('group', groupId);
+      if (group) filesPanel.open(group, byId('messagesFilesButton'), { folderPath: path });
+    },
     elements: {
       title: byId('messagesThreadTitle'), subtitle: byId('messagesThreadSubtitle'), messages: byId('messagesLog'),
       form: byId('messagesForm'), send: byId('messagesSend'), cancelEdit: byId('messagesCancelEdit'),
       formStatus: byId('messagesFormStatus'),
-      imageAttach: byId('messagesImageAttach'), imageInput: byId('messagesImage'),
-      imagePreview: byId('messagesImagePreview'), imageThumb: byId('messagesImageThumb'),
-      imageRemove: byId('messagesImageRemove'), dropHint: byId('messagesDropHint'),
+      imageInput: byId('messagesImage'), imagePreview: byId('messagesImagePreview'), imageThumb: byId('messagesImageThumb'),
+      imageRemove: byId('messagesImageRemove'),
+      attachButton: byId('messagesAttachButton'), attachMenuHost: byId('messagesAttach'),
+      filesInput: byId('messagesFiles'), folderInput: byId('messagesFolder'), tray: byId('messagesAttachTray'),
+      dropZone: document.querySelector('.dm__thread'), dropHint: byId('messagesDropHint'),
     },
     onDmRead: id => {
       const conversation = findItem('dm', id);
@@ -112,7 +132,7 @@ export async function startMessagesPage({ config, richText }) {
       render();
     },
     onGroupRead: id => markGroupRead(findItem('group', id)),
-    onFileShared: id => files.refreshIfShowing(id),
+    onFileShared: id => filesPanel.refreshIfShowing(id),
   });
 
   const groupActions = byId('messagesGroupActions');
@@ -265,9 +285,9 @@ export async function startMessagesPage({ config, richText }) {
     const group = openGroup();
     if (group) members.open(group, event.currentTarget);
   });
-  byId('messagesFiles').addEventListener('click', event => {
+  byId('messagesFilesButton').addEventListener('click', event => {
     const group = openGroup();
-    if (group) files.open(group, event.currentTarget);
+    if (group) filesPanel.open(group, event.currentTarget);
   });
   byId('messagesLeaveGroup').addEventListener('click', async () => {
     const group = openGroup();

@@ -837,11 +837,15 @@ text:
     imageOnly: Drop an image or screenshot here.
     imageWhileEditing: "Images can't be added while you edit a message."
     imageMessage: Image
+    filesMessage: Files
+    sharedButNotSent: "Your files are shared, but the message didn't send. Press Send to try again."
     today: Today
     yesterday: Yesterday
-    fileShared: "{sender} shared a file:"
-    fileSharedBySomeone: "A file was shared:"
-    fileGone: "{filename} is no longer shared with this group."
-    fileFailed: "Could not download {filename}. Try again."
+    folderFiles: "{files} · {size}"
+    previewFile: "Preview {name}"
+    downloadFile: "Download {name}"
+    openFolder: "Open {name} in Files"
+    zipFolder: "Download {name} as a .zip"
+    imagePreview: "{name}, shared by {sender}"
     idleTitle: Pick a conversation
     idleHint: Or start a new chat, or find a group to join.

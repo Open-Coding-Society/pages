@@ -8,6 +8,7 @@
 //   const chat = await mountGroupChat(element, { groupId, config, richText });
 //   chat.destroy(); // before the element goes
 import { createChatSocket } from './chat-socket.js';
+import { GroupFiles } from './group-files.js';
 import { LOG_TEXTS, withTexts } from './message-log.js';
 import { createMessagesApi } from './messages-api.js';
 import { EMPTY_STATES, THREAD_TEXTS, createThread } from './thread.js';
@@ -235,8 +236,11 @@ async function mount(kind, root, options) {
       pane.status.textContent = t.offline;
     };
     socket = createChatSocket(config.javaWebSocketURI, { onClose: showOffline });
+    // Files shared in a group open and download here too; sharing them is /dm's.
+    const files = kind === 'group' ? new GroupFiles({ api, groupId: id }) : null;
     thread = createThread({
       api, socket, richText, me, readOnly, formatBody,
+      groupFiles: files ? () => files : null,
       elements: pane.elements,
       texts: t,
       emptyState: { title: t.emptyTitle, hint: t.emptyHint },
