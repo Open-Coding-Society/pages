@@ -423,10 +423,15 @@
   background: none;
 }
 
-// Four tabs fit across a phone.
+// On a phone the tabs drop their icons so all four share one row down to a 360px screen;
+// with the icons the last tab wrapped onto a second line.
 @include dm-below($breakpoint-mobile) {
   .dm .ocs__tabs-btn {
-    padding: var(--dm-space-xs) var(--dm-space-xs);
+    padding: var(--dm-space-xs);
+  }
+
+  .dm .ocs__tabs-btn > .fas {
+    display: none;
   }
 }
 
