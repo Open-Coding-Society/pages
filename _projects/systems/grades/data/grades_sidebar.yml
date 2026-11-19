@@ -1,6 +1,8 @@
 # The Grades sidebar, shown on every page that sets `sidebar: grades_sidebar`
 # (the grading pages in this system). Profile and the toolkit keep
 # _data/aesthetihawk_sidebar.yml. Each id matches a page's active_tab.
+# `children` are sections of that page, listed under it; each `section` is a
+# data-section the page defines, opened with url#section (js/page-sections.js).
 - section: Grades
   items:
     - id: grades-home
@@ -21,15 +23,39 @@
       icon: |
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/>
+      children:
+        - section: ocs-analytics
+          title: OCS Analytics
+        - section: github
+          title: GitHub Analytics
+        - section: grade
+          title: Grade Predictor
+        - section: skill-passport
+          title: Skill Passport
     - id: retrospective
       title: Retrospective
       url: /retrospective
       icon: |
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      children:
+        - section: sprint
+          title: Sprint Reflection
+        - section: growth
+          title: Growth Over Time
+        - section: forecast
+          title: Forecast Retrospective
     - id: submissions
       title: Submissions
       url: /submissions
       icon: |
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+      children:
+        - section: my-submissions
+          title: My Submissions
+        - section: created-assignments
+          title: Assignments You Created
+        - section: all-submissions
+          title: All Submissions
+          audience: Teachers

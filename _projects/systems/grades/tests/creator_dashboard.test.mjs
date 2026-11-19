@@ -109,10 +109,15 @@ test("grade source comes from Spring's grading state, not from guessing at feedb
   assert.equal(gradeSourceLabel({ grade: 3, feedback: "x", aiSummary: "x" }), "");
 });
 
-// Just enough DOM for load(): every id resolves to a stub that records its markup and listeners.
+// Just enough DOM for load(): every id resolves to a stub that records its markup and listeners,
+// and the section's two sidebar links (side column and phone menu) are plain stubs.
 async function loadDashboard({ isTeacher, assignments, openLessonSummary }) {
   const elements = new Map();
+  const sidebarLinks = [{ textContent: "Assignments You Created" }, { textContent: "Assignments You Created" }];
   globalThis.document = {
+    querySelectorAll(selector) {
+      return selector === '[data-sidebar-section="created-assignments"]' ? sidebarLinks : [];
+    },
     getElementById(id) {
       if (!elements.has(id)) {
         elements.set(id, {
@@ -132,8 +137,17 @@ async function loadDashboard({ isTeacher, assignments, openLessonSummary }) {
     escapeHtml: (value) => String(value), cellTitle: () => "", openLessonSummary,
   });
   await dashboard.load("mort", { isTeacher });
+  elements.sidebarLinks = sidebarLinks;
   return elements;
 }
+
+test("teachers see the section named Teacher Dashboard in the sidebar; creators keep their name", async () => {
+  const teacher = await loadDashboard({ isTeacher: true, assignments: [] });
+  assert.deepEqual(teacher.sidebarLinks.map((link) => link.textContent), ["Teacher Dashboard", "Teacher Dashboard"]);
+
+  const creator = await loadDashboard({ isTeacher: false, assignments: [] });
+  assert.deepEqual(creator.sidebarLinks.map((link) => link.textContent), ["Assignments You Created", "Assignments You Created"]);
+});
 
 test("teachers get a Lesson Summary for team-taught lessons only", async () => {
   const opened = [];

@@ -1,6 +1,13 @@
 {% comment %}
   A page picks its sidebar with `sidebar: <data file>` in its front matter;
   the Grades pages use grades_sidebar. Without it, the Profile sidebar shows.
+  The layout includes it twice, beside the page and in the phone menu, so the
+  phone copy passes id_prefix to keep its link ids unique.
+
+  An item's `children` are sections of its page, listed under it as an
+  ocs__tree. Each links to the page with `#section`; on the current page the
+  links are only `#section` and carry data-sidebar-section, and the page sets
+  aria-current on the one it shows.
 {% endcomment %}
 {% assign sidebar_name = page.sidebar | default: "aesthetihawk_sidebar" %}
 <ul class="flex flex-col py-4 space-y-1">
@@ -15,7 +22,7 @@
     {% for item in section.items %}
       {% assign item_id = item.id | strip %}
       <li>
-        <a id="sidebar-{{ item_id }}" href="{{ site.baseurl }}{{ item.url }}"
+        <a id="{{ include.id_prefix }}sidebar-{{ item_id }}" href="{{ site.baseurl }}{{ item.url }}"
            class="nav-item relative flex flex-row items-center h-11 focus:outline-none pr-6 border-l-4
            {% if current == item_id %}
              bg-neutral-700 text-neutral-50 border-indigo-500
@@ -30,6 +37,17 @@
           </span>
           <span class="ml-2 text-sm tracking-wide truncate">{{ item.title }}</span>
         </a>
+        {% if item.children %}
+          <ul class="ocs__tree ml-7 mr-4 my-1">
+            {% for child in item.children %}
+              <li>
+                {%- comment -%} On its own page a section link is just #section, so it never reloads the page. {%- endcomment %}
+                <a {% if current == item_id %}href="#{{ child.section }}" data-sidebar-section="{{ child.section }}"{% else %}href="{{ site.baseurl }}{{ item.url }}#{{ child.section }}"{% endif %}
+                   class="nav-item flex flex-row flex-wrap items-center gap-x-2 min-h-9 py-1.5 pl-3 pr-2 border-l-4 border-transparent leading-snug text-sm tracking-wide text-neutral-600 hover:text-neutral-50 aria-[current=true]:border-indigo-500 aria-[current=true]:bg-neutral-700 aria-[current=true]:text-neutral-50 aria-[current=true]:font-semibold">{{ child.title }}{% if child.audience %}<small class="ocs__status-pill ocs__status-pill--neutral">{{ child.audience }}</small>{% endif %}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
       </li>
     {% endfor %}
   {% endfor %}
