@@ -208,3 +208,32 @@ test('reveal says when the message is not in the log', () => {
   log.append(message('m1', 'first'), false);
   assert.equal(log.reveal('m9'), false);
 });
+
+test('with onSchedule, anyone\'s message gets an Add to calendar button; edit and delete stay on your own', () => {
+  const scheduled = [];
+  const { element, log } = makeLog({ onSchedule: (shown, opener) => scheduled.push([shown.id, opener]) });
+  log.append(message('m1', 'lunch friday'), false);
+  log.append(message('m2', 'ok', { senderKey: 'ada' }), true);
+
+  const labels = key => element.querySelector(`[data-key="${key}"]`).querySelectorAll('.chat-msg-action').map(b => b.getAttribute('aria-label'));
+  assert.deepEqual(labels('m1'), ['Add to calendar']);
+  assert.deepEqual(labels('m2'), ['Add to calendar', 'Edit message', 'Delete message']);
+
+  const button = element.querySelector('[data-key="m1"]').querySelector('.chat-msg-action');
+  button.dispatchEvent(fakeEvent('click'));
+  assert.deepEqual(scheduled, [['m1', button]]);
+});
+
+test('no Add to calendar button in a read-only log, on a deleted message, or without onSchedule', () => {
+  const readOnly = makeLog({ onSchedule() {}, readOnly: true });
+  readOnly.log.append(message('m1', 'hi'), false);
+  assert.equal(readOnly.element.querySelector('.chat-msg-action'), null);
+
+  const { element, log } = makeLog({ onSchedule() {} });
+  log.append(message('m2', '', { deleted: true }), false);
+  assert.equal(element.querySelector('.chat-msg-action'), null);
+
+  const plain = makeLog();
+  plain.log.append(message('m3', 'hi'), false);
+  assert.equal(plain.element.querySelector('.chat-msg-actions'), null);
+});

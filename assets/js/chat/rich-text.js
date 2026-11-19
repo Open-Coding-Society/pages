@@ -783,14 +783,9 @@ export function createRichComposer(opts = {}) {
 
   editor.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' || e.isComposing) return;
-    // In a chat, Enter inside a list has to build the list, so it can't also send:
-    // the browser's own Enter starts the next item and, on an empty item, leaves
-    // the list. Ctrl/Cmd+Enter (or the Send button) sends instead.
-    const sendShortcut = enterKey === 'send' && (e.ctrlKey || e.metaKey);
-    if (enterKey === 'send' && !e.shiftKey && !sendShortcut && inListItem()) return;
     // Shift+Enter is a soft newline, and so is Enter in a form field ('newline');
     // inside a list that means the next item.
-    if (!sendShortcut && (e.shiftKey || enterKey === 'newline')) {
+    if (e.shiftKey || enterKey === 'newline') {
       if (inListItem()) {
         e.preventDefault();
         document.execCommand('insertParagraph', false, null);

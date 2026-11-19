@@ -368,3 +368,10 @@
     background: var(--dm-rule);
   }
 }
+
+// "Add to calendar": the day and the optional time side by side.
+.dm .dm__schedule-when {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
