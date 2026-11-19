@@ -1,0 +1,47 @@
+{% comment %}
+  Team chat: a capstone team's group chat on the team's own page, where the team and its
+  mentors talk. It is the same group the team has in Messages (/dm).
+
+  {% raw %}{% include projects/capstone/capstone-team-chat.html %}{% endraw %}
+
+  The post names its group, exactly as Messages shows it:
+
+    capstone_project:
+      team_group: "OCS Communication Systems"
+
+  It renders nothing without team_group, and nothing on a Flask-only site (spring: false).
+  Place it outside a *-infograph wrapper: _sass/capstone/infograph.scss styles everything in
+  one by the end of its class name (any "-title" there is 2.75rem), which would restyle the chat.
+  The chat is Messages' group chat embed (mountGroupChat), loaded only when the person may
+  see it; assets/js/projects/capstone/team-chat.js decides what each person sees (see "Team
+  chat" in the Capstone README). The words are in _data/projects/capstone/team_chat.yml, and
+  go to the script as JSON with every "<" escaped, so no value can end the script early.
+{% endcomment %}
+{%- assign team_group = page.capstone_project.team_group -%}
+{%- if site.spring != false and team_group -%}
+{%- assign team_chat_text = site.data.projects.capstone.team_chat -%}
+<section class="ocs__card" aria-labelledby="team-chat-title">
+  <h2 id="team-chat-title">{{ team_chat_text.title | escape }}</h2>
+  <p class="ocs__lead">{{ team_chat_text.lead | escape }}</p>
+  <div data-team-chat data-team-group="{{ team_group | escape }}"></div>
+  <script type="application/json" data-team-chat-texts>{{ team_chat_text | jsonify | replace: "<", "\u003c" }}</script>
+  <script type="module">
+    import * as config from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { CapstoneTeamChat } from '{{ site.baseurl }}/assets/js/projects/capstone/team-chat.js';
+    import { TeamGroupApi } from '{{ site.baseurl }}/assets/js/projects/capstone/team-group-api.js';
+
+    const root = document.querySelector('[data-team-chat]');
+    const texts = JSON.parse(document.querySelector('[data-team-chat-texts]').textContent);
+    new CapstoneTeamChat(root, {
+      groupName: root.dataset.teamGroup,
+      config,
+      texts,
+      api: new TeamGroupApi({ javaURI: config.javaURI, fetchOptions: config.fetchOptions }),
+      load: {
+        embed: () => import('{{ site.baseurl }}/assets/js/projects/messages/conversation-embed.js'),
+        richText: () => import('{{ site.baseurl }}/assets/js/chat/rich-text.js'),
+      },
+    }).start();
+  </script>
+</section>
+{%- endif -%}

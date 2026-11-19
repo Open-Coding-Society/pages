@@ -2,7 +2,9 @@
   "files": [
     { "source": "pages", "destination": "navigation/projects/capstone" },
     { "source": "_includes/capstone-browser.html", "destination": "_includes/projects/capstone/capstone-browser.html" },
+    { "source": "_includes/capstone-team-chat.html", "destination": "_includes/projects/capstone/capstone-team-chat.html" },
     { "source": "plugins", "destination": "_plugins/projects/capstone" },
+    { "source": "data", "destination": "_data/projects/capstone" },
     { "source": "js", "destination": "assets/js/projects/capstone" },
     { "source": "sass/main.scss", "destination": "_sass/projects/capstone/main.scss" }
   ]

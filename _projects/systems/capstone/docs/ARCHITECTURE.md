@@ -45,3 +45,22 @@ project data.
 The project owns the landing-page source, generator, include, JavaScript and
 SCSS. Distribution publishes generated copies; edit only files under
 `_projects/systems/capstone/`.
+
+## Team chat
+
+A project page can hold its team's group chat. The page names an existing
+Messages group (`capstone_project.team_group`); the Capstone system adds no
+store of its own, and Spring's groups stay the one record of who is on a team.
+
+```text
+capstone-team-chat.html (only with team_group, only with spring)
+    └── CapstoneTeamChat.start()
+          ├── TeamGroupApi.me(), then groupsOf(me.id); findByName only for teachers
+          ├── TeamChatAccess.viewFor(me, group): chat, note, or sign in
+          └── Messages' mountGroupChat(groupId) + "Open in Messages" (/dm?group=id)
+```
+
+Spring decides who may read and post (`MentorRules`): a mentor uses only a
+group they were added to, with at least 2 members who aren't mentors, and never
+a direct message. `TeamChatAccess` applies the same rules to choose a view, so
+the browser asks only for what Spring would allow.
