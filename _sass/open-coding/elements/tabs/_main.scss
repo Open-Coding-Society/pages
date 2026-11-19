@@ -90,3 +90,27 @@
     display: block;
   }
 }
+
+// Fitted tabs, for an app's main tabs on a phone. Below the mobile breakpoint each tab takes
+// an equal share of the row and its icon sits above its words, as a phone app's tab bar does,
+// so four or five tabs stay on one line instead of wrapping. Wider screens keep the usual
+// tabs. Add to .ocs__tabs; a tab's icon goes straight inside its .ocs__tabs-btn.
+.ocs__tabs--fit {
+  @media (max-width: $breakpoint-mobile) {
+    .ocs__tabs-list > li {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .ocs__tabs-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: $spacing-xxxs;
+      width: 100%;
+      padding: $spacing-xs $spacing-xxxs;
+      font-size: 0.875rem;
+      text-align: center;
+    }
+  }
+}
