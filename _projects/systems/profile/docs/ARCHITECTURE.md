@@ -17,28 +17,57 @@ toolkit's `aesthetihawk` layout. The layout holds:
   when the site runs Spring (`spring` in `_config.yml` isn't `false`).
 - a JSON list of courses, built from each course's `course.title` in
   `_projects/systems/courses/data/<course>.yml` (published to `_data/`)
-- one starter script that imports the shared helpers with the `site.baseurl` path and
-  calls `initProfilePage(api)`
+- one starter script that imports the shared helpers with the `site.baseurl` path,
+  builds the profile with `createProfile(createBackends({ pythonURI, javaURI,
+  fetchOptions, springEnabled }))` (see Profile classes below), and calls
+  `initProfilePage({ profile })`
 
 ## Modules
 
-Each module runs one part of the page. They receive the shared helpers as `api`
-(`pythonURI`, `javaURI`, `springEnabled`, `fetchOptions`, `putUpdate`, `postUpdate`)
-and import each other only with `./` paths. When `springEnabled` is false, none of
-them calls Spring: Account saves to Flask only, Classes skips the course-group sync,
-and `profile-page.js` doesn't start Face ID or watch the Gist card.
+Each module runs one part of the page. They get the profile, never a URL or
+`springEnabled`, and import each other only with `./` paths. A Flask-only site gets a
+`FlaskProfile`, so none of them calls Spring: Account saves to Flask only, Classes has
+no course groups to keep in step, and `profile-page.js` doesn't start Face ID or watch
+the Gist card, because `profile.usesSpring` is false.
 
-| Module | Runs | Endpoints |
+| Module | Runs | Uses |
 |---|---|---|
-| `profile-page.js` | Starts the others; the top card and its setup checklist | none |
-| `profile-account.js` | The Account form | Flask `GET /api/id`; for each changed field, Flask `PUT /api/user` and, with Spring, Spring `POST /api/person/update` |
-| `profile-classes.js` | The course list, Add class and Remove | Flask `GET`/`POST /api/user/class`; with Spring, Spring `PUT /api/groups/class-memberships` |
-| `profile-personas.js` | The persona summary and picker cards | Flask `GET /api/persona`, `GET /api/user/personas`, `POST /api/user/persona` |
-| `profile-skills.js` | The skill check-in (four 1–6 ratings) | Flask `POST /api/user/skill-snapshot` |
-| `profile-face.js` | Face ID status and the camera scanner | Spring `GET /api/person/get`, `POST /api/face/register` |
-| `gist-connection.js` | The Gist card | Spring `GET`/`PUT`/`DELETE /api/gist-connection` |
-| `ai-connections.js` | Optional AI grading card | Spring `GET /api/ai-connections`, `PUT`/`DELETE /api/ai-connections/{gemini\|groq}` |
+| `profile-page.js` | Starts the others; the top card and its setup checklist | `profile.usesSpring` |
+| `profile-account.js` | The Account form | `loadAccount`, and `saveField` for each changed field |
+| `profile-classes.js` | The course list, Add class and Remove | `classes`, `addClass`, `removeClass`, and `syncCourseGroups` on load |
+| `profile-personas.js` | The persona summary and picker cards | `personas`, `chosenPersonas`, `choosePersona` |
+| `profile-skills.js` | The skill check-in (four 1–6 ratings) | `saveSkillSnapshot` |
+| `profile-face.js` | Face ID status and the camera scanner | `person`, `registerFace` (a `SpringProfile` only) |
+| `profile-backend.js` | `FlaskProfile`, `SpringProfile` and `createProfile` | Flask and Spring, through Login's `Backend` |
+| `gist-connection.js` | The Gist card, started by its include | Spring `GET`/`PUT`/`DELETE /api/gist-connection` |
+| `ai-connections.js` | Optional AI grading card, started by its include | Spring `GET /api/ai-connections`, `PUT`/`DELETE /api/ai-connections/{gemini\|groq}` |
 | `profile-model.js` | Pure helpers: changed fields, initials, persona sections, setup steps | none |
+
+## Profile classes
+
+`FlaskProfile` is the core every site has (OCS for Business). `SpringProfile extends
+FlaskProfile` for sites that also run Spring (OCS for Education), the same way Login's
+`SpringSession` extends `FlaskSession`. Both send their requests through Login's
+`Backend` (`assets/js/login/backend.js`), which the starter makes with `createBackends`,
+and `createProfile` picks `SpringProfile` only when there is a Spring backend.
+
+| Method | `FlaskProfile` (Flask) | `SpringProfile` adds (Spring) |
+|---|---|---|
+| `usesSpring` | `false` | `true` |
+| `loadAccount()` | `GET /api/id`; keeps the five fields the form shows; rejects when nobody is signed in | |
+| `saveField(key, value)` | `PUT /api/user`; rejects with "Flask didn't accept it" | `POST /api/person/update`, sent with Flask's; "Spring didn't accept it" when only Spring refused |
+| `classes()` | `GET /api/user/class` | |
+| `addClass(code)`, `removeClass(code)` | `POST /api/user/class`; resolves `{ classes, groupsError: null }` | then `syncCourseGroups`; when that fails, the classes stay saved and `groupsError` is Spring's error or "Failed to update course group membership" |
+| `syncCourseGroups(classes)` | no request | `PUT /api/groups/class-memberships` |
+| `personas()`, `chosenPersonas()` | `GET /api/persona`, `GET /api/user/personas` (no choices when Flask refuses) | |
+| `choosePersona(personaId)` | `POST /api/user/persona` | |
+| `saveSkillSnapshot(snapshot)` | `POST /api/user/skill-snapshot` | |
+| `person()`, `registerFace(faceData)` | | `GET /api/person/get`, `POST /api/face/register` |
+
+A failed request rejects with the reason the page shows after "Couldn't …:", in the
+words the page has always used: Flask's own message for persona and check-in saves,
+Spring's error for the course groups, "the server answered" and the status for the other
+requests, and the browser's own text when no answer arrived.
 
 ## What saves when
 
@@ -62,9 +91,10 @@ Each part saves on its own, so no single Save button covers the whole page:
   session stops working once it changes.
 - Course changes run one at a time, so Spring's course groups never get a stale list.
 - Persona cards and course rows are built with `textContent`, not HTML strings.
-- The layout reads `site.spring` and the modules read `springEnabled` from `config.js`.
-  Both treat a missing setting as Spring on, so the cards on the page and the calls
-  the modules make always agree.
+- The layout reads `site.spring` to decide which cards exist, and the starter reads
+  `springEnabled` from `config.js` to pick the profile class. Both treat a missing
+  setting as Spring on, so the cards on the page and the calls the profile makes always
+  agree.
 - `config.js` and `pages/profile.md` have `regenerate: true` in their front matter.
   Incremental builds don't notice a change to `_config.yml`, so without it they would
   keep the old `springEnabled` after `spring` changes.
@@ -74,6 +104,14 @@ Each part saves on its own, so no single Save button covers the whole page:
 ## Testing
 
 - `node --test tests/profile_model.test.mjs` and `node --test tests/test_gist_connection.mjs`.
+- `node --test tests/profile_backend.test.mjs`: the profile classes over Login's real
+  `Backend`, with a fake network.
+- `node --test tests/profile_page.test.mjs`: the real modules on the Messages system's fake
+  DOM, started the way the starter starts them, against fake Flask and Spring servers. It
+  checks that a Flask-only page never asks Spring, that Save and the class changes reach
+  Spring's copy and course groups, and the status texts and console lines.
+- `node --test tests/profile_starter.test.mjs`: every name the starter imports is exported
+  by the file published at that path, and the modules import only `./` files beside them.
 - In a browser, run the local site with Flask (`localhost:8587`) and Spring
   (`localhost:8585`), or answer their requests with stubs. Check:
   - Save sends only the edited field.

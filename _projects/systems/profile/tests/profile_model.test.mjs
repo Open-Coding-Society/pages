@@ -83,6 +83,6 @@ test('setup steps report what is done and what is left', () => {
 
 test('a Flask-only site leaves the Spring steps out of the setup list', () => {
     const progress = { classes: ['CSA'], personaCount: 4, faceRegistered: false, gistConnected: false };
-    assert.deepEqual(setupSteps(progress, { springEnabled: false }).map(s => s.key), ['classes', 'persona']);
-    assert.deepEqual(setupSteps(progress, { springEnabled: true }).map(s => s.key), ['classes', 'persona', 'face', 'github']);
+    assert.deepEqual(setupSteps(progress, { usesSpring: false }).map(s => s.key), ['classes', 'persona']);
+    assert.deepEqual(setupSteps(progress, { usesSpring: true }).map(s => s.key), ['classes', 'persona', 'face', 'github']);
 });
