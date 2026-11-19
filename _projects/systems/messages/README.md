@@ -36,7 +36,7 @@ same way they reach a direct message.
 | `js/message-more.js` | A message's More menu (Copy text, Add to calendar, New GitHub issue): one menu for everything that isn't Reply, Pin, Edit or Delete. |
 | `js/github-links.js` | Reading GitHub links (issues, pull requests, commits, repos, gists) and building one from "owner/repo#12". |
 | `js/shortcuts.js`, `js/help-dialog.js` | The keyboard shortcuts, and `/help`'s list of them and of every slash command, drawn from the same lists the page runs on. |
-| `js/github-cards.js` | Live cards (`ocs__link-card`) for the GitHub links in a message: an issue's or pull request's title, state, author, size and checks; a commit; a repository; a gist. |
+| `js/github-cards.js` | Live cards (compact `ocs__nav-card`s) for the GitHub links in a message: an issue's or pull request's title, state, author, size and checks; a commit; a repository; a gist. |
 | `js/delete-group.js` | The Delete group dialog: says what deleting takes away, and waits for the group's name. |
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
@@ -183,8 +183,10 @@ placeholder says "Write a message, or type / for commands".
 
 ## GitHub cards
 
-Up to three GitHub links in a message get a card under it (`ocs__link-card`, in
-`_sass/open-coding/elements/link-cards`). The card is drawn from the link at once
+Up to three GitHub links in a message get a card under it: the grammar's nav card with
+`ocs__nav-card--compact` (`_sass/open-coding/elements/capstone`), so the whole card is the
+link. The conversation rows' styles apply inside `.dm__list` only, so they leave these
+cards alone. The card is drawn from the link at once
 (`owner/repo #12`) and filled in when it scrolls near the screen: an issue's title, state
 (Open, Closed, Not planned), author, comments and labels; a pull request's title, state
 (Open, Draft, Merged, Closed), author, files and lines changed, and for an open one its

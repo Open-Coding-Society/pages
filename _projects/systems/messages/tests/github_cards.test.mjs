@@ -56,7 +56,17 @@ test('a pull request card shows its title, state, author, size and checks', asyn
   assert.match(text, /syowns opened 2 days ago/);
   assert.match(text, /9 files \+1,200 −300/);
   assert.match(text, /Checks passed/);
-  assert.equal(card.querySelector('.ocs__link-card-title').href, 'https://github.com/Open-Coding-Society/pages/pull/2031');
+  // The card is the grammar's nav card, compact: the whole card is the link, its kicker
+  // holds where it points and the pills, and its title is the pull request's title.
+  assert.equal(card.tagName, 'A');
+  assert.ok(card.classList.contains('ocs__nav-card'));
+  assert.ok(card.classList.contains('ocs__nav-card--compact'));
+  assert.equal(card.href, 'https://github.com/Open-Coding-Society/pages/pull/2031');
+  assert.equal(card.target, '_blank');
+  assert.ok(card.querySelector('.ocs__status-pill').closest('.ocs__nav-card-kicker'));
+  assert.equal(textOf(card.querySelector('.ocs__nav-card-title')), 'Messages page: full-page redesign');
+  assert.match(textOf(card.querySelector('.ocs__text')), /syowns opened 2 days ago/);
+  assert.equal(card.querySelector('.ocs__link-card'), null);
   assert.equal(asked.length, 2);
 });
 

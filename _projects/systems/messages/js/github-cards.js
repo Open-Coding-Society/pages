@@ -156,26 +156,28 @@ export function createGitHubCards({
     return pill(text.checksPassed, 'good');
   }
 
-  // The parts of a card: filled in place as the data arrives.
+  // The parts of a card, filled in place as the data arrives. A card is the grammar's nav
+  // card, compact (elements/capstone): the whole card is the link, its kicker says where it
+  // points and holds the status pills, and the details are its text line.
   function shell(link) {
-    const card = el('article', 'ocs__link-card');
+    const card = el('a', 'ocs__nav-card ocs__nav-card--compact');
+    card.href = link.url;
+    card.target = '_blank';
+    card.rel = 'noopener noreferrer';
     card.dataset.kind = link.kind;
-    const head = el('div', 'ocs__link-card-head');
-    const icon = el('i', `fas ${KIND_ICONS[link.kind]} ocs__link-card-icon`);
+    const head = el('span', 'ocs__nav-card-kicker');
+    const icon = el('i', `fas ${KIND_ICONS[link.kind]}`);
     icon.setAttribute('aria-hidden', 'true');
     const source = link.kind === 'gist'
       ? `${text.gist}${link.owner ? ` · ${link.owner}` : ''}`
       : `${link.owner}/${link.repo}${link.number ? ` #${link.number}` : ''}${link.sha ? ` @ ${link.sha.slice(0, 7)}` : ''}`;
-    head.append(icon, el('em', 'ocs__link-card-source', source));
-    const title = el('a', 'ocs__link-card-title');
-    title.href = link.url;
-    title.target = '_blank';
-    title.rel = 'noopener noreferrer';
+    head.append(icon, ` ${source}`);
+    const title = el('span', 'ocs__nav-card-title');
     title.textContent = link.kind === 'pull' ? fill(text.pull, link)
       : link.kind === 'issue' ? fill(text.issue, link)
         : link.kind === 'commit' ? link.sha.slice(0, 7)
           : link.kind === 'repo' ? link.repo : link.gistId;
-    const meta = el('em', 'ocs__link-card-meta', text.loading);
+    const meta = el('span', 'ocs__text', text.loading);
     card.append(head, title, meta);
     return { card, head, title, meta };
   }
@@ -186,9 +188,9 @@ export function createGitHubCards({
     if (link.kind === 'pull') {
       title.textContent = data.title;
       const state = data.merged ? [text.merged, 'good'] : data.state === 'closed' ? [text.closed, 'bad'] : data.draft ? [text.draft, 'neutral'] : [text.open, 'good'];
-      head.appendChild(pill(...state));
+      head.append(' ', pill(...state));
       const checksLabel = checksPill(checks);
-      if (checksLabel) head.appendChild(checksLabel);
+      if (checksLabel) head.append(' ', checksLabel);
       details.push(fill(text.opened, { who: data.user?.login || '?', when: ago(data.created_at) }));
       if (data.changed_files !== undefined) {
         details.push(`${plural(text.files, data.changed_files)} +${Number(data.additions || 0).toLocaleString()} −${Number(data.deletions || 0).toLocaleString()}`);
@@ -197,7 +199,7 @@ export function createGitHubCards({
     } else if (link.kind === 'issue') {
       title.textContent = data.title;
       const state = data.state === 'open' ? [text.open, 'good'] : data.state_reason === 'not_planned' ? [text.notPlanned, 'neutral'] : [text.closed, 'neutral'];
-      head.appendChild(pill(...state));
+      head.append(' ', pill(...state));
       details.push(fill(text.opened, { who: data.user?.login || '?', when: ago(data.created_at) }));
       if (data.comments) details.push(plural(text.comments, data.comments));
       (data.labels || []).slice(0, 3).forEach(label => details.push(label.name));
@@ -207,7 +209,7 @@ export function createGitHubCards({
       if (data.stats) details.push(`+${Number(data.stats.additions || 0).toLocaleString()} −${Number(data.stats.deletions || 0).toLocaleString()}`);
     } else if (link.kind === 'repo') {
       title.textContent = data.full_name || `${link.owner}/${link.repo}`;
-      if (data.description) card.insertBefore(el('p', 'ocs__link-card-body', data.description), meta);
+      if (data.description) card.insertBefore(el('span', 'ocs__text', data.description), meta);
       if (data.language) details.push(data.language);
       details.push(fill(text.stars, { count: Number(data.stargazers_count || 0).toLocaleString() }));
       details.push(plural(text.forks, data.forks_count || 0));

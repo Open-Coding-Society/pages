@@ -140,6 +140,31 @@ that exception instead of making it the default styling pattern.
 
 ## Grammar reference
 
+### Shared pieces
+
+Elements are built from a few shared pieces, so each one adds only what is its own:
+
+- `surface` (`mixins/_panel.scss`): the 1px ring, rounded corners, panel and text color
+  that cards, rows, menus and previews are drawn on
+- `accent-tint`: the accent ring and tint of a hovered, active or chosen item
+- `kicker`: small capitals over a title or a group
+- `.ocs__truncate`, which other parts `@extend` for one line that ends in "…"
+- `$radius-pill` (`mixins/_variables.scss`): fully round ends
+
+| Element | Reuses |
+| --- | --- |
+| `ocs__card`, `ocs__pager-link` | `surface` |
+| `ocs__hub-card` | `surface`; `accent-tint` when hovered or chosen |
+| `ocs__nav-card` | `surface`; `accent-tint` when hovered or `is-active`; `kicker` for its kicker and call to action |
+| `ocs__nav-card--compact` | the whole nav card, tighter, with an accent edge |
+| `ocs__grid-cell` in a card, calculator or gallery grid | `surface`, through `grid-card-cell`, `grid-key-cell` and `gallery-cell` |
+| `ocs__section-title`, `ocs__stat-label` | `kicker` |
+| `ocs__file`, `ocs__file-preview` | `surface`; `accent-tint` on a row that opens something; `.ocs__truncate` for the name and details |
+| `ocs__menu` | `surface` with a stronger ring; `kicker` for headings; `accent-tint` without a ring on the highlighted item; `.ocs__truncate` for names and hints |
+| `ocs__badge`, `ocs__status`, `ocs__progress` | `$radius-pill` |
+
+Start a new element from these. See [`mixins/README.md`](mixins/README.md).
+
 ### Buttons and links
 
 ```html
@@ -455,28 +480,29 @@ Write headings, names and hints as `<b>`, `<strong>` and `<em>`, not spans. See
 [`elements/menus`](elements/menus). Messages uses it for the attach menu and the
 slash-command picker.
 
-### Link cards
+### Nav cards
 
 ```html
-<article class="ocs__link-card">
-  <div class="ocs__link-card-head">
-    <i class="fas fa-code-pull-request ocs__link-card-icon" aria-hidden="true"></i>
-    <em class="ocs__link-card-source">Open-Coding-Society/pages #2031</em>
-    <b class="ocs__status-pill ocs__status-pill--good">Open</b>
-  </div>
-  <a class="ocs__link-card-title" href="https://github.com/Open-Coding-Society/pages/pull/2031">Messages page redesign</a>
-  <em class="ocs__link-card-meta">syowns opened 2 days ago · 9 files +1,200 −300</em>
-</article>
+<a class="ocs__nav-card" href="/csh/week-4/">
+  <span class="ocs__nav-card-kicker">Week 4</span>
+  <span class="ocs__nav-card-title">Retrospective and Assessment</span>
+  <span class="ocs__text">Reflect on the sprint and set goals</span>
+</a>
+<a class="ocs__nav-card ocs__nav-card--compact" href="https://github.com/Open-Coding-Society/pages/pull/2031">
+  <span class="ocs__nav-card-kicker"><i class="fas fa-code-pull-request" aria-hidden="true"></i> Open-Coding-Society/pages #2031 <b class="ocs__status-pill ocs__status-pill--good">Open</b></span>
+  <span class="ocs__nav-card-title">Messages page redesign</span>
+  <span class="ocs__text">syowns opened 2 days ago · 9 files +1,200 −300</span>
+</a>
 ```
 
-- `ocs__link-card`: a preview of a link, with an accent edge on the left
-- `ocs__link-card-head`, `ocs__link-card-icon`, `ocs__link-card-source`: where it points,
-  with `ocs__status-pill`s after it
-- `ocs__link-card-title`: the link itself; `ocs__link-card-body`: an optional description
-- `ocs__link-card-meta`: muted details. Write the source and details as `<em>`
+- `ocs__nav-card`: a card that is a link: a kicker, a title and an optional line of
+  text. Add `is-active` for the current one; `ocs__nav-card-cta` goes at the end
+- `ocs__nav-card--compact`: a link previewed inside a stream, tighter and with an accent
+  edge. Its kicker says where the link points and can hold status pills
 
-See [`elements/link-cards`](elements/link-cards). Messages (`/dm`) shows GitHub issues,
-pull requests, commits, repositories and gists linked in a chat this way.
+See [`elements/capstone`](elements/capstone). The UI Builder's Link cards block and the
+course sprint and week pages use nav cards. Messages (`/dm`) shows the GitHub issues, pull
+requests, commits, repositories and gists linked in a chat as compact ones.
 
 ### Card headers
 

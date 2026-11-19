@@ -1,11 +1,14 @@
 // A menu of choices that opens over the page: an attach menu, a slash-command picker, a
 // message's More actions. Groups get a small heading; each item is an icon, a name and an
-// optional hint, with a keyboard key at the end. The highlighted item (aria-selected="true",
-// or hover) takes the accent tint with the text color on it. Where the menu sits is the
-// page's job (it knows what opened it); this draws the panel. Write headings, names and
-// hints as <b>, <strong> and <em>: preset themes recolor span, small and div.
+// optional hint, with a keyboard key at the end. The panel is a surface (mixins/_panel.scss)
+// with a stronger ring, so it stands out over the page; headings are kickers; the
+// highlighted item (aria-selected="true", or hover) takes the accent tint with the text
+// color on it; names and hints are ocs__truncate. Where the menu sits is the page's job (it
+// knows what opened it). Write headings, names and hints as <b>, <strong> and <em>: preset
+// themes recolor span, small and div.
 
 .ocs__menu {
+  @include surface($radius-sm, $spacing-xxxs, $border: color-mix(in srgb, var(--pref-text-color) 26%, var(--panel)));
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -15,11 +18,6 @@
   max-height: unquote("min(24rem, 60vh)");
   overflow-y: auto;
   margin: 0;
-  padding: $spacing-xxxs;
-  border: 1px solid color-mix(in srgb, var(--pref-text-color) 26%, var(--panel));
-  border-radius: $radius-sm;
-  background: var(--panel);
-  color: var(--pref-text-color);
   list-style: none;
 
   // display above would beat the attribute, so a closed menu says so itself.
@@ -43,12 +41,9 @@
 }
 
 .ocs__menu-heading {
+  @include kicker($text-xs);
   display: block;
   padding: 2px $spacing-xxxs;
-  font-size: $text-xs;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--text-muted);
 }
 
@@ -71,9 +66,10 @@
   text-decoration: none;
   cursor: pointer;
 
+  // The tint without the ring: an item has no border.
   &:hover,
   &[aria-selected="true"] {
-    background: color-mix(in srgb, var(--pref-accent-color) 16%, var(--panel));
+    @include accent-tint(16%, null);
   }
 
   &:focus-visible {
@@ -95,19 +91,15 @@
 }
 
 .ocs__menu-name {
-  overflow: hidden;
+  @extend .ocs__truncate;
   font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .ocs__menu-hint {
+  @extend .ocs__truncate;
   grid-column: 2;
-  overflow: hidden;
   font-size: 0.85em;
   font-style: normal;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   color: var(--text-muted);
 }
 

@@ -5,6 +5,11 @@
  * - theme vars: --pref-bg-color, --pref-text-color, --pref-accent-color, --panel, --panel-mid, --ui-border
  */
 
+// Cells are drawn with surface() from _panel.scss. A project's own stylesheet
+// (assets/css/projects/<name>/main.scss) can import this file without the site's, so it
+// imports what it needs itself.
+@import "panel";
+
 // ===========================
 // Base Grid
 // ===========================
@@ -53,11 +58,7 @@
  * Grid Card Cell — themed card with hover lift.
  */
 @mixin grid-card-cell {
-  background: var(--panel);
-  border: 1px solid var(--ui-border);
-  border-radius: $radius-lg;
-  padding: $spacing-lg;
-  color: var(--pref-text-color);
+  @include surface($radius-lg, $spacing-lg);
   transition: all $transition-base ease;
 
   &:hover {
@@ -92,14 +93,11 @@
  * Grid Key Cell — square themed tile.
  */
 @mixin grid-key-cell {
+  @include surface($radius-lg);
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--panel);
-  border: 1px solid var(--ui-border);
-  border-radius: $radius-lg;
-  color: var(--pref-text-color);
   font-size: $text-xl;
   font-weight: 600;
   cursor: pointer;
@@ -166,10 +164,8 @@
  * Gallery Cell — square themed tile.
  */
 @mixin gallery-cell {
+  @include surface($radius-md, $color: null);
   aspect-ratio: 1;
-  background: var(--panel);
-  border: 1px solid var(--ui-border);
-  border-radius: $radius-md;
   overflow: hidden;
   transition: all $transition-base ease;
 
