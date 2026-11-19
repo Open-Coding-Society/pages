@@ -50,15 +50,20 @@ export class GroupFiles {
   }
 
   // Every file under a folder with its bytes, for zipStore. onProgress(done, total) after each.
-  // A folder whose files add up to more than maxBytes throws a RangeError carrying its size
-  // before any file is fetched: the group's own list decides, not the size a message gives.
+  // A folder over maxBytes throws a RangeError carrying its size: first by the group's list,
+  // before any file is fetched (not the size a message gives), then by the bytes that arrive,
+  // since a list kept from earlier can be out of date.
   async folderEntries(folderPath, { maxBytes = Infinity, onProgress = () => {} } = {}) {
+    const tooBig = size => Object.assign(new RangeError(`${folderPath} holds ${size} bytes, over ${maxBytes}`), { size });
     const inside = filesUnder(await this.index(), folderPath);
-    const size = inside.reduce((total, file) => total + (Number(file.size) || 0), 0);
-    if (size > maxBytes) throw Object.assign(new RangeError(`${folderPath} holds ${size} bytes, over ${maxBytes}`), { size });
+    const listed = inside.reduce((total, file) => total + (Number(file.size) || 0), 0);
+    if (listed > maxBytes) throw tooBig(listed);
     const entries = [];
+    let received = 0;
     for (const file of inside) {
       const blob = await this.blob(file.path);
+      received += blob.size;
+      if (received > maxBytes) throw tooBig(received);
       entries.push({ path: file.path, bytes: new Uint8Array(await blob.arrayBuffer()) });
       onProgress(entries.length, inside.length);
     }

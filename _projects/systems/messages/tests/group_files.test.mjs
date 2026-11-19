@@ -152,6 +152,15 @@ test('folderEntries refuses a folder over maxBytes by the index’s sizes, befor
   assert.equal((await files.folderEntries('v', { maxBytes: 1400 })).length, 2);
 });
 
+test('folderEntries stops once the bytes that arrive pass maxBytes, when the list’s sizes are out of date', async () => {
+  const api = fakeApi({ index: [{ path: 'v/a.bin', size: 1 }, { path: 'v/b.bin', size: 1 }, { path: 'v/c.bin', size: 1 }] });
+  const fetched = [];
+  api.groupFileContent = async (groupId, path) => { fetched.push(path); return new Blob(['x'.repeat(600)]); };
+  const files = new GroupFiles({ api, groupId: 7 });
+  await assert.rejects(files.folderEntries('v', { maxBytes: 1000 }), error => error instanceof RangeError && error.size === 1200);
+  assert.deepEqual(fetched, ['v/a.bin', 'v/b.bin'], 'c.bin is never fetched');
+});
+
 test('folderEntries fetches every file under a folder for a ZIP', async () => {
   const api = fakeApi({ index: [{ path: 'p/a.txt', size: 1 }, { path: 'p/q/b.txt', size: 1 }, { path: 'other.txt', size: 1 }] });
   const files = new GroupFiles({ api, groupId: 7 });
