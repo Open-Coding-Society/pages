@@ -372,9 +372,88 @@ See [`elements/tabs`](elements/tabs). The Dashboard uses this for its tab bar.
 
 How a page shows/hides the modal (a `hidden`/`open` class, an
 `aria-hidden` attribute) is up to the page — this only styles the chrome.
+- `ocs__modal-card--wide`: a 48rem card for a modal that holds a list or a
+  browser rather than a short form, like Messages' Files panel
+
 See [`elements/modals`](elements/modals).
 Dashboard and Analytics Dashboard use the plain card+close shape; Calendar
 and Profile's face scanner use the full header/actions shape.
+
+### Files
+
+```html
+<ul class="ocs__file-list">
+  <li class="ocs__file">
+    <i class="fas fa-file-pdf ocs__file-icon" aria-hidden="true"></i>
+    <div class="ocs__file-text">
+      <b class="ocs__file-name" title="Design review.pdf">Design review.pdf</b>
+      <em class="ocs__file-meta">2.4 MB · Ada Lovelace</em>
+    </div>
+    <div class="ocs__file-actions">
+      <button class="ocs__btn small" type="button">Download</button>
+    </div>
+  </li>
+  <li><button class="ocs__file" type="button">
+    <i class="fas fa-folder ocs__file-icon" aria-hidden="true"></i>
+    <div class="ocs__file-text">
+      <b class="ocs__file-name">project</b>
+      <em class="ocs__file-meta">42 files · 3.1 MB</em>
+    </div>
+  </button></li>
+</ul>
+```
+
+- `ocs__file-list`: rows of files with a small gap
+- `ocs__file`: one file or folder: icon, name and details, actions. Make it a
+  `<button>` or `<a>` when the whole row opens something, like a folder
+- `ocs__file-icon`: the type icon, in the accent
+- `ocs__file-text`, `ocs__file-name`, `ocs__file-meta`: the name on one line (cut
+  with "…") over muted details. Write the name as `<b>` and the details as `<em>`:
+  preset themes recolor span, small and div
+- `ocs__file-actions`: buttons at the end of the row
+- `ocs__file-preview`: an image, video, PDF frame or `<pre>` of text shown with a file
+
+See [`elements/files`](elements/files). Messages (`/dm`) shows shared files,
+the upload tray and the files under a message this way.
+
+### Progress
+
+```html
+<progress class="ocs__progress" max="100" value="40">40%</progress>
+```
+
+`ocs__progress`: a thin bar on a native `<progress>`, the accent on a track mixed
+from the text color, in every theme. Leave `value` off while the amount is unknown.
+See [`elements/progress`](elements/progress).
+
+### Menus
+
+```html
+<div class="ocs__menu" role="listbox" aria-label="Commands">
+  <div class="ocs__menu-group" role="group" aria-labelledby="share-heading">
+    <b class="ocs__menu-heading" id="share-heading">Share</b>
+    <button class="ocs__menu-item" type="button" role="option" aria-selected="true">
+      <i class="fas fa-paperclip ocs__menu-icon" aria-hidden="true"></i>
+      <strong class="ocs__menu-name">/file</strong>
+      <em class="ocs__menu-hint">Attach files from your computer</em>
+      <kbd>Enter</kbd>
+    </button>
+  </div>
+  <em class="ocs__menu-foot">↑ ↓ to move · Enter to pick · Esc to close</em>
+</div>
+```
+
+- `ocs__menu`: the panel; where it opens is the page's job
+- `ocs__menu-group`, `ocs__menu-heading`: groups, divided by a line
+- `ocs__menu-item`: a `<button>`, `<a>` or a `<label>` for a hidden file input.
+  `aria-selected="true"` (or hover) gives it the accent tint with the text color on it
+- `ocs__menu-icon`, `ocs__menu-name`, `ocs__menu-hint`, `kbd` or `ocs__menu-key`:
+  the item's icon, name, muted hint and key
+- `ocs__menu-foot`: a muted line of keyboard help
+
+Write headings, names and hints as `<b>`, `<strong>` and `<em>`, not spans. See
+[`elements/menus`](elements/menus). Messages uses it for the attach menu and the
+slash-command picker.
 
 ### Card headers
 
