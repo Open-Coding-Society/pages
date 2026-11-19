@@ -204,7 +204,7 @@ function shareThread({ filesApi = fakeFilesApi(), sendFails = 0 } = {}) {
     elements, api, socket, me, groupFiles: () => files,
     richText: { ...richText, createRichComposer: () => composer },
   });
-  return { thread, elements, composer, sent, filesApi };
+  return { thread, elements, composer, sent, filesApi, files };
 }
 
 function pickFiles(input, list) {
@@ -257,6 +257,25 @@ test('when the message fails after the files are up, the next Send doesn’t upl
   await settle();
   assert.deepEqual(filesApi.calls.uploads, ['proj/x.js']);
   assert.equal(sent[0], '[[files:d~proj~1~4]] code');
+});
+
+test('Send names the files against the group’s files as they are now, so a teammate’s file isn’t replaced', async () => {
+  const filesApi = fakeFilesApi();
+  let listed = [];
+  filesApi.groupFileIndex = async () => { filesApi.calls.index += 1; return listed; };
+  const { thread, elements, composer, sent, files } = shareThread({ filesApi });
+  thread.open('group', 7, { title: '', subtitle: '' });
+  await settle();
+  await files.index(); // the Files tab listed the group earlier
+  // A teammate shares plan.pdf while another chat is open, so no frame reaches this page.
+  listed = [{ path: 'plan.pdf', size: 9 }];
+  pickFiles(elements.filesInput, [file('plan.pdf', 5)]);
+  composer.setHTML('');
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  await settle();
+  assert.deepEqual(filesApi.calls.uploads, ['plan (2).pdf']);
+  assert.equal(sent[0], '[[files:f~plan (2).pdf~5]]');
 });
 
 test('in a direct message, dropped files say where they can go, and the menu offers only an image', async () => {

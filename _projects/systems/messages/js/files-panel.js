@@ -206,6 +206,9 @@ export function createFilesTab({ host, notify, groupFilesFor, actions, onShare =
       path = folderPath;
       query = '';
       index = [];
+      // Asked for afresh each time the tab opens: the page only hears about shares in the
+      // conversation that is open, so a cached list can miss what was shared elsewhere.
+      groupFilesFor(current.id).refresh();
       load();
     },
     hide() {

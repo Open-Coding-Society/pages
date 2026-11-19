@@ -8,6 +8,7 @@ const { document } = installFakeDom();
 
 const { createMessageLog } = await import('../js/message-log.js');
 const { createConversationPanel } = await import('../js/conversation-panel.js');
+const { GroupFiles } = await import('../js/group-files.js');
 
 const me = { id: 1, uid: 'ada', name: 'Ada Lovelace', pfp: null };
 const richText = {
@@ -72,7 +73,7 @@ function panelElements() {
   };
 }
 
-function makePanel(messages, { files = [] } = {}) {
+function makePanel(messages, { files = [], groupFiles = null, viewer = { show() {} } } = {}) {
   const elements = panelElements();
   const shown = [];
   const unpinned = [];
@@ -81,9 +82,9 @@ function makePanel(messages, { files = [] } = {}) {
     showMessage: key => shown.push(key),
     togglePin: async (message, pinned) => { unpinned.push([message.id, pinned]); return true; },
   };
-  const groupFiles = { index: async () => files, blob: async () => new Blob(['x']) };
+  const filesOfGroup = groupFiles || new GroupFiles({ api: { groupFileIndex: async () => files }, groupId: 12 });
   const panel = createConversationPanel({
-    elements, thread, groupFilesFor: () => groupFiles, viewer: { show() {} },
+    elements, thread, groupFilesFor: () => filesOfGroup, viewer,
     makeFileActions: () => ({ handle() {}, thumbnail: async () => 'blob:thumb', clear() {} }),
   });
   return { panel, elements, shown, unpinned };
@@ -118,6 +119,21 @@ test('a group’s panel opens on Files and counts its media, links and pins', as
   assert.match(elements.panels.files.textContent, /shot\.png/);
   const linkNames = elements.panels.links.querySelectorAll('.ocs__file-name').map(name => name.textContent);
   assert.deepEqual(linkNames, ['github.com/Open-Coding-Society/pages/pull/2031', 'example.com']);
+});
+
+test('opening the Files tab lists the group’s files as they are now, not as they were', async () => {
+  let listed = [{ path: 'a.txt', size: 1 }];
+  const groupFiles = new GroupFiles({ api: { groupFileIndex: async () => listed }, groupId: 12 });
+  const { panel, elements } = makePanel([], { groupFiles });
+  const group = { kind: 'group', id: 12, name: 'Team Turing' };
+  panel.open(group, null);
+  await settle();
+  assert.match(elements.panels.files.textContent, /a\.txt/);
+  // A teammate shares b.txt while another chat is open, so no frame reaches this page.
+  listed = [...listed, { path: 'b.txt', size: 2 }];
+  panel.open(group, null);
+  await settle();
+  assert.match(elements.panels.files.textContent, /b\.txt/);
 });
 
 test('Pinned lists each pin with Show in the chat and Unpin', async () => {

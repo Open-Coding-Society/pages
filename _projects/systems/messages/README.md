@@ -101,7 +101,9 @@ direct message only an image can be attached: Spring stores shared files for gro
   Spring and nginx take 50 MB bodies and base64 makes a file a third bigger. A share holds
   at most 500 files, and at most 50 loose ones (more go in a folder).
 - **Names already taken.** A second `report.pdf` goes up as `report (2).pdf`, and a second
-  `project` folder as `project (2)`, so an older message's file isn't replaced.
+  `project` folder as `project (2)`, so an older message's file isn't replaced. Send asks
+  Spring for the group's list first, because the page only hears about shares in the open
+  conversation: a list kept from earlier could miss a teammate's file of the same name.
 - **The message.** It starts with a `[[files:…]]` marker after any reply marker:
   `f~path~size` for a file and `d~path~count~size` for a folder, separated by `;`, with
   `%`, `[`, `]`, `|`, `;`, `~`, `<`, `>`, `&` and control characters escaped as `%XX`.
@@ -113,7 +115,7 @@ direct message only an image can be attached: Spring stores shared files for gro
   its bytes, and the page adds nothing to the log for it (the share's message lists the
   files); it only marks the group's file list out of date.
 - **The Files tab** of the Shared panel (or a folder's Open) lists the group's files as
-  folders with breadcrumbs, filters by name, previews (images, video, sound, PDF, the
+  they are when it opens, as folders with breadcrumbs, filters by name, previews (images, video, sound, PDF, the
   first 512 KB of text and code), downloads, and zips a folder (up to 1 GB, built in the
   browser).
 

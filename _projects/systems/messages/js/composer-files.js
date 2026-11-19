@@ -137,6 +137,9 @@ export function createComposerFiles({
     const files = groupFiles(context.id);
     let taken;
     try {
+      // The names in use right now: a list cached while another chat was open misses what
+      // teammates shared meanwhile, and an upload under one of their names would replace it.
+      files.refresh();
       taken = topNames(await files.index());
     } catch (error) {
       console.warn('Messages: could not list the group’s files before sharing', error);
