@@ -41,16 +41,11 @@ export class PopupMenu {
     button.setAttribute('aria-expanded', 'false');
     button.setAttribute('aria-controls', id);
 
-    button.addEventListener('click', () => (this.#open ? this.close() : this.#show()));
-    button.addEventListener('keydown', event => {
-      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-        event.preventDefault();
-        this.#show();
-        if (event.key === 'ArrowUp') this.#focusItem(-1);
-      }
-    });
+    button.addEventListener('click', this.#onButtonClick);
+    button.addEventListener('keydown', this.#onButtonKeydown);
     menu.addEventListener('keydown', event => {
-      const at = this.#choices.indexOf(document.activeElement);
+      // Counted among the enabled items, the ones #focusItem steps through.
+      const at = this.#enabled().indexOf(document.activeElement);
       if (event.key === 'ArrowDown') this.#focusItem(at + 1);
       else if (event.key === 'ArrowUp') this.#focusItem(at - 1);
       else if (event.key === 'Home') this.#focusItem(0);
@@ -85,14 +80,30 @@ export class PopupMenu {
     if (refocus) this.#button.focus();
   }
 
-  /** Closes the menu and takes it off the page. */
+  /** Closes the menu, takes it off the page and lets go of its button. */
   destroy() {
     this.close({ refocus: false });
+    this.#button.removeEventListener('click', this.#onButtonClick);
+    this.#button.removeEventListener('keydown', this.#onButtonKeydown);
     this.#menu.remove();
   }
 
+  #onButtonClick = () => (this.#open ? this.close() : this.#show());
+
+  #onButtonKeydown = event => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.#show();
+      if (event.key === 'ArrowUp') this.#focusItem(-1);
+    }
+  };
+
+  #enabled() {
+    return this.#choices.filter(item => !item.disabled);
+  }
+
   #focusItem(index) {
-    const enabled = this.#choices.filter(item => !item.disabled);
+    const enabled = this.#enabled();
     if (!enabled.length) return;
     enabled[(index + enabled.length) % enabled.length].focus();
   }

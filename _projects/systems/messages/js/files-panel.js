@@ -263,8 +263,11 @@ export class FilesTab {
       this.#host.replaceChildren(spinner, el('p', 'ocs__text', this.#text.loading));
     }
     try {
-      this.#index = await files.index();
+      // A list for a load the tab has moved on from (another group, or closed) is dropped
+      // before it is kept: kept, the next filter or folder would draw that group's files.
+      const index = await files.index();
       if (ticket !== this.#loadCount) return;
+      this.#index = index;
       this.#render();
     } catch (error) {
       if (ticket !== this.#loadCount) return;
