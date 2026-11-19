@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { crc32, zipStore } from '../js/zip-store.js';
+import { ZipStore } from '../js/zip-store.js';
 
 const bytes = text => new TextEncoder().encode(text);
 
@@ -32,12 +32,12 @@ function readZip(archive) {
 }
 
 test('crc32 matches the standard check value', () => {
-  assert.equal(crc32(bytes('The quick brown fox jumps over the lazy dog')), 0x414fa339);
-  assert.equal(crc32(new Uint8Array(0)), 0);
+  assert.equal(ZipStore.crc32(bytes('The quick brown fox jumps over the lazy dog')), 0x414fa339);
+  assert.equal(ZipStore.crc32(new Uint8Array(0)), 0);
 });
 
 test('zipStore writes a stored archive that reads back file for file, with UTF-8 names', () => {
-  const archive = zipStore([
+  const archive = ZipStore.build([
     { path: 'project/README.md', bytes: bytes('# Hello') },
     { path: 'project/src/Résumé.java', bytes: bytes('class R {}') },
   ], { date: new Date(2026, 10, 18, 21, 5, 30) });
@@ -48,9 +48,9 @@ test('zipStore writes a stored archive that reads back file for file, with UTF-8
     assert.equal(entry.method, 0);
     assert.equal(entry.flags & 0x0800, 0x0800);
   });
-  assert.equal(entries[0].crc, crc32(bytes('# Hello')));
+  assert.equal(entries[0].crc, ZipStore.crc32(bytes('# Hello')));
 });
 
 test('zipStore refuses what a plain ZIP cannot hold instead of writing a broken one', () => {
-  assert.throws(() => zipStore(Array.from({ length: 65536 }, (_, i) => ({ path: `f${i}`, bytes: new Uint8Array(0) }))), RangeError);
+  assert.throws(() => ZipStore.build(Array.from({ length: 65536 }, (_, i) => ({ path: `f${i}`, bytes: new Uint8Array(0) }))), RangeError);
 });

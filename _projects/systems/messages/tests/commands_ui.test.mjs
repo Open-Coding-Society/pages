@@ -13,10 +13,10 @@ const opened = [];
 globalThis.window.open = (url, target, features) => opened.push([url, target, features]);
 globalThis.window.location = { href: 'https://pages.example/dm?group=12' };
 
-const { createCommandMenu } = await import('../js/command-menu.js');
+const { CommandMenu } = await import('../js/command-menu.js');
 const { createThread } = await import('../js/thread.js');
 const { createMessageLog } = await import('../js/message-log.js');
-const { addCodeMarker } = await import('../js/code-model.js');
+const { CodeBlocks } = await import('../js/code-model.js');
 
 // A composer whose editor text follows what's set in it, as the real one's does.
 function stubComposer() {
@@ -50,7 +50,7 @@ function menuFor(kind = 'group') {
   const composer = stubComposer();
   const host = document.createElement('div');
   const ran = [];
-  const menu = createCommandMenu({ composer, host, kindOf: () => kind, onRun: (command, args) => ran.push([command.name, args]) });
+  const menu = new CommandMenu({ composer, host, kindOf: () => kind, onRun: (command, args) => ran.push([command.name, args]) });
   return { composer, host, ran, menu };
 }
 
@@ -180,7 +180,7 @@ test('/code posts a code block with the message as its caption; /gist saves it a
   composer.setHTML('try this');
   elements.form.dispatchEvent(fakeEvent('submit'));
   await settle();
-  assert.equal(sent.at(-1), addCodeMarker('try this', 'java', 'class Main {}'));
+  assert.equal(sent.at(-1), CodeBlocks.addMarker('try this', 'java', 'class Main {}'));
   assert.equal(elements.codeHost.querySelector('.dm__code-box').hidden, true, 'the box closes once sent');
 
   composer.type('/gist hello.py');
@@ -250,8 +250,8 @@ test('a code block draws its code as text, with Copy, and Run for a language the
     me: { name: 'Ada' }, onEdit() {}, onDelete() {},
     runCode: async (language, code) => { runs.push([language, code]); return 'Hello'; },
   });
-  log.append({ id: 'c1', key: 'c1', senderKey: 'g', senderName: 'Grace', body: addCodeMarker('caption', 'python', 'print("<b>Hello</b>")'), sentAt: null }, false);
-  log.append({ id: 'c2', key: 'c2', senderKey: 'g', senderName: 'Grace', body: addCodeMarker('', 'html', '<h1>x</h1>'), sentAt: null }, false);
+  log.append({ id: 'c1', key: 'c1', senderKey: 'g', senderName: 'Grace', body: CodeBlocks.addMarker('caption', 'python', 'print("<b>Hello</b>")'), sentAt: null }, false);
+  log.append({ id: 'c2', key: 'c2', senderKey: 'g', senderName: 'Grace', body: CodeBlocks.addMarker('', 'html', '<h1>x</h1>'), sentAt: null }, false);
   const [python, html] = host.querySelectorAll('.chat-code');
   assert.equal(python.querySelector('code').textContent, 'print("<b>Hello</b>")');
   assert.deepEqual(python.querySelectorAll('button').map(button => button.textContent), ['Copy', 'Run']);

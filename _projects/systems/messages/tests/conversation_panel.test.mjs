@@ -7,9 +7,9 @@ import { fakeEvent, installFakeDom, settle } from './fake-dom.mjs';
 const { document } = installFakeDom();
 
 const { createMessageLog } = await import('../js/message-log.js');
-const { createConversationPanel } = await import('../js/conversation-panel.js');
+const { ConversationPanel } = await import('../js/conversation-panel.js');
 const { GroupFiles } = await import('../js/group-files.js');
-const { createFileViewer } = await import('../js/file-viewer.js');
+const { FileViewer } = await import('../js/file-viewer.js');
 const { createDialog } = await import('../js/dialogs.js');
 
 const me = { id: 1, uid: 'ada', name: 'Ada Lovelace', pfp: null };
@@ -85,7 +85,7 @@ function makePanel(messages, { files = [], groupFiles = null, viewer = { show() 
     togglePin: async (message, pinned) => { unpinned.push([message.id, pinned]); return true; },
   };
   const filesOfGroup = groupFiles || new GroupFiles({ api: { groupFileIndex: async () => files }, groupId: 12 });
-  const panel = createConversationPanel({
+  const panel = new ConversationPanel({
     elements, thread, groupFilesFor: () => filesOfGroup, viewer,
     makeFileActions: () => ({ handle() {}, thumbnail: async () => 'blob:thumb', clear() {} }),
   });
@@ -140,7 +140,7 @@ test('a picture sent in the chat opens in the viewer as an image, though its nam
 test('the viewer draws an image it is told is one, and says when a file has no preview', async () => {
   const root = document.createElement('div');
   document.body.appendChild(root);
-  const viewer = createFileViewer({ root });
+  const viewer = new FileViewer({ root });
   const png = new Blob([new Uint8Array([137, 80, 78, 71])], { type: 'image/png' });
   await viewer.show({ name: 'Image from Grace', blob: png, preview: 'image' }, null);
   assert.equal(root.querySelectorAll('img.ocs__file-preview').length, 1);
@@ -158,7 +158,7 @@ test('Escape closes the viewer on top, and the Shared panel under it stays open'
   panelDialog.open(null);
   const root = document.createElement('div');
   document.body.appendChild(root);
-  const viewer = createFileViewer({ root });
+  const viewer = new FileViewer({ root });
   await viewer.show({ name: 'notes.md', blob: new Blob(['# notes']) }, null);
   document.dispatchEvent(fakeEvent('keydown', { key: 'Escape' }));
   assert.equal(viewer.isOpen(), false);

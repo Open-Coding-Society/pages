@@ -7,16 +7,16 @@
 // Replies carry a [[reply:...]] marker at the start of their body (chat-reply.js,
 // reached through `richText`); an image pasted into the composer is attached like one
 // picked with the Image control or dropped on the composer.
-import { ChatCommands, DM_MAX_LENGTH } from './chat-commands.js';
-import { addCodeMarker, languageOf } from './code-model.js';
-import { createCodeComposer } from './code-composer.js';
-import { createCommandMenu } from './command-menu.js';
-import { createComposerFiles } from './composer-files.js';
+import { ChatCommands } from './chat-commands.js';
+import { CodeBlocks } from './code-model.js';
+import { CodeComposer } from './code-composer.js';
+import { CommandMenu } from './command-menu.js';
+import { ComposerFiles } from './composer-files.js';
 import { readImageFile } from './dialogs.js';
-import { createFileActions } from './file-actions.js';
-import { createFileViewer } from './file-viewer.js';
-import { pinMarker, unpinMarker } from './conversation-model.js';
-import { addFilesMarker, extractFilesMarker } from './files-model.js';
+import { FileActions } from './file-actions.js';
+import { FileViewer } from './file-viewer.js';
+import { Conversation } from './conversation-model.js';
+import { FilesMarker } from './files-model.js';
 import { classifyDmEvent, classifyGroupEvent, dmMessage, groupMessage } from './messages-model.js';
 import { createMessageLog, withTexts } from './message-log.js';
 
@@ -120,8 +120,8 @@ export function createThread({
 
   // Shared files open from the group they were shared in; the viewer lives in the page's .dm root.
   const openGroupFiles = () => (groupFiles && current?.kind === 'group' ? groupFiles(current.id) : null);
-  const viewer = sharedViewer || (groupFiles ? createFileViewer({ root: elements.messages.closest?.('.dm') || document.body }) : null);
-  const fileActions = groupFiles ? createFileActions({
+  const viewer = sharedViewer || (groupFiles ? new FileViewer({ root: elements.messages.closest?.('.dm') || document.body }) : null);
+  const fileActions = groupFiles ? new FileActions({
     filesFor: openGroupFiles,
     viewer,
     notify: message => showFormMessage(message),
@@ -137,7 +137,7 @@ export function createThread({
     thumbnail: fileActions ? item => fileActions.thumbnail(item) : null,
     onPin: readOnly ? null : (message, pinned) => togglePin(message, pinned),
     runCode,
-    saveGist: readOnly || !api.createGist ? null : (language, code) => commands.saveGist(language, code, `snippet.${languageOf(language)?.extension || 'txt'}`),
+    saveGist: readOnly || !api.createGist ? null : (language, code) => commands.saveGist(language, code, `snippet.${CodeBlocks.languageOf(language)?.extension || 'txt'}`),
     linkCards,
     onMore: readOnly ? null : (action, message) => commands.more(action, message),
   });
@@ -153,7 +153,7 @@ export function createThread({
     elements.form.insertBefore(composer.element, elements.cancelEdit);
   }
   // The Attach menu and file sharing, where the page has an Attach button for them.
-  const composerFiles = composer && groupFiles && elements.attachButton ? createComposerFiles({
+  const composerFiles = composer && groupFiles && elements.attachButton ? new ComposerFiles({
     elements: {
       attachButton: elements.attachButton, menuHost: elements.attachMenuHost || elements.form,
       imageInput: elements.imageInput, filesInput: elements.filesInput, folderInput: elements.folderInput,
@@ -165,12 +165,12 @@ export function createThread({
   }) : null;
 
   // The code box (/code, /gist) and the slash-command menu sit above the composer too.
-  const codeBox = composer && elements.codeHost ? createCodeComposer({
+  const codeBox = composer && elements.codeHost ? new CodeComposer({
     host: elements.codeHost,
     onSubmit: () => submit(),
     onClose: () => composer.focus(),
   }) : null;
-  const commandMenu = composer && elements.commandHost ? createCommandMenu({
+  const commandMenu = composer && elements.commandHost ? new CommandMenu({
     composer,
     host: elements.commandHost,
     kindOf: () => (current?.loaded && !editing ? current.kind : null),
@@ -277,7 +277,7 @@ export function createThread({
       sender: message.isSelf ? me.name : message.senderName,
       excerpt: richText.replyExcerpt(html)
         || (message.image ? text.imageMessage : '')
-        || (extractFilesMarker(html).items.length ? text.filesMessage : '')
+        || (FilesMarker.extract(html).items.length ? text.filesMessage : '')
         || (/\[\[code:/.test(html) ? text.codeMessage : ''),
     };
     replyBar.show(replyingTo);
@@ -374,7 +374,7 @@ export function createThread({
     }
     let withCode = html;
     if (code?.mode === 'code') {
-      withCode = addCodeMarker(html, code.language, code.code);
+      withCode = CodeBlocks.addMarker(html, code.language, code.code);
     } else if (code?.mode === 'gist') {
       const url = await commands.saveGist(code.language, code.code, code.filename);
       if (destroyed) return;
@@ -385,9 +385,9 @@ export function createThread({
       }
       withCode = html ? `${html} ${url}` : url;
     }
-    const withFiles = addFilesMarker(withCode, files);
+    const withFiles = FilesMarker.add(withCode, files);
     const outgoing = reply ? richText.addReplyMarker(withFiles, reply) : withFiles;
-    if (kind === 'dm' && outgoing.length > DM_MAX_LENGTH) {
+    if (kind === 'dm' && outgoing.length > ChatCommands.DM_MAX_LENGTH) {
       pending = null;
       refreshComposer();
       showFormMessage(text.tooLongForDm);
@@ -455,7 +455,7 @@ export function createThread({
     const { kind, id } = current;
     showFormMessage('');
     try {
-      const saved = await kinds[kind].send(id, pinned ? unpinMarker(message.id) : pinMarker(message.id), null);
+      const saved = await kinds[kind].send(id, pinned ? Conversation.unpinMarker(message.id) : Conversation.pinMarker(message.id), null);
       if (destroyed || !isOpen(kind, id)) return true;
       showSaved(kind, id, saved);
       if (!socket.isConnected()) loadNew(kind, id);

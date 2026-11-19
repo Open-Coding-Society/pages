@@ -2,18 +2,10 @@
 // commands this conversation has (ocs__menu), narrowed as you type. ↑ ↓ move, Enter or Tab
 // picks, Escape closes, and a click picks too. A command that needs words after it (/issue
 // owner/repo#12) is put in the composer for you to finish; Enter then runs it instead of
-// sending. One whose words are optional (/code [language]) runs when picked. onRun(command,
-// args) does the work (thread.js).
-import { COMMANDS, matchCommands, parseCommand } from './slash-commands.js';
+// sending. One whose words are optional (/code [language]) runs when picked.
+import { SlashCommands } from './slash-commands.js';
 
-export const MENU_TEXTS = Object.freeze({
-  label: 'Commands',
-  foot: '↑ ↓ to move · Enter or Tab to pick · Esc to close',
-  empty: 'No command starts with that. Try /help.',
-});
-
-let menuCount = 0;
-const plain = composer => composer.editor.textContent.replace(/[\u200b\ufeff]/g, '').replace(/\u00a0/g, ' ');
+const plain = composer => composer.editor.textContent.replace(/[​﻿]/g, '').replace(/ /g, ' ');
 
 // Puts the caret at the end of the editor, after a command's name is filled in.
 function caretToEnd(editor) {
@@ -26,48 +18,128 @@ function caretToEnd(editor) {
   selection?.addRange(range);
 }
 
-export function createCommandMenu({ composer, host, kindOf, onRun, texts = {} }) {
-  const text = { ...MENU_TEXTS, ...texts };
-  const id = `messagesCommands${++menuCount}`;
-  const menu = document.createElement('div');
-  menu.className = 'ocs__menu dm__commands';
-  menu.id = id;
-  menu.setAttribute('role', 'listbox');
-  menu.setAttribute('aria-label', text.label);
-  menu.hidden = true;
-  host.appendChild(menu);
-  const editor = composer.editor;
-  editor.setAttribute('aria-autocomplete', 'list');
-  editor.setAttribute('aria-controls', id);
-  editor.setAttribute('aria-expanded', 'false');
+/**
+ * The composer's slash-command menu.
+ */
+export class CommandMenu {
+  /** Its wording; the page can pass its own over these. */
+  static TEXTS = Object.freeze({
+    label: 'Commands',
+    foot: '↑ ↓ to move · Enter or Tab to pick · Esc to close',
+    empty: 'No command starts with that. Try /help.',
+  });
 
-  let items = []; // [{ command, element }]
-  let index = 0;
+  static #count = 0;
 
-  const isOpen = () => !menu.hidden;
+  #composer;
+  #editor;
+  #kindOf;
+  #onRun;
+  #text;
+  #id;
+  #menu;
+  #items = []; // [{ command, element }]
+  #index = 0;
 
-  function close() {
-    if (!isOpen()) return;
+  /**
+   * Builds the menu, closed, and listens to the composer.
+   * @param {object} options
+   * @param {object} options.composer the rich composer (element, editor, setHTML, focus, clear)
+   * @param {HTMLElement} options.host where the menu goes
+   * @param {Function} options.kindOf gives the open conversation's kind ('group' or 'dm'),
+   *   or null while commands can't run
+   * @param {Function} options.onRun onRun(command, args) does the work (thread.js)
+   * @param {object} options.texts wording over TEXTS
+   */
+  constructor({ composer, host, kindOf, onRun, texts = {} }) {
+    this.#composer = composer;
+    this.#kindOf = kindOf;
+    this.#onRun = onRun;
+    this.#text = { ...CommandMenu.TEXTS, ...texts };
+    CommandMenu.#count += 1;
+    this.#id = `messagesCommands${CommandMenu.#count}`;
+    const menu = document.createElement('div');
+    menu.className = 'ocs__menu dm__commands';
+    menu.id = this.#id;
+    menu.setAttribute('role', 'listbox');
+    menu.setAttribute('aria-label', this.#text.label);
     menu.hidden = true;
-    menu.replaceChildren();
-    items = [];
+    host.appendChild(menu);
+    this.#menu = menu;
+    const editor = composer.editor;
+    this.#editor = editor;
+    editor.setAttribute('aria-autocomplete', 'list');
+    editor.setAttribute('aria-controls', this.#id);
     editor.setAttribute('aria-expanded', 'false');
-    editor.removeAttribute('aria-activedescendant');
+
+    // Capture, so this runs before the composer's own Enter-to-send.
+    composer.element.addEventListener('keydown', this.#onKeydown, true);
+    editor.addEventListener('input', this.#update);
+    editor.addEventListener('blur', this.#onBlur);
   }
 
-  function highlight(next) {
-    if (!items.length) return;
-    index = (next + items.length) % items.length;
-    items.forEach((item, at) => item.element.setAttribute('aria-selected', String(at === index)));
-    const current = items[index].element;
-    editor.setAttribute('aria-activedescendant', current.id);
+  /** Puts "/" in the composer and opens the menu on every command. */
+  open() {
+    this.#composer.setHTML('/');
+    this.#composer.focus();
+    caretToEnd(this.#editor);
+    this.#update();
+  }
+
+  /** Closes the menu. */
+  close() {
+    if (!this.isOpen()) return;
+    this.#menu.hidden = true;
+    this.#menu.replaceChildren();
+    this.#items = [];
+    this.#editor.setAttribute('aria-expanded', 'false');
+    this.#editor.removeAttribute('aria-activedescendant');
+  }
+
+  /** @returns {boolean} whether the menu is open */
+  isOpen() {
+    return !this.#menu.hidden;
+  }
+
+  /**
+   * A finished command in the composer, if there is one: what Enter or Send runs.
+   * @returns {{command: object, args: string}|null}
+   */
+  typedCommand() {
+    const kind = this.#kindOf();
+    return kind ? SlashCommands.parse(plain(this.#composer).trim(), { kind }) : null;
+  }
+
+  /**
+   * Every command, whatever is typed: what /help lists.
+   * @returns {ReadonlyArray}
+   */
+  all() {
+    return SlashCommands.ALL;
+  }
+
+  /** Closes the menu, stops listening and takes it off the page. */
+  destroy() {
+    this.close();
+    this.#composer.element.removeEventListener('keydown', this.#onKeydown, true);
+    this.#editor.removeEventListener('input', this.#update);
+    this.#editor.removeEventListener('blur', this.#onBlur);
+    this.#menu.remove();
+  }
+
+  #highlight(next) {
+    if (!this.#items.length) return;
+    this.#index = (next + this.#items.length) % this.#items.length;
+    this.#items.forEach((item, at) => item.element.setAttribute('aria-selected', String(at === this.#index)));
+    const current = this.#items[this.#index].element;
+    this.#editor.setAttribute('aria-activedescendant', current.id);
     current.scrollIntoView?.({ block: 'nearest' });
   }
 
-  function option(command) {
+  #option(command) {
     const element = document.createElement('div');
     element.className = 'ocs__menu-item';
-    element.id = `${id}-${command.name}`;
+    element.id = `${this.#id}-${command.name}`;
     element.setAttribute('role', 'option');
     element.setAttribute('aria-selected', 'false');
     const glyph = document.createElement('i');
@@ -83,127 +155,97 @@ export function createCommandMenu({ composer, host, kindOf, onRun, texts = {} })
     // mousedown, not click: picking mustn't take focus from the composer first.
     element.addEventListener('mousedown', event => {
       event.preventDefault();
-      pick(command);
+      this.#pick(command);
     });
     element.addEventListener('mousemove', () => {
-      const at = items.findIndex(item => item.command === command);
-      if (at !== index) highlight(at);
+      const at = this.#items.findIndex(item => item.command === command);
+      if (at !== this.#index) this.#highlight(at);
     });
     return element;
   }
 
-  function render(groups) {
-    items = [];
+  #render(groups) {
+    this.#items = [];
     const nodes = groups.map(group => {
       const section = document.createElement('div');
       section.className = 'ocs__menu-group';
       section.setAttribute('role', 'group');
       const heading = document.createElement('b');
       heading.className = 'ocs__menu-heading';
-      heading.id = `${id}-${group.id}`;
+      heading.id = `${this.#id}-${group.id}`;
       heading.textContent = group.label;
       section.setAttribute('aria-labelledby', heading.id);
       section.appendChild(heading);
       group.commands.forEach(command => {
-        const element = option(command);
-        items.push({ command, element });
+        const element = this.#option(command);
+        this.#items.push({ command, element });
         section.appendChild(element);
       });
       return section;
     });
     const foot = document.createElement('em');
     foot.className = 'ocs__menu-foot';
-    foot.textContent = items.length ? text.foot : text.empty;
-    menu.replaceChildren(...nodes, foot);
-    menu.hidden = false;
-    editor.setAttribute('aria-expanded', 'true');
-    highlight(0);
+    foot.textContent = this.#items.length ? this.#text.foot : this.#text.empty;
+    this.#menu.replaceChildren(...nodes, foot);
+    this.#menu.hidden = false;
+    this.#editor.setAttribute('aria-expanded', 'true');
+    this.#highlight(0);
   }
 
-  function update() {
-    const kind = kindOf();
-    const groups = kind ? matchCommands(plain(composer), { kind }) : null;
+  #update = () => {
+    const kind = this.#kindOf();
+    const groups = kind ? SlashCommands.match(plain(this.#composer), { kind }) : null;
     if (!groups) {
-      close();
+      this.close();
       return;
     }
-    render(groups);
-  }
+    this.#render(groups);
+  };
 
-  function pick(command) {
-    close();
+  #onBlur = () => this.close();
+
+  #pick(command) {
+    this.close();
     // Words a command needs ("owner/repo#number") are typed after its name; one whose words
     // are optional ("[language]") runs straight away.
     if (command.args && !command.args.startsWith('[')) {
       // Fill in the name and let the words after it be typed; Enter then runs it.
-      composer.setHTML(`/${command.name}&nbsp;`);
-      composer.focus();
-      caretToEnd(editor);
+      this.#composer.setHTML(`/${command.name}&nbsp;`);
+      this.#composer.focus();
+      caretToEnd(this.#editor);
       return;
     }
-    composer.clear();
-    onRun(command, '');
+    this.#composer.clear();
+    this.#onRun(command, '');
   }
 
-  // A finished command in the composer, if there is one: what Enter or Send runs.
-  function typedCommand() {
-    const kind = kindOf();
-    return kind ? parseCommand(plain(composer).trim(), { kind }) : null;
-  }
-
-  function onKeydown(event) {
+  #onKeydown = event => {
     if (event.isComposing) return;
-    if (isOpen() && ['ArrowDown', 'ArrowUp', 'Enter', 'Tab', 'Escape'].includes(event.key)) {
+    if (this.isOpen() && ['ArrowDown', 'ArrowUp', 'Enter', 'Tab', 'Escape'].includes(event.key)) {
       if (event.key === 'Escape') {
         event.preventDefault();
         event.stopPropagation();
-        close();
+        this.close();
         return;
       }
-      if (!items.length) {
-        if (event.key === 'Enter' || event.key === 'Tab') close();
+      if (!this.#items.length) {
+        if (event.key === 'Enter' || event.key === 'Tab') this.close();
         return;
       }
       event.preventDefault();
       event.stopPropagation();
-      if (event.key === 'ArrowDown') highlight(index + 1);
-      else if (event.key === 'ArrowUp') highlight(index - 1);
-      else pick(items[index].command);
+      if (event.key === 'ArrowDown') this.#highlight(this.#index + 1);
+      else if (event.key === 'ArrowUp') this.#highlight(this.#index - 1);
+      else this.#pick(this.#items[this.#index].command);
       return;
     }
     if (event.key === 'Enter' && !event.shiftKey) {
-      const typed = typedCommand();
+      const typed = this.typedCommand();
       if (!typed) return;
       event.preventDefault();
       event.stopPropagation();
-      composer.clear();
-      onRun(typed.command, typed.args);
+      this.#composer.clear();
+      this.#onRun(typed.command, typed.args);
     }
-  }
-
-  // Capture, so this runs before the composer's own Enter-to-send.
-  composer.element.addEventListener('keydown', onKeydown, true);
-  editor.addEventListener('input', update);
-  editor.addEventListener('blur', close);
-
-  return {
-    open: () => {
-      composer.setHTML('/');
-      composer.focus();
-      caretToEnd(editor);
-      update();
-    },
-    close,
-    isOpen,
-    typedCommand,
-    // For /help: every command, grouped, whatever is typed.
-    all: () => COMMANDS,
-    destroy() {
-      close();
-      composer.element.removeEventListener('keydown', onKeydown, true);
-      editor.removeEventListener('input', update);
-      editor.removeEventListener('blur', close);
-      menu.remove();
-    },
   };
 }

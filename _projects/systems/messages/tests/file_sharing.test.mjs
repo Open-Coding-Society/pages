@@ -8,11 +8,11 @@ import { fakeEvent, installFakeDom, settle } from './fake-dom.mjs';
 const { document } = installFakeDom();
 
 const { createMessageLog } = await import('../js/message-log.js');
-const { createAttachments, entriesFromDrop } = await import('../js/attachments.js');
+const { Attachments } = await import('../js/attachments.js');
 const { createThread } = await import('../js/thread.js');
 const { GroupFiles } = await import('../js/group-files.js');
-const { addFilesMarker, MAX_LOOSE_FILES } = await import('../js/files-model.js');
-const { createFileActions } = await import('../js/file-actions.js');
+const { FilesMarker, SharedFiles } = await import('../js/files-model.js');
+const { FileActions } = await import('../js/file-actions.js');
 
 const me = { id: 1, uid: 'ada', name: 'Ada Lovelace', pfp: null };
 const richText = {
@@ -28,7 +28,7 @@ test('a share’s message lists its files and folders with their buttons, not th
     { type: 'folder', path: 'project', count: 3, size: 3 * 1024 * 1024 },
     { type: 'file', path: 'build.log', size: 10 },
   ];
-  log.append({ id: 'm1', key: 'm1', senderKey: 'Grace', senderName: 'Grace', body: addFilesMarker('here you go', items), sentAt: '2026-11-18T10:00:00Z' }, false);
+  log.append({ id: 'm1', key: 'm1', senderKey: 'Grace', senderName: 'Grace', body: FilesMarker.add('here you go', items), sentAt: '2026-11-18T10:00:00Z' }, false);
   const rows = host.querySelectorAll('.ocs__file');
   assert.equal(rows.length, 3);
   const [pdf, folder, logFile] = rows;
@@ -47,7 +47,7 @@ test('a file row’s buttons hand the item and the button to onFile', () => {
   const seen = [];
   const host = document.createElement('div');
   const log = createMessageLog(host, { richText, me, onEdit() {}, onDelete() {}, onFile: (action, item, control) => seen.push([action, item.path, control.tagName]) });
-  const body = addFilesMarker('', [{ type: 'file', path: 'a.png', size: 5 }, { type: 'folder', path: 'src', count: 1, size: 1 }]);
+  const body = FilesMarker.add('', [{ type: 'file', path: 'a.png', size: 5 }, { type: 'folder', path: 'src', count: 1, size: 1 }]);
   log.append({ id: 'm2', key: 'm2', senderKey: 'Ada Lovelace', senderName: 'Ada Lovelace', body, sentAt: null }, true);
   host.querySelectorAll('.ocs__file').flatMap(row => row.querySelectorAll('button'))
     .forEach(control => control.dispatchEvent(fakeEvent('click')));
@@ -62,11 +62,11 @@ test('up to four shared images show previews; five list as files', async () => {
     thumbnail: async item => { asked.push(item.path); return `blob:${item.path}`; },
   });
   const images = n => Array.from({ length: n }, (_, i) => ({ type: 'file', path: `shot${i}.png`, size: 9 }));
-  log.append({ id: 'a', key: 'a', senderKey: 'x', senderName: 'Grace', body: addFilesMarker('', images(4)), sentAt: null }, false);
+  log.append({ id: 'a', key: 'a', senderKey: 'x', senderName: 'Grace', body: FilesMarker.add('', images(4)), sentAt: null }, false);
   await settle();
   assert.equal(asked.length, 4);
   assert.equal(host.querySelectorAll('img.chat-file-thumb')[0].src, 'blob:shot0.png');
-  log.append({ id: 'b', key: 'b', senderKey: 'x', senderName: 'Grace', body: addFilesMarker('', images(5)), sentAt: null }, false);
+  log.append({ id: 'b', key: 'b', senderKey: 'x', senderName: 'Grace', body: FilesMarker.add('', images(5)), sentAt: null }, false);
   await settle();
   assert.equal(asked.length, 4);
 });
@@ -74,7 +74,7 @@ test('up to four shared images show previews; five list as files', async () => {
 test('deleting a share’s message takes its files off it', () => {
   const host = document.createElement('div');
   const log = createMessageLog(host, { richText, me, onEdit() {}, onDelete() {}, onFile() {} });
-  log.append({ id: 'c', key: 'c', senderKey: 'Ada Lovelace', senderName: 'Ada Lovelace', body: addFilesMarker('x', [{ type: 'file', path: 'a.txt', size: 1 }]), sentAt: null }, true);
+  log.append({ id: 'c', key: 'c', senderKey: 'Ada Lovelace', senderName: 'Ada Lovelace', body: FilesMarker.add('x', [{ type: 'file', path: 'a.txt', size: 1 }]), sentAt: null }, true);
   log.markDeleted('c');
   assert.equal(host.querySelectorAll('.ocs__file').length, 0);
 });
@@ -92,7 +92,7 @@ test('a folder’s .zip is refused by the size of its files, whatever its messag
     groupId: 7,
   });
   const said = [];
-  const actions = createFileActions({ filesFor: () => files, viewer: null, notify: message => said.push(message) });
+  const actions = new FileActions({ filesFor: () => files, viewer: null, notify: message => said.push(message) });
   // Anyone can type a marker: this one says the folder holds nothing.
   await actions.handle('zip', { type: 'folder', path: 'videos', count: 2, size: 0 });
   assert.equal(fetched, 0);
@@ -101,7 +101,7 @@ test('a folder’s .zip is refused by the size of its files, whatever its messag
 
 test('the tray lists what waits by file and folder, and Remove takes one out', () => {
   const tray = document.createElement('div');
-  const attachments = createAttachments({ tray });
+  const attachments = new Attachments({ tray });
   assert.equal(tray.hidden, true);
   attachments.add({ entries: [{ file: file('a.pdf', 2048), path: 'a.pdf' }, { file: file('x.js'), path: 'proj/x.js' }, { file: file('y.js'), path: 'proj/lib/y.js' }] });
   assert.equal(tray.hidden, false);
@@ -116,12 +116,12 @@ test('the tray lists what waits by file and folder, and Remove takes one out', (
 
 test('the tray says what it left out and refuses a share it can’t send', () => {
   const tray = document.createElement('div');
-  const attachments = createAttachments({ tray });
+  const attachments = new Attachments({ tray });
   attachments.add({ entries: [{ file: file('a.txt'), path: 'site/a.txt' }], skippedFolders: ['site/node_modules', 'site/.git'] });
   assert.match(tray.textContent, /Left out site\/node_modules, site\/\.git/);
   assert.equal(attachments.problem(), null);
   attachments.clear();
-  attachments.add({ entries: Array.from({ length: MAX_LOOSE_FILES + 1 }, (_, i) => ({ file: file(`f${i}`), path: `f${i}.txt` })) });
+  attachments.add({ entries: Array.from({ length: SharedFiles.MAX_LOOSE_FILES + 1 }, (_, i) => ({ file: file(`f${i}`), path: `f${i}.txt` })) });
   assert.equal(attachments.problem(), 'tooManyLoose');
   assert.match(tray.textContent, /Put them in a folder/);
 });
@@ -129,7 +129,7 @@ test('the tray says what it left out and refuses a share it can’t send', () =>
 test('while a share uploads the tray shows each row’s progress and a Cancel', () => {
   const tray = document.createElement('div');
   let cancelled = false;
-  const attachments = createAttachments({ tray });
+  const attachments = new Attachments({ tray });
   const entries = [{ file: file('x.js'), path: 'proj/x.js' }, { file: file('y.js'), path: 'proj/y.js' }];
   attachments.add({ entries });
   const progress = attachments.beginUpload({ uploads: entries, items: [{ type: 'folder', path: 'proj', count: 2, size: 8 }], skipped: 0, tooBig: [], invalid: [], problem: null }, { onCancel: () => { cancelled = true; } });
@@ -164,11 +164,11 @@ test('a dropped folder is walked into paths, skipping tool folders without openi
   const nodeModules = fakeEntry('node_modules', []);
   nodeModules.createReader = () => { opened.push('node_modules'); return { readEntries: ok => ok([]) }; };
   const site = fakeEntry('site', [fakeEntry('index.html'), fakeEntry('css', [fakeEntry('main.css')]), nodeModules, fakeEntry('.DS_Store')]);
-  const found = await entriesFromDrop({ items: [{ kind: 'file', webkitGetAsEntry: () => site }, { kind: 'file', webkitGetAsEntry: () => fakeEntry('notes.md') }] });
+  const found = await Attachments.fromDrop({ items: [{ kind: 'file', webkitGetAsEntry: () => site }, { kind: 'file', webkitGetAsEntry: () => fakeEntry('notes.md') }] });
   assert.deepEqual(found.entries.map(entry => entry.path), ['site/index.html', 'site/css/main.css', 'notes.md']);
   assert.deepEqual(found.skippedFolders, ['site/node_modules']);
   assert.deepEqual(opened, []);
-  const capped = await entriesFromDrop({ items: [{ kind: 'file', webkitGetAsEntry: () => site }] }, { limit: 1 });
+  const capped = await Attachments.fromDrop({ items: [{ kind: 'file', webkitGetAsEntry: () => site }] }, { limit: 1 });
   assert.equal(capped.entries.length, 1);
   assert.equal(capped.truncated, true);
 });

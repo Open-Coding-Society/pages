@@ -4,14 +4,14 @@
 // here only import each other, with ./ paths.
 import { createChatSocket } from './chat-socket.js';
 import { initDeleteGroup } from './delete-group.js';
-import { createFileActions } from './file-actions.js';
-import { createFileViewer } from './file-viewer.js';
-import { createConversationPanel } from './conversation-panel.js';
-import { createGitHubCards } from './github-cards.js';
-import { findGitHubLinks } from './github-links.js';
+import { FileActions } from './file-actions.js';
+import { FileViewer } from './file-viewer.js';
+import { ConversationPanel } from './conversation-panel.js';
+import { GitHubCards } from './github-cards.js';
+import { GitHubLinks } from './github-links.js';
 import { GroupFiles } from './group-files.js';
-import { initHelp } from './help-dialog.js';
-import { initShortcuts } from './shortcuts.js';
+import { HelpDialog } from './help-dialog.js';
+import { Shortcuts } from './shortcuts.js';
 import { initGroupFormation } from './group-formation.js';
 import { initFindGroup, initMembers } from './group-dialogs.js';
 import { initMessageSearch } from './message-search.js';
@@ -107,7 +107,7 @@ export async function startMessagesPage({ config, richText }) {
     if (!filesByGroup.has(id)) filesByGroup.set(id, new GroupFiles({ api, groupId: id }));
     return filesByGroup.get(id);
   };
-  const viewer = createFileViewer({ root: document.querySelector('.dm') || document.body });
+  const viewer = new FileViewer({ root: document.querySelector('.dm') || document.body });
   // GitHub previews for the links in messages: GitHub's API from the browser, gists through
   // Spring. localStorage holds their 10-minute cache, where the browser allows it.
   let storage = null;
@@ -116,9 +116,9 @@ export async function startMessagesPage({ config, richText }) {
   } catch {
     storage = null;
   }
-  const githubCards = createGitHubCards({ readGist: id => api.readGist(id), storage });
+  const githubCards = new GitHubCards({ readGist: id => api.readGist(id), storage });
   const linkCards = html => {
-    const links = findGitHubLinks(html);
+    const links = GitHubLinks.find(html);
     if (!links.length) return null;
     const box = document.createElement('div');
     links.forEach(link => box.appendChild(githubCards.render(link)));
@@ -170,7 +170,7 @@ export async function startMessagesPage({ config, richText }) {
     onGroupRead: id => markGroupRead(findItem('group', id)),
     onFileShared: id => panel.refreshIfShowing('group', id),
   });
-  panel = createConversationPanel({
+  panel = new ConversationPanel({
     elements: {
       dialog: byId('conversationPanel'), title: byId('conversationPanelTitle'), tabList: byId('conversationPanelTabs'),
       status: byId('conversationPanelStatus'),
@@ -182,11 +182,11 @@ export async function startMessagesPage({ config, richText }) {
     thread,
     groupFilesFor: groupFiles,
     viewer,
-    makeFileActions: ({ filesFor, notify }) => createFileActions({ filesFor, viewer, notify }),
+    makeFileActions: ({ filesFor, notify }) => new FileActions({ filesFor, viewer, notify }),
     // Sharing starts from the composer, so the chat says what was shared.
     onShare: () => byId('messagesAttachButton').click(),
   });
-  const help = initHelp({
+  const help = new HelpDialog({
     elements: { dialog: byId('helpDialog'), body: byId('helpBody') },
     isMac: /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || ''),
   });
@@ -195,7 +195,7 @@ export async function startMessagesPage({ config, richText }) {
     const params = new URL(link.href, window.location.href).searchParams;
     return params.has('group') ? { kind: 'group', id: Number(params.get('group')) } : { kind: 'dm', id: Number(params.get('dm')) };
   }).filter(item => Number.isInteger(item.id));
-  initShortcuts({
+  new Shortcuts({
     order: sidebarOrder,
     active: () => state.active,
     open: (kind, id) => {

@@ -5,9 +5,9 @@ import test from 'node:test';
 import { fakeEvent, installFakeDom } from './fake-dom.mjs';
 
 const { document } = installFakeDom();
-const { initShortcuts, SHORTCUTS } = await import('../js/shortcuts.js');
-const { initHelp } = await import('../js/help-dialog.js');
-const { COMMANDS } = await import('../js/slash-commands.js');
+const { Shortcuts } = await import('../js/shortcuts.js');
+const { HelpDialog } = await import('../js/help-dialog.js');
+const { SlashCommands } = await import('../js/slash-commands.js');
 
 const press = (key, extra = {}, target = document.body) => {
   const event = fakeEvent('keydown', { key, target, ...extra });
@@ -18,7 +18,7 @@ const press = (key, extra = {}, target = document.body) => {
 function setup(activeItem = { kind: 'group', id: 7 }) {
   const calls = [];
   let active = activeItem;
-  const shortcuts = initShortcuts({
+  const shortcuts = new Shortcuts({
     order: () => [{ kind: 'group', id: 7 }, { kind: 'group', id: 12 }, { kind: 'dm', id: 4 }],
     active: () => active,
     open: (kind, id) => { calls.push(['open', kind, id]); active = { kind, id }; return true; },
@@ -70,12 +70,12 @@ test('/help lists every shortcut and every command, with ⌘ on a Mac', () => {
   dialog.className = 'ocs__modal hidden';
   const body = document.createElement('div');
   document.body.append(dialog, body);
-  const help = initHelp({ elements: { dialog, body }, isMac: true });
+  const help = new HelpDialog({ elements: { dialog, body }, isMac: true });
   help.open(null);
   assert.equal(help.isOpen(), true);
   const text = body.textContent;
-  SHORTCUTS.forEach(shortcut => assert.ok(text.includes(shortcut.does), shortcut.does));
-  COMMANDS.forEach(command => assert.ok(text.includes(`/${command.name}`), command.name));
+  Shortcuts.ALL.forEach(shortcut => assert.ok(text.includes(shortcut.does), shortcut.does));
+  SlashCommands.ALL.forEach(command => assert.ok(text.includes(`/${command.name}`), command.name));
   assert.match(text, /⌘/);
   assert.match(text, /only in group chats/);
 });

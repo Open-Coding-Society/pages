@@ -5,23 +5,43 @@
 // It also remembers, in this browser only, the repository each conversation last named, so
 // "/pr 12" works after "/pr owner/repo#11", and keeps the message a "New GitHub issue" was
 // started from until that /newissue runs.
-import { MAX_CODE_LENGTH } from './code-model.js';
-import { plainText } from './conversation-model.js';
-import { findGitHubLinks, githubUrlFor, newIssueUrl, parseGitHubUrl, repoOf } from './github-links.js';
-
-// A direct message holds at most this much (Spring's DirectMessage body column).
-export const DM_MAX_LENGTH = 2000;
-
-export const escapeHtml = value => String(value).replace(/[&<>"']/g, character => `&#${character.charCodeAt(0)};`);
+import { CodeBlocks } from './code-model.js';
+import { Conversation } from './conversation-model.js';
+import { GitHubLinks } from './github-links.js';
 
 const GIST_URL = /^https:\/\/gist\.github\.com\/[\w-]+\/[0-9a-f]+$/;
 const OWNER_REPO = /^[\w.-]+\/[\w.-]+$/;
 
+/**
+ * What the slash commands and a message's More menu do in one pane.
+ */
 export class ChatCommands {
-  // elements: title, formStatus, imageInput, filesInput, folderInput. composer: the rich
-  // composer. codeBox: code-composer.js. conversation(): the open { kind, id }. send(html)
-  // sends a message as if typed; say(text) shows a status line. onCommand(name, args) runs
-  // what the page owns (panels, members, search, help). text: the pane's wording.
+  /** The most a direct message holds (Spring's DirectMessage body column). */
+  static DM_MAX_LENGTH = 2000;
+
+  /**
+   * @param {*} value
+   * @returns {string} the value as text that HTML shows as it is
+   */
+  static escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, character => `&#${character.charCodeAt(0)};`);
+  }
+
+  /**
+   * @param {object} options
+   * @param {object} options.elements title, formStatus, imageInput, filesInput, folderInput
+   * @param {object} options.composer the rich composer
+   * @param {object|null} options.codeBox the pane's CodeComposer
+   * @param {object} options.api the Messages API
+   * @param {object} options.me the signed-in person
+   * @param {object} options.text the pane's wording
+   * @param {Function} options.conversation gives the open { kind, id }
+   * @param {Function} options.send send(html) sends a message as if typed
+   * @param {Function} options.say say(text) shows a status line
+   * @param {Function} options.onCommand onCommand(name, args) runs what the page owns
+   *   (panels, members, search, help)
+   * @param {string} options.profileUrl where Profile's Gist card is
+   */
   constructor({
     elements, composer, codeBox, api, me, text, conversation, send, say, onCommand = () => {}, profileUrl = '/profile',
   }) {
@@ -30,11 +50,13 @@ export class ChatCommands {
   }
 
   // ── The repository a conversation last named ─────────────────────────────────────
+  /** @returns {string} the localStorage key for the open conversation's repository */
   repoKey() {
     const { kind, id } = this.conversation() || {};
     return `ocs-messages-repo:${kind}:${id}`;
   }
 
+  /** @returns {string|null} the "owner/repo" the open conversation last named */
   knownRepo() {
     try {
       return localStorage.getItem(this.repoKey());
@@ -43,8 +65,12 @@ export class ChatCommands {
     }
   }
 
+  /**
+   * Remembers a link's repository for the open conversation.
+   * @param {string} url a GitHub link
+   */
   rememberRepo(url) {
-    const repo = repoOf(parseGitHubUrl(url));
+    const repo = GitHubLinks.repoOf(GitHubLinks.parse(url));
     if (!repo) return;
     try {
       localStorage.setItem(this.repoKey(), repo);
@@ -53,12 +79,17 @@ export class ChatCommands {
     }
   }
 
-  // A /newissue drafted from a message and then not run doesn't quote it later.
+  /** Forgets the message a New GitHub issue started from: a /newissue not run doesn't quote it later. */
   clearQuote() {
     this.issueQuote = null;
   }
 
   // ── Slash commands ──────────────────────────────────────────────────────────────
+  /**
+   * Runs a slash command.
+   * @param {object} command a SlashCommands.ALL entry
+   * @param {string} args what was typed after its name
+   */
   run(command, args) {
     const kind = this.conversation()?.kind;
     const { elements, text } = this;
@@ -79,7 +110,7 @@ export class ChatCommands {
           language: command.name === 'code' ? args : '',
           filename: command.name === 'gist' ? args : '',
           // A code block in a direct message has to fit the message; a gist sends only its link.
-          maxLength: command.name === 'code' && kind === 'dm' ? DM_MAX_LENGTH - 200 : MAX_CODE_LENGTH,
+          maxLength: command.name === 'code' && kind === 'dm' ? ChatCommands.DM_MAX_LENGTH - 200 : CodeBlocks.MAX_LENGTH,
         });
         break;
       case 'issue':
@@ -92,30 +123,37 @@ export class ChatCommands {
         this.newIssue(args);
         break;
       case 'me':
-        if (args) this.send(`<i>${escapeHtml(args)}</i>`);
+        if (args) this.send(`<i>${ChatCommands.escapeHtml(args)}</i>`);
         break;
       case 'shrug':
-        this.send(`${escapeHtml(args)} ¯\\_(ツ)_/¯`.trim());
+        this.send(`${ChatCommands.escapeHtml(args)} ¯\\_(ツ)_/¯`.trim());
         break;
       default:
         this.onCommand(command.name, args);
     }
   }
 
-  // /issue, /pr, /commit, /repo: the GitHub link, as a message.
+  /**
+   * /issue, /pr, /commit, /repo: the GitHub link, as a message.
+   * @param {string} name the command's name
+   * @param {string} args
+   */
   postLink(name, args) {
-    const url = githubUrlFor(name, args, this.knownRepo());
+    const url = GitHubLinks.urlFor(name, args, this.knownRepo());
     if (!url) {
       this.say(this.text.badGitHubRef);
-      this.composer.setHTML(`/${name}&nbsp;${escapeHtml(args)}`);
+      this.composer.setHTML(`/${name}&nbsp;${ChatCommands.escapeHtml(args)}`);
       return;
     }
     this.rememberRepo(url);
     this.send(url);
   }
 
-  // /newissue [owner/repo] title: GitHub's own new-issue form, filled in, in a new tab. The
-  // student checks it and submits it on GitHub as themselves.
+  /**
+   * /newissue [owner/repo] title: GitHub's own new-issue form, filled in, in a new tab. The
+   * student checks it and submits it on GitHub as themselves.
+   * @param {string} args
+   */
   newIssue(args) {
     const { text } = this;
     const [first = '', ...rest] = args.split(/\s+/);
@@ -126,10 +164,10 @@ export class ChatCommands {
     const chat = this.elements.title.textContent;
     const quote = this.issueQuote;
     const body = quote
-      ? text.issueQuote.replace('{text}', plainText(quote.body).replace(/\n/g, '\n> '))
+      ? text.issueQuote.replace('{text}', Conversation.plainText(quote.body).replace(/\n/g, '\n> '))
         .replace('{sender}', quote.isSelf ? this.me.name : quote.senderName).replace('{chat}', chat).replace('{link}', link)
       : text.newIssueBody.replace('{chat}', chat).replace('{link}', link);
-    const url = repo ? newIssueUrl(repo, { title, body }) : null;
+    const url = repo ? GitHubLinks.newIssueUrl(repo, { title, body }) : null;
     if (!url) {
       this.say(text.newIssueNeedsRepo);
       return;
@@ -140,15 +178,19 @@ export class ChatCommands {
   }
 
   // ── A message's More menu ───────────────────────────────────────────────────────
-  // Copy its words, or start a GitHub issue from it: "/newissue owner/repo <its words>" goes
-  // in the composer (the chat's last repository, or the one the message links to), and
-  // Enter opens GitHub's form with the message quoted.
+  /**
+   * Copies a message's words, or starts a GitHub issue from it: "/newissue owner/repo <its
+   * words>" goes in the composer (the chat's last repository, or the one the message links
+   * to), and Enter opens GitHub's form with the message quoted.
+   * @param {'copy'|'issue'} action
+   * @param {object} message
+   */
   async more(action, message) {
     if (!message) return;
     const { text } = this;
     if (action === 'copy') {
       try {
-        await navigator.clipboard.writeText(plainText(message.body));
+        await navigator.clipboard.writeText(Conversation.plainText(message.body));
         this.say(text.copiedMessage);
       } catch {
         this.say(text.copyMessageFailed);
@@ -157,17 +199,23 @@ export class ChatCommands {
     }
     if (action === 'issue') {
       this.issueQuote = message;
-      const repo = this.knownRepo() || repoOf(findGitHubLinks(message.body)[0]);
-      const title = plainText(message.body).slice(0, 120);
-      this.composer.setHTML(`/newissue&nbsp;${repo ? `${escapeHtml(repo)}&nbsp;` : ''}${escapeHtml(title)}`);
+      const repo = this.knownRepo() || GitHubLinks.repoOf(GitHubLinks.find(message.body)[0]);
+      const title = Conversation.plainText(message.body).slice(0, 120);
+      this.composer.setHTML(`/newissue&nbsp;${repo ? `${ChatCommands.escapeHtml(repo)}&nbsp;` : ''}${ChatCommands.escapeHtml(title)}`);
       this.composer.focus();
       this.say(repo ? '' : text.issueNeedsRepo);
     }
   }
 
   // ── Gists ───────────────────────────────────────────────────────────────────────
-  // Saves code as a secret gist with the student's own GitHub token (Spring keeps it, from
-  // Profile's Gist card). Resolves the gist's URL, or null after saying why it couldn't.
+  /**
+   * Saves code as a secret gist with the student's own GitHub token (Spring keeps it, from
+   * Profile's Gist card).
+   * @param {string} language
+   * @param {string} code
+   * @param {string} filename
+   * @returns {Promise<string|null>} the gist's URL, or null after saying why it couldn't
+   */
   async saveGist(language, code, filename) {
     const { text, elements } = this;
     try {

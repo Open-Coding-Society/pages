@@ -17,26 +17,26 @@ same way they reach a direct message.
 | `js/sidebar.js` | The Groups and Direct messages lists, as `ocs__nav-card` links, each starting with an `ocs__avatar` of the name's initials. |
 | `js/new-chat.js` | The New chat dialog. |
 | `js/group-dialogs.js` | Find a group (search, join, make a group) and Members (with Delete group at the bottom, for admins). |
-| `js/files-model.js` | Pure functions for shared files: planning a share (folders keep their paths, clutter is skipped, taken names become "name (2)"), the `[[files:…]]` marker, sizes, icons, and the folder tree. |
+| `js/files-model.js` | `SharedFiles` and `FilesMarker`, static: planning a share (folders keep their paths, clutter is skipped, taken names become "name (2)"), sizes, icons and the folder tree, and the `[[files:…]]` marker. |
 | `js/group-files.js` | `GroupFiles`: one group's shared files. The list without bytes, one file's bytes, a folder's files for a .zip, and uploads with progress, three at a time. |
-| `js/composer-files.js` | The composer's Attach menu, the Files and Folder pickers, dropping files or folders on the conversation, and sharing them before the message sends. |
-| `js/attachments.js` | The tray above the composer: what waits to be shared, what was left out and why, and each item's upload progress. Also walks a dropped folder. |
-| `js/conversation-panel.js` | The Shared panel: a conversation's Files (groups), Media, Links and Pinned, in the grammar's tabs. |
-| `js/files-panel.js` | The Shared panel's Files tab: a group's files as folders, with breadcrumbs, a name filter, previews, downloads and a folder as .zip. |
-| `js/conversation-model.js` | Pure functions for pins (`[[pin:<id>]]` messages), and the links and media a conversation holds. |
-| `js/file-actions.js`, `js/file-viewer.js` | What a shared file's buttons do (download, preview, open a folder, .zip), and the preview: an image, video, sound, PDF or the start of a text file. |
-| `js/zip-store.js` | A stored (uncompressed) ZIP writer, so a shared folder downloads as one file. |
-| `js/popup-menu.js` | A menu a button opens (`ocs__menu`), with the arrow keys, Escape and click-away. |
-| `js/slash-commands.js` | The slash commands, grouped, and matching what's typed against them. |
-| `js/command-menu.js` | The slash-command menu over the composer (`ocs__menu`, `role="listbox"`): ↑ ↓, Enter or Tab, Escape. |
-| `js/code-model.js`, `js/code-composer.js` | The `[[code:…]]` marker and its languages, and the code box `/code` and `/gist` open above the composer. |
+| `js/composer-files.js` | `ComposerFiles`: the composer's Attach menu, the Files and Folder pickers, dropping files or folders on the conversation, and sharing them before the message sends. |
+| `js/attachments.js` | `Attachments`: the tray above the composer: what waits to be shared, what was left out and why, and each item's upload progress. `Attachments.fromInput` and `Attachments.fromDrop` read a picker and a dropped folder. |
+| `js/conversation-panel.js` | `ConversationPanel`: the Shared panel: a conversation's Files (groups), Media, Links and Pinned, in the grammar's tabs. |
+| `js/files-panel.js` | `FilesTab`: the Shared panel's Files tab: a group's files as folders, with breadcrumbs, a name filter, previews, downloads and a folder as .zip. |
+| `js/conversation-model.js` | `Conversation`, static: pins (`[[pin:<id>]]` messages), a message's plain text, and the links and media a conversation holds. |
+| `js/file-actions.js`, `js/file-viewer.js` | `FileActions` and `FileViewer`: what a shared file's buttons do (download, preview, open a folder, .zip), and the preview: an image, video, sound, PDF or the start of a text file. |
+| `js/zip-store.js` | `ZipStore`, static: a stored (uncompressed) ZIP writer, so a shared folder downloads as one file. |
+| `js/popup-menu.js` | `PopupMenu`: a menu a button opens (`ocs__menu`), with the arrow keys, Escape and click-away. |
+| `js/slash-commands.js` | `SlashCommands`, static: the slash commands, grouped, and matching what's typed against them. |
+| `js/command-menu.js` | `CommandMenu`: the slash-command menu over the composer (`ocs__menu`, `role="listbox"`): ↑ ↓, Enter or Tab, Escape. |
+| `js/code-model.js`, `js/code-composer.js` | `CodeBlocks` (static) and `CodeComposer`: the `[[code:…]]` marker and its languages, and the code box `/code` and `/gist` open above the composer. |
 | `js/chat-commands.js` | `ChatCommands`: what the slash commands and a message's More menu do in the open conversation (GitHub links, `/newissue`, gists, `/me`, `/shrug`), and the repository each chat last named. |
-| `js/code-block.js` | A code block in the log: the code as text, Copy, Run and Save as gist. |
-| `js/file-rows.js` | The files a message shares, as `ocs__file` rows with their buttons, and small previews for a few images. |
-| `js/message-more.js` | A message's More menu (Copy text, Add to calendar, New GitHub issue): one menu for everything that isn't Reply, Pin, Edit or Delete. |
-| `js/github-links.js` | Reading GitHub links (issues, pull requests, commits, repos, gists) and building one from "owner/repo#12". |
-| `js/shortcuts.js`, `js/help-dialog.js` | The keyboard shortcuts, and `/help`'s list of them and of every slash command, drawn from the same lists the page runs on. |
-| `js/github-cards.js` | Live cards (compact `ocs__nav-card`s) for the GitHub links in a message: an issue's or pull request's title, state, author, size and checks; a commit; a repository; a gist. |
+| `js/code-block.js` | `CodeBlock`: a code block in the log: the code as text, Copy, Run and Save as gist. |
+| `js/file-rows.js` | `FileRows`: the files a message shares, as `ocs__file` rows with their buttons, and small previews for a few images. |
+| `js/message-more.js` | `MoreMenu`: a message's More menu (Copy text, Add to calendar, New GitHub issue): one menu for everything that isn't Reply, Pin, Edit or Delete. |
+| `js/github-links.js` | `GitHubLinks`, static: reading GitHub links (issues, pull requests, commits, repos, gists) and building one from "owner/repo#12". |
+| `js/shortcuts.js`, `js/help-dialog.js` | `Shortcuts` and `HelpDialog`: the keyboard shortcuts, and `/help`'s list of them and of every slash command, drawn from the same lists the page runs on. |
+| `js/github-cards.js` | `GitHubCards`: live cards (compact `ocs__nav-card`s) for the GitHub links in a message: an issue's or pull request's title, state, author, size and checks; a commit; a repository; a gist. |
 | `js/delete-group.js` | The Delete group dialog: says what deleting takes away, and waits for the group's name. |
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
@@ -48,12 +48,21 @@ same way they reach a direct message.
 | `js/messages-model.js` | Pure functions: one message shape for DMs and groups, labels, roles. |
 | `js/formation-model.js` | Pure functions: the steps of forming groups. |
 | `sass/` | The `/dm` skin, scoped under `.dm`. File rows, menus and progress bars are the shared grammar (`ocs__file`, `ocs__menu`, `ocs__progress` in `_sass/open-coding/elements/`); `sass/` only places them; `.dm--embed` in `_layout.scss` fits an embed into its host's column. It has no palette or scale of its own: `_tokens.scss` aliases the site's theme tokens and the shared scale in `_sass/open-coding/mixins/_variables.scss`, and no partial holds a literal colour. See [Styling under a user theme](#styling-under-a-user-theme). |
-| `tests/*.test.mjs` | Node tests: the two model files, the sidebar, the message log, the pane, the embed, and the shared composer's `enterKey` and `destroy()`. |
+| `tests/*.test.mjs` | Node tests: the models, the sidebar, the message log, the pane, the embed, the shared composer's `enterKey` and `destroy()`, and `module_classes.test.mjs`, which fails if a newer module exports anything but classes. |
 | `tests/fake-dom.mjs` | A small stand-in for the browser DOM that the pane, log, embed and composer tests run on. |
 
 The modules import each other with `./` paths only. The page imports `config.js` and
 `rich-text.js` with `{{ site.baseurl }}` and passes them to `startMessagesPage`, so no
 module needs a `../` path that breaks when files move.
+
+The newer modules export classes, not loose functions, the way Java keeps `Math.random`
+with its kin on `Math`. Pure helpers are static methods on one class
+(`SharedFiles.formatBytes(size)`, `GitHubLinks.find(body)`), and anything with state or UI
+is made with `new` (`new CommandMenu({ ... })`) and keeps its state in private fields.
+Each class and method has a JSDoc comment. The older modules (the page, the pane, the
+log, the embed, the models, the dialogs and Add to calendar's `schedule-*.js`) keep their
+function exports for now: other systems import them by name, like the UI Builder's chat
+block with `mountGroupChat`.
 
 ## How a conversation works
 

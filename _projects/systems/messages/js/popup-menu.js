@@ -1,40 +1,109 @@
 // A menu a button opens: the composer's Attach menu, a message's More actions. Drawn with
 // the ocs__menu grammar; this only does the behaviour: open and close, the arrow keys,
 // Home and End, Escape (focus back on the button), and closing on a click elsewhere.
-// Items are { icon, label, hint, onPick, disabled }; `items` may be a function, so a menu
-// can offer different things in different conversations.
 
-let menuCount = 0;
+/**
+ * One button's menu.
+ */
+export class PopupMenu {
+  static #count = 0;
 
-export function createPopupMenu({ button, container, label, items }) {
-  const id = `ocs-menu-${++menuCount}`;
-  const menu = document.createElement('div');
-  menu.className = 'ocs__menu';
-  menu.id = id;
-  menu.setAttribute('role', 'menu');
-  menu.setAttribute('aria-label', label);
-  menu.hidden = true;
-  container.appendChild(menu);
-  button.setAttribute('aria-haspopup', 'menu');
-  button.setAttribute('aria-expanded', 'false');
-  button.setAttribute('aria-controls', id);
+  #button;
+  #items;
+  #menu;
+  #open = false;
+  #choices = [];
 
-  let open = false;
-  let buttons = [];
+  /**
+   * Builds the menu, closed, and wires its button.
+   * @param {object} options
+   * @param {HTMLElement} options.button what opens it
+   * @param {HTMLElement} options.container where the menu goes
+   * @param {string} options.label its name for assistive technology
+   * @param {Array|Function} options.items [{ icon, label, hint, onPick(button), disabled }],
+   *   or a function that gives them as it opens, so a menu can offer different things in
+   *   different conversations
+   */
+  constructor({ button, container, label, items }) {
+    this.#button = button;
+    this.#items = items;
+    PopupMenu.#count += 1;
+    const id = `ocs-menu-${PopupMenu.#count}`;
+    const menu = document.createElement('div');
+    menu.className = 'ocs__menu';
+    menu.id = id;
+    menu.setAttribute('role', 'menu');
+    menu.setAttribute('aria-label', label);
+    menu.hidden = true;
+    container.appendChild(menu);
+    this.#menu = menu;
+    button.setAttribute('aria-haspopup', 'menu');
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', id);
 
-  const focusItem = index => {
-    const enabled = buttons.filter(item => !item.disabled);
-    if (!enabled.length) return;
-    enabled[(index + enabled.length) % enabled.length].focus();
-  };
-
-  function onDocumentClick(event) {
-    if (!menu.contains(event.target) && !button.contains(event.target)) close();
+    button.addEventListener('click', () => (this.#open ? this.close() : this.#show()));
+    button.addEventListener('keydown', event => {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        this.#show();
+        if (event.key === 'ArrowUp') this.#focusItem(-1);
+      }
+    });
+    menu.addEventListener('keydown', event => {
+      const at = this.#choices.indexOf(document.activeElement);
+      if (event.key === 'ArrowDown') this.#focusItem(at + 1);
+      else if (event.key === 'ArrowUp') this.#focusItem(at - 1);
+      else if (event.key === 'Home') this.#focusItem(0);
+      else if (event.key === 'End') this.#focusItem(-1);
+      else if (event.key === 'Escape') this.close();
+      else if (event.key === 'Tab') this.close({ refocus: false });
+      else return;
+      if (event.key !== 'Tab') event.preventDefault();
+    });
   }
 
-  function build() {
-    const list = typeof items === 'function' ? items() : items;
-    buttons = list.map(item => {
+  /** The menu's element. */
+  get element() {
+    return this.#menu;
+  }
+
+  /** @returns {boolean} whether the menu is open */
+  isOpen() {
+    return this.#open;
+  }
+
+  /**
+   * Closes the menu.
+   * @param {{refocus?: boolean}} options refocus puts focus back on the button (the default)
+   */
+  close({ refocus = true } = {}) {
+    if (!this.#open) return;
+    this.#open = false;
+    this.#menu.hidden = true;
+    this.#button.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('click', this.#onDocumentClick, true);
+    if (refocus) this.#button.focus();
+  }
+
+  /** Closes the menu and takes it off the page. */
+  destroy() {
+    this.close({ refocus: false });
+    this.#menu.remove();
+  }
+
+  #focusItem(index) {
+    const enabled = this.#choices.filter(item => !item.disabled);
+    if (!enabled.length) return;
+    enabled[(index + enabled.length) % enabled.length].focus();
+  }
+
+  #onDocumentClick = event => {
+    if (!this.#menu.contains(event.target) && !this.#button.contains(event.target)) this.close();
+  };
+
+  #build() {
+    const list = typeof this.#items === 'function' ? this.#items() : this.#items;
+    this.#choices = list.map(item => {
       const choice = document.createElement('button');
       choice.type = 'button';
       choice.className = 'ocs__menu-item';
@@ -54,59 +123,20 @@ export function createPopupMenu({ button, container, label, items }) {
         choice.appendChild(hint);
       }
       choice.addEventListener('click', () => {
-        close({ refocus: false });
-        item.onPick(button);
+        this.close({ refocus: false });
+        item.onPick(this.#button);
       });
       return choice;
     });
-    menu.replaceChildren(...buttons);
+    this.#menu.replaceChildren(...this.#choices);
   }
 
-  function show() {
-    build();
-    open = true;
-    menu.hidden = false;
-    button.setAttribute('aria-expanded', 'true');
-    document.addEventListener('click', onDocumentClick, true);
-    focusItem(0);
+  #show() {
+    this.#build();
+    this.#open = true;
+    this.#menu.hidden = false;
+    this.#button.setAttribute('aria-expanded', 'true');
+    document.addEventListener('click', this.#onDocumentClick, true);
+    this.#focusItem(0);
   }
-
-  function close({ refocus = true } = {}) {
-    if (!open) return;
-    open = false;
-    menu.hidden = true;
-    button.setAttribute('aria-expanded', 'false');
-    document.removeEventListener('click', onDocumentClick, true);
-    if (refocus) button.focus();
-  }
-
-  button.addEventListener('click', () => (open ? close() : show()));
-  button.addEventListener('keydown', event => {
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault();
-      show();
-      if (event.key === 'ArrowUp') focusItem(-1);
-    }
-  });
-  menu.addEventListener('keydown', event => {
-    const at = buttons.indexOf(document.activeElement);
-    if (event.key === 'ArrowDown') focusItem(at + 1);
-    else if (event.key === 'ArrowUp') focusItem(at - 1);
-    else if (event.key === 'Home') focusItem(0);
-    else if (event.key === 'End') focusItem(-1);
-    else if (event.key === 'Escape') close();
-    else if (event.key === 'Tab') close({ refocus: false });
-    else return;
-    if (event.key !== 'Tab') event.preventDefault();
-  });
-
-  return {
-    element: menu,
-    isOpen: () => open,
-    close,
-    destroy() {
-      close({ refocus: false });
-      menu.remove();
-    },
-  };
 }

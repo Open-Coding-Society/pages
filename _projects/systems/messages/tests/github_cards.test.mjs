@@ -5,8 +5,8 @@ import test from 'node:test';
 import { installFakeDom, settle } from './fake-dom.mjs';
 
 installFakeDom();
-const { createGitHubCards } = await import('../js/github-cards.js');
-const { parseGitHubUrl } = await import('../js/github-links.js');
+const { GitHubCards } = await import('../js/github-cards.js');
+const { GitHubLinks } = await import('../js/github-links.js');
 
 function memoryStorage() {
   const store = new Map();
@@ -17,7 +17,7 @@ const NOW = Date.parse('2026-11-18T21:00:00Z');
 
 function makeCards(answers, { storage = memoryStorage(), gist = null } = {}) {
   const asked = [];
-  const cards = createGitHubCards({
+  const cards = new GitHubCards({
     fetchJson: async path => {
       asked.push(path);
       const answer = answers[path];
@@ -46,7 +46,7 @@ test('a pull request card shows its title, state, author, size and checks', asyn
       total_count: 3, check_runs: [{ status: 'completed', conclusion: 'success' }, { status: 'completed', conclusion: 'success' }, { status: 'completed', conclusion: 'skipped' }],
     }),
   });
-  const card = cards.render(parseGitHubUrl('https://github.com/Open-Coding-Society/pages/pull/2031'));
+  const card = cards.render(GitHubLinks.parse('https://github.com/Open-Coding-Society/pages/pull/2031'));
   assert.match(textOf(card), /Open-Coding-Society\/pages #2031/);
   await settle();
   await settle();
@@ -77,7 +77,7 @@ test('merged, draft and closed pull requests and issues get their own pills', as
     '/repos/a/b/issues/3': ok({ title: 'Bug', state: 'closed', state_reason: 'completed', user: { login: 'y' }, comments: 1 }),
     '/repos/a/b/issues/4': ok({ title: 'Idea', state: 'open', user: { login: 'y' }, comments: 0, labels: [{ name: 'enhancement' }] }),
   });
-  const render = url => cards.render(parseGitHubUrl(url));
+  const render = url => cards.render(GitHubLinks.parse(url));
   const merged = render('https://github.com/a/b/pull/1');
   const draft = render('https://github.com/a/b/pull/2');
   const closed = render('https://github.com/a/b/issues/3');
@@ -98,8 +98,8 @@ test('commits and repositories show what matters about them', async () => {
     '/repos/a/b/commits/0b82e37': ok({ sha: '0b82e375a', commit: { message: 'Fix the scoreboard\n\nlonger body', author: { name: 'Ada', date: '2026-11-18T19:00:00Z' } }, author: { login: 'ada' }, stats: { additions: 5, deletions: 2 } }),
     '/repos/a/b': ok({ full_name: 'a/b', description: 'Our team site', stargazers_count: 12, forks_count: 3, language: 'JavaScript', open_issues_count: 4, pushed_at: '2026-11-18T20:00:00Z' }),
   });
-  const commit = cards.render(parseGitHubUrl('https://github.com/a/b/commit/0b82e37'));
-  const repo = cards.render(parseGitHubUrl('https://github.com/a/b'));
+  const commit = cards.render(GitHubLinks.parse('https://github.com/a/b/commit/0b82e37'));
+  const repo = cards.render(GitHubLinks.parse('https://github.com/a/b'));
   await settle();
   assert.match(textOf(commit), /Fix the scoreboard/);
   assert.doesNotMatch(textOf(commit), /longer body/);
@@ -112,12 +112,12 @@ test('a card is fetched once and kept for ten minutes, here and in storage', asy
   const storage = memoryStorage();
   const answers = { '/repos/a/b': ok({ full_name: 'a/b', description: 'x' }) };
   const first = makeCards(answers, { storage });
-  first.cards.render(parseGitHubUrl('https://github.com/a/b'));
-  first.cards.render(parseGitHubUrl('https://github.com/a/b'));
+  first.cards.render(GitHubLinks.parse('https://github.com/a/b'));
+  first.cards.render(GitHubLinks.parse('https://github.com/a/b'));
   await settle();
   assert.equal(first.asked.length, 1);
   const second = makeCards(answers, { storage });
-  second.cards.render(parseGitHubUrl('https://github.com/a/b'));
+  second.cards.render(GitHubLinks.parse('https://github.com/a/b'));
   await settle();
   assert.equal(second.asked.length, 0, 'read from storage');
 });
@@ -125,10 +125,10 @@ test('a card is fetched once and kept for ten minutes, here and in storage', asy
 test('after GitHub’s hourly limit, cards stop asking until it resets and say so', async () => {
   const limited = { status: 403, body: { message: 'API rate limit exceeded' }, headers: { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': String((NOW + 30 * 60000) / 1000) } };
   const { cards, asked } = makeCards({ '/repos/a/b/issues/1': limited });
-  const one = cards.render(parseGitHubUrl('https://github.com/a/b/issues/1'));
+  const one = cards.render(GitHubLinks.parse('https://github.com/a/b/issues/1'));
   await settle();
   assert.match(textOf(one), /GitHub’s hourly limit/);
-  const two = cards.render(parseGitHubUrl('https://github.com/a/b/issues/2'));
+  const two = cards.render(GitHubLinks.parse('https://github.com/a/b/issues/2'));
   await settle();
   assert.equal(asked.length, 1);
   assert.match(textOf(two), /GitHub’s hourly limit/);
@@ -136,7 +136,7 @@ test('after GitHub’s hourly limit, cards stop asking until it resets and say s
 
 test('a 403 whose message says rate limit counts as the limit, even without its headers', async () => {
   const { cards } = makeCards({ '/repos/a/b/issues/5': { status: 403, body: { message: 'API rate limit exceeded for 1.2.3.4.' }, headers: {} } });
-  const card = cards.render(parseGitHubUrl('https://github.com/a/b/issues/5'));
+  const card = cards.render(GitHubLinks.parse('https://github.com/a/b/issues/5'));
   await settle();
   assert.match(textOf(card), /GitHub’s hourly limit/);
 });
@@ -145,8 +145,8 @@ test('a private or missing item says so; a gist is read through Spring', async (
   const { cards, asked } = makeCards({}, {
     gist: id => ({ description: 'Scoreboard helper', files: { 'score.py': { content: 'a\nb\nc' }, 'README.md': { content: '#' } } }),
   });
-  const missing = cards.render(parseGitHubUrl('https://github.com/a/private/issues/9'));
-  const gist = cards.render(parseGitHubUrl('https://gist.github.com/ada/aa11bb22cc33'));
+  const missing = cards.render(GitHubLinks.parse('https://github.com/a/private/issues/9'));
+  const gist = cards.render(GitHubLinks.parse('https://gist.github.com/ada/aa11bb22cc33'));
   await settle();
   assert.match(textOf(missing), /private, or not on GitHub/);
   assert.match(textOf(gist), /Scoreboard helper/);

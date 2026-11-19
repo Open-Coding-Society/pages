@@ -3,12 +3,12 @@
 // with its avatar, sender and time, a Reply button, and edit and delete buttons on your
 // own messages (none in a read-only log). A reply shows a quote of the message it
 // answers, from the [[reply:...]] marker at the start of its body (assets/js/chat/chat-reply.js).
-import { renderCodeBlock } from './code-block.js';
-import { extractCodeMarker } from './code-model.js';
-import { currentPins, extractPinMarker, plainText } from './conversation-model.js';
-import { createFileRows } from './file-rows.js';
-import { createMoreMenu } from './message-more.js';
-import { extractFilesMarker } from './files-model.js';
+import { CodeBlock } from './code-block.js';
+import { CodeBlocks } from './code-model.js';
+import { Conversation } from './conversation-model.js';
+import { FileRows } from './file-rows.js';
+import { MoreMenu } from './message-more.js';
+import { FilesMarker } from './files-model.js';
 import { dayKey, dayLabel, initialsFor, pfpSrc, tintFor } from './messages-model.js';
 
 // What the log says, worded for /dm. A host passes its own wording for any of these in
@@ -112,7 +112,7 @@ export function createMessageLog(element, {
   const text = withTexts(LOG_TEXTS, texts);
   const messages = new Map();
   let lastDay = null;
-  const fileRows = createFileRows({ onFile, thumbnail, text });
+  const fileRows = new FileRows({ onFile, thumbnail, text });
 
   const rowFor = key => element.querySelector(`[data-key="${CSS.escape(key)}"]`);
   const isNearBottom = () => element.scrollHeight - element.scrollTop - element.clientHeight < 40;
@@ -293,8 +293,8 @@ export function createMessageLog(element, {
   // A code block goes after the body, then the files shared with the message.
   function renderBody(body, stored) {
     const { reply, html: withFiles } = splitReply(richText, stored.body);
-    const { items, html: withCode } = extractFilesMarker(withFiles);
-    const { language, code, html } = extractCodeMarker(withCode);
+    const { items, html: withCode } = FilesMarker.extract(withFiles);
+    const { language, code, html } = CodeBlocks.extractMarker(withCode);
     const main = body.parentNode;
     main.querySelector('.chat-reply-quote')?.remove();
     main.querySelector('.chat-code')?.remove();
@@ -305,7 +305,7 @@ export function createMessageLog(element, {
     richText.renderRichMessage(body, shownBody({ ...stored, body: html }, formatBody));
     let after = body;
     if (code !== null) {
-      after = renderCodeBlock(language, code, { runCode, saveGist, text });
+      after = new CodeBlock(language, code, { runCode, saveGist, text }).element;
       main.insertBefore(after, body.nextSibling);
     }
     fileRows.render(main, after, items, stored.isSelf ? text.you : stored.senderName);
@@ -335,14 +335,14 @@ export function createMessageLog(element, {
   }
 
   // A message's More menu (message-more.js), one open at a time.
-  const more = onMore || onSchedule ? createMoreMenu({ text, onMore, onSchedule, makeButton: actionButton }) : null;
+  const more = onMore || onSchedule ? new MoreMenu({ text, onMore, onSchedule, makeButton: actionButton }) : null;
 
   // Which messages are pinned, from the pin messages in the log: refreshed after every
   // change, so each message's Pin button and Pinned mark stay right.
   let pinnedIds = new Set();
 
   function refreshPins() {
-    pinnedIds = new Set(currentPins([...messages.values()]).map(pin => String(pin.message.id)));
+    pinnedIds = new Set(Conversation.currentPins([...messages.values()]).map(pin => String(pin.message.id)));
     messages.forEach(stored => {
       const row = rowFor(stored.key);
       if (!row || stored.pinNote) return;
@@ -387,7 +387,7 @@ export function createMessageLog(element, {
     const jump = document.createElement('button');
     jump.type = 'button';
     jump.className = 'chat-system-link';
-    jump.textContent = target ? (plainText(splitReply(richText, target.body).html) || text.aMessage) : text.aMessage;
+    jump.textContent = target ? (Conversation.plainText(splitReply(richText, target.body).html) || text.aMessage) : text.aMessage;
     jump.addEventListener('click', () => {
       const other = [...messages.values()].find(candidate => String(candidate.id) === pin.id);
       if (other) reveal(other.key);
@@ -414,7 +414,7 @@ export function createMessageLog(element, {
       element.appendChild(divider);
     }
 
-    const pin = message.deleted ? { action: null } : extractPinMarker(message.body);
+    const pin = message.deleted ? { action: null } : Conversation.extractPinMarker(message.body);
     if (pin.action) {
       appendPinNote(message, pin, isSelf);
       refreshPins();
