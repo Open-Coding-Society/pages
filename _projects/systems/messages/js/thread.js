@@ -46,7 +46,7 @@ export const EMPTY_STATES = Object.freeze({
 export function createThread({
   elements, api, socket, richText, me,
   onDmRead = () => {}, onGroupRead = () => {}, onFileShared = () => {},
-  readOnly = false, emptyState = null, texts = {}, formatBody = null,
+  readOnly = false, onSchedule = null, emptyState = null, texts = {}, formatBody = null,
 }) {
   if (emptyState !== null && (typeof emptyState !== 'object' || typeof emptyState.title !== 'string')) {
     throw new TypeError('createThread: emptyState must be null or { title, hint }');
@@ -94,7 +94,7 @@ export function createThread({
   // reply, edit or delete.
   const log = createMessageLog(elements.messages, {
     richText, me, onEdit: beginEdit, onDelete: deleteMessage, onReply: canReply ? beginReply : null,
-    readOnly, texts, formatBody,
+    onSchedule, readOnly, texts, formatBody,
   });
   // Pasted images go where the Image control's would, so only where that control exists.
   const composer = readOnly

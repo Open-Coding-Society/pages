@@ -11,6 +11,7 @@ export const LOG_TEXTS = Object.freeze({
   you: 'You',
   edited: '(edited)',
   editMessage: 'Edit message',
+  addToCalendar: 'Add to calendar',
   deleteMessage: 'Delete message',
   replyMessage: 'Reply',
   imageFrom: 'Image from {name}',
@@ -62,7 +63,7 @@ function splitReply(richText, body) {
 }
 
 export function createMessageLog(element, {
-  richText, me, onEdit, onDelete, onReply = null, readOnly = false, texts = {}, formatBody = null,
+  richText, me, onEdit, onDelete, onReply = null, onSchedule = null, readOnly = false, texts = {}, formatBody = null,
 }) {
   if (formatBody !== null && typeof formatBody !== 'function') {
     throw new TypeError('createMessageLog: formatBody must be a function or null');
@@ -352,18 +353,24 @@ export function createMessageLog(element, {
         main.appendChild(imageLink);
       }
     }
-    // A message saved before ids existed can't be replied to, edited or deleted.
-    if (!readOnly && message.id && !message.deleted && (onReply || isSelf)) {
-      const actions = document.createElement('div');
-      actions.className = 'chat-msg-actions';
-      if (onReply) actions.append(actionButton('fa-reply', text.replyMessage, () => onReply(messages.get(message.key))));
+    // A message saved before ids existed can't be replied to, edited or deleted. Anyone's
+    // message can go on your calendar, so that button is not limited to your own.
+    if (!readOnly && message.id && !message.deleted) {
+      const buttons = [];
+      if (onReply) buttons.push(actionButton('fa-reply', text.replyMessage, () => onReply(messages.get(message.key))));
+      if (onSchedule) buttons.push(actionButton('fa-calendar-plus', text.addToCalendar, button => onSchedule(messages.get(message.key), button)));
       if (isSelf) {
-        actions.append(
+        buttons.push(
           actionButton('fa-pen', text.editMessage, () => onEdit(messages.get(message.key))),
           actionButton('fa-trash', text.deleteMessage, button => onDelete(messages.get(message.key), button)),
         );
       }
-      main.appendChild(actions);
+      if (buttons.length) {
+        const actions = document.createElement('div');
+        actions.className = 'chat-msg-actions';
+        actions.append(...buttons);
+        main.appendChild(actions);
+      }
     }
 
     row.append(avatarFor(message, isSelf), main);
