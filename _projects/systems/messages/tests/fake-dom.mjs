@@ -24,10 +24,16 @@ export class FakeEventTarget {
     this.listeners = this.listeners.filter(l => !(l.type === type && l.handler === handler && l.capture === capture));
   }
 
+  // As a browser runs them for an event aimed at this target: capture listeners first, then
+  // the rest, which stopPropagation() in a capture listener keeps the event from.
   dispatchEvent(event) {
-    this.listeners.filter(l => l.type === event.type).forEach(l => {
-      if (l.once) this.removeEventListener(l.type, l.handler, l.capture);
-      l.handler.call(this, event);
+    const matching = this.listeners.filter(l => l.type === event.type);
+    [true, false].forEach(capture => {
+      if (!capture && event.propagationStopped) return;
+      matching.filter(l => l.capture === capture).forEach(l => {
+        if (l.once) this.removeEventListener(l.type, l.handler, l.capture);
+        l.handler.call(this, event);
+      });
     });
     return !event.defaultPrevented;
   }
@@ -42,8 +48,12 @@ export function fakeEvent(type, props = {}) {
   return {
     type,
     defaultPrevented: false,
+    propagationStopped: false,
     preventDefault() {
       this.defaultPrevented = true;
+    },
+    stopPropagation() {
+      this.propagationStopped = true;
     },
     ...props,
   };

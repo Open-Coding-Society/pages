@@ -26,9 +26,12 @@ export function createFileViewer({ root, texts = {} }) {
   let url = null;
   let returnFocus = null;
 
+  // Listened for in the capture phase and stopped there: the viewer sits over the Shared
+  // panel, whose own Escape would otherwise close it too. One Escape closes one layer.
   function onKeydown(event) {
     if (event.key !== 'Escape') return;
     event.preventDefault();
+    event.stopPropagation();
     close();
   }
 
@@ -78,8 +81,10 @@ export function createFileViewer({ root, texts = {} }) {
     url = null;
   }
 
-  async function content(name, blob) {
-    const { preview } = fileKind(name);
+  // asked: 'image' for a picture sent in the chat, whose name ("Image from Grace") gives no
+  // kind. Only an image can be asked for: an <img> runs nothing, whatever the blob holds.
+  async function content(name, blob, asked) {
+    const preview = asked === 'image' ? 'image' : fileKind(name).preview;
     if (preview === 'text') {
       const pre = document.createElement('pre');
       pre.className = 'ocs__file-preview';
@@ -97,7 +102,11 @@ export function createFileViewer({ root, texts = {} }) {
       return [note];
     }
     release();
-    url = URL.createObjectURL(new Blob([blob], { type: mimeFor(name) }));
+    // The type comes from the name, so a file can't pass for another kind; a picture from
+    // the chat, whose name has no type, keeps its own image type.
+    const named = mimeFor(name);
+    const type = preview === 'image' && !named.startsWith('image/') && blob.type?.startsWith('image/') ? blob.type : named;
+    url = URL.createObjectURL(new Blob([blob], { type }));
     const media = document.createElement({ image: 'img', video: 'video', audio: 'audio', pdf: 'iframe' }[preview]);
     media.className = 'ocs__file-preview';
     media.src = url;
@@ -107,8 +116,9 @@ export function createFileViewer({ root, texts = {} }) {
     return [media];
   }
 
-  // file: { name, blob, onDownload(control) }. opener gets focus back on close.
-  async function show({ name, blob, onDownload: download }, opener) {
+  // file: { name, blob, preview, onDownload(control) }, preview being 'image' when the name
+  // doesn't say so. opener gets focus back on close.
+  async function show({ name, blob, preview = null, onDownload: download }, opener) {
     if (!modal) build();
     returnFocus = opener || document.activeElement;
     onDownload = download || null;
@@ -116,16 +126,16 @@ export function createFileViewer({ root, texts = {} }) {
     downloadButton.classList.toggle('hidden', !onDownload);
     title.textContent = nameOf(name);
     title.title = name;
-    body.replaceChildren(...await content(name, blob));
+    body.replaceChildren(...await content(name, blob, preview));
     modal.classList.remove('hidden');
-    document.addEventListener('keydown', onKeydown);
+    document.addEventListener('keydown', onKeydown, true);
     downloadButton.focus?.();
   }
 
   function close() {
     if (!modal || modal.classList.contains('hidden')) return;
     modal.classList.add('hidden');
-    document.removeEventListener('keydown', onKeydown);
+    document.removeEventListener('keydown', onKeydown, true);
     body.replaceChildren();
     release();
     returnFocus?.focus?.();

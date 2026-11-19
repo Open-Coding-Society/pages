@@ -159,7 +159,7 @@ export function createConversationPanel({
           return;
         }
         const blob = await (await fetch(entry.src)).blob();
-        viewer.show({ name: fill(text.imageFrom, { name: entry.sender || text.someone }), blob }, cell);
+        viewer.show({ name: fill(text.imageFrom, { name: entry.sender || text.someone }), blob, preview: 'image' }, cell);
       });
       grid.appendChild(cell);
     });

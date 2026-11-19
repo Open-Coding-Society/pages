@@ -9,6 +9,8 @@ const { document } = installFakeDom();
 const { createMessageLog } = await import('../js/message-log.js');
 const { createConversationPanel } = await import('../js/conversation-panel.js');
 const { GroupFiles } = await import('../js/group-files.js');
+const { createFileViewer } = await import('../js/file-viewer.js');
+const { createDialog } = await import('../js/dialogs.js');
 
 const me = { id: 1, uid: 'ada', name: 'Ada Lovelace', pfp: null };
 const richText = {
@@ -119,6 +121,51 @@ test('a group’s panel opens on Files and counts its media, links and pins', as
   assert.match(elements.panels.files.textContent, /shot\.png/);
   const linkNames = elements.panels.links.querySelectorAll('.ocs__file-name').map(name => name.textContent);
   assert.deepEqual(linkNames, ['github.com/Open-Coding-Society/pages/pull/2031', 'example.com']);
+});
+
+test('a picture sent in the chat opens in the viewer as an image, though its name has no extension', async () => {
+  const opened = [];
+  const { panel, elements } = makePanel([row('m1', 'Grace', 'pic', { image: 'data:image/png;base64,iVBORw0KGgo=' })], {
+    viewer: { show: file => opened.push(file) },
+  });
+  panel.open({ kind: 'dm', id: 4, name: 'Grace' }, null);
+  elements.panels.media.querySelector('button').dispatchEvent(fakeEvent('click'));
+  await settle();
+  await settle();
+  assert.equal(opened.length, 1);
+  assert.equal(opened[0].name, 'Image from Grace');
+  assert.equal(opened[0].preview, 'image');
+});
+
+test('the viewer draws an image it is told is one, and says when a file has no preview', async () => {
+  const root = document.createElement('div');
+  document.body.appendChild(root);
+  const viewer = createFileViewer({ root });
+  const png = new Blob([new Uint8Array([137, 80, 78, 71])], { type: 'image/png' });
+  await viewer.show({ name: 'Image from Grace', blob: png, preview: 'image' }, null);
+  assert.equal(root.querySelectorAll('img.ocs__file-preview').length, 1);
+  await viewer.show({ name: 'Image from Grace', blob: png }, null);
+  assert.equal(root.querySelectorAll('img.ocs__file-preview').length, 0);
+  assert.match(root.textContent, /no preview/);
+  viewer.destroy();
+});
+
+test('Escape closes the viewer on top, and the Shared panel under it stays open', async () => {
+  const modal = document.createElement('div');
+  modal.className = 'ocs__modal hidden';
+  document.body.appendChild(modal);
+  const panelDialog = createDialog(modal);
+  panelDialog.open(null);
+  const root = document.createElement('div');
+  document.body.appendChild(root);
+  const viewer = createFileViewer({ root });
+  await viewer.show({ name: 'notes.md', blob: new Blob(['# notes']) }, null);
+  document.dispatchEvent(fakeEvent('keydown', { key: 'Escape' }));
+  assert.equal(viewer.isOpen(), false);
+  assert.equal(panelDialog.isOpen(), true, 'one Escape, one layer');
+  document.dispatchEvent(fakeEvent('keydown', { key: 'Escape' }));
+  assert.equal(panelDialog.isOpen(), false);
+  viewer.destroy();
 });
 
 test('opening the Files tab lists the group’s files as they are now, not as they were', async () => {
