@@ -34,6 +34,9 @@ export function createComposerFiles({
 }) {
   const text = { ...COMPOSER_FILE_TEXTS, ...texts };
   let context = { kind: null, id: null, loaded: false, editing: false };
+  // Goes up when the conversation changes or the composer goes, so a dropped folder that is
+  // still being read lands only in the tray of the conversation it was dropped on.
+  let generation = 0;
   let dragDepth = 0;
 
   const attachments = createAttachments({ tray: elements.tray, onChange: () => {} });
@@ -111,8 +114,9 @@ export function createComposerFiles({
       showMessage(text.filesOnlyInGroups);
       return;
     }
+    const dropped = generation;
     const found = await entriesFromDrop(event.dataTransfer);
-    attachments.add(found);
+    if (dropped === generation) attachments.add(found);
   }
   const zone = elements.dropZone;
   zone.addEventListener('dragenter', onDragEnter);
@@ -123,6 +127,7 @@ export function createComposerFiles({
   // The conversation changed, or loaded, or an edit started or ended.
   function setContext(next) {
     const moved = next.kind !== context.kind || next.id !== context.id;
+    if (moved) generation += 1;
     context = { ...context, ...next };
     if (moved && !attachments.isUploading()) attachments.clear();
     elements.attachButton.disabled = !canAttach();
@@ -176,6 +181,7 @@ export function createComposerFiles({
     isUploading: () => attachments.isUploading(),
     problem: () => attachments.problem(),
     destroy() {
+      generation += 1;
       menu.destroy();
       zone.removeEventListener('dragenter', onDragEnter);
       zone.removeEventListener('dragover', onDragOver);

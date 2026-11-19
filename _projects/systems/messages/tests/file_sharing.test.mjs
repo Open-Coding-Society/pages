@@ -278,6 +278,36 @@ test('Send names the files against the group’s files as they are now, so a tea
   assert.equal(sent[0], '[[files:f~plan (2).pdf~5]]');
 });
 
+test('a folder still being read when the chat changes stays out of the next chat’s tray', async () => {
+  const { thread, elements } = shareThread();
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  let finishReading = null;
+  let read = false;
+  const slowFolder = {
+    name: 'site',
+    isFile: false,
+    isDirectory: true,
+    createReader: () => ({
+      readEntries: ok => {
+        if (read) return ok([]);
+        read = true;
+        finishReading = () => ok([fakeEntry('index.html')]);
+        return undefined;
+      },
+    }),
+  };
+  const drop = fakeEvent('drop', { dataTransfer: { types: ['Files'], files: [], items: [{ kind: 'file', webkitGetAsEntry: () => slowFolder }] } });
+  elements.dropZone.dispatchEvent(drop);
+  await settle();
+  thread.open('group', 8, { title: 'Team Babbage', subtitle: '' });
+  await settle();
+  finishReading();
+  await settle();
+  await settle();
+  assert.equal(elements.tray.hidden, true, 'Team Turing’s folder doesn’t wait in Team Babbage');
+});
+
 test('in a direct message, dropped files say where they can go, and the menu offers only an image', async () => {
   const { thread, elements } = shareThread();
   thread.open('dm', 4, { title: 'Grace', subtitle: 'Direct message' });
