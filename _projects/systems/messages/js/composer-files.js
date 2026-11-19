@@ -28,6 +28,10 @@ export const COMPOSER_FILE_TEXTS = Object.freeze({
 
 const fill = (template, values) => String(template).replace(/\{(\w+)\}/g, (slot, key) => (key in values ? String(values[key]) : slot));
 const isImage = file => Boolean(file?.type?.startsWith('image/'));
+// Spring refuses (409) to write over a file shared under the same name a moment ago. A file
+// on its own then goes up again under the next free name; one in a folder is left off, since
+// renaming it alone would split its folder.
+const refusedLoose = (path, error) => error?.status === 409 && !path.includes('/');
 
 export function createComposerFiles({
   elements, groupFiles, onImage, showMessage, texts = {}, moreItems = () => [],
@@ -136,6 +140,36 @@ export function createComposerFiles({
     if (!canAttach()) menu.close({ refocus: false });
   }
 
+  // The loose files Spring refused in `first` go up once more, named against the group's list
+  // as it is now; their rows in the tray report this try. Resolves { items, failed,
+  // cancelled } for the whole share.
+  async function shareRefusedAgain(files, plan, first, progress, signal) {
+    const refused = first.failed.filter(failure => refusedLoose(failure.path, failure.error));
+    const failed = first.failed.filter(failure => !refused.includes(failure));
+    const items = sharedItems(plan, first.done);
+    if (!refused.length) return { items, failed, cancelled: false };
+    let taken;
+    try {
+      files.refresh();
+      taken = topNames(await files.index());
+    } catch (error) {
+      refused.forEach(failure => progress.onFile(failure.path, 'failed'));
+      return { items, failed: first.failed, cancelled: false };
+    }
+    const entries = refused.map(failure => plan.uploads.find(upload => upload.path === failure.path));
+    const again = planShare(entries, taken);
+    const firstPathOf = new Map(again.uploads.map(upload => [upload.path, entries.find(entry => entry.file === upload.file).path]));
+    const second = await files.upload(again.uploads, {
+      onFile: (path, state) => progress.onFile(firstPathOf.get(path), state),
+      signal,
+    });
+    return {
+      items: [...items, ...sharedItems(again, second.done)],
+      failed: [...failed, ...second.failed],
+      cancelled: second.cancelled,
+    };
+  }
+
   // Uploads the tray to the open group. Resolves { items } for the message's marker, or null
   // when the message shouldn't go (cancelled, or nothing could be shared; the reason is shown).
   async function share() {
@@ -155,14 +189,20 @@ export function createComposerFiles({
     if (plan.problem) return null; // the tray already says why
     const controller = new AbortController();
     const progress = attachments.beginUpload(plan, { onCancel: () => controller.abort() });
-    const result = await files.upload(plan.uploads, { ...progress, signal: controller.signal });
+    // A refused file's row waits for its second try before it says how the file went.
+    const first = await files.upload(plan.uploads, {
+      onProgress: progress.onProgress,
+      onFile: (path, state, error) => { if (state !== 'failed' || !refusedLoose(path, error)) progress.onFile(path, state); },
+      signal: controller.signal,
+    });
+    const result = first.cancelled ? first : await shareRefusedAgain(files, plan, first, progress, controller.signal);
     if (result.cancelled) {
       attachments.endUpload({ keep: true });
       showMessage(text.shareCancelled);
       return null;
     }
     attachments.endUpload();
-    const items = sharedItems(plan, result.done);
+    const { items } = result;
     if (!items.length) {
       showMessage(text.nothingShared);
       return null;

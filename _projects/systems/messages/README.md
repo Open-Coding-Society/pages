@@ -104,6 +104,10 @@ direct message only an image can be attached: Spring stores shared files for gro
   `project` folder as `project (2)`, so an older message's file isn't replaced. Send asks
   Spring for the group's list first, because the page only hears about shares in the open
   conversation: a list kept from earlier could miss a teammate's file of the same name.
+  Spring never writes over a shared file either: when two people share `notes.md` at the
+  same moment, the second upload is refused (409), and the page shares that file again as
+  `notes (2).md`. A refused file inside a folder is left off the message, which says so,
+  since renaming it alone would split its folder.
 - **The message.** It starts with a `[[files:…]]` marker after any reply marker:
   `f~path~size` for a file and `d~path~count~size` for a folder, separated by `;`, with
   `%`, `[`, `]`, `|`, `;`, `~`, `<`, `>`, `&` and control characters escaped as `%XX`.
@@ -330,10 +334,11 @@ Spring:
 - `/api/groups/chat/{id}/messages` (read, send, edit, delete),
   `GET /api/groups/chat/unread`, `POST /api/groups/chat/{id}/read`
 - Shared files: `POST /api/groups/chat/{id}/files` (`{filename, base64Data}`, sent with
-  XMLHttpRequest for its progress), `GET /api/groups/chat/{id}/files/index` (paths, sizes
-  and who shared them, no bytes) and `GET /api/groups/chat/{id}/files/content?path=` (one
-  file's bytes). The index and content routes are new in Spring's
-  `feat/group-files-index`, which has to deploy before this page.
+  XMLHttpRequest for its progress; 409 when that path is already shared),
+  `GET /api/groups/chat/{id}/files/index` (paths, sizes and who shared them, no bytes) and
+  `GET /api/groups/chat/{id}/files/content?path=` (one file's bytes). The index and content
+  routes, and the 409, are new in Spring's `feat/group-files-index`, which has to deploy
+  before this page.
 - STOMP over SockJS at `/ws-chat` (port 8589 on localhost)
 
 Flask, for Form groups: `POST /api/persona/evaluate-group`, `POST /api/persona/form-groups`.

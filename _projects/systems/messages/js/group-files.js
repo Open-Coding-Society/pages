@@ -70,8 +70,8 @@ export class GroupFiles {
     return entries;
   }
 
-  // Uploads [{ file, path }] a few at a time. onFile(path, 'uploading' | 'done' | 'failed')
-  // as each one moves on, onProgress(fraction) for the whole share by bytes sent. Resolves
+  // Uploads [{ file, path }] a few at a time. onFile(path, 'uploading' | 'done' | 'failed',
+  // error) as each one moves on, onProgress(fraction) for the whole share by bytes sent. Resolves
   // { done: [path], failed: [{ path, error }], cancelled } and never rejects: one file that
   // fails doesn't stop the others. Aborting `signal` starts nothing new and cancels the rest.
   async upload(uploads, { onFile = () => {}, onProgress = () => {}, signal = null } = {}) {
@@ -104,12 +104,13 @@ export class GroupFiles {
             result.cancelled = true;
             continue;
           }
-          console.warn(`Messages: could not share ${path}`, error);
+          // A taken name (409) isn't a fault: the composer shares that file under the next name.
+          if (error?.status !== 409) console.warn(`Messages: could not share ${path}`, error);
           // Finished, if not shared: the bar measures how far through the share it is.
           sent.set(path, file.size || 0);
           report();
           result.failed.push({ path, error });
-          onFile(path, 'failed');
+          onFile(path, 'failed', error);
         }
       }
     };

@@ -297,6 +297,53 @@ test('Send names the files against the group’s files as they are now, so a tea
   assert.equal(sent[0], '[[files:f~plan (2).pdf~5]]');
 });
 
+test('a loose file Spring refuses, its name taken a moment ago, goes up again under the next free name', async () => {
+  const filesApi = fakeFilesApi();
+  let listed = [];
+  filesApi.groupFileIndex = async () => { filesApi.calls.index += 1; return listed; };
+  filesApi.uploadGroupFileWithProgress = async (groupId, path) => {
+    filesApi.calls.uploads.push(path);
+    if (path === 'notes.md') {
+      // Grace's notes.md landed between this share's look at the list and its upload.
+      listed = [{ path: 'notes.md', size: 9 }];
+      throw Object.assign(new Error('Conflict'), { status: 409 });
+    }
+    return {};
+  };
+  const { thread, elements, composer, sent } = shareThread({ filesApi });
+  thread.open('group', 7, { title: '', subtitle: '' });
+  await settle();
+  pickFiles(elements.filesInput, [file('notes.md', 3), file('plan.pdf', 5)]);
+  composer.setHTML('');
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  for (let i = 0; i < 6; i += 1) await settle();
+  assert.deepEqual(filesApi.calls.uploads, ['notes.md', 'plan.pdf', 'notes (2).md']);
+  assert.equal(sent[0], '[[files:f~plan.pdf~5;f~notes (2).md~3]]');
+  assert.doesNotMatch(elements.formStatus.textContent, /could not be shared/);
+});
+
+test('a file in a folder that Spring refuses is left off the message, which says so', async () => {
+  const filesApi = fakeFilesApi();
+  filesApi.uploadGroupFileWithProgress = async (groupId, path) => {
+    filesApi.calls.uploads.push(path);
+    if (path === 'site/index.html') throw Object.assign(new Error('Conflict'), { status: 409 });
+    return {};
+  };
+  const { thread, elements, composer, sent } = shareThread({ filesApi });
+  thread.open('group', 7, { title: '', subtitle: '' });
+  await settle();
+  pickFiles(elements.folderInput, [
+    Object.assign(file('index.html', 4), { webkitRelativePath: 'site/index.html' }),
+    Object.assign(file('main.css', 2), { webkitRelativePath: 'site/main.css' }),
+  ]);
+  composer.setHTML('');
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  for (let i = 0; i < 6; i += 1) await settle();
+  assert.deepEqual(filesApi.calls.uploads, ['site/index.html', 'site/main.css']);
+  assert.equal(sent[0], '[[files:d~site~1~2]]');
+  assert.match(elements.formStatus.textContent, /1 could not be shared: site\/index\.html/);
+});
+
 test('a folder still being read when the chat changes stays out of the next chat’s tray', async () => {
   const { thread, elements } = shareThread();
   thread.open('group', 7, { title: 'Team Turing', subtitle: '' });

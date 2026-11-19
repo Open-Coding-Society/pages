@@ -128,6 +128,21 @@ test('upload sends three at a time, reports each file and the total, and lists w
   assert.equal(events.filter(([path]) => path === 'total').at(-1)[1], 100);
 });
 
+test('a taken name (409) is reported to the caller without a console warning', async t => {
+  const warned = [];
+  t.mock.method(console, 'warn', (...args) => warned.push(args));
+  const api = fakeApi();
+  api.uploadGroupFileWithProgress = async () => { throw Object.assign(new Error('HTTP 409'), { status: 409 }); };
+  const files = new GroupFiles({ api, groupId: 7 });
+  const states = [];
+  const result = await files.upload([{ file: file('x', 'notes.md'), path: 'notes.md' }], {
+    onFile: (path, state, error) => states.push([path, state, error?.status]),
+  });
+  assert.deepEqual(result.failed.map(failure => [failure.path, failure.error.status]), [['notes.md', 409]]);
+  assert.deepEqual(states, [['notes.md', 'uploading', undefined], ['notes.md', 'failed', 409]]);
+  assert.deepEqual(warned, []);
+});
+
 test('cancel stops the uploads that have not started and aborts the rest', async () => {
   const api = fakeApi();
   const files = new GroupFiles({ api, groupId: 7, concurrency: 1 });
