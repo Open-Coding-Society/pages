@@ -31,6 +31,7 @@ same way they reach a direct message.
 | `js/command-menu.js` | The slash-command menu over the composer (`ocs__menu`, `role="listbox"`): ↑ ↓, Enter or Tab, Escape. |
 | `js/code-model.js`, `js/code-composer.js` | The `[[code:…]]` marker and its languages, and the code box `/code` and `/gist` open above the composer. |
 | `js/github-links.js` | Reading GitHub links (issues, pull requests, commits, repos, gists) and building one from "owner/repo#12". |
+| `js/shortcuts.js`, `js/help-dialog.js` | The keyboard shortcuts, and `/help`'s list of them and of every slash command, drawn from the same lists the page runs on. |
 | `js/github-cards.js` | Live cards (`ocs__link-card`) for the GitHub links in a message: an issue's or pull request's title, state, author, size and checks; a commit; a repository; a gist. |
 | `js/delete-group.js` | The Delete group dialog: says what deleting takes away, and waits for the group's name. |
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
@@ -154,6 +155,19 @@ is filled in for you to finish, and Enter (or Send) then runs it instead of send
   (`ocs-messages-repo:<kind>:<id>`), a convenience only.
 - The course announcement chats have their own `/event` commands (Courses'
   `calendar-command.js`), unchanged.
+
+## Keys
+
+| Keys | What it does |
+| --- | --- |
+| Ctrl or ⌘ + K | Find a conversation |
+| Alt or ⌥ + ↑ / ↓ | The conversation above or below, in the sidebar's order (left to a field being typed in, except an empty message box) |
+| Ctrl or ⌘ + / | Show every slash command |
+| Enter / Shift+Enter / Ctrl or ⌘+Enter | Send / new line / send even from a list or the code box |
+| Esc | Close a menu, a reply or an edit |
+
+`/help` opens "Commands and keys", which lists these and every command. The message box's
+placeholder says "Write a message, or type / for commands".
 
 ## GitHub cards
 

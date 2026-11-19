@@ -10,6 +10,8 @@ import { createConversationPanel } from './conversation-panel.js';
 import { createGitHubCards } from './github-cards.js';
 import { findGitHubLinks } from './github-links.js';
 import { GroupFiles } from './group-files.js';
+import { initHelp } from './help-dialog.js';
+import { initShortcuts } from './shortcuts.js';
 import { initGroupFormation } from './group-formation.js';
 import { initFindGroup, initMembers } from './group-dialogs.js';
 import { initMessageSearch } from './message-search.js';
@@ -131,8 +133,10 @@ export async function startMessagesPage({ config, richText }) {
       if (['files', 'media', 'links', 'pinned'].includes(name)) openPanel({ tab: name });
       else if (name === 'members') byId('messagesMembers').click();
       else if (name === 'search') byId('messagesSearch')?.focus();
-      else if (name === 'help') thread.showCommands();
+      else if (name === 'help') help.open(byId('messagesForm'));
     },
+    // Where the slash commands are, said where people type.
+    texts: { placeholder: 'Write a message, or type / for commands' },
     onOpenFolder: (groupId, path) => {
       const group = findItem('group', groupId);
       if (group) panel.open({ kind: 'group', id: group.id, name: group.name }, byId('messagesSharedButton'), { tab: 'files', folderPath: path });
@@ -173,6 +177,32 @@ export async function startMessagesPage({ config, richText }) {
     // Sharing starts from the composer, so the chat says what was shared.
     onShare: () => byId('messagesAttachButton').click(),
   });
+  const help = initHelp({
+    elements: { dialog: byId('helpDialog'), body: byId('helpBody') },
+    isMac: /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || ''),
+  });
+  // The conversations in the order the sidebar shows them (after any search), for Alt+↑/↓.
+  const sidebarOrder = () => [...document.querySelectorAll('#messagesGroupList a, #messagesDmList a')].map(link => {
+    const params = new URL(link.href, window.location.href).searchParams;
+    return params.has('group') ? { kind: 'group', id: Number(params.get('group')) } : { kind: 'dm', id: Number(params.get('dm')) };
+  }).filter(item => Number.isInteger(item.id));
+  initShortcuts({
+    order: sidebarOrder,
+    active: () => state.active,
+    open: (kind, id) => {
+      const opened = openConversation(kind, id);
+      // On a phone the list and the conversation share the screen; show the conversation.
+      if (opened) document.querySelector('.dm')?.setAttribute('data-dm-view', 'thread');
+      return opened;
+    },
+    findConversation: () => {
+      document.querySelector('.dm')?.removeAttribute('data-dm-view');
+      conversationSearch?.focus();
+    },
+    showCommands: () => thread.showCommands(),
+    isEmptyComposer: target => Boolean(target.closest?.('.rt-editor')) && !target.closest('.rt-editor').textContent.trim(),
+  });
+
   // The panel for the open conversation, on whichever tab is asked for.
   const openPanel = (options = {}, opener = byId('messagesSharedButton')) => {
     if (!state.active) return;

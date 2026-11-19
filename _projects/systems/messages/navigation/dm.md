@@ -293,6 +293,19 @@ the open conversation each start with a bar of the same height.
   </div>
 
   {%- comment -%}
+    /help (js/help-dialog.js): the keyboard shortcuts and every slash command.
+  {%- endcomment -%}
+  <div class="ocs__modal hidden" id="helpDialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="ocs__modal-card ocs__modal-card--wide ocs__stack">
+      <div class="ocs__modal-header">
+        <h3 class="ocs__modal-title" id="helpTitle">Commands and keys</h3>
+        <button type="button" class="ocs__btn small" data-close aria-label="Close" data-focus>&times;</button>
+      </div>
+      <div class="ocs__stack dm__help" id="helpBody"></div>
+    </div>
+  </div>
+
+  {%- comment -%}
     The conversation panel (js/conversation-panel.js): a group's Files (js/files-panel.js),
     and any conversation's Media, Links and Pinned, in the grammar's tabs. The script fills
     the tab bar.

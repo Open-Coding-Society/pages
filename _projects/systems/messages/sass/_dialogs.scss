@@ -455,3 +455,9 @@
   font-size: 2rem;
   color: var(--dm-accent);
 }
+
+// /help's tables show in full: the dialog scrolls, not each table.
+.dm .dm__help .ocs__table-wrap {
+  max-height: none;
+  overflow: visible;
+}
