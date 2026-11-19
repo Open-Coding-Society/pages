@@ -1,8 +1,10 @@
 import { TeamChatAccess } from './team-chat-access.js';
+import { TeamMentorsPanel } from './team-mentors.js';
 
 /**
  * The team chat on a capstone page. It finds the team's group for the signed-in person, then shows
- * Messages' group chat (mountGroupChat) with a link to the group in Messages, or a note saying why not.
+ * Messages' group chat (mountGroupChat) with a link to the group in Messages and the team's mentors
+ * (TeamMentorsPanel), or a note saying why not.
  * Each view's words come from the page (texts). One per page; destroy() takes it down.
  */
 export class CapstoneTeamChat {
@@ -12,7 +14,7 @@ export class CapstoneTeamChat {
    * @param {string} options.groupName The team group's exact name, from capstone_project.team_group.
    * @param {object} options.config config.js: springEnabled, baseurl, javaURI, javaWebSocketURI, fetchOptions.
    * @param {object} options.texts The page's words: loading, signIn, unavailable, notMember, mentorWaiting,
-   *   notFound, openInMessages, and embed (passed to the chat as its texts).
+   *   notFound, openInMessages, mentors (the panel's words), and embed (passed to the chat as its texts).
    * @param {object} options.api A TeamGroupApi.
    * @param {object} options.load embed() and richText() load Messages' embed and the composer when needed.
    */
@@ -24,6 +26,7 @@ export class CapstoneTeamChat {
     this.api = api;
     this.load = load;
     this.chat = null;
+    this.mentors = null;
     this.destroyed = false;
   }
 
@@ -58,7 +61,7 @@ export class CapstoneTeamChat {
       return view;
     }
     try {
-      await this.showChat(group);
+      await this.showChat(group, me.data);
     } catch (error) {
       // The chat's code didn't load (a network error) or wouldn't mount: say so rather than leave a broken box.
       console.warn('Team chat: the chat could not be shown', error);
@@ -89,7 +92,7 @@ export class CapstoneTeamChat {
     return byName.ok ? { group: byName.data, failed: false } : { group: null, failed: true };
   }
 
-  async showChat(group) {
+  async showChat(group, viewer) {
     const room = document.createElement('div');
     const links = document.createElement('div');
     links.className = 'ocs__links';
@@ -98,7 +101,10 @@ export class CapstoneTeamChat {
     open.setAttribute('href', `${this.config.baseurl ?? ''}/dm?group=${encodeURIComponent(group.id)}`);
     open.textContent = this.texts.openInMessages;
     links.appendChild(open);
-    this.root.replaceChildren(room, links);
+    const mentors = document.createElement('div');
+    this.root.replaceChildren(room, links, mentors);
+    this.mentors = new TeamMentorsPanel(mentors, { api: this.api, group, viewer, texts: this.texts.mentors });
+    this.mentors.render();
 
     const [embed, richText] = await Promise.all([this.load.embed(), this.load.richText()]);
     if (this.destroyed) return;

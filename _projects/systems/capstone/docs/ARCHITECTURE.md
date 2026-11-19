@@ -57,7 +57,8 @@ capstone-team-chat.html (only with team_group, only with spring)
     └── CapstoneTeamChat.start()
           ├── TeamGroupApi.me(), then groupsOf(me.id); findByName only for teachers
           ├── TeamChatAccess.viewFor(me, group): chat, note, or sign in
-          └── Messages' mountGroupChat(groupId) + "Open in Messages" (/dm?group=id)
+          ├── Messages' mountGroupChat(groupId) + "Open in Messages" (/dm?group=id)
+          └── TeamMentorsPanel: the team's mentors; Add and Remove for the team and teachers
 ```
 
 Spring decides who may read and post (`MentorRules`): a mentor uses only a
