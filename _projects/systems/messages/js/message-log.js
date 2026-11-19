@@ -17,6 +17,7 @@ export const LOG_TEXTS = Object.freeze({
   you: 'You',
   edited: '(edited)',
   editMessage: 'Edit message',
+  addToCalendar: 'Add to calendar',
   deleteMessage: 'Delete message',
   replyMessage: 'Reply',
   imageFrom: 'Image from {name}',
@@ -102,7 +103,7 @@ function splitReply(richText, body) {
 // linkCards(html) returns an element of previews for the links in a body (GitHub cards), or
 // null; onMore(action, message) adds a More menu ('copy', 'issue') to each message.
 export function createMessageLog(element, {
-  richText, me, onEdit, onDelete, onReply = null, readOnly = false, texts = {}, formatBody = null,
+  richText, me, onEdit, onDelete, onReply = null, onSchedule = null, readOnly = false, texts = {}, formatBody = null,
   onFile = null, thumbnail = null, onPin = null, runCode = null, saveGist = null, linkCards = null, onMore = null,
 }) {
   if (formatBody !== null && typeof formatBody !== 'function') {
@@ -334,7 +335,7 @@ export function createMessageLog(element, {
   }
 
   // A message's More menu (message-more.js), one open at a time.
-  const more = onMore ? createMoreMenu({ text, onMore, makeButton: actionButton }) : null;
+  const more = onMore || onSchedule ? createMoreMenu({ text, onMore, onSchedule, makeButton: actionButton }) : null;
 
   // Which messages are pinned, from the pin messages in the log: refreshed after every
   // change, so each message's Pin button and Pinned mark stay right.
@@ -485,8 +486,9 @@ export function createMessageLog(element, {
         main.appendChild(imageLink);
       }
     }
-    // A message saved before ids existed can't be replied to, edited or deleted.
-    if (!readOnly && message.id && !message.deleted && (onReply || onPin || isSelf)) {
+    // A message saved before ids existed can't be replied to, edited or deleted. Anyone's
+    // message can go on your calendar (in its More menu), so the bar isn't only for your own.
+    if (!readOnly && message.id && !message.deleted) {
       const actions = document.createElement('div');
       actions.className = 'chat-msg-actions';
       if (onReply) actions.append(actionButton('fa-reply', text.replyMessage, () => onReply(messages.get(message.key))));
@@ -503,7 +505,7 @@ export function createMessageLog(element, {
           actionButton('fa-trash', text.deleteMessage, button => onDelete(messages.get(message.key), button)),
         );
       }
-      main.appendChild(actions);
+      if (actions.firstChild) main.appendChild(actions);
     }
 
     row.append(avatarFor(message, isSelf), main);

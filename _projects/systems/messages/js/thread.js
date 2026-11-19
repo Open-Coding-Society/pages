@@ -71,7 +71,7 @@ export const EMPTY_STATES = Object.freeze({
 export function createThread({
   elements, api, socket, richText, me,
   onDmRead = () => {}, onGroupRead = () => {}, onFileShared = () => {},
-  readOnly = false, emptyState = null, texts = {}, formatBody = null,
+  readOnly = false, onSchedule = null, emptyState = null, texts = {}, formatBody = null,
   groupFiles = null, onOpenFolder = null, viewer: sharedViewer = null,
   runCode = null, onCommand = () => {}, profileUrl = '/profile', linkCards = null,
 }) {
@@ -132,7 +132,7 @@ export function createThread({
   // reply, edit or delete.
   const log = createMessageLog(elements.messages, {
     richText, me, onEdit: beginEdit, onDelete: deleteMessage, onReply: canReply ? beginReply : null,
-    readOnly, texts, formatBody,
+    onSchedule, readOnly, texts, formatBody,
     onFile: fileActions ? (action, item, control) => fileActions.handle(action, item, control) : null,
     thumbnail: fileActions ? item => fileActions.thumbnail(item) : null,
     onPin: readOnly ? null : (message, pinned) => togglePin(message, pinned),

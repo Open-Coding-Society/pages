@@ -20,6 +20,7 @@ import {
   canFormGroups, conversationLabel, groupSubtitle, isClassGroup, isCourseChannel, sortGroups,
 } from './messages-model.js';
 import { initNewChat } from './new-chat.js';
+import { initScheduleDialog } from './schedule-dialog.js';
 import { conversationHref, createSidebar } from './sidebar.js';
 import { createThread } from './thread.js';
 
@@ -124,8 +125,10 @@ export async function startMessagesPage({ config, richText }) {
     return box;
   };
   let panel = null; // the conversation panel, made once the thread exists (it reads the thread)
+  let scheduleDialog = null; // wired up below, once the thread exists
   const thread = createThread({
     api,
+    onSchedule: (message, opener) => scheduleDialog?.open(message, opener),
     socket,
     richText,
     me,
@@ -411,6 +414,18 @@ export async function startMessagesPage({ config, richText }) {
       open: byId('messagesNewChat'), dialog: byId('newChatDialog'), form: byId('newChatForm'),
       search: byId('newChatSearch'), results: byId('newChatResults'), selected: byId('newChatSelected'),
       status: byId('newChatStatus'), start: byId('newChatStart'),
+    },
+  });
+  scheduleDialog = initScheduleDialog({
+    api,
+    // A reply's body starts with a [[reply:...]] marker, which has no place in an event.
+    stripMarkers: typeof richText.stripChatMarkers === 'function' ? richText.stripChatMarkers : undefined,
+    // A link back to this chat, kept in the event's notes.
+    chatUrl: () => (state.active ? `${location.origin}${location.pathname}${conversationHref(state.active.kind, state.active.id)}` : ''),
+    onScheduled: text => { notice.textContent = text; },
+    elements: {
+      dialog: byId('scheduleDialog'), form: byId('scheduleForm'), title: byId('scheduleTitle'),
+      date: byId('scheduleDate'), time: byId('scheduleTime'), status: byId('scheduleStatus'), save: byId('scheduleSave'),
     },
   });
   messageSearch = initMessageSearch({

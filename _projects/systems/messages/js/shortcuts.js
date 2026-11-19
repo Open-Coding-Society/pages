@@ -11,9 +11,9 @@ export const SHORTCUTS = Object.freeze([
   { keys: ['Alt', '↓'], mac: ['⌥', '↓'], does: 'Open the conversation below' },
   { keys: ['Ctrl', '/'], mac: ['⌘', '/'], does: 'Show every slash command' },
   { keys: ['/'], mac: ['/'], does: 'At the start of a message: open the command menu' },
-  { keys: ['Enter'], mac: ['Enter'], does: 'Send (in a list, the next item)' },
-  { keys: ['Shift', 'Enter'], mac: ['Shift', 'Enter'], does: 'A new line' },
-  { keys: ['Ctrl', 'Enter'], mac: ['⌘', 'Enter'], does: 'Send, even from a list or the code box' },
+  { keys: ['Enter'], mac: ['Enter'], does: 'Send' },
+  { keys: ['Shift', 'Enter'], mac: ['Shift', 'Enter'], does: 'A new line (in a list, the next item)' },
+  { keys: ['Ctrl', 'Enter'], mac: ['⌘', 'Enter'], does: 'Send from the code box' },
   { keys: ['Esc'], mac: ['Esc'], does: 'Close a menu, a reply or an edit' },
 ]);
 

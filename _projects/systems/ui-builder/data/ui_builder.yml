@@ -828,6 +828,7 @@ text:
     edited: (edited)
     deleted: This message was deleted.
     editMessage: Edit message
+    addToCalendar: Add to calendar
     deleteMessage: Delete message
     replyMessage: Reply
     imageFrom: "Image from {name}"

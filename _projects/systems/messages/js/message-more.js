@@ -1,15 +1,18 @@
-// A message's More menu: a small ocs__menu under its "…" button with Copy text and New
-// GitHub issue. One is open at a time, and it closes on a pick, Escape (focus back on the
-// button) or a click anywhere else. onMore(action, message) does the work (thread.js);
-// makeButton(icon, label, onClick) is the log's own action button, so it looks like Reply.
+// A message's More menu: a small ocs__menu under its "…" button with Copy text, Add to
+// calendar and New GitHub issue. One is open at a time, and it closes on a pick, Escape (focus
+// back on the button) or a click anywhere else. onMore(action, message) does Copy and the issue
+// (thread.js); onSchedule(message, opener) opens Add to calendar, with the "…" button as the
+// opener that gets focus back. Either can be null, which leaves its items out. makeButton(icon,
+// label, onClick) is the log's own action button, so it looks like Reply.
 
-export function createMoreMenu({ text, onMore, makeButton }) {
-  let open = null; // { button, menu } while a menu is open
+export function createMoreMenu({ text, onMore = null, onSchedule = null, makeButton }) {
+  let open = null; // { button, menu, row } while a menu is open
 
   function close() {
     if (!open) return;
     open.menu.remove();
     open.button.setAttribute('aria-expanded', 'false');
+    open.row?.classList.remove('is-menu-open');
     document.removeEventListener('click', onOutside, true);
     document.removeEventListener('keydown', onKey);
     open = null;
@@ -26,7 +29,7 @@ export function createMoreMenu({ text, onMore, makeButton }) {
     button.focus?.();
   }
 
-  function item(action, icon, label, messageOf) {
+  function item(icon, label, run) {
     const choice = document.createElement('button');
     choice.type = 'button';
     choice.className = 'ocs__menu-item';
@@ -40,7 +43,7 @@ export function createMoreMenu({ text, onMore, makeButton }) {
     choice.append(glyph, name);
     choice.addEventListener('click', () => {
       close();
-      onMore(action, messageOf());
+      run();
     });
     return choice;
   }
@@ -56,13 +59,16 @@ export function createMoreMenu({ text, onMore, makeButton }) {
       const menu = document.createElement('div');
       menu.className = 'ocs__menu chat-more-menu';
       menu.setAttribute('role', 'menu');
-      menu.append(
-        item('copy', 'fa-copy', text.copyText, messageOf),
-        item('issue', 'fa-circle-dot', text.newIssue, messageOf),
-      );
+      if (onMore) menu.append(item('fa-copy', text.copyText, () => onMore('copy', messageOf())));
+      if (onSchedule) menu.append(item('fa-calendar-plus', text.addToCalendar, () => onSchedule(messageOf(), control)));
+      if (onMore) menu.append(item('fa-circle-dot', text.newIssue, () => onMore('issue', messageOf())));
       actions.appendChild(menu);
       control.setAttribute('aria-expanded', 'true');
-      open = { button: control, menu };
+      // Each message row is its own stacking context (its fade-in animation), so the menu's
+      // z-index can't lift it over the messages after it: the row itself is raised meanwhile.
+      const row = actions.closest('.chat-msg');
+      row?.classList.add('is-menu-open');
+      open = { button: control, menu, row };
       document.addEventListener('click', onOutside, true);
       document.addEventListener('keydown', onKey);
       menu.querySelector('button')?.focus?.();

@@ -33,7 +33,7 @@ same way they reach a direct message.
 | `js/chat-commands.js` | `ChatCommands`: what the slash commands and a message's More menu do in the open conversation (GitHub links, `/newissue`, gists, `/me`, `/shrug`), and the repository each chat last named. |
 | `js/code-block.js` | A code block in the log: the code as text, Copy, Run and Save as gist. |
 | `js/file-rows.js` | The files a message shares, as `ocs__file` rows with their buttons, and small previews for a few images. |
-| `js/message-more.js` | A message's More menu (Copy text, New GitHub issue). |
+| `js/message-more.js` | A message's More menu (Copy text, Add to calendar, New GitHub issue): one menu for everything that isn't Reply, Pin, Edit or Delete. |
 | `js/github-links.js` | Reading GitHub links (issues, pull requests, commits, repos, gists) and building one from "owner/repo#12". |
 | `js/shortcuts.js`, `js/help-dialog.js` | The keyboard shortcuts, and `/help`'s list of them and of every slash command, drawn from the same lists the page runs on. |
 | `js/github-cards.js` | Live cards (`ocs__link-card`) for the GitHub links in a message: an issue's or pull request's title, state, author, size and checks; a commit; a repository; a gist. |
@@ -42,6 +42,8 @@ same way they reach a direct message.
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
 | `js/messages-api.js` | Every Spring and Flask request. |
 | `js/message-search.js` | The search box in a direct message's header: debounced query for that chat, matches listed under the header with the match marked, and jumping to the one picked. |
+| `js/schedule-model.js` | "Add to calendar" without the page: the plain text of a message, the date and time it mentions (today, Friday, Nov 20, 3pm...), a starting title, and the request Spring's calendar takes. A message is turned into text once, and the description it writes holds no raw `<`, because `/student/calendar` shows a description as HTML. |
+| `js/schedule-dialog.js` | The dialog opened by Add to calendar in a message's More menu: title, day and optional time, then saves one event to your own calendar. A reply's `[[reply:...]]` marker is left out of the text (`richText.stripChatMarkers`). |
 | `js/chat-socket.js` | The STOMP-over-SockJS connection to Spring's `/ws-chat`, one for `/dm` and one for each embed. |
 | `js/messages-model.js` | Pure functions: one message shape for DMs and groups, labels, roles. |
 | `js/formation-model.js` | Pure functions: the steps of forming groups. |
@@ -173,7 +175,7 @@ is filled in for you to finish, and Enter (or Send) then runs it instead of send
 | Ctrl or ⌘ + K | Find a conversation: type, then Enter opens the first match |
 | Alt or ⌥ + ↑ / ↓ | The conversation above or below, in the sidebar's order (left to a field being typed in, except the conversation search and an empty message box) |
 | Ctrl or ⌘ + / | Show every slash command |
-| Enter / Shift+Enter / Ctrl or ⌘+Enter | Send / new line / send even from a list or the code box |
+| Enter / Shift+Enter / Ctrl or ⌘+Enter | Send / new line (in a list, the next item) / send from the code box |
 | Esc | Close a menu, a reply or an edit |
 
 `/help` opens "Commands and keys", which lists these and every command. The message box's
@@ -328,6 +330,9 @@ Spring:
   `GET /api/dm/search?q=` (your direct messages only, 2-100 characters, newest 50;
   add `&conversationId=` for one chat, which is what the page does; group chats are
   not searched)
+- `POST /api/calendar/add_event` (Add to calendar: `title`, `date`, `description`, `type`, `period`; no
+  `individual`, so Spring files the event under whoever is signed in -- a blank one would show it to everyone.
+  The calendar keeps a date only, so a time is written into the title and description)
 - `GET /api/groups/person/{personId}` (your groups), `GET /api/groups/search?name=`,
   `GET /api/groups` (Form groups only), `POST /api/groups`, `DELETE /api/groups/{id}`,
   `POST` and `DELETE /api/groups/{id}/members/{personId}`

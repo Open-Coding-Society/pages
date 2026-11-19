@@ -702,3 +702,13 @@
   z-index: 6;
   min-width: 15rem;
 }
+
+// A row with its More menu open sits above the rows after it, which would otherwise cover the
+// menu (each row is a stacking context), and keeps its bar showing when the pointer leaves it.
+.dm .chat-msg.is-menu-open {
+  z-index: $z-dropdown;
+}
+
+.dm .chat-msg.is-menu-open .chat-msg-actions {
+  opacity: 1;
+}

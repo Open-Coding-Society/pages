@@ -187,6 +187,34 @@ the open conversation each start with a bar of the same height.
     </form>
   </div>
 
+  <div class="ocs__modal hidden" id="scheduleDialog" role="dialog" aria-modal="true" aria-labelledby="scheduleHeading">
+    <form class="ocs__modal-card ocs__stack" id="scheduleForm">
+      <div class="ocs__modal-header">
+        <h3 class="ocs__modal-title" id="scheduleHeading">Add to calendar</h3>
+        <button type="button" class="ocs__btn small" data-close aria-label="Close">&times;</button>
+      </div>
+      <div class="ocs__field">
+        <label class="ocs__label" for="scheduleTitle">Title</label>
+        <input class="ocs__input" id="scheduleTitle" type="text" autocomplete="off" required data-focus>
+      </div>
+      <div class="dm__schedule-when">
+        <div class="ocs__field">
+          <label class="ocs__label" for="scheduleDate">Day</label>
+          <input class="ocs__input" id="scheduleDate" type="date" required>
+        </div>
+        <div class="ocs__field">
+          <label class="ocs__label" for="scheduleTime">Time (optional)</label>
+          <input class="ocs__input" id="scheduleTime" type="time">
+        </div>
+      </div>
+      <p class="ocs__text" id="scheduleStatus" role="status"></p>
+      <div class="ocs__modal-actions">
+        <button type="button" class="ocs__btn" data-close>Cancel</button>
+        <button type="submit" class="ocs__btn accent fill" id="scheduleSave">Add event</button>
+      </div>
+    </form>
+  </div>
+
   <div class="ocs__modal hidden" id="findGroupDialog" role="dialog" aria-modal="true" aria-labelledby="findGroupTitle">
     <div class="ocs__modal-card ocs__stack">
       <div class="ocs__modal-header">
