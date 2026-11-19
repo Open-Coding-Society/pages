@@ -1,12 +1,10 @@
-// The Files panel: everything shared with a group, as folders. Opened from the conversation
-// header (or a shared folder's Open button), it lists the folder you're in with breadcrumbs
-// back up, filters every file by name as you type, and previews, downloads or zips. Sharing
-// starts from the composer, so whatever goes up is announced in the chat.
-import { createDialog } from './dialogs.js';
+// The conversation panel's Files tab: everything shared with a group, as folders. It lists
+// the folder you're in with breadcrumbs back up, filters every file by name as you type,
+// and previews, downloads or zips. Sharing starts from the composer, so whatever goes up is
+// announced in the chat.
 import { buildTree, countFiles, fileKind, formatBytes } from './files-model.js';
 
-export const FILES_PANEL_TEXTS = Object.freeze({
-  title: 'Files in {group}',
+export const FILES_TAB_TEXTS = Object.freeze({
   root: 'All files',
   filter: 'Filter files by name',
   loading: 'Loading files…',
@@ -50,30 +48,24 @@ function button(className, glyph, label, onClick, { iconOnly = false } = {}) {
     control.setAttribute('aria-label', label);
     control.title = label;
   } else {
-    control.append(` ${label}`);
+    // ocs__btn--icon spaces the icon from the words: a flex button drops a leading space.
+    control.classList.add('ocs__btn--icon');
+    control.append(label);
   }
   control.addEventListener('click', () => onClick(control));
   return control;
 }
 
-// elements: dialog, title, body (the Files tab's content), status. groupFilesFor(groupId)
-// gives that group's GroupFiles; fileActions(filesFor) makes the buttons' handler for it.
-export function createFilesPanel({ elements, groupFilesFor, makeFileActions, onShare = null, texts = {} }) {
-  const text = { ...FILES_PANEL_TEXTS, ...texts };
+// host: the tab's element. notify(text) says something in the panel's status line.
+// groupFilesFor(groupId) gives that group's GroupFiles; actions handle a file's buttons
+// (file-actions.js); onClose closes the panel before onShare opens the composer's Attach.
+export function createFilesTab({ host, notify, groupFilesFor, actions, onShare = null, onClose = () => {}, texts = {} }) {
+  const text = { ...FILES_TAB_TEXTS, ...texts };
   let group = null;
   let path = '';
   let query = '';
   let index = [];
   let loadCount = 0;
-
-  const notify = message => { elements.status.textContent = message; };
-  const actions = makeFileActions({ filesFor: () => (group ? groupFilesFor(group.id) : null), notify });
-  const dialog = createDialog(elements.dialog, {
-    onClose: () => {
-      loadCount += 1;
-      group = null;
-    },
-  });
 
   function crumbs(tree) {
     const nav = el('nav', 'ocs__links dm__crumbs');
@@ -82,9 +74,9 @@ export function createFilesPanel({ elements, groupFilesFor, makeFileActions, onS
     const levels = [{ name: text.root, at: '' }, ...parts.map((name, i) => ({ name, at: parts.slice(0, i + 1).join('/') }))];
     levels.forEach((level, i) => {
       const last = i === levels.length - 1;
-      const crumb = el('button', `ocs__btn small${last ? ' accent' : ''}`);
+      const crumb = el('button', `ocs__btn small${last ? ' accent' : ''}${i === 0 ? ' ocs__btn--icon' : ''}`);
       crumb.type = 'button';
-      if (i === 0) crumb.append(icon('fa-folder-tree'), ` ${level.name}`);
+      if (i === 0) crumb.append(icon('fa-folder-tree'), level.name);
       else crumb.textContent = level.name;
       if (last) crumb.setAttribute('aria-current', 'location');
       crumb.addEventListener('click', () => go(level.at));
@@ -140,11 +132,11 @@ export function createFilesPanel({ elements, groupFilesFor, makeFileActions, onS
       renderList();
     });
     bar.appendChild(filter);
-    if (onShare) bar.appendChild(button('ocs__btn small', 'fa-paperclip', text.share, () => { dialog.close(); onShare(); }));
+    if (onShare) bar.appendChild(button('ocs__btn small', 'fa-paperclip', text.share, () => { onClose(); onShare(); }));
     holder.push(bar);
     const listHost = el('div', 'dm__files-list');
     holder.push(listHost);
-    elements.body.replaceChildren(...holder);
+    host.replaceChildren(...holder);
 
     function renderList() {
       listHost.replaceChildren();
@@ -184,7 +176,7 @@ export function createFilesPanel({ elements, groupFilesFor, makeFileActions, onS
     path = at;
     query = '';
     render();
-    elements.body.querySelector('[aria-current="location"]')?.focus?.();
+    host.querySelector('[aria-current="location"]')?.focus?.();
   }
 
   async function load() {
@@ -194,7 +186,7 @@ export function createFilesPanel({ elements, groupFilesFor, makeFileActions, onS
     if (!index.length) {
       const spinner = el('div', 'ocs__loading');
       spinner.appendChild(el('div', 'ocs__spinner'));
-      elements.body.replaceChildren(spinner, el('p', 'ocs__text', text.loading));
+      host.replaceChildren(spinner, el('p', 'ocs__text', text.loading));
     }
     try {
       index = await files.index();
@@ -203,26 +195,27 @@ export function createFilesPanel({ elements, groupFilesFor, makeFileActions, onS
     } catch (error) {
       if (ticket !== loadCount) return;
       console.warn('Messages: could not load the shared files', error);
-      elements.body.replaceChildren(el('p', 'ocs__text', text.loadFailed));
+      host.replaceChildren(el('p', 'ocs__text', text.loadFailed));
     }
   }
 
   return {
     // folderPath opens straight into a shared folder (a message's Open button).
-    open(current, opener, { folderPath = '' } = {}) {
+    show(current, { folderPath = '' } = {}) {
       group = current;
       path = folderPath;
       query = '';
       index = [];
-      elements.title.textContent = fill(text.title, { group: current.name });
-      dialog.open(opener);
       load();
     },
-    // Someone shared a file while the panel shows this group's files.
-    refreshIfShowing(groupId) {
-      if (dialog.isOpen() && group?.id === groupId) load();
+    hide() {
+      loadCount += 1;
+      group = null;
     },
-    isOpen: () => dialog.isOpen(),
+    // Someone shared a file while the tab shows this group's files.
+    refreshIfShowing(groupId) {
+      if (group?.id === groupId) load();
+    },
   };
 }
 

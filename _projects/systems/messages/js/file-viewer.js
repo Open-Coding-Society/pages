@@ -49,11 +49,11 @@ export function createFileViewer({ root, texts = {} }) {
     actions.className = 'ocs__links';
     downloadButton = document.createElement('button');
     downloadButton.type = 'button';
-    downloadButton.className = 'ocs__btn small';
+    downloadButton.className = 'ocs__btn small ocs__btn--icon';
     const glyph = document.createElement('i');
     glyph.className = 'fas fa-download';
     glyph.setAttribute('aria-hidden', 'true');
-    downloadButton.append(glyph, ` ${text.download}`);
+    downloadButton.append(glyph, text.download);
     downloadButton.addEventListener('click', () => onDownload?.(downloadButton));
     const closeButton = document.createElement('button');
     closeButton.type = 'button';

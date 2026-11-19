@@ -96,9 +96,13 @@ the open conversation each start with a bar of the same height.
         <form class="dm__search" id="messagesSearchForm" role="search" autocomplete="off" hidden>
           <input class="ocs__input" id="messagesSearch" type="search" placeholder="Search this chat" aria-label="Search this chat" disabled>
         </form>
-        <div class="dm__thread-actions hidden" id="messagesGroupActions">
+        {%- comment -%}
+          Shared opens the conversation panel (files, media, links, pins) for any open
+          conversation; Members and Leave are a group's.
+        {%- endcomment -%}
+        <div class="dm__thread-actions hidden" id="messagesThreadActions">
+          <button type="button" class="dm__action" id="messagesSharedButton" title="Files, media, links and pins"><i class="fas fa-folder-open" aria-hidden="true"></i> Shared</button>
           <button type="button" class="dm__action" id="messagesMembers">Members</button>
-          <button type="button" class="dm__action" id="messagesFilesButton"><i class="fas fa-folder-open" aria-hidden="true"></i> Files</button>
           <button type="button" class="dm__action" id="messagesLeaveGroup">Leave</button>
         </div>
       </header>
@@ -279,16 +283,26 @@ the open conversation each start with a bar of the same height.
   </div>
 
   {%- comment -%}
-    The Files panel (js/files-panel.js): everything shared with the open group, as folders.
+    The conversation panel (js/conversation-panel.js): a group's Files (js/files-panel.js),
+    and any conversation's Media, Links and Pinned, in the grammar's tabs. The script fills
+    the tab bar.
   {%- endcomment -%}
-  <div class="ocs__modal hidden" id="filesDialog" role="dialog" aria-modal="true" aria-labelledby="filesTitle">
+  <div class="ocs__modal hidden" id="conversationPanel" role="dialog" aria-modal="true" aria-labelledby="conversationPanelTitle">
     <div class="ocs__modal-card ocs__modal-card--wide ocs__stack">
       <div class="ocs__modal-header">
-        <h3 class="ocs__modal-title" id="filesTitle">Files</h3>
+        <h3 class="ocs__modal-title" id="conversationPanelTitle">Shared</h3>
         <button type="button" class="ocs__btn small" data-close aria-label="Close" data-focus>&times;</button>
       </div>
-      <div class="ocs__stack" id="filesBody"></div>
-      <p class="ocs__text" id="filesStatus" role="status"></p>
+      <div class="ocs__tabs">
+        <ul class="ocs__tabs-list" id="conversationPanelTabs"></ul>
+      </div>
+      <div class="ocs__tabs-panels">
+        <div class="ocs__tabs-panel ocs__stack" id="conversationPanelFiles"></div>
+        <div class="ocs__tabs-panel hidden" id="conversationPanelMedia"></div>
+        <div class="ocs__tabs-panel hidden" id="conversationPanelLinks"></div>
+        <div class="ocs__tabs-panel hidden" id="conversationPanelPinned"></div>
+      </div>
+      <p class="ocs__text" id="conversationPanelStatus" role="status"></p>
     </div>
   </div>
 

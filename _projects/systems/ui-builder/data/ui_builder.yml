@@ -847,5 +847,12 @@ text:
     openFolder: "Open {name} in Files"
     zipFolder: "Download {name} as a .zip"
     imagePreview: "{name}, shared by {sender}"
+    pinMessage: Pin
+    unpinMessage: Unpin
+    pinned: Pinned
+    pinnedNote: "{name} pinned a message:"
+    unpinnedNote: "{name} unpinned a message:"
+    aMessage: a message
+    pinFailed: Could not change the pin. Try again.
     idleTitle: Pick a conversation
     idleHint: Or start a new chat, or find a group to join.

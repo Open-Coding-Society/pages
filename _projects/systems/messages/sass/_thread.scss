@@ -459,7 +459,7 @@
   color: var(--dm-ink);
 }
 
-// The filename in "<someone> shared a file:" -- a button that downloads it.
+// The link in a line like "<someone> pinned a message:" -- a button that shows the message.
 .dm .chat-system-link {
   padding: 0;
   border: 0;
@@ -597,4 +597,24 @@
   font-size: $text-sm;
   font-style: normal;
   color: var(--dm-muted);
+}
+
+// ── Pins ─────────────────────────────────────────────────────────────────────────
+// "Pinned" in a pinned message's meta line, and a faint accent wash on the message.
+.dm .chat-msg.is-pinned {
+  background: color-mix(in srgb, var(--dm-accent) 6%, transparent);
+}
+
+.dm .chat-msg-pinned {
+  font-family: var(--dm-font);
+  font-size: $text-xs;
+  font-weight: 600;
+  color: var(--dm-accent);
+}
+
+// A pin or unpin note: one line, like the day dividers, with the message's words as its link.
+.dm .chat-pin-note .chat-system-link {
+  display: inline;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }

@@ -11,6 +11,7 @@ import { createComposerFiles } from './composer-files.js';
 import { readImageFile } from './dialogs.js';
 import { createFileActions } from './file-actions.js';
 import { createFileViewer } from './file-viewer.js';
+import { pinMarker, unpinMarker } from './conversation-model.js';
 import { addFilesMarker, extractFilesMarker } from './files-model.js';
 import { classifyDmEvent, classifyGroupEvent, dmMessage, groupMessage } from './messages-model.js';
 import { createMessageLog, withTexts } from './message-log.js';
@@ -37,6 +38,7 @@ export const THREAD_TEXTS = Object.freeze({
   imageMessage: '🖼 Image',
   filesMessage: '📎 Files',
   sharedButNotSent: 'Your files are shared, but the message didn’t send. Press Send to try again.',
+  pinFailed: 'Could not change the pin. Try again.',
 });
 
 // What an open conversation with no messages says, unless the host passes `emptyState`.
@@ -114,6 +116,7 @@ export function createThread({
     readOnly, texts, formatBody,
     onFile: fileActions ? (action, item, control) => fileActions.handle(action, item, control) : null,
     thumbnail: fileActions ? item => fileActions.thumbnail(item) : null,
+    onPin: readOnly ? null : (message, pinned) => togglePin(message, pinned),
   });
   // Pasted images go where the Image control's would, so only where that control exists.
   const composer = readOnly
@@ -362,6 +365,29 @@ export function createThread({
     if (!socket.isConnected()) loadNew(kind, id);
   }
 
+  // Pins and unpins are messages of their own ([[pin:<id>]]), so every member sees them.
+  // Resolves whether the pin changed.
+  async function togglePin(message, pinned) {
+    if (!current?.loaded || !message?.id) return false;
+    if (pending) {
+      showFormMessage(text.waitForSave);
+      return false;
+    }
+    const { kind, id } = current;
+    showFormMessage('');
+    try {
+      const saved = await kinds[kind].send(id, pinned ? unpinMarker(message.id) : pinMarker(message.id), null);
+      if (destroyed || !isOpen(kind, id)) return true;
+      showSaved(kind, id, saved);
+      if (!socket.isConnected()) loadNew(kind, id);
+      return true;
+    } catch (error) {
+      console.warn('Messages: could not change the pin', error);
+      showFormMessage(text.pinFailed);
+      return false;
+    }
+  }
+
   // A group send answers with the chat's messages, a DM send with the saved message's event.
   function showSaved(kind, id, saved) {
     if (kind === 'group' && Array.isArray(saved)) {
@@ -608,7 +634,11 @@ export function createThread({
   close();
 
   return {
-    open, close, resume, setHeading, showMessage, destroy,
+    open, close, resume, setHeading, showMessage, destroy, togglePin,
     current: () => (current ? { kind: current.kind, id: current.id } : null),
+    // The open conversation's messages as loaded, oldest first; the conversation panel
+    // reads its media, links and pins from them.
+    messages: () => (current?.loaded ? log.list() : []),
+    isPinned: messageId => log.isPinned(messageId),
   };
 }

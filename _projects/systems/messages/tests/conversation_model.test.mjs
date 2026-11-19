@@ -1,0 +1,59 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  currentPins, extractPinMarker, linksIn, mediaIn, pinMarker, plainText, unpinMarker,
+} from '../js/conversation-model.js';
+
+const message = (key, body, extra = {}) => ({ id: key, key, senderName: 'Grace', body, sentAt: '2026-11-18T10:00:00Z', ...extra });
+
+test('a pin message is just its marker, and the id inside it is read back', () => {
+  assert.equal(pinMarker('m12'), '[[pin:m12]]');
+  assert.equal(unpinMarker('m12'), '[[unpin:m12]]');
+  assert.deepEqual(extractPinMarker('[[pin:m12]]'), { action: 'pin', id: 'm12', html: '' });
+  assert.deepEqual(extractPinMarker('  [[unpin:401]] '), { action: 'unpin', id: '401', html: '' });
+  assert.deepEqual(extractPinMarker('see [[pin:m12]]'), { action: null, id: null, html: 'see [[pin:m12]]' });
+  assert.throws(() => pinMarker('a]b'), TypeError);
+});
+
+test('currentPins replays pins and unpins, newest first, and drops deleted messages', () => {
+  const messages = [
+    message('a', 'first'), message('b', 'second'), message('c', 'third'),
+    message('p1', '[[pin:a]]', { senderName: 'Ada', sentAt: '2026-11-18T11:00:00Z' }),
+    message('p2', '[[pin:b]]', { senderName: 'Alan', sentAt: '2026-11-18T12:00:00Z' }),
+    message('p3', '[[unpin:a]]'),
+    message('p4', '[[pin:c]]', { sentAt: '2026-11-18T13:00:00Z' }),
+    message('p5', '[[pin:b]]'),
+  ];
+  messages[2].deleted = true;
+  const pins = currentPins(messages);
+  assert.deepEqual(pins.map(pin => pin.message.key), ['b']);
+  assert.equal(pins[0].pinnedBy, 'Alan');
+});
+
+test('plainText reads a body the way a list shows it: no tags, markers or entities', () => {
+  assert.equal(plainText('[[reply:1|A|x]] [[files:f~a.txt~1]] <b>Fish</b> &amp; chips<br>tonight'), 'Fish & chips tonight');
+});
+
+test('linksIn lists each message’s links once, GitHub first, newest first', () => {
+  const messages = [
+    message('1', 'docs at https://example.com/guide and https://example.com/guide', { sentAt: '2026-11-18T09:00:00Z' }),
+    message('2', 'PR: <a href="https://github.com/Open-Coding-Society/pages/pull/2031">https://github.com/Open-Coding-Society/pages/pull/2031</a>.', { sentAt: '2026-11-18T10:00:00Z' }),
+    message('3', 'nothing here'),
+  ];
+  const links = linksIn(messages);
+  assert.deepEqual(links.map(link => link.url), ['https://github.com/Open-Coding-Society/pages/pull/2031', 'https://example.com/guide']);
+  assert.equal(links[0].github, true);
+  assert.equal(links[1].host, 'example.com');
+  assert.equal(links[1].messageKey, '1');
+});
+
+test('mediaIn gathers sent images and shared image and video files, newest first', () => {
+  const messages = [
+    message('1', 'look', { image: 'data:image/png;base64,AAA', sentAt: '2026-11-18T09:00:00Z' }),
+    message('2', '[[files:f~shots%2Fa.png~5;f~demo.mp4~9;f~notes.md~3]] files', { sentAt: '2026-11-18T10:00:00Z' }),
+  ];
+  const media = mediaIn(messages);
+  assert.deepEqual(media.map(item => item.kind), ['image', 'video', 'image']);
+  assert.equal(media[0].file.path, 'shots/a.png');
+  assert.equal(media[2].src, 'data:image/png;base64,AAA');
+});

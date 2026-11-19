@@ -21,7 +21,9 @@ same way they reach a direct message.
 | `js/group-files.js` | `GroupFiles`: one group's shared files. The list without bytes, one file's bytes, a folder's files for a .zip, and uploads with progress, three at a time. |
 | `js/composer-files.js` | The composer's Attach menu, the Files and Folder pickers, dropping files or folders on the conversation, and sharing them before the message sends. |
 | `js/attachments.js` | The tray above the composer: what waits to be shared, what was left out and why, and each item's upload progress. Also walks a dropped folder. |
-| `js/files-panel.js` | The Files panel: a group's files as folders, with breadcrumbs, a name filter, previews, downloads and a folder as .zip. |
+| `js/conversation-panel.js` | The Shared panel: a conversation's Files (groups), Media, Links and Pinned, in the grammar's tabs. |
+| `js/files-panel.js` | The Shared panel's Files tab: a group's files as folders, with breadcrumbs, a name filter, previews, downloads and a folder as .zip. |
+| `js/conversation-model.js` | Pure functions for pins (`[[pin:<id>]]` messages), and the links and media a conversation holds. |
 | `js/file-actions.js`, `js/file-viewer.js` | What a shared file's buttons do (download, preview, open a folder, .zip), and the preview: an image, video, sound, PDF or the start of a text file. |
 | `js/zip-store.js` | A stored (uncompressed) ZIP writer, so a shared folder downloads as one file. |
 | `js/popup-menu.js` | A menu a button opens (`ocs__menu`), with the arrow keys, Escape and click-away. |
@@ -100,10 +102,23 @@ direct message only an image can be attached: Spring stores shared files for gro
 - **The socket.** Spring's `sendFileServer` frame now names the file and its size but not
   its bytes, and the page adds nothing to the log for it (the share's message lists the
   files); it only marks the group's file list out of date.
-- **The Files panel** (the header's Files button, or a folder's Open) lists the group's
-  files as folders with breadcrumbs, filters by name, previews (images, video, sound, PDF,
-  the first 512 KB of text and code), downloads, and zips a folder (up to 1 GB, built in
-  the browser).
+- **The Files tab** of the Shared panel (or a folder's Open) lists the group's files as
+  folders with breadcrumbs, filters by name, previews (images, video, sound, PDF, the
+  first 512 KB of text and code), downloads, and zips a folder (up to 1 GB, built in the
+  browser).
+
+## Pins and the Shared panel
+
+- **Pins.** Each message has a Pin button. Pinning sends a message of its own,
+  `[[pin:<message id>]]` (`[[unpin:…]]` to take it off), so every member sees the same pins
+  without new storage, like Slack's "pinned a message". The log shows it as one line,
+  "Ada pinned a message: …", whose words jump to the message, and marks the pinned
+  message. Deleting the pin message takes the pin away. `currentPins` replays them in order.
+- **Shared** (in the conversation header, for groups and direct messages) opens the panel:
+  Files (groups only), Media (images sent in messages, and shared image and video files),
+  Links (GitHub first) and Pinned, each with a count. Media, Links and Pinned read the
+  messages the conversation already loaded, so opening them asks Spring for nothing.
+  Show in the chat closes the panel and marks the message.
 
 ## Embedding a conversation
 
@@ -182,6 +197,9 @@ back the listeners the pane and its composer put on `document` and `window`, and
 | `folderFiles` | {files} · {size} (a shared folder's line) |
 | `previewFile`, `downloadFile`, `openFolder`, `zipFolder` | Preview {name}; Download {name}; Open {name} in Files; Download {name} as a .zip (button labels) |
 | `imagePreview` | {name}, shared by {sender} |
+| `pinMessage`, `unpinMessage`, `pinned` | Pin; Unpin; Pinned |
+| `pinnedNote`, `unpinnedNote`, `aMessage` | {name} pinned a message:; {name} unpinned a message:; a message |
+| `pinFailed` | Could not change the pin. Try again. |
 | `openImage`, `closeImage` | View image from {name} larger; Close image (the image viewer) |
 | `today`, `yesterday` | Today; Yesterday (day dividers; older days use the browser's date format) |
 
