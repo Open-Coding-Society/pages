@@ -78,7 +78,8 @@ export class ChatCommands {
         this.codeBox?.open(command.name, {
           language: command.name === 'code' ? args : '',
           filename: command.name === 'gist' ? args : '',
-          maxLength: kind === 'dm' ? DM_MAX_LENGTH - 200 : MAX_CODE_LENGTH,
+          // A code block in a direct message has to fit the message; a gist sends only its link.
+          maxLength: command.name === 'code' && kind === 'dm' ? DM_MAX_LENGTH - 200 : MAX_CODE_LENGTH,
         });
         break;
       case 'issue':

@@ -573,6 +573,8 @@ export function createThread({
     current = { kind, id, loaded: false, catchUp: false };
     unsentFiles = null;
     commands?.clearQuote();
+    // Like the text, a code block being written belongs to the conversation it was begun in.
+    codeBox?.close();
     fileActions?.clear();
     early = [];
     unseenWhileHidden = false;

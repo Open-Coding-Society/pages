@@ -209,6 +209,38 @@ test('a code block too long for a direct message says to use a gist and sends no
   assert.match(elements.formStatus.textContent, /too long for a direct message/);
 });
 
+test('/gist in a direct message takes code longer than a message there holds: only its link is sent', async () => {
+  const { thread, composer, sent, gists, elements } = commandThread();
+  thread.open('dm', 4, { title: 'Grace', subtitle: '' });
+  await settle();
+  composer.type('/gist long.py');
+  key(composer.element, 'Enter');
+  const code = 'x = 1\n'.repeat(500); // 3,000 characters, over a direct message's 2,000
+  elements.codeHost.querySelector('textarea').value = code;
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  await settle();
+  assert.equal(gists.length, 1);
+  assert.equal(gists[0].files['long.py'].content, code.trimEnd());
+  assert.deepEqual(sent, ['https://gist.github.com/ada/abc123']);
+});
+
+test('a code block still being written stays with its conversation: opening another closes it', async () => {
+  const { thread, composer, sent, elements } = commandThread();
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  composer.type('/code python');
+  key(composer.element, 'Enter');
+  elements.codeHost.querySelector('textarea').value = 'secret = 42';
+  thread.open('group', 13, { title: 'Team Babbage', subtitle: '' });
+  await settle();
+  assert.equal(elements.codeHost.querySelector('.dm__code-box').hidden, true);
+  composer.setHTML('hello');
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  assert.deepEqual(sent, ['hello']);
+});
+
 // ── Code blocks in the log ──────────────────────────────────────────────────────────
 test('a code block draws its code as text, with Copy, and Run for a language the runners take', async () => {
   const host = document.createElement('div');
