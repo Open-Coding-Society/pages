@@ -9,7 +9,7 @@ const { document } = installFakeDom();
 
 const { initScheduleDialog } = await import('../js/schedule-dialog.js');
 
-function makeDialog({ addCalendarEvent }) {
+function makeDialog({ addCalendarEvent, ...options }) {
   const make = tag => document.createElement(tag);
   const elements = {
     dialog: make('div'), form: make('form'), title: make('input'), date: make('input'),
@@ -25,6 +25,7 @@ function makeDialog({ addCalendarEvent }) {
     chatUrl: () => 'https://x.test/dm?dm=5',
     onScheduled: text => done.push(text),
     now: () => new Date(2026, 10, 18, 15, 0),
+    ...options,
   });
   const submit = () => elements.form.dispatchEvent(fakeEvent('submit'));
   return { elements, sent, done, dialog, submit };
@@ -81,6 +82,28 @@ test('a message that spells out markup is saved as text, not as markup', async (
     assert.ok(!sent[0].description.includes('<'), `no raw "<" in ${JSON.stringify(sent[0].description)}`);
     assert.ok(!sent[0].title.includes('<'));
   }
+});
+
+// A reply is stored as "[[reply:<id>|<sender>|<excerpt>]] <its own html>" (chat-reply.js).
+// That is not what the person wrote, so it must not reach the title or the note. The page
+// gives the dialog richText.stripChatMarkers; this stand-in does the same for a reply's.
+test('a reply is saved without its marker', async () => {
+  const stripMarkers = text => text.replace(/\[\[reply:[^\]]*\]\]/g, '').trim();
+  const reply = '[[reply:42|Grace%20Hopper|Can%20we%20meet%3F]] <p>Yes, Friday at 3pm works.</p>';
+
+  const { elements, sent, dialog, submit } = makeDialog({ addCalendarEvent: async () => ({}), stripMarkers });
+  dialog.open(message(reply));
+  assert.equal(elements.title.value, 'Yes, Friday at 3pm works.');
+  assert.equal(elements.date.value, '2026-11-20', 'the day is still found in what was said');
+  assert.equal(elements.time.value, '15:00');
+  submit();
+  await settle();
+  assert.ok(!/\[\[|\]\]/.test(sent[0].title + sent[0].description), `no marker in ${JSON.stringify(sent[0])}`);
+
+  // Without it (a host whose richText predates replies) the body is used as stored.
+  const plain = makeDialog({ addCalendarEvent: async () => ({}) });
+  plain.dialog.open(message(reply));
+  assert.match(plain.elements.title.value, /^\[\[reply:42/);
 });
 
 test('an empty title is refused without asking Spring', async () => {

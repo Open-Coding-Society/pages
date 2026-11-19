@@ -314,6 +314,8 @@ export async function startMessagesPage({ config, richText }) {
   });
   scheduleDialog = initScheduleDialog({
     api,
+    // A reply's body starts with a [[reply:...]] marker, which has no place in an event.
+    stripMarkers: typeof richText.stripChatMarkers === 'function' ? richText.stripChatMarkers : undefined,
     // A link back to this chat, kept in the event's notes.
     chatUrl: () => (state.active ? `${location.origin}${location.pathname}${conversationHref(state.active.kind, state.active.id)}` : ''),
     onScheduled: text => { notice.textContent = text; },

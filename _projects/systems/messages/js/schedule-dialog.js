@@ -6,7 +6,12 @@ import {
   buildCalendarEvent, dateKey, dateLabel, guessEventDate, guessEventTime, MAX_TITLE_LENGTH, plainText, suggestTitle,
 } from './schedule-model.js';
 
-export function initScheduleDialog({ elements, api, chatUrl = () => '', onScheduled = () => {}, now = () => new Date() }) {
+// `stripMarkers` takes the markers chat adds to a body (a reply's `[[reply:...]]`) out of
+// it. The page passes richText.stripChatMarkers, which knows every kind there is; a host
+// whose richText has none shows bodies as stored.
+export function initScheduleDialog({
+  elements, api, chatUrl = () => '', stripMarkers = text => text, onScheduled = () => {}, now = () => new Date(),
+}) {
   let message = null;
   let saving = false;
   const dialog = createDialog(elements.dialog, { onClose: () => { message = null; } });
@@ -19,7 +24,8 @@ export function initScheduleDialog({ elements, api, chatUrl = () => '', onSchedu
     // The message's body as stored. suggestTitle and buildCalendarEvent turn it into text
     // themselves, once, so it is handed to them as it is and not as `text`: converting it
     // here as well would decode it twice, and "&amp;lt;" would come out as a real "<".
-    const body = String(source.body ?? '');
+    // A reply's marker is not part of what the person wrote, so it is left out first.
+    const body = stripMarkers(String(source.body ?? ''));
     const text = plainText(body); // only for finding a day and a time in it
     message = { ...source, body };
     saving = false;
