@@ -67,9 +67,9 @@ export function personaSections(allPersonas, selected) {
 }
 
 // The setup checklist at the top of the page. A value of null means that part hasn't loaded yet.
-// Face ID and GitHub are saved in Spring, so a Flask-only site (springEnabled false) leaves them out.
+// Face ID and GitHub are saved in Spring, so a Flask-only site (usesSpring false) leaves them out.
 export function setupSteps({ classes = null, personaCount = null, faceRegistered = null, gistConnected = null },
-    { springEnabled = true } = {}) {
+    { usesSpring = true } = {}) {
     const loading = 'Checking…';
     const steps = [
         {
@@ -89,5 +89,5 @@ export function setupSteps({ classes = null, personaCount = null, faceRegistered
             value: gistConnected === null ? loading : (gistConnected ? 'Connected' : 'Not linked'),
         },
     ];
-    return springEnabled ? steps : steps.filter(step => !step.needsSpring);
+    return usesSpring ? steps : steps.filter(step => !step.needsSpring);
 }
