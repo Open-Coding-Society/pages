@@ -1,0 +1,77 @@
+// Design tokens for the band element. Sizes come from the shared scale in
+// mixins/_variables.scss. Colors are not Sass colors: band-mix() writes a CSS color-mix() over
+// the theme variables, so a saved preference theme still recolors every band (UGRC-CSA/Pages#93
+// is what baked Sass colors do).
+
+// ── Looks ───────────────────────────────────────────────────────────────
+
+// Each look: the surface behind the section, how much accent washes into it, and its border
+// (width and which theme color). Text and links sit straight on these surfaces. The presets
+// keep their accent only just above 4.5:1 on --panel (Light: 4.6:1), so any accent washed into
+// the panel pushes links below it. tint washes the page background instead, which every preset
+// keeps further from its text and accent: at 12%, links stay above 4.8:1 and text above 6.5:1
+// in every preset. outline puts the accent in the border instead of behind the text.
+$band-looks: (
+  card: (surface: panel, wash: 0%, border-width: 1px, border: border),
+  tint: (surface: page, wash: 12%, border-width: 1px, border: wash),
+  outline: (surface: panel, wash: 0%, border-width: 2px, border: accent),
+);
+
+// The theme variable behind each surface.
+$band-surfaces: (
+  panel: unquote("var(--panel)"),
+  page: unquote("var(--pref-bg-color)"),
+);
+
+// ── Box ─────────────────────────────────────────────────────────────────
+
+$band-box: (
+  padding: $spacing-lg,
+  padding-phone: $spacing-sm,
+  radius: $radius-xl,
+);
+
+// Below this width a band keeps less padding, so phone text doesn't lose a fifth of the screen.
+$band-phone: 600px;
+
+// ── Functions ───────────────────────────────────────────────────────────
+
+@function band-mix($color, $amount, $base) {
+  @return unquote("color-mix(in srgb, #{$color} #{$amount}, #{$base})");
+}
+
+// A look's surface: the theme variable it sits on.
+@function band-surface($look) {
+  @return map-get($band-surfaces, map-get($look, surface));
+}
+
+// A look's background: its surface with its share of accent (the surface itself when none).
+@function band-background($look) {
+  $wash: map-get($look, wash);
+  @if $wash == 0% {
+    @return band-surface($look);
+  }
+  @return band-mix(var(--pref-accent-color), $wash, band-surface($look));
+}
+
+// A look's border color: the theme's border, the accent, or the band's own wash a little
+// stronger (a tinted band needs no visible frame, only an edge on surfaces of the same color).
+@function band-border-color($look) {
+  $kind: map-get($look, border);
+  @if $kind == accent {
+    @return var(--pref-accent-color);
+  }
+  @if $kind == wash {
+    @return band-mix(var(--pref-accent-color), map-get($look, wash) * 2, band-surface($look));
+  }
+  @return var(--ui-border);
+}
+
+// The box every band shares: padding and radius, and the section's own text color, because the
+// band paints a surface behind text that would otherwise inherit from the page.
+%band-box {
+  box-sizing: border-box;
+  padding: map-get($band-box, padding);
+  border-radius: map-get($band-box, radius);
+  color: var(--pref-text-color);
+}

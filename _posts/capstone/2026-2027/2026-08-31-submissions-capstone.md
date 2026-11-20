@@ -27,6 +27,12 @@ capstone_project:
     <p class="submissions-description">{{ data.Description }}</p>
   </div>
 
+  <section class="submissions-card" aria-labelledby="submissions-mentorship">
+    <h2 id="submissions-mentorship" class="submissions-project-title">{{ data.Mentorship.title }}</h2>
+    <p><strong>{{ data.Mentorship.mentor }}</strong></p>
+    <p class="submissions-about">{{ data.Mentorship.description }}</p>
+  </section>
+
   <!-- Sprint Board: live from the team's GitHub project -->
   {% if data.Board %}
   {% include ocs_kanban_board.html url=data.Board.url filter=data.Board.filter %}

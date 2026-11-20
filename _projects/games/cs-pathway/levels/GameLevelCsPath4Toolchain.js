@@ -59,6 +59,7 @@ import ChatHelper from './ChatHelper.js';
 import { buildChatProgress } from '../model/chatContext.js';
 import { sampleSpline, resolveCircle, clampToCorridor, roundedLoop } from '../model/splineBarriers.js';
 import { recordLevelRatio } from '../model/pathwayScores.js';
+import { stationLogosFor } from '../data/toolchainTrailLogos.js';
 import {
   STATION_STATUS,
   formatStationGlyph,
@@ -262,6 +263,7 @@ class GameLevelCsPath4Toolchain {
     this._failureBannerEl = null;
     this._panelFailureAlertEl = null;
     this._lockOverlays = {};
+    this._logoBadges = {};
     this._openTrialStationId = null;
     this._lastPastedOutput = '';
 
@@ -1392,6 +1394,7 @@ class GameLevelCsPath4Toolchain {
    * Per-frame proximity detection for zone alerts (same pattern as Level 1).
    */
   update() {
+    this._syncLogoBadges();
     // Keep the padlocks glued to the stations and hide the banner while a
     // station panel is open (so it doesn't cover the panel's controls).
     if (this.failureState) {
@@ -2043,6 +2046,60 @@ class GameLevelCsPath4Toolchain {
     this._lockOverlays = {};
   }
 
+  // Tool logos floating above each station (data/toolchainTrailLogos.js).
+  // Runs every frame: rebuilds a badge only when the selected OS changes its
+  // logos, and only writes positions that moved (e.g. after a resize).
+  _syncLogoBadges() {
+    const container = this.gameEnv?.container;
+    if (!container) return;
+    const objects = this.gameEnv.gameObjects || [];
+
+    this.STATIONS.forEach((station) => {
+      const logos = stationLogosFor(station.id, this.selectedOS);
+      const key = logos.map((logo) => logo.id).join(',');
+      let badge = this._logoBadges[station.id];
+      if (badge && badge.dataset.logos !== key) {
+        badge.remove();
+        badge = null;
+        delete this._logoBadges[station.id];
+      }
+      if (!logos.length) return;
+      if (!badge) {
+        badge = this._createLogoBadge(logos, key);
+        container.appendChild(badge);
+        this._logoBadges[station.id] = badge;
+      }
+
+      const obj = objects.find((o) => o?.spriteData?.id === station.id || o?.data?.id === station.id);
+      const canvas = obj?.canvas;
+      badge.hidden = !canvas || canvas.style.display === 'none';
+      if (badge.hidden) return;
+      const left = `${canvas.offsetLeft + canvas.offsetWidth / 2}px`;
+      const top = `${canvas.offsetTop}px`;
+      if (badge.style.left !== left) badge.style.left = left;
+      if (badge.style.top !== top) badge.style.top = top;
+    });
+  }
+
+  _createLogoBadge(logos, key) {
+    const badge = document.createElement('div');
+    badge.className = 'tt-station-logos';
+    badge.dataset.logos = key;
+    logos.forEach((logo) => {
+      const img = document.createElement('img');
+      img.src = `${this._path}/images/projects/cs-pathway/logos/${logo.file}`;
+      img.alt = logo.label;
+      img.title = logo.label;
+      badge.appendChild(img);
+    });
+    return badge;
+  }
+
+  _removeLogoBadges() {
+    Object.values(this._logoBadges || {}).forEach((el) => el.remove());
+    this._logoBadges = {};
+  }
+
   markLevelComplete() {
     // Hook for whatever cross-level "completion" bookkeeping Level 1 uses
     // elsewhere in the codebase (e.g. cs_pathway_completion key). Left as a
@@ -2067,6 +2124,7 @@ class GameLevelCsPath4Toolchain {
     this._audioCtx?.close?.().catch?.(() => {});
     this._audioCtx = null;
     this._removeLockOverlays();
+    this._removeLogoBadges();
     if (this._onTerminalTextInput) document.removeEventListener('input', this._onTerminalTextInput, true);
     if (this._onTerminalPaste) document.removeEventListener('paste', this._onTerminalPaste, true);
     this.clearZoneAlert?.();

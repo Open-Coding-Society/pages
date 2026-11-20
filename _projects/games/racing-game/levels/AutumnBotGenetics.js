@@ -9,7 +9,7 @@ import {
   AUTUMN_TRACK_OBSTACLES,
 } from './AutumnTrackGeometry.js';
 import { AUTUMN_BOT_GENOME } from './AutumnBotGenome.js';
-import LapTracker from './LapTracker.js';
+import LapTracker from '@assets/js/GameEnginev1.1/essentials/LapTracker.js';
 
 export const AUTUMN_TRACK_CENTERLINE = [
   { x: 0.4, y: 0.86 },

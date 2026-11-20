@@ -1,7 +1,7 @@
 // Face ID on /profile: whether the student's face is registered, and the camera
-// scanner that registers it. The Bathroom Pass identifies students with it.
-export async function initFaceRegistration({ api, pill, openButton, modal, video, canvas, status, captureButton, onChange }) {
-    const { javaURI, fetchOptions } = api;
+// scanner that registers it. The Bathroom Pass identifies students with it. Only a site that
+// runs Spring has this card, so `profile` is a SpringProfile.
+export async function initFaceRegistration({ profile, pill, openButton, modal, video, canvas, status, captureButton, onChange }) {
     let stream = null;
     let uid = null;
 
@@ -62,12 +62,7 @@ export async function initFaceRegistration({ api, pill, openButton, modal, video
         status.textContent = 'Registering…';
         captureButton.disabled = true;
         try {
-            const response = await fetch(`${javaURI}/api/face/register`, {
-                ...fetchOptions,
-                method: 'POST',
-                body: JSON.stringify({ faceData }),
-            });
-            if (!response.ok) throw new Error(`the server answered ${response.status}`);
+            await profile.registerFace(faceData);
         } catch (error) {
             console.error('Face registration error:', error);
             status.textContent = 'Registration failed. Try again.';
@@ -90,9 +85,7 @@ export async function initFaceRegistration({ api, pill, openButton, modal, video
     });
 
     try {
-        const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
-        if (!response.ok) throw new Error(`the server answered ${response.status}`);
-        const person = await response.json();
+        const person = await profile.person();
         uid = person.uid ?? null;
         show(Boolean(person.faceData));
     } catch (error) {

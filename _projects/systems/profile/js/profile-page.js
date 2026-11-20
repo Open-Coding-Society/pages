@@ -1,9 +1,9 @@
 // Starts every part of /profile (layouts/profile.html in this system) and keeps the
 // identity card and the setup checklist at the top of the page in step with them.
-// `api` holds the shared helpers the layout imports with the site's baseurl
-// ({ pythonURI, javaURI, springEnabled, fetchOptions, putUpdate, postUpdate }), so these
-// modules only import each other, with ./ paths. springEnabled is false on a Flask-only
-// site, where the layout leaves out the Face ID and Gist cards.
+// `profile` (js/profile-backend.js) is what every part loads and saves through: a
+// FlaskProfile, or a SpringProfile on a site that runs Spring. The layout's starter builds
+// it, so these modules only import each other, with ./ paths. A Flask-only site has no
+// Face ID or Gist card.
 import { initAccountForm } from './profile-account.js';
 import { initClasses } from './profile-classes.js';
 import { initFaceRegistration } from './profile-face.js';
@@ -24,10 +24,10 @@ function renderIdentity(user) {
 }
 
 // Returns update(partial): merge what one part of the page learned and redraw the list.
-function createSetupChecklist(list, springEnabled) {
+function createSetupChecklist(list, usesSpring) {
     const state = {};
     function render() {
-        list.replaceChildren(...setupSteps(state, { springEnabled }).map(step => {
+        list.replaceChildren(...setupSteps(state, { usesSpring }).map(step => {
             const item = document.createElement('li');
             const mark = document.createElement('span');
             mark.className = 'ocs__check';
@@ -71,12 +71,12 @@ function readCourses() {
     }
 }
 
-export function initProfilePage(api) {
-    const updateSetup = createSetupChecklist(byId('profileSetup'), api.springEnabled);
+export function initProfilePage({ profile }) {
+    const updateSetup = createSetupChecklist(byId('profileSetup'), profile.usesSpring);
     const report = part => error => console.error(`Error starting the ${part}:`, error);
 
     initAccountForm({
-        api,
+        profile,
         form: byId('profileSettingsForm'),
         saveButton: byId('saveChangesBtn'),
         status: byId('saveStatus'),
@@ -86,7 +86,7 @@ export function initProfilePage(api) {
     }).catch(report('account form'));
 
     initClasses({
-        api,
+        profile,
         list: byId('classesContainer'),
         form: byId('addClassForm'),
         select: byId('addClassSelect'),
@@ -96,7 +96,7 @@ export function initProfilePage(api) {
     }).catch(report('classes'));
 
     initPersonas({
-        api,
+        profile,
         container: byId('personaSelectionContainer'),
         progress: byId('personaProgress'),
         editButton: byId('personaEditBtn'),
@@ -107,17 +107,17 @@ export function initProfilePage(api) {
     }).catch(report('personas'));
 
     initSkillCheckIn({
-        api,
+        profile,
         form: byId('skillSnapshotForm'),
         project: byId('snapshotProjectName'),
         status: byId('snapshotStatus'),
     });
 
     // Face ID and the Gist connection are saved in Spring.
-    if (!api.springEnabled) return;
+    if (!profile.usesSpring) return;
 
     initFaceRegistration({
-        api,
+        profile,
         pill: byId('regStatusText'),
         openButton: byId('openScannerBtn'),
         modal: byId('webcamOverlay'),

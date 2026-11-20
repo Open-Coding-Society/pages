@@ -163,3 +163,44 @@ test('currentUser resolves null when Flask answers something other than a user',
   assert.equal(await new FlaskSession({ flask: fakeBackend({ 'GET /api/id': '<html>proxy page</html>' }) }).currentUser(), null);
   assert.equal(await new FlaskSession({ flask: fakeBackend({ 'GET /api/id': null }) }).currentUser(), null);
 });
+
+test("signIn hands Flask's signed role statement to Spring once both accept", async () => {
+  const flask = fakeBackend({ 'POST /api/authenticate': { message: 'signed in', role_attestation: 'signed.statement' } });
+  const spring = fakeBackend({ 'POST /authenticate': 'Authenticated', 'GET /api/person/get': { id: 42 } });
+  const result = await new SpringSession({ flask, spring }).signIn('adalovelace', 'pw');
+  assert.equal(result.spring, true);
+  assert.deepEqual(spring.calls, ['POST /authenticate', 'GET /api/person/get', 'POST /api/person/mentor/confirm']);
+  assert.deepEqual(spring.bodies['POST /api/person/mentor/confirm'], { attestation: 'signed.statement' });
+});
+
+test('signIn sends no role statement when Flask signed nothing', async () => {
+  const flask = fakeBackend({ 'POST /api/authenticate': { message: 'signed in' } });
+  const spring = fakeBackend({ 'POST /authenticate': 'Authenticated', 'GET /api/person/get': { id: 42 } });
+  await new SpringSession({ flask, spring }).signIn('adalovelace', 'pw');
+  assert.deepEqual(spring.calls, ['POST /authenticate', 'GET /api/person/get']);
+});
+
+test('signIn sends no role statement to a Spring that refused the sign-in', async () => {
+  const flask = fakeBackend({ 'POST /api/authenticate': { role_attestation: 'signed.statement' } });
+  const spring = fakeBackend({ 'POST /authenticate': refuse(401) });
+  const result = await new SpringSession({ flask, spring }).signIn('adalovelace', 'pw');
+  assert.equal(result.spring, false);
+  assert.deepEqual(spring.calls, ['POST /authenticate']);
+});
+
+test("a Spring refusal of the role statement does not stop the sign-in", async () => {
+  const warn = console.warn; console.warn = () => {};
+  try {
+    const flask = fakeBackend({ 'POST /api/authenticate': { role_attestation: 'forged' } });
+    const spring = fakeBackend({ 'POST /authenticate': 'Authenticated', 'GET /api/person/get': { id: 42 }, 'POST /api/person/mentor/confirm': refuse(403) });
+    const result = await new SpringSession({ flask, spring }).signIn('adalovelace', 'pw');
+    assert.equal(result.spring, true);
+  } finally { console.warn = warn; }
+});
+
+test('a Flask-only session never calls Spring with a role statement', async () => {
+  const flask = fakeBackend({ 'POST /api/authenticate': { role_attestation: 'signed.statement' } });
+  const session = new FlaskSession({ flask, spring: springMustNotBeCalled });
+  await session.signIn('adalovelace', 'pw');
+  assert.deepEqual(flask.calls, ['POST /api/authenticate']);
+});

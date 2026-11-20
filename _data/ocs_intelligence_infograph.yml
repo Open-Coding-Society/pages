@@ -3,6 +3,8 @@ Title: "OCS Intelligence LLM"
 Description: "Reduce dependence on paid AI subscriptions enabling student development and growth."
 
 Year: "2026-2027"
+mentor: "Mr. Eddie Revollo"
+mentorContribution: "Mr. Eddie Revollo has guided us to create documentation playbooks and establish safety protocols, including grounding ourselves before handling GPUs or other hardware."
 
 problemStatement:
   kicker: "The problem"
@@ -348,14 +350,27 @@ stages:
       - "Classroom access"
       - "Shared fairness"
 
+  - slug: phase-3
+    title: "Phase 3 — Provision the Mac mini pool"
+    navLabel: "Mac mini architecture"
+    navKicker: "Phase 3"
+    status: "In progress — one Mini verified; fleet rollout pending"
+    summary: "Recent architecture work: repeatable Mac mini provisioning, stable node identities, and a shared package cache, with measured progress and the next steps toward a distributed orchestrator."
+    tech:
+      - "Ansible"
+      - "NetBird"
+      - "Pinned Python and Ray"
+      - "LAN package cache"
+
 Topics:
   - title: "A shared mind for the class"
     subtitle: "Turn a donated GPU rack into a dependable companion for coding — then keep the door open when the class shows up."
-    visualTitle: "Three implementation phases"
+    visualTitle: "Implementation phases"
     stack:
       - "Phase 0: Problem framing, literature, candidate model"
       - "Phase 1: Rack, inference, stream"
       - "Phase 2: Deploy, monitor, include everyone"
+      - "Phase 3: Mac mini provisioning, networking, package cache"
     keyPoints:
       - "Phase 0 names the problem and picks a direction before any hardware is touched."
       - "The hardware was given. The work is to make it a service."

@@ -90,7 +90,7 @@ test('normalizePage keeps known keys, fills defaults and fixes types without los
   assert.deepEqual([page.schemaVersion, page.kind], [1, 'ocs-ui-page']);
   assert.deepEqual(page.page, { title: 'T'.repeat(130), description: '', byline: '', image: '', width: 'contained', course: '' }, 'content kept, choices fixed');
   const [section] = page.sections;
-  assert.deepEqual([section.settings, section.hidden], [{}, false]);
+  assert.deepEqual([section.settings, section.hidden], [{ style: 'plain' }, false]);
   const blocks = section.cells[0].blocks;
   assert.deepEqual(blocks.map((b) => b.type), ['heading', 'buttons', 'api_data', 'chat', 'members', 'checklist', 'announcements'], 'unknown types dropped');
   assert.deepEqual(blocks[0], { id: 'b-keep01', type: 'heading', settings: { text: '42', level: '3', subtitle: '' }, hidden: true });
@@ -139,7 +139,7 @@ test('addSection and addBlock insert defaults where asked and leave the input al
   const ids = counterIds();
   const one = addSection(page, registry, { ids });
   assert.equal(shape(one), `${START} s-000001[]`);
-  assert.deepEqual(one.sections[2], { id: 's-000001', type: 'stack', settings: {}, hidden: false, cells: [{ blocks: [] }] });
+  assert.deepEqual(one.sections[2], { id: 's-000001', type: 'stack', settings: { style: 'plain' }, hidden: false, cells: [{ blocks: [] }] });
   assert.equal(one.sections[0], page.sections[0], 'unchanged sections are shared');
   const thirds = addSection(page, registry, { type: 'columns', layout: 'thirds', index: 0, newId: 's-mine01' });
   assert.equal(shape(thirds).split(' ')[0], 's-mine01[||]');

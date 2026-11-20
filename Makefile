@@ -4,9 +4,25 @@ LOG_FILE = /tmp/jekyll$(PORT).log
 PYTHON := venv/bin/python3
 CONVERT_JOBS ?= 4
 CONVERT_FLAGS ?=
+DOCX_FLAGS ?=
+DOCX_VERBOSE = $(if $(filter convert convert-docx,$(MAKECMDGOALS)),--verbose,)
 
 SHELL = /bin/bash -c
 .SHELLFLAGS = -e
+
+# Ensure ruby user gems are in PATH and GEM_HOME, and locale is UTF-8
+ifeq ($(GEM_HOME),)
+  ifneq ($(wildcard $(HOME)/.local/gems),)
+    export GEM_HOME := $(HOME)/.local/gems
+  else
+    export GEM_HOME := $(shell ruby -e 'puts Gem.user_dir' 2>/dev/null)
+  endif
+endif
+ifneq ($(GEM_HOME),)
+  export PATH := $(GEM_HOME)/bin:$(PATH)
+endif
+export LC_ALL ?= C.UTF-8
+
 
 DESTINATION_DIRECTORY = _posts
 
@@ -308,7 +324,7 @@ convert-single:
 # DOCX conversion
 convert-docx:
 	@if [ -d "_docx" ] && [ "$(shell ls -A _docx 2>/dev/null)" ]; then \
-		$(PYTHON) scripts/convert_docx.py; \
+		$(PYTHON) scripts/convert_docx.py $(DOCX_VERBOSE) $(DOCX_FLAGS); \
 	else \
 		echo "No DOCX files found in _docx directory"; \
 	fi
@@ -318,9 +334,9 @@ convert-docx-config:
 	@if [ -d "_docx" ] && [ "$(shell ls -A _docx 2>/dev/null)" ]; then \
 		if [ -n "$(CONFIG_FILE)" ]; then \
 			echo "🔧 Config file changed: $(CONFIG_FILE)"; \
-			$(PYTHON) scripts/convert_docx.py --config-changed "$(CONFIG_FILE)"; \
+			$(PYTHON) scripts/convert_docx.py $(DOCX_VERBOSE) $(DOCX_FLAGS) --config-changed "$(CONFIG_FILE)"; \
 		else \
-			$(PYTHON) scripts/convert_docx.py; \
+			$(PYTHON) scripts/convert_docx.py $(DOCX_VERBOSE) $(DOCX_FLAGS); \
 		fi; \
 	else \
 		echo "No DOCX files found in _docx directory"; \

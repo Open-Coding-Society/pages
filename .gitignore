@@ -163,6 +163,7 @@ _layouts/projects/
 /_includes/submissions/creator-dashboard.html
 /assets/js/submissions/grading.js
 /assets/js/submissions/creator-dashboard.js
+/assets/js/grades/page-sections.js
 /_sass/open-coding/submissions.scss
 /_sass/open-coding/submissions-v2.scss
 

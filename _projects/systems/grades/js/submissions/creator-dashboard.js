@@ -491,9 +491,11 @@ export function createCreatorDashboard(options) {
     });
   }
 
-  // Teachers manage every lesson, so the tab becomes a teacher dashboard rather than "yours".
+  // Teachers manage every lesson, so the section becomes a teacher dashboard rather than "yours".
+  // Its sidebar links (side column and phone menu) are renamed to match.
   function showTeacherLabels() {
-    element("tab-created-assignments").textContent = "Teacher Dashboard";
+    document.querySelectorAll('[data-sidebar-section="created-assignments"]')
+      .forEach((link) => { link.textContent = "Teacher Dashboard"; });
     element("creator-workspace-eyebrow").textContent = "Teacher dashboard";
     element("creator-workspace-title").textContent = "All lessons";
     element("creator-workspace-description").textContent =

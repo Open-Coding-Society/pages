@@ -3,7 +3,12 @@ Badge: "OCS Capstones › Submissions"
 Title: "OCS Assignments System"
 Description: "The goal right now is to make grading faster and more trustworthy, and to let teachers do everything they need from the Pages frontend without digging into the Spring admin views. Below are the six things we're focused on, who's working on what, and the design notes we're working from."
 
-# The team's GitHub project board, shown live under the header (_includes/ocs_kanban_board.html)
+Mentorship:
+  title: "Mentorship"
+  mentor: "Bhargav Joshi — Project Mentor"
+  description: "Bhargav Joshi has helped guide our team toward a more reliable and user-friendly submissions system. His guidance has shaped how we think about AI availability, clear grading workflows, useful feedback, and testing before production. He has also helped us prioritize realistic goals and coordinate our work as a team."
+
+# The team's GitHub project board (_includes/ocs_kanban_board.html)
 Board:
   url: "https://github.com/orgs/AAApages/projects/1/views/1"
 

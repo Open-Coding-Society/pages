@@ -1,7 +1,5 @@
-/**
- * Panel Mixins
- * Reusable panel patterns for consistent content containers
- */
+// Panel Mixins
+// Reusable panel patterns for consistent content containers
 
 // Panel color variables (using CSS custom properties)
 $panel-bg: var(--panel);
@@ -14,23 +12,21 @@ $panel-bg-hover: var(--panel-mid);
 // Common font stacks
 $mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 
-/**
- * Base Panel
- * Standard panel with border and background
- *
- * @param {Number} $padding - Inner padding (default: 1.5rem)
- * @param {Number} $border-width - Border width (default: 2px)
- * @param {Number} $margin-bottom - Bottom margin (default: 1rem)
- *
- * @example
- *   .my-panel {
- *     @include panel;
- *   }
- *
- *   .compact-panel {
- *     @include panel(1rem, 1px, 0.5rem);
- *   }
- */
+// Base Panel
+// Standard panel with border and background
+//
+// @param {Number} $padding - Inner padding (default: 1.5rem)
+// @param {Number} $border-width - Border width (default: 2px)
+// @param {Number} $margin-bottom - Bottom margin (default: 1rem)
+//
+// @example
+//   .my-panel {
+//     @include panel;
+//   }
+//
+//   .compact-panel {
+//     @include panel(1rem, 1px, 0.5rem);
+//   }
 @mixin info-panel($padding: 1.5rem, $border-width: 2px, $margin-bottom: 1rem) {
   // Layout & Spacing
   padding: $padding;
@@ -68,22 +64,20 @@ $mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   }
 }
 
-/**
- * Output Panel
- * Panel optimized for code/content display with scrolling
- *
- * @param {Number} $min-height - Minimum height (default: 100px)
- * @param {Number} $max-height - Maximum height (default: 300px)
- *
- * @example
- *   .output-content {
- *     @include output-panel;
- *   }
- *
- *   .tall-content {
- *     @include output-panel(200px, 500px);
- *   }
- */
+// Output Panel
+// Panel optimized for code/content display with scrolling
+//
+// @param {Number} $min-height - Minimum height (default: 100px)
+// @param {Number} $max-height - Maximum height (default: 300px)
+//
+// @example
+//   .output-content {
+//     @include output-panel;
+//   }
+//
+//   .tall-content {
+//     @include output-panel(200px, 500px);
+//   }
 @mixin output-panel($min-height: 100px, $max-height: 300px) {
   // Layout & Dimensions
   min-height: $min-height;
@@ -121,15 +115,13 @@ $mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   }
 }
 
-/**
- * Input Panel
- * Panel for code editors with syntax highlighting (CodeMirror)
- *
- * @example
- *   .CodeMirror {
- *     @include input-panel;
- *   }
- */
+// Input Panel
+// Panel for code editors with syntax highlighting (CodeMirror)
+//
+// @example
+//   .CodeMirror {
+//     @include input-panel;
+//   }
 @mixin input-panel {
   // Colors & Styling
   background: $panel-bg;
@@ -141,23 +133,21 @@ $mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 14px;
 }
 
-/**
- * Control Panel
- * Horizontal bar for controls, buttons, and selects
- *
- * @param {String} $padding - Inner padding (default: 0.75rem 1rem)
- * @param {String} $gap - Gap between items (default: 1rem)
- * @param {String} $border-radius - Border radius (default: 10px 10px 0 0)
- *
- * @example
- *   .control-bar {
- *     @include control-panel;
- *   }
- *
- *   .toolbar {
- *     @include control-panel(0.5rem, 0.5rem, 8px);
- *   }
- */
+// Control Panel
+// Horizontal bar for controls, buttons, and selects
+//
+// @param {String} $padding - Inner padding (default: 0.75rem 1rem)
+// @param {String} $gap - Gap between items (default: 1rem)
+// @param {String} $border-radius - Border radius (default: 10px 10px 0 0)
+//
+// @example
+//   .control-bar {
+//     @include control-panel;
+//   }
+//
+//   .toolbar {
+//     @include control-panel(0.5rem, 0.5rem, 8px);
+//   }
 @mixin control-panel($padding: 0.75rem 1rem, $gap: 1rem, $border-radius: 10px 10px 0 0) {
   // Layout
   display: flex;
@@ -184,4 +174,52 @@ $mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     gap: 0.25rem;
     padding: 0.5rem;
   }
+}
+
+// Surface
+// What a card, a file row, a menu or a preview is drawn on: a 1px ring, rounded corners,
+// the panel and the text color. An element includes it and adds only what is its own.
+// A null argument leaves that property out.
+//
+// @param {Number} $radius - Corner radius (default: $radius-sm)
+// @param {Number} $padding - Inner padding (default: none)
+// @param {Color} $border - Ring color (default: $panel-border)
+// @param {Color} $background - Fill (default: $panel-bg)
+// @param {Color} $color - Text color (default: $panel-text)
+//
+// @example
+//   .ocs__card { @include surface(1rem, 1.5rem 1.75rem); }
+//   .ocs__file-preview { @include surface($color: null); }
+@mixin surface($radius: $radius-sm, $padding: null, $border: $panel-border, $background: $panel-bg, $color: $panel-text) {
+  padding: $padding;
+  @if $border { border: 1px solid $border; } // null would still leave "1px solid"
+  border-radius: $radius;
+  background: $background;
+  color: $color;
+}
+
+// Accent Tint
+// The hovered, active or chosen item: the accent mixed into the panel, with an accent ring.
+//
+// @param {Number} $amount - How much accent (default: 10%)
+// @param {Color} $ring - Border color; null for an item without a border (default: $panel-accent)
+//
+// @example
+//   .ocs__nav-card:hover { @include accent-tint; }
+//   .ocs__menu-item:hover { @include accent-tint(16%, null); }
+@mixin accent-tint($amount: 10%, $ring: $panel-accent) {
+  border-color: $ring;
+  background: color-mix(in srgb, $panel-accent $amount, $panel-bg);
+}
+
+// Kicker
+// Small capitals over a title or a group: a card's kicker, a section title, a menu heading.
+//
+// @param {Number} $size - Font size
+// @param {Number} $tracking - Letter spacing (default: 0.08em)
+@mixin kicker($size, $tracking: 0.08em) {
+  font-size: $size;
+  font-weight: 700;
+  letter-spacing: $tracking;
+  text-transform: uppercase;
 }
