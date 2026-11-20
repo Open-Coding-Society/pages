@@ -49,6 +49,7 @@ the open conversation each start with a bar of the same height.
     <nav class="dm__aside" aria-label="Conversations">
       <header class="dm__masthead">
         <h1 class="dm__title" id="messagesTitle">Messages</h1>
+        <button type="button" class="ocs__btn small hidden" id="messagesNotify" aria-pressed="false">Notify my phone</button>
         <span class="dm__status" id="messagesStatusPill">
           <span class="dm__status-dot" aria-hidden="true"></span>
           <span id="messagesStatus">loading…</span>
@@ -454,7 +455,8 @@ the open conversation each start with a bar of the same height.
 <script type="module">
   import { javaURI, javaWebSocketURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
   import * as richText from '{{ site.baseurl }}/assets/js/chat/rich-text.js';
+  import * as push from '{{ site.baseurl }}/assets/js/api/push-notifications.js';
   import { startMessagesPage } from '{{ site.baseurl }}/assets/js/projects/messages/messages-page.js';
 
-  startMessagesPage({ config: { javaURI, javaWebSocketURI, pythonURI, fetchOptions }, richText });
+  startMessagesPage({ config: { javaURI, javaWebSocketURI, pythonURI, fetchOptions }, richText, push });
 </script>

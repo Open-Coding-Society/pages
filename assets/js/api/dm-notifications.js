@@ -1,4 +1,5 @@
 import { javaURI, fetchOptions, springEnabled } from './config.js';
+import { resyncPush } from './push-notifications.js';
 
 // Navbar notification bell (_includes/themes/minima/header.html). The badge is the
 // number of conversations waiting for the signed-in user: each different person who has
@@ -8,6 +9,9 @@ import { javaURI, fetchOptions, springEnabled } from './config.js';
 // DM read state so the badge updates right away, and 'dm:group-read' ({ groupId }) after
 // marking a group read. A successful message deletion also refreshes the summary because
 // the backend may update unread state.
+// The first good summary also proves someone is signed in, which is when this phone's push
+// subscription (if they turned phone notifications on) is re-sent to Spring, so a phone Spring
+// lost track of comes back without the user doing anything (push-notifications.js).
 
 const POLL_MS = 30000;
 // Spring counts a group's unread messages by reading the group's whole chat file from S3,
@@ -105,6 +109,7 @@ async function refresh(withGroups) {
         const summary = await res.json();
         if (seq !== requestSeq) return;
         dmSummary = summary;
+        resyncPush();
         // Groups are asked about only once the DM answer shows someone is signed in.
         if (groupsSupported && (withGroups === true || Date.now() - groupsCheckedAt >= GROUP_POLL_MS)) {
             groupsCheckedAt = Date.now();
