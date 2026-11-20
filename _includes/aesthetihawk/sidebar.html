@@ -11,11 +11,11 @@
      mentor's /profile page), plus mentor extras; everyone else sees the normal
      OCS sidebar. -->
 <div id="sidebar-role-default">
-  {% include aesthetihawk/sidebar-list.html data=sidebar_data %}
+  {% include aesthetihawk/sidebar-list.html data=sidebar_data id_prefix=include.id_prefix %}
 </div>
 <div id="sidebar-role-mentor" hidden>
-  {% include aesthetihawk/sidebar-list.html data=sidebar_data prefix="mentor-" exclude="bathroom_pass,analytics,grades,submissions" %}
-  {% include aesthetihawk/sidebar-list.html data=site.data.aesthetihawk_sidebar_mentor prefix="mentor-" %}
+  {% include aesthetihawk/sidebar-list.html data=sidebar_data id_prefix=include.id_prefix prefix="mentor-" exclude="bathroom_pass,analytics,grades,submissions" %}
+  {% include aesthetihawk/sidebar-list.html data=site.data.aesthetihawk_sidebar_mentor id_prefix=include.id_prefix prefix="mentor-" %}
 </div>
 <script>
   // Apply the last-known role synchronously, before first paint, so navigating

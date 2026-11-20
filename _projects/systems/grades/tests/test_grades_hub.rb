@@ -10,6 +10,7 @@ class GradesHubTest < Minitest::Test
   SECTIONS = YAML.load_file(File.join(SYSTEM, "data/grades_hub.yml"))
   LINKS = SECTIONS.flat_map { |section| section.fetch("links") }
   SIDEBAR_ITEMS = YAML.load_file(File.join(SYSTEM, "data/grades_sidebar.yml")).flat_map { |section| section.fetch("items") }
+  SIDEBAR_TEMPLATE = File.read(File.join(ROOT, "_includes/aesthetihawk/sidebar-list.html"))
 
   # Front matter of page sources (committed or new), keyed by permalink without a trailing slash.
   def pages_by_permalink
@@ -67,6 +68,14 @@ class GradesHubTest < Minitest::Test
         assert_opens_section("#{item['title']} > #{child['title']}", "#{item['url']}##{child['section']}")
       end
     end
+  end
+
+  def test_sidebar_renders_child_sections_as_links
+    assert_includes SIDEBAR_TEMPLATE, "{% if item.children %}"
+    assert_includes SIDEBAR_TEMPLATE, 'class="ocs__tree ml-7 mr-4 my-1"'
+    assert_includes SIDEBAR_TEMPLATE, 'data-sidebar-section="{{ child.section }}"'
+    assert_includes SIDEBAR_TEMPLATE, 'href="{{ site.baseurl }}{{ item.url }}#{{ child.section }}"'
+    assert_includes SIDEBAR_TEMPLATE, "{{ child.title }}"
   end
 
   def test_spring_links_are_paths_on_the_spring_backend
