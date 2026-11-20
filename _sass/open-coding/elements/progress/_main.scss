@@ -1,0 +1,37 @@
+// A thin progress bar on a native <progress>: an upload, a download, a quiz's place. The
+// track is the text color mixed into the panel and the bar is the accent, in every theme,
+// with round ends ($radius-pill). Leave `value` off while the amount is unknown, and the
+// browser animates it.
+
+$progress-track: color-mix(in srgb, var(--pref-text-color) 14%, var(--panel));
+
+.ocs__progress {
+  appearance: none;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 0.375rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: $radius-pill;
+  background: $progress-track;
+  accent-color: var(--pref-accent-color);
+  color: var(--pref-accent-color);
+
+  // One rule per engine's parts: a browser drops a whole rule that names a part it doesn't know.
+  &::-webkit-progress-bar {
+    border-radius: $radius-pill;
+    background: $progress-track;
+  }
+
+  &::-webkit-progress-value {
+    border-radius: $radius-pill;
+    background: var(--pref-accent-color);
+    transition: width $transition-base ease;
+  }
+
+  &::-moz-progress-bar {
+    border-radius: $radius-pill;
+    background: var(--pref-accent-color);
+  }
+}

@@ -1,0 +1,128 @@
+// A menu of choices that opens over the page: an attach menu, a slash-command picker, a
+// message's More actions. Groups get a small heading; each item is an icon, a name and an
+// optional hint, with a keyboard key at the end. The panel is a surface (mixins/_panel.scss)
+// with a stronger ring, so it stands out over the page; headings are kickers; the
+// highlighted item (aria-selected="true", or hover) takes the accent tint with the text
+// color on it; names and hints are ocs__truncate. Where the menu sits is the page's job (it
+// knows what opened it). Write headings, names and hints as <b>, <strong> and <em>: preset
+// themes recolor span, small and div.
+
+.ocs__menu {
+  @include surface($radius-sm, $spacing-xxxs, $border: color-mix(in srgb, var(--pref-text-color) 26%, var(--panel)));
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+  min-width: 14rem;
+  max-width: unquote("min(30rem, calc(100vw - 2rem))");
+  max-height: unquote("min(24rem, 60vh)");
+  overflow-y: auto;
+  margin: 0;
+  list-style: none;
+
+  // display above would beat the attribute, so a closed menu says so itself.
+  &[hidden] {
+    display: none;
+  }
+}
+
+.ocs__menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+
+  & + & {
+    margin-top: $spacing-xxxs;
+    padding-top: $spacing-xxxs;
+    border-top: 1px solid var(--ui-border);
+  }
+}
+
+.ocs__menu-heading {
+  @include kicker($text-xs);
+  display: block;
+  padding: 2px $spacing-xxxs;
+  color: var(--text-muted);
+}
+
+// An item is a <button>, an <a>, or a <label> for a hidden file input.
+.ocs__menu-item {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: $spacing-xxs;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: $spacing-xxxs;
+  border: 0;
+  border-radius: $radius-xs;
+  background: transparent;
+  color: var(--pref-text-color);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+
+  // The tint without the ring: an item has no border.
+  &:hover,
+  &[aria-selected="true"] {
+    @include accent-tint(16%, null);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pref-accent-color);
+    outline-offset: -2px;
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.ocs__menu-icon {
+  grid-row: span 2;
+  text-align: center;
+  color: var(--pref-accent-color);
+}
+
+.ocs__menu-name {
+  @extend .ocs__truncate;
+  font-weight: 600;
+}
+
+.ocs__menu-hint {
+  @extend .ocs__truncate;
+  grid-column: 2;
+  font-size: 0.85em;
+  font-style: normal;
+  color: var(--text-muted);
+}
+
+// A key to press, at the end of the row: Enter, Tab, Esc.
+.ocs__menu-item kbd,
+.ocs__menu-key {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  padding: 0 $spacing-xxxs;
+  border: 1px solid var(--ui-border);
+  border-radius: $radius-xxs;
+  font-family: inherit;
+  font-size: $text-xs;
+  color: var(--text-muted);
+}
+
+// A line of guidance under the items, like "↑↓ to move · Enter to pick".
+.ocs__menu-foot {
+  display: block;
+  margin-top: $spacing-xxxs;
+  padding: $spacing-xxxs $spacing-xxxs 0;
+  border-top: 1px solid var(--ui-border);
+  font-size: $text-xs;
+  font-style: normal;
+  color: var(--text-muted);
+}
