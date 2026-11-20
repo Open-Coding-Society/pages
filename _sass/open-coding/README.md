@@ -738,6 +738,9 @@ someone is reading, and this bar is there when the page loads. Mark an urgent an
 an `ocs__status-pill ocs__status-pill--bad` pill at the start of its link instead. See
 [`elements/ticker`](elements/ticker).
 
+Course homes fill one from the calendar with `{% include ocs_calendar_ticker.html %}`: Courses'
+`calendar-ticker.js` builds both lists and moves the bar only when its links don't fit on one row.
+
 ## Theme file reference
 
 `user-preferences.scss` defines the current user-selectable theme contract.
