@@ -40,31 +40,26 @@ capstone_project:
 </nav>
 
 <div class="ocs__card" id="stages">
-  <h3 class="ocs__section-title">Five Stages: Start With an Idea, Grow As You Need</h3>
-  <p>Each stage builds on the one before.</p>
-  <div class="ocs__diagram">
-    <pre class="mermaid">flowchart LR
-    P[1. Prototype
-Explore and learn] --> R[2. Production
-Go live with confidence]
-    R --> X[3. Extended Services
-Add what you need]
-    X --> E[4. Education
-Teach and inspire]
-    E --> B[5. Business
-Go further together]</pre>
-  </div>
+  <h3 class="ocs__section-title">Start With an Idea. Build a Solution. Grow As You Need.</h3>
+  <p>An open, customizable foundation for building websites, applications, and digital services. Each stage builds on the one before.</p>
+  <img class="ocs__image-frame" src="{{ '/images/OCS-Kit-Infographic.webp' | relative_url }}" alt="OCS-in-a-Kit infographic: 1 Prototype, 2 Production, 3 Extended Services, 4 Education, 5 Business, and a win-win partnership between students and organizations" loading="lazy">
   <div class="ocs__table-wrap">
     <table class="ocs__table">
       <thead><tr><th>Stage</th><th>What it includes</th><th>Status</th><th>What is next</th></tr></thead>
       <tbody>
-        <tr><td>1. Prototype (Vanilla)</td><td>GitHub Pages and Jekyll, Flask only, OCS GameEngine, grammar-based UI, login and signup, profiles and roles, AI services (Gemini, Groq, or OCS AI)</td><td><span class="ocs__status-pill ocs__status-pill--good">Mostly built</span></td><td>Events (in progress), scheduled before and after posts, doc converter, topics and tags for posts</td></tr>
-        <tr><td>2. Production</td><td>Vanilla on AWS: EC2 hosting, RDS database, S3 storage, backups, restore procedures</td><td><span class="ocs__status-pill ocs__status-pill--warn">Partly built</span></td><td>Docker and nginx hosting exist; EC2, RDS, S3, backups and restore are next</td></tr>
-        <tr><td>3. Extended Services</td><td>Spring Boot server, chat, calendar, email, REST integration, role-based services</td><td><span class="ocs__status-pill ocs__status-pill--warn">In progress</span></td><td>Chat (Flask) and calendar (Spring) are in the kits; OCS Email is missing</td></tr>
-        <tr><td>4. Education</td><td>A classroom kit, with a customer waiting</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td><td>A default UI for the Education kit</td></tr>
-        <tr><td>5. Business</td><td>A kit for companies serving their own members</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td><td>A default UI for the Business kit</td></tr>
+        <tr><td>1. Prototype<br><small>Explore and learn</small></td><td>GitHub Pages and Jekyll, OCS GameEngine, Flask for data, grammar-based UI, login and signup, profiles and roles, AI services</td><td><span class="ocs__status-pill ocs__status-pill--good">Mostly built</span></td><td>Events (in progress), scheduled before and after posts, doc converter, topics and tags for posts</td></tr>
+        <tr><td>2. Production<br><small>Go live with confidence</small></td><td>AWS RDS and S3, backup and recovery, email (SES), Spring Boot services</td><td><span class="ocs__status-pill ocs__status-pill--warn">Partly built</span></td><td>Spring and Docker hosting exist; RDS, S3, backups, restore and SES email are next</td></tr>
+        <tr><td>3. Extended Services<br><small>Add what you need</small></td><td>OCS Chat, OCS Calendar, OCS Email</td><td><span class="ocs__status-pill ocs__status-pill--warn">In progress</span></td><td>Chat (Flask) and calendar (Spring) are in the kits; OCS Email is missing</td></tr>
+        <tr><td>4. Education<br><small>Teach and inspire</small></td><td>Student and teacher tools, coursework and grading, learning analytics</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td><td>A default UI for the Education kit, for the customer waiting on it</td></tr>
+        <tr><td>5. Business<br><small>Go further together</small></td><td>Custom features, business workflows, niche integrations</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td><td>A default UI for the Business kit</td></tr>
       </tbody>
     </table>
+  </div>
+  <h4 class="ocs__section-title">A Win-Win Partnership</h4>
+  <p>OCS-in-a-Kit connects student learning with the real technology needs of organizations in our community.</p>
+  <div class="ocs__grid ocs__grid--standard cols-2">
+    <div class="ocs__grid-cell"><strong>Students gain</strong><br>Authentic development experience, real-world challenges, skills for the future.</div>
+    <div class="ocs__grid-cell"><strong>Organizations gain</strong><br>Access to emerging technology, fresh perspectives, development capacity.</div>
   </div>
 </div>
 
