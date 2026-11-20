@@ -262,6 +262,8 @@ calendar, hall pass]</pre>
   </div>
 </div>
 
+{% include ocs_kanban_board.html url="https://github.com/orgs/CSA-Admin-OCS/projects/17" title="OCS in a Kit Kanban Board" %}
+
 <div class="ocs__capstone-footer">
   <div class="ocs__team"><span class="ocs__team-label">Project Team</span><span class="ocs__team-name">{{ data.Team | join: ", " }}</span></div>
   <div class="ocs__status">In Development</div>
