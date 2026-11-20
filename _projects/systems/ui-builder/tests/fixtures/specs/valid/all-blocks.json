@@ -227,6 +227,7 @@
               "id": "b-linkcards01",
               "type": "link_cards",
               "settings": {
+                "label": "Project links",
                 "items": [
                   { "kicker": "App", "title": "Flood Watch", "text": "The live app.", "url": "https://binary-beasts.github.io/flood-watch/" },
                   { "kicker": "Code", "title": "Frontend repo", "text": "The pages and styles.", "url": "https://github.com/binary-beasts/flood-watch" },

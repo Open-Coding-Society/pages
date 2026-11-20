@@ -286,6 +286,26 @@ test('content blocks follow the grammar markup', needsRuby, () => {
   assert.equal(one('divider'), '<hr>');
 });
 
+// A page with two groups of link cards has two navigation landmarks; a screen reader lists them
+// by name, so the group's name is the nav's aria-label (PNEC's team asked for it on their pages).
+test('link cards: the group name is the nav\'s accessible name in every mode', needsRuby, () => {
+  const registry = loadRegistry();
+  const { block } = builder();
+  const inner = (settings, mode) => innerOf(htmlOf(renderBlock(block('link_cards', settings), ctxFor(registry, mode))), 'link_cards');
+  for (const mode of MODES) {
+    assert.ok(inner({ ...SAMPLES.link_cards, label: '  Ways to help  ' }, mode).startsWith('<nav class="ocs__nav-grid" aria-label="Ways to help"><a '), mode);
+  }
+  // No name, or only spaces: the nav is written as before, without an empty label.
+  assert.ok(inner(SAMPLES.link_cards, 'view').startsWith('<nav class="ocs__nav-grid"><a '));
+  assert.ok(inner({ ...SAMPLES.link_cards, label: '   ' }, 'view').startsWith('<nav class="ocs__nav-grid"><a '));
+  // The name is the student's own text: the page file escapes its quotes and braces (so Liquid
+  // never runs), and the canvas sets it as plain text.
+  const hostile = { ...SAMPLES.link_cards, label: 'Say "hi" {{ site.x }}' };
+  assert.ok(inner(hostile, 'export').startsWith('<nav class="ocs__nav-grid" aria-label="Say &quot;hi&quot; &#123;&#123; site.x &#125;&#125;"><a '));
+  const nav = elementsOf(domOf(renderBlock(block('link_cards', hostile), ctxFor(registry, 'canvas')))).find((element) => element.localName === 'nav');
+  assert.equal(nav.getAttribute('aria-label'), 'Say "hi" {{ site.x }}');
+});
+
 test('tables split rows on lines and cells on |, within the registry limits', () => {
   assert.deepEqual(parseTable('a | b | c\r\n1|2\n\n  \nx'), [['a', 'b', 'c'], ['1', '2', ''], ['x', '', '']]);
   assert.deepEqual(parseTable('a|b|c', { maxRows: 5, maxCols: 2 }), [['a', 'b']]);
