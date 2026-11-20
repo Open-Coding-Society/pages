@@ -13,6 +13,7 @@ capstone_project:
   image: "/images/csa-chat/announcement-chat.png"
   description: "Students are extending the OCS communication system with chat, announcements, assignment discussions, direct messaging, calendar integration, and reusable presentation components. The work includes maintaining the real-time WebSocket service and connecting these features to the existing course site, backend APIs, security, and data model. Students will also develop the OCS SASS grammar—a small, purpose-built styling system for consistent, responsive, reusable components across the OCS GitHub Pages ecosystem."
   team: "Akhil, Syown, Leon, Perry, Skandan, Sathwik, Akshajh, Tarun, Samarth"
+  team_group: "OCS Comm and Cap"
   links:
     frontend: "https://github.com/UGRC-CSA/Pages"
     backend: "https://github.com/Open-Coding-Society/spring"
@@ -133,4 +134,6 @@ capstone_project:
   </div>
   {% endif %}
 </div>
+
+{% include projects/capstone/capstone-team-chat.html %}
 <!-- markdownlint-restore -->
