@@ -3,9 +3,16 @@
 // {% include ocs_calendar_ticker.html %}; course homes put it above the announcements.
 //
 // TickerItems decides which events show, how each one reads and where it links. It is pure (no
-// DOM, no network), so its rules are tested on their own.
+// DOM, no network), so its rules are tested on their own. CalendarTicker fills the include's
+// empty bar with them and keeps it current.
+//
+// The calendar is in Spring and Spring answers only signed-in visitors, so a Flask-only site, a
+// signed-out visitor, or a course with nothing coming up gets no bar at all.
 
-import { addDays, formatShortDate, nextSchoolDay, PRIORITIES } from './calendar-model.js';
+import { createLiveCalendarStore } from './calendar-data.js';
+import {
+  addDays, formatShortDate, nextSchoolDay, parseSchoolCalendar, PRIORITIES, todayIso,
+} from './calendar-model.js';
 
 // The same rule the week strip uses (calendar-feed.js): a closing tag or an entity means the title
 // was saved as HTML. A typed title such as "ArrayList<Integer> practice" has neither.
@@ -105,5 +112,183 @@ export class TickerItems {
         href: TickerItems.linkFor(event, links),
         urgent: event.priority === URGENT.value,
       }));
+  }
+}
+
+const SCHOOL_CALENDAR_SELECTOR = 'script[id="ocsSchoolCalendarData"]';
+const SIGNED_OUT = new Set([401, 403]);
+
+export class CalendarTicker {
+  /** How fast a moving bar slides, so a long and a short list move at the same speed. */
+  static PIXELS_PER_SECOND = 50;
+
+  /**
+   * Start every calendar ticker the include put inside root. On a site without Spring
+   * (spring: false) it starts none and asks Spring nothing.
+   * @param {Document|Element} root - usually document
+   * @param {object} options
+   * @param {string} options.javaURI - Spring's address, from config.js
+   * @param {object} options.fetchOptions - from config.js, with the sign-in cookie
+   * @param {boolean} options.springEnabled - from config.js
+   * @param {Function|null} options.splitLinkedDoc - the Calendar system's linked-doc reader, or null
+   * @param {string} [options.today] - YYYY-MM-DD; the visitor's today when left out
+   * @param {{origin: string, href: string}} [options.location] - the page's address
+   * @returns {CalendarTicker[]}
+   */
+  static mountAll(root, {
+    javaURI, fetchOptions, springEnabled, splitLinkedDoc = null, today = null, location = globalThis.location,
+  }) {
+    if (!springEnabled) return [];
+    const data = root.querySelector(SCHOOL_CALENDAR_SELECTOR);
+    const weeks = data ? parseSchoolCalendar(JSON.parse(data.textContent)).weeks : [];
+    return [...root.querySelectorAll('[data-ocs-calendar-ticker]')].map((wrapper) => {
+      const ticker = new CalendarTicker(wrapper, {
+        store: createLiveCalendarStore({ course: wrapper.dataset.course || 'all', javaURI, fetchOptions }),
+        weeks,
+        splitLinkedDoc,
+        origin: location.origin,
+        pageUrl: location.href,
+        calendarUrl: wrapper.dataset.calendarUrl,
+        today,
+      });
+      ticker.start();
+      return ticker;
+    });
+  }
+
+  /**
+   * @param {Element} wrapper - the include's hidden [data-ocs-calendar-ticker] element
+   * @param {object} options
+   * @param {{listRange: Function}} options.store - a calendar store from calendar-data.js
+   * @param {Array} options.weeks - school weeks; [] when the page has none
+   * @param {Function|null} options.splitLinkedDoc
+   * @param {string} options.origin
+   * @param {string} options.pageUrl
+   * @param {string} options.calendarUrl - where an item without a linked doc goes
+   * @param {string|null} options.today
+   */
+  constructor(wrapper, {
+    store, weeks, splitLinkedDoc, origin, pageUrl, calendarUrl, today,
+  }) {
+    this.wrapper = wrapper;
+    this.section = wrapper.querySelector('.ocs__ticker');
+    this.viewport = wrapper.querySelector('.ocs__ticker-viewport');
+    this.track = wrapper.querySelector('[data-hook="track"]');
+    this.store = store;
+    this.weeks = weeks;
+    this.links = { splitLinkedDoc, origin, pageUrl, calendarUrl };
+    this.today = today;
+    this.stopped = false;
+    this.observer = null;
+    this.onVisible = () => {
+      if (document.visibilityState === 'visible') this.refresh();
+    };
+  }
+
+  /**
+   * Load the events, then keep the bar current: reload when the visitor comes back to the tab,
+   * and check again whether it fits when its width changes or the page's fonts arrive.
+   * @returns {Promise<void>} the first load
+   */
+  start() {
+    document.addEventListener('visibilitychange', this.onVisible);
+    if (typeof ResizeObserver === 'function') {
+      let width = null;
+      this.observer = new ResizeObserver(([entry]) => {
+        if (entry.contentRect.width === width) return;
+        width = entry.contentRect.width;
+        this.fit();
+      });
+      this.observer.observe(this.viewport);
+    }
+    document.fonts?.ready.then(() => this.fit());
+    return this.refresh();
+  }
+
+  /**
+   * Ask the calendar for today through the last day and show what comes back. Signed out (401 or
+   * 403) there is nothing to show; any other failure is logged. Either way the bar stays hidden.
+   * @returns {Promise<void>}
+   */
+  async refresh() {
+    const today = this.today || todayIso();
+    let events;
+    try {
+      events = await this.store.listRange(today, TickerItems.lastDay(this.weeks, today));
+    } catch (error) {
+      if (!SIGNED_OUT.has(error.status)) console.warn('Calendar ticker: could not load the calendar', error);
+      events = [];
+    }
+    if (this.stopped) return;
+    this.show(TickerItems.from(events, { today, ...this.links }));
+  }
+
+  /**
+   * Put the items in the bar, or hide it when there are none. The second list is the copy the
+   * grammar slides in behind the first, so screen readers and the Tab key skip it.
+   * @param {Array<{text: string, href: string, urgent: boolean}>} items
+   */
+  show(items) {
+    if (!items.length) {
+      this.track.replaceChildren();
+      this.wrapper.hidden = true;
+      return;
+    }
+    this.track.replaceChildren(CalendarTicker.list(items, false), CalendarTicker.list(items, true));
+    this.wrapper.hidden = false;
+    this.fit();
+  }
+
+  /**
+   * Move the bar only when its items don't fit on one row. The grammar still keeps it still on
+   * phones, touch screens and with reduced motion, and its Pause switch stops it anywhere.
+   */
+  fit() {
+    const [list] = this.track.children;
+    this.section.classList.remove('ocs__ticker--moving');
+    if (!list) return;
+    const items = [...list.children];
+    if (items.every((item) => item.offsetTop === items[0].offsetTop)) return;
+    this.section.classList.add('ocs__ticker--moving');
+    const seconds = Math.round(list.getBoundingClientRect().width / CalendarTicker.PIXELS_PER_SECOND);
+    this.section.style.setProperty('--ocs-ticker-duration', `${seconds}s`);
+  }
+
+  /** Stop listening and leave the bar empty and hidden. */
+  unmount() {
+    this.stopped = true;
+    document.removeEventListener('visibilitychange', this.onVisible);
+    this.observer?.disconnect();
+    this.track.replaceChildren();
+    this.wrapper.hidden = true;
+    this.section.classList.remove('ocs__ticker--moving');
+  }
+
+  /**
+   * One list of items as an ocs__ticker-items list of links. Text goes in as text, never HTML.
+   * @param {Array<{text: string, href: string, urgent: boolean}>} items
+   * @param {boolean} copy - the loop copy: hidden from screen readers, out of the tab order
+   * @returns {Element}
+   */
+  static list(items, copy) {
+    const list = document.createElement('ul');
+    list.className = 'ocs__ticker-items';
+    if (copy) list.setAttribute('aria-hidden', 'true');
+    items.forEach(({ text, href, urgent }) => {
+      const link = document.createElement('a');
+      link.setAttribute('href', href);
+      if (copy) link.setAttribute('tabindex', '-1');
+      if (urgent) {
+        const pill = document.createElement('span');
+        pill.className = 'ocs__status-pill ocs__status-pill--bad';
+        pill.textContent = URGENT.label;
+        link.append(pill, ' ');
+      }
+      link.append(text);
+      const item = document.createElement('li');
+      item.append(link);
+      list.append(item);
+    });
+    return list;
   }
 }
