@@ -1,5 +1,6 @@
 @import "theme/legacy/root-color-map";
 @import "mixins/variables";
+@import "mixins/panel"; // surface, accent-tint and kicker, which the elements build on
 @import "base/code";
 @import "base/tables";
 @import "bathroom";

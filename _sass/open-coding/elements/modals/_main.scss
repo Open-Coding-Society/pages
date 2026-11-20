@@ -36,6 +36,12 @@
 // SCSS import order (ocs__card is compiled in a separate, later-loading
 // stylesheet entry point, _sass/minima/custom-styles.scss, so a
 // same-specificity bare override here isn't reliable).
+// A wider card for a modal that holds a list or a browser rather than a short form:
+// a conversation's files, a gallery.
+.ocs__modal-card--wide {
+  max-width: 48rem;
+}
+
 .ocs__card.ocs__modal-card {
   margin-bottom: 0;
 }
