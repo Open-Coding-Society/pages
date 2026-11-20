@@ -56,13 +56,13 @@ Go further together]</pre>
   </div>
   <div class="ocs__table-wrap">
     <table class="ocs__table">
-      <thead><tr><th>Stage</th><th>Status</th><th>What is next</th></tr></thead>
+      <thead><tr><th>Stage</th><th>What it includes</th><th>Status</th><th>What is next</th></tr></thead>
       <tbody>
-        <tr><td>1. Prototype</td><td><span class="ocs__status-pill ocs__status-pill--good">Mostly built</span></td><td>Events: admin screen and scrolling ticker (in progress)</td></tr>
-        <tr><td>2. Production</td><td><span class="ocs__status-pill ocs__status-pill--warn">Partly built</span></td><td>Docker and nginx setup exist; S3 file storage and backup and restore guides are missing</td></tr>
-        <tr><td>3. Extended Services</td><td><span class="ocs__status-pill ocs__status-pill--warn">In progress</span></td><td>Chat (Flask) and calendar (Spring) are in the kits; OCS Email is missing</td></tr>
-        <tr><td>4. Education</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td><td>A default UI for the Education kit</td></tr>
-        <tr><td>5. Business</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td><td>A default UI for the Business kit</td></tr>
+        <tr><td>1. Prototype (Vanilla)</td><td>GitHub Pages and Jekyll, Flask only, OCS GameEngine, grammar-based UI, login and signup, profiles and roles, AI services (Gemini, Groq, or OCS AI)</td><td><span class="ocs__status-pill ocs__status-pill--good">Mostly built</span></td><td>Events (in progress), scheduled before and after posts, doc converter, topics and tags for posts</td></tr>
+        <tr><td>2. Production</td><td>Vanilla on AWS: EC2 hosting, RDS database, S3 storage, backups, restore procedures</td><td><span class="ocs__status-pill ocs__status-pill--warn">Partly built</span></td><td>Docker and nginx hosting exist; EC2, RDS, S3, backups and restore are next</td></tr>
+        <tr><td>3. Extended Services</td><td>Spring Boot server, chat, calendar, email, REST integration, role-based services</td><td><span class="ocs__status-pill ocs__status-pill--warn">In progress</span></td><td>Chat (Flask) and calendar (Spring) are in the kits; OCS Email is missing</td></tr>
+        <tr><td>4. Education</td><td>A classroom kit, with a customer waiting</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td><td>A default UI for the Education kit</td></tr>
+        <tr><td>5. Business</td><td>A kit for companies serving their own members</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td><td>A default UI for the Business kit</td></tr>
       </tbody>
     </table>
   </div>
@@ -80,7 +80,7 @@ Go further together]</pre>
     <table class="ocs__table">
       <thead><tr><th>Kit</th><th>Who picks it</th></tr></thead>
       <tbody>
-        <tr><td><strong>Vanilla</strong></td><td>Anyone who wants a basic site for users: accounts, profiles, a blog. Add features later.</td></tr>
+        <tr><td><strong>Vanilla</strong></td><td>Anyone who wants a basic Jekyll site they can build on: login, profiles, a blog, and events. Runs on GitHub Pages and Flask only. Add features later.</td></tr>
         <tr><td><strong>Education</strong></td><td>A teacher or school running a CS classroom: lessons, code runner, assignments, grading, AI tutor, hall pass.</td></tr>
         <tr><td><strong>Business</strong></td><td>A company serving its own members. No classroom features, just chat and posts, calendar, AI chatbot, analytics, profiles.</td></tr>
       </tbody>
@@ -170,13 +170,12 @@ from the dashboard]</pre>
 <div class="ocs__card" id="future">
   <h3 class="ocs__section-title">Future</h3>
   <div class="ocs__keypoints">
-    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Finish Events: admin screen, scrolling ticker, events page, photo gallery</span></div>
+    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Finish Events: admin screen, scrolling ticker, events page, photo gallery, scheduled before and after posts</span></div>
     <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Give the Education and Business kits their own default UI</span></div>
-    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Add S3 file storage and backup and restore guides for production</span></div>
+    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Add EC2, RDS, S3, backups, and restore procedures for production</span></div>
     <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Add OCS Email to Extended Services</span></div>
-    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Move the rest of OCS's old site content into the kit with the import tool</span></div>
-    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Add a hosted option for schools without their own server</span></div>
-    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Get a real school to pilot it end to end</span></div>
+    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Move the current OCS Pages, Flask, and Spring repos onto the kits, so OCS becomes one flavor of the kit</span></div>
+    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Deliver the Education kit to its first customer</span></div>
   </div>
 </div>
 
@@ -256,14 +255,14 @@ calendar, hall pass]</pre>
 
 <div class="ocs__card" id="default-ui">
   <h3 class="ocs__section-title">A Default UI for Every Kit</h3>
-  <p>A kit should look finished the moment it is installed.</p>
+  <p>A kit should look finished the moment it is installed. Rishab and Shayan are building the default UIs with Samarth.</p>
   <div class="ocs__table-wrap">
     <table class="ocs__table">
       <thead><tr><th>Kit</th><th>Default UI</th><th>Status</th></tr></thead>
       <tbody>
-        <tr><td>Vanilla</td><td>Portfolio</td><td><span class="ocs__status-pill ocs__status-pill--good">Exists</span></td></tr>
+        <tr><td>Vanilla</td><td>Portfolio (Student Personal)</td><td><span class="ocs__status-pill ocs__status-pill--good">Exists</span></td></tr>
         <tr><td>Education</td><td>A customer-facing Education UI</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td></tr>
-        <tr><td>Business</td><td>Portfolio today; needs its own Business UI</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td></tr>
+        <tr><td>Business</td><td>Portfolio today; business has its own distinct pattern</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td></tr>
       </tbody>
     </table>
   </div>
