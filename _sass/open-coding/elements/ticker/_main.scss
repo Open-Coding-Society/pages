@@ -1,0 +1,7 @@
+// Ticker element: a bar of short announcements, each a link to its details. A ticker is still
+// unless it has ocs__ticker--moving, and even then it never moves on a touch screen, in a narrow
+// window, or when the visitor's system asks for reduced motion. Anyone can stop it: the Pause
+// switch holds it still, a mouse hover pauses it, and keyboard focus on an announcement shows
+// the list still and wrapped (WCAG 2.2.2 Pause, Stop, Hide).
+@import "tokens";
+@import "common";
