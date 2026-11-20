@@ -11,7 +11,7 @@ globalThis.localStorage = {
 let reloads = 0;
 globalThis.window = { location: { reload: () => { reloads += 1; } } };
 
-const { viewFor, roleNames, isMentorAccount, switchView, clearRoleViewCache } =
+const { viewFor, roleNames, isMentorAccount, switchView, clearRoleViewCache, showRoleSidebars } =
     await import('../assets/js/api/role-view.js');
 
 beforeEach(() => {
@@ -53,4 +53,24 @@ test('clearRoleViewCache forgets the cached sidebar and the view choice', () => 
     storage.set('ocsMentorSidebar', 'mentor');
     clearRoleViewCache();
     assert.equal(storage.size, 0);
+});
+
+// The layout renders the sidebar twice: the side column and the phone Menu.
+function pageWithTwoSidebarCopies() {
+    const sidebars = ['default', 'mentor', 'default', 'mentor']
+        .map(role => ({ dataset: { sidebarRole: role }, hidden: role === 'mentor' }));
+    return { sidebars, querySelectorAll: selector => (selector === '[data-sidebar-role]' ? sidebars : []) };
+}
+
+test('the mentor view shows the mentor sidebar in both the side column and the phone Menu', () => {
+    const page = pageWithTwoSidebarCopies();
+    showRoleSidebars(page, true);
+    assert.deepEqual(page.sidebars.map(s => s.hidden), [true, false, true, false]);
+});
+
+test('the default view shows the default sidebar in both copies again', () => {
+    const page = pageWithTwoSidebarCopies();
+    showRoleSidebars(page, true);
+    showRoleSidebars(page, false);
+    assert.deepEqual(page.sidebars.map(s => s.hidden), [false, true, false, true]);
 });

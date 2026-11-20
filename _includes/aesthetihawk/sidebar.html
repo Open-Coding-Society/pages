@@ -9,11 +9,12 @@
      student menu minus the student-only items (grades, analytics, submissions,
      bathroom pass -- mirrors the same student-only sections hidden on the
      mentor's /profile page), plus mentor extras; everyone else sees the normal
-     OCS sidebar. -->
-<div id="sidebar-role-default">
+     OCS sidebar. The layout includes this file twice (side column and phone Menu),
+     so the two sidebars are marked with data-sidebar-role, not ids. -->
+<div data-sidebar-role="default">
   {% include aesthetihawk/sidebar-list.html data=sidebar_data id_prefix=include.id_prefix %}
 </div>
-<div id="sidebar-role-mentor" hidden>
+<div data-sidebar-role="mentor" hidden>
   {% include aesthetihawk/sidebar-list.html data=sidebar_data id_prefix=include.id_prefix prefix="mentor-" exclude="bathroom_pass,analytics,grades,submissions" %}
   {% include aesthetihawk/sidebar-list.html data=site.data.aesthetihawk_sidebar_mentor id_prefix=include.id_prefix prefix="mentor-" %}
 </div>
@@ -23,8 +24,10 @@
   // while the real /api/person/get check (in the layout, below) re-verifies it.
   try {
     if (localStorage.getItem('ocsMentorSidebar') === 'mentor') {
-      document.getElementById('sidebar-role-default').hidden = true;
-      document.getElementById('sidebar-role-mentor').hidden = false;
+      // Every copy parsed so far, so the phone Menu's copy switches too.
+      document.querySelectorAll('[data-sidebar-role]').forEach((sidebar) => {
+        sidebar.hidden = sidebar.dataset.sidebarRole !== 'mentor';
+      });
     }
   } catch (e) { /* localStorage unavailable; default sidebar stays visible */ }
 </script>
