@@ -252,7 +252,8 @@ function table(settings, ctx) {
 }
 
 // nav.ocs__nav-grid > a.ocs__nav-card with kicker and title spans (ocs-intelligence-capstone.md);
-// the grammar recolors those two spans under presets itself. The host pill is a <strong>.
+// the grammar recolors those two spans under presets itself. The host pill is a <strong>. Every
+// group is a navigation landmark, so its name becomes the nav's aria-label (left off when blank).
 function linkCards(settings, ctx) {
   const cards = listOf(settings, 'items', ctx, 'link_cards').map((item) => {
     const target = linkTo(ownValue(item, 'url'), ctx);
@@ -266,7 +267,8 @@ function linkCards(settings, ctx) {
       text ? h('span', { class: 'ocs__text' }, text) : null,
       hostPill(ctx, target.host));
   }).filter(Boolean);
-  return cards.length ? h('nav', { class: 'ocs__nav-grid' }, cards) : null;
+  const name = lineOf(settings, 'label');
+  return cards.length ? h('nav', { class: 'ocs__nav-grid', 'aria-label': name || undefined }, cards) : null;
 }
 
 function initialsOf(name) {

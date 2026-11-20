@@ -254,10 +254,11 @@ blocks:
   link_cards:
     label: Link cards
     help: Clickable cards that link to your app, your repo or a lesson.
-    code_note: "A nav with ocs__nav-grid. Each card is one big link (ocs__nav-card) with a small kicker, a title and a line of text."
+    code_note: "A nav with ocs__nav-grid, and the group name as its aria-label when you give one. Each card is one big link (ocs__nav-card) with a small kicker, a title and a line of text."
     icon: fa-grip
     category: content
     fields:
+      - { id: label, type: text, label: Group name, max: 60, placeholder: Ways to help, help: "Screen readers read this name for the group of cards. Give each group on a page its own name." }
       - id: items
         type: items
         label: Cards

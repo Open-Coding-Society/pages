@@ -188,6 +188,14 @@ test('items lists check every item against its item fields', needsRuby, () => {
   assert.deepEqual(check('link_cards', { items: {} }), ['items:bad_list']);
 });
 
+test('link cards: the group name is optional, one line and at most 60 characters', needsRuby, () => {
+  const items = [{ kicker: '', title: 'Volunteer', text: '', url: '/get-involved/' }];
+  assert.deepEqual(check('link_cards', { items }), [], 'a group without a name still passes');
+  assert.deepEqual(check('link_cards', { label: 'Ways to help', items }), []);
+  assert.deepEqual(check('link_cards', { label: 'x'.repeat(61), items }), ['label:too_long']);
+  assert.deepEqual(check('link_cards', { label: 'Ways\nto help', items }), ['label:one_line']);
+});
+
 test('tables: rows are non-blank lines and cells split on |, within the registry limits', needsRuby, () => {
   const { table_rows: rows, table_cols: cols } = loadRegistry().limits;
   assert.deepEqual(tableRows('A | B\n\n  \nC|D|\r\nE'), [['A', 'B'], ['C', 'D', ''], ['E']]);
