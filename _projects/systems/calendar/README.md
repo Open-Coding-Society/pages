@@ -92,6 +92,11 @@ For detailed module documentation, see [ARCHITECTURE.md](docs/ARCHITECTURE.md).
   - Every doc page (Blogs `post.html`) has an **Add to Calendar** button that opens `/student/calendar?doc=<url>&title=<title>` with the Add New Event modal filled in
   - Edits always send a `period` (the backend requires one); events with no course are saved as `Personal`, which the calendar treats as no course
   - Test: `node --test tests/calendar_doc_links.test.mjs`
+- Safe event text: any signed-in account can save an event, so the page never puts its text in as raw HTML
+  - Descriptions go through DOMPurify; if DOMPurify didn't load, they're escaped instead
+  - Titles, names and group labels on the grid and in the CS Pathway list are escaped
+  - Both go through [CalendarSafeHtml.js](js/CalendarSafeHtml.js); a new spot that writes an event value into HTML uses it too
+  - Test: `node --test tests/calendar_safe_html.test.mjs`
 
 ### Issue Tracking
 - GitHub-style issue creation and management

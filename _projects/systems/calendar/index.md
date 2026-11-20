@@ -358,6 +358,7 @@ active_tab: calendar
 <script type="module">
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     import { normalizeDocUrl, splitLinkedDoc, joinLinkedDoc, readDocLaunchParams } from '{{site.baseurl}}/assets/js/projects/calendar/CalendarDocLinks.js';
+    import { CalendarSafeHtml } from '{{site.baseurl}}/assets/js/projects/calendar/CalendarSafeHtml.js';
 
     // ─── Auth helpers ───────────────────────────────────────────────
     let javaAuthenticated = true;
@@ -483,12 +484,12 @@ active_tab: calendar
             const level = levelMatch ? levelMatch[1].trim() : 'CS Pathway';
             return `<li class="calendar-cs-pathway-task">
                 <div class="calendar-cs-pathway-task-meta">
-                    <span class="calendar-cs-pathway-task-priority priority-${String(priority).toLowerCase()}">${priority}</span>
-                    <span class="calendar-cs-pathway-task-date">${due}</span>
-                    <span class="calendar-cs-pathway-task-level">${level}</span>
+                    <span class="calendar-cs-pathway-task-priority priority-${CalendarSafeHtml.escape(String(priority).toLowerCase())}">${CalendarSafeHtml.escape(priority)}</span>
+                    <span class="calendar-cs-pathway-task-date">${CalendarSafeHtml.escape(due)}</span>
+                    <span class="calendar-cs-pathway-task-level">${CalendarSafeHtml.escape(level)}</span>
                 </div>
-                <strong class="calendar-cs-pathway-task-title">${task.title || 'Untitled task'}</strong>
-                <p class="calendar-cs-pathway-task-desc">${(task.description || ext.description || '').replace(/\n/g, '<br>')}</p>
+                <strong class="calendar-cs-pathway-task-title">${CalendarSafeHtml.escape(task.title || 'Untitled task')}</strong>
+                <p class="calendar-cs-pathway-task-desc">${CalendarSafeHtml.clean((task.description || ext.description || '').replace(/\n/g, '<br>'))}</p>
             </li>`;
         }).join('');
     }
@@ -1701,28 +1702,28 @@ active_tab: calendar
                         const title = event.title || '';
                         const groupName = ext.groupName || '';
                         let html = '<div class="fc-event-appointment">';
-                        if (individual) html += '<div class="fc-event-individual">' + individual + '</div>';
-                        html += '<div class="fc-event-title-custom">' + title + '</div>';
-                        if (groupName) html += '<div class="fc-event-group">' + groupName + '</div>';
+                        if (individual) html += '<div class="fc-event-individual">' + CalendarSafeHtml.escape(individual) + '</div>';
+                        html += '<div class="fc-event-title-custom">' + CalendarSafeHtml.escape(title) + '</div>';
+                        if (groupName) html += '<div class="fc-event-group">' + CalendarSafeHtml.escape(groupName) + '</div>';
                         html += '</div>';
                         return { html };
                     }
                     if (isIssue && !isBreak) {
                         let html = '<div class="fc-event-issue">';
                         const titleText = (event.title || 'Issue').replace(/^Issue:\s*/, '');
-                        html += '<div class="fc-event-title-custom" title="' + titleText + '" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + titleText + '</div>';
-                        if (ext.author) html += '<div class="fc-event-individual">' + ext.author + '</div>';
+                        html += '<div class="fc-event-title-custom" title="' + CalendarSafeHtml.escape(titleText) + '" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + CalendarSafeHtml.escape(titleText) + '</div>';
+                        if (ext.author) html += '<div class="fc-event-individual">' + CalendarSafeHtml.escape(ext.author) + '</div>';
                         // Show assigned groups if available (use lookup map if present)
                                 try {
                                     if (Array.isArray(ext.assignedGroupLabels) && ext.assignedGroupLabels.length) {
-                                        html += '<div class="fc-event-group">' + ext.assignedGroupLabels.join(', ') + '</div>';
+                                        html += '<div class="fc-event-group">' + CalendarSafeHtml.escape(ext.assignedGroupLabels.join(', ')) + '</div>';
                                     } else {
                                         const agRaw = ext.assignedGroups || event.assignedGroups || null;
                                         if (agRaw) {
                                             const ag = typeof agRaw === 'string' ? JSON.parse(agRaw) : agRaw;
                                             if (Array.isArray(ag) && ag.length) {
                                                 const labels = ag.map(id => (window.allGroupsById && window.allGroupsById[String(id)]) || String(id));
-                                                html += '<div class="fc-event-group">' + labels.join(', ') + '</div>';
+                                                html += '<div class="fc-event-group">' + CalendarSafeHtml.escape(labels.join(', ')) + '</div>';
                                             }
                                         }
                                     }
@@ -1754,7 +1755,7 @@ active_tab: calendar
                     // Edit mode reads the title from this field, so it must hold the event's title
                     document.getElementById('editTitle').textContent = displayTitle;
                     const { body, docUrl } = splitLinkedDoc(currentEvent.extendedProps.description, window.location.origin);
-                    document.getElementById('editDescription').innerHTML = slackToHtml(body);
+                    document.getElementById('editDescription').innerHTML = CalendarSafeHtml.clean(slackToHtml(body));
                     showLinkedDoc(docUrl);
                     document.getElementById('editDateDisplay').textContent = formatDisplayDate(currentEvent.start);
                     document.getElementById('editDate').value = formatDate(currentEvent.start);
@@ -2033,7 +2034,7 @@ active_tab: calendar
             }
             setDocFieldEditable(true);
             // Edit the raw text; the linked doc has its own field
-            document.getElementById("editDescription").innerHTML = splitLinkedDoc(currentEvent.extendedProps.description, window.location.origin).body;
+            document.getElementById("editDescription").innerHTML = CalendarSafeHtml.clean(splitLinkedDoc(currentEvent.extendedProps.description, window.location.origin).body);
             document.getElementById("editTitle").focus();
         };
 
