@@ -1201,13 +1201,13 @@ active_tab: calendar
                 const assignedLabel = (() => {
                     try {
                         if (Array.isArray(issue.assignedGroupLabels) && issue.assignedGroupLabels.length) {
-                            return `<div class="issue-assigned-groups">📍 ${issue.assignedGroupLabels.join(', ')}</div>`;
+                            return `<div class="issue-assigned-groups">📍 ${CalendarSafeHtml.escape(issue.assignedGroupLabels.join(', '))}</div>`;
                         }
                         if (issue.assignedGroups) {
                             const ag = typeof issue.assignedGroups === 'string' ? JSON.parse(issue.assignedGroups) : issue.assignedGroups;
                             if (Array.isArray(ag) && ag.length) {
                                 const labels = ag.map(id => (window.allGroupsById && window.allGroupsById[String(id)]) || String(id));
-                                return `<div class="issue-assigned-groups">📍 ${labels.join(', ')}</div>`;
+                                return `<div class="issue-assigned-groups">📍 ${CalendarSafeHtml.escape(labels.join(', '))}</div>`;
                             }
                         }
                     } catch (e) { }
@@ -1266,13 +1266,13 @@ active_tab: calendar
                             const assignedLabelInner = (() => {
                                 try {
                                     if (Array.isArray(issue.assignedGroupLabels) && issue.assignedGroupLabels.length) {
-                                        return `<div class="issue-assigned-groups">📍 ${issue.assignedGroupLabels.join(', ')}</div>`;
+                                        return `<div class="issue-assigned-groups">📍 ${CalendarSafeHtml.escape(issue.assignedGroupLabels.join(', '))}</div>`;
                                     }
                                     if (issue.assignedGroups) {
                                         const ag = typeof issue.assignedGroups === 'string' ? JSON.parse(issue.assignedGroups) : issue.assignedGroups;
                                         if (Array.isArray(ag) && ag.length) {
                                             const labels = ag.map(id => (window.allGroupsById && window.allGroupsById[String(id)]) || String(id));
-                                            return `<div class="issue-assigned-groups">📍 ${labels.join(', ')}</div>`;
+                                            return `<div class="issue-assigned-groups">📍 ${CalendarSafeHtml.escape(labels.join(', '))}</div>`;
                                         }
                                     }
                                 } catch (e) { }

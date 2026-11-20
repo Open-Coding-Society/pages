@@ -127,6 +127,15 @@ test('the month grid escapes every event value it puts into its markup', () => {
   assert.deepEqual(raw, [], 'appointment and issue labels go through CalendarSafeHtml.escape');
 });
 
+test('the Issues list and board escape the group names an issue is assigned to', () => {
+  // Spring sends back any group value it doesn't recognize as the label, so labels are user text.
+  const labels = [...page.matchAll(/class="issue-assigned-groups">[^$<]*\$\{([^}]*)\}/g)].map((match) => match[1].trim());
+  assert.ok(labels.length >= 4, 'the list and the board each show assigned groups');
+  for (const value of labels) {
+    assert.match(value, /^(CalendarSafeHtml\.escape|escapeIssueText)\(|\.map\(\s*\w+\s*=>\s*escapeIssueText\(\w+\)\)/, `raw group label: ${value}`);
+  }
+});
+
 test('the CS Pathway list escapes event titles and cleans descriptions', () => {
   const list = block(page, /function renderCsPathwayPanel\(\) \{/);
   const values = [...list.matchAll(/\$\{([^}]*)\}/g)].map((match) => match[1].trim());
