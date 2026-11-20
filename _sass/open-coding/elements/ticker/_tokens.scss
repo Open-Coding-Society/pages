@@ -1,0 +1,51 @@
+// Design tokens for the ticker element. Sizes come from the shared scale in
+// mixins/_variables.scss.
+
+// The surface and edge are the band element's tint look (elements/bands/_tokens.scss), so the
+// ticker is imported after bands. At 12% of the accent over the page background, text stays
+// above 6.5:1 and links above 4.8:1 in every preset.
+$ticker-look: map-get($band-looks, tint);
+
+// The bar's padding and corners.
+$ticker-box: (
+  padding: $spacing-xs $spacing-md,
+  radius: $radius-lg,
+);
+
+// Space between the bar's parts (label, Pause switch, announcements), and between announcements.
+$ticker-part-gap: $spacing-sm;
+$ticker-item-gap: $spacing-xl;
+
+// The announcements' starting width beside the label. Narrower than this, they move under it.
+$ticker-text-basis: 16rem;
+
+// How long one full loop takes when the page doesn't set --ocs-ticker-duration. A script that
+// knows how wide the announcements are can set it, so long and short bars move at one speed.
+$ticker-duration: 40s;
+
+// At this width and below, a ticker never moves; its announcements wrap instead.
+$ticker-phone: $breakpoint-mobile;
+
+// The still form of a moving bar's list, used where it must not move: the list wraps and the
+// loop copy goes away. Included on the viewport.
+@mixin ticker-list-still {
+  overflow: visible;
+  container-type: normal;
+
+  .ocs__ticker-track {
+    width: auto;
+    animation: none;
+  }
+
+  .ocs__ticker-items {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    min-width: 0;
+    white-space: normal;
+    padding-right: 0;
+
+    &[aria-hidden="true"] {
+      display: none;
+    }
+  }
+}

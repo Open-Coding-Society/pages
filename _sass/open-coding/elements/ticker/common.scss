@@ -1,0 +1,137 @@
+// Public grammar:
+//   .ocs__ticker            a bar of announcements: a <section> named by its label
+//   .ocs__ticker-label      the bar's visible name, such as "Announcements"
+//   .ocs__ticker-switch     the Pause switch: an ocs__toggle with this class
+//   .ocs__ticker-viewport   the window the announcements show through
+//   .ocs__ticker-track      what slides: one list, or two while moving
+//   .ocs__ticker-items      a list of announcements, one link per <li>
+//   .ocs__ticker--moving    slide the announcements sideways in a loop
+//
+// While moving, the track holds the list twice. The second copy is aria-hidden="true" with its
+// links out of the tab order, and the track slides left by half its width, so the loop has no
+// seam and a screen reader reads each announcement once.
+//
+// The label and list rules start with .ocs__ticker so they outrank a page layout's own rules for
+// headings, paragraphs and lists (a post's `.post-content h2`, minima's `ul`).
+
+.ocs__ticker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $ticker-part-gap;
+  box-sizing: border-box;
+  padding: map-get($ticker-box, padding);
+  border: map-get($ticker-look, border-width) solid band-border-color($ticker-look);
+  border-radius: map-get($ticker-box, radius);
+  background: band-background($ticker-look);
+  color: var(--pref-text-color);
+}
+
+.ocs__ticker .ocs__ticker-label {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--pref-text-color);
+  font-size: $text-md;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.ocs__ticker-viewport {
+  flex: 1 1 $ticker-text-basis;
+  min-width: 0;
+}
+
+.ocs__ticker-track {
+  display: flex;
+}
+
+.ocs__ticker .ocs__ticker-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xxs $ticker-item-gap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  > li {
+    margin: 0;
+  }
+
+  // The copy exists only to close the loop while moving.
+  &[aria-hidden="true"] {
+    display: none;
+  }
+}
+
+// A still ticker has nothing to pause.
+.ocs__ticker:not(.ocs__ticker--moving) .ocs__ticker-switch {
+  display: none;
+}
+
+.ocs__ticker--moving {
+  // The viewport is a size container, so each copy of the list can be at least as wide as it
+  // (100cqw) and a short list loops with no gap. It also keeps the sliding list's width out of
+  // the bar's own sizing, so a grid column or flex row holding the bar doesn't grow to fit it.
+  .ocs__ticker-viewport {
+    overflow: hidden;
+    container-type: inline-size;
+  }
+
+  .ocs__ticker-track {
+    width: max-content;
+    animation: ocs-ticker-scroll var(--ocs-ticker-duration, #{$ticker-duration}) linear infinite;
+    will-change: transform;
+  }
+
+  .ocs__ticker-items {
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    min-width: 100cqw;
+    white-space: nowrap;
+    // The space after the last announcement matches the space between them.
+    padding-right: $ticker-item-gap;
+
+    &[aria-hidden="true"] {
+      display: flex;
+    }
+  }
+}
+
+// The Pause switch holds it still until it is switched off. :has() keeps a rule of its own, so
+// a browser that can't read it drops only this rule.
+.ocs__ticker--moving:has(.ocs__ticker-switch :checked) .ocs__ticker-track {
+  animation-play-state: paused;
+}
+
+// A mouse hover holds it still too. Touch screens report a hover on tap, so only real pointers.
+@media (hover: hover) and (pointer: fine) {
+  .ocs__ticker--moving:hover .ocs__ticker-track {
+    animation-play-state: paused;
+  }
+}
+
+// Keyboard focus on an announcement shows the whole list, still and wrapped, so the focused link
+// is never scrolled out of sight. The Pause switch sits outside the viewport, so the focus a
+// click leaves on it doesn't hold the bar still after it is switched off.
+.ocs__ticker--moving .ocs__ticker-viewport:focus-within {
+  @include ticker-list-still;
+}
+
+// No motion on a touch screen, a narrow window, or when the visitor's system asks for less
+// motion: the announcements wrap, and the loop copy and the Pause switch go away.
+@media (prefers-reduced-motion: reduce), (max-width: $ticker-phone), (pointer: coarse) {
+  .ocs__ticker--moving .ocs__ticker-viewport {
+    @include ticker-list-still;
+  }
+
+  .ocs__ticker--moving .ocs__ticker-switch {
+    display: none;
+  }
+}
+
+// Constant motion, so the timing is linear. Only the transform moves.
+@keyframes ocs-ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}

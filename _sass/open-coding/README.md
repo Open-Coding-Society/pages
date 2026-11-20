@@ -687,6 +687,57 @@ In every preset, text on every look stays above 6:1 and links above 4.5:1 (lowes
 Light's card, 4.6:1, the same as on any panel). The UI Builder's Section style writes these
 classes. See [`elements/bands`](elements/bands).
 
+### Ticker
+
+One bar of short announcements, each a link to its details. It is still unless it has
+`ocs__ticker--moving`, and then it slides sideways in a loop. It never moves on a touch screen, in
+a window 768px wide or narrower, or when the visitor's system asks for reduced motion; the links
+wrap instead. Anyone can stop it (WCAG 2.2.2): the Pause switch holds it still, a mouse hover
+pauses it, and keyboard focus on a link shows the whole list still and wrapped.
+
+```html
+<section class="ocs__ticker ocs__ticker--moving" aria-labelledby="news-title">
+  <p class="ocs__ticker-label" id="news-title">Announcements</p>
+  <label class="ocs__toggle ocs__ticker-switch">
+    <input class="ocs__toggle-input" type="checkbox">
+    <span class="ocs__toggle-track"></span>
+    <span class="ocs__toggle-label">Pause</span>
+  </label>
+  <div class="ocs__ticker-viewport">
+    <div class="ocs__ticker-track">
+      <ul class="ocs__ticker-items">
+        <li><a href="/events/night-at-the-museum/">Night at the Museum: Thursday at 6 PM</a></li>
+        <li><a href="/events/hour-of-code/">Hour of Code sign-ups close Friday</a></li>
+      </ul>
+      <ul class="ocs__ticker-items" aria-hidden="true">
+        <li><a href="/events/night-at-the-museum/" tabindex="-1">Night at the Museum: Thursday at 6 PM</a></li>
+        <li><a href="/events/hour-of-code/" tabindex="-1">Hour of Code sign-ups close Friday</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+```
+
+- `ocs__ticker`: the bar, a `<section>` named by its label. Its surface and edge are the band's
+  tint look, so text and links keep their contrast in every preset.
+- `ocs__ticker-label`: the bar's visible name. Use a `<p>`, not a heading, so a page layout's
+  heading styles don't restyle it.
+- `ocs__ticker-switch`: the Pause switch, an `ocs__toggle`. A CSS rule pauses the bar while it is
+  on, so it needs no JavaScript. It comes before the moving text, so it is the first thing the
+  keyboard reaches. A still bar, a touch screen, a narrow window and reduced motion hide it.
+- `ocs__ticker-viewport`, `ocs__ticker-track`, `ocs__ticker-items`: the window, what slides, and
+  the list of links.
+- `ocs__ticker--moving`: slide the list. The track holds it twice, the second copy
+  `aria-hidden="true"` with its links at `tabindex="-1"`, so a screen reader reads each
+  announcement once. Each copy is at least as wide as the bar and the track slides by half its
+  width, so even a short list loops with no gap. A still bar needs only the first list.
+- `--ocs-ticker-duration`: how long one loop takes (40s unless the page sets it).
+
+Don't give the bar `role="alert"` or `aria-live`: an alert is for news that appears while
+someone is reading, and this bar is there when the page loads. Mark an urgent announcement with
+an `ocs__status-pill ocs__status-pill--bad` pill at the start of its link instead. See
+[`elements/ticker`](elements/ticker).
+
 ## Theme file reference
 
 `user-preferences.scss` defines the current user-selectable theme contract.
