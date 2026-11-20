@@ -24,6 +24,7 @@ capstone_project:
 
 <nav class="ocs__capstone-nav">
   <div class="ocs__links ocs__links--wide">
+    <a href="#stages" class="ocs__btn pill">Five Stages</a>
     <a href="#problem" class="ocs__btn pill">The Problem</a>
     <a href="#who" class="ocs__btn pill">Who It's For</a>
     <a href="#features" class="ocs__btn pill">What You Get</a>
@@ -32,8 +33,40 @@ capstone_project:
     <a href="#future" class="ocs__btn pill">Future</a>
     <a href="#considerations" class="ocs__btn pill">Considerations</a>
     <a href="#how-its-built" class="ocs__btn pill">How It's Built</a>
+    <a href="#versioning" class="ocs__btn pill">Versioning</a>
+    <a href="#install" class="ocs__btn pill">install.sh</a>
+    <a href="#default-ui" class="ocs__btn pill">Default UIs</a>
   </div>
 </nav>
+
+<div class="ocs__card" id="stages">
+  <h3 class="ocs__section-title">Five Stages: Start With an Idea, Grow As You Need</h3>
+  <p>Each stage builds on the one before.</p>
+  <div class="ocs__diagram">
+    <pre class="mermaid">flowchart LR
+    P[1. Prototype
+Explore and learn] --> R[2. Production
+Go live with confidence]
+    R --> X[3. Extended Services
+Add what you need]
+    X --> E[4. Education
+Teach and inspire]
+    E --> B[5. Business
+Go further together]</pre>
+  </div>
+  <div class="ocs__table-wrap">
+    <table class="ocs__table">
+      <thead><tr><th>Stage</th><th>Status</th><th>What is next</th></tr></thead>
+      <tbody>
+        <tr><td>1. Prototype</td><td><span class="ocs__status-pill ocs__status-pill--good">Mostly built</span></td><td>Events: admin screen and scrolling ticker (in progress)</td></tr>
+        <tr><td>2. Production</td><td><span class="ocs__status-pill ocs__status-pill--warn">Not started</span></td><td>S3 file storage, backup and restore guides</td></tr>
+        <tr><td>3. Extended Services</td><td><span class="ocs__status-pill ocs__status-pill--warn">In progress</span></td><td>Chat and calendar exist in Spring; OCS Email is missing</td></tr>
+        <tr><td>4. Education</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td><td>A default UI for the Education kit</td></tr>
+        <tr><td>5. Business</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td><td>A default UI for the Business kit</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
 <div class="ocs__card" id="problem">
   <h3 class="ocs__section-title">The Problem</h3>
@@ -178,6 +211,54 @@ backend]</pre>
     G -->|blocked| Fx[Fix & re-run]</pre>
   </div>
   <p>Installing is one script, <code>./install.sh</code>, which clones the 3 codebases, sets them up, and starts the site.</p>
+</div>
+
+<div class="ocs__card" id="versioning">
+  <h3 class="ocs__section-title">Versioning and Packaging</h3>
+  <p>Four repositories ship as one kit, so they are released together.</p>
+  <div class="ocs__grid ocs__grid--standard cols-4">
+    <div class="ocs__grid-cell"><strong>Vanilla</strong><br>Installer, sync tool, and the one catalog of kits and features.</div>
+    <div class="ocs__grid-cell"><strong>Pages</strong><br>The Jekyll site. Reads the catalog.</div>
+    <div class="ocs__grid-cell"><strong>Flask</strong><br>Python backend. Reports its features.</div>
+    <div class="ocs__grid-cell"><strong>Spring</strong><br>Java backend. Reports its features.</div>
+  </div>
+  <h4 class="ocs__section-title">From change to release</h4>
+  <div class="ocs__grid ocs__grid--standard cols-4">
+    <div class="ocs__grid-cell"><strong>1</strong><br>Change on a branch, reviewed in a pull request</div>
+    <div class="ocs__grid-cell"><strong>2</strong><br>Checks confirm every repo's catalog copy matches</div>
+    <div class="ocs__grid-cell"><strong>3</strong><br>Tag the same version on all four repos</div>
+    <div class="ocs__grid-cell"><strong>4</strong><br>Images publish from the tag; the installer pins it</div>
+  </div>
+</div>
+
+<div class="ocs__card" id="install">
+  <h3 class="ocs__section-title">How install.sh Begins</h3>
+  <p>The script comes from the Vanilla repo. It builds a school's copy from templates and keeps it linked to upstream.</p>
+  <div class="ocs__grid ocs__grid--standard cols-4">
+    <div class="ocs__grid-cell"><strong>1</strong><br>Download install.sh from the Vanilla repo</div>
+    <div class="ocs__grid-cell"><strong>2</strong><br>Choose a kit: Vanilla, Education, or Business</div>
+    <div class="ocs__grid-cell"><strong>3</strong><br>Create the school's repos from the templates, at the pinned release</div>
+    <div class="ocs__grid-cell"><strong>4</strong><br>Apply the catalog and start the services</div>
+  </div>
+  <div class="ocs__grid ocs__grid--standard cols-2">
+    <div class="ocs__grid-cell"><strong>Template</strong><br>The school's own copy of a repo, under its own name.</div>
+    <div class="ocs__grid-cell"><strong>Upstream</strong><br>Our repos. The sync tool pulls their updates into the school's copy.</div>
+  </div>
+</div>
+
+<div class="ocs__card" id="default-ui">
+  <h3 class="ocs__section-title">A Default UI for Every Kit</h3>
+  <p>A kit should look finished the moment it is installed.</p>
+  <div class="ocs__table-wrap">
+    <table class="ocs__table">
+      <thead><tr><th>Kit</th><th>Default UI</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Vanilla</td><td>Portfolio</td><td><span class="ocs__status-pill ocs__status-pill--good">Exists</span></td></tr>
+        <tr><td>Education</td><td>Education pattern</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td></tr>
+        <tr><td>Business</td><td>Business pattern</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td></tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <div class="ocs__capstone-footer">
