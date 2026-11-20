@@ -7,13 +7,10 @@
   border-bottom: 1px solid var(--ui-border);
 }
 
+// Every card here is a surface (mixins/_panel.scss) and adds only its own layout.
 .ocs__card {
-  background: var(--panel);
-  border: 1px solid var(--ui-border);
-  border-radius: 1rem;
-  padding: 1.5rem 1.75rem;
+  @include surface(1rem, 1.5rem 1.75rem);
   margin-bottom: 1.5rem;
-  color: var(--pref-text-color);
 }
 
 // A title/action row inside a card -- extracted from 5 pages that had
@@ -43,12 +40,9 @@
 }
 
 .ocs__section-title {
+  @include kicker(0.875rem, 0.06em);
   margin: 0 0 1rem;
   color: var(--pref-text-color);
-  font-size: 0.875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 
 // Outrank generic page typography for compact capstone section headings.
@@ -63,7 +57,7 @@
   margin-bottom: 1rem;
   padding: 0.35rem 1rem;
   border: 1px solid var(--pref-accent-color);
-  border-radius: 999px;
+  border-radius: $radius-pill;
   background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
   color: var(--pref-text-color);
   font-size: 0.75rem;
@@ -110,7 +104,7 @@
   align-items: center;
   padding: 0.28rem 0.65rem;
   border: 1px solid var(--pref-accent-color);
-  border-radius: 999px;
+  border-radius: $radius-pill;
   background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
   color: var(--pref-text-color);
   font-size: 0.72rem;
@@ -222,13 +216,10 @@
 }
 
 .ocs__stat-label {
+  @include kicker(0.72rem);
   display: block;
   margin-top: 0.35rem;
   color: var(--text-muted);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .ocs__diagram {
@@ -294,18 +285,14 @@
 }
 
 .ocs__nav-card {
+  @include surface($radius-md, $spacing-md);
   display: flex;
   align-items: flex-start;
   flex-direction: column;
   justify-content: flex-start;
   gap: 0.35rem;
-  padding: $spacing-md;
-  border: 1px solid var(--ui-border);
-  border-radius: $radius-md;
-  background: var(--panel);
-  color: var(--pref-text-color);
   text-decoration: none;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition: background $transition-base ease, border-color $transition-base ease, color $transition-base ease, transform $transition-base ease;
 }
 
 .ocs__nav-card:visited {
@@ -314,12 +301,7 @@
 
 .ocs__nav-card:hover,
 .ocs__nav-card.is-active {
-  border-color: var(--pref-accent-color);
-  background: color-mix(in srgb, var(--pref-accent-color) 10%, var(--panel));
-}
-
-.ocs__nav-card:hover {
-  transform: translateY(-1px);
+  @include accent-tint(10%);
 }
 
 .ocs__nav-card:hover {
@@ -327,10 +309,7 @@
 }
 
 .ocs__nav-card-kicker {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  @include kicker(0.75rem);
 }
 
 html.user-theme-active .ocs__nav-card-kicker {
@@ -362,12 +341,21 @@ html.user-theme-active .ocs__nav-card-title {
 }
 
 .ocs__nav-card-cta {
+  @include kicker(0.68rem, 0.06em);
   margin-left: auto;
   color: var(--pref-accent-color);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+}
+
+// A link previewed inside a stream, like a GitHub issue in a chat: a tighter card with an
+// accent edge, at a width a line reads well at. Its kicker says where the link points and
+// can hold status pills; a long name breaks anywhere rather than widening the card.
+.ocs__nav-card--compact {
+  gap: 2px;
+  max-width: 34rem;
+  padding: $spacing-xxxs $spacing-xs;
+  border-left: 3px solid var(--pref-accent-color);
+  border-radius: $radius-sm;
+  overflow-wrap: anywhere;
 }
 
 
@@ -383,19 +371,14 @@ html.user-theme-active .ocs__nav-card-title {
 }
 
 .ocs__hub-card {
+  @include surface(1rem, 1.5rem, $color: inherit);
   display: block;
-  padding: 1.5rem;
-  border: 1px solid var(--ui-border);
-  border-radius: 1rem;
-  background: var(--panel);
-  color: inherit;
   text-decoration: none;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition: background $transition-base ease, border-color $transition-base ease, transform $transition-base ease;
 }
 
 .ocs__hub-card:hover {
-  border-color: var(--pref-accent-color);
-  background: color-mix(in srgb, var(--pref-accent-color) 8%, var(--panel));
+  @include accent-tint(8%);
   transform: translateY(-2px);
 }
 
@@ -415,8 +398,7 @@ button.ocs__hub-card {
 }
 
 .ocs__hub-card.ocs__hub-card--selected {
-  border-color: var(--pref-accent-color);
-  background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
+  @include accent-tint(12%);
 }
 
 .ocs__hub-card-title {
@@ -453,12 +435,8 @@ button.ocs__hub-card {
 }
 
 .ocs__pager-link {
+  @include surface(0.75rem, 1rem 1.25rem, $color: var(--text-muted));
   display: block;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--ui-border);
-  border-radius: 0.75rem;
-  background: var(--panel);
-  color: var(--text-muted);
   text-decoration: none;
 }
 

@@ -1,0 +1,111 @@
+// Files and folders in a list: a type icon, the name on one line (cut with "…"), a muted
+// line with the size and who shared it, and actions at the end. Shared files, an upload
+// tray, attachments under a chat message. A row is a surface (mixins/_panel.scss) whose
+// name and details are ocs__truncate; a row that opens something takes the accent tint.
+// Write the name as <b> and the details as <em>: preset themes recolor every span, small
+// and div to the text color, which would lose the muted line. A row that opens something
+// (a folder) is a <button> or <a> with the same class.
+
+.ocs__file-list {
+  display: grid;
+  gap: $spacing-xxxs;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ocs__file {
+  @include surface($radius-sm, $spacing-xxxs $spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+}
+
+button.ocs__file,
+a.ocs__file {
+  cursor: pointer;
+  transition: border-color $transition-fast ease, background-color $transition-fast ease;
+
+  &:hover {
+    @include accent-tint(10%);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pref-accent-color);
+    outline-offset: 2px;
+  }
+}
+
+// The type icon (a Font Awesome <i>), in the accent so a list scans by kind.
+.ocs__file-icon {
+  flex: none;
+  width: 1.75rem;
+  font-size: 1.3rem;
+  text-align: center;
+  color: var(--pref-accent-color);
+}
+
+// Name over details; also holds an upload's <progress class="ocs__progress">.
+.ocs__file-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ocs__file-name {
+  @extend .ocs__truncate;
+  font-weight: 600;
+  color: var(--pref-text-color);
+}
+
+.ocs__file-meta {
+  @extend .ocs__truncate;
+  font-size: 0.85em;
+  font-style: normal;
+  color: var(--text-muted);
+}
+
+// Buttons at the end of the row. They stay on the row on a phone; the name gives way.
+.ocs__file-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: $spacing-xxxs;
+}
+
+// A preview inside a file's row group: an image, a video, a PDF or the start of a text file.
+.ocs__file-preview {
+  @include surface($radius-sm, $color: null);
+  display: block;
+  box-sizing: border-box;
+  max-width: 100%;
+  max-height: 24rem;
+  margin: 0;
+}
+
+pre.ocs__file-preview {
+  overflow: auto;
+  padding: $spacing-xs;
+  font-size: $text-sm;
+  white-space: pre;
+  color: var(--pref-text-color);
+}
+
+iframe.ocs__file-preview,
+video.ocs__file-preview {
+  width: 100%;
+}
+
+iframe.ocs__file-preview {
+  height: 24rem;
+}

@@ -140,6 +140,31 @@ that exception instead of making it the default styling pattern.
 
 ## Grammar reference
 
+### Shared pieces
+
+Elements are built from a few shared pieces, so each one adds only what is its own:
+
+- `surface` (`mixins/_panel.scss`): the 1px ring, rounded corners, panel and text color
+  that cards, rows, menus and previews are drawn on
+- `accent-tint`: the accent ring and tint of a hovered, active or chosen item
+- `kicker`: small capitals over a title or a group
+- `.ocs__truncate`, which other parts `@extend` for one line that ends in "…"
+- `$radius-pill` (`mixins/_variables.scss`): fully round ends
+
+| Element | Reuses |
+| --- | --- |
+| `ocs__card`, `ocs__pager-link` | `surface` |
+| `ocs__hub-card` | `surface`; `accent-tint` when hovered or chosen |
+| `ocs__nav-card` | `surface`; `accent-tint` when hovered or `is-active`; `kicker` for its kicker and call to action |
+| `ocs__nav-card--compact` | the whole nav card, tighter, with an accent edge |
+| `ocs__grid-cell` in a card, calculator or gallery grid | `surface`, through `grid-card-cell`, `grid-key-cell` and `gallery-cell` |
+| `ocs__section-title`, `ocs__stat-label` | `kicker` |
+| `ocs__file`, `ocs__file-preview` | `surface`; `accent-tint` on a row that opens something; `.ocs__truncate` for the name and details |
+| `ocs__menu` | `surface` with a stronger ring; `kicker` for headings; `accent-tint` without a ring on the highlighted item; `.ocs__truncate` for names and hints |
+| `ocs__badge`, `ocs__status`, `ocs__progress` | `$radius-pill` |
+
+Start a new element from these. See [`mixins/README.md`](mixins/README.md).
+
 ### Buttons and links
 
 ```html
@@ -372,9 +397,114 @@ See [`elements/tabs`](elements/tabs). The Dashboard uses this for its tab bar.
 
 How a page shows/hides the modal (a `hidden`/`open` class, an
 `aria-hidden` attribute) is up to the page — this only styles the chrome.
+- `ocs__modal-card--wide`: a 48rem card for a modal that holds a list or a
+  browser rather than a short form, like a group's shared files
+
 See [`elements/modals`](elements/modals).
 Dashboard and Analytics Dashboard use the plain card+close shape; Calendar
 and Profile's face scanner use the full header/actions shape.
+
+### Files
+
+```html
+<ul class="ocs__file-list">
+  <li class="ocs__file">
+    <i class="fas fa-file-pdf ocs__file-icon" aria-hidden="true"></i>
+    <div class="ocs__file-text">
+      <b class="ocs__file-name" title="Design review.pdf">Design review.pdf</b>
+      <em class="ocs__file-meta">2.4 MB · Ada Lovelace</em>
+    </div>
+    <div class="ocs__file-actions">
+      <button class="ocs__btn small" type="button">Download</button>
+    </div>
+  </li>
+  <li><button class="ocs__file" type="button">
+    <i class="fas fa-folder ocs__file-icon" aria-hidden="true"></i>
+    <div class="ocs__file-text">
+      <b class="ocs__file-name">project</b>
+      <em class="ocs__file-meta">42 files · 3.1 MB</em>
+    </div>
+  </button></li>
+</ul>
+```
+
+- `ocs__file-list`: rows of files with a small gap
+- `ocs__file`: one file or folder: icon, name and details, actions. Make it a
+  `<button>` or `<a>` when the whole row opens something, like a folder
+- `ocs__file-icon`: the type icon, in the accent
+- `ocs__file-text`, `ocs__file-name`, `ocs__file-meta`: the name on one line (cut
+  with "…") over muted details. Write the name as `<b>` and the details as `<em>`:
+  preset themes recolor span, small and div
+- `ocs__file-actions`: buttons at the end of the row
+- `ocs__file-preview`: an image, video, PDF frame or `<pre>` of text shown with a file
+
+See [`elements/files`](elements/files). It's for a group's shared files, an upload
+tray, or the files under a chat message.
+
+### Progress
+
+```html
+<progress class="ocs__progress" max="100" value="40">40%</progress>
+```
+
+`ocs__progress`: a thin bar on a native `<progress>`, the accent on a track mixed
+from the text color, in every theme. Leave `value` off while the amount is unknown.
+See [`elements/progress`](elements/progress).
+
+### Menus
+
+```html
+<div class="ocs__menu" role="listbox" aria-label="Commands">
+  <div class="ocs__menu-group" role="group" aria-labelledby="share-heading">
+    <b class="ocs__menu-heading" id="share-heading">Share</b>
+    <button class="ocs__menu-item" type="button" role="option" aria-selected="true">
+      <i class="fas fa-paperclip ocs__menu-icon" aria-hidden="true"></i>
+      <strong class="ocs__menu-name">/file</strong>
+      <em class="ocs__menu-hint">Attach files from your computer</em>
+      <kbd>Enter</kbd>
+    </button>
+  </div>
+  <em class="ocs__menu-foot">↑ ↓ to move · Enter to pick · Esc to close</em>
+</div>
+```
+
+- `ocs__menu`: the panel; where it opens is the page's job
+- `ocs__menu-group`, `ocs__menu-heading`: groups, divided by a line
+- `ocs__menu-item`: a `<button>`, `<a>` or a `<label>` for a hidden file input.
+  `aria-selected="true"` (or hover) gives it the accent tint with the text color on it
+- `ocs__menu-icon`, `ocs__menu-name`, `ocs__menu-hint`, `kbd` or `ocs__menu-key`:
+  the item's icon, name, muted hint and key
+- `ocs__menu-foot`: a muted line of keyboard help
+
+Write headings, names and hints as `<b>`, `<strong>` and `<em>`, not spans. See
+[`elements/menus`](elements/menus). It's for an attach menu, a slash-command picker
+or a message's More actions.
+
+### Nav cards
+
+```html
+<div class="ocs__stack">
+  <a class="ocs__nav-card" href="/csh/week-4/">
+    <span class="ocs__nav-card-kicker">Week 4</span>
+    <span class="ocs__nav-card-title">Retrospective and Assessment</span>
+    <span class="ocs__text">Reflect on the sprint and set goals</span>
+  </a>
+  <a class="ocs__nav-card ocs__nav-card--compact" href="https://github.com/Open-Coding-Society/pages/pull/2031">
+    <span class="ocs__nav-card-kicker"><i class="fas fa-code-pull-request" aria-hidden="true"></i> Open-Coding-Society/pages #2031 <b class="ocs__status-pill ocs__status-pill--good">Open</b></span>
+    <span class="ocs__nav-card-title">Messages page redesign</span>
+    <span class="ocs__text">syowns opened 2 days ago · 9 files +1,200 −300</span>
+  </a>
+</div>
+```
+
+- `ocs__nav-card`: a card that is a link: a kicker, a title and an optional line of
+  text. Add `is-active` for the current one; `ocs__nav-card-cta` goes at the end
+- `ocs__nav-card--compact`: a link previewed inside a stream, tighter and with an accent
+  edge. Its kicker says where the link points and can hold status pills
+
+See [`elements/capstone`](elements/capstone). The UI Builder's Link cards block and the
+course sprint and week pages use nav cards. The compact one is for a link previewed
+in a chat, like a GitHub issue or pull request.
 
 ### Card headers
 

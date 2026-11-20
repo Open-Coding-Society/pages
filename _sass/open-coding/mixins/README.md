@@ -172,6 +172,39 @@ Horizontal bar for controls and buttons.
 
 ---
 
+### `@mixin surface($radius, $padding, $border, $background, $color)`
+What a card, a file row, a menu or a preview is drawn on. The grammar's elements include
+it and add only their own layout. `open-coding/_main.scss` imports `_panel.scss` first, so
+every element can use it.
+
+```scss
+.ocs__card { @include surface(1rem, 1.5rem 1.75rem); }
+.ocs__file-preview { @include surface($color: null); } // null leaves a property out
+```
+
+**Parameters:**
+- `$radius`: Corner radius (default: `$radius-sm`)
+- `$padding`: Inner padding (default: none)
+- `$border`, `$background`, `$color`: the 1px ring, the fill and the text (default: `$panel-border`, `$panel-bg`, `$panel-text`)
+
+---
+
+### `@mixin accent-tint($amount, $ring)`
+The hovered, active or chosen item: the accent mixed into the panel, with an accent ring.
+
+```scss
+.ocs__nav-card:hover { @include accent-tint; }               // 10%
+.ocs__menu-item:hover { @include accent-tint(16%, null); }   // no ring: the item has no border
+```
+
+---
+
+### `@mixin kicker($size, $tracking)`
+Small capitals over a title or a group: 700 weight, uppercase, `$tracking` letter spacing
+(default 0.08em). Nav card kickers, section titles, stat labels and menu headings use it.
+
+---
+
 ## Modal Mixins (`_modals.scss`)
 
 ### `@mixin modal-overlay`
