@@ -90,7 +90,7 @@ Go further together]</pre>
 
 <div class="ocs__card" id="features">
   <h3 class="ocs__section-title">What You Get</h3>
-  <p>16 features total. Every kit starts with the same core (login, accounts, blog) and adds from there.</p>
+  <p>Every kit starts with the same core (login, accounts, blog) and adds from there.</p>
   <div class="ocs__keypoints">
     <div class="ocs__keypoint"><span class="ocs__check">✓</span><span><strong>Lessons &amp; code runner:</strong> students run Python/JS/Java in the browser</span></div>
     <div class="ocs__keypoint"><span class="ocs__check">✓</span><span><strong>Assignments &amp; grading:</strong> submissions, grades, quizzes, AI feedback</span></div>
