@@ -75,11 +75,17 @@ test('a typed title that only looks a little like code stays exactly as typed', 
 
 /* ── Where each one links ───────────────────────────────────────────────── */
 
-test('an event with a linked doc opens the doc', () => {
+test('an event with a linked doc on this site opens the doc', () => {
   const linked = event({ description: `Read it first\nLinked doc: ${ORIGIN}/csa/frq-practice` });
   assert.equal(TickerItems.linkFor(linked, LINKS), `${ORIGIN}/csa/frq-practice`);
+});
+
+test('a linked doc on another site opens the calendar, where the event shows its full address', () => {
+  // Anyone signed in can add an event, so the home page never links straight off the site.
   const webDoc = event({ description: 'Linked doc: https://docs.google.com/document/d/abc' });
-  assert.equal(TickerItems.linkFor(webDoc, LINKS), 'https://docs.google.com/document/d/abc');
+  assert.equal(TickerItems.linkFor(webDoc, LINKS), '/student/calendar');
+  const lookalike = event({ description: 'Linked doc: https://pages.opencodingsociety.com.example.net/csa/' });
+  assert.equal(TickerItems.linkFor(lookalike, LINKS), '/student/calendar');
 });
 
 test('an event without a linked doc opens the calendar', () => {

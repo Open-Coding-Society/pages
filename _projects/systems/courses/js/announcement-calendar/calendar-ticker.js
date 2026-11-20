@@ -79,8 +79,10 @@ export class TickerItems {
   }
 
   /**
-   * Where an item links: the event's linked doc, or the calendar when it has none. A linked doc
-   * that is the page the ticker is on (an event posted from its announcements) counts as none.
+   * Where an item links: the event's linked doc, or the calendar when it has none. Only a doc on
+   * this site counts: anyone signed in can add an event, so a link to another site opens the
+   * calendar, where the event shows the link's full address. A linked doc that is the page the
+   * ticker is on (an event posted from its announcements) counts as none too.
    * @param {{description: string}} event
    * @param {{splitLinkedDoc: Function|null, origin: string, pageUrl: string, calendarUrl: string}} links
    *   splitLinkedDoc is the Calendar system's reader (CalendarDocLinks.js), or null without it
@@ -90,8 +92,8 @@ export class TickerItems {
     const docUrl = splitLinkedDoc ? splitLinkedDoc(event.description, origin).docUrl : '';
     if (!docUrl) return calendarUrl;
     const doc = new URL(docUrl);
-    const here = new URL(pageUrl);
-    return doc.origin + doc.pathname === here.origin + here.pathname ? calendarUrl : docUrl;
+    if (doc.origin !== origin) return calendarUrl;
+    return doc.pathname === new URL(pageUrl).pathname ? calendarUrl : docUrl;
   }
 
   /**

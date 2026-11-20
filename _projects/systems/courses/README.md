@@ -262,7 +262,8 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
   be built; courses being `:dev` does not itself enable calendar's whole dashboard.
   The calendar ticker links events to their linked docs with calendar's
   `CalendarDocLinks.js`, imported only when calendar is built (`site.static_files`);
-  without it every item opens `/student/calendar`.
+  without it every item opens `/student/calendar`. A doc on another site opens the
+  calendar too, because any signed-in account can add an event.
 - **Curriculum reporting:** college topic maps, report templates, reference
   navigation, and curriculum-specific tests remain with the curriculum system.
 - **Backend contracts:** enrollment, calendar, announcements/chat, and assignment
@@ -285,7 +286,7 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
 - Above the announcements, a calendar ticker (`ocs_calendar_ticker.html`,
   `CalendarTicker` in `js/announcement-calendar/calendar-ticker.js`) shows the
   course's events from today through the fifth school day after it, each linking
-  to its linked doc or the calendar. Spring's calendar answers only signed-in
+  to its linked doc on this site or else the calendar. Spring's calendar answers only signed-in
   visitors, so signed out, with nothing coming up, or on `spring: false` there is
   no bar. Tests: `node --test tests/calendar_ticker.test.mjs`,
   `bundle exec ruby scripts/test_calendar_ticker.rb`.
