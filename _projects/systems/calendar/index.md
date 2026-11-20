@@ -1924,7 +1924,7 @@ active_tab: calendar
             }
             const form = {
                 title: document.getElementById("editTitle").textContent.trim(),
-                description: joinLinkedDoc(document.getElementById("editDescription").innerHTML, docUrl),
+                description: joinLinkedDoc(CalendarSafeHtml.editorHtml(document.getElementById("editDescription")), docUrl),
                 date: document.getElementById("editDate").value,
                 priority: document.getElementById("editPriority").value,
                 type: document.getElementById("editEventType").value,
@@ -2057,7 +2057,7 @@ active_tab: calendar
         document.getElementById("makeBreakButton").onclick = function () {
             const breakDate = document.getElementById("editDate").value;
             const breakTitle = document.getElementById("editTitle").innerHTML.trim();
-            const breakDescription = document.getElementById("editDescription").innerHTML;
+            const breakDescription = CalendarSafeHtml.editorHtml(document.getElementById("editDescription"));
             if (!breakDate) { alert("Please select a date for the break!"); return; }
             if (!breakTitle) { alert("Please enter a name for the break!"); return; }
             if (isBreakDay(breakDate)) { alert(`There is already a break on that date.`); return; }

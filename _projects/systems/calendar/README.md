@@ -94,6 +94,7 @@ For detailed module documentation, see [ARCHITECTURE.md](docs/ARCHITECTURE.md).
   - Test: `node --test tests/calendar_doc_links.test.mjs`
 - Safe event text: any signed-in account can save an event, so the page never puts its text in as raw HTML
   - Descriptions go through DOMPurify; if DOMPurify didn't load, they're escaped instead
+  - Saving reads the editor back through `CalendarSafeHtml.editorHtml`, so without DOMPurify a description is saved exactly as it was, not as escaped text
   - Titles, names and group labels on the grid and in the CS Pathway list are escaped
   - Both go through [CalendarSafeHtml.js](js/CalendarSafeHtml.js); a new spot that writes an event value into HTML uses it too
   - Test: `node --test tests/calendar_safe_html.test.mjs`

@@ -57,6 +57,24 @@ test('clean gives an empty string for an event with no description', () => {
   assert.equal(purifier.calls.length, 0);
 });
 
+// An element as the browser keeps it: textContent is innerHTML with its tags gone and its
+// entities read, which is all the editor needs here.
+const editor = (innerHTML) => ({
+  innerHTML,
+  textContent: innerHTML.replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&amp;/g, '&'),
+});
+
+test('saving reads the cleaned description HTML back from the editor', () => {
+  const purifier = recordingPurifier('<b>Quiz</b>');
+  assert.equal(CalendarSafeHtml.editorHtml(editor(CalendarSafeHtml.clean('<b>Quiz</b>', purifier)), purifier), '<b>Quiz</b>');
+});
+
+test('without DOMPurify, saving gives back the description exactly as it was, not its escaped form', () => {
+  // Edit showed the description as text, so the editor's text is the description's HTML.
+  const shown = editor(CalendarSafeHtml.clean('<b>Quiz</b> &amp; notes', null));
+  assert.equal(CalendarSafeHtml.editorHtml(shown, null), '<b>Quiz</b> &amp; notes');
+});
+
 /* ── The calendar page ─────────────────────────────────────────────────── */
 
 // The page's script is inline in index.md, so Node can't run it. These checks read it as text
@@ -92,6 +110,13 @@ test('an event description reaches the event window only through CalendarSafeHtm
   for (const value of assignments) {
     assert.ok(value === '""' || value === "''" || value.startsWith('CalendarSafeHtml.clean('), `raw description HTML: ${value}`);
   }
+});
+
+test('saving reads the description through CalendarSafeHtml.editorHtml', () => {
+  const reads = [...page.matchAll(/getElementById\(["']editDescription["']\)\.innerHTML(?!\s*=[^=])/g)];
+  assert.deepEqual(reads.map((match) => match[0]), [], 'no save reads the editor\'s innerHTML directly');
+  assert.ok((page.match(/CalendarSafeHtml\.editorHtml\(document\.getElementById\(["']editDescription["']\)\)/g) || []).length >= 2,
+    'the event form and Make Break both read it through the helper');
 });
 
 test('the month grid escapes every event value it puts into its markup', () => {

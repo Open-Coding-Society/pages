@@ -31,4 +31,16 @@ export class CalendarSafeHtml {
     if (purifier) return purifier.sanitize(html, { ADD_ATTR: ['target'] });
     return CalendarSafeHtml.escape(html);
   }
+
+  /**
+   * The description HTML to save from the editor that clean() filled. Without DOMPurify, clean()
+   * put the description in as text, so the editor's text is the description itself; reading its
+   * innerHTML would save the escaped form and turn its formatting into visible tags.
+   * @param {{innerHTML: string, textContent: string}} editor - the description editor
+   * @param {{sanitize: Function}|null} purifier - DOMPurify; the page's own copy by default
+   * @returns {string}
+   */
+  static editorHtml(editor, purifier = globalThis.DOMPurify) {
+    return purifier ? editor.innerHTML : editor.textContent;
+  }
 }
