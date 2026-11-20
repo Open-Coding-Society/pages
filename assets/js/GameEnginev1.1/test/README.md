@@ -61,22 +61,52 @@ left/right keys move horizontally, up jumps once per press while supported,
 and gravity applies even when moving. Down does not fly or crouch. It keeps
 `Player.js` unchanged and disables its legacy gravity pass.
 
-The platformer game extends it in
-`_projects/games/platformer/levels/PlatformerPlayer.js`, using the engine's
-inherited circular collision detector, with platform contact responses,
-jump sound, and debug overlay local. The shared detector uses circle-to-rectangle
-contact for `Barrier` surfaces (zero reduction by default), so wide floors are
-solid across their full width. Characters remain circular, including at platform
-corners; character-to-character collision is unchanged. Tangent Barrier contact
-counts as support, and contact faces come from the closest surface rather than
-overlapping sprite extents. There is no game-specific detector or support probe.
-A new
-game must supply support/collision handling: override `hasSupport()` when
-needed, position the player on landing, then call `land()`; on an underside
-contact, position the player below the platform and call `hitCeiling()`.
+`PlayerPlatformer` also owns platform contacts: a `Barrier` it touches acts as
+a platform. Falling onto the top lands (`land()`), rising into the underside
+stops at the ceiling (`hitCeiling()`), and touching a side stops horizontal
+movement. Contacts with other objects keep the normal `Player` rules. It uses
+the engine's inherited circular collision detector; the shared detector uses
+circle-to-rectangle contact for `Barrier` surfaces (zero reduction by default),
+so wide floors are solid across their full width. Characters remain circular,
+including at platform corners; character-to-character collision is unchanged.
+Tangent Barrier contact counts as support, and contact faces come from the
+closest surface rather than overlapping sprite extents. A game can still
+override `hasSupport()` or `handleCollisionState()` for special platforms.
 Override `onJump()` for sound or effects. Positive `verticalVelocity` means
 upward; `gravityAcceleration` and `jumpVelocity` are configurable through data.
 Physics retains the existing game's per-update units, not seconds.
+
+`essentials/LapTracker.js` counts laps for racing games. It is pure logic (no
+drawing or DOM): give it a finish line and a checkpoint, each `{ x, top, bottom }`
+in 0–1 canvas coordinates, and the number of laps, then call
+`update(car, centre)` every frame. A lap counts only when a car crosses the
+finish line moving right after passing the checkpoint on the far side, so
+shortcuts and driving backwards never count. The racing game's lap screens use
+it directly.
+
+`essentials/LapRace.js` is a ready-made race built on it: add it to a level's
+classes with `{ totalLaps, finishLine, checkpoint }` and it tracks every
+`PlayerDriver`, draws the finish line, timer and lap panel, and stops all cars
+once one wins. GameBuilder's Racing template uses it. `PlayerDriver` cars with
+`rotateWithHeading: true` draw their `up` frame turned to face their heading.
+
+`essentials/PlatformChallenge.js` adds coins and enemies to a platform level:
+give it `{ coins, enemies }`, each item `{ src, x, y, size }` in 0–1 canvas
+coordinates (enemies may add `patrol`). It draws them and a score panel,
+collects coins a `PlayerPlatformer` touches, declares a win when every coin is
+collected, and sends the player back to their start when they touch an enemy.
+GameBuilder's Platform template uses it.
+
+`essentials/ClickerGame.js` is a whole clicker game in one object: give it a
+`target` picture, `targetCount`, `targetSpeed`, `goalScore`, `winMessage` and
+`powerUps` (`{ name, src, cost, effect: 'per-click' | 'auto-click', amount }`).
+It listens for clicks on the game container, because the canvas is replaced
+when the game resizes. `GameEnvBackground` without a picture fills with its
+data's `color`. GameBuilder's Clicker template uses both.
+
+The platformer game extends it in
+`_projects/games/platformer/levels/PlatformerPlayer.js` only for its jump sound
+and debug hitbox overlay.
 
 Student extension points include animation states, crouching, jump height,
 and platform contact responses using the shared engine detector. Keep game-specific assets and

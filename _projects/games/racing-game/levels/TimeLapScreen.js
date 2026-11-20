@@ -1,6 +1,6 @@
 import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
-import LapTracker from './LapTracker.js';
+import LapTracker from '@assets/js/GameEnginev1.1/essentials/LapTracker.js';
 import LosingScreen from './Losing-Screen.js';
 import RestartPrompt from './RestartPrompt.js';
 

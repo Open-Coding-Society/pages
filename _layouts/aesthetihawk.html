@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ page.title }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -24,10 +25,17 @@
     <!-- navbar -->
     {%- include aesthetihawk/header-shared.html -%}
 
+    <!-- Shown only for a signed-in ROLE_MENTOR account. Styles: status-indicators/mentor-badge.scss -->
+    <div id="mentor-badge" class="mentor-badge" hidden>
+        <span class="mentor-badge__dot"></span>
+        <span id="mentor-badge-text"></span>
+        <button type="button" id="mentor-view-switch" class="ocs__btn small pill mentor-badge__switch"></button>
+    </div>
+
     <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased mt-[53px] theme-inner">
 
         <!-- Sidebar -->
-        <div class="fixed left-0 top-[53px] w-64 h-full border-r flex flex-col lesson-sidebar">
+        <div class="fixed left-0 top-[53px] w-64 h-full border-r flex flex-col max-[768px]:hidden lesson-sidebar">
 
             <!-- welcome section 
             <div class="p-6 flex flex-col items-center bg-neutral-800">
@@ -43,7 +51,13 @@
         </div>
 
         <!-- Main Content Area -->
-        <div class="ml-64 p-8 lesson-main">
+        <div class="p-4 min-[769px]:ml-64 min-[769px]:p-8 lesson-main">
+            <!-- Phones: the side column is hidden, so its links fold into a menu above the page -->
+            <details class="ocs__card mb-6 min-[769px]:hidden">
+                <summary class="cursor-pointer font-medium">Menu</summary>
+                {%- include aesthetihawk/sidebar.html id_prefix="phone-" -%}
+            </details>
+
             <div class="flex justify-between items-center mb-8">
                 <h1 class="text-2xl font-bold">{{page.title}}</h1>
             </div>
@@ -54,3 +68,52 @@
 </body>
 
 </html>
+
+<script type="module">
+    // ROLE_MENTOR comes from Spring (granted from Flask's verification); this only changes what is shown.
+    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { viewFor, roleNames, isMentorAccount, switchView, clearRoleViewCache } from '{{site.baseurl}}/assets/js/api/role-view.js';
+
+    const defaultSidebar = document.getElementById('sidebar-role-default');
+    const mentorSidebar = document.getElementById('sidebar-role-mentor');
+    const badge = document.getElementById('mentor-badge');
+    const badgeText = document.getElementById('mentor-badge-text');
+    const switchButton = document.getElementById('mentor-view-switch');
+
+    function showSidebar(isMentorView, isMentorAccountHolder) {
+        defaultSidebar.hidden = isMentorView;
+        mentorSidebar.hidden = !isMentorView;
+        badge.hidden = !isMentorAccountHolder;
+        badge.classList.toggle('mentor-badge--student-view', isMentorAccountHolder && !isMentorView);
+        badgeText.textContent = isMentorView
+            ? 'Signed in as a Mentor: showing your mentor view'
+            : 'Mentor account: viewing the site as a Student';
+        switchButton.textContent = isMentorView ? 'Switch to student view' : 'Switch to mentor view';
+        // The sidebar is position:fixed, so it starts below the bar.
+        document.body.classList.toggle('mentor-bar-active', isMentorAccountHolder);
+        if (isMentorAccountHolder) {
+            document.documentElement.style.setProperty('--mentor-bar-bottom', `${badge.getBoundingClientRect().bottom + window.scrollY}px`);
+        }
+        try {
+            localStorage.setItem('ocsMentorSidebar', isMentorView ? 'mentor' : 'default');
+        } catch (e) {
+            console.warn('Could not cache the sidebar choice', e);
+        }
+    }
+
+    try {
+        const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+        if (!response.ok) {
+            // Signed out: forget the last account's cached sidebar and student-view choice for the next sign-in.
+            showSidebar(false, false);
+            clearRoleViewCache();
+        } else {
+            const roles = roleNames(await response.json());
+            switchButton.onclick = () => switchView(roles);
+            showSidebar(viewFor(roles) === 'mentor', isMentorAccount(roles));
+        }
+    } catch (error) {
+        console.error('Mentor role check failed', error);
+        showSidebar(false, false);
+    }
+</script>

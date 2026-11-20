@@ -99,11 +99,28 @@ export class SpringSession extends FlaskSession {
   }
 
   // Signs in to Flask and Spring at the same time. Rejects only when Flask refuses; spring is
-  // false when only Spring refused.
+  // false when only Spring refused. When both accept, Spring is told what Flask knows about the
+  // account's roles (see #confirmRole).
   async signIn(uid, password) {
     const spring = this.#signInToSpring(uid, password);
     const { flask } = await super.signIn(uid, password);
-    return { flask, spring: await spring };
+    const springSignedIn = await spring;
+    if (springSignedIn) await this.#confirmRole(flask);
+    return { flask, spring: springSignedIn };
+  }
+
+  // Which mentors a Teacher or Admin has verified is kept in Flask, so Spring cannot see it. At sign-in
+  // Flask signs a short statement about the account (`role_attestation`); Spring checks the signature and
+  // gives the person ROLE_MENTOR, or takes it away. A refusal is only logged, so it never stops a sign-in:
+  // the person simply keeps the roles they had.
+  async #confirmRole(flaskAnswer) {
+    const attestation = flaskAnswer && flaskAnswer.role_attestation;
+    if (typeof attestation !== 'string' || attestation === '') return;  // Flask signed nothing (no shared secret)
+    try {
+      await this.spring.request('/api/person/mentor/confirm', { method: 'POST', body: { attestation } });
+    } catch (error) {
+      console.warn('Spring did not accept the role statement from Flask:', error.status);
+    }
   }
 
   async #signInToSpring(uid, password) {

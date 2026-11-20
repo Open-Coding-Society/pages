@@ -33,6 +33,11 @@ permalink: /gamebuilder/v2/
           <p class="ocs__gamebuilder-status ocs__gamebuilder-action-feedback" data-role="status" role="status" aria-live="polite"></p>
         </div>
       </header>
+      <fieldset class="ocs__gamebuilder-template-picker">
+        <legend>Game type</legend>
+        <div class="ocs__gamebuilder-template-choices" data-role="template-choices"></div>
+        <p class="ocs__gamebuilder-form-help" data-role="template-description"></p>
+      </fieldset>
       <form class="ocs__gamebuilder-form" data-role="builder-form">
         <label>
           Game name
@@ -70,14 +75,18 @@ permalink: /gamebuilder/v2/
           <p class="ocs__gamebuilder-npc-empty" data-role="npc-empty">No NPCs added yet.</p>
           <div class="ocs__gamebuilder-npc-list" data-role="npc-list"></div>
         </fieldset>
+        <p class="ocs__gamebuilder-form-help">Player and NPC positions use proportions of the runner canvas. Movement uses WASD.</p>
+      </form>
+      <form class="ocs__gamebuilder-form" data-role="template-form" hidden></form>
+      <!-- Spline barriers are shared by the game types that list "barriers": true (and RPG). -->
+      <form class="ocs__gamebuilder-form" data-role="barrier-form">
         <fieldset class="ocs__gamebuilder-barriers" data-role="barriers-fieldset">
           <legend>Spline barriers</legend>
-          <p class="ocs__gamebuilder-form-help">Click the preview to add points. Undo removes the last point; finish the barrier from its card.</p>
+          <p class="ocs__gamebuilder-form-help">Click the preview to add points. Undo removes the last point; finish the barrier from its card. For Racing, Push and Run first so the track shows, then draw walls along both edges of the road.</p>
           <button class="ocs__btn" type="button" data-action="add-barrier">Add spline barrier</button>
           <p class="ocs__gamebuilder-barrier-empty" data-role="barrier-empty">No barriers added yet.</p>
           <div class="ocs__gamebuilder-barrier-list" data-role="barrier-list"></div>
         </fieldset>
-        <p class="ocs__gamebuilder-form-help">Player and NPC positions use proportions of the runner canvas. Movement uses WASD.</p>
       </form>
     </section>
 

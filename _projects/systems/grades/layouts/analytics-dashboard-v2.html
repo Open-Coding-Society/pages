@@ -11,45 +11,11 @@ active_tab: analytics
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" referrerpolicy="no-referrer">
 <div class="ocs__analytics-page">
     <div class="ocs__stack ocs__stack--wide">
-        <div class="ocs__tabs">
-            <ul class="ocs__tabs-list" id="tab-bar">
-                <li>
-                    <a href="#" id="tab-ocs-analytics"
-                        class="tab-btn active ocs__tabs-btn"
-                        aria-current="page">
-                        OCS Analytics
-                    </a>
-                </li>
-                <li>
-                    <a href="#" id="tab-github"
-                        class="tab-btn ocs__tabs-btn">
-                        GitHub Analytics
-                    </a>
-                </li>
-                <li>
-                    <a href="#" id="tab-grade"
-                        class="tab-btn ocs__tabs-btn">
-                        Grade Predictor
-                    </a>
-                </li>
-                <li>
-                    <a href="#" id="tab-skill-passport"
-                        class="tab-btn ocs__tabs-btn">
-                        Skill Passport
-                    </a>
-                </li>
-            </ul>
-            <!-- sliding underline indicator -->
-            <div id="tab-underline" class="ocs__tabs-underline"
-                style="position:absolute;bottom:0;left:0;height:2px;width:0;transition:all 0.3s cubic-bezier(.4,0,.2,1);border-radius:2px;">
-            </div>
-        </div>
-
-        <!-- tab content container -->
+        <!-- sections, one shown at a time (see showSection) -->
         <div id="tab-content-container" class="ocs__tabs-panels">
 
             <!-- OCS Analytics tab content -->
-            <div id="tab-content-ocs-analytics" class="tab-content block ocs__tabs-panel">
+            <div id="tab-content-ocs-analytics" data-section="ocs-analytics" class="tab-content block ocs__tabs-panel">
                 <div class="ocs__loading">
                     <div class="ocs__spinner"></div>
                     <p class="ocs__text">Loading OCS analytics...</p>
@@ -57,7 +23,7 @@ active_tab: analytics
             </div>
 
             <!-- GitHub Analytics tab content -->
-            <div id="tab-content-github" class="tab-content hidden ocs__tabs-panel">
+            <div id="tab-content-github" data-section="github" class="tab-content hidden ocs__tabs-panel">
                 <!-- Grid -->
                 <div class="ocs__analytics-stat-grid">
                     <!-- Avatar Card -->
@@ -148,7 +114,7 @@ active_tab: analytics
             </div>
 
             <!-- Grade Predictor tab content -->
-            <div id="tab-content-grade" class="tab-content hidden ocs__tabs-panel">
+            <div id="tab-content-grade" data-section="grade" class="tab-content hidden ocs__tabs-panel">
                 <h2 class="ocs__section-title ocs__analytics-page-title">Grade Predictor</h2>
                 <div class="ocs__grid--col2">
                     <!-- Left: Technical analytics -->
@@ -305,7 +271,7 @@ score += gists * 0.5
                 </div>
             </div>
 
-            <div id="tab-content-skill-passport" class="tab-content hidden ocs__tabs-panel">
+            <div id="tab-content-skill-passport" data-section="skill-passport" class="tab-content hidden ocs__tabs-panel">
                 <div class="ocs__analytics-card-spaced-sm">
                     <h2 class="ocs__section-title">Skill Passport</h2>
                     <p class="ocs__text ocs__analytics-fineprint">Your skill levels and growth across projects</p>
@@ -397,6 +363,7 @@ score += gists * 0.5
     import { initOCSAnalyticsDashboard } from '{{ site.baseurl }}/assets/js/ocs-analytics-dashboard.js';
     import { recordForecast } from '{{ site.baseurl }}/assets/js/analytics/forecast-retrospective.js';
     import { initGradeCalculator } from '{{ site.baseurl }}/assets/js/analytics/grade-calculator.js';
+    import { followSectionHash } from '{{ site.baseurl }}/assets/js/grades/page-sections.js';
 
     // Under the predictor: the student's own Grade Calculator (scores copied from their gradebook, plus
     // what-ifs). Each Smart Predict is logged for the Forecast Retrospective on the Retrospective page.
@@ -1176,64 +1143,30 @@ score += gists * 0.5
         }
     };
 
-    // Tab switcher code with underline animation
-    const tabs = document.querySelectorAll(".tab-btn");
-    const tabContents = document.querySelectorAll(".tab-content");
-    const underline = document.getElementById("tab-underline");
+    // One section shows at a time. The URL hash picks it: the sidebar's Analytics
+    // Dashboard links and the Grades hub's Grade Predictor link (#grade) open one.
+    const sections = document.querySelectorAll(".tab-content");
 
-    function setUnderline(el) {
-        const rect = el.getBoundingClientRect();
-        const parentRect = el.parentElement.parentElement.getBoundingClientRect();
-        underline.style.width = `${rect.width}px`;
-        underline.style.left = `${rect.left - parentRect.left}px`;
-    }
-
-    tabs.forEach((tab) => {
-        tab.addEventListener("click", async (e) => {
-            e.preventDefault();
-            tabs.forEach(t => t.classList.remove("active", "text-blue-500", "border-blue-500"));
-            tabContents.forEach(c => c.classList.add("hidden"));
-            tabContents.forEach(c => c.classList.remove("block"));
-            const targetId = `tab-content-${tab.id.replace("tab-", "")}`;
-            document.getElementById(targetId).classList.remove("hidden");
-            document.getElementById(targetId).classList.add("block");
-            tab.classList.add("active", "text-blue-500", "border-blue-500");
-            setUnderline(tab);
-
-            if (targetId === "tab-content-ocs-analytics") {
-                if (window.OCSAnalytics && window.OCSAnalytics.loadAnalyticsSummary) {
-                    await window.OCSAnalytics.loadAnalyticsSummary();
-                }
-            }
-            if (targetId === "tab-content-grade") {
-                await showGradeCalculator();
-            }
-            if (targetId === "tab-content-skill-passport") {
-                await loadSkillPassport();
-}
+    async function showSection(name) {
+        sections.forEach((section) => {
+            const shown = section.dataset.section === name;
+            section.classList.toggle("hidden", !shown);
+            section.classList.toggle("block", shown);
         });
-    });
-
-    // A link such as /analytics-dashboard#grade opens that tab; the Grades hub
-    // links straight to the Grade Predictor this way.
-    function openLinkedTab() {
-        const tab = document.getElementById(`tab-${location.hash.slice(1)}`);
-        if (tab?.classList.contains("tab-btn")) tab.click();
+        // OCS Analytics, the Grade Predictor and the Skill Passport load when they open.
+        if (name === "ocs-analytics" && window.OCSAnalytics?.loadAnalyticsSummary) {
+            await window.OCSAnalytics.loadAnalyticsSummary();
+        }
+        if (name === "grade") await showGradeCalculator();
+        if (name === "skill-passport") await loadSkillPassport();
     }
 
     // Initialize on load
     window.onload = async () => {
-        openLinkedTab();
-        const activeTab = document.querySelector(".tab-btn.active");
-        if (activeTab) setUnderline(activeTab);
+        followSectionHash([...sections].map((section) => section.dataset.section), showSection);
 
         // The sections don't depend on each other, so they load at the same time.
-        const loads = [fetchData(), loadStudentEvaluation()];
-        // OCS Analytics loads now only if it's the active tab; otherwise when its tab is opened.
-        if (activeTab?.id === "tab-ocs-analytics" && window.OCSAnalytics?.loadAnalyticsSummary) {
-            loads.push(window.OCSAnalytics.loadAnalyticsSummary());
-        }
-        await Promise.all(loads);
+        await Promise.all([fetchData(), loadStudentEvaluation()]);
     };
                 </script>
 

@@ -1,41 +1,9 @@
 // The classes card on /profile: lists the student's classes and adds or removes one
-// in Flask right away, then, on a site that runs Spring, keeps Spring's course groups in
-// step (course calendars read them).
-async function requestClasses({ pythonURI, fetchOptions }, method, body) {
-    const response = await fetch(`${pythonURI}/api/user/class`, {
-        ...fetchOptions,
-        method,
-        ...(body ? { body: JSON.stringify(body) } : {}),
-    });
-    if (!response.ok) throw new Error(`the server answered ${response.status}`);
-    const data = await response.json();
-    return Array.isArray(data.class) ? data.class : [];
-}
-
-// Keep the four course-group memberships aligned with the saved profile classes.
-// A Flask-only site has no course groups, so there is nothing to sync.
-async function syncClassGroupMemberships({ javaURI, springEnabled, fetchOptions }, classes) {
-    if (!springEnabled) return null;
-    const response = await fetch(`${javaURI}/api/groups/class-memberships`, {
-        ...fetchOptions,
-        method: 'PUT',
-        body: JSON.stringify({ classes }),
-    });
-    if (!response.ok) {
-        let message = 'Failed to update course group membership';
-        try {
-            const error = await response.json();
-            if (error.error) message = error.error;
-        } catch (parseError) {
-            console.error('Unable to read group membership error:', parseError);
-        }
-        throw new Error(message);
-    }
-    return response.json();
-}
+// right away. On a site that runs Spring, the profile also keeps Spring's course groups
+// in step (course calendars read them).
 
 // `courses` is [{ code: 'CSA', name: 'Computer Science A' }, ...], from the course data files.
-export async function initClasses({ api, list, form, select, status, courses, onChange }) {
+export async function initClasses({ profile, list, form, select, status, courses, onChange }) {
     let classes = [];
     const nameOf = code => courses.find(course => course.code === code)?.name ?? code;
     const addButton = form.querySelector('button[type="submit"]');
@@ -88,14 +56,14 @@ export async function initClasses({ api, list, form, select, status, courses, on
         list.querySelectorAll('[data-remove-class]').forEach(button => { button.disabled = true; });
         showStatus('Saving…');
         try {
-            classes = await request();
+            const saved = await request();
+            classes = saved.classes;
             onChange?.(classes);
-            try {
-                await syncClassGroupMemberships(api, classes);
+            if (saved.groupsError) {
+                console.error('Class saved but group membership sync failed:', saved.groupsError);
+                showStatus(`Your classes were saved, but the course groups didn't update: ${saved.groupsError}`);
+            } else {
                 showStatus('Saved');
-            } catch (error) {
-                console.error('Class saved but group membership sync failed:', error);
-                showStatus(`Your classes were saved, but the course groups didn't update: ${error.message}`);
             }
         } catch (error) {
             console.error('Error updating classes:', error);
@@ -109,15 +77,15 @@ export async function initClasses({ api, list, form, select, status, courses, on
     form.addEventListener('submit', event => {
         event.preventDefault();
         const code = select.value;
-        if (code) change(() => requestClasses(api, 'POST', { class: code }));
+        if (code) change(() => profile.addClass(code));
     });
     list.addEventListener('click', event => {
         const button = event.target.closest('[data-remove-class]');
-        if (button) change(() => requestClasses(api, 'POST', { action: 'remove', class: button.dataset.removeClass }));
+        if (button) change(() => profile.removeClass(button.dataset.removeClass));
     });
 
     try {
-        classes = await requestClasses(api, 'GET');
+        classes = await profile.classes();
     } catch (error) {
         console.error('Error loading classes:', error);
         list.replaceChildren(messageRow("Couldn't load your classes."));
@@ -125,6 +93,6 @@ export async function initClasses({ api, list, form, select, status, courses, on
     }
     render();
     onChange?.(classes);
-    // As before, the groups are re-synced every time the page loads.
-    syncClassGroupMemberships(api, classes).catch(error => console.error('Group membership sync failed:', error));
+    // As before, the groups are re-synced every time the page loads (a FlaskProfile has none).
+    profile.syncCourseGroups(classes).catch(error => console.error('Group membership sync failed:', error));
 }

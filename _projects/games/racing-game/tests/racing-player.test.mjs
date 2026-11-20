@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import RacingPlayer from '../levels/RacingPlayer.js';
 import AccelDecelRacingPlayer from '../levels/AccelDecelRacingPlayer.js';
 import TimeLapScreen from '../levels/TimeLapScreen.js';
-import LapTracker from '../levels/LapTracker.js';
+import LapTracker from '@assets/js/GameEnginev1.1/essentials/LapTracker.js';
 import GameLevelWinter from '../levels/winter-level.js';
 import { getRandomTrackPoint } from '../levels/WinterIcicle.js';
 import {

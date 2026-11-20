@@ -123,6 +123,19 @@ add a renderer to `blocks-content.js` (and a mount to `blocks-live.js` or `block
 if it is live), follow the key convention, and add it to the shared fixture `all-blocks.json`
 in both repos.
 
+## The Studio
+
+The Studio makes the builder work like a site builder such as Squarespace, for the pages this
+class makes (capstone pages, N@tM booths, sprint reviews). Everything it makes is an ordinary
+page of existing blocks, so the page model's rules, the renderer's safety, the stores and Spring
+are unchanged.
+
+- **Section style.** Both frames have a `style` field (Plain, Card, Tinted, Accent outline).
+  `render.js` adds the grammar's `ocs__band ocs__band--<style>` for any style the frame's field
+  lists. The band element (`_sass/open-coding/elements/bands`) mixes its colors from theme
+  variables. In every preset theme, text on every band stays above 6:1 and links above 4.5:1
+  (lowest: a link on Light's card, 4.6:1, the same as on any panel).
+
 ## Rendering and safety
 
 - `render.js` → a **vnode** tree (`vnode.js`). `toDOM` builds it with `createElement`,
@@ -435,4 +448,6 @@ such as `bad_url`). For example, Spring's `bad_path` is the editor's `bad_api_pa
 - A new block or frame: its `code_note`. A renderer that uses a new `ocs__` class: its line in
   `text.code_classes` (`tests/editor-code.test.mjs` checks both).
 - A new test file: add it to `tests/ui_builder.test.mjs` too.
+- A new frame setting (like `style`): `all-blocks.json` gains it once normalized, so Spring's
+  byte-for-byte copy of that fixture needs the same edit.
 - AGENTS.md and AGENTS_MD_DOCUMENTATION.md together when these rules change.

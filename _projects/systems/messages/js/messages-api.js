@@ -42,6 +42,10 @@ export function createMessagesApi({ javaURI, pythonURI, fetchOptions }) {
       `/api/dm/search?q=${part(query)}${conversationId ? `&conversationId=${part(conversationId)}` : ''}`,
     ),
 
+    // Adds one event to the signed-in person's calendar (Spring files it under them when no
+    // `individual` is sent).
+    addCalendarEvent: event => spring('/api/calendar/add_event', 'POST', event),
+
     myGroups: personId => spring(`/api/groups/person/${part(personId)}`),
     allGroups: () => spring('/api/groups'),
     searchGroups: name => spring(`/api/groups/search?name=${part(name)}`),

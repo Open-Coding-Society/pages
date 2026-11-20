@@ -14,7 +14,7 @@ capstone_project:
   title: "Friends of the Poway Library 2026–27"
   image: "/images/capstone/poway_library.png"
   description: "A CSP capstone developing a Friends of the Poway Library website focused on a searchable bookstore catalog, events, newsletters, community history, volunteer and contact information, and member profiles."
-  team: "Pranav Sai — Scrum Master; Nathan Trieu — System Architect; Raadin Ansari — Product Owner; Luke Sanders — Education Liaison"
+  team: "Pranav Sai — Scrum Master & Product Owner; Nathan Trieu — System Architect; Raadin Ansari — System Architect; Luke Sanders — Education Liaison"
   links:
     frontend: "https://github.com/FOPL-Team-2026/bb-pages"
     backend: "https://github.com/FOPL-Team-2026/bb-flask"
@@ -46,7 +46,7 @@ capstone_project:
     <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="https://github.com/FOPL-Team-2026/bb-flask" target="_blank" rel="noreferrer noopener">
         <span>Backend Repository</span>
     </a>
-    <a class="ocs__btn iridescent" href="https://fopl.opencodingsociety.com/home" target="_blank" rel="noreferrer noopener">Previous Prototype ↗</a>
+    <a class="ocs__btn iridescent" href="https://fopl-team-2026.github.io/bb-pages/home" target="_blank" rel="noreferrer noopener">Our Prototype ↗</a>
 </div>
 
 <br>
@@ -318,7 +318,7 @@ Sprint work from the team's GitHub project, including planning and frontend issu
     <div class="ocs__grid-cell ocs__grid-cell--header">Current project team</div>
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Pranav Sai</strong>
-        <p>Scrum Master</p>
+        <p>Scrum Master & Product Owner</p>
     </div>
     <div class="ocs__grid-cell">
         <strong>Nathan Trieu</strong>
@@ -326,7 +326,7 @@ Sprint work from the team's GitHub project, including planning and frontend issu
     </div>
     <div class="ocs__grid-cell">
         <strong>Raadin Ansari</strong>
-        <p>Product Owner</p>
+        <p>System Architect</p>
     </div>
     <div class="ocs__grid-cell">
         <strong>Luke Sanders</strong>

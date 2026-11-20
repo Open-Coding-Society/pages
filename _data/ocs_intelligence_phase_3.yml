@@ -1,0 +1,52 @@
+# Phase 3 architecture update — November 17, 2026
+introduction: "Our November 12–17 work makes the future orchestrator machines repeatable to set up: one Ansible baseline, stable node identities, and a shared download cache. The inventory now counts 33 Mac minis. Silver, node 25, is the first fully configured and checked machine; the remaining fleet still needs the setup rollout. The Minis are not yet in the student request path."
+diagram: |
+  flowchart TD
+    A[FIX stick and serial-to-number table] --> B[Local bootstrap service]
+    B --> C[Shared Ansible baseline]
+    D[Silver: wired download cache] -->|apt packages and locked Python wheels| C
+    C --> E[Named Ubuntu node with NetBird and pinned Python and Ray]
+    E --> F[Local Ray smoke test]
+    F -. next .-> G[Multi-node Ray and Mini orchestrator]
+sections:
+  - title: "1. Set up each Mini from the same playbook"
+    body: "The FIX stick restores the wired network, copies the setup kit onto the Mini, and starts a local service. That service runs the same Ansible playbook we can also run over SSH. Setup can continue after the stick is removed, without depending on an operator laptop staying connected."
+    steps:
+      - "Install the common baseline: fan control, power-on after power loss, zram, Docker, NetBird, and a uv-managed Python 3.12 environment with Ray 2.60.0 and locked dependencies."
+      - "Download Python packages and install NetBird while the first-run wired connection is still active; configure the Wi-Fi driver afterwards."
+      - "Resume after a kernel reboot, bound retries and reboot attempts, and remove the copied setup secrets when setup succeeds."
+    evidence: "The Ansible baseline completed on silver on November 13; a rerun changed nothing, and reboot and power-cut recovery worked over Wi-Fi alone. The current unattended stick workflow has offline checks, but its first complete run on a fresh Mini is still pending."
+    source:
+      label: "November 13 setup commit"
+      url: "https://github.com/Open-Coding-Society/OCS-Intelligence/commit/0eb456a88c6a3cf073f465033a94ec52c2a6bac7"
+  - title: "2. Give each node a stable identity and network path"
+    body: "Each Mini is named from its firmware serial and the team's numbered inventory. Discovery finds our machines again when DHCP addresses move, and router reservations give wired and Wi-Fi interfaces predictable addresses. Silver is node 25; the mastermac is a separate machine, node 0."
+    steps:
+      - "Discover only machines with our SSH key, expected Mac mini model, and OCS names. Remember SSH host keys by machine name so an address change does not erase the machine's identity."
+      - "Generate router reservations with clash checks, backup, and verification. The first reservations were applied to silver; the rest follow as machines come online."
+      - "Prefer Ethernet on silver so cache replies leave over the cable. Other nodes currently prefer Wi-Fi after setup; wired-versus-Wi-Fi performance for Ray still needs measurement."
+    evidence: "Silver's reserved addresses and recovery were checked on November 13. Its wired-first route was verified again on November 17. These are checks on one node, not proof that the full fleet is configured."
+    source:
+      label: "November 13 addressing commit"
+      url: "https://github.com/Open-Coding-Society/OCS-Intelligence/commit/151d4e037dfc5caa7a6fb0c74c2bc2bc4e466e04"
+  - title: "3. Fetch setup packages from one local cache"
+    body: "Every Mini downloading the same packages would compete for the lab's shared internet link. Silver now runs apt-cacher-ng and serves the pinned uv binary and all 89 locked Python wheels locally. This cache accelerates provisioning; it does not store student conversations or model context."
+    steps:
+      - "Keep silver wired-first and fetch repeated packages over the LAN. HTTP apt repositories use the proxy; HTTPS repositories such as NetBird's still go directly to the internet."
+      - "Publish the wheelhouse READY marker only after the download completes. A client uses that wheelhouse only when the marker matches the SHA-256 of its own requirements lock; otherwise it uses PyPI."
+      - "Resume interrupted cache population by checking for missing wheels, rather than assuming a copied requirements file means the cache is finished."
+    evidence: "On November 17, silver held all 89 wheels, its READY marker matched the lock, and both cache services were active. A 79 MB Ray wheel reached the operator's Wi-Fi laptop at 48 MB/s from silver versus 9.8 MB/s from PyPI, about five times faster. A second wired Mini and concurrent fleet setup have not yet been measured."
+    source:
+      label: "November 17 cache results"
+      url: "https://github.com/Open-Coding-Society/OCS-Intelligence/blob/45246ff2a0c3baf032c52b26db6dc9f3dafd3a5f/evidence/pending-playbook.md#week-of-2026-11-16"
+  - title: "4. Connect the pool only after the baseline works"
+    body: "Ray currently passes a local smoke test on silver. The next architecture step is a head node on the mastermac and worker services on the other Minis, followed by the Mini orchestrator. Installing Ray on one machine does not establish a distributed cluster or move API traffic onto it."
+    steps:
+      - "Run the current FIX stick on one fresh Mini with a monitor through reboot to completion, then expand in batches and verify naming, networking, and package consistency."
+      - "Measure wired and Wi-Fi paths between nodes before choosing how distributed compute traffic should travel."
+      - "Add Ray head and worker services, then demonstrate work crossing machines and recovery when a worker disappears."
+      - "Design and test the Mini router before inserting it into the API path. The larger Redis/RDS session broker remains a future proposal; the deployed gateway still holds its wait lines in process memory."
+    evidence: "The next milestone is two independently provisioned Minis completing a distributed task, followed by a measured routing and recovery demonstration. Fleet capacity, session recovery, and classroom reliability remain to be proven."
+    source:
+      label: "Rollout evidence and remaining work"
+      url: "https://github.com/Open-Coding-Society/OCS-Intelligence/blob/45246ff2a0c3baf032c52b26db6dc9f3dafd3a5f/evidence/pending-playbook.md#week-of-2026-11-09"

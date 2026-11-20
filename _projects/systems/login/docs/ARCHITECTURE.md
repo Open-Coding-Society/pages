@@ -42,7 +42,9 @@ and passes them to the module's start function.
 
 Each starter builds the session with `createSession(createBackends({ pythonURI, javaURI,
 fetchOptions, springEnabled }))`. That gives a `FlaskSession` on a Flask-only site and a
-`SpringSession` on a site with Spring.
+`SpringSession` on a site with Spring. Profile's layout (`_projects/systems/profile/layouts/profile.html`)
+also uses `createBackends`, to build its `FlaskProfile` or `SpringProfile`, so a change to
+`Backend` reaches `/profile` too.
 
 `/login` keeps its markup, which calls four functions by name (`loginBoth`,
 `showSignupForm`, `handleSignupSubmit`, and Google's `handleGoogleSignIn` callback), so
@@ -60,7 +62,7 @@ parsed answer.
 | Method | `FlaskSession` | `SpringSession` adds |
 |---|---|---|
 | `signUp(account)` | `POST /api/user`; rejects with Flask's message, or "Flask signup failed (status)" | then `POST /api/person/create`, except for a guest. `spring` in the result is a promise of `{ created, error }` that never rejects, so the page shows Flask's result first |
-| `signIn(uid, password)` | `POST /api/authenticate`; resolves Flask's answer, which says whether the student must re-verify | `POST /authenticate`, then `GET /api/person/get`, at the same time as Flask; `spring` is `false` when only Spring refused |
+| `signIn(uid, password)` | `POST /api/authenticate`; resolves Flask's answer, which says whether the student must re-verify | `POST /authenticate`, then `GET /api/person/get`, at the same time as Flask; `spring` is `false` when only Spring refused. When both accept and Flask's answer has a `role_attestation`, `POST /api/person/mentor/confirm` hands it to Spring (a refusal is only logged) |
 | `signOut()` | `DELETE /api/authenticate` | then `POST /api/logout` |
 | `currentUser()` | `GET /api/id`; `null` when nobody is signed in | |
 | `springSignedIn()` | | `GET /api/person/get`; `false` when Spring refuses, rejects when it can't be reached |

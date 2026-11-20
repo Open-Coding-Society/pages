@@ -37,7 +37,10 @@ original `/gamebuilder/` page. Other documentation is published from `docs/`.
   which also remains visible in the preview. Cards can hide or show a barrier;
   hidden barriers are invisible but retain their player collision behavior.
   Generated levels create independent `SplineBarrier` objects from the shared
-  GameEngine.
+  GameEngine. The barrier panel is its own form below the game type panels:
+  RPG always shows it, and so does any game type with `"barriers": true` in
+  `game-templates.json` (Racing). Each game type keeps its own barrier list,
+  RPG in its builder state and the others in their options as `barriers`.
 - `docs/` retains the existing asset guidance, workbench page, and GameBuilder
   v2 proposal.
 - `images/` is reserved for GameBuilder system-owned images. Game/project art
@@ -51,6 +54,64 @@ original `/gamebuilder/` page. Other documentation is published from `docs/`.
 
 Edit these sources under `_projects/systems/gamebuilder/`. The page, JavaScript,
 Sass, and images copied into the site directories are generated output.
+
+## Game types
+
+The **Game type** picker at the top of the builder lists the templates in
+`js/game-templates.json`: RPG, Racing, Platform and Clicker, in that order.
+RPG uses the builder form described above. The other types draw their option
+panels from the data file (`js/template-panel.mjs`), so options, defaults and
+list items (obstacles, platforms, enemies, coins, power-ups) change by editing
+JSON, not code. `js/game-templates.mjs` validates the file when the page loads.
+
+Each game type offers only pictures from its own base game, listed under that
+type's `assets` in the same file and referenced where the base game already
+publishes them (no copies): Racing uses the racing game's tracks, cars and
+obstacles (`/images/projects/racing-game/`); Platform uses the platformer
+backgrounds, players, enemies and coins (`/images/platformer/` and the
+astronaut platformer's astronaut); Clicker uses the cookie clicker's Cookie and
+Grandma (`/hacks/cookie-clicker/assets/`). The cookie games have no background
+picture, so Clicker offers plain background colours. A test checks that every
+listed picture exists in the repository.
+
+Some list items can be drawn on the preview instead of typed in. A list with
+`"draw": "box"` (Platform's platforms) gets a **Draw … on preview** button:
+drag a box on the preview and a new item gets its X, Y, width and height. A
+list with `"draw": "point"` (Racing's obstacles) places a new item's top-left
+corner where you click. Push and Run first so the background shows. Escape
+cancels. `js/placement-editor.mjs` owns the drawing overlay; values round to
+the panel's 0.01 step.
+
+Each game type keeps its own settings in the workspace, so switching types does
+not lose work. All four types are `"codeReady": true` and can **Push →**; a type marked
+false reports that code generation is coming.
+
+Each code-ready type other than RPG has a generator in `js/generators/` that
+turns its panel settings into a level module (`generators/source.mjs` holds the
+shared printing helpers). Racing (`generators/racing.mjs`) builds the track
+background, a `PlayerDriver` car on WASD (plus a second car on the arrow keys
+when chosen), one `Character` per obstacle, and the engine's `LapRace`, which
+draws the finish line, lap counter, timer and winner banner. Each track item in
+the JSON carries its finish line, checkpoint and start position, copied from
+the racing game's levels; each car item carries its sprite sheet layout. To
+keep cars on the road, draw spline barriers along the track edges (Push and Run
+first so the track shows in the preview); each becomes a `SplineBarrier` wall
+that pushes cars back. The checkpoint also stops shortcut laps.
+
+Platform (`generators/platform.mjs`) builds the background, an invisible floor,
+one `Barrier` per platform (X/Y is the top-left corner), a `PlayerPlatformer`
+that jumps with W and uses the panel's gravity and jump strength, and the
+engine's `PlatformChallenge` with the coins and enemies (X/Y is their centre).
+Collecting every coin wins; touching an enemy sends the player back to the
+start, and enemies walk a short way left and right. Player pictures carry their
+sprite sheet layout in the JSON; enemy and coin pictures carry their size.
+
+Clicker (`generators/clicker.mjs`) builds a plain-colour `GameEnvBackground`
+and the engine's `ClickerGame`, which draws the targets (still or bouncing),
+the points panel and a shop card per power-up. Clicking a target scores; a
+card buys its power-up when there are enough points, and it can be bought
+again. Per-click power-ups add to every click; auto-click power-ups add points
+each second. Earned points count toward the goal even after they are spent.
 
 ## Protecting workspace work
 
@@ -101,7 +162,9 @@ choose replacements before generation. Invalid files do not replace open work.
 Storage failures and cross-tab conflicts stop recovery writes, show an error,
 and retain the last valid stored draft. Export open work before resolving them.
 
-`js/workspace-store.mjs` owns versioned validation and storage.
+`js/workspace-store.mjs` owns versioned validation and storage. Version 2
+workspaces add the chosen game type and each type's settings; version 1 saves,
+drafts and exported JSON open as the RPG type without other changes.
 `js/workspace-persistence.mjs` owns controls and recovery wiring. The shared
 runner controller emits `ocs:runner-saved` after a successful source write,
 exposes its saved snapshot, and awaits GameBuilder's workspace-save hook before

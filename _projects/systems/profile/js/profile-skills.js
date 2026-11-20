@@ -7,8 +7,7 @@ const SKILLS = [
     { id: 'initiative', field: 'initiative' },
 ];
 
-export function initSkillCheckIn({ api, form, project, status }) {
-    const { pythonURI, fetchOptions } = api;
+export function initSkillCheckIn({ profile, form, project, status }) {
     const slider = skill => document.getElementById(skill.id);
     const showValue = skill => { document.getElementById(`${skill.id}Val`).textContent = slider(skill).value; };
     for (const skill of SKILLS) slider(skill).addEventListener('input', () => showValue(skill));
@@ -24,15 +23,7 @@ export function initSkillCheckIn({ api, form, project, status }) {
         status.textContent = 'Saving…';
         const ratings = Object.fromEntries(SKILLS.map(skill => [skill.field, Number(slider(skill).value)]));
         try {
-            const response = await fetch(`${pythonURI}/api/user/skill-snapshot`, {
-                ...fetchOptions,
-                method: 'POST',
-                body: JSON.stringify({ project_name: projectName, ...ratings }),
-            });
-            if (!response.ok) {
-                const error = await response.json().catch(() => ({}));
-                throw new Error(error.message || `the server answered ${response.status}`);
-            }
+            await profile.saveSkillSnapshot({ project_name: projectName, ...ratings });
         } catch (error) {
             console.error('Snapshot error:', error);
             status.textContent = `Couldn't save the check-in: ${error.message}.`;
