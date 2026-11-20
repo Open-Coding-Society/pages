@@ -13,7 +13,7 @@ capstone_project:
   title: "OCS-in-a-Kit"
   image: "/images/OCS-Kit-Capstone.png"
   description: "Open Coding Society built a full classroom platform with lessons, a code runner, grading, chat, and hall passes, but it was wired to one school, with names, logins, and settings hard coded in. OCS-in-a-Kit turns that into a product any school or organization can run on its own. An admin picks a kit, answers a few questions, and gets a working copy with no coding required. Vanilla is a basic site with accounts and a blog. Education adds a full CS classroom: lessons, code runner, assignments, grading, an AI tutor, and hall pass. Business drops the classroom features for chat, calendar, and an AI chatbot aimed at organizations. Every kit bundles the same three codebases, a Portfolio frontend plus Flask and Spring backends, and admins can turn individual features on or off later without reinstalling."
-  team: "Shayan, Dhyan, Arnav, Harrish, Darshan"
+  team: "Shayan, Dhyan, Darshan, Jim"
 ---
 
 {% assign data = site.data.ocs_in_a_kit_infograph %}
@@ -24,6 +24,7 @@ capstone_project:
 
 <nav class="ocs__capstone-nav">
   <div class="ocs__links ocs__links--wide">
+    <a href="#stages" class="ocs__btn pill">Five Stages</a>
     <a href="#problem" class="ocs__btn pill">The Problem</a>
     <a href="#who" class="ocs__btn pill">Who It's For</a>
     <a href="#features" class="ocs__btn pill">What You Get</a>
@@ -32,8 +33,34 @@ capstone_project:
     <a href="#future" class="ocs__btn pill">Future</a>
     <a href="#considerations" class="ocs__btn pill">Considerations</a>
     <a href="#how-its-built" class="ocs__btn pill">How It's Built</a>
+    <a href="#versioning" class="ocs__btn pill">Versioning</a>
+    <a href="#install" class="ocs__btn pill">install.sh</a>
+    <a href="#default-ui" class="ocs__btn pill">Default UIs</a>
   </div>
 </nav>
+
+<div class="ocs__card" id="stages">
+  <h3 class="ocs__section-title">Start With an Idea. Build a Solution. Grow As You Need.</h3>
+  <p>An open, customizable foundation for building websites, applications, and digital services. Each stage builds on the one before.</p>
+  <div class="ocs__table-wrap">
+    <table class="ocs__table">
+      <thead><tr><th>Stage</th><th>What it includes</th><th>Status</th><th>What is next</th></tr></thead>
+      <tbody>
+        <tr><td>1. Prototype<br><small>Explore and learn</small></td><td>GitHub Pages and Jekyll, OCS GameEngine, Flask for data, grammar-based UI, login and signup, profiles and roles, AI services</td><td><span class="ocs__status-pill ocs__status-pill--good">Mostly built</span></td><td>Events (in progress), scheduled before and after posts, doc converter, topics and tags for posts</td></tr>
+        <tr><td>2. Production<br><small>Go live with confidence</small></td><td>AWS RDS and S3, backup and recovery, email (SES), Spring Boot services</td><td><span class="ocs__status-pill ocs__status-pill--warn">Partly built</span></td><td>Spring and Docker hosting exist; RDS, S3, backups, restore and SES email are next</td></tr>
+        <tr><td>3. Extended Services<br><small>Add what you need</small></td><td>OCS Chat, OCS Calendar, OCS Email</td><td><span class="ocs__status-pill ocs__status-pill--warn">In progress</span></td><td>Chat (Flask) and calendar (Spring) are in the kits; OCS Email is missing</td></tr>
+        <tr><td>4. Education<br><small>Teach and inspire</small></td><td>Student and teacher tools, coursework and grading, learning analytics</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td><td>A default UI for the Education kit, for the customer waiting on it</td></tr>
+        <tr><td>5. Business<br><small>Go further together</small></td><td>Custom features, business workflows, niche integrations</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td><td>A default UI for the Business kit</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h4 class="ocs__section-title">A Win-Win Partnership</h4>
+  <p>OCS-in-a-Kit connects student learning with the real technology needs of organizations in our community.</p>
+  <div class="ocs__grid ocs__grid--standard cols-2">
+    <div class="ocs__grid-cell"><strong>Students gain</strong><br>Authentic development experience, real-world challenges, skills for the future.</div>
+    <div class="ocs__grid-cell"><strong>Organizations gain</strong><br>Access to emerging technology, fresh perspectives, development capacity.</div>
+  </div>
+</div>
 
 <div class="ocs__card" id="problem">
   <h3 class="ocs__section-title">The Problem</h3>
@@ -47,9 +74,9 @@ capstone_project:
     <table class="ocs__table">
       <thead><tr><th>Kit</th><th>Who picks it</th></tr></thead>
       <tbody>
-        <tr><td><strong>Vanilla</strong></td><td>Anyone who wants a basic site for users: accounts, profiles, a blog. Add features later.</td></tr>
+        <tr><td><strong>Vanilla</strong></td><td>Anyone who wants a basic Jekyll site they can build on: login, profiles, a blog, and events. Runs on GitHub Pages and Flask only. Add features later.</td></tr>
         <tr><td><strong>Education</strong></td><td>A teacher or school running a CS classroom: lessons, code runner, assignments, grading, AI tutor, hall pass.</td></tr>
-        <tr><td><strong>Business</strong></td><td>A company serving its own members. No classroom features, just chat, calendar, AI chatbot, profiles.</td></tr>
+        <tr><td><strong>Business</strong></td><td>A company serving its own members. No classroom features, just chat and posts, calendar, AI chatbot, analytics, profiles.</td></tr>
       </tbody>
     </table>
   </div>
@@ -57,7 +84,7 @@ capstone_project:
 
 <div class="ocs__card" id="features">
   <h3 class="ocs__section-title">What You Get</h3>
-  <p>16 features total. Every kit starts with the same core (login, accounts, blog) and adds from there.</p>
+  <p>Every kit starts with the same core (login, accounts, blog) and adds from there.</p>
   <div class="ocs__keypoints">
     <div class="ocs__keypoint"><span class="ocs__check">✓</span><span><strong>Lessons &amp; code runner:</strong> students run Python/JS/Java in the browser</span></div>
     <div class="ocs__keypoint"><span class="ocs__check">✓</span><span><strong>Assignments &amp; grading:</strong> submissions, grades, quizzes, AI feedback</span></div>
@@ -106,11 +133,12 @@ capstone_project:
     <pre class="mermaid">flowchart TD
     A[Teacher runs the install script] --> B[A setup page opens in the browser]
     B --> C[Picks the Education kit]
-    C --> D[Types school name,
-admin email, passwords]
+    C --> D[Types the school name
+and passwords]
     D --> E[Optional: adds an AI key
 for the tutor and grading]
-    E --> F[Installer checks the computer
+    E --> F[Installer checks the computer,
+downloads release v0.2.0,
 and sets everything up]
     F --> G[Done page shows the site address
 and the accounts]
@@ -124,7 +152,7 @@ from the dashboard]</pre>
       <thead><tr><th>Step</th><th>What the teacher does</th><th>What happens for them</th></tr></thead>
       <tbody>
         <tr><td>1</td><td>Runs one script</td><td>A setup page opens in their browser and walks them through the rest</td></tr>
-        <tr><td>2</td><td>Answers a few questions</td><td>Kit, school name, passwords. Blank passwords are made for them</td></tr>
+        <tr><td>2</td><td>Answers a few questions</td><td>Kit, school name, passwords, optional API keys. Blank passwords are generated for them</td></tr>
         <tr><td>3</td><td>Waits a few minutes</td><td>The site and both backends are installed and started</td></tr>
         <tr><td>4</td><td>Logs in</td><td>Lessons, code runner, grading, and hall pass are ready</td></tr>
         <tr><td>5</td><td>Changes their mind later</td><td>Features switch on or off without reinstalling, and nothing is lost</td></tr>
@@ -136,10 +164,12 @@ from the dashboard]</pre>
 <div class="ocs__card" id="future">
   <h3 class="ocs__section-title">Future</h3>
   <div class="ocs__keypoints">
-    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Move the rest of OCS's old site content into the kit</span></div>
-    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Add a hosted option for schools without their own server</span></div>
-    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Test turning features on and off live</span></div>
-    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Get a real school to pilot it end to end</span></div>
+    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Finish Events: admin screen, scrolling ticker, events page, photo gallery, scheduled before and after posts</span></div>
+    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Give the Education and Business kits their own default UI</span></div>
+    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Add EC2, RDS, S3, backups, and restore procedures for production</span></div>
+    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Add OCS Email to Extended Services</span></div>
+    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Move the current OCS Pages, Flask, and Spring repos onto the kits, so OCS becomes one flavor of the kit</span></div>
+    <div class="ocs__keypoint"><span class="ocs__check">✓</span><span>Deliver the Education kit to its first customer</span></div>
   </div>
 </div>
 
@@ -150,7 +180,7 @@ from the dashboard]</pre>
       <tbody>
         <tr><td>Privacy</td><td>Grading, hall pass, and chat handle real student data</td></tr>
         <tr><td>Self hosting</td><td>Needs Docker. Not every admin can run that</td></tr>
-        <tr><td>Staying in sync</td><td>OCS's own site keeps changing; someone has to keep the kit updated</td></tr>
+        <tr><td>Staying in sync</td><td>OCS's own site keeps changing. The import tool brings updates in behind a scrub check, but someone has to run it</td></tr>
       </tbody>
     </table>
   </div>
@@ -158,16 +188,18 @@ from the dashboard]</pre>
 
 <div class="ocs__card" id="how-its-built">
   <h3 class="ocs__section-title">How It's Built</h3>
-  <p>Each kit bundles 3 codebases: a Portfolio frontend, and Flask and Spring backends. Flask mainly handles login.</p>
+  <p>Every kit uses the same 3 codebases: a Portfolio website, a Flask backend, and a Spring backend. A kit is just a preset list of features and role names, so a fix reaches every kit at once.</p>
   <div class="ocs__diagram">
     <pre class="mermaid">flowchart TD
     K[Pick a kit:
 Vanilla / Education / Business] --> P[Portfolio
 frontend website]
-    K --> F[Flask
-backend, mainly login]
-    K --> S[Spring
-backend]</pre>
+    K --> F[Flask backend
+logins, AI chat,
+code runner, social]
+    K --> S[Spring backend
+people, assignments,
+calendar, hall pass]</pre>
   </div>
   <p>Content comes from OCS's original site through an automated scrub step that strips anything school specific (names, logins, secrets) before it's added in.</p>
   <div class="ocs__diagram">
@@ -177,8 +209,60 @@ backend]</pre>
     G -->|pass| Kt[Kit codebase]
     G -->|blocked| Fx[Fix & re-run]</pre>
   </div>
-  <p>Installing is one script, <code>./install.sh</code>, which clones the 3 codebases, sets them up, and starts the site.</p>
+  <p>Installing is one script, <code>./install.sh</code>. It opens a setup page, then downloads the 3 codebases at the pinned release, sets them up, and starts the site. The website runs on GitHub Pages and the backends run in Docker.</p>
 </div>
+
+<div class="ocs__card" id="versioning">
+  <h3 class="ocs__section-title">Versioning and Packaging</h3>
+  <p>Four repositories ship as one kit, so they are released together. The current release is v0.2.0.</p>
+  <div class="ocs__grid ocs__grid--standard cols-4">
+    <div class="ocs__grid-cell"><strong>OCS-Kit</strong><br>Installer, import tool, and the one catalog of kits and features.</div>
+    <div class="ocs__grid-cell"><strong>OCS-Kit-Pages</strong><br>The Jekyll website. Hides links for features that are off.</div>
+    <div class="ocs__grid-cell"><strong>OCS-Kit-Flask</strong><br>Python backend. Answers 404 for features that are off.</div>
+    <div class="ocs__grid-cell"><strong>OCS-Kit-Spring</strong><br>Java backend. Answers 404 for features that are off.</div>
+  </div>
+  <h4 class="ocs__section-title">From change to release</h4>
+  <div class="ocs__grid ocs__grid--standard cols-4">
+    <div class="ocs__grid-cell"><strong>1</strong><br>Change on a branch, reviewed in a pull request</div>
+    <div class="ocs__grid-cell"><strong>2</strong><br>Checks confirm every repo's catalog copy matches</div>
+    <div class="ocs__grid-cell"><strong>3</strong><br>Tag the same version, such as v0.2.0, on all four repos</div>
+    <div class="ocs__grid-cell"><strong>4</strong><br>Backend images build from the <code>v*</code> tag, and the installer pins that version</div>
+  </div>
+</div>
+
+<div class="ocs__card" id="install">
+  <h3 class="ocs__section-title">How install.sh Begins</h3>
+  <p>The script lives in the OCS-Kit repo. It is a small launcher that finds Python 3.8 or newer and runs the installer.</p>
+  <div class="ocs__grid ocs__grid--standard cols-4">
+    <div class="ocs__grid-cell"><strong>1</strong><br>Clone the OCS-Kit repo and run <code>./install.sh</code></div>
+    <div class="ocs__grid-cell"><strong>2</strong><br>A setup page checks the computer and asks for the kit, school name, passwords, and keys</div>
+    <div class="ocs__grid-cell"><strong>3</strong><br>It downloads the website and both backends at the pinned release, v0.2.0</div>
+    <div class="ocs__grid-cell"><strong>4</strong><br>It writes the settings, applies the catalog, and starts everything</div>
+  </div>
+  <h4 class="ocs__section-title">Templates and upstreams</h4>
+  <div class="ocs__grid ocs__grid--standard cols-3">
+    <div class="ocs__grid-cell"><strong>Upstream</strong><br>The Open Coding Society repos (pages, flask, spring). An import tool brings features into the kit repos one at a time, behind a scrub check.</div>
+    <div class="ocs__grid-cell"><strong>Kit repos</strong><br>OCS-Kit-Pages, OCS-Kit-Flask, and OCS-Kit-Spring. They hold the clean, school-neutral code and the release tags.</div>
+    <div class="ocs__grid-cell"><strong>School copy</strong><br>The school's own website repo, made from OCS-Kit-Pages. The kit release is merged into it, and its main branch is never rewritten.</div>
+  </div>
+</div>
+
+<div class="ocs__card" id="default-ui">
+  <h3 class="ocs__section-title">A Default UI for Every Kit</h3>
+  <p>A kit should look finished the moment it is installed. Rishab and Shayan are building the default UIs with Samarth.</p>
+  <div class="ocs__table-wrap">
+    <table class="ocs__table">
+      <thead><tr><th>Kit</th><th>Default UI</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Vanilla</td><td>Portfolio (Student Personal)</td><td><span class="ocs__status-pill ocs__status-pill--good">Exists</span></td></tr>
+        <tr><td>Education</td><td>A customer-facing Education UI</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td></tr>
+        <tr><td>Business</td><td>Portfolio today; business has its own distinct pattern</td><td><span class="ocs__status-pill ocs__status-pill--warn">Needs UI</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% include ocs_kanban_board.html url="https://github.com/orgs/CSA-Admin-OCS/projects/17" title="OCS in a Kit Kanban Board" %}
 
 <div class="ocs__capstone-footer">
   <div class="ocs__team"><span class="ocs__team-label">Project Team</span><span class="ocs__team-name">{{ data.Team | join: ", " }}</span></div>
