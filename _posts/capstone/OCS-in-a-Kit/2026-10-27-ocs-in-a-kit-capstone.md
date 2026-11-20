@@ -42,7 +42,6 @@ capstone_project:
 <div class="ocs__card" id="stages">
   <h3 class="ocs__section-title">Start With an Idea. Build a Solution. Grow As You Need.</h3>
   <p>An open, customizable foundation for building websites, applications, and digital services. Each stage builds on the one before.</p>
-  <img class="ocs__image-frame" src="{{ '/images/OCS-Kit-Infographic.webp' | relative_url }}" alt="OCS-in-a-Kit infographic: 1 Prototype, 2 Production, 3 Extended Services, 4 Education, 5 Business, and a win-win partnership between students and organizations" loading="lazy">
   <div class="ocs__table-wrap">
     <table class="ocs__table">
       <thead><tr><th>Stage</th><th>What it includes</th><th>Status</th><th>What is next</th></tr></thead>
