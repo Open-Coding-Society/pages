@@ -6,25 +6,56 @@
   <div class="microblog-panel-header">
     <button id="microblog-close-btn" class="microblog-close-btn" aria-label="Close Microblog">&times;</button>
     <h2 class="microblog-panel-title">Microblog</h2>
-    <button id="guest-signup-toggle" class="guest-signup-toggle-btn">Guest Signup</button>
+    <button id="quick-access-toggle" class="guest-signup-toggle-btn" aria-controls="quick-access">Guest &amp; Mentor</button>
     <button id="microblog-qr-btn" class="microblog-qr-btn" title="QR code: review this page from a phone" aria-label="QR code for phone reviews">QR code</button>
   </div>
 
-  <!-- Guest Signup Form (initially hidden) -->
-  <div id="guest-signup-form" class="guest-signup-container" style="display: none;">
-    <h3 class="guest-signup-title">Quick Guest Signup</h3>
-    <form id="guest-form" onsubmit="handleGuestSignup(event);">
+  <!-- Guest & Mentor quick access (initially hidden): log in, or make a guest or mentor account, without leaving the page -->
+  <div id="quick-access" class="guest-signup-container" style="display: none;">
+    <div class="quick-tabs" role="tablist" aria-label="Guest and mentor access">
+      <button type="button" id="quick-tab-login" class="quick-tab" role="tab" aria-selected="true">Quick login</button>
+      <button type="button" id="quick-tab-signup" class="quick-tab" role="tab" aria-selected="false">Quick sign-up</button>
+    </div>
+
+    <form id="quick-login-form">
       <div class="guest-form-group">
-        <input type="text" id="guest-username" placeholder="Username" required>
+        <input type="text" id="quick-login-uid" placeholder="Username or GitHub ID" autocomplete="username" required>
       </div>
       <div class="guest-form-group">
-        <input type="password" id="guest-password" placeholder="Password" required>
+        <input type="password" id="quick-login-password" placeholder="Password" autocomplete="current-password" required>
       </div>
       <p>
-        <button type="submit" class="guest-submit-btn">Sign Up & Login</button>
+        <button type="submit" id="quick-login-submit" class="guest-submit-btn">Log in</button>
       </p>
-      <p id="guest-status-message" class="guest-status"></p>
     </form>
+
+    <form id="quick-signup-form" hidden>
+      <div class="guest-form-group">
+        <select id="quick-type" aria-label="Account type">
+          <option value="guest">Guest</option>
+          <option value="mentor">Mentor</option>
+        </select>
+      </div>
+      <p id="quick-window-note" class="guest-note" hidden></p>
+      <p id="quick-type-note" class="guest-note"></p>
+      <div id="quick-name-group" class="guest-form-group" hidden>
+        <input type="text" id="quick-name" placeholder="Name" autocomplete="name">
+      </div>
+      <div class="guest-form-group">
+        <input type="text" id="quick-uid" placeholder="Username" autocomplete="username" required>
+      </div>
+      <div id="quick-email-group" class="guest-form-group">
+        <input type="email" id="quick-email" placeholder="Email" autocomplete="email">
+      </div>
+      <div class="guest-form-group">
+        <input type="password" id="quick-password" placeholder="Password" autocomplete="new-password" required>
+      </div>
+      <p>
+        <button type="submit" id="quick-signup-submit" class="guest-submit-btn">Create account &amp; log in</button>
+      </p>
+    </form>
+
+    <p id="quick-status" class="guest-status" role="status" aria-live="polite"></p>
   </div>
 
   <div class="microblog-panel-content">
@@ -70,9 +101,7 @@
 </aside>
 
 <script type="module">
-// Import required functions from config
-import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-import { SPRING_PASSWORD_RULES, meetsSpringPasswordRules } from '{{site.baseurl}}/assets/js/api/passwordRules.js';
+import { initQuickAccess } from '{{site.baseurl}}/assets/js/api/quick-access.js';
 
 // Microblog panel open/close logic
 const microblogPanel = document.getElementById('microblog-panel');
@@ -90,102 +119,8 @@ function closeMicroblogPanel() {
 microblogFab.onclick = openMicroblogPanel;
 microblogCloseBtn.onclick = closeMicroblogPanel;
 
-// Guest signup toggle logic
-const guestSignupToggle = document.getElementById('guest-signup-toggle');
-const guestSignupForm = document.getElementById('guest-signup-form');
-
-guestSignupToggle.onclick = function() {
-  if (guestSignupForm.style.display === 'none') {
-    guestSignupForm.style.display = 'block';
-  } else {
-    guestSignupForm.style.display = 'none';
-  }
-};
-
-// Guest signup handler with auto-login
-window.handleGuestSignup = async function(event) {
-  event.preventDefault();
-
-  const username = document.getElementById('guest-username').value;
-  const password = document.getElementById('guest-password').value;
-  const statusMessage = document.getElementById('guest-status-message');
-  const submitButton = document.querySelector('.guest-submit-btn');
-
-  // Disable button and show loading state
-  submitButton.disabled = true;
-  submitButton.textContent = 'Creating Account...';
-  statusMessage.textContent = '';
-  statusMessage.style.color = '#666';
-
-  const signupData = {
-    uid: username,
-    password: password
-  };
-
-  // A new account needs the shared password rule. A password that breaks it can
-  // still log in to a guest account made before the rule, so only skip signup.
-  const canSignUp = meetsSpringPasswordRules(password);
-
-  try {
-    let accountExists = !canSignUp;
-
-    // Step 1: Try to create guest account using Flask backend
-    if (canSignUp) {
-      statusMessage.textContent = 'Creating guest account...';
-      const signupResponse = await fetch(`${pythonURI}/api/user/guest`, {
-        ...fetchOptions,
-        method: 'POST',
-        body: JSON.stringify(signupData)
-      });
-
-      if (!signupResponse.ok) {
-        // Account might already exist, so we'll try to login instead
-        accountExists = true;
-        statusMessage.textContent = 'Account exists, logging in...';
-      } else {
-        await signupResponse.json();
-        statusMessage.textContent = 'Account created! Logging in...';
-      }
-    } else {
-      statusMessage.textContent = 'Logging in...';
-    }
-
-    // Step 2: Login with the credentials (whether account was just created or already existed)
-    const loginResponse = await fetch(`${pythonURI}/api/authenticate`, {
-      ...fetchOptions,
-      method: 'POST',
-      body: JSON.stringify(signupData)
-    });
-
-    if (!loginResponse.ok) {
-      // No account to log in to: a new one needs a password that follows the rule
-      throw new Error(canSignUp ? 'Login failed - please check your credentials' : SPRING_PASSWORD_RULES);
-    }
-
-    await loginResponse.json();
-
-    // Success - stay on current page
-    statusMessage.textContent = 'Success! You are now logged in.';
-    statusMessage.style.color = 'green';
-
-    // Hide the form after successful signup/login
-    setTimeout(() => {
-      guestSignupForm.style.display = 'none';
-      // Reset form
-      document.getElementById('guest-username').value = '';
-      document.getElementById('guest-password').value = '';
-      submitButton.disabled = false;
-      submitButton.textContent = 'Sign Up & Login';
-    }, 2000);
-
-  } catch (error) {
-    console.error('Guest signup error:', error);
-    statusMessage.textContent = `Error: ${error.message}`;
-    statusMessage.style.color = 'red';
-    submitButton.disabled = false;
-    submitButton.textContent = 'Sign Up & Login';
-  }
-};
+// Guest & Mentor quick access: quick login, and quick sign-up as a guest or a mentor
+initQuickAccess();
 </script>
 
 <!-- Create/Edit Modal Overlay using Tailwind -->
@@ -681,6 +616,9 @@ async function loadPostsData() {
     }
     return data;
 }
+
+// The quick login, or a quick sign-up, has logged somebody in: load the posts they can now see
+window.addEventListener('quick-access:login', () => renderMicroblogTable());
 
 // MicroBlog Table Manager. `refetch: false` redraws from the last response (search typing).
 async function renderMicroblogTable({ refetch = true } = {}) {
