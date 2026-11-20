@@ -25,13 +25,6 @@
     <!-- navbar -->
     {%- include aesthetihawk/header-shared.html -%}
 
-    <!-- Shown only for a signed-in ROLE_MENTOR account. Styles: status-indicators/mentor-badge.scss -->
-    <div id="mentor-badge" class="mentor-badge" hidden>
-        <span class="mentor-badge__dot"></span>
-        <span id="mentor-badge-text"></span>
-        <button type="button" id="mentor-view-switch" class="ocs__btn small pill mentor-badge__switch"></button>
-    </div>
-
     <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased mt-[53px] theme-inner">
 
         <!-- Sidebar -->
@@ -52,6 +45,18 @@
 
         <!-- Main Content Area -->
         <div class="p-4 min-[769px]:ml-64 min-[769px]:p-8 lesson-main">
+            <!-- Shown only to a ROLE_MENTOR account. Built from shared OCS elements (callout,
+                 status-pill badge, ocs__btn), so it needs no style of its own. -->
+            <div id="role-bar" class="ocs__callout mb-6" hidden>
+                <b id="role-bar-badge" class="ocs__status-pill ocs__status-pill--good">Mentor</b>
+                <span id="role-bar-text">You are signed in with a mentor account.</span>
+                <button type="button" id="role-view-switch" class="ocs__btn small pill">Switch to student view</button>
+            </div>
+            <script>
+                // Show the bar before first paint for a cached mentor view, so the page doesn't shift when the role check below confirms it.
+                try { if (localStorage.getItem('ocsMentorSidebar') === 'mentor') document.getElementById('role-bar').hidden = false; } catch (e) { /* storage unavailable */ }
+            </script>
+
             <!-- Phones: the side column is hidden, so its links fold into a menu above the page -->
             <details class="ocs__card mb-6 min-[769px]:hidden">
                 <summary class="cursor-pointer font-medium">Menu</summary>
@@ -76,24 +81,23 @@
 
     const defaultSidebar = document.getElementById('sidebar-role-default');
     const mentorSidebar = document.getElementById('sidebar-role-mentor');
-    const badge = document.getElementById('mentor-badge');
-    const badgeText = document.getElementById('mentor-badge-text');
-    const switchButton = document.getElementById('mentor-view-switch');
+    const roleBar = document.getElementById('role-bar');
+    const roleBadge = document.getElementById('role-bar-badge');
+    const roleText = document.getElementById('role-bar-text');
+    const switchButton = document.getElementById('role-view-switch');
 
     function showSidebar(isMentorView, isMentorAccountHolder) {
         defaultSidebar.hidden = isMentorView;
         mentorSidebar.hidden = !isMentorView;
-        badge.hidden = !isMentorAccountHolder;
-        badge.classList.toggle('mentor-badge--student-view', isMentorAccountHolder && !isMentorView);
-        badgeText.textContent = isMentorView
-            ? 'Signed in as a Mentor: showing your mentor view'
-            : 'Mentor account: viewing the site as a Student';
+        roleBar.hidden = !isMentorAccountHolder;
+        // The badge's state modifier carries the view: accent ring for mentor, neutral for student.
+        roleBadge.textContent = isMentorView ? 'Mentor' : 'Student view';
+        roleBadge.classList.toggle('ocs__status-pill--good', isMentorView);
+        roleBadge.classList.toggle('ocs__status-pill--neutral', !isMentorView);
+        roleText.textContent = isMentorView
+            ? 'You are signed in with a mentor account.'
+            : 'Your mentor account is viewing the site as a student.';
         switchButton.textContent = isMentorView ? 'Switch to student view' : 'Switch to mentor view';
-        // The sidebar is position:fixed, so it starts below the bar.
-        document.body.classList.toggle('mentor-bar-active', isMentorAccountHolder);
-        if (isMentorAccountHolder) {
-            document.documentElement.style.setProperty('--mentor-bar-bottom', `${badge.getBoundingClientRect().bottom + window.scrollY}px`);
-        }
         try {
             localStorage.setItem('ocsMentorSidebar', isMentorView ? 'mentor' : 'default');
         } catch (e) {
