@@ -17,15 +17,15 @@ Topics:
     subtitle: "One script installs a classroom platform any school can run"
     description: "Open Coding Society built a full classroom platform with lessons, a code runner, grading, chat, and hall passes, but it was wired to one school. OCS-in-a-Kit turns it into a product any school or organization can install and run on its own, with no coding required."
     keyPoints:
-      - "Three kits: Vanilla (basic site), Education (full CS classroom), Business (chat, calendar, AI chatbot)"
+      - "Three kits: Vanilla (basic site), Education (full CS classroom), Business (chat, calendar, AI chatbot, analytics)"
       - "16 features that admins can turn on or off at any time"
       - "Every kit bundles a Portfolio frontend with Flask and Spring backends"
       - "School specific names, logins, and secrets are scrubbed automatically before anything is added"
       - "One install script sets up the whole site"
     tech:
       - "Jekyll (Portfolio frontend)"
-      - "Python Flask (backend, mainly login)"
-      - "Java Spring (backend)"
+      - "Python Flask (backend: logins, AI chat, code runner)"
+      - "Java Spring (backend: people, assignments, calendar, hall pass)"
       - "Docker"
       - "GitHub Actions"
     impact:
@@ -36,6 +36,5 @@ Topics:
     team:
       - "Shayan"
       - "Dhyan"
-      - "Arnav"
-      - "Harrish"
       - "Darshan"
+      - "Jim"
