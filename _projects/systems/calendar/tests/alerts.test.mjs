@@ -56,6 +56,23 @@ test('alert words anywhere else are the description\'s own text', () => {
   }
 });
 
+test('reading the alert line stays fast on a very long description', () => {
+  // Any signed-in account can write a description, and every visitor's ticker reads each event's.
+  // A pattern that slows down on long runs of blank lines or <br> tags takes over a second at this
+  // size (the doc-link reader's leading run: 30k blank lines, about 1.2 s); this one takes about 1 ms.
+  const n = 30000;
+  const slowForBacktracking = [
+    '\n'.repeat(n) + 'x',
+    '<br>'.repeat(n / 4) + 'x',
+    ' \n'.repeat(n / 2) + 'x',
+    'Alert: 1 day before' + '\n'.repeat(n) + 'x',
+    'Alert: 1 day before' + '<br>'.repeat(n / 4) + 'x',
+  ];
+  const started = performance.now();
+  for (const text of slowForBacktracking) assert.equal(CalendarAlerts.split(text).days, null);
+  assert.ok(performance.now() - started < 500, `took ${Math.round(performance.now() - started)} ms`);
+});
+
 test('joining puts the alert line after the text, or leaves the text alone without one', () => {
   assert.equal(CalendarAlerts.join('Bring notes', 14), 'Bring notes\nAlert: 14 days before');
   assert.equal(CalendarAlerts.join('', 3), 'Alert: 3 days before');
