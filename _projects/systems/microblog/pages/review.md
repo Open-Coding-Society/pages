@@ -18,6 +18,9 @@ Helpers and their tests: assets/js/projects/microblog/microblog-review.js, tests
 {%- endcomment -%}
 {%- assign microblog_posts = site.posts | where: "microblog", true -%}
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD033 -->
+
 <div class="review-page" data-review-page>
   <section class="review-head">
     {%- comment -%} An h2: a project stylesheet hides every h1 site-wide, and the layout's own title is an h2 {%- endcomment -%}
@@ -46,7 +49,7 @@ Helpers and their tests: assets/js/projects/microblog/microblog-review.js, tests
       </div>
       <p id="review-identity" class="review-identity" hidden>
         <span>Posting as <strong id="review-user-name"></strong></span>
-        <button type="button" id="review-logout" class="review-link">Not you?</button>
+        <button type="button" id="review-logout" class="ocs__btn small">Not you?</button>
       </p>
       <div class="ocs__field">
         <label class="ocs__label" for="review-content">Your review</label>
@@ -58,7 +61,7 @@ Helpers and their tests: assets/js/projects/microblog/microblog-review.js, tests
       <p id="review-message" class="review-message" aria-live="polite"></p>
     </form>
     <p id="review-signin-offer" class="review-note review-center">
-      Student or teacher? <button type="button" id="review-signin-toggle" class="review-link">Sign in with your account</button>
+      Student or teacher? <button type="button" id="review-signin-toggle" class="ocs__btn small">Sign in with your account</button>
     </p>
   </section>
 
@@ -77,7 +80,7 @@ Helpers and their tests: assets/js/projects/microblog/microblog-review.js, tests
       <p id="login-message" class="review-message" aria-live="polite"></p>
     </form>
     <p class="review-note review-center">
-      <button type="button" id="review-signin-back" class="review-link">Back to the review</button>
+      <button type="button" id="review-signin-back" class="ocs__btn small">Back to the review</button>
     </p>
   </section>
 
@@ -319,3 +322,5 @@ $('review-qr-toggle').onclick = async () => {
   box.hidden = false;
 };
 </script>
+
+<!-- markdownlint-restore -->

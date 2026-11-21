@@ -40,6 +40,26 @@ test('reader Microblog button toggles the panel and keeps its expanded state in 
     assert.equal(attributes['aria-expanded'], 'false');
 });
 
+test('page filter keeps its selection on redraw and exposes both choices as buttons', () => {
+    const start = html.indexOf('const pageIcon =');
+    const end = html.indexOf('// Create and Page Icons', start);
+    const icons = html.slice(start, end);
+    const modeStart = html.indexOf("window.__microblogFilterMode = window.__microblogFilterMode || 'page';");
+    const modeEnd = html.indexOf('setTimeout(() => {', modeStart);
+    assert.ok(start >= 0 && end > start && modeStart >= 0 && modeEnd > modeStart);
+    const window = {};
+    let redraws = 0;
+    const context = vm.createContext({ window, renderMicroblogTable: () => redraws++ });
+    vm.runInContext(html.slice(modeStart, modeEnd), context);
+    vm.runInContext("setFilterMode('people')", context);
+    assert.equal(window.__microblogFilterMode, 'people');
+    assert.equal(redraws, 1);
+    vm.runInContext(html.slice(modeStart, modeEnd), context);
+    const result = vm.runInContext(`${icons}\n[pageIcon, manyPagesIcon]`, context);
+    assert.match(result[0], /^<button.*aria-pressed="false"/);
+    assert.match(result[1], /^<button.*aria-pressed="true"/);
+});
+
 for (const formId of ['microblog-form', 'reply-form']) {
     test(`${formId}: disables during save, rejects repeat submits, preserves rejected draft`, async () => {
         const start = html.indexOf(`document.getElementById('${formId}').onsubmit`);

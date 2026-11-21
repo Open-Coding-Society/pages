@@ -20,6 +20,10 @@ Edit the sources here, not the generated copies in the project directories.
 - Flask owns the microblog API and stored posts. The shared QR library, site shell,
   Capstone cards and Login are dependencies, not Microblog sources.
 
+The panel and review page use shared `ocs__` controls and theme tokens. Their SCSS
+keeps Microblog-specific layout and survey styling; the QR code stays on white
+for scanning.
+
 ## Verification
 
 Run `bundle exec ruby scripts/test_system_project_distribution.rb` for publication,

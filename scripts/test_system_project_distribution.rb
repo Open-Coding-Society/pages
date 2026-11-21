@@ -196,11 +196,16 @@ class SystemProjectDistributionTest < Minitest::Test
       assert_includes ordinary, "/preview/assets/js/projects/microblog/microblog.js"
       assert_includes ordinary, "/preview/assets/js/projects/microblog/quick-access.js"
       assert_includes File.read(File.join(site.dest, "review.html")), "/preview/assets/js/projects/microblog/microblog-review.js"
+      document = Nokogiri::HTML(ordinary)
+      %w[microblog-modal microblog-qr-modal reply-modal].each do |id|
+        assert_equal 1, document.css("##{id}.ocs__modal.hidden .ocs__modal-card").size
+      end
       authors = JSON.parse(File.read(File.join(site.dest, "assets/js/projects/microblog/microblog-authors.json")))
       assert authors.any? { |entry| entry["authors"] == ["author1"] && entry["path"].end_with?("ordinary.html") }
       css = File.read(File.join(site.dest, "assets/css/microblog.css"))
       assert_includes css, ".microblog-panel"
       assert_includes css, ".review-page"
+      assert_match(/\.microblog-modal\.ocs__modal\.hidden\s*\{\s*display:\s*none/, css)
     end
   end
 

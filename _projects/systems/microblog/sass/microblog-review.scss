@@ -51,17 +51,6 @@
   gap: 1rem;
 }
 
-// A button that reads as a link: "Not you?", "Sign in with your account"
-.review-link {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--pref-accent-color);
-  font: inherit;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
 .review-center { text-align: center; }
 
 .review-note {
@@ -87,8 +76,14 @@
   line-height: 1.5;
   color: var(--text-muted);
 
-  &[data-tone="error"] { color: #ef4444; }
-  &[data-tone="ok"] { color: #22c55e; }
+  &[data-tone="error"],
+  &[data-tone="ok"] {
+    padding: 0.35rem 0.6rem;
+    border-left: 3px solid var(--pref-accent-color);
+    color: var(--pref-text-color);
+  }
+
+  &[data-tone="error"] { border-left-color: var(--priority-p0, var(--red)); }
 }
 
 .review-posts-title {
@@ -104,10 +99,7 @@
   gap: 0.75rem;
 
   li {
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--ui-border);
-    border-radius: 0.75rem;
-    background: var(--panel);
+    @include surface(0.75rem, 0.75rem 1rem);
   }
 
   strong { font-size: 0.85rem; color: var(--text-muted); }
@@ -162,24 +154,11 @@
 // The panel's QR button sits in the panel header beside Guest Signup
 .microblog-qr-btn {
   margin-left: 0.5rem;
-  padding: 0.3rem 0.6rem;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 999px;
-  background: none;
-  color: #fff;
-  font-size: 0.85rem;
-  cursor: pointer;
   white-space: nowrap;
-
-  &:hover,
-  &:focus-visible {
-    background: rgba(255, 255, 255, 0.12);
-  }
 }
 
 .microblog-qr-body {
   padding-top: 0.5rem;
-  color: #f1f5f9;
 
   .microblog-qr-note {
     margin: 0;
