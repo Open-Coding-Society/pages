@@ -67,7 +67,10 @@ export function createLiveCalendarStore({ course, javaURI, fetchOptions, sourceU
     const body = text ? (() => { try { return JSON.parse(text); } catch (_) { return text; } })() : null;
     if (!res.ok) {
       const reason = body?.message || body?.error || (typeof body === 'string' ? body : '');
-      throw new Error(`Calendar ${init.method || 'GET'} ${path} failed (HTTP ${res.status}) ${reason}`.trim());
+      const error = new Error(`Calendar ${init.method || 'GET'} ${path} failed (HTTP ${res.status}) ${reason}`.trim());
+      // A signed-out visitor gets 401 or 403; callers like the ticker treat that as nothing to show.
+      error.status = res.status;
+      throw error;
     }
     return body;
   }

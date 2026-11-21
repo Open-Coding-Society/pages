@@ -21,11 +21,11 @@ and browser paths. Do not edit those generated copies.
 | `_includes/player-pages/` | Home, sprint, week, and Blogs page bodies | `_includes/player-pages/` |
 | `_includes/sprint-*.html` | Sprint cards, week cards, and progression modal | `_includes/` |
 | `_includes/{announcement_chat,lesson_chat}.html` | Course and document chat | `_includes/` |
-| `_includes/{calendar,ocs_calendar_card,announcement_calendar_demo}.html` | Calendar integration and preview interfaces | `_includes/` |
+| `_includes/{calendar,ocs_calendar_card,ocs_calendar_ticker,announcement_calendar_demo}.html` | Calendar integration and preview interfaces | `_includes/` |
 | `plugins/lesson_player_pages.rb` | Generates course player pages from schedule data | `_plugins/lesson_player_pages.rb` |
 | `data/{cs,csa,csp,csse,csh}.yml` | Shared sprint definitions and course schedules | `_data/` |
 | `js/player/` | Direct course entry and navigation state | Existing `assets/js/` filenames |
-| `js/announcement-calendar/` | Calendar cards, commands, data, feeds, and composer | `assets/js/chat/calendar/` |
+| `js/announcement-calendar/` | Calendar cards, ticker, commands, data, feeds, and composer | `assets/js/chat/calendar/` |
 | `js/courses.js` | Legacy sprint progression and certificates | `assets/js/projects/courses/courses.js` |
 | `sass/main.scss` | Registered project's legacy sprint styling | `_sass/projects/courses/main.scss` |
 | `sass/viewing/` | Timeline and announcement-calendar styling | Existing `_sass/open-coding/` filenames |
@@ -260,6 +260,10 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
   `assets/js/projects/calendar/` modules. This kit owns the consuming interfaces.
   `_data/school_calendar.yml` stays shared. Calendar sync requires calendar to
   be built; courses being `:dev` does not itself enable calendar's whole dashboard.
+  The calendar ticker links events to their linked docs with calendar's
+  `CalendarDocLinks.js`, imported only when calendar is built (`site.static_files`);
+  without it every item opens `/student/calendar`. A doc on another site opens the
+  calendar too, because any signed-in account can add an event.
 - **Curriculum reporting:** college topic maps, report templates, reference
   navigation, and curriculum-specific tests remain with the curriculum system.
 - **Backend contracts:** enrollment, calendar, announcements/chat, and assignment
@@ -279,6 +283,13 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
   enrolled course in CSSE/CSP/CSA/CSH order.
 - Course homes remain `/navigation/courses/<course>/` and render their
   announcements/calendar inside the reader shell (legacy player as fallback). Legacy chooser/catalog routes remain available.
+- Above the announcements, a calendar ticker (`ocs_calendar_ticker.html`,
+  `CalendarTicker` in `js/announcement-calendar/calendar-ticker.js`) shows the
+  course's events from today through the fifth school day after it, each linking
+  to its linked doc on this site or else the calendar. Spring's calendar answers only signed-in
+  visitors, so signed out, with nothing coming up, or on `spring: false` there is
+  no bar. Tests: `node --test tests/calendar_ticker.test.mjs`,
+  `bundle exec ruby scripts/test_calendar_ticker.rb`.
 - The generator creates sprint and Blogs pages, and week pages only for weeks
   with lessons. Sidebar links and generated URLs must stay aligned.
 - Desktop and mobile panels put course buttons first, X at upper-right, and the

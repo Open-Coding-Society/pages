@@ -106,6 +106,7 @@ _layouts/projects/
 /_includes/announcement_calendar_demo.html
 /_includes/ocs_calendar_card.html
 /_includes/ocs_calendar_card_data.html
+/_includes/ocs_calendar_ticker.html
 /_includes/sprint-card.html
 /_includes/sprint-item-card.html
 /_includes/sprint-modals.html

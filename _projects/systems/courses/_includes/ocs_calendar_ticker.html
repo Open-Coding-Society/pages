@@ -1,0 +1,56 @@
+{% comment %}
+  Calendar ticker: what's coming up on a course's calendar, in an ocs__ticker bar, so a class
+  home says what's going on. Course homes put it above the announcements.
+
+  {% raw %}{% include ocs_calendar_ticker.html %}{% endraw %}
+
+  Options (all optional):
+    course   csa | csp | csse | csh, or "all"   default: the page's course, else all
+    title    the bar's label                    default: "Coming up"
+
+  The bar starts empty and hidden. CalendarTicker (assets/js/chat/calendar/calendar-ticker.js)
+  asks Spring's calendar for the course's events from today through the fifth school day after
+  it and fills the bar. With nothing to show (signed out, or nothing coming up) it stays hidden.
+  On a site without Spring (spring: false) this include writes nothing, so nothing asks Spring.
+
+  It is the ocs__ticker grammar (_sass/open-coding/elements/ticker) with no CSS of its own: the
+  bar stays still unless its items don't fit on one row. [hidden] sits on a plain wrapper,
+  because ocs__ticker sets display, which beats [hidden]. The school weeks
+  (ocs_calendar_card_data.html) and the start-up script go on the page once.
+
+  The Calendar system owns the linked-doc format (CalendarDocLinks.js). make dev doesn't build that
+  system, so the script imports it only when its file is on the site; without it every item opens
+  the calendar.
+{% endcomment %}
+{%- if site.spring != false -%}
+{%- assign ocs_ticker_course = include.course | default: page.course | default: "all" -%}
+{%- assign ocs_ticker_title = include.title | default: "Coming up" -%}
+{%- assign ocs_ticker_id = ocs_ticker_course | slugify | prepend: "ocs-calendar-ticker-" -%}
+<div data-ocs-calendar-ticker data-course="{{ ocs_ticker_course | escape }}" data-calendar-url="{{ site.baseurl }}/student/calendar" hidden>
+  <section class="ocs__ticker" aria-labelledby="{{ ocs_ticker_id }}">
+    <p class="ocs__ticker-label" id="{{ ocs_ticker_id }}">{{ ocs_ticker_title | escape }}</p>
+    <label class="ocs__toggle ocs__ticker-switch">
+      <input class="ocs__toggle-input" type="checkbox">
+      <span class="ocs__toggle-track"></span>
+      <span class="ocs__toggle-label">Pause</span>
+    </label>
+    <div class="ocs__ticker-viewport">
+      <div class="ocs__ticker-track" data-hook="track"></div>
+    </div>
+  </section>
+</div>
+{% include ocs_calendar_card_data.html %}
+{%- unless ocs_calendar_ticker_script -%}
+{%- assign ocs_calendar_ticker_script = true -%}
+{%- assign ocs_ticker_doc_links = site.static_files | where: "path", "/assets/js/projects/calendar/CalendarDocLinks.js" | first %}
+<script type="module">
+  import { fetchOptions, javaURI, springEnabled } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { CalendarTicker } from '{{ site.baseurl }}/assets/js/chat/calendar/calendar-ticker.js';
+{%- if ocs_ticker_doc_links %}
+  import { splitLinkedDoc } from '{{ site.baseurl }}/assets/js/projects/calendar/CalendarDocLinks.js';
+{%- endif %}
+
+  CalendarTicker.mountAll(document, { javaURI, fetchOptions, springEnabled, splitLinkedDoc: {% if ocs_ticker_doc_links %}splitLinkedDoc{% else %}null{% endif %} });
+</script>
+{%- endunless -%}
+{%- endif -%}
