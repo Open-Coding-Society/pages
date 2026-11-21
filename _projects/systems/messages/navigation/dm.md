@@ -111,6 +111,19 @@ the open conversation each start with a bar of the same height.
 
       <div class="dm__log" id="messagesLog" role="log" aria-live="polite" tabindex="0"></div>
 
+      {%- comment -%}
+        Dropping files or folders anywhere on the open conversation shares them (a group
+        chat) or attaches an image (any chat); js/composer-files.js shows this over the pane
+        while something is dragged over it and words it for the conversation.
+      {%- endcomment -%}
+      <p class="dm__drop-hint" id="messagesDropHint" aria-hidden="true"></p>
+
+      {%- comment -%}
+        Files waiting to be shared with the next message (js/attachments.js), and their
+        upload progress once Send is pressed.
+      {%- endcomment -%}
+      <div class="dm__tray" id="messagesAttachTray" hidden></div>
+
       <div class="dm__attach-preview hidden" id="messagesImagePreview">
         <img id="messagesImageThumb" alt="Image attached to your next message">
         <button type="button" class="dm__action" id="messagesImageRemove">Remove</button>
@@ -119,29 +132,21 @@ the open conversation each start with a bar of the same height.
       {%- comment -%}
         The form is the composer's box. thread.js inserts the rich composer before the
         Cancel button; sass/_composer.scss gives it the box's whole first row and lines the
-        controls up on the right beneath it, whatever order they come in here. The attach
-        control is a <label> for a
-        visually hidden file input -- a file input cannot be restyled, and a label for it
-        is operable by keyboard and screen reader on its own. thread.js shows it only in
-        conversations that can store an image.
+        controls up on the right beneath it, whatever order they come in here. Attach opens
+        a menu (js/composer-files.js, the ocs__menu grammar) whose choices click one of the
+        visually hidden file inputs: an image in any chat, and files or a folder in a group.
+        The inputs are out of the tab order because the menu is how they are reached.
       {%- endcomment -%}
       <form class="dm__composer" id="messagesForm" autocomplete="off">
-        <span class="dm__drop-hint" id="messagesDropHint" aria-hidden="true">
-          <i class="fas fa-cloud-arrow-up" aria-hidden="true"></i>
-          Drop screenshot or image here
-        </span>
         <button class="dm__action dm-cancel-edit" id="messagesCancelEdit" type="button" hidden>Cancel</button>
-        <span class="dm__attach hidden" id="messagesImageAttach">
-          {%- comment -%}
-            Input before label, not after: focus lands on the hidden input, and the ring
-            is drawn on the label with an adjacent-sibling selector, which only reaches
-            forwards.
-          {%- endcomment -%}
-          <input class="dm__file-input" id="messagesImage" type="file" accept="image/*">
-          <label class="dm__action dm__image-action" for="messagesImage">
-            <i class="fas fa-image" aria-hidden="true"></i> Add image
-          </label>
-        </span>
+        <div class="dm__attach" id="messagesAttach">
+          <input class="dm__file-input" id="messagesImage" type="file" accept="image/*" tabindex="-1" aria-hidden="true">
+          <input class="dm__file-input" id="messagesFilesInput" type="file" multiple tabindex="-1" aria-hidden="true">
+          <input class="dm__file-input" id="messagesFolder" type="file" webkitdirectory multiple tabindex="-1" aria-hidden="true">
+          <button class="dm__action" id="messagesAttachButton" type="button" disabled>
+            <i class="fas fa-paperclip" aria-hidden="true"></i> Attach
+          </button>
+        </div>
         <button class="dm__send" id="messagesSend" type="submit" disabled>Send</button>
       </form>
       <p class="dm__form-status" id="messagesFormStatus" role="alert" hidden></p>
@@ -303,26 +308,15 @@ the open conversation each start with a bar of the same height.
   </div>
 
   <div class="ocs__modal hidden" id="filesDialog" role="dialog" aria-modal="true" aria-labelledby="filesTitle">
-    <div class="ocs__modal-card ocs__stack">
+    <div class="ocs__modal-card ocs__modal-card--wide ocs__stack">
       <div class="ocs__modal-header">
         <h3 class="ocs__modal-title" id="filesTitle">Files</h3>
         <button type="button" class="ocs__btn small" data-close aria-label="Close" data-focus>&times;</button>
       </div>
-      <div class="ocs__table-wrap hidden" id="filesTable">
-        <table class="ocs__table">
-          <thead><tr><th>File</th><th>Shared by</th><th>Action</th></tr></thead>
-          <tbody id="filesList"></tbody>
-        </table>
-      </div>
-      <form class="ocs__stack" id="filesForm">
-        <div class="ocs__field">
-          <label class="ocs__label" for="filesInput">Share a file with the group</label>
-          <input class="ocs__input" id="filesInput" type="file">
-        </div>
-        <div class="ocs__links">
-          <button type="submit" class="ocs__btn accent fill" id="filesUpload">Share file</button>
-        </div>
-      </form>
+      {%- comment -%}
+        js/files-panel.js draws the group's files here, as folders, from Spring's index.
+      {%- endcomment -%}
+      <div class="ocs__stack" id="filesBody"></div>
       <p class="ocs__text" id="filesStatus" role="status"></p>
     </div>
   </div>

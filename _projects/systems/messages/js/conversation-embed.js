@@ -8,6 +8,8 @@
 //   const chat = await mountGroupChat(element, { groupId, config, richText });
 //   chat.destroy(); // before the element goes
 import { createChatSocket } from './chat-socket.js';
+import { FileViewer } from './file-viewer.js';
+import { GroupFiles } from './group-files.js';
 import { LOG_TEXTS, withTexts } from './message-log.js';
 import { createMessagesApi } from './messages-api.js';
 import { EMPTY_STATES, THREAD_TEXTS, createThread } from './thread.js';
@@ -201,11 +203,13 @@ async function mount(kind, root, options) {
 
   let thread = null;
   let socket = null;
+  let viewer = null;
   let destroyed = false;
   function destroy() {
     if (destroyed) return;
     destroyed = true;
     thread?.destroy();
+    viewer?.destroy();
     socket?.disconnect();
     root.replaceChildren();
     mountedRoots.delete(root);
@@ -235,8 +239,15 @@ async function mount(kind, root, options) {
       pane.status.textContent = t.offline;
     };
     socket = createChatSocket(config.javaWebSocketURI, { onClose: showOffline });
+    // Files shared in a group open and download here too; sharing them is /dm's.
+    const files = kind === 'group' ? new GroupFiles({ api, groupId: id }) : null;
+    // A preview opens inside the embed's .dm frame, where the pane's styles reach it; the
+    // pane isn't in the frame yet when the thread is made, so the frame is handed in.
+    viewer = files ? new FileViewer({ root: frame }) : null;
     thread = createThread({
       api, socket, richText, me, readOnly, formatBody,
+      groupFiles: files ? () => files : null,
+      viewer,
       elements: pane.elements,
       texts: t,
       emptyState: { title: t.emptyTitle, hint: t.emptyHint },

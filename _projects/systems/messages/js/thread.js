@@ -8,11 +8,15 @@
 // reached through `richText`); an image pasted into the composer is attached like one
 // picked with the Image control or dropped on the composer.
 import { classifyDmEvent, classifyGroupEvent, dmMessage, groupMessage } from './messages-model.js';
-import { createMessageLog, fillText, withTexts } from './message-log.js';
-import { readImageFile, saveFile } from './dialogs.js';
+import { ComposerFiles } from './composer-files.js';
+import { readImageFile } from './dialogs.js';
+import { FileActions } from './file-actions.js';
+import { FileViewer } from './file-viewer.js';
+import { FilesMarker } from './files-model.js';
+import { createMessageLog, withTexts } from './message-log.js';
 
 // What the pane says, worded for /dm. A host passes its own wording for any of these in
-// `texts`; {sender} and {filename} are filled in.
+// `texts`.
 export const THREAD_TEXTS = Object.freeze({
   idleTitle: 'Pick a conversation',
   idleHint: 'Or start a new chat, or find a group to join.',
@@ -31,10 +35,8 @@ export const THREAD_TEXTS = Object.freeze({
   imageOnly: 'Drop an image or screenshot here.',
   imageWhileEditing: 'Images can’t be added while you edit a message.',
   imageMessage: '🖼 Image',
-  fileShared: '{sender} shared a file:',
-  fileSharedBySomeone: 'A file was shared:',
-  fileGone: '{filename} is no longer shared with this group.',
-  fileFailed: 'Could not download {filename}. Try again.',
+  filesMessage: '📎 Files',
+  sharedButNotSent: 'Your files are shared, but the message didn’t send. Press Send to try again.',
 });
 
 // What an open conversation with no messages says, unless the host passes `emptyState`.
@@ -43,10 +45,14 @@ export const EMPTY_STATES = Object.freeze({
   group: Object.freeze({ title: 'No messages yet', hint: 'Say hi to your group.' }),
 });
 
+// groupFiles(id) is that group's GroupFiles (group-files.js): with it, shared files under a
+// message open and download, and a composer with an Attach button can share files and
+// folders. onOpenFolder(groupId, path) opens a shared folder in the page's Files dialog.
 export function createThread({
   elements, api, socket, richText, me,
   onDmRead = () => {}, onGroupRead = () => {}, onFileShared = () => {},
   readOnly = false, onSchedule = null, emptyState = null, texts = {}, formatBody = null,
+  groupFiles = null, onOpenFolder = null, viewer: sharedViewer = null,
 }) {
   if (emptyState !== null && (typeof emptyState !== 'object' || typeof emptyState.title !== 'string')) {
     throw new TypeError('createThread: emptyState must be null or { title, hint }');
@@ -84,17 +90,31 @@ export function createThread({
   let pendingImage = null; // a data URL attached to the next message, or null
   let replyingTo = null; // { id, sender, excerpt } the next message replies to
   let editingReply = null; // the reply marker of the message being edited, kept on save
+  let editingFiles = []; // the files the message being edited lists, kept on save
+  let unsentFiles = null; // files already shared whose message didn't send yet
   let dragDepth = 0;
   let destroyed = false;
 
   // Replies need chat-reply.js's helpers; a host with an older rich-text.js has none.
   const canReply = typeof richText.addReplyMarker === 'function';
 
+  // Shared files open from the group they were shared in; the viewer lives in the page's .dm root.
+  const openGroupFiles = () => (groupFiles && current?.kind === 'group' ? groupFiles(current.id) : null);
+  const viewer = sharedViewer || (groupFiles ? new FileViewer({ root: elements.messages.closest?.('.dm') || document.body }) : null);
+  const fileActions = groupFiles ? new FileActions({
+    filesFor: openGroupFiles,
+    viewer,
+    notify: message => showFormMessage(message),
+    onOpenFolder: onOpenFolder ? path => onOpenFolder(current?.id, path) : null,
+  }) : null;
+
   // A read-only pane shows the conversation but can't change it: no composer, and no
   // reply, edit or delete.
   const log = createMessageLog(elements.messages, {
     richText, me, onEdit: beginEdit, onDelete: deleteMessage, onReply: canReply ? beginReply : null,
     onSchedule, readOnly, texts, formatBody,
+    onFile: fileActions ? (action, item, control) => fileActions.handle(action, item, control) : null,
+    thumbnail: fileActions ? item => fileActions.thumbnail(item) : null,
   });
   // Pasted images go where the Image control's would, so only where that control exists.
   const composer = readOnly
@@ -107,6 +127,17 @@ export function createThread({
     elements.form.classList.add('chat-form--rich');
     elements.form.insertBefore(composer.element, elements.cancelEdit);
   }
+  // The Attach menu and file sharing, where the page has an Attach button for them.
+  const composerFiles = composer && groupFiles && elements.attachButton ? new ComposerFiles({
+    elements: {
+      attachButton: elements.attachButton, menuHost: elements.attachMenuHost || elements.form,
+      imageInput: elements.imageInput, filesInput: elements.filesInput, folderInput: elements.folderInput,
+      tray: elements.tray, dropZone: elements.dropZone || elements.form, dropHint: elements.dropHint,
+    },
+    groupFiles,
+    onImage: file => pasteImage(file),
+    showMessage: message => showFormMessage(message),
+  }) : null;
   // "Replying to …" sits just above the composer.
   const replyBar = composer && canReply ? richText.createReplyBar({ onCancel: clearReply }) : null;
   if (replyBar) {
@@ -140,12 +171,8 @@ export function createThread({
     elements.cancelEdit.hidden = !editing;
     elements.cancelEdit.disabled = pending === 'edit';
     setSendLabel(editing ? 'fa-save' : 'fa-paper-plane', editing ? text.save : text.send);
-    // Attaching is offered only where the conversation can store an image, and not
-    // while editing, which rewrites the text of a message that is already sent.
-    if (elements.imageAttach) {
-      const canAttach = loaded && !editing && Boolean(kinds[current?.kind]?.supportsImages);
-      elements.imageAttach.classList.toggle('hidden', !canAttach);
-    }
+    // Attaching isn't offered while editing, which rewrites the text of a sent message.
+    composerFiles?.setContext({ kind: current?.kind ?? null, id: current?.id ?? null, loaded, editing: Boolean(editing) });
   }
 
   // ── Attaching an image ───────────────────────────────────────────────────────
@@ -202,7 +229,9 @@ export function createThread({
     replyingTo = {
       id: message.id,
       sender: message.isSelf ? me.name : message.senderName,
-      excerpt: richText.replyExcerpt(html) || (message.image ? text.imageMessage : ''),
+      excerpt: richText.replyExcerpt(html)
+        || (message.image ? text.imageMessage : '')
+        || (FilesMarker.extract(html).items.length ? text.filesMessage : ''),
     };
     replyBar.show(replyingTo);
     showFormMessage('');
@@ -212,6 +241,7 @@ export function createThread({
   function resetEdit() {
     editing = null;
     editingReply = null;
+    editingFiles = [];
     clearReply();
     composer?.clear();
     clearImage();
@@ -226,7 +256,10 @@ export function createThread({
     // The quote isn't editable text: it is set aside and put back on save.
     const { reply, html } = canReply ? richText.extractReplyMarker(message.body) : { reply: null, html: message.body };
     editingReply = reply;
-    composer.setHTML(html);
+    // So is the list of files it shared: an edit changes the words, not what was shared.
+    const { items, html: words } = FilesMarker.extract(html);
+    editingFiles = items;
+    composer.setHTML(words);
     showFormMessage('');
     refreshComposer();
     composer.focus();
@@ -254,21 +287,44 @@ export function createThread({
     }
   }
 
+  // Shares what waits in the tray before the message goes. Resolves the items for its
+  // [[files:…]] marker, [] when nothing waits, or null when the message should stay unsent.
+  async function shareFirst() {
+    if (unsentFiles) return unsentFiles;
+    if (!composerFiles?.hasFiles()) return [];
+    const shared = await composerFiles.share();
+    return shared ? shared.items : null;
+  }
+
   async function submit() {
-    // An image on its own is a message, so an empty composer is only a reason to stop
-    // when nothing is attached. Editing stays text-only.
+    // An image or files on their own are a message, so an empty composer is only a reason
+    // to stop when nothing is attached. Editing stays text-only.
     const sendingImage = !editing && pendingImage;
+    const sendingFiles = !editing && (Boolean(unsentFiles) || Boolean(composerFiles?.hasFiles()));
     if (pending || !current?.loaded || composer.isOverLimit()) return;
-    if (composer.isEmpty() && !sendingImage) return;
+    if (composer.isEmpty() && !sendingImage && !sendingFiles) return;
+    if (sendingFiles && composerFiles?.problem()) return; // the tray says why
     const { kind, id } = current;
     const target = editing;
     const html = composer.getHTML();
     const reply = target ? editingReply : replyingTo;
-    const outgoing = reply ? richText.addReplyMarker(html, reply) : html;
     const hadFocus = composer.element.contains(document.activeElement);
     pending = target ? 'edit' : 'send';
     showFormMessage('');
     refreshComposer();
+    // Only a share waits before the send: a plain message goes out at once.
+    // An edit keeps the files its message lists; only a share waits before a send.
+    let files = [];
+    if (target) files = editingFiles;
+    else if (sendingFiles) files = await shareFirst();
+    if (destroyed) return;
+    if (files === null) {
+      pending = null;
+      refreshComposer();
+      return;
+    }
+    const withFiles = FilesMarker.add(html, files);
+    const outgoing = reply ? richText.addReplyMarker(withFiles, reply) : withFiles;
     let saved = null;
     try {
       if (target) await kinds[kind].edit(id, target.id, outgoing);
@@ -279,12 +335,18 @@ export function createThread({
       if (target && log.get(target.key)?.deleted) {
         resetEdit();
         showFormMessage(text.editOfDeleted);
+      } else if (!target && files.length) {
+        // The files are up; the next Send tries the message again without uploading them twice.
+        unsentFiles = files;
+        refreshComposer();
+        showFormMessage(text.sharedButNotSent);
       } else {
         refreshComposer();
         showFormMessage(target ? text.editFailed : text.sendFailed);
       }
       return;
     }
+    unsentFiles = null;
     // A pane destroyed while the message was saving has nothing left to update or fetch.
     if (destroyed) return;
     pending = null;
@@ -336,27 +398,6 @@ export function createThread({
     }
   }
 
-  // The socket's file frame carries the bytes, but a conversation opened later only has
-  // the line in the log, so the file is fetched by name when it is clicked. The list
-  // endpoint is the only way to read one back -- there is no per-file URL.
-  async function downloadShared(groupId, filename, control) {
-    control.disabled = true;
-    try {
-      const files = await api.groupFiles(groupId);
-      const match = (files || []).find(file => file.filename === filename);
-      if (!match) {
-        showFormMessage(fillText(text.fileGone, { filename }));
-        return;
-      }
-      saveFile(match);
-    } catch (error) {
-      console.warn('Messages: could not download the shared file', error);
-      showFormMessage(fillText(text.fileFailed, { filename }));
-    } finally {
-      control.disabled = false;
-    }
-  }
-
   function handleEvent(kind, id, event) {
     if (!isOpen(kind, id)) return;
     if (!current.loaded) {
@@ -387,11 +428,10 @@ export function createThread({
         // Someone else deleting a message can change your unread count.
         if (kind === 'dm' && change.senderUid !== me.uid) window.dispatchEvent(new Event('dm:refresh-unread'));
         break;
+      // A file went up. The message that shares it lists it, so the log adds nothing; the
+      // group's file list is just out of date.
       case 'file':
-        log.note(
-          change.sender ? fillText(text.fileShared, { sender: change.sender }) : text.fileSharedBySomeone,
-          { label: change.filename, onClick: control => downloadShared(id, change.filename, control) },
-        );
+        groupFiles?.(id)?.refresh();
         onFileShared(id);
         break;
       case 'error':
@@ -433,6 +473,11 @@ export function createThread({
     }
     const ticket = ++openCount;
     current = { kind, id, loaded: false, catchUp: false };
+    unsentFiles = null;
+    fileActions?.clear();
+    // The page hears about shares only in the open conversation, so a group's list kept from
+    // an earlier visit may miss files shared meanwhile; the next read fetches it again.
+    if (kind === 'group') groupFiles?.(id)?.refresh();
     early = [];
     unseenWhileHidden = false;
     setHeading(title, subtitle);
@@ -507,6 +552,10 @@ export function createThread({
     socket.unfollow();
     document.removeEventListener('visibilitychange', onVisibilityChange);
     composer?.destroy();
+    composerFiles?.destroy();
+    fileActions?.clear();
+    // A viewer the page handed in is the page's to keep.
+    if (!sharedViewer) viewer?.destroy();
     // Takes the image viewer and its Escape listener off the page too.
     log.destroy();
   }
@@ -519,7 +568,13 @@ export function createThread({
       submit();
     });
     elements.cancelEdit.addEventListener('click', resetEdit);
-    elements.imageInput?.addEventListener('change', event => pickImage(event.target.files?.[0]));
+    elements.imageInput?.addEventListener('change', event => {
+      pasteImage(event.target.files?.[0]);
+      event.target.value = '';
+    });
+  }
+  // Without file sharing (an embed), an image dropped on the composer is attached the old way.
+  if (composer && !composerFiles) {
     const setDragging = active => {
       elements.form.classList.toggle('is-dragging', active);
       if (elements.dropHint) elements.dropHint.setAttribute('aria-hidden', String(!active));
@@ -543,6 +598,8 @@ export function createThread({
       setDragging(false);
       pickImage(event.dataTransfer?.files?.[0]);
     });
+  }
+  if (composer) {
     elements.imageRemove?.addEventListener('click', () => {
       clearImage();
       refreshComposer();

@@ -6,7 +6,7 @@
 // The form is the box: one bordered field holding the formatting bar, the text, and
 // under them a single row with the controls at its right-hand end.
 // It wraps, and the editor asks for the whole first row, so the same rules lay out /dm
-// (Add image, Cancel, Send) and an embed (Cancel and Send alone) without either
+// (Cancel, Attach, Send) and an embed (Cancel and Send alone) without either
 // needing to know what the other has. `order` puts the row in reading order whatever
 // order the controls come in: thread.js inserts the editor in front of Cancel.
 .dm__composer {
@@ -31,15 +31,20 @@
   }
 }
 
-// Dragging an image over the composer covers it with where to let go.
+// Dragging files over the conversation covers it with where to let go. The pane is the
+// drop zone (js/composer-files.js); an embed has no pane-wide drop, so its composer is.
+.dm__thread {
+  position: relative;
+}
+
 .dm__drop-hint {
   position: absolute;
-  inset: -1px;
-  z-index: 3;
+  inset: var(--dm-space-sm);
+  z-index: 6;
   display: none;
   align-items: center;
   justify-content: center;
-  gap: var(--dm-space-sm);
+  margin: 0;
   border: 2px dashed var(--dm-accent);
   border-radius: $radius-sm;
   background: color-mix(in srgb, var(--dm-accent) 14%, var(--dm-bg));
@@ -50,8 +55,47 @@
   pointer-events: none;
 }
 
+.dm__thread.is-dragging .dm__drop-hint,
 .dm__composer.is-dragging .dm__drop-hint {
   display: flex;
+}
+
+// The files waiting to be shared, above the composer: ocs__file rows (elements/files) under
+// a line that says what they come to, with Clear, or Cancel while they upload.
+.dm__tray {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--dm-space-xs);
+  max-height: 38vh;
+  overflow-y: auto;
+  margin: 0 var(--dm-gutter) var(--dm-space-xs);
+}
+
+// Side by side where there is room, like attachments in a mail.
+.dm__tray .ocs__file-list {
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+}
+
+.dm__tray-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dm-space-sm);
+}
+
+.dm__tray-title {
+  min-width: 0;
+  font-family: var(--dm-font);
+  font-size: $text-sm;
+  font-weight: 600;
+  color: var(--dm-ink);
+}
+
+.dm__tray-note {
+  font-size: $text-sm;
+  font-style: normal;
+  color: var(--dm-muted);
 }
 
 // Wider than the box's own padding, so the formatting bar's rule runs edge to edge.
@@ -145,20 +189,30 @@
   }
 }
 
-// ── Attaching an image ─────────────────────────────────────────────────────────
+// ── Attach ──────────────────────────────────────────────────────────────────────
+// The button, its hidden inputs, and the ocs__menu it opens, which rises above the composer.
 .dm__attach {
   order: 2;
+  position: relative;
   display: inline-flex;
   flex: none;
   align-items: center;
 }
 
-.dm .dm__image-action i {
+// Anchored to the button's right edge: Attach sits at the composer's right end, so a menu
+// opening rightwards would leave a phone's screen.
+.dm__attach .ocs__menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--dm-space-sm));
+  z-index: 7;
+}
+
+.dm #messagesAttachButton i {
   color: var(--dm-accent);
 }
 
-// The real file input: present for the label and for assistive technology, but never
-// drawn. Not display:none, which would take it out of the accessibility tree.
+// The real file inputs, never drawn: the Attach menu clicks them.
 .dm__file-input {
   position: absolute;
   width: 1px;
@@ -166,12 +220,6 @@
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
-}
-
-// Keyboard focus lands on the hidden input, so the ring has to be drawn on its label.
-.dm__file-input:focus-visible + label {
-  outline: 2px solid var(--dm-accent);
-  outline-offset: 1px;
 }
 
 // Cancel, which appears while editing a message.

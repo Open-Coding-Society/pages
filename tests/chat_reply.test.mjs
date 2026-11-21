@@ -49,3 +49,8 @@ test('imageFromClipboard finds a pasted image among other clipboard items', () =
   assert.equal(imageFromClipboard({ files: [png] }), png);
   assert.equal(imageFromClipboard(null), null);
 });
+
+test('excerpts and search results leave out /dm’s file markers too', () => {
+  assert.equal(stripChatMarkers('[[files:f~plan.pdf~5]] here it is'), 'here it is');
+  assert.equal(replyExcerpt('[[files:f~plan.pdf~5;d~site~3~120]] see this'), 'see this');
+});

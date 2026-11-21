@@ -3,6 +3,8 @@
 // with its avatar, sender and time, a Reply button, and edit and delete buttons on your
 // own messages (none in a read-only log). A reply shows a quote of the message it
 // answers, from the [[reply:...]] marker at the start of its body (assets/js/chat/chat-reply.js).
+import { FileRows } from './file-rows.js';
+import { FilesMarker } from './files-model.js';
 import { dayKey, dayLabel, initialsFor, pfpSrc, tintFor } from './messages-model.js';
 
 // What the log says, worded for /dm. A host passes its own wording for any of these in
@@ -20,6 +22,12 @@ export const LOG_TEXTS = Object.freeze({
   deleted: 'This message was deleted.',
   today: 'Today',
   yesterday: 'Yesterday',
+  folderFiles: '{files} · {size}',
+  previewFile: 'Preview {name}',
+  downloadFile: 'Download {name}',
+  openFolder: 'Open {name} in Files',
+  zipFolder: 'Download {name} as a .zip',
+  imagePreview: '{name}, shared by {sender}',
 });
 
 // Fills a text's {slot}s, the way the UI Builder's registry text marks them. A slot with
@@ -62,8 +70,11 @@ function splitReply(richText, body) {
     : { reply: null, html: body };
 }
 
+// onFile(action, item, control), when given, is what a shared file's buttons do ('preview',
+// 'download', 'folder', 'zip'); thumbnail(item) resolves a URL for an image's inline preview.
 export function createMessageLog(element, {
   richText, me, onEdit, onDelete, onReply = null, onSchedule = null, readOnly = false, texts = {}, formatBody = null,
+  onFile = null, thumbnail = null,
 }) {
   if (formatBody !== null && typeof formatBody !== 'function') {
     throw new TypeError('createMessageLog: formatBody must be a function or null');
@@ -71,6 +82,7 @@ export function createMessageLog(element, {
   const text = withTexts(LOG_TEXTS, texts);
   const messages = new Map();
   let lastDay = null;
+  const fileRows = new FileRows({ onFile, thumbnail, text });
 
   const rowFor = key => element.querySelector(`[data-key="${CSS.escape(key)}"]`);
   const isNearBottom = () => element.scrollHeight - element.scrollTop - element.clientHeight < 40;
@@ -247,8 +259,10 @@ export function createMessageLog(element, {
 
   // The body's reply quote (if any) goes just before the body; formatBody sees the rest.
   // Clicking the quote scrolls to the original and marks it, as a search result does.
+  // The files shared with the message go after the body.
   function renderBody(body, stored) {
-    const { reply, html } = splitReply(richText, stored.body);
+    const { reply, html: withFiles } = splitReply(richText, stored.body);
+    const { items, html } = FilesMarker.extract(withFiles);
     const main = body.parentNode;
     main.querySelector('.chat-reply-quote')?.remove();
     if (reply && typeof richText.renderReplyQuote === 'function') {
@@ -256,6 +270,7 @@ export function createMessageLog(element, {
     }
     body.replaceChildren();
     richText.renderRichMessage(body, shownBody({ ...stored, body: html }, formatBody));
+    fileRows.render(main, body, items, stored.isSelf ? text.you : stored.senderName);
   }
 
   function actionButton(icon, label, handler) {
@@ -400,6 +415,8 @@ export function createMessageLog(element, {
     if (!row) return;
     showDeleted(row.querySelector('.chat-msg-body'));
     row.querySelector('.chat-reply-quote')?.remove();
+    row.querySelector('.chat-files')?.remove();
+    row.querySelector('.chat-file-gallery')?.remove();
     row.querySelector('.chat-msg-actions')?.remove();
     row.querySelector('.chat-msg-edited')?.remove();
     // If the viewer is showing the image of the message just deleted, close it rather
@@ -408,9 +425,8 @@ export function createMessageLog(element, {
     row.querySelector('.chat-msg-image-link')?.remove();
   }
 
-  // A line between messages that isn't anyone's message, like a shared file.
-  // `link` turns part of the line into a control: { label, onClick }. A button, not an
-  // anchor, because the file's bytes are fetched on click rather than sitting at a URL.
+  // A line between messages that isn't anyone's message. `link` turns part of the line
+  // into a control: { label, onClick }, a button rather than an anchor.
   function note(message, link) {
     element.querySelector('[data-empty]')?.remove();
     const stickToBottom = isNearBottom();

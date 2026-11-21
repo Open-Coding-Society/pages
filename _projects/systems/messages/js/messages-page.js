@@ -4,8 +4,11 @@
 // here only import each other, with ./ paths.
 import { createChatSocket } from './chat-socket.js';
 import { initDeleteGroup } from './delete-group.js';
+import { FileActions } from './file-actions.js';
+import { FileViewer } from './file-viewer.js';
 import { initGroupFormation } from './group-formation.js';
 import { initFiles, initFindGroup, initMembers } from './group-dialogs.js';
+import { GroupFiles } from './group-files.js';
 import { initMessageSearch } from './message-search.js';
 import { createMessagesApi } from './messages-api.js';
 import {
@@ -87,11 +90,21 @@ export async function startMessagesPage({ config, richText, push }) {
   }
 
   const socket = createChatSocket(config.javaWebSocketURI, { onClose: () => setStatus('disconnected', 'is-error') });
+  // One GroupFiles per group, so a group's file list is fetched once and shared by the
+  // thread, the files under its messages and the Files dialog.
+  const filesByGroup = new Map();
+  const groupFiles = id => {
+    if (!filesByGroup.has(id)) filesByGroup.set(id, new GroupFiles({ api, groupId: id }));
+    return filesByGroup.get(id);
+  };
+  const viewer = new FileViewer({ root: document.querySelector('.dm') || document.body });
   const files = initFiles({
-    api,
+    groupFilesFor: groupFiles,
+    makeFileActions: ({ filesFor, notify }) => new FileActions({ filesFor, viewer, notify }),
+    // Sharing starts from the composer, so the chat says what was shared.
+    onShare: () => byId('messagesAttachButton').click(),
     elements: {
-      dialog: byId('filesDialog'), title: byId('filesTitle'), list: byId('filesList'), table: byId('filesTable'),
-      form: byId('filesForm'), input: byId('filesInput'), upload: byId('filesUpload'), status: byId('filesStatus'),
+      dialog: byId('filesDialog'), title: byId('filesTitle'), body: byId('filesBody'), status: byId('filesStatus'),
     },
   });
   let scheduleDialog = null; // wired up below, once the thread exists
@@ -101,13 +114,22 @@ export async function startMessagesPage({ config, richText, push }) {
     socket,
     richText,
     me,
+    groupFiles,
+    viewer,
+    // A folder's Open button in the chat opens it in the Files dialog.
+    onOpenFolder: (groupId, path) => {
+      const group = findItem('group', groupId);
+      if (group) files.open(group, byId('messagesFiles'), { folderPath: path });
+    },
     elements: {
       title: byId('messagesThreadTitle'), subtitle: byId('messagesThreadSubtitle'), messages: byId('messagesLog'),
       form: byId('messagesForm'), send: byId('messagesSend'), cancelEdit: byId('messagesCancelEdit'),
       formStatus: byId('messagesFormStatus'),
-      imageAttach: byId('messagesImageAttach'), imageInput: byId('messagesImage'),
-      imagePreview: byId('messagesImagePreview'), imageThumb: byId('messagesImageThumb'),
-      imageRemove: byId('messagesImageRemove'), dropHint: byId('messagesDropHint'),
+      imageInput: byId('messagesImage'), imagePreview: byId('messagesImagePreview'), imageThumb: byId('messagesImageThumb'),
+      imageRemove: byId('messagesImageRemove'),
+      attachButton: byId('messagesAttachButton'), attachMenuHost: byId('messagesAttach'),
+      filesInput: byId('messagesFilesInput'), folderInput: byId('messagesFolder'), tray: byId('messagesAttachTray'),
+      dropZone: document.querySelector('.dm__thread'), dropHint: byId('messagesDropHint'),
     },
     onDmRead: id => {
       const conversation = findItem('dm', id);
