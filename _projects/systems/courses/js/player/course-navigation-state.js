@@ -3,6 +3,7 @@ export function createNavigationState(root, course, panel, sections, environment
   let state = { sections: {}, scrollTop: 0, lastDocument: null };
   const selection = '.lesson-item.active, .sprint-nav [aria-current="page"], .modal-lesson-item.active, .document-reader__lesson[aria-current="page"], [data-reader-overview][aria-current="page"]';
   let resume = null;
+  let resumeTitle = '';
 
   function selectedRow() {
     return root.querySelector(selection) || resume;
@@ -57,6 +58,7 @@ export function createNavigationState(root, course, panel, sections, environment
       resume = Array.from(root.querySelectorAll('[data-lesson-id]'))
         .find(row => row.dataset.lessonId && row.href === state.lastDocument) || null;
       if (resume) {
+        resumeTitle = resume.title;
         resume.classList.add('navigation-resume');
         resume.title = `Continue reading: ${resume.textContent.trim()}`;
       }
@@ -82,6 +84,10 @@ export function createNavigationState(root, course, panel, sections, environment
   environment.addEventListener('pagehide', save);
   function destroy() {
     save();
+    if (resume) {
+      resume.classList.remove('navigation-resume');
+      resume.title = resumeTitle;
+    }
     root.removeEventListener('scroll', save);
     root.removeEventListener('click', save);
     root.removeEventListener('navigation-toggle', save);

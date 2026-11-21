@@ -10,6 +10,7 @@
      {%- endif %}
      data-index-url="{{ '/assets/js/projects/courses/reader/data.json' | relative_url }}">
   <header class="document-reader__toolbar">
+    <span class="document-reader__toolbar-label">Course Viewer</span>
     <a class="ocs__btn ocs__btn--icon small accent" href="{{ '/topics/' | relative_url }}" data-reader-home aria-label="Topics catalog" title="Topics catalog"><i class="fas fa-home" aria-hidden="true"></i></a>
     <select id="document-reader-context" class="ocs__input" data-reader-context aria-label="Navigation">
       {% for placement in page.document_reader.courses %}
@@ -21,6 +22,9 @@
       <a class="ocs__btn ocs__btn--icon small accent" data-reader-toolbar-previous hidden aria-label="Previous document" title="Previous document"><i class="fas fa-chevron-left" aria-hidden="true"></i></a>
       <a class="ocs__btn ocs__btn--icon small accent" data-reader-toolbar-next hidden aria-label="Next document" title="Next document"><i class="fas fa-chevron-right" aria-hidden="true"></i></a>
     </nav>
+    {% if page.microblog or page.team_teach and page.assignment %}
+    <button id="microblog-toggle-btn" class="ocs__btn small accent document-reader__microblog" type="button" data-reader-microblog aria-controls="microblog-panel" aria-expanded="false">Microblog</button>
+    {% endif %}
     <p role="status" aria-live="polite" data-reader-status></p>
   </header>
   <div class="document-reader__panes">

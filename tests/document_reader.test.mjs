@@ -46,7 +46,7 @@ test('course cadence uses each placement without duplicating document identity',
 async function startFakeReader(t, {
   dataset = {}, restore = () => {}, extraDocuments = [], sprintTitle = 'Start', currentTitle = '',
   sprints = [{ id: 'Sprint1', title: sprintTitle, start: 1, end: 2, weeks: { 1: 'Foundations', 2: 'Building' } }],
-  extraCourses = {},
+  extraCourses = {}, initialMobile = false,
 } = {}) {
   class Element {
     constructor(tag = 'div') {
@@ -103,6 +103,7 @@ async function startFakeReader(t, {
     'toolbar-previous', 'toolbar-next', 'current-title',
   ].map(name => [name, new Element()]));
   const root = new Element();
+  hooks.navigation.open = true;
   hooks['current-title'].textContent = currentTitle;
   root.dataset = {
     membership: JSON.stringify({ csp: { week: 1 } }), baseurl: '/preview',
@@ -124,13 +125,19 @@ async function startFakeReader(t, {
   const listeners = {};
   const redirects = [];
   const remembered = [];
+  const panels = [];
+  const media = {
+    matches: initialMobile,
+    addEventListener(_name, callback) { this.change = callback; },
+    setMobile(matches) { this.matches = matches; this.change({ matches }); },
+  };
   const location = new URL(`https://example.test${root.dataset.documentUrl}?context=course&course=csp`);
   location.assign = url => redirects.push(url);
   const replacements = {
     document: { createElement: tag => new Element(tag) },
     location,
     history: { pushState() {}, replaceState() {} },
-    matchMedia: () => ({ matches: false }),
+    matchMedia: () => media,
     localStorage: { getItem: key => saved.get(key) || null, setItem: (key, value) => saved.set(key, value) },
     fetch: async () => ({ ok: true, json: async () => ({
       documents, courses: { csp: { title: 'CSP', sprints }, ...extraCourses },
@@ -147,13 +154,38 @@ async function startFakeReader(t, {
     readState: () => ({ query: '', categories: [] }), writeState: () => '',
     selectedDocuments: shown => shown, COURSE_ORDER, courseEntryUrl, rememberCourse: course => remembered.push(course),
     // The real helper restores saved sections and opens the current path; the reader must not close any.
-    createNavigationState: (_root, _course, _panel, sections) => ({
-      restore() { sections.forEach(section => section.setOpen(true)); restore(hooks); }, destroy() {}, restorePosition() {},
-    }),
+    createNavigationState: (_root, _course, panel, sections) => {
+      const state = { panel, destroyed: false };
+      panels.push(state);
+      return {
+        restore() { sections.forEach(section => section.setOpen(true)); restore(hooks); },
+        destroy() { state.destroyed = true; },
+        restorePosition() {},
+      };
+    },
   });
-  return { hooks, documents, saved, listeners, redirects, remembered };
+  return { hooks, documents, saved, listeners, redirects, remembered, media, panels };
 
 }
+
+test('resizing switches navigation panels without rebuilding the tree', async t => {
+  const { hooks, media, panels } = await startFakeReader(t, { initialMobile: true });
+  const sprint = hooks.tree.children[0];
+  const lesson = hooks.tree.querySelector('[data-lesson-id]');
+  assert.equal(hooks.navigation.open, false);
+  assert.equal(panels[0].panel, 'mobile');
+  media.setMobile(false);
+  assert.equal(hooks.navigation.open, true);
+  assert.equal(panels[0].destroyed, true);
+  assert.equal(panels[1].panel, 'desktop');
+  assert.equal(hooks.tree.children[0], sprint);
+  assert.equal(hooks.tree.querySelector('[data-lesson-id]'), lesson);
+  media.setMobile(true);
+  assert.equal(hooks.navigation.open, false);
+  assert.equal(panels[1].destroyed, true);
+  assert.equal(panels[2].panel, 'mobile');
+  assert.equal(hooks.tree.children[0], sprint);
+});
 
 test('reader navigation displays lesson types and updates week completion without changing identity', async t => {
   const { hooks, documents, saved, listeners } = await startFakeReader(t);

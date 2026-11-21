@@ -22,7 +22,14 @@ class DocumentReaderTest < Minitest::Test
     assert_match(/height: auto;/, rule)
     assert_match(/white-space: normal;/, rule)
     assert_match(/box-sizing: border-box;/, rule)
+    assert_match(/min-height: 24px;/, rule)
+    assert_match(/padding: 0\.2rem 0\.4rem;/, rule)
     assert_match(/grid-template-columns: auto minmax\(0, 1fr\) auto;/, rule)
+    label = css[/\.document-reader__toolbar-label \{([^}]+)\}/, 1]
+    refute_nil label
+    refute_match(/margin-left: auto;/, label)
+    assert_match(/\.document-reader__toolbar \{\s*justify-content: center;/, css)
+    assert_match(/\.document-reader__toolbar-label \{\s*display: none;/, css)
     assert_match(/\.document-reader__navigation \.document-reader__check \{\s*font-size: 0\.75rem;/, css)
     # S/W pills grow to the OCS medium button height on mobile, over .ocs__btn.small.
     assert_match(/@media \(max-width: 768px\) \{\s*\.document-reader__navigation \.document-reader__folder-pill\.ocs__btn \{\s*height: 35px;/, css)
@@ -31,6 +38,20 @@ class DocumentReaderTest < Minitest::Test
     assert_match(/overflow-wrap: break-word;/, main)
     # Only Markdown tables become scrolling blocks; .ocs__table must fill its width.
     assert_match(/\.document-reader__main table:not\(\.ocs__table\) \{\s*display: block;/, css)
+  end
+
+  def test_reader_microblog_toggle_follows_frontmatter
+    template = File.read(File.join(ROOT, "_projects/systems/courses/reader/start.html"))
+    conditional = template[/\{% if page\.microblog or page\.team_teach and page\.assignment %\}.*?\{% endif %\}/m]
+    refute_nil conditional
+    [{ "microblog" => true }, { "team_teach" => true, "assignment" => true }].each do |page|
+      assert_equal 1, Nokogiri::HTML(Liquid::Template.parse(conditional).render("page" => page)).css("#microblog-toggle-btn[data-reader-microblog]").size
+    end
+    [{}, { "team_teach" => true }, { "assignment" => true }].each do |page|
+      assert_empty Nokogiri::HTML(Liquid::Template.parse(conditional).render("page" => page)).css("#microblog-toggle-btn")
+    end
+    foundation = File.read(File.join(ROOT, "_includes/microblog_foundation.html"))
+    assert_match(/\{% unless page\.document_reader %\}.*?id="microblog-toggle-btn".*?\{% endunless %\}/m, foundation)
   end
 
   def test_real_shared_javascript_keeps_one_document_and_submission_identity
@@ -106,10 +127,11 @@ class DocumentReaderTest < Minitest::Test
         assert_equal 1, document.css("[data-reader-navigation] > summary [data-reader-heading]").size
         assert_equal 0, document.css("[data-reader-navigation] > nav h2[data-reader-heading]").size
         home = document.at_css("[data-reader-home]")
-        assert_equal home, document.at_css(".document-reader__toolbar").element_children.first
         assert_equal 1, home.css(".fa-home[aria-hidden='true']").size
         assert_equal "Topics catalog", home["aria-label"]
         toolbar = document.at_css(".document-reader__toolbar")
+        assert_equal "Course Viewer", toolbar.at_css(".document-reader__toolbar-label").text
+        assert_equal [toolbar.at_css(".document-reader__toolbar-label"), home], toolbar.element_children.first(2)
         %w[previous next].each do |direction|
           button = toolbar.at_css("[data-reader-toolbar-#{direction}]")
           refute_nil button, "toolbar has a #{direction} document button"

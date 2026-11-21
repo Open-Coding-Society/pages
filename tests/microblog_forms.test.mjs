@@ -5,6 +5,36 @@ import vm from 'node:vm';
 
 const html = await readFile(new URL('../_includes/microblog_foundation.html', import.meta.url), 'utf8');
 
+test('reader Microblog button toggles the panel and keeps its expanded state in sync', () => {
+    const start = html.indexOf('function openMicroblogPanel()');
+    const end = html.indexOf('// Guest & Mentor quick access:', start);
+    const classes = new Set();
+    const panel = { classList: {
+        add: value => classes.add(value),
+        remove: value => classes.delete(value),
+        contains: value => classes.has(value)
+    } };
+    const attributes = {};
+    const button = {
+        style: {},
+        hasAttribute: name => name === 'data-reader-microblog',
+        setAttribute: (name, value) => { attributes[name] = value; }
+    };
+    const close = {};
+    vm.runInNewContext(html.slice(start, end), { microblogPanel: panel, microblogFab: button, microblogCloseBtn: close });
+    button.onclick();
+    assert.equal(classes.has('open'), true);
+    assert.equal(attributes['aria-expanded'], 'true');
+    assert.notEqual(button.style.display, 'none');
+    button.onclick();
+    assert.equal(classes.has('open'), false);
+    assert.equal(attributes['aria-expanded'], 'false');
+    button.onclick();
+    close.onclick();
+    assert.equal(classes.has('open'), false);
+    assert.equal(attributes['aria-expanded'], 'false');
+});
+
 for (const formId of ['microblog-form', 'reply-form']) {
     test(`${formId}: disables during save, rejects repeat submits, preserves rejected draft`, async () => {
         const start = html.indexOf(`document.getElementById('${formId}').onsubmit`);

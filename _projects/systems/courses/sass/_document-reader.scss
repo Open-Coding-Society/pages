@@ -24,6 +24,8 @@
     .ocs__links { gap: 0.25rem; }
     p { margin: 0; }
   }
+  &__toolbar-label { font-weight: 600; }
+  &__microblog { margin-left: auto; }
   // Review circle: in front of the current document in navigation.
   .document-reader__complete.ocs__btn {
     width: 2rem;
@@ -170,10 +172,10 @@
       width: 100%;
       // OCS small controls have a fixed height; lesson titles must wrap.
       height: auto;
-      min-height: 28px;
+      min-height: 24px;
       white-space: normal;
       text-align: left;
-      padding: 0.5rem;
+      padding: 0.2rem 0.4rem;
     }
     .document-reader__check { font-size: 0.75rem; }
     .document-reader__active {
@@ -215,6 +217,8 @@
       border-bottom: 1px solid var(--ui-border);
     }
     &__main { flex: 1; padding: 0.75rem; }
-    &__toolbar { padding: 0.5rem; font-size: 0.9rem; }
+    &__toolbar { justify-content: center; padding: 0.5rem; font-size: 0.9rem; }
+    &__toolbar-label { display: none; }
+    &__microblog { margin-left: 0; }
   }
 }

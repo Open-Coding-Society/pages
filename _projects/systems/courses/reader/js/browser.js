@@ -23,11 +23,13 @@ export async function startDocumentReader(root, tools) {
     sprint: Number(root.dataset.overviewSprint),
     week: Number(root.dataset.overviewWeek),
   };
-  const panel = matchMedia('(max-width: 768px)').matches ? 'mobile' : 'desktop';
+  const mobileViewport = matchMedia('(max-width: 768px)');
+  let panel = mobileViewport.matches ? 'mobile' : 'desktop';
   if (panel === 'mobile') sidebar.open = false;
   let context = readerContext(location.search, membership, root.dataset.defaultCourse);
   let topics = readState(location.search);
   let navigation;
+  let courseSections = [];
   let payload;
   const originalLinks = new WeakMap();
 
@@ -263,7 +265,8 @@ export async function startDocumentReader(root, tools) {
       order.push(...group.lessons);
       tree.append(section);
     });
-    navigation = createNavigationState(sidebar, context.course, panel, sections);
+    courseSections = sections;
+    navigation = createNavigationState(sidebar, context.course, panel, courseSections);
     navigation.restore();
     if (panel === 'desktop') scrollCurrentNearTop();
     return order;
@@ -296,6 +299,7 @@ export async function startDocumentReader(root, tools) {
   function render() {
     navigation?.destroy();
     navigation = null;
+    courseSections = [];
     tree.replaceChildren();
     selector.value = context.course || 'topics';
     status.textContent = context.issue;
@@ -396,6 +400,13 @@ export async function startDocumentReader(root, tools) {
     selector.disabled = true;
     return;
   }
+  mobileViewport.addEventListener('change', event => {
+    navigation?.destroy();
+    panel = event.matches ? 'mobile' : 'desktop';
+    sidebar.open = panel === 'desktop';
+    navigation = context.course ? createNavigationState(sidebar, context.course, panel, courseSections) : null;
+    navigation?.restore();
+  });
   selector.addEventListener('change', () => {
     if (selector.value !== 'topics' && !Object.hasOwn(membership, selector.value)) {
       navigation?.destroy();

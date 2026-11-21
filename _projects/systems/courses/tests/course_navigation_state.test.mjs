@@ -64,18 +64,23 @@ test('Blogs keeps the last document visible without changing the page or complet
     dataset: { lessonId: '/csa/document/' },
     href: 'https://example.test/csa/document/',
     textContent: 'Arrays',
-    classList: { add: value => classes.add(value) },
+    classList: { add: value => classes.add(value), remove: value => classes.delete(value) },
+    title: 'Arrays',
     getBoundingClientRect: () => ({ top: 250 - setup.root.scrollTop, bottom: 280 - setup.root.scrollTop }),
   };
   setup.root.querySelectorAll = () => [documentRow];
   setup.sections[1].element.contains = row => row === documentRow;
   setup.sections[2].element.contains = row => row === documentRow;
-  createNavigationState(setup.root, 'csa', 'desktop', setup.sections, setup.environment).restore();
+  const navigation = createNavigationState(setup.root, 'csa', 'desktop', setup.sections, setup.environment);
+  navigation.restore();
   assert.deepEqual(setup.sections.map(section => section.open), [true, true, true]);
   assert.equal(classes.has('navigation-resume'), true);
   assert.equal(documentRow.title, 'Continue reading: Arrays');
   assert.equal(setup.root.scrollTop, 100);
   assert.equal(JSON.parse(setup.storage.get('ocs-course-navigation:csa:desktop')).lastDocument, documentRow.href);
+  navigation.destroy();
+  assert.equal(classes.has('navigation-resume'), false);
+  assert.equal(documentRow.title, 'Arrays');
 });
 
 test('opening a document updates the resume target, even before leaving its page', () => {
