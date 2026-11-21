@@ -475,6 +475,9 @@ export function createThread({
     current = { kind, id, loaded: false, catchUp: false };
     unsentFiles = null;
     fileActions?.clear();
+    // The page hears about shares only in the open conversation, so a group's list kept from
+    // an earlier visit may miss files shared meanwhile; the next read fetches it again.
+    if (kind === 'group') groupFiles?.(id)?.refresh();
     early = [];
     unseenWhileHidden = false;
     setHeading(title, subtitle);

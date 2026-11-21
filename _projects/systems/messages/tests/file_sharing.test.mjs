@@ -178,10 +178,12 @@ test('a dropped folder is walked into paths, skipping tool folders without openi
 // between Sends.
 function fakeFilesApi({ failPaths = [], failStatus = 500, gate = null } = {}) {
   const calls = { uploads: [], index: 0, content: [] };
-  return {
+  const api = {
     calls,
     failPaths,
-    groupFileIndex: async () => { calls.index += 1; return [{ path: 'notes.txt', size: 1 }]; },
+    // What Spring lists now; a test can swap it for what a teammate shared.
+    index: [{ path: 'notes.txt', size: 1 }],
+    groupFileIndex: async () => { calls.index += 1; return api.index; },
     groupFileContent: async (groupId, path) => {
       calls.content.push([groupId, path]);
       return new Blob(['x']);
@@ -193,6 +195,7 @@ function fakeFilesApi({ failPaths = [], failStatus = 500, gate = null } = {}) {
       return {};
     },
   };
+  return api;
 }
 
 function shareThread({ filesApi = fakeFilesApi(), sendFails = 0, history = [], dmHistory = [] } = {}) {
@@ -358,6 +361,22 @@ test('a file dropped before a conversation is open is kept from opening in the t
   assert.equal(over.defaultPrevented, true);
   assert.equal(drop.defaultPrevented, true);
   assert.equal(elements.tray.hidden, true);
+});
+
+test('back in a group after another chat, a folder shared meanwhile zips with its files', async () => {
+  // The page hears about shares only in the open conversation, so the list it kept for a
+  // group can miss a folder a teammate shared while you were in another chat.
+  const { thread, filesApi, files } = shareThread();
+  thread.open('group', 7, { title: '', subtitle: '' });
+  await settle();
+  await files.index(); // the list as it was, as the Files dialog loads it
+  thread.open('dm', 4, { title: 'Grace', subtitle: 'Direct message' });
+  await settle();
+  filesApi.index = [{ path: 'notes.txt', size: 1 }, { path: 'site/index.html', size: 1 }];
+  thread.open('group', 7, { title: '', subtitle: '' });
+  await settle();
+  const entries = await files.folderEntries('site');
+  assert.deepEqual(entries.map(entry => entry.path), ['site/index.html']);
 });
 
 test('editing a files message edits only its words; the files stay on it', async () => {
