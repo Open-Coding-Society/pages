@@ -25,12 +25,6 @@
     if (localStorage.getItem('ocsMentorSidebar') === 'mentor') {
       document.getElementById('sidebar-role-default').hidden = true;
       document.getElementById('sidebar-role-mentor').hidden = false;
-      const badge = document.getElementById('mentor-badge');
-      if (badge) {
-        badge.hidden = false;
-        document.body.classList.add('mentor-bar-active');
-        document.documentElement.style.setProperty('--mentor-bar-bottom', (badge.getBoundingClientRect().bottom + window.scrollY) + 'px');
-      }
     }
   } catch (e) { /* localStorage unavailable; default sidebar stays visible */ }
 </script>
