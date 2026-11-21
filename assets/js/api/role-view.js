@@ -19,6 +19,15 @@ export function isMentorAccount(roles) {
     return roles.includes('ROLE_MENTOR');
 }
 
+// Shows the mentor or default sidebar in every copy under root. The layout renders the
+// sidebar twice (side column and phone Menu), so this switches all of them, not the first.
+export function showRoleSidebars(root, isMentorView) {
+    const shownRole = isMentorView ? 'mentor' : 'default';
+    root.querySelectorAll('[data-sidebar-role]').forEach((sidebar) => {
+        sidebar.hidden = sidebar.dataset.sidebarRole !== shownRole;
+    });
+}
+
 // A mentor account can switch to the student view and back (the switch lives in the
 // mentor banner and the navbar dropdown). This is presentation only: Spring still
 // decides what the account may do, and the choice resets at login/logout.

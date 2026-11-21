@@ -77,18 +77,15 @@
 <script type="module">
     // ROLE_MENTOR comes from Spring (granted from Flask's verification); this only changes what is shown.
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-    import { viewFor, roleNames, isMentorAccount, switchView, clearRoleViewCache } from '{{site.baseurl}}/assets/js/api/role-view.js';
+    import { viewFor, roleNames, isMentorAccount, switchView, clearRoleViewCache, showRoleSidebars } from '{{site.baseurl}}/assets/js/api/role-view.js';
 
-    const defaultSidebar = document.getElementById('sidebar-role-default');
-    const mentorSidebar = document.getElementById('sidebar-role-mentor');
     const roleBar = document.getElementById('role-bar');
     const roleBadge = document.getElementById('role-bar-badge');
     const roleText = document.getElementById('role-bar-text');
     const switchButton = document.getElementById('role-view-switch');
 
     function showSidebar(isMentorView, isMentorAccountHolder) {
-        defaultSidebar.hidden = isMentorView;
-        mentorSidebar.hidden = !isMentorView;
+        showRoleSidebars(document, isMentorView);
         roleBar.hidden = !isMentorAccountHolder;
         // The badge's state modifier carries the view: accent ring for mentor, neutral for student.
         roleBadge.textContent = isMentorView ? 'Mentor' : 'Student view';
