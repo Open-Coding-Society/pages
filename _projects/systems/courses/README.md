@@ -283,10 +283,23 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
   enrolled course in CSSE/CSP/CSA/CSH order.
 - Course homes remain `/navigation/courses/<course>/` and render their
   announcements/calendar inside the reader shell (legacy player as fallback). Legacy chooser/catalog routes remain available.
+- The announcements have no header box: the chat's calendar button and
+  connection pill sit in the week calendar's header row. `mountWeekView({ tools })`
+  hands them to `WeekRowTools.place` (`js/announcement-calendar/calendar-feed.js`),
+  which puts `start` nodes before `<` `>` and wraps the row in `ocs__card-header`
+  with `end` at the far right (the row wraps on a phone). The chat finds them
+  once in `[data-hook="calendar-tools"]`; each new week view (live, then preview
+  if the connection fails) moves them into its row. Without `tools` the week view
+  is unchanged (the calendar card). Tests: `node --test tests/week_row_tools.test.mjs`,
+  `bundle exec ruby scripts/test_course_landing_pages.rb`.
 - Above the announcements, a calendar ticker (`ocs_calendar_ticker.html`,
   `CalendarTicker` in `js/announcement-calendar/calendar-ticker.js`) shows the
-  course's events from today through the fifth school day after it, each linking
-  to its linked doc on this site or else the calendar. Spring's calendar answers only signed-in
+  course's events from today through the look-ahead in `_config.yml`'s
+  `calendar_ticker` (`school_days_ahead` school days, or `days_ahead` days without
+  school weeks; 5 and 7 when unset), each linking to its linked doc on this site or
+  else the calendar. An event's own Ticker alert (the Calendar system's
+  `CalendarAlerts.js`) shows it that many days before its date instead, at most
+  `alert_limit_days` ahead (30 when unset). Spring's calendar answers only signed-in
   visitors, so signed out, with nothing coming up, or on `spring: false` there is
   no bar. Tests: `node --test tests/calendar_ticker.test.mjs`,
   `bundle exec ruby scripts/test_calendar_ticker.rb`.

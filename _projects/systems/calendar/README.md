@@ -92,6 +92,10 @@ For detailed module documentation, see [ARCHITECTURE.md](docs/ARCHITECTURE.md).
   - Every doc page (Blogs `post.html`) has an **Add to Calendar** button that opens `/student/calendar?doc=<url>&title=<title>` with the Add New Event modal filled in
   - Edits always send a `period` (the backend requires one); events with no course are saved as `Personal`, which the calendar treats as no course
   - Test: `node --test tests/calendar_doc_links.test.mjs`
+- Ticker alerts: an event's **Ticker alert** field sets how many days before its date the course home's calendar ticker starts showing it (0 means only on the day; blank means the ticker's default, `calendar_ticker` in `_config.yml`)
+  - Like the linked doc, it is a description line, `Alert: 14 days before`, just before the `Linked doc:` line ([CalendarAlerts.js](js/CalendarAlerts.js)); the event window shows it as its own field and keeps it out of the description text
+  - The box takes 0 to `alert_limit_days` (the ticker looks no further ahead for alerts); a break's window has no alert field, since breaks never show on the ticker
+  - Test: `node --test tests/calendar_alerts.test.mjs`
 - Safe event text: any signed-in account can save an event, so the page never puts its text in as raw HTML
   - Descriptions go through DOMPurify; if DOMPurify didn't load, they're escaped instead
   - Saving reads the editor back through `CalendarSafeHtml.editorHtml`, so without DOMPurify a description is saved exactly as it was, not as escaped text

@@ -9,6 +9,10 @@
 <!-- "preview" mode backed by localStorage, so the feature is visible and -->
 <!-- testable without a login. -->
 <!-- -->
+<!-- No header box: the calendar button and the connection pill sit in the week -->
+<!-- calendar's header row (mountWeekView's tools), the button before < > and the -->
+<!-- pill at the far right. The section keeps its name for screen readers. -->
+<!-- -->
 <!-- Calendar: a strip of this school week sits above the messages, anyone -->
 <!-- signed in adds events with the /event slash command, and announcements -->
 <!-- that carry events show event cards. See assets/js/chat/calendar/calendar-announcements.js. -->
@@ -17,26 +21,20 @@
 <!-- and shows a quote of the original (assets/js/chat/chat-reply.js). An image pasted -->
 <!-- into the composer is attached to the next message (Spring's group chat `image`). -->
 
-<section id="announcementChat" class="announcement-chat" data-course="{{ page.course }}" aria-labelledby="announcementChatTitle">
-  <div class="chat-header">
-    <div class="chat-heading">
-      <a class="chat-badge" href="{{ '/student/calendar' | relative_url }}" aria-label="Open OCS calendar" title="Open OCS calendar"><i class="fas fa-calendar" aria-hidden="true"></i></a>
-      <div class="chat-heading-text">
-        <h2 class="chat-title" id="announcementChatTitle">{{ page.course | upcase }} Announcements</h2>
-        <p class="chat-subtitle">Class-wide chat for this course — announcements and questions.</p>
-      </div>
-    </div>
-    <span class="chat-status-pill" id="announcementChatStatusPill">
-      <span class="chat-status-dot" aria-hidden="true"></span>
-      <span class="chat-status" id="announcementChatStatus">loading…</span>
-    </span>
-  </div>
-
+<section id="announcementChat" class="announcement-chat" data-course="{{ page.course }}" aria-label="{{ page.course | upcase }} Announcements">
   <div class="chat-body">
     <p class="chat-preview-note" id="announcementChatNote" hidden>
       <i class="fas fa-flask" aria-hidden="true"></i><span id="announcementChatNoteText"></span>
     </p>
-    <div class="announcement-chat-calendar" data-hook="calendar"></div>
+    <div class="announcement-chat-calendar" data-hook="calendar">
+      <div data-hook="calendar-tools">
+        <a class="ocs__btn small pill" data-hook="calendar-link" href="{{ '/student/calendar' | relative_url }}" aria-label="Open OCS calendar" title="Open OCS calendar"><i class="fas fa-calendar" aria-hidden="true"></i></a>
+        <span class="chat-status-pill" id="announcementChatStatusPill" data-hook="status">
+          <span class="chat-status-dot" aria-hidden="true"></span>
+          <span class="chat-status" id="announcementChatStatus">loading…</span>
+        </span>
+      </div>
+    </div>
     <div class="chat-messages" id="announcementChatMessages" role="log" aria-live="polite">
       <div class="chat-empty" id="announcementChatEmpty">
         <i class="fas fa-bullhorn" aria-hidden="true"></i>
