@@ -281,6 +281,9 @@ active_tab: calendar
                 {% for doc in site.data.topics_catalog %}<option value="{{ doc.url | relative_url | escape }}">{{ doc.title | escape }}</option>
                 {% endfor %}
             </datalist>
+            <label for="editAlertDays" class="calendar-event-modal-label">Ticker alert:</label>
+            <p id="editAlertDisplay" class="calendar-event-modal-field calendar-event-modal-display"></p>
+            <input type="text" id="editAlertDays" inputmode="numeric" class="calendar-event-modal-field issue-form-date-hidden" placeholder="Days before the event, or blank for the default" autocomplete="off">
             <label for="editPriority" class="calendar-event-modal-label">Priority:</label>
             <select id="editPriority" disabled class="calendar-event-modal-field">
                 <option value="P0">P0 - Critical</option>
@@ -359,6 +362,7 @@ active_tab: calendar
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     import { normalizeDocUrl, splitLinkedDoc, joinLinkedDoc, readDocLaunchParams } from '{{site.baseurl}}/assets/js/projects/calendar/CalendarDocLinks.js';
     import { CalendarSafeHtml } from '{{site.baseurl}}/assets/js/projects/calendar/CalendarSafeHtml.js';
+    import { CalendarAlerts } from '{{site.baseurl}}/assets/js/projects/calendar/CalendarAlerts.js';
 
     // ─── Auth helpers ───────────────────────────────────────────────
     let javaAuthenticated = true;
@@ -985,6 +989,21 @@ active_tab: calendar
         function setDocFieldEditable(editable) {
             document.getElementById('editDocDisplay').style.display = editable ? 'none' : 'block';
             document.getElementById('editDocUrl').style.display = editable ? 'block' : 'none';
+        }
+        // The ticker alert: how many days before its date the course home's ticker shows the event.
+        function showAlert(days) {
+            document.getElementById('editAlertDisplay').textContent = CalendarAlerts.describe(days);
+            document.getElementById('editAlertDays').value = days === null ? '' : String(days);
+        }
+        function setAlertFieldEditable(editable) {
+            document.getElementById('editAlertDisplay').style.display = editable ? 'none' : 'block';
+            document.getElementById('editAlertDays').style.display = editable ? 'block' : 'none';
+        }
+        // The description's own text, its linked doc and its ticker alert (each has its own field).
+        function descriptionParts(description) {
+            const { body: text, docUrl } = splitLinkedDoc(description, window.location.origin);
+            const { body, days } = CalendarAlerts.split(text);
+            return { body, docUrl, days };
         }
         // Accepts a doc picked from the list, a pasted link, or a doc title typed in full.
         // Returns '' for no doc and null for text that is not a link.
@@ -1754,9 +1773,10 @@ active_tab: calendar
                     document.getElementById('eventTitle').textContent = displayTitle;
                     // Edit mode reads the title from this field, so it must hold the event's title
                     document.getElementById('editTitle').textContent = displayTitle;
-                    const { body, docUrl } = splitLinkedDoc(currentEvent.extendedProps.description, window.location.origin);
+                    const { body, docUrl, days } = descriptionParts(currentEvent.extendedProps.description);
                     document.getElementById('editDescription').innerHTML = CalendarSafeHtml.clean(slackToHtml(body));
                     showLinkedDoc(docUrl);
+                    showAlert(days);
                     document.getElementById('editDateDisplay').textContent = formatDisplayDate(currentEvent.start);
                     document.getElementById('editDate').value = formatDate(currentEvent.start);
                     document.getElementById("editPriority").value = currentEvent.extendedProps.priority || "P2";
@@ -1837,6 +1857,7 @@ active_tab: calendar
             document.getElementById("editEventType").disabled = true;
             document.getElementById("editGroupName").disabled = true;
             setDocFieldEditable(false);
+            setAlertFieldEditable(false);
         }
         function closeModal() {
             leaveEditMode();
@@ -1876,6 +1897,8 @@ active_tab: calendar
             selectEventGroup('');
             showLinkedDoc(docUrl);
             setDocFieldEditable(true);
+            showAlert(null);
+            setAlertFieldEditable(true);
             document.getElementById('editDateDisplay').textContent = formatDisplayDate(date);
             document.getElementById('editDate').value = formatDate(date);
             document.getElementById('editDateDisplay').style.display = pickDate ? 'none' : 'block';
@@ -1922,9 +1945,17 @@ active_tab: calendar
                 alert("Linked Doc must be a doc from the list or a web link (https://...).");
                 return null;
             }
+            let alertDays;
+            try {
+                alertDays = CalendarAlerts.parse(document.getElementById('editAlertDays').value);
+            } catch (error) {
+                alert(`${error.message} Leave it blank to use the default.`);
+                return null;
+            }
             const form = {
                 title: document.getElementById("editTitle").textContent.trim(),
-                description: joinLinkedDoc(CalendarSafeHtml.editorHtml(document.getElementById("editDescription")), docUrl),
+                // The alert line goes before the doc line, which stays last.
+                description: joinLinkedDoc(CalendarAlerts.join(CalendarSafeHtml.editorHtml(document.getElementById("editDescription")), alertDays), docUrl),
                 date: document.getElementById("editDate").value,
                 priority: document.getElementById("editPriority").value,
                 type: document.getElementById("editEventType").value,
@@ -2033,8 +2064,9 @@ active_tab: calendar
                 document.getElementById("editGroupName").disabled = false;
             }
             setDocFieldEditable(true);
-            // Edit the raw text; the linked doc has its own field
-            document.getElementById("editDescription").innerHTML = CalendarSafeHtml.clean(splitLinkedDoc(currentEvent.extendedProps.description, window.location.origin).body);
+            setAlertFieldEditable(true);
+            // Edit the raw text; the linked doc and the ticker alert have their own fields
+            document.getElementById("editDescription").innerHTML = CalendarSafeHtml.clean(descriptionParts(currentEvent.extendedProps.description).body);
             document.getElementById("editTitle").focus();
         };
 

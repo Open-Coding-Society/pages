@@ -2,6 +2,7 @@
 // ticker starts showing it, kept as a description line the way the linked doc is.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { CalendarAlerts } from '../js/CalendarAlerts.js';
 import { joinLinkedDoc, splitLinkedDoc } from '../js/CalendarDocLinks.js';
 
@@ -89,4 +90,56 @@ test('the event window shows the alert in words', () => {
   assert.equal(CalendarAlerts.describe(0), 'On the day only');
   assert.equal(CalendarAlerts.describe(1), '1 day before');
   assert.equal(CalendarAlerts.describe(14), '14 days before');
+});
+
+/* ── The calendar page's Ticker alert field ──────────────────────────────── */
+
+// The page's script is inline in index.md, so Node can't run it. These checks read it as text;
+// the browser check in the PR opens, edits and saves an event on the real page.
+const page = await readFile(new URL('../index.md', import.meta.url), 'utf8');
+
+// The source of a function: `opening` matches its first line up to the body's `{`, so a
+// destructured parameter's braces aren't taken for the body.
+function block(source, opening) {
+  const match = source.match(opening);
+  assert.ok(match, `index.md has no ${opening}`);
+  const start = match.index;
+  let depth = 0;
+  for (let i = start + match[0].length - 1; i < source.length; i += 1) {
+    if (source[i] === '{') depth += 1;
+    if (source[i] === '}') depth -= 1;
+    if (depth === 0) return source.slice(start, i + 1);
+  }
+  throw new Error(`index.md: ${opening} never closes`);
+}
+const count = (pattern) => (page.match(pattern) || []).length;
+
+test('the page imports CalendarAlerts', () => {
+  assert.match(page, /import \{ CalendarAlerts \} from '\{\{site\.baseurl\}\}\/assets\/js\/projects\/calendar\/CalendarAlerts\.js';/);
+});
+
+test('the event window has a Ticker alert field: the alert in words, and a box while editing', () => {
+  assert.match(page, /<label for="editAlertDays" class="calendar-event-modal-label">Ticker alert:<\/label>/);
+  assert.match(page, /<p id="editAlertDisplay" class="calendar-event-modal-field calendar-event-modal-display"><\/p>/);
+  assert.match(page, /<input type="text" id="editAlertDays" inputmode="numeric" class="calendar-event-modal-field issue-form-date-hidden"/);
+  assert.match(block(page, /function showAlert\(days\) \{/), /textContent = CalendarAlerts\.describe\(days\)/);
+});
+
+test('every description shown in the window has its alert line taken out, like its doc line', () => {
+  const parts = block(page, /function descriptionParts\(description\) \{/);
+  assert.match(parts, /splitLinkedDoc\(description, window\.location\.origin\)/);
+  assert.match(parts, /CalendarAlerts\.split\(/);
+  assert.equal(count(/splitLinkedDoc\(/g), 1, 'opening an event and Edit read the description through descriptionParts');
+  assert.equal(count(/descriptionParts\(currentEvent\.extendedProps\.description\)/g), 2);
+});
+
+test('the alert box is editable exactly when the doc box is', () => {
+  assert.equal(count(/setAlertFieldEditable\((true|false)\)/g), count(/setDocFieldEditable\((true|false)\)/g));
+  assert.match(block(page, /function openAddEventModal\(.*\) \{/), /showAlert\(null\);/);
+});
+
+test('saving reads the box and puts the alert line before the doc line', () => {
+  const form = block(page, /function readEventForm\(.*\) \{/);
+  assert.match(form, /CalendarAlerts\.parse\(document\.getElementById\('editAlertDays'\)\.value\)/);
+  assert.match(form, /joinLinkedDoc\(CalendarAlerts\.join\(CalendarSafeHtml\.editorHtml\(document\.getElementById\("editDescription"\)\), alertDays\), docUrl\)/);
 });
