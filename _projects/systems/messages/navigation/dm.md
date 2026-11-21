@@ -303,17 +303,15 @@ the open conversation each start with a bar of the same height.
   </div>
 
   <div class="ocs__modal hidden" id="filesDialog" role="dialog" aria-modal="true" aria-labelledby="filesTitle">
-    <div class="ocs__modal-card ocs__stack">
+    <div class="ocs__modal-card ocs__modal-card--wide ocs__stack">
       <div class="ocs__modal-header">
         <h3 class="ocs__modal-title" id="filesTitle">Files</h3>
         <button type="button" class="ocs__btn small" data-close aria-label="Close" data-focus>&times;</button>
       </div>
-      <div class="ocs__table-wrap hidden" id="filesTable">
-        <table class="ocs__table">
-          <thead><tr><th>File</th><th>Shared by</th><th>Action</th></tr></thead>
-          <tbody id="filesList"></tbody>
-        </table>
-      </div>
+      {%- comment -%}
+        js/files-panel.js draws the group's files here, as folders, from Spring's index.
+      {%- endcomment -%}
+      <div class="ocs__stack" id="filesBody"></div>
       <form class="ocs__stack" id="filesForm">
         <div class="ocs__field">
           <label class="ocs__label" for="filesInput">Share a file with the group</label>

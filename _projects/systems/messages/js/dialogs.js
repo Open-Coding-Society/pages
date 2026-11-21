@@ -47,6 +47,19 @@ export function saveFile(file) {
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
+// Saves a Blob as a download named `filename` (its last path part). The URL is let go a
+// minute later, not at once: Safari can still be reading a big file when click() returns.
+export function saveBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = downloadName(filename);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
 // Reads an image file and returns a data URL, downscaled so the long edge is at most
 // MAX_IMAGE_EDGE. A group's messages are stored as one JSONL file that is read and
 // rewritten on every send, so pasting a phone photo in at full size would bloat every

@@ -1,8 +1,9 @@
 // The group dialogs: find a group to join or make a new one, see and change a group's
-// members, and share files with a group. Leaving a group is a button in the conversation
-// header (messages-page.js). Deleting one starts at the bottom of Members, for site
-// admins only, and is confirmed in delete-group.js.
-import { button, cell, createDialog, saveFile } from './dialogs.js';
+// members, and see the files shared with a group. Leaving a group is a button in the
+// conversation header (messages-page.js). Deleting one starts at the bottom of Members, for
+// site admins only, and is confirmed in delete-group.js.
+import { button, cell, createDialog } from './dialogs.js';
+import { FilesTab } from './files-panel.js';
 import {
   canDeleteGroup, deleteGroupWarning, groupSubtitle, isClassGroup, isCourseChannel, isGroupMember, sortGroups,
 } from './messages-model.js';
@@ -254,47 +255,22 @@ function readAsBase64(file) {
   });
 }
 
-export function initFiles({ elements, api }) {
+// The Files dialog: everything shared with a group, as folders (FilesTab), from Spring's
+// index, with Download and Preview for a file and a .zip for a folder. makeFileActions({
+// filesFor, notify }) makes the FileActions its buttons use, so they open the dialog's group
+// and speak in its status line. The form under the list shares one file.
+export function initFiles({ elements, api, groupFilesFor, makeFileActions, onShare = null }) {
   let group = null;
-  let loadCount = 0;
-
-  function fileRow(file) {
-    const row = document.createElement('tr');
-    const action = document.createElement('td');
-    action.appendChild(button('Download', 'ocs__btn small', () => {
-      try {
-        saveFile(file);
-      } catch (error) {
-        console.warn('Messages: could not read the shared file', error);
-        elements.status.textContent = `Could not download ${file.filename}.`;
-      }
-    }));
-    // Files shared before uploads were attributed have no uploadedBy, so they say so
-    // rather than showing a blank cell.
-    row.append(cell(file.filename), cell(file.uploadedBy || 'Unknown'), action);
-    return row;
-  }
-
-  async function load() {
-    const ticket = ++loadCount;
-    elements.status.textContent = 'Loading files…';
-    try {
-      const files = await api.groupFiles(group.id) || [];
-      if (ticket !== loadCount) return;
-      elements.list.replaceChildren(...files.map(fileRow));
-      elements.table.classList.toggle('hidden', files.length === 0);
-      elements.status.textContent = files.length ? '' : 'No files shared yet.';
-    } catch (error) {
-      if (ticket !== loadCount) return;
-      console.warn('Messages: could not load the shared files', error);
-      elements.table.classList.add('hidden');
-      elements.status.textContent = 'Could not load the files. Try again.';
-    }
-  }
-
+  const notify = message => { elements.status.textContent = message; };
+  const actions = makeFileActions({ filesFor: () => (group ? groupFilesFor(group.id) : null), notify });
+  const tab = new FilesTab({
+    host: elements.body, notify, groupFilesFor, actions, onShare, onClose: () => dialog.close(),
+  });
   const dialog = createDialog(elements.dialog, {
     onClose: () => {
-      loadCount += 1;
+      tab.hide();
+      actions.clear();
+      group = null;
       elements.form.reset();
     },
   });
@@ -303,36 +279,39 @@ export function initFiles({ elements, api }) {
     event.preventDefault();
     const file = elements.input.files?.[0];
     if (!file) {
-      elements.status.textContent = 'Choose a file first.';
+      notify('Choose a file first.');
       return;
     }
     elements.upload.disabled = true;
-    elements.status.textContent = `Sharing ${file.name}…`;
+    notify(`Sharing ${file.name}…`);
     try {
       await api.uploadGroupFile(group.id, file.name, await readAsBase64(file));
       elements.form.reset();
-      await load();
-      elements.status.textContent = `Shared ${file.name}.`;
+      groupFilesFor(group.id).refresh();
+      tab.refreshIfShowing(group.id);
+      notify(`Shared ${file.name}.`);
     } catch (error) {
       console.warn('Messages: could not share the file', error);
-      elements.status.textContent = `Could not share ${file.name}. Try again.`;
+      notify(`Could not share ${file.name}. Try again.`);
     } finally {
       elements.upload.disabled = false;
     }
   });
 
   return {
-    open(current, opener) {
+    // folderPath opens straight into a shared folder.
+    open(current, opener, { folderPath = '' } = {}) {
       group = current;
       elements.title.textContent = `Files in ${group.name}`;
-      elements.list.replaceChildren();
-      elements.table.classList.add('hidden');
+      notify('');
       dialog.open(opener);
-      load();
+      tab.show(group, { folderPath });
     },
     // Someone shared a file while the dialog shows this group's files.
     refreshIfShowing(groupId) {
-      if (dialog.isOpen() && group?.id === groupId) load();
+      if (!dialog.isOpen() || group?.id !== groupId) return;
+      groupFilesFor(groupId).refresh();
+      tab.refreshIfShowing(groupId);
     },
   };
 }

@@ -544,3 +544,23 @@
     transition-duration: 0.01ms;
   }
 }
+
+// ── The file viewer (js/file-viewer.js) ─────────────────────────────────────────
+.dm__viewer-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dm-space-xs);
+  min-width: 0;
+}
+
+.dm__viewer-body img.ocs__file-preview {
+  align-self: center;
+  max-height: 70vh;
+  object-fit: contain;
+}
+
+.dm__viewer-note {
+  font-size: $text-sm;
+  font-style: normal;
+  color: var(--dm-muted);
+}

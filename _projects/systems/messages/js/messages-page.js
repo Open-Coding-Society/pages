@@ -4,8 +4,11 @@
 // here only import each other, with ./ paths.
 import { createChatSocket } from './chat-socket.js';
 import { initDeleteGroup } from './delete-group.js';
+import { FileActions } from './file-actions.js';
+import { FileViewer } from './file-viewer.js';
 import { initGroupFormation } from './group-formation.js';
 import { initFiles, initFindGroup, initMembers } from './group-dialogs.js';
+import { GroupFiles } from './group-files.js';
 import { initMessageSearch } from './message-search.js';
 import { createMessagesApi } from './messages-api.js';
 import {
@@ -87,10 +90,20 @@ export async function startMessagesPage({ config, richText, push }) {
   }
 
   const socket = createChatSocket(config.javaWebSocketURI, { onClose: () => setStatus('disconnected', 'is-error') });
+  // One GroupFiles per group, so a group's file list is fetched once and shared by the
+  // thread, the files under its messages and the Files dialog.
+  const filesByGroup = new Map();
+  const groupFiles = id => {
+    if (!filesByGroup.has(id)) filesByGroup.set(id, new GroupFiles({ api, groupId: id }));
+    return filesByGroup.get(id);
+  };
+  const viewer = new FileViewer({ root: document.querySelector('.dm') || document.body });
   const files = initFiles({
     api,
+    groupFilesFor: groupFiles,
+    makeFileActions: ({ filesFor, notify }) => new FileActions({ filesFor, viewer, notify }),
     elements: {
-      dialog: byId('filesDialog'), title: byId('filesTitle'), list: byId('filesList'), table: byId('filesTable'),
+      dialog: byId('filesDialog'), title: byId('filesTitle'), body: byId('filesBody'),
       form: byId('filesForm'), input: byId('filesInput'), upload: byId('filesUpload'), status: byId('filesStatus'),
     },
   });
