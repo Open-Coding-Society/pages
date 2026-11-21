@@ -1,0 +1,1148 @@
+/* Microblog form group and label */
+.microblog-form-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.microblog-form-label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #f1f5f9;
+  margin-bottom: 0.25rem;
+}
+
+.microblog-form-label .required {
+  color: #ef4444;
+}
+
+
+/* Modal overlay background: dark semi-transparent */
+#microblog-modal,
+#microblog-qr-modal,
+#reply-modal {
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1200;
+}
+
+#microblog-modal,
+#microblog-qr-modal,
+#reply-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  transition: opacity 0.2s;
+}
+
+#microblog-modal.hidden,
+#microblog-qr-modal.hidden,
+#reply-modal.hidden {
+  display: none;
+}
+
+/* Modal Panel: matches microblog panel pattern */
+.microblog-modal-panel {
+  background: var(--green-bg);
+  color: var(--white);
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 0.5rem;
+  padding: 1.5rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.microblog-modal-content {
+  /* Remove background and color, handled by .microblog-modal-panel */
+  width: 100%;
+  padding: 0;
+  background: none;
+  color: inherit;
+}
+
+.microblog-modal-close {
+  background: none;
+  border: none;
+  color: #e5e7eb;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  margin-right: 0.5rem;
+}
+
+.microblog-modal-close:hover {
+  color: #fff;
+}
+
+.microblog-modal-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.microblog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.microblog-form label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #f1f5f9;
+  margin-bottom: 0.25rem;
+}
+
+.microblog-form input[type="text"] {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  color: #222;
+  background: #fff;
+  margin-top: 0.25rem;
+}
+
+// The topic is set from the page, so it reads as a quiet, read-only line
+.microblog-form input.microblog-topic-input {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #e5e7eb;
+  font-size: 0.85rem;
+  cursor: default;
+}
+
+.microblog-form textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 7rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  color: #222;
+  background: #fff;
+  margin-top: 0.25rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.microblog-form .microblog-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.microblog-btn {
+  background: #1e40af;
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.microblog-btn:hover {
+  background: #2563eb;
+}
+
+.microblog-btn-cancel {
+  background: #64748b;
+}
+
+.microblog-btn-cancel:hover {
+  background: #475569;
+}
+
+/* Floating Action Button */
+
+/* Container that holds the microblog FAB */
+.micro-actions-wrapper {
+  position: fixed;
+  top: 5rem;
+  right: 2rem;
+  z-index: 1050;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  --fab-size: 56px; /* default diameter for circular FABs */
+}
+
+/* Floating Action Button */
+.microblog-fab {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 0 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--fab-size, 56px);
+  min-width: calc(var(--fab-size, 56px) + 40px);
+}
+
+.microblog-fab:hover { background: #1e40af; }
+
+@media (max-width: 600px) {
+  .micro-actions-wrapper { top: 1rem; right: 1rem; }
+  .microblog-fab { font-size: 1.2rem; min-width: 56px; height: var(--fab-size,56px); }
+}
+
+/* Side Panel */
+.microblog-panel {
+  background: var(--green-bg);
+  color: var(--white);
+  position: fixed;
+  top: 5rem;
+  right: 0;
+  width: 400px;
+  max-width: 90vw;
+  height: calc(100vh - 5rem - 3rem);
+  /* leave 3rem for footer */
+  margin-bottom: 3rem;
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.12);
+  z-index: 1100;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(.4, 0, .2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.microblog-panel.open {
+  transform: translateX(0);
+}
+
+.microblog-panel-header,
+.microblog-modal-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.microblog-panel-title,
+.microblog-modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-left: 1rem;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.microblog-close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  line-height: 1;
+}
+
+.microblog-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .microblog-panel {
+    width: 95vw;
+    max-width: 95vw;
+    height: 85vh;
+    border-radius: 12px;
+
+    /* Centered Modal Style */
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    right: auto;
+    /* Reset right positioning */
+    transform: translate(-50%, -50%) scale(0.96);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.28s cubic-bezier(.4, 0, .2, 1),
+      opacity 0.2s ease, visibility 0.2s ease;
+  }
+
+  .microblog-panel.open {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .microblog-fab {
+    right: 2rem;
+    top: 5rem;
+    padding: 1rem 1.5rem;
+    font-size: 1.2rem;
+    min-width: auto;
+    min-height: auto;
+    border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Post list (the DataTables table in #microblog-playground). The theme's
+   markdown-table stripes, borders and dark header are reset here so each post
+   reads as one block: who and when on the left, the message on the right. */
+#microblog-panel {
+  .dataTables_wrapper {
+    color: inherit;
+    font-size: 0.85rem;
+  }
+
+  // Top row: New + page icons on the left, "Show 10" on the right
+  .dataTables_length,
+  .dataTables_info {
+    float: none;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    color: #d1d5db;
+  }
+
+  .dataTables_length {
+    margin: 0.75rem 0 0.25rem;
+
+    label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    select {
+      padding: 0.15rem 0.3rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 0.375rem;
+      background: #1f2937;
+      color: #f9fafb;
+    }
+  }
+
+  .dataTables_info {
+    padding-top: 0.75rem;
+  }
+
+  .dataTables_paginate {
+    float: none;
+    padding-top: 0.5rem;
+    text-align: center;
+  }
+
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.2rem 0.6rem;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    background: none;
+    color: #e5e7eb !important;
+
+    &:hover:not(.disabled) {
+      border-color: rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    &.current,
+    &.current:hover {
+      border-color: rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    &.disabled {
+      opacity: 0.4;
+    }
+  }
+}
+
+.microblog-filter-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+// New post: compact, with its label, so it doesn't outweigh the posts
+.microblog-btn.microblog-btn-create {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.5rem;
+  font-size: 0.85rem;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+// This page / all pages toggles (their colors and opacity are set inline by the panel script)
+.microblog-filter-page,
+.microblog-filter-many {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+// The post list scrolls inside the panel, so the toolbar above it stays put
+.microblog-table-scroll {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+#microblog-panel table.microblog-table {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  background: transparent;
+
+  tr,
+  tr:nth-child(even) {
+    background: transparent;
+  }
+
+  thead th {
+    padding: 0.4rem 0.6rem;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+    color: #d1d5db;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  tbody td {
+    padding: 0.75rem 0.6rem;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  tbody tr:first-child td {
+    border-top: 0;
+  }
+
+  // The writer column: name, then time and length in smaller, quieter text
+  tbody td:first-child {
+    width: 30%;
+  }
+
+  // A post's replies sit directly under it, as part of the same block
+  tr.replies-row td {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  td.dataTables_empty {
+    padding: 1.5rem 0.5rem;
+    color: #d1d5db;
+    text-align: center;
+  }
+}
+
+.microblog-post-author {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.microblog-post-time,
+.microblog-post-count {
+  margin-top: 0.15rem;
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.microblog-post-content {
+  margin-top: 0.3rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Search box, beside the Show filter */
+.microblog-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+
+  .microblog-view-filter {
+    margin-top: 0;
+    margin-left: auto;
+  }
+}
+
+.microblog-search {
+  position: relative;
+  flex: 1 1 9rem;
+  min-width: 0;
+}
+
+.microblog-search-icon {
+  position: absolute;
+  z-index: 1; // the theme positions inputs, which would paint over it
+  top: 50%;
+  left: 0.6rem;
+  color: #9ca3af;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.microblog-search-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.35rem 0.6rem 0.35rem 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.375rem;
+  background: #1f2937;
+  color: #f9fafb;
+  font-size: 0.85rem;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 1px;
+  }
+}
+
+/* Survey on a post: each choice is a vote button filled to its share of the votes */
+.microblog-survey {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+}
+
+.microblog-survey-choice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.375rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+
+  &:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 1px;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &.is-chosen {
+    border-color: #6ee7b7;
+  }
+}
+
+// The share of the votes, drawn behind the label
+.microblog-survey-bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: rgba(59, 130, 246, 0.35);
+  transition: width 0.3s ease;
+
+  .is-chosen > & {
+    background: rgba(16, 185, 129, 0.35);
+  }
+}
+
+.microblog-survey-label,
+.microblog-survey-share {
+  position: relative;
+}
+
+.microblog-survey-label {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.microblog-survey-share {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.microblog-survey-total {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+/* Replies: an indented thread under the post */
+.replies-container {
+  margin-left: 0.5rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid rgba(16, 185, 129, 0.6);
+}
+
+.microblog-replies-heading {
+  margin-bottom: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.microblog-reply {
+  padding: 0.4rem 0;
+
+  & + & {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+.microblog-reply-author {
+  font-size: 0.8rem;
+}
+
+.microblog-reply-time {
+  font-size: 0.7rem;
+  opacity: 0.75;
+}
+
+.microblog-reply-content {
+  margin-top: 0.15rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Create / reply modals */
+.microblog-modal-panel .microblog-form {
+  margin-top: 1rem;
+}
+
+.microblog-modal-panel {
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+.microblog-survey-toggle,
+.microblog-text-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.1rem;
+  border: 0;
+  background: none;
+  color: #93c5fd;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: #fff;
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.is-danger {
+    color: #fca5a5;
+  }
+}
+
+.microblog-survey-toggle[hidden],
+.microblog-survey-fields[hidden],
+.microblog-survey-builder[hidden] {
+  display: none;
+}
+
+.microblog-survey-fields {
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0.5rem;
+
+  legend {
+    padding: 0 0.25rem;
+  }
+}
+
+.microblog-survey-hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.microblog-survey-option-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  input {
+    margin-top: 0;
+  }
+}
+
+.microblog-survey-builder-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+/* Guest & Mentor quick access (projects/microblog/quick-access.js).
+   Drawn from the preference tokens and the shared mixins, with no literal colors (see "Color and preferences"
+   in open-coding/README.md), so it reads in every preset. */
+
+// A control filled with the accent. Page-colored text on an accent fill keeps 4.5:1 in every preset.
+%quick-accent-fill {
+  border: none;
+  border-radius: 0.375rem;
+  background: var(--pref-accent-color);
+  color: var(--pref-bg-color);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--pref-accent-color) 85%, var(--pref-text-color));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pref-text-color);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.guest-signup-toggle-btn {
+  @extend %quick-accent-fill;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  margin-left: auto;
+}
+
+.guest-signup-container {
+  @include surface(0.5rem, 1rem);
+  margin: 1rem;
+}
+
+.guest-form-group {
+  margin-bottom: 0.75rem;
+
+  input,
+  select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--field-border);
+    border-radius: 0.375rem;
+    background: var(--pref-bg-color);
+    color: var(--pref-text-color);
+    font-size: 1rem;
+    box-sizing: border-box;
+
+    &:focus-visible {
+      border-color: var(--pref-accent-color);
+      outline: 2px solid var(--pref-accent-color);
+      outline-offset: 1px;
+    }
+  }
+
+  input::placeholder {
+    color: var(--text-muted);
+  }
+}
+
+.guest-submit-btn {
+  @extend %quick-accent-fill;
+  width: 100%;
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+}
+
+.guest-note {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+// A status line is the text color; what it means is on its left edge: the accent for success, red for an error.
+.guest-status {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  text-align: center;
+  min-height: 1.2rem;
+  color: var(--pref-text-color);
+
+  &.is-success,
+  &.is-error {
+    padding: 0.35rem 0.6rem;
+    border-left: 3px solid var(--pref-accent-color);
+    text-align: left;
+  }
+
+  &.is-error {
+    border-left-color: $red;
+  }
+}
+
+.quick-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0 1rem 0;
+}
+
+.quick-tab {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--pref-text-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    @include accent-tint(8%);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pref-accent-color);
+    outline-offset: 2px;
+  }
+
+  // The chosen tab: the accent ring and tint, and an underline, so it is not told by color alone
+  &[aria-selected="true"] {
+    @include accent-tint(16%);
+    box-shadow: inset 0 -2px 0 var(--pref-accent-color);
+  }
+}
+
+#quick-access [hidden] {
+  display: none;
+}
+
+/* Channel tabs: Chat / Suggestions. Underlined like page tabs, so they read
+   as separate places rather than another filter. */
+.microblog-channel-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.microblog-channel-tab {
+  flex: 1;
+  margin-bottom: -1px;
+  padding: 0.5rem 0.75rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #d1d5db;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  &.is-active {
+    border-bottom-color: #3b82f6;
+    color: #fff;
+  }
+}
+
+/* View filter: All / Active / Mine / History */
+.microblog-view-filter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+
+  label {
+    color: #d1d5db;
+    font-weight: 600;
+  }
+}
+
+.microblog-view-select {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.375rem;
+  background: #1f2937;
+  color: #f9fafb;
+  font-size: 0.85rem;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 1px;
+  }
+}
+
+.microblog-status {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: #e5e7eb;
+
+  &:empty {
+    display: none;
+  }
+}
+
+/* Post layout: topic line (+ Resolved badge), content, then one row of actions */
+.microblog-post-topic {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+/* Never wraps: four 1.75rem buttons plus Resolve fit the narrowest panel, and
+   Resolve drops its label on small screens (see the media query below) */
+.microblog-post-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+}
+
+/* Edit / Reply: matching square icon buttons */
+.microblog-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0.375rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* Delete: same square, turns red on hover */
+  &.is-danger:hover:not(:disabled) {
+    background: #dc2626;
+    border-color: #dc2626;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* Resolve / Reopen: same height as the icon buttons, with a label, at the row's right end */
+.microblog-resolve-btn {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 0.3rem;
+  margin-left: auto;
+  height: 1.75rem;
+  padding: 0 0.65rem;
+  border: 1px solid #10b981;
+  border-radius: 0.375rem;
+  background: #10b981;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #059669;
+    border-color: #059669;
+  }
+
+  &:disabled {
+    background: #94a3b8;
+    border-color: #94a3b8;
+    cursor: not-allowed;
+  }
+}
+
+/* Replies: name and date, then the reply's status badge and its own
+   Resolve / Reopen, pushed to the right (margin-left: auto above) */
+.microblog-reply-byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+}
+
+.microblog-resolve-btn.microblog-resolve-btn--reply {
+  height: 1.5rem;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+}
+
+// Resolved replies stay readable but step back from open ones
+.microblog-reply.is-resolved {
+  opacity: 0.7;
+}
+
+/* Reopen is the secondary action on a resolved post, so it's outlined */
+.microblog-resolve-btn.is-reopen {
+  background: transparent;
+  color: #6ee7b7;
+
+  &:hover:not(:disabled) {
+    background: rgba(16, 185, 129, 0.2);
+    color: #fff;
+  }
+}
+
+/* Phones: Resolve / Reopen become icon squares (the title still says which) */
+@media (max-width: 480px) {
+  .microblog-resolve-btn {
+    justify-content: center;
+    width: 1.75rem;
+    padding: 0;
+
+    span {
+      display: none;
+    }
+  }
+
+  .microblog-resolve-btn.microblog-resolve-btn--reply {
+    width: 1.5rem;
+    padding: 0;
+  }
+}
+
+.microblog-resolved-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.25);
+  color: #6ee7b7;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Microblog notification badges (projects/microblog/microblog-notifications.js):
+   the DM bell's red count (%notification-badge in dm-bell.scss), on the
+   Capstone tab and on each capstone card with new posts on its microblog. */
+
+// On the tab it sits just after the name instead of over an icon.
+.microblog-unread-badge {
+  @extend %notification-badge;
+  position: relative;
+  top: -0.55em;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+// On a card, in its top-right corner (projects/microblog/capstone-microblog-badges.js).
+[data-microblog-unread-card] {
+  position: relative;
+}
+
+// Two classes, so its size beats the shared pill's, which dm-bell.scss writes later.
+.microblog-unread-badge.microblog-unread-badge--card {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  font-size: 12px;
+  line-height: 22px;
+}
+
+// Phones keep the tabs behind the menu icon: a dot on it says there is news.
+@media screen and (max-width: 599px) {
+  .site-nav.has-microblog-unread .menu-icon {
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: -3px;
+      right: -5px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: darken($red, 8%);
+    }
+  }
+}
+/* Add more microblog-specific styles as needed */

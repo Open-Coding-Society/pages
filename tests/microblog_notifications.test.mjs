@@ -10,9 +10,9 @@ async function loadWithStubs(path, stubs) {
 }
 
 // The notifications module uses microblog.js's marker and author helpers for real.
-globalThis.__microblog = await loadWithStubs('../assets/js/api/microblog.js',
+globalThis.__microblog = await loadWithStubs('../_projects/systems/microblog/js/microblog.js',
     "const pythonURI = ''; const fetchOptions = {}; const withMicroblogRateLimit = () => {};\n");
-const notifications = await loadWithStubs('../assets/js/api/microblog-notifications.js',
+const notifications = await loadWithStubs('../_projects/systems/microblog/js/microblog-notifications.js',
     "const baseurl = ''; const { fetchPosts, fetchCurrentUser, isStatusMarker, normalizeAuthorUids } = globalThis.__microblog;\n");
 const { normalizePagePath, parseServerTime, pagesAuthoredBy, countNewActivity } = notifications;
 

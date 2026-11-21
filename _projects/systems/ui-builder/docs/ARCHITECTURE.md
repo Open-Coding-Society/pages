@@ -227,7 +227,7 @@ are unchanged.
 | Team members | `SpringPageStore.members(slug, blockId)` | names only, from the published page's group |
 | Class calendar | Courses `calendar-card.js` `createCalendarCardSection` + `mountCalendarCard` | Spring calendar; the school week when signed out |
 | Kanban board | `assets/js/kanban-board.js` `createKanbanSection` + `mountKanbanBoard` | GitHub (60 requests an hour per network, so it loads on click) |
-| Visitor feedback | `assets/js/api/microblog.js` `createPost`, and Flask's public `GET /api/microblog/page/<key>` | Flask microblog, filed under the published address |
+| Visitor feedback | `assets/js/projects/microblog/microblog.js` `createPost`, and Flask's public `GET /api/microblog/page/<key>` | Flask microblog, filed under the published address |
 | Data from your API | `api-data.js` `fetchJson` | the student's own API, without cookies |
 
 Other systems' modules load by address, and only when a page has their block: the viewer passes

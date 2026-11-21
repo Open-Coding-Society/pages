@@ -1,0 +1,29 @@
+# Microblog
+
+Microblog provides page-scoped posts, replies, surveys, search, notifications,
+guest access and phone reviews. It is registered as `systems/microblog:dev` so
+the panel, styles and API modules are available in both `make` and `make dev`.
+Edit the sources here, not the generated copies in the project directories.
+
+## Boundaries
+
+- `navigation/microblog_foundation.html` publishes to `_includes/projects/microblog/`.
+  The site shell includes it for `microblog: true` and for team-taught assignments.
+  The Courses reader puts its toggle in the toolbar; other pages use the floating
+  toggle. Lesson Feedback supplies the Ratings tab for team-taught assignments.
+- `js/` publishes to `assets/js/projects/microblog/`, including the
+  Jekyll-generated notification index. The modules use the shared API
+  configuration and Login's published password helpers.
+- `sass/` publishes to `_sass/projects/microblog/`; the site stylesheet imports
+  both files. `pages/review.md` publishes under `navigation/projects/microblog/`
+  and keeps its `/review` permalink and QR guest flow.
+- Flask owns the microblog API and stored posts. The shared QR library, site shell,
+  Capstone cards and Login are dependencies, not Microblog sources.
+
+## Verification
+
+Run `bundle exec ruby scripts/test_system_project_distribution.rb` for publication,
+cleanup and republication. Run `node --test tests/microblog_*.test.mjs` for panel,
+API, notifications, surveys, guest access and review behavior. Reader integration
+is covered by `bundle exec ruby scripts/test_document_reader.rb`.
+Restart project watchers after changing the shared Makefile template.

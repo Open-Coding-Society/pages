@@ -50,7 +50,7 @@ class DocumentReaderTest < Minitest::Test
     [{}, { "team_teach" => true }, { "assignment" => true }].each do |page|
       assert_empty Nokogiri::HTML(Liquid::Template.parse(conditional).render("page" => page)).css("#microblog-toggle-btn")
     end
-    foundation = File.read(File.join(ROOT, "_includes/microblog_foundation.html"))
+    foundation = File.read(File.join(ROOT, "_projects/systems/microblog/navigation/microblog_foundation.html"))
     assert_match(/\{% unless page\.document_reader %\}.*?id="microblog-toggle-btn".*?\{% endunless %\}/m, foundation)
   end
 

@@ -45,7 +45,7 @@ are asked not to index them.
       kanban: '{{ site.baseurl }}/assets/js/kanban-board.js',
       calendarCard: '{{ site.baseurl }}/assets/js/chat/calendar/calendar-card.js',
       calendarModel: '{{ site.baseurl }}/assets/js/chat/calendar/calendar-model.js',
-      microblog: '{{ site.baseurl }}/assets/js/api/microblog.js',
+      microblog: '{{ site.baseurl }}/assets/js/projects/microblog/microblog.js',
     },
   });
 </script>

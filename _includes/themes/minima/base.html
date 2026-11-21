@@ -10,7 +10,7 @@
         {% comment %} Team-taught assignment pages always get the panel: lesson feedback lives in its Ratings tab {% endcomment %}
         {% if page.microblog or page.team_teach and page.assignment %}
           <div class="micro-actions-wrapper">
-            {% include microblog_foundation.html %}
+            {% include projects/microblog/microblog_foundation.html %}
           </div>
         {% endif %}
 

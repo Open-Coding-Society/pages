@@ -25,6 +25,7 @@ class UiBuilderPagesTest < Minitest::Test
   SOURCES = {
     %r{\A/assets/js/projects/ui-builder/(.+)\z} => ->(name) { File.join(PROJECT, "js", name) },
     %r{\A/assets/js/projects/messages/(.+)\z} => ->(name) { File.join(MESSAGES, "js", name) },
+    %r{\A/assets/js/projects/microblog/(.+)\z} => ->(name) { File.join(ROOT, "_projects/systems/microblog/js", name) },
     %r{\A/assets/js/chat/calendar/(.+)\z} => ->(name) { File.join(COURSES, "js/announcement-calendar", name) },
     %r{\A/assets/js/(.+)\z} => ->(name) { File.join(ROOT, "assets/js", name) },
   }.freeze
@@ -149,7 +150,7 @@ class UiBuilderPagesTest < Minitest::Test
       build(spring: true, baseurl: baseurl) do |pages|
         { "view" => %w[api/config.js chat/rich-text.js projects/messages/messages-model.js projects/ui-builder/viewer.js
                        projects/messages/conversation-embed.js kanban-board.js chat/calendar/calendar-card.js
-                       chat/calendar/calendar-model.js api/microblog.js],
+                       chat/calendar/calendar-model.js projects/microblog/microblog.js],
           "gallery" => %w[api/config.js projects/ui-builder/gallery.js] }.each do |name, expected|
           urls = module_urls(pages[name])
           expected.each { |path| assert_includes urls, "#{baseurl}/assets/js/#{path}", "#{name} uses #{path}" }

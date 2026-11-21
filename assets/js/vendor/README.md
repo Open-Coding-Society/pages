@@ -36,5 +36,5 @@ it is not required for ordinary site builds.
   it on demand, only when a QR code is asked for).
 - License: [MIT license](./qrcode-LICENSE), copied from that repository.
 - Purpose: draw a QR code as inline SVG in the browser, with no server and no image service.
-- Consumer: the microblog's "QR" button (`_includes/microblog_foundation.html`) and the
-  phone review page (`navigation/review.md`), through `assets/js/api/microblog-review.js`.
+- Consumer: the microblog's "QR" button (`_projects/systems/microblog/navigation/microblog_foundation.html`) and the
+  phone review page (`_projects/systems/microblog/pages/review.md`), through `assets/js/projects/microblog/microblog-review.js`.

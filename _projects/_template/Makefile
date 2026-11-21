@@ -70,6 +70,10 @@ assets:
 				cp "$$file" "$(INCLUDES_DEST)/$$(basename "$$file")"; \
 		done; \
 	fi
+	@if [ -d "pages" ] && [ ! -f "distribution.json" ]; then \
+		mkdir -p $(PAGES_DEST); \
+		cp -r pages/* $(PAGES_DEST)/ || exit 1; \
+	fi
 	@if [ -d "levels" ]; then mkdir -p $(JS_DEST)/levels; cp levels/*.js $(JS_DEST)/levels/ 2>/dev/null || true; fi
 	@if [ -d "model" ]; then mkdir -p $(JS_DEST)/model; cp model/*.js $(JS_DEST)/model/ 2>/dev/null || true; fi
 	@if [ -d "services" ]; then mkdir -p $(JS_DEST)/services; cp services/*.js $(JS_DEST)/services/ 2>/dev/null || true; fi
@@ -87,7 +91,7 @@ assets:
 		mkdir -p $(SASS_DEST); \
 		cp -r sass/* $(SASS_DEST)/ 2>/dev/null || true; \
 	fi
-	@if [ -f "distribution.json" ]; then \
+	@if [ -f "distribution.json" ] || [ -f "$(WORKSPACE_ROOT)/.project-distribution-cache/$(PROJECT_NAME).json" ]; then \
 		ruby "$(WORKSPACE_ROOT)/scripts/publish_project.rb" publish "$(PROJECT_SRC)" "$(abspath $(WORKSPACE_ROOT))"; \
 	fi
 	@if [ -f "$(SASS_DEST)/main.scss" ]; then \
@@ -204,6 +208,18 @@ watch:
 					touch /tmp/.jekyll_rebuild_trigger; \
 					changed=1; \
 				fi; \
+			done; \
+			for file in $$(find $(PROJECT_SRC)/navigation -type f \( -name '*.html' -o -name '*.md' \) -newer /tmp/.project_$(PROJECT_NAME)_marker 2>/dev/null); do \
+				$(MAKE) assets || exit 1; \
+				changed=1; \
+				break; \
+			done; \
+		fi; \
+		if [ -d "$(PROJECT_SRC)/pages" ] && [ ! -f "$(PROJECT_SRC)/distribution.json" ]; then \
+			for file in $$(find $(PROJECT_SRC)/pages -type f -newer /tmp/.project_$(PROJECT_NAME)_marker 2>/dev/null); do \
+				$(MAKE) assets || exit 1; \
+				changed=1; \
+				break; \
 			done; \
 		fi; \
 		if [ -d "$(PROJECT_SRC)/js" ]; then \

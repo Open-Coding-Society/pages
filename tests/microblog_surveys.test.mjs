@@ -1,4 +1,4 @@
-// Microblog surveys and search (assets/js/api/microblog.js): a post's writer saves
+// Microblog surveys and search: a post's writer saves
 // survey choices in its `data`, votes are marker replies, and the panel's search box
 // matches a post's text, writer, topic, survey choices and replies.
 import { test } from 'node:test';
@@ -13,7 +13,7 @@ async function loadWithStubs(path, stubs) {
 }
 
 const sent = [];
-const microblog = await loadWithStubs('../assets/js/api/microblog.js',
+const microblog = await loadWithStubs('../_projects/systems/microblog/js/microblog.js',
     "const pythonURI = ''; const fetchOptions = {}; const withMicroblogRateLimit = () => {};\n" +
     "globalThis.fetch = async (url, options) => { globalThis.__sent.push({ url, body: JSON.parse(options.body) }); return { ok: true, json: async () => ({}) }; };\n");
 globalThis.__sent = sent;

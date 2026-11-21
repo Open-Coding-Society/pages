@@ -80,6 +80,7 @@ _projects/<category>/
    │   ├── page.md
    │   ├── include.html
    │   └── page.ipynb
+   ├── pages/                  # Optional standalone pages with explicit permalinks
    ├── js/                     # JavaScript source code
    ├── sass/                   # SCSS definitions; main.scss is the entry point
    ├── levels/                 # Optional OCS game engine code
@@ -113,8 +114,14 @@ notebooks, generated posts, or course-split files.
 
 ### Namespaced system distributions
 
-System projects may use `distribution.json` with the shared publisher to place
-each resource under a generic ignored project root:
+Without a manifest, the shared template publishes `js/`, `sass/`, standalone
+`pages/` and HTML includes in `navigation/` into their corresponding generic
+project roots. Standalone pages need explicit permalinks. The template's
+watcher updates these files as well.
+
+Use `distribution.json` with the shared publisher when a project needs other
+resources or exceptional destinations. It can place resources under these
+generic ignored project roots:
 
 | Resource | Destination |
 | --- | --- |
@@ -132,8 +139,8 @@ Use explicit permalinks on standalone pages to preserve public routes without
 turning navigation into blog posts. Includes use `projects/<name>/<file>`;
 data is namespaced as `site.data.projects.<name>`. Jekyll loads nested plugins
 automatically. Reference nested layouts as `projects/<name>/<layout>`.
-These roots are manifest destinations, not automatic
-copies of every `data/` folder (some projects use `data/` for JavaScript).
+These roots do not imply automatic copies of every `data/` folder (some
+projects use `data/` for JavaScript).
 The shared template cleans all of these project directories, and
 `clean-removed-projects` handles them after a project is deleted.
 
@@ -141,7 +148,9 @@ The publisher's `.project-distribution-cache/<name>.json` records ownership and
 checksums. Keep the cache when changing destinations: the next publish removes
 obsolete outputs before recording the new paths. Do not delete caches to
 resolve ownership conflicts. Never hand-edit generated files or add per-project
-ignore rules for these roots. Examples: `systems/topics` and `systems/capstone`.
+ignore rules for these roots. A project that removes its manifest also releases
+its cached outputs on the next assets build. Examples: `systems/topics` and
+`systems/capstone`.
 Validate with `bundle exec ruby scripts/test_system_project_distribution.rb`.
 
 ### CSA Curriculum Source Ownership

@@ -2,6 +2,8 @@ require "minitest/autorun"
 require "tmpdir"
 require "fileutils"
 require "json"
+require "jekyll"
+require "nokogiri"
 require "open3"
 require "rbconfig"
 require_relative "publish_project"
@@ -48,6 +50,12 @@ class SystemProjectDistributionTest < Minitest::Test
     source = File.join(ROOT, "_projects/systems", name)
     project = File.join(workspace, "_projects/systems", name)
     FileUtils.mkdir_p(project)
+    unless File.file?(File.join(source, "distribution.json"))
+      %w[navigation pages js sass].each do |directory|
+        FileUtils.cp_r(File.join(source, directory), project) if File.directory?(File.join(source, directory))
+      end
+      return project
+    end
     manifest = File.read(File.join(source, "distribution.json"))
     JSON.parse(manifest).fetch("files").map { |entry| entry.fetch("source") }.uniq.each do |relative|
       FileUtils.mkdir_p(File.dirname(File.join(project, relative)))
@@ -100,6 +108,99 @@ class SystemProjectDistributionTest < Minitest::Test
       end
       command("make", "-f", TEMPLATE, "-C", project, "clean", "WORKSPACE_ROOT=#{workspace}")
       paths.each { |path| refute File.exist?(path), path }
+    end
+  end
+
+  def test_microblog_migrates_to_project_paths_and_republishes_after_clean
+    in_workspace do |workspace|
+      project = project_copy(workspace, "microblog")
+      manifest = File.join(project, "distribution.json")
+      legacy = [
+        { "source" => "js/microblog.js", "destination" => "assets/js/api/microblog.js" },
+        { "source" => "pages/review.md", "destination" => "navigation/review.md" }
+      ]
+      File.write(manifest, JSON.generate("files" => legacy))
+      ProjectPublisher.run("publish", project, workspace)
+      FileUtils.rm(manifest)
+      command("make", "-f", TEMPLATE, "-C", project, "assets", "WORKSPACE_ROOT=#{workspace}")
+      legacy.each { |entry| refute File.exist?(File.join(workspace, entry.fetch("destination"))) }
+      mappings = {
+        "navigation/microblog_foundation.html" => "_includes/projects/microblog/microblog_foundation.html",
+        "pages/review.md" => "navigation/projects/microblog/review.md"
+      }
+      %w[microblog.scss microblog-review.scss].each do |name|
+        mappings["sass/#{name}"] = "_sass/projects/microblog/#{name}"
+      end
+      %w[microblog.js microblog-rate-limit.js microblog-notifications.js microblog-review.js
+         quick-access.js capstone-microblog-badges.js microblog-authors.json].each do |name|
+        mappings["js/#{name}"] = "assets/js/projects/microblog/#{name}"
+      end
+      paths = mappings.values
+      mappings.each { |source, destination| assert_equal File.binread(File.join(project, source)), File.binread(File.join(workspace, destination)) }
+      ignored = command("git", "-C", workspace, "check-ignore", "--", *paths).lines.map(&:strip)
+      assert_equal paths.sort, ignored.sort
+      command("make", "-f", TEMPLATE, "-C", project, "clean", "WORKSPACE_ROOT=#{workspace}")
+      paths.each { |path| refute File.exist?(File.join(workspace, path)), path }
+      command("make", "-f", TEMPLATE, "-C", project, "assets", "WORKSPACE_ROOT=#{workspace}")
+      mappings.each { |source, destination| assert_equal File.binread(File.join(project, source)), File.binread(File.join(workspace, destination)) }
+    end
+  end
+
+  def test_microblog_published_files_render_in_jekyll
+    in_workspace do |workspace|
+      project = project_copy(workspace, "microblog")
+      command("make", "-f", TEMPLATE, "-C", project, "assets", "WORKSPACE_ROOT=#{workspace}")
+      reader = File.join(workspace, "_includes/projects/courses/reader/start.html")
+      FileUtils.mkdir_p(File.dirname(reader))
+      FileUtils.cp(File.join(ROOT, "_projects/systems/courses/reader/start.html"), reader)
+      ratings = File.join(workspace, "_includes/projects/lesson-feedback/lesson-feedback-ratings.html")
+      FileUtils.mkdir_p(File.dirname(ratings))
+      File.write(ratings, "Ratings form")
+      FileUtils.mkdir_p(File.join(workspace, "_layouts"))
+      File.write(File.join(workspace, "_layouts/page.html"), <<~LIQUID)
+        {% if page.microblog or page.team_teach and page.assignment %}{% include projects/microblog/microblog_foundation.html %}{% endif %}
+        {% if page.document_reader %}{% include projects/courses/reader/start.html %}</div></div></div>{% endif %}
+        {{ content }}
+      LIQUID
+      {
+        "ordinary" => "microblog: true\nauthors: [author1]",
+        "reader" => "microblog: true\ndocument_reader: {courses: {}, default_course: csp}",
+        "team" => "team_teach: true\nassignment: true\ndocument_reader: {courses: {}, default_course: csp}",
+        "disabled" => "microblog: false\ndocument_reader: {courses: {}, default_course: csp}"
+      }.each do |name, frontmatter|
+        File.write(File.join(workspace, "#{name}.md"), "---\nlayout: page\n#{frontmatter}\n---\n#{name}\n")
+      end
+      FileUtils.mkdir_p(File.join(workspace, "assets/css"))
+      %w[mixins/_variables.scss mixins/_panel.scss dm-bell.scss].each do |path|
+        destination = File.join(workspace, "_sass/open-coding", path)
+        FileUtils.mkdir_p(File.dirname(destination))
+        FileUtils.cp(File.join(ROOT, "_sass/open-coding", path), destination)
+      end
+      File.write(File.join(workspace, "assets/css/microblog.scss"), "---\n---\n$red: #e53e3e;\n@import 'open-coding/mixins/variables';\n@import 'open-coding/mixins/panel';\n@import 'projects/microblog/microblog';\n@import 'projects/microblog/microblog-review';\n@import 'open-coding/dm-bell';\n")
+      site = Jekyll::Site.new(Jekyll.configuration(
+        "source" => workspace, "destination" => File.join(workspace, "_site"),
+        "layouts_dir" => File.join(workspace, "_layouts"), "includes_dir" => File.join(workspace, "_includes"),
+        "config" => [], "plugins_dir" => [], "quiet" => true, "baseurl" => "/preview"
+      ))
+      site.process
+      %w[ordinary reader team disabled].each do |name|
+        document = Nokogiri::HTML(File.read(File.join(site.dest, "#{name}.html")))
+        enabled = name != "disabled"
+        assert_equal enabled ? 1 : 0, document.css("#microblog-toggle-btn").size, name
+        assert_equal enabled ? 1 : 0, document.css("#microblog-panel").size
+        assert_equal %w[reader team].include?(name) ? 1 : 0, document.css(".document-reader__toolbar #microblog-toggle-btn").size
+        assert_equal name == "team" ? 1 : 0, document.css("#microblog-ratings-panel").size
+      end
+      assert File.file?(File.join(site.dest, "review.html"))
+      ordinary = File.read(File.join(site.dest, "ordinary.html"))
+      assert_includes ordinary, "/preview/assets/js/projects/microblog/microblog.js"
+      assert_includes ordinary, "/preview/assets/js/projects/microblog/quick-access.js"
+      assert_includes File.read(File.join(site.dest, "review.html")), "/preview/assets/js/projects/microblog/microblog-review.js"
+      authors = JSON.parse(File.read(File.join(site.dest, "assets/js/projects/microblog/microblog-authors.json")))
+      assert authors.any? { |entry| entry["authors"] == ["author1"] && entry["path"].end_with?("ordinary.html") }
+      css = File.read(File.join(site.dest, "assets/css/microblog.css"))
+      assert_includes css, ".microblog-panel"
+      assert_includes css, ".review-page"
     end
   end
 

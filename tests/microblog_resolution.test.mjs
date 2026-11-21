@@ -9,7 +9,7 @@ async function loadWithStubs(path, stubs) {
     return import(`data:text/javascript;base64,${Buffer.from(stubs + body).toString('base64')}`);
 }
 
-const microblog = await loadWithStubs('../assets/js/api/microblog.js',
+const microblog = await loadWithStubs('../_projects/systems/microblog/js/microblog.js',
     "const pythonURI = ''; const fetchOptions = {}; const withMicroblogRateLimit = () => {};\n");
 
 const reply = (content, userId) => ({ content, userId, userName: `user${userId}`, timestamp: '2026-10-01T00:00:00' });

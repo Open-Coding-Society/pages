@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const source = await readFile(new URL('../assets/js/api/microblog-rate-limit.js', import.meta.url), 'utf8');
+const source = await readFile(new URL('../_projects/systems/microblog/js/microblog-rate-limit.js', import.meta.url), 'utf8');
 let moduleId = 0;
 async function load() {
     return import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}#${moduleId++}`);
@@ -56,8 +56,8 @@ test('microblog writes enforce cooldown, persistence, pending requests, and serv
 
 test('all API writes share the limiter while reads remain available', async () => {
     const limiterUrl = `data:text/javascript;base64,${Buffer.from(source).toString('base64')}#api`;
-    const apiSource = (await readFile(new URL('../assets/js/api/microblog.js', import.meta.url), 'utf8'))
-        .replace("import { pythonURI, fetchOptions } from './config.js';", "const pythonURI = 'https://test.invalid'; const fetchOptions = { method: 'GET' };")
+    const apiSource = (await readFile(new URL('../_projects/systems/microblog/js/microblog.js', import.meta.url), 'utf8'))
+        .replace("import { pythonURI, fetchOptions } from '../../api/config.js';", "const pythonURI = 'https://test.invalid'; const fetchOptions = { method: 'GET' };")
         .replace("'./microblog-rate-limit.js'", JSON.stringify(limiterUrl));
     const api = await import(`data:text/javascript;base64,${Buffer.from(apiSource).toString('base64')}`);
     const originalFetch = globalThis.fetch;

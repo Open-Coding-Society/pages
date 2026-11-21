@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
     normalizeTopicPath, topicFromSearch, buildReviewUrl, titleForTopic, remainingChars, REVIEW_PATH,
-} from '../assets/js/api/microblog-review.js';
+} from '../_projects/systems/microblog/js/microblog-review.js';
 
 test('normalizeTopicPath keeps a site path and drops its query and hash', () => {
     assert.equal(normalizeTopicPath('/capstone/presence-system/'), '/capstone/presence-system/');
@@ -56,7 +56,7 @@ test('remainingChars counts down from the 280 limit', () => {
 });
 
 test('guestCredentials makes a hidden guest login from a name', async () => {
-    const { guestCredentials } = await import('../assets/js/api/microblog-review.js');
+    const { guestCredentials } = await import('../_projects/systems/microblog/js/microblog-review.js');
     const { meetsSpringPasswordRules } = await import('../_projects/systems/login/js/password-rules.js');
     const fixed = length => 'k3j9q2wvbn7f0ha1xcz5'.slice(0, length);
     assert.deepEqual(guestCredentials('Darth Vader', fixed), { uid: 'darthvader-k3j9q2', password: 'Qr!k3j9q2wvbn7f0ha1xcz5aZ9' });
@@ -66,7 +66,7 @@ test('guestCredentials makes a hidden guest login from a name', async () => {
 });
 
 test('guestCredentials draws the password separately from the visible username', async () => {
-    const { guestCredentials } = await import('../assets/js/api/microblog-review.js');
+    const { guestCredentials } = await import('../_projects/systems/microblog/js/microblog-review.js');
     const { meetsSpringPasswordRules } = await import('../_projects/systems/login/js/password-rules.js');
     const one = guestCredentials('Sam');
     assert.match(one.uid, /^sam-[a-z0-9]{6}$/);
@@ -78,7 +78,7 @@ test('guestCredentials draws the password separately from the visible username',
 });
 
 test('guestCredentials refuses to run without a cryptographic generator', async () => {
-    const { guestCredentials } = await import('../assets/js/api/microblog-review.js');
+    const { guestCredentials } = await import('../_projects/systems/microblog/js/microblog-review.js');
     const saved = Object.getOwnPropertyDescriptor(globalThis, 'crypto');
     Object.defineProperty(globalThis, 'crypto', { value: undefined, configurable: true });
     try {

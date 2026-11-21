@@ -1,4 +1,4 @@
-// The microblog panel's Guest & Mentor quick access (assets/js/api/quick-access.js), in a stubbed browser.
+// The microblog panel's Guest & Mentor quick access, in a stubbed browser.
 // NOSPRING=1 renders config.js as a Flask-only site (spring: false).
 import fs from 'fs';
 import path from 'path';
@@ -18,6 +18,9 @@ const render = s => s.replace(/\{\{\s*site\.baseurl\s*\|\s*jsonify\s*\}\}/g, '""
 fs.mkdirSync(path.join(work, 'assets/js/api'), { recursive: true });
 for (const f of fs.readdirSync(path.join(repo, 'assets/js/api')).filter(f => f.endsWith('.js')))
   fs.writeFileSync(path.join(work, 'assets/js/api', f.replace(/\.js$/, '.mjs')), render(fs.readFileSync(path.join(repo, 'assets/js/api', f), 'utf8')).replace(/\.js'/g, ".mjs'"));
+fs.mkdirSync(path.join(work, 'assets/js/projects/microblog'), { recursive: true });
+for (const f of fs.readdirSync(path.join(repo, '_projects/systems/microblog/js')).filter(f => f.endsWith('.js')))
+  fs.writeFileSync(path.join(work, 'assets/js/projects/microblog', f.replace(/\.js$/, '.mjs')), render(fs.readFileSync(path.join(repo, '_projects/systems/microblog/js', f), 'utf8')).replace(/\.js'/g, ".mjs'"));
 // passwordRules.js is published into assets/js/api from the login project (its distribution.json), and is not in git
 if (!fs.existsSync(path.join(work, 'assets/js/api/passwordRules.mjs')))
   fs.writeFileSync(path.join(work, 'assets/js/api/passwordRules.mjs'), fs.readFileSync(path.join(repo, '_projects/systems/login/js/password-rules.js'), 'utf8'));
@@ -57,7 +60,7 @@ globalThis.fetch = async (url, opts = {}) => {
 };
 const realConsole = globalThis.console; globalThis.console = { ...realConsole, log() {}, warn() {}, error() {} };
 const settle = () => new Promise(r => setTimeout(r, 30));
-const mod = await import(pathToFileURL(path.join(work, 'assets/js/api/quick-access.mjs')).href);
+const mod = await import(pathToFileURL(path.join(work, 'assets/js/projects/microblog/quick-access.mjs')).href);
 const { quickLogin, quickSignup, guestWindowOpen, initQuickAccess, QUICK_TYPES } = mod;
 const type = id => QUICK_TYPES.find(t => t.id === id);
 const WEAK = 'weak', STRONG = 'Aa1!StrongPass';

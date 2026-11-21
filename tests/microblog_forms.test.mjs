@@ -3,7 +3,12 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
-const html = await readFile(new URL('../_includes/microblog_foundation.html', import.meta.url), 'utf8');
+const html = await readFile(new URL('../_projects/systems/microblog/navigation/microblog_foundation.html', import.meta.url), 'utf8');
+
+test('Microblog is registered for development builds', async () => {
+    const registry = await readFile(new URL('../_projects/.makeprojects', import.meta.url), 'utf8');
+    assert.match(registry, /^systems\/microblog:dev$/m);
+});
 
 test('reader Microblog button toggles the panel and keeps its expanded state in sync', () => {
     const start = html.indexOf('function openMicroblogPanel()');

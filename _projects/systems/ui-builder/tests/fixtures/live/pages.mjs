@@ -117,7 +117,7 @@ export const MODULE_URLS = Object.freeze({
   kanban: '/assets/js/kanban-board.js',
   calendarCard: '/assets/js/chat/calendar/calendar-card.js',
   calendarModel: '/assets/js/chat/calendar/calendar-model.js',
-  microblog: '/assets/js/api/microblog.js',
+  microblog: '/assets/js/projects/microblog/microblog.js',
 });
 
 export function moduleLoader(fakes) {

@@ -36,7 +36,7 @@ The repository implements a modern microblogging system that allows users to eng
      - Creates the microblog overlay and button
      - Manages the overall UI structure
 
-   - **JavaScript Layer** (`assets/js/api/microblog.js`)
+   - **JavaScript Layer** (`assets/js/projects/microblog/microblog.js`)
      - Manages UI interactivity
      - Handles API communications
      - Processes posts, replies, and updates

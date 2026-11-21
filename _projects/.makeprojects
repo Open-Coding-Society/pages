@@ -49,6 +49,7 @@ systems/ai-ab-engine
 systems/calendar
 systems/profile:dev
 systems/login:dev
+systems/microblog:dev
 systems/grades:dev
 systems/blogs:dev
 systems/topics:dev

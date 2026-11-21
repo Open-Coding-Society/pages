@@ -25,7 +25,6 @@ const PUBLISHED_PATHS = [
 // Every page and include that imports a Login script, with the site.baseurl path.
 const IMPORTERS = [
   '_includes/themes/minima/header.html',
-  '_includes/microblog_foundation.html',
   'navigation/authentication/support.md',
   '_projects/systems/login/pages/login.md',
   '_projects/systems/login/pages/logout.md',
@@ -54,6 +53,12 @@ test('every published login file is git-ignored so copies are never committed', 
     const parentIgnored = [...ignored].some((line) => line.endsWith('/') && `/${destination}`.startsWith(line));
     assert.ok(ignored.has(`/${destination}`) || parentIgnored, `${destination} is not in .gitignore`);
   }
+});
+
+test('Microblog quick access uses the published Login password rules', () => {
+  const quickAccess = readFileSync(new URL('_projects/systems/microblog/js/quick-access.js', root), 'utf8');
+  assert.match(quickAccess, /from '\.\.\/\.\.\/api\/passwordRules\.js'/);
+  assert.ok(distribution().some(entry => entry.destination === 'assets/js/api/passwordRules.js'));
 });
 
 // A page's import fails to link if the name isn't exported where it points, so check both ways:
