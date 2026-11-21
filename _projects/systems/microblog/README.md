@@ -22,7 +22,8 @@ Edit the sources here, not the generated copies in the project directories.
 
 The panel and review page use shared `ocs__` controls and theme tokens. Their SCSS
 keeps Microblog-specific layout and survey styling; the QR code stays on white
-for scanning.
+for scanning. The floating panel uses the shared `overlay-panel` mixin; it has
+no backdrop, so the document remains usable.
 
 ## Verification
 

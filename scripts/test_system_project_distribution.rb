@@ -206,6 +206,9 @@ class SystemProjectDistributionTest < Minitest::Test
       assert_includes css, ".microblog-panel"
       assert_includes css, ".review-page"
       assert_match(/\.microblog-modal\.ocs__modal\.hidden\s*\{\s*display:\s*none/, css)
+      %w[microblog-filter-page microblog-filter-many microblog-icon-btn].each do |name|
+        assert_match(/\.#{name}\.ocs__btn\.small[^{]*\{[^}]*padding:\s*0;/, css)
+      end
     end
   end
 

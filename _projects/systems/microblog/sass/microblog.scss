@@ -224,7 +224,7 @@
 }
 
 // New post: compact, with its label, so it doesn't outweigh the posts
-.microblog-btn-create.ocs__btn {
+.microblog-btn-create.ocs__btn.small {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -238,11 +238,17 @@
 }
 
 // This page / all pages toggles.
-.microblog-filter-page.ocs__btn,
-.microblog-filter-many.ocs__btn {
+.microblog-filter-page.ocs__btn.small,
+.microblog-filter-many.ocs__btn.small {
   width: 1.75rem;
   height: 1.75rem;
   padding: 0;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
 
   &[aria-pressed="true"] {
     @include accent-tint(16%);
@@ -677,7 +683,7 @@
 }
 
 /* Edit / Reply: matching square icon buttons */
-.microblog-icon-btn.ocs__btn {
+.microblog-icon-btn.ocs__btn.small {
   width: 1.75rem;
   height: 1.75rem;
   padding: 0;
@@ -685,12 +691,13 @@
   svg {
     width: 1rem;
     height: 1rem;
+    flex-shrink: 0;
   }
 
 }
 
 /* Resolve / Reopen: same height as the icon buttons, with a label, at the row's right end */
-.microblog-resolve-btn.ocs__btn {
+.microblog-resolve-btn.ocs__btn.small {
   flex-shrink: 0;
   gap: 0.3rem;
   margin-left: auto;
@@ -718,7 +725,7 @@
 
 /* Phones: Resolve / Reopen become icon squares (the title still says which) */
 @media (max-width: 480px) {
-  .microblog-resolve-btn.ocs__btn {
+  .microblog-resolve-btn.ocs__btn.small {
     justify-content: center;
     width: 1.75rem;
     padding: 0;
