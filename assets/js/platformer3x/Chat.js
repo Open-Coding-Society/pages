@@ -62,10 +62,15 @@ class Chat {
         button.id = "chatButton";
         button.innerText = "Send";
 
+        // name, message and color arrive from other players over the socket, so they go in as text, never HTML
+        const allowedColors = [...colorSelect.options].map(option => option.value);
         function addMessage(message, name, color){
             const div3 = document.createElement("div");
             const para = document.createElement("p");
-            para.innerHTML = `<b style="color:${color};">${name}:</b> ${message}`;
+            const author = document.createElement("b");
+            author.style.color = allowedColors.includes(color) ? color : "black";
+            author.textContent = `${name}:`;
+            para.append(author, ` ${message}`);
             div3.append(para);
             div2.append(div3);
         }
