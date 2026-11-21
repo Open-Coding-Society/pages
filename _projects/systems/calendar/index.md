@@ -281,9 +281,9 @@ active_tab: calendar
                 {% for doc in site.data.topics_catalog %}<option value="{{ doc.url | relative_url | escape }}">{{ doc.title | escape }}</option>
                 {% endfor %}
             </datalist>
-            <label for="editAlertDays" class="calendar-event-modal-label">Ticker alert:</label>
+            <label for="editAlertDays" id="editAlertLabel" class="calendar-event-modal-label">Ticker alert:</label>
             <p id="editAlertDisplay" class="calendar-event-modal-field calendar-event-modal-display"></p>
-            <input type="text" id="editAlertDays" inputmode="numeric" class="calendar-event-modal-field issue-form-date-hidden" placeholder="Days before the event, or blank for the default" autocomplete="off">
+            <input type="text" id="editAlertDays" inputmode="numeric" class="calendar-event-modal-field issue-form-date-hidden" data-max-days="{{ site.calendar_ticker.alert_limit_days | default: 30 }}" placeholder="Days before the event, or blank for the default" autocomplete="off">
             <label for="editPriority" class="calendar-event-modal-label">Priority:</label>
             <select id="editPriority" disabled class="calendar-event-modal-field">
                 <option value="P0">P0 - Critical</option>
@@ -991,13 +991,20 @@ active_tab: calendar
             document.getElementById('editDocUrl').style.display = editable ? 'block' : 'none';
         }
         // The ticker alert: how many days before its date the course home's ticker shows the event.
+        // Breaks never show on the ticker, so a break's window leaves the field out.
+        let alertFieldShown = true;
         function showAlert(days) {
             document.getElementById('editAlertDisplay').textContent = CalendarAlerts.describe(days);
             document.getElementById('editAlertDays').value = days === null ? '' : String(days);
         }
+        function setAlertFieldShown(shown) {
+            alertFieldShown = shown;
+            document.getElementById('editAlertLabel').style.display = shown ? '' : 'none';
+            setAlertFieldEditable(false);
+        }
         function setAlertFieldEditable(editable) {
-            document.getElementById('editAlertDisplay').style.display = editable ? 'none' : 'block';
-            document.getElementById('editAlertDays').style.display = editable ? 'block' : 'none';
+            document.getElementById('editAlertDisplay').style.display = alertFieldShown && !editable ? 'block' : 'none';
+            document.getElementById('editAlertDays').style.display = alertFieldShown && editable ? 'block' : 'none';
         }
         // The description's own text, its linked doc and its ticker alert (each has its own field).
         function descriptionParts(description) {
@@ -1777,6 +1784,7 @@ active_tab: calendar
                     document.getElementById('editDescription').innerHTML = CalendarSafeHtml.clean(slackToHtml(body));
                     showLinkedDoc(docUrl);
                     showAlert(days);
+                    setAlertFieldShown(!isBreak);
                     document.getElementById('editDateDisplay').textContent = formatDisplayDate(currentEvent.start);
                     document.getElementById('editDate').value = formatDate(currentEvent.start);
                     document.getElementById("editPriority").value = currentEvent.extendedProps.priority || "P2";
@@ -1898,6 +1906,7 @@ active_tab: calendar
             showLinkedDoc(docUrl);
             setDocFieldEditable(true);
             showAlert(null);
+            setAlertFieldShown(true);
             setAlertFieldEditable(true);
             document.getElementById('editDateDisplay').textContent = formatDisplayDate(date);
             document.getElementById('editDate').value = formatDate(date);
@@ -1945,9 +1954,12 @@ active_tab: calendar
                 alert("Linked Doc must be a doc from the list or a web link (https://...).");
                 return null;
             }
+            // The box stops at calendar_ticker's alert_limit_days, as far ahead as the ticker looks for alerts.
+            // A break's box is hidden, so whatever line its description already has is kept as it is.
+            const alertBox = document.getElementById('editAlertDays');
             let alertDays;
             try {
-                alertDays = CalendarAlerts.parse(document.getElementById('editAlertDays').value);
+                alertDays = CalendarAlerts.parse(alertBox.value, alertFieldShown ? Number(alertBox.dataset.maxDays) : CalendarAlerts.MAX_DAYS);
             } catch (error) {
                 alert(`${error.message} Leave it blank to use the default.`);
                 return null;

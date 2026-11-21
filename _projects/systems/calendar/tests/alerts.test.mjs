@@ -75,6 +75,15 @@ test('an alert and a linked doc round-trip through the description, doc line las
   assert.deepEqual(CalendarAlerts.split(body), { body: 'Bring notes', days: 14 });
 });
 
+test('the event window\'s box can be held to a site\'s own limit', () => {
+  assert.equal(CalendarAlerts.parse('30', 30), 30);
+  assert.throws(() => CalendarAlerts.parse('31', 30), /whole number of days from 0 to 30/);
+  assert.throws(() => CalendarAlerts.parse('400', 500), /from 0 to 365/, 'never past what the line can hold');
+  // A broken alert_limit_days in a site's config must not stop events from saving.
+  assert.equal(CalendarAlerts.parse('45', Number.NaN), 45);
+  assert.throws(() => CalendarAlerts.parse('400', Number.NaN), /from 0 to 365/);
+});
+
 test('the event window\'s box reads blank as the default and rejects anything but whole days', () => {
   assert.equal(CalendarAlerts.parse(''), null);
   assert.equal(CalendarAlerts.parse('  '), null);
@@ -119,9 +128,11 @@ test('the page imports CalendarAlerts', () => {
 });
 
 test('the event window has a Ticker alert field: the alert in words, and a box while editing', () => {
-  assert.match(page, /<label for="editAlertDays" class="calendar-event-modal-label">Ticker alert:<\/label>/);
+  assert.match(page, /<label for="editAlertDays" id="editAlertLabel" class="calendar-event-modal-label">Ticker alert:<\/label>/);
   assert.match(page, /<p id="editAlertDisplay" class="calendar-event-modal-field calendar-event-modal-display"><\/p>/);
   assert.match(page, /<input type="text" id="editAlertDays" inputmode="numeric" class="calendar-event-modal-field issue-form-date-hidden"/);
+  // The ticker can't see an alert past calendar_ticker's alert_limit_days, so the box stops there.
+  assert.match(page, /id="editAlertDays"[^>]*data-max-days="\{\{ site\.calendar_ticker\.alert_limit_days \| default: 30 \}\}"/);
   assert.match(block(page, /function showAlert\(days\) \{/), /textContent = CalendarAlerts\.describe\(days\)/);
 });
 
@@ -134,12 +145,28 @@ test('every description shown in the window has its alert line taken out, like i
 });
 
 test('the alert box is editable exactly when the doc box is', () => {
-  assert.equal(count(/setAlertFieldEditable\((true|false)\)/g), count(/setDocFieldEditable\((true|false)\)/g));
-  assert.match(block(page, /function openAddEventModal\(.*\) \{/), /showAlert\(null\);/);
+  // Wherever the doc box changes mode, the alert box changes to the same mode right after.
+  const calls = [...page.matchAll(/setDocFieldEditable\((true|false)\);/g)];
+  assert.equal(calls.length, 3, 'leaving edit mode, adding an event and Edit');
+  for (const call of calls) {
+    const next = page.slice(call.index, call.index + 200);
+    assert.match(next, new RegExp(`setAlertFieldEditable\\(${call[1]}\\);`), next);
+  }
+  assert.match(block(page, /function openAddEventModal\(.*\) \{/), /showAlert\(null\);\s*setAlertFieldShown\(true\);/);
+});
+
+test('a break\'s window leaves the alert field out, since breaks never show on the ticker', () => {
+  assert.equal(count(/setAlertFieldShown\(!isBreak\);/g), 1, 'opening an event or break sets it');
+  const shown = block(page, /function setAlertFieldShown\(shown\) \{/);
+  assert.match(shown, /editAlertLabel/);
+  const editable = block(page, /function setAlertFieldEditable\(editable\) \{/);
+  assert.match(editable, /alertFieldShown && !editable/);
+  assert.match(editable, /alertFieldShown && editable/);
 });
 
 test('saving reads the box and puts the alert line before the doc line', () => {
   const form = block(page, /function readEventForm\(.*\) \{/);
-  assert.match(form, /CalendarAlerts\.parse\(document\.getElementById\('editAlertDays'\)\.value\)/);
+  // A break's field is hidden, so its stored line is kept as it is, never checked against the limit.
+  assert.match(form, /CalendarAlerts\.parse\(alertBox\.value, alertFieldShown \? Number\(alertBox\.dataset\.maxDays\) : CalendarAlerts\.MAX_DAYS\)/);
   assert.match(form, /joinLinkedDoc\(CalendarAlerts\.join\(CalendarSafeHtml\.editorHtml\(document\.getElementById\("editDescription"\)\), alertDays\), docUrl\)/);
 });

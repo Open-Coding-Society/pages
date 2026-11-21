@@ -79,14 +79,18 @@ export class CalendarAlerts {
   /**
    * Read the event window's alert box.
    * @param {string} value - what was typed; blank means the ticker's default
+   * @param {number} [maxDays] - the site's limit (calendar_ticker's alert_limit_days), never
+   *   more than MAX_DAYS: the ticker can't see an alert further ahead than that. A limit that
+   *   isn't a whole number (a broken config) counts as MAX_DAYS, so events can still be saved.
    * @returns {number|null} the days, or null when blank
-   * @throws {RangeError} when it is not a whole number from 0 to MAX_DAYS
+   * @throws {RangeError} when it is not a whole number from 0 to the limit
    */
-  static parse(value) {
+  static parse(value, maxDays = CalendarAlerts.MAX_DAYS) {
     const text = String(value ?? '').trim();
     if (!text) return null;
     const days = Number(text);
-    if (!CalendarAlerts.isDays(days)) throw CalendarAlerts.rangeError(text);
+    const max = CalendarAlerts.isDays(maxDays) ? maxDays : CalendarAlerts.MAX_DAYS;
+    if (!CalendarAlerts.isDays(days) || days > max) throw CalendarAlerts.rangeError(text, max);
     return days;
   }
 
@@ -102,9 +106,7 @@ export class CalendarAlerts {
   }
 
   /** @private */
-  static rangeError(value) {
-    return new RangeError(
-      `Ticker alert must be a whole number of days from 0 to ${CalendarAlerts.MAX_DAYS}, not "${value}".`,
-    );
+  static rangeError(value, max = CalendarAlerts.MAX_DAYS) {
+    return new RangeError(`Ticker alert must be a whole number of days from 0 to ${max}, not "${value}".`);
   }
 }
