@@ -1,6 +1,21 @@
 {% assign topics_course_context = false %}
 {% if include.course_context == true and page.topics_context != true %}{% assign topics_course_context = true %}{% endif %}
 <section class="topics-browser" data-topics-browser data-course-context="{{ topics_course_context }}" data-initial-category="{{ page.lesson_category | downcase | escape }}" data-index-url="{{ '/assets/js/projects/topics/data.json' | relative_url }}" data-unit-names="{{ site.data.projects.topics.topics_units | jsonify | escape }}">
+  <script data-topics-bootstrap>
+    (function (root) {
+      root.classList.add('topics-browser--loading');
+      function showFallback() {
+        console.error('Topics scripts could not load.');
+        root.classList.remove('topics-browser--loading');
+        root.querySelector('[data-topics-status]').textContent = 'Topics search is unavailable. Reload to retry; document links remain available.';
+        root.querySelectorAll('input[type="checkbox"], #topics-view').forEach(function (control) { control.disabled = true; });
+      }
+      root.addEventListener('error', function (event) {
+        if (event.target.hasAttribute('data-topics-script')) showFallback();
+      }, true);
+      root.addEventListener('topics-load-error', showFallback);
+    })(document.currentScript.parentElement);
+  </script>
   <div class="ocs__split ocs__split--aside">
     <aside class="ocs__stack" aria-label="Browse topics">
       <header class="topics-browser__header">
@@ -71,6 +86,7 @@
     </div>
   </div>
   <noscript>Enable JavaScript to combine category filters and use full-text search. The document links above remain available.</noscript>
+  <script src="{{ '/assets/js/vendor/lunr.min.js' | relative_url }}" data-topics-script></script>
+  <script type="module" src="{{ '/assets/js/projects/topics/browser.js' | relative_url }}" data-topics-script></script>
+  <script nomodule>document.currentScript.parentElement.dispatchEvent(new Event('topics-load-error'));</script>
 </section>
-<script src="{{ '/assets/js/vendor/lunr.min.js' | relative_url }}"></script>
-<script type="module" src="{{ '/assets/js/projects/topics/browser.js' | relative_url }}"></script>

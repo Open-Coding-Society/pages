@@ -44,6 +44,10 @@ and lays out with `ocs__split ocs__split--aside`, one column on phones:
   and a document appears once, under its first topic in YAML order.
 - **Search:** title-match cards, then text matches, both within the filters.
 
+While the browser loads its index, the server-rendered fallback cards stay
+hidden so they do not flash before the grouped view. If loading fails, or
+JavaScript is disabled, the original document links remain available.
+
 Topic Filters keeps the original controls. Topic Filter, expanded by default,
 holds the primary topics with OR, AND and CLEAR buttons; More Categories, also expanded
 by default, lists remaining categories with at least five documents, ordered by

@@ -1,4 +1,5 @@
 .topics-browser {
+  &--loading [data-topics-flat] { display: none; }
   [data-topics-title-heading][hidden],
   [data-topics-body-section][hidden] { display: none; }
   &__controls {

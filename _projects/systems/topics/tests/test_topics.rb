@@ -158,6 +158,9 @@ class TopicsTest < Minitest::Test
       assert_includes secondary, 'value="algorithms"'
       assert_equal 1, browser.scan('value="algorithms"').size
       assert_includes browser, 'data-topics-body-results'
+      assert_operator browser.index('data-topics-bootstrap'), :<, browser.index('data-topic-url')
+      assert_includes browser, '<noscript>Enable JavaScript'
+      assert_includes browser, 'data-topics-script'
       refute_includes browser, "js-search-results"
       refute_includes browser, "CSA week 14"
       course_browser = File.read(File.join(source, "_site/course-browser/index.html"))

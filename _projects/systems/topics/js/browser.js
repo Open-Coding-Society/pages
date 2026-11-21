@@ -25,7 +25,7 @@ if (root) {
   const labels = new Map(filters.map((filter) => [filter.value, filter.closest('label').dataset.topicsLabel]));
   const OTHER = 'other-references';
   // Optional names per topic and unit, from data/topics_units.yml.
-  const unitNames = JSON.parse(root.dataset.unitNames || '{}') || {};
+  let unitNames;
   let state = readState(location.search);
   if (!state.categories.length && root.dataset.initialCategory) {
     state.categories = [root.dataset.initialCategory];
@@ -291,6 +291,7 @@ if (root) {
 
   async function initialize() {
     try {
+      unitNames = JSON.parse(root.dataset.unitNames || '{}') || {};
       const response = await fetch(root.dataset.indexUrl);
       if (!response.ok) throw new Error(`Topics index HTTP ${response.status}`);
       documents = await response.json();
@@ -300,6 +301,7 @@ if (root) {
       query.disabled = false;
       showFilterCounts();
       render();
+      root.classList.remove('topics-browser--loading');
       if (root.dataset.courseContext !== 'true') {
         for (const type of ['click', 'auxclick', 'contextmenu']) {
           root.addEventListener(type, (event) => {
@@ -330,6 +332,19 @@ if (root) {
       window.addEventListener('popstate', () => { state = readState(location.search); render(); });
     } catch (error) {
       console.error('Topics search could not initialize', error);
+      flatGrid.append(...cards);
+      cards.forEach((card) => { card.hidden = false; });
+      flat.hidden = false;
+      groupList.replaceChildren();
+      titleHeading.hidden = true;
+      bodySection.hidden = true;
+      root.classList.remove('topics-browser--loading');
+      query.disabled = true;
+      view.disabled = true;
+      filters.forEach((filter) => { filter.disabled = true; });
+      matchButtons.forEach((button) => { button.disabled = true; });
+      filterClear.disabled = true;
+      searchClear.disabled = true;
       status.classList.remove('topics-browser__accessible-label');
       status.textContent = 'Topics search is unavailable. Reload to retry; document links remain available.';
     }
