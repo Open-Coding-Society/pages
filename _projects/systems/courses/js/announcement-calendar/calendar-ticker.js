@@ -31,26 +31,52 @@ function decodeEntities(text) {
 }
 
 export class TickerItems {
-  /** How many school days after today the ticker reaches. */
-  static SCHOOL_DAYS_AHEAD = 5;
-
-  /** How many days ahead it reaches on a page with no school calendar. */
-  static DAYS_AHEAD_WITHOUT_WEEKS = 7;
-
   /**
-   * The last day the ticker shows: the fifth school day after today, skipping weekends, breaks
-   * and closed days, or a week ahead when there are no school weeks.
+   * The last day of the look-ahead: the schoolDays-th school day after today, skipping weekends,
+   * breaks and closed days, or `days` after today when there are no school weeks. Both come from
+   * calendar_ticker in _config.yml, which the include writes on the bar.
    * @param {Array} weeks - school weeks from parseSchoolCalendar
    * @param {string} today - YYYY-MM-DD
+   * @param {{schoolDays: number, days: number}} reach
    * @returns {string} YYYY-MM-DD
    */
-  static lastDay(weeks, today) {
-    if (!weeks.length) return addDays(today, TickerItems.DAYS_AHEAD_WITHOUT_WEEKS);
+  static lastDay(weeks, today, { schoolDays, days }) {
+    if (!weeks.length) return addDays(today, days);
     let day = today;
-    for (let count = 0; count < TickerItems.SCHOOL_DAYS_AHEAD; count += 1) {
+    for (let count = 0; count < schoolDays; count += 1) {
       day = nextSchoolDay(weeks, addDays(day, 1));
     }
     return day;
+  }
+
+  /**
+   * The last day to ask the calendar for. When the ticker can read events' own alerts, an event
+   * as far as alertLimitDays ahead may already be showing, so it asks that far.
+   * @param {string} today - YYYY-MM-DD
+   * @param {string} lastDay - the look-ahead's last day
+   * @param {{alertLimitDays: number, readsAlerts: boolean}} options
+   * @returns {string} YYYY-MM-DD
+   */
+  static fetchUntil(today, lastDay, { alertLimitDays, readsAlerts }) {
+    if (!readsAlerts) return lastDay;
+    const limit = addDays(today, alertLimitDays);
+    return limit > lastDay ? limit : lastDay;
+  }
+
+  /**
+   * Whether an event is on the ticker today: through the look-ahead's last day, or, when it has
+   * its own alert, from that many days before its date. An alert longer than alertLimitDays
+   * counts as alertLimitDays. Events before today never are.
+   * @param {{date: string, description: string}} event
+   * @param {{today: string, lastDay: string, calendarAlerts: object|null, alertLimitDays: number}} options
+   *   calendarAlerts is the Calendar system's reader (CalendarAlerts.js), or null without it
+   * @returns {boolean}
+   */
+  static shows(event, { today, lastDay, calendarAlerts, alertLimitDays }) {
+    if (event.date < today) return false;
+    const days = calendarAlerts ? calendarAlerts.split(event.description).days : null;
+    if (days === null) return event.date <= lastDay;
+    return event.date <= addDays(today, Math.min(days, alertLimitDays));
   }
 
   /**
@@ -97,17 +123,26 @@ export class TickerItems {
   }
 
   /**
-   * The ticker's items: by date, the most urgent first within a day.
+   * The ticker's items: the events it shows today (shows), by date, the most urgent first within
+   * a day.
    * @param {Array} events - calendar events as calendar-data.js normalizes them
-   * @param {{today: string, splitLinkedDoc: Function|null, origin: string, pageUrl: string, calendarUrl: string}} options
+   * @param {object} options
+   * @param {string} options.today - YYYY-MM-DD
+   * @param {string} options.lastDay - the look-ahead's last day (lastDay)
+   * @param {object|null} [options.calendarAlerts] - the Calendar system's alert reader, or null
+   * @param {number} [options.alertLimitDays] - needed with calendarAlerts
+   * @param {Function|null} options.splitLinkedDoc - and origin, pageUrl, calendarUrl: see linkFor
    * @returns {Array<{text: string, href: string, urgent: boolean}>}
    */
-  static from(events, { today, ...links }) {
+  static from(events, {
+    today, lastDay, calendarAlerts = null, alertLimitDays, ...links
+  }) {
     const rank = (priority) => {
       const position = PRIORITY_ORDER.indexOf(priority);
       return position === -1 ? PRIORITY_ORDER.length : position;
     };
-    return [...events]
+    return events
+      .filter((event) => TickerItems.shows(event, { today, lastDay, calendarAlerts, alertLimitDays }))
       .sort((a, b) => a.date.localeCompare(b.date) || rank(a.priority) - rank(b.priority))
       .map((event) => ({
         text: `${TickerItems.dayLabel(event.date, today)}: ${TickerItems.plainTitle(event.title)}`,
@@ -133,20 +168,29 @@ export class CalendarTicker {
    * @param {object} options.fetchOptions - from config.js, with the sign-in cookie
    * @param {boolean} options.springEnabled - from config.js
    * @param {Function|null} options.splitLinkedDoc - the Calendar system's linked-doc reader, or null
+   * @param {object|null} [options.calendarAlerts] - the Calendar system's alert reader
+   *   (CalendarAlerts.js), or null without it: then every event keeps to the look-ahead
    * @param {string} [options.today] - YYYY-MM-DD; the visitor's today when left out
    * @param {{origin: string, href: string}} [options.location] - the page's address
    * @returns {CalendarTicker[]}
+   * @throws {RangeError} when a bar's look-ahead setting is missing or not a whole number (reach)
    */
   static mountAll(root, {
-    javaURI, fetchOptions, springEnabled, splitLinkedDoc = null, today = null, location = globalThis.location,
+    javaURI, fetchOptions, springEnabled, splitLinkedDoc = null, calendarAlerts = null, today = null,
+    location = globalThis.location,
   }) {
     if (!springEnabled) return [];
     const data = root.querySelector(SCHOOL_CALENDAR_SELECTOR);
     const weeks = data ? parseSchoolCalendar(JSON.parse(data.textContent)).weeks : [];
-    return [...root.querySelectorAll('[data-ocs-calendar-ticker]')].map((wrapper) => {
+    const wrappers = [...root.querySelectorAll('[data-ocs-calendar-ticker]')];
+    // Every bar's setting is read before any bar asks Spring, so a broken one stops them all.
+    const reaches = wrappers.map((wrapper) => CalendarTicker.reach(wrapper));
+    return wrappers.map((wrapper, index) => {
       const ticker = new CalendarTicker(wrapper, {
         store: createLiveCalendarStore({ course: wrapper.dataset.course || 'all', javaURI, fetchOptions }),
         weeks,
+        reach: reaches[index],
+        calendarAlerts,
         splitLinkedDoc,
         origin: location.origin,
         pageUrl: location.href,
@@ -159,10 +203,37 @@ export class CalendarTicker {
   }
 
   /**
+   * How far a bar looks ahead: the include writes calendar_ticker from _config.yml on it as
+   * data-school-days-ahead, data-days-ahead and data-alert-limit-days.
+   * @param {Element} wrapper - the include's [data-ocs-calendar-ticker] element
+   * @returns {{schoolDays: number, days: number, alertLimitDays: number}}
+   * @throws {RangeError} when one is missing or not a whole number of days
+   */
+  static reach(wrapper) {
+    const read = (attribute) => {
+      const value = wrapper.getAttribute(attribute);
+      const days = value === null || value.trim() === '' ? Number.NaN : Number(value);
+      if (!Number.isInteger(days) || days < 0) {
+        throw new RangeError(
+          `Calendar ticker: ${attribute} must be a whole number of days (calendar_ticker in _config.yml), not "${value}"`,
+        );
+      }
+      return days;
+    };
+    return {
+      schoolDays: read('data-school-days-ahead'),
+      days: read('data-days-ahead'),
+      alertLimitDays: read('data-alert-limit-days'),
+    };
+  }
+
+  /**
    * @param {Element} wrapper - the include's hidden [data-ocs-calendar-ticker] element
    * @param {object} options
    * @param {{listRange: Function}} options.store - a calendar store from calendar-data.js
    * @param {Array} options.weeks - school weeks; [] when the page has none
+   * @param {{schoolDays: number, days: number, alertLimitDays: number}} options.reach - see reach
+   * @param {object|null} options.calendarAlerts - the Calendar system's alert reader, or null
    * @param {Function|null} options.splitLinkedDoc
    * @param {string} options.origin
    * @param {string} options.pageUrl
@@ -170,7 +241,7 @@ export class CalendarTicker {
    * @param {string|null} options.today
    */
   constructor(wrapper, {
-    store, weeks, splitLinkedDoc, origin, pageUrl, calendarUrl, today,
+    store, weeks, reach, calendarAlerts, splitLinkedDoc, origin, pageUrl, calendarUrl, today,
   }) {
     this.wrapper = wrapper;
     this.section = wrapper.querySelector('.ocs__ticker');
@@ -178,6 +249,8 @@ export class CalendarTicker {
     this.track = wrapper.querySelector('[data-hook="track"]');
     this.store = store;
     this.weeks = weeks;
+    this.reach = reach;
+    this.calendarAlerts = calendarAlerts;
     this.links = { splitLinkedDoc, origin, pageUrl, calendarUrl };
     this.today = today;
     this.stopped = false;
@@ -208,21 +281,27 @@ export class CalendarTicker {
   }
 
   /**
-   * Ask the calendar for today through the last day and show what comes back. Signed out (401 or
-   * 403) there is nothing to show; any other failure is logged. Either way the bar stays hidden.
+   * Ask the calendar for today through the look-ahead (or the alert limit, when alerts can be
+   * read) and show what is on the ticker today. Signed out (401 or 403) there is nothing to show;
+   * any other failure is logged. Either way the bar stays hidden.
    * @returns {Promise<void>}
    */
   async refresh() {
     const today = this.today || todayIso();
+    const { alertLimitDays } = this.reach;
+    const lastDay = TickerItems.lastDay(this.weeks, today, this.reach);
+    const until = TickerItems.fetchUntil(today, lastDay, { alertLimitDays, readsAlerts: Boolean(this.calendarAlerts) });
     let events;
     try {
-      events = await this.store.listRange(today, TickerItems.lastDay(this.weeks, today));
+      events = await this.store.listRange(today, until);
     } catch (error) {
       if (!SIGNED_OUT.has(error.status)) console.warn('Calendar ticker: could not load the calendar', error);
       events = [];
     }
     if (this.stopped) return;
-    this.show(TickerItems.from(events, { today, ...this.links }));
+    this.show(TickerItems.from(events, {
+      today, lastDay, calendarAlerts: this.calendarAlerts, alertLimitDays, ...this.links,
+    }));
   }
 
   /**
