@@ -125,10 +125,10 @@ unit's Practice row. Units come from lesson titles; their optional names come
 from [`topics_units.yml`](../data/topics_units.yml). Layout details are in the
 [README](../README.md#page-layout).
 
-Topic Filters holds the two disclosures, both open by default. Topic Filter starts with its OR/AND pair:
+Topic Filters holds the two disclosures, both open by default. Topic Filter starts with OR, AND and CLEAR:
 `ocs__btn` buttons in an `ocs__links` group, the current choice filled and
-`aria-pressed`, disabled until the search index loads. Clear Filters belongs to
-that box and clears only category selections. Search has an in-field clear control.
+`aria-pressed`, disabled until the search index loads. CLEAR clears only category
+selections. Search has an in-field clear control.
 Each clear button is dimmed and disabled when its corresponding state is empty.
 
 The [browser controller](../js/browser.js) builds a Lunr index in the client

@@ -130,6 +130,9 @@ class TopicsTest < Minitest::Test
       match = browser.split('data-topics-match', 2).last.split('</p>', 2).first
       assert_match(/<button[^>]*class="ocs__btn small accent fill"[^>]*value="or"[^>]*aria-pressed="true"[^>]*disabled/, match)
       assert_match(/<button[^>]*class="ocs__btn small accent"[^>]*value="and"[^>]*aria-pressed="false"[^>]*disabled/, match)
+      assert_match(/<button[^>]*data-topics-clear[^>]*disabled[^>]*>CLEAR<\/button>/, match)
+      assert_match(/value="or"[^>]*>OR<\/button>/, match)
+      assert_match(/value="and"[^>]*>AND<\/button>/, match)
       assert_operator browser.index('data-topics-primary'), :<, browser.index('data-topics-match')
       assert_operator browser.index('data-topics-match'), :<, browser.index('<legend class="topics-browser__accessible-label">Topic Filter</legend>')
       refute_includes primary, 'data-topics-match'

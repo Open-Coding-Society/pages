@@ -1,4 +1,4 @@
-import { selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, categoriesByCount, showMoreCategory, createSearchIndex, unitGroups } from './model.js';
+import { selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, categoriesByCount, showMoreCategory, resultHeading, createSearchIndex, unitGroups } from './model.js';
 import { SNAPSHOT_KEY, readSnapshot, orderedDocuments } from './viewer-model.js';
 
 const root = document.querySelector('[data-topics-browser]');
@@ -9,7 +9,7 @@ if (root) {
   // Topic Filter values; every other checked box belongs to More Categories.
   const primary = [...root.querySelectorAll('[data-topics-primary] input[type="checkbox"]')].map((filter) => filter.value);
   const secondaryFilters = [...root.querySelectorAll('[data-topics-secondary] input[type="checkbox"]')];
-  const matchButtons = [...root.querySelectorAll('[data-topics-match] button')];
+  const matchButtons = [...root.querySelectorAll('[data-topics-match] button[aria-pressed]')];
   const status = root.querySelector('[data-topics-status]');
   const heading = root.querySelector('[data-topics-heading]');
   const cards = [...root.querySelectorAll('[data-topic-url]')];
@@ -120,8 +120,7 @@ if (root) {
   function unitCard(topic, { unit, lessons, practice }) {
     const card = element('section', 'ocs__grid-cell ocs__stack');
     const header = element('header');
-    header.append(element('h3', '', unitTitle(topic, unit)),
-      element('span', 'ocs__status', `${lessons.length} lessons`));
+    header.append(element('h3', '', `${unitTitle(topic, unit)} (${lessons.length + practice.length})`));
     card.append(header);
     if (lessons.length) {
       const list = element('div', `topics-browser__unit-lessons ${state.view === 'cards' ? 'topics-browser__results' : 'ocs__stack'}`);
@@ -165,12 +164,6 @@ if (root) {
     const fieldset = root.querySelector('[data-topics-secondary] fieldset');
     categoriesByCount(secondaryFilters.map((filter) => filter.value), counts)
       .forEach((category) => fieldset.append(labelsByCategory.get(category)));
-  }
-
-  function headingText(searching, count) {
-    if (searching) return `Results for “${state.query.trim()}” (${count})`;
-    if (!state.categories.length) return 'All topics';
-    return chosenCategory() ? labels.get(chosenCategory()) : 'Filtered lessons';
   }
 
   function render() {
@@ -242,8 +235,8 @@ if (root) {
       bodyResults.append(link);
     }
     const count = selected.length + (searching ? groups.body.length : 0);
-    heading.textContent = headingText(searching, count);
-    status.classList.toggle('topics-browser__accessible-label', searching && count > 0);
+    heading.textContent = resultHeading(state, labels, count);
+    status.classList.toggle('topics-browser__accessible-label', count > 0);
     status.textContent = count ? `${count} ${searching ? 'results' : 'lessons'}` : 'No lessons match these filters and search.';
   }
 
@@ -337,6 +330,7 @@ if (root) {
       window.addEventListener('popstate', () => { state = readState(location.search); render(); });
     } catch (error) {
       console.error('Topics search could not initialize', error);
+      status.classList.remove('topics-browser__accessible-label');
       status.textContent = 'Topics search is unavailable. Reload to retry; document links remain available.';
     }
   }

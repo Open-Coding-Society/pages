@@ -36,9 +36,10 @@
   }
   &__search-clear.ocs__btn {
     position: absolute;
-    top: 50%;
+    top: 0;
+    bottom: 0;
     right: 0.25rem;
-    transform: translateY(-50%);
+    margin: auto 0;
     width: 2rem;
     height: 2rem;
     padding: 0;
@@ -46,7 +47,8 @@
     background: transparent;
     color: var(--pref-text-color);
     font-size: 1.4rem;
-    &:hover { transform: translateY(-50%); }
+    line-height: 1;
+    &:hover { transform: none; }
   }
   &__count { font-size: inherit; font-weight: inherit; }
   &__categories {
@@ -109,10 +111,13 @@
     &[hidden] { display: none; }
   }
   &__metadata { font-size: 0.85rem; }
-  &__practice .ocs__btn {
+  &__practice .ocs__btn.small {
     max-width: 100%;
+    box-sizing: border-box;
     height: auto;
-    min-height: 2rem;
+    min-height: calc(2.7em + 0.7rem + 2px);
+    padding: 0.35rem 0.7rem;
+    line-height: 1.35;
     white-space: normal;
     overflow-wrap: anywhere;
   }

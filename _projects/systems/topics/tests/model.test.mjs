@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { filterGroups, selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, categoriesByCount, showMoreCategory, createSearchIndex, unitOf, unitGroups, isPractice } from '../js/model.js';
+import { filterGroups, selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, categoriesByCount, showMoreCategory, resultHeading, createSearchIndex, unitOf, unitGroups, isPractice } from '../js/model.js';
 
 const require = createRequire(import.meta.url);
 const lunr = require('../../../../assets/js/vendor/lunr.min.js');
@@ -45,6 +45,14 @@ test('more categories show five or more documents and retain selected older link
   assert.equal(showMoreCategory(4, false), false);
   assert.equal(showMoreCategory(5, false), true);
   assert.equal(showMoreCategory(4, true), true);
+});
+
+test('all result headings include their counts', () => {
+  const labels = new Map([['java', 'Java']]);
+  assert.equal(resultHeading(readState(''), labels, 10), 'All topics (10)');
+  assert.equal(resultHeading(readState('?category=java'), labels, 3), 'Java (3)');
+  assert.equal(resultHeading(readState('?category=java&category=python'), labels, 0), 'Filtered lessons (0)');
+  assert.equal(resultHeading(readState('?q=AWS'), labels, 8), 'Results for “AWS” (8)');
 });
 
 test('search finds a document by a low-count category even when its text does not mention it', () => {

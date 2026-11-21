@@ -47,14 +47,14 @@ and lays out with `ocs__split ocs__split--aside`, one column on phones:
 - **Search:** title-match cards, then text matches, both within the filters.
 
 Topic Filters keeps the original controls. Topic Filter, expanded by default,
-holds the primary topics with the OR/AND buttons; More Categories, also expanded
+holds the primary topics with OR, AND and CLEAR buttons; More Categories, also expanded
 by default, lists remaining categories with at least five documents, ordered by
 count with alphabetical ties. An already-selected category below five stays
 visible so a shared or older filter link can be cleared. Both groups are
 multi-select with document counts; search also indexes category names, so
 documents in less common categories remain discoverable.
-Clear Filters clears only topic/category selections, not the OR/AND choice;
-The search X clears only the query. Each clear button is dimmed and disabled when
+CLEAR clears only topic/category selections, not the OR/AND choice;
+the search X clears only the query. Each clear button is dimmed and disabled when
 its corresponding selection is empty. The View selector (Compact list, the
 default, or Cards; `?view=cards`) picks lesson dropdowns or cards inside units.
 Both boxes filter `categories`; YAML controls prominence,

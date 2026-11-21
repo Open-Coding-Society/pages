@@ -142,6 +142,14 @@ export function showMoreCategory(count, selected) {
   return count >= 5 || selected;
 }
 
+export function resultHeading(state, labels, count) {
+  const query = state.query.trim();
+  if (query) return `Results for “${query}” (${count})`;
+  const title = state.categories.length === 0 ? 'All topics' :
+    state.categories.length === 1 ? labels.get(state.categories[0]) || state.categories[0] : 'Filtered lessons';
+  return `${title} (${count})`;
+}
+
 export function createSearchIndex(lunr, documents) {
   return lunr(function () {
     this.ref('url');
