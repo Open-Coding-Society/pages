@@ -300,7 +300,8 @@ Write it as an `<abbr>` with the full name in `title`, not a `<span>` or
 ```
 
 Use `ocs__table-wrap` for horizontal scrolling and `ocs__table` for theme-aware
-headers, borders, alternating rows, and hover states.
+headers, borders, alternating rows, and hover states. Add `ocs__table--list` for
+a compact, unstriped list with separators and quiet uppercase headers.
 
 See [`elements/tables`](elements/tables).
 

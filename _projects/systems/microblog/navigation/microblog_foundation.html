@@ -5,9 +5,9 @@
 
 <!-- Microblog Side Panel -->
 <aside id="microblog-panel" class="microblog-panel" tabindex="-1" aria-label="Microblog panel">
-  <div class="microblog-panel-header">
+  <div class="ocs__card-header microblog-panel-header">
     <button id="microblog-close-btn" class="ocs__btn ocs__btn--icon small microblog-close-btn" aria-label="Close Microblog">&times;</button>
-    <h2 class="microblog-panel-title">Microblog</h2>
+    <h2 class="ocs__truncate microblog-panel-title">Microblog</h2>
     <button id="quick-access-toggle" class="ocs__btn small accent fill guest-signup-toggle-btn" aria-controls="quick-access">Guest &amp; Mentor</button>
     <button id="microblog-qr-btn" class="ocs__btn small pill microblog-qr-btn" title="QR code: review this page from a phone" aria-label="QR code for phone reviews">QR code</button>
   </div>
@@ -492,7 +492,7 @@ async function loadRepliesForPost(postId) {
 
         repliesRow.innerHTML = `
           <td colspan="2">
-            <div class="replies-container">
+            <div class="ocs__tree replies-container">
               <div class="microblog-replies-heading">${replies.length} ${replies.length === 1 ? 'reply' : 'replies'}</div>
               ${repliesHtml}
             </div>
@@ -730,7 +730,7 @@ async function renderMicroblogTable({ refetch = true } = {}) {
         // Table: set container with scrollable wrapper
         container.innerHTML = `
         <div class="microblog-table-scroll">
-          <table id="microblog-table" class="ocs__table microblog-table">
+          <table id="microblog-table" class="ocs__table ocs__table--list microblog-table">
               ${head}
               ${body}
           </table>

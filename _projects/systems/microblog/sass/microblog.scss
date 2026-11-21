@@ -73,11 +73,10 @@
   transform: translateX(0);
 }
 
-.microblog-panel-header {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+.microblog-panel-header.ocs__card-header {
+  justify-content: flex-start;
   gap: 0.5rem;
+  margin-bottom: 0;
   padding: 1rem;
   border-bottom: 1px solid var(--ui-border);
 }
@@ -87,10 +86,6 @@
   font-size: 1.2rem;
   font-weight: 700;
   flex: 1 1 auto;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .microblog-panel-content {
@@ -100,15 +95,14 @@
   padding: 1rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: $breakpoint-mobile) {
   .microblog-panel {
     width: 95vw;
     max-width: 95vw;
     height: min(85vh, calc(100vh - 5rem));
-    border-radius: 12px;
+    border-radius: $radius-lg;
 
     /* Centered Modal Style */
-    position: fixed;
     left: 50%;
     top: 4rem;
     right: auto;
@@ -133,7 +127,7 @@
     font-size: 1.2rem;
     min-width: auto;
     min-height: auto;
-    border-radius: 999px;
+    border-radius: $radius-pill;
     box-shadow: $shadow-sm;
   }
 
@@ -146,9 +140,7 @@
   }
 }
 
-/* Post list (the DataTables table in #microblog-playground). The theme's
-   markdown-table stripes, borders and dark header are reset here so each post
-   reads as one block: who and when on the left, the message on the right. */
+/* DataTables controls within the post list. */
 #microblog-panel {
   .dataTables_wrapper {
     color: inherit;
@@ -263,42 +255,6 @@
 }
 
 #microblog-panel table.microblog-table {
-  width: 100%;
-  margin: 0;
-  border: 0;
-  border-collapse: collapse;
-  background: transparent;
-
-  tr,
-  tr:nth-child(even) {
-    background: transparent;
-  }
-
-  thead th {
-    padding: 0.4rem 0.6rem;
-    border: 0;
-    border-bottom: 1px solid var(--ui-border);
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-align: left;
-    text-transform: uppercase;
-  }
-
-  tbody td {
-    padding: 0.75rem 0.6rem;
-    border: 0;
-    border-top: 1px solid var(--ui-border);
-    text-align: left;
-    vertical-align: top;
-  }
-
-  tbody tr:first-child td {
-    border-top: 0;
-  }
-
   // The writer column: name, then time and length in smaller, quieter text
   tbody td:first-child {
     width: 30%;
@@ -444,18 +400,15 @@
 }
 
 /* Replies: an indented thread under the post */
-.replies-container {
+.replies-container.ocs__tree {
   margin-left: 0.5rem;
   padding-left: 0.75rem;
   border-left: 2px solid var(--pref-accent-color);
 }
 
 .microblog-replies-heading {
+  @include kicker(0.7rem, 0.06em);
   margin-bottom: 0.25rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   opacity: 0.75;
 }
 
@@ -503,10 +456,8 @@
 }
 
 .microblog-survey-fields {
+  @include surface(0.5rem, 0.75rem, $background: null, $color: null);
   margin: 0;
-  padding: 0.75rem;
-  border: 1px solid var(--ui-border);
-  border-radius: 0.5rem;
 
   legend {
     padding: 0 0.25rem;
@@ -664,11 +615,15 @@
 }
 
 /* Post layout: topic line (+ Resolved badge), content, then one row of actions */
-.microblog-post-topic {
+.microblog-post-topic,
+.microblog-reply-byline {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.25rem 0.5rem;
+}
+
+.microblog-post-topic {
   font-size: 0.85rem;
   opacity: 0.85;
 }
@@ -711,13 +666,6 @@
 
 /* Replies: name and date, then the reply's status badge and its own
    Resolve / Reopen, pushed to the right (margin-left: auto above) */
-.microblog-reply-byline {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.25rem 0.5rem;
-}
-
 .microblog-resolve-btn.microblog-resolve-btn--reply.ocs__btn {
   height: 1.5rem;
   padding: 0 0.5rem;

@@ -23,7 +23,10 @@ Edit the sources here, not the generated copies in the project directories.
 The panel and review page use shared `ocs__` controls and theme tokens. Their SCSS
 keeps Microblog-specific layout and survey styling; the QR code stays on white
 for scanning. The floating panel uses the shared `overlay-panel` mixin; it has
-no backdrop, so the document remains usable.
+no backdrop, so the document remains usable. Its header uses `ocs__card-header`
+and its title uses `ocs__truncate`. Posts use `ocs__table--list`, replies use
+`ocs__tree`, resolved labels use `ocs__status-pill`, and unread counts share
+the notification badge with the message bell. Survey vote bars remain custom.
 
 ## Verification
 

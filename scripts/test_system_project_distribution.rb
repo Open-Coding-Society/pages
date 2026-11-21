@@ -171,12 +171,12 @@ class SystemProjectDistributionTest < Minitest::Test
         File.write(File.join(workspace, "#{name}.md"), "---\nlayout: page\n#{frontmatter}\n---\n#{name}\n")
       end
       FileUtils.mkdir_p(File.join(workspace, "assets/css"))
-      %w[mixins/_variables.scss mixins/_panel.scss dm-bell.scss].each do |path|
+      %w[mixins/_variables.scss mixins/_panel.scss mixins/_forms.scss elements/tables/_main.scss dm-bell.scss].each do |path|
         destination = File.join(workspace, "_sass/open-coding", path)
         FileUtils.mkdir_p(File.dirname(destination))
         FileUtils.cp(File.join(ROOT, "_sass/open-coding", path), destination)
       end
-      File.write(File.join(workspace, "assets/css/microblog.scss"), "---\n---\n$red: #e53e3e;\n@import 'open-coding/mixins/variables';\n@import 'open-coding/mixins/panel';\n@import 'projects/microblog/microblog';\n@import 'projects/microblog/microblog-review';\n@import 'open-coding/dm-bell';\n")
+      File.write(File.join(workspace, "assets/css/microblog.scss"), "---\n---\n$red: #e53e3e;\n@import 'open-coding/mixins/variables';\n@import 'open-coding/mixins/panel';\n@import 'open-coding/mixins/forms';\n@import 'projects/microblog/microblog';\n@import 'projects/microblog/microblog-review';\n@import 'open-coding/elements/tables/main';\n@import 'open-coding/dm-bell';\n")
       site = Jekyll::Site.new(Jekyll.configuration(
         "source" => workspace, "destination" => File.join(workspace, "_site"),
         "layouts_dir" => File.join(workspace, "_layouts"), "includes_dir" => File.join(workspace, "_includes"),
@@ -195,8 +195,10 @@ class SystemProjectDistributionTest < Minitest::Test
       ordinary = File.read(File.join(site.dest, "ordinary.html"))
       assert_includes ordinary, "/preview/assets/js/projects/microblog/microblog.js"
       assert_includes ordinary, "/preview/assets/js/projects/microblog/quick-access.js"
+      assert_includes ordinary, 'class="ocs__table ocs__table--list microblog-table"'
       assert_includes File.read(File.join(site.dest, "review.html")), "/preview/assets/js/projects/microblog/microblog-review.js"
       document = Nokogiri::HTML(ordinary)
+      assert_equal 1, document.css("#microblog-panel .ocs__card-header.microblog-panel-header .ocs__truncate.microblog-panel-title").size
       %w[microblog-modal microblog-qr-modal reply-modal].each do |id|
         assert_equal 1, document.css("##{id}.ocs__modal.hidden .ocs__modal-card").size
       end
@@ -205,6 +207,8 @@ class SystemProjectDistributionTest < Minitest::Test
       css = File.read(File.join(site.dest, "assets/css/microblog.css"))
       assert_includes css, ".microblog-panel"
       assert_includes css, ".review-page"
+      assert_match(/^\s*\.ocs__table\.ocs__table--list\s*\{[^}]*background:\s*transparent/m, css)
+      assert_match(/^\s*\.ocs__table\.ocs__table--list tbody tr:nth-child\(even\):hover\s*\{\s*background:\s*transparent/m, css)
       assert_match(/\.microblog-modal\.ocs__modal\.hidden\s*\{\s*display:\s*none/, css)
       assert_match(/\.microblog-panel\s*\{[^}]*border:\s*1px solid var\(--field-border, var\(--ui-border\)\);[^}]*box-shadow:/m, css)
       assert_match(/box-shadow:\s*0 0 20px 4px color-mix\(in srgb, var\(--pref-text-color\) 25%, transparent\)/, css)

@@ -124,6 +124,31 @@ test('renderMicroblogTable escapes every post field before it joins the markup',
     assert.doesNotMatch(render, /<span>\$\{post\./);
 });
 
+test('replies render inside the shared tree without showing status markers', async () => {
+    const start = html.indexOf('async function loadRepliesForPost(postId)');
+    const end = html.indexOf("// A reply's Resolved badge", start);
+    const row = { insertAdjacentElement: (_, element) => { row.replies = element; } };
+    const document = {
+        querySelector: selector => selector === '#post-row-42' ? row : null,
+        createElement: () => ({})
+    };
+    const context = {
+        document, currentUserPromise: Promise.resolve(null), postsById: new Map(),
+        fetchReplies: async () => ({ replies: [
+            { userName: 'Ada', content: 'Hello', timestamp: 'today' },
+            { content: '[[microblog:resolved]]' }
+        ] }),
+        isStatusMarker: reply => reply.content.startsWith('[['),
+        escapeHtml: value => value, formatPostTime: value => value,
+        console: { error: message => { throw new Error(message); } }
+    };
+    await vm.runInNewContext(`${html.slice(start, end)}\nloadRepliesForPost(42)`, context);
+    assert.match(row.replies.innerHTML, /class="ocs__tree replies-container"/);
+    assert.match(row.replies.innerHTML, /1 reply/);
+    assert.match(row.replies.innerHTML, /Hello/);
+    assert.doesNotMatch(row.replies.innerHTML, /microblog:resolved/);
+});
+
 test('microblog-form: saves an open survey\'s choices with a new post, and keeps the draft when they are unusable', async () => {
     const start = html.indexOf("document.getElementById('microblog-form').onsubmit");
     const handler = html.slice(start, html.indexOf('\n};', start) + 3);
