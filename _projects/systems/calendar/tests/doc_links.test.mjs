@@ -42,6 +42,40 @@ test('the doc line is found after HTML line breaks from the editor', () => {
   assert.deepEqual(splitLinkedDoc(description, origin), { body: 'Notes', docUrl: `${origin}/csa/x` });
 });
 
+test('the doc line is found after <br/>, <br /> and <BR> tags too', () => {
+  const description = `Notes<br/><br /><BR>Linked doc: ${origin}/csa/x`;
+  assert.deepEqual(splitLinkedDoc(description, origin), { body: 'Notes', docUrl: `${origin}/csa/x` });
+});
+
+// Any signed-in account can save a description, and every signed-in visitor's ticker splits it.
+const BLANK_LINES = '\n'.repeat(200000);
+const BLANK_BREAKS = '<br>'.repeat(50000);
+
+function millisecondsToSplit(description) {
+  const started = performance.now();
+  splitLinkedDoc(description, origin);
+  return performance.now() - started;
+}
+
+test('a long run of blank lines splits quickly', () => {
+  const descriptions = [
+    `Notes${BLANK_LINES}More notes`,
+    `Notes${BLANK_BREAKS}More notes`,
+    `Notes${BLANK_LINES}More notes\nLinked doc: ${origin}/csa/x`,
+    `Notes${BLANK_BREAKS}Linked doc: ${origin}/csa/x`
+  ];
+  for (const description of descriptions) {
+    const milliseconds = millisecondsToSplit(description);
+    assert.ok(milliseconds < 100, `took ${Math.round(milliseconds)} ms`);
+  }
+});
+
+test('the doc line is still found after a long run of blank lines', () => {
+  const docUrl = `${origin}/csa/x`;
+  assert.deepEqual(splitLinkedDoc(`Notes${BLANK_LINES}Linked doc: ${docUrl}`, origin), { body: 'Notes', docUrl });
+  assert.deepEqual(splitLinkedDoc(`Notes${BLANK_BREAKS}Linked doc: ${docUrl}`, origin), { body: 'Notes', docUrl });
+});
+
 test('a sprint-synced lesson URL counts as the linked doc and is not added twice', () => {
   const synced = `Formative - Week 3\n${origin}/csa/lesson`;
   const { body, docUrl } = splitLinkedDoc(synced, origin);
