@@ -32,21 +32,6 @@ export function createDialog(modal, { onClose } = {}) {
   return { open, close, isOpen: () => !modal.classList.contains('hidden') };
 }
 
-// Turns one entry from /api/groups/chat/{id}/files into a download. Lives here rather
-// than in group-dialogs.js because the Files dialog and the chat log (thread.js, where
-// a shared file appears as a line you can click) both need it.
-export function saveFile(file) {
-  const bytes = Uint8Array.from(atob(file.base64Data || ''), character => character.charCodeAt(0));
-  const url = URL.createObjectURL(new Blob([bytes]));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = downloadName(file.filename);
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 0);
-}
-
 // Saves a Blob as a download named `filename` (its last path part). The URL is let go a
 // minute later, not at once: Safari can still be reading a big file when click() returns.
 export function saveBlob(blob, filename) {

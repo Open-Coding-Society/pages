@@ -246,20 +246,11 @@ export function initMembers({ elements, api, me, onChanged, onDelete }) {
   };
 }
 
-function readAsBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-}
-
 // The Files dialog: everything shared with a group, as folders (FilesTab), from Spring's
 // index, with Download and Preview for a file and a .zip for a folder. makeFileActions({
 // filesFor, notify }) makes the FileActions its buttons use, so they open the dialog's group
-// and speak in its status line. The form under the list shares one file.
-export function initFiles({ elements, api, groupFilesFor, makeFileActions, onShare = null }) {
+// and speak in its status line. Files go up from the composer's Attach (onShare opens it).
+export function initFiles({ elements, groupFilesFor, makeFileActions, onShare = null }) {
   let group = null;
   const notify = message => { elements.status.textContent = message; };
   const actions = makeFileActions({ filesFor: () => (group ? groupFilesFor(group.id) : null), notify });
@@ -271,31 +262,7 @@ export function initFiles({ elements, api, groupFilesFor, makeFileActions, onSha
       tab.hide();
       actions.clear();
       group = null;
-      elements.form.reset();
     },
-  });
-
-  elements.form.addEventListener('submit', async event => {
-    event.preventDefault();
-    const file = elements.input.files?.[0];
-    if (!file) {
-      notify('Choose a file first.');
-      return;
-    }
-    elements.upload.disabled = true;
-    notify(`Sharing ${file.name}…`);
-    try {
-      await api.uploadGroupFile(group.id, file.name, await readAsBase64(file));
-      elements.form.reset();
-      groupFilesFor(group.id).refresh();
-      tab.refreshIfShowing(group.id);
-      notify(`Shared ${file.name}.`);
-    } catch (error) {
-      console.warn('Messages: could not share the file', error);
-      notify(`Could not share ${file.name}. Try again.`);
-    } finally {
-      elements.upload.disabled = false;
-    }
   });
 
   return {

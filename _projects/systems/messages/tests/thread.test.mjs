@@ -106,9 +106,10 @@ test('a pane needs no onDmRead, onGroupRead or onFileShared', async () => {
 
   thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
   await settle();
-  socket.handler({ context: 'sendFileServer', sender: 'Grace', filename: 'plan.pdf' });
+  socket.handler({ context: 'sendFileServer', sender: 'Grace', filename: 'plan.pdf', size: 12 });
   socket.handler(groupFrame('m9', 'Grace Hopper', 'new here'));
-  assert.match(elements.messages.textContent, /Grace shared a file:/);
+  // The message that shares a file lists it; the socket's file frame adds no line of its own.
+  assert.doesNotMatch(elements.messages.textContent, /plan\.pdf/);
   assert.match(elements.messages.textContent, /new here/);
 });
 

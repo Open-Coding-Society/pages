@@ -111,8 +111,6 @@ export function createMessagesApi({
     groupUnread: () => spring('/api/groups/chat/unread'),
     markGroupRead: groupId => spring(`/api/groups/chat/${part(groupId)}/read`, 'POST'),
 
-    groupFiles: groupId => spring(`/api/groups/chat/${part(groupId)}/files`),
-    uploadGroupFile: (groupId, filename, base64Data) => spring(`/api/groups/chat/${part(groupId)}/files`, 'POST', { filename, base64Data }),
     // A group's shared files by path, with each one's size and who shared it, but no bytes.
     groupFileIndex: groupId => spring(`/api/groups/chat/${part(groupId)}/files/index`),
     // One shared file's bytes, as a Blob.
