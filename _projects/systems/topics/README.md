@@ -16,12 +16,10 @@ categories: [Java, Algorithms]
 ```
 
 Categories are independent facets, not ordered parent/child declarations.
-Boxes in the same filter add to each other: Java plus Python shows every Java
-document and every Python document. In the Topic Filter, the AND button makes
-every checked topic required instead: Java AND Spring shows only documents tagged
-with both, and OR, the default, adds them again. More Categories boxes always
-add to each other. The Topic Filter and More Categories narrow each other: Java
-plus Algorithms shows only documents tagged with both. No new topic attribute or
+OR, the default, shows documents matching any checked topic or category: Java
+OR FRQ shows both sets, counting shared documents once. AND requires every
+checked topic and category: Java AND Algorithms shows only documents tagged with
+both. This rule applies across both checkbox groups. No new topic attribute or
 YAML topic inventory is required.
 Document membership is discovered at build time from posts/pages.
 Hidden, draft and search-excluded documents are omitted.

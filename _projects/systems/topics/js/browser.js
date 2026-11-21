@@ -6,7 +6,7 @@ if (root) {
   const query = root.querySelector('#topics-query');
   const view = root.querySelector('#topics-view');
   const filters = [...root.querySelectorAll('input[type="checkbox"]')];
-  // Topic Filter values; every other checked box belongs to More Categories.
+  // Primary topics determine presentation order, not how selections combine.
   const primary = [...root.querySelectorAll('[data-topics-primary] input[type="checkbox"]')].map((filter) => filter.value);
   const secondaryFilters = [...root.querySelectorAll('[data-topics-secondary] input[type="checkbox"]')];
   const matchButtons = [...root.querySelectorAll('[data-topics-match] button[aria-pressed]')];
@@ -174,7 +174,7 @@ if (root) {
       filter.closest('label').hidden = !showMoreCategory(counts.get(filter.value) || 0, filter.checked);
     });
     showMatch();
-    const rule = { primary, match: state.match };
+    const rule = { match: state.match };
     const searching = Boolean(state.query.trim());
     const matches = searching && index ? index.query((search) => {
       const tokens = window.lunr.tokenizer(state.query);

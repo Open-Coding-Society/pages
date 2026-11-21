@@ -12,20 +12,21 @@ const documents = [
 ];
 
 const topics = ['java', 'python'];
-const any = { primary: topics };
-const every = { primary: topics, match: 'and' };
+const any = { match: 'or' };
+const every = { match: 'and' };
 
-test('boxes in one filter widen the results and the two filters narrow each other', () => {
+test('OR includes documents matching any checked topic or category', () => {
   assert.equal(selectedDocuments(documents, ['algorithms'], null, any).length, 2);
   assert.deepEqual(selectedDocuments(documents, ['java', 'python'], null, any).map((doc) => doc.url),
     ['/java/', '/python/', '/objects/']);
-  assert.deepEqual(selectedDocuments(documents, ['java', 'algorithms'], null, any).map((doc) => doc.url), ['/java/']);
+  assert.deepEqual(selectedDocuments(documents, ['java', 'algorithms'], null, any).map((doc) => doc.url),
+    ['/java/', '/python/', '/objects/']);
   assert.deepEqual(selectedDocuments(documents, ['java', 'python', 'algorithms'], null, any).map((doc) => doc.url),
-    ['/java/', '/python/']);
+    ['/java/', '/python/', '/objects/']);
   assert.equal(selectedDocuments(documents, [], null, any).length, 3);
 });
 
-test('two Categories Filter boxes are alternatives too', () => {
+test('OR includes multiple More Categories selections', () => {
   const docs = [
     { url: '/a/', categories: ['java', 'arrays'] },
     { url: '/b/', categories: ['java', 'loops'] },
@@ -66,7 +67,7 @@ test('search finds a document by a low-count category even when its text does no
   assert.deepEqual(docs[0].categories, ['visualization']);
 });
 
-test('AND requires every checked topic; categories stay alternatives that narrow', () => {
+test('AND requires every checked topic and category', () => {
   const docs = [
     { url: '/both/', categories: ['java', 'python', 'arrays'] },
     { url: '/java/', categories: ['java', 'arrays'] },
@@ -76,11 +77,24 @@ test('AND requires every checked topic; categories stay alternatives that narrow
   assert.deepEqual(urls(['java', 'python'], any), ['/both/', '/java/', '/python/']);
   assert.deepEqual(urls(['java', 'python'], every), ['/both/']);
   assert.deepEqual(urls(['java'], every), urls(['java'], any));
-  assert.deepEqual(urls(['java', 'python', 'arrays', 'loops'], every), ['/both/']);
-  assert.deepEqual(urls(['arrays', 'loops'], every), ['/both/', '/java/', '/python/']);
+  assert.deepEqual(urls(['java', 'python', 'arrays', 'loops'], every), []);
+  assert.deepEqual(urls(['arrays', 'loops'], every), []);
+  assert.deepEqual(urls(['java', 'arrays'], every), ['/both/', '/java/']);
   assert.deepEqual(urls([], every), ['/both/', '/java/', '/python/']);
-  assert.deepEqual(filterGroups(['loops', 'java', 'python'], every), [['java'], ['python'], ['loops']]);
-  assert.deepEqual(filterGroups(['loops', 'java', 'python'], any), [['java', 'python'], ['loops']]);
+  assert.deepEqual(filterGroups(['loops', 'java', 'python'], every), [['loops'], ['java'], ['python']]);
+  assert.deepEqual(filterGroups(['loops', 'java', 'python'], any), [['loops', 'java', 'python']]);
+});
+
+test('OR across topic and category counts shared documents only once', () => {
+  const docs = [
+    { url: '/java/', categories: ['java'] },
+    { url: '/frq/', categories: ['frq'] },
+    { url: '/shared/', categories: ['java', 'frq'] },
+    { url: '/other/', categories: ['other'] },
+  ];
+  assert.deepEqual(selectedDocuments(docs, ['java', 'frq'], null, any).map((doc) => doc.url),
+    ['/java/', '/frq/', '/shared/']);
+  assert.deepEqual(selectedDocuments(docs, ['java', 'frq'], null, every).map((doc) => doc.url), ['/shared/']);
 });
 
 test('full-text matches cannot escape the selected categories', () => {
@@ -127,7 +141,7 @@ test('title cards precede body matches and both respect all category filters', (
     this.metadataWhitelist = ['position'];
     docs.forEach((doc) => this.add(doc));
   });
-  const groups = groupedMatches(docs, ['java', 'algorithms'], index.search('algorithm'), any);
+  const groups = groupedMatches(docs, ['java', 'algorithms'], index.search('algorithm'), every);
   assert.deepEqual(groups.title.map((match) => match.document.url), ['/title/']);
   assert.deepEqual(groups.body.map((match) => match.document.url), ['/body/']);
   assert.deepEqual(highlightedParts(groups.title[0].document.title, groups.title[0].positions)
@@ -135,6 +149,9 @@ test('title cards precede body matches and both respect all category filters', (
   assert.equal(groups.body[0].field, 'content');
   assert.equal(highlightedParts(groups.body[0].document.content, groups.body[0].positions)
     .find((part) => part.highlighted).text, 'algorithm');
+  const acrossGroups = groupedMatches(docs, ['java', 'algorithms'], index.search('algorithm'), any);
+  assert.deepEqual(acrossGroups.title.map((match) => match.document.url), ['/title/', '/other/']);
+  assert.deepEqual(acrossGroups.body.map((match) => match.document.url), ['/body/']);
   const either = groupedMatches(docs, ['java', 'python'], index.search('algorithm'), any);
   assert.deepEqual([...either.title, ...either.body].map((match) => match.document.url).sort(), ['/body/', '/other/', '/title/']);
   const both = groupedMatches(docs, ['java', 'python'], index.search('algorithm'), every);

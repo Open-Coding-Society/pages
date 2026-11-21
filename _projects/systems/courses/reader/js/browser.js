@@ -273,9 +273,8 @@ export async function startDocumentReader(root, tools) {
   }
 
   function topicsTree() {
-    const primary = payload.primary || [];
     const selected = selectedDocuments(payload.documents.filter(document => document.topics !== false), topics.categories, null,
-      { primary, match: topics.match }).filter(document => {
+      { match: topics.match }).filter(document => {
       const text = `${document.title} ${document.description}`.toLowerCase();
       return topics.query.toLowerCase().trim().split(/\s+/).every(word => text.includes(word));
     });

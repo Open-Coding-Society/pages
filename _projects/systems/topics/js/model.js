@@ -1,12 +1,7 @@
-// Checked boxes in the same filter are alternatives (Java or Python); the Topic and
-// Categories filters narrow each other (Java and Algorithms). `primary` lists the
-// Topic Filter values; every other checked value belongs to More Categories.
-// With `match: 'and'`, every checked Topic Filter box is required (Java and Spring).
-export function filterGroups(categories, { primary = [], match = 'or' } = {}) {
-  const topics = categories.filter((category) => primary.includes(category));
-  const others = categories.filter((category) => !primary.includes(category));
-  const topicGroups = match === 'and' ? topics.map((topic) => [topic]) : [topics];
-  return [...topicGroups, others].filter((group) => group.length);
+// OR accepts any checked category; AND requires all checked categories.
+export function filterGroups(categories, { match = 'or' } = {}) {
+  if (!categories.length) return [];
+  return match === 'and' ? categories.map((category) => [category]) : [categories];
 }
 
 export function selectedDocuments(documents, categories, rankedIds = null, rule = {}) {

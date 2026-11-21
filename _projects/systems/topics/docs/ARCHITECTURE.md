@@ -63,17 +63,11 @@ categories: [Java, Algorithms]
 ```
 
 Categories are independent facets, not an ordered parent/child path. Both filter
-groups support multiple selections. Checked boxes in the same group are
-alternatives: Java and Python finds every document in either collection. The two
-groups narrow each other: Java (Topic Filter) and Algorithms (More Categories)
-finds documents in both. In set terms, each group is a union and the groups are
-intersected.
-
-The Topic Filter has OR and AND buttons. OR, the default, is the rule above. AND
-requires every checked Topic Filter box: Java and Spring finds only documents in
-both collections. More Categories boxes remain alternatives in both modes, and
-the two groups still narrow each other. In set terms, AND makes the Topic group an
-intersection instead of a union.
+groups support multiple selections, and the OR/AND buttons apply across both
+groups. OR, the default, finds documents matching any checked category, with
+each document appearing once. AND requires every checked category. For example,
+Java OR Algorithms includes documents in either collection, while Java AND
+Algorithms includes only documents in both.
 
 The [primary topics configuration](../data/topics_primary.yml) orders prominent
 categories: SASS, Python, Java, JavaScript, Flask, Spring, CS111, CS112 and CS113.
