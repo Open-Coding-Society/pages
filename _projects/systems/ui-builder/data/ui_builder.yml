@@ -831,6 +831,7 @@ text:
     editMessage: Edit message
     deleteMessage: Delete message
     replyMessage: Reply
+    addToCalendar: Add to calendar
     imageFrom: "Image from {name}"
     openImage: "View image from {name} larger"
     closeImage: Close image
