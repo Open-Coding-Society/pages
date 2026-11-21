@@ -23,11 +23,6 @@ function fakeApi(files) {
       calls.push(['content', groupId, path]);
       return new Blob([files.find(file => file.path === path).text]);
     },
-    groupFiles: async groupId => {
-      calls.push(['list with bytes', groupId]);
-      return [];
-    },
-    uploadGroupFile: async () => null,
   };
 }
 
@@ -40,10 +35,7 @@ function dialogElements() {
   };
   const dialog = make('div', 'filesDialog');
   dialog.className = 'ocs__modal hidden';
-  return {
-    dialog, title: make('h3'), body: make('div', 'filesBody'), status: make('p'),
-    form: make('form'), input: make('input'), upload: make('button'),
-  };
+  return { dialog, title: make('h3'), body: make('div', 'filesBody'), status: make('p') };
 }
 
 function openDialog(files, { viewer = { show: async () => {} } } = {}) {
@@ -55,7 +47,7 @@ function openDialog(files, { viewer = { show: async () => {} } } = {}) {
   };
   const elements = dialogElements();
   const dialog = initFiles({
-    elements, api, groupFilesFor,
+    elements, groupFilesFor,
     makeFileActions: ({ filesFor, notify }) => new FileActions({ filesFor, viewer, notify }),
   });
   dialog.open({ id: 7, name: 'Team Seven' }, null);

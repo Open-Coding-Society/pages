@@ -1,6 +1,6 @@
 // One group's shared files: the list (Spring's index, without bytes), one file's bytes, a
 // folder's files for a ZIP, and uploads. The composer's share, the files under a message and
-// the Files panel all go through one of these per group, so the list is fetched once and
+// the Files dialog all go through one of these per group, so the list is fetched once and
 // refreshed when someone shares something.
 import { SharedFiles } from './files-model.js';
 

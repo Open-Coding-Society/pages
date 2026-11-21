@@ -425,9 +425,8 @@ export function createMessageLog(element, {
     row.querySelector('.chat-msg-image-link')?.remove();
   }
 
-  // A line between messages that isn't anyone's message, like a shared file.
-  // `link` turns part of the line into a control: { label, onClick }. A button, not an
-  // anchor, because the file's bytes are fetched on click rather than sitting at a URL.
+  // A line between messages that isn't anyone's message. `link` turns part of the line
+  // into a control: { label, onClick }, a button rather than an anchor.
   function note(message, link) {
     element.querySelector('[data-empty]')?.remove();
     const stickToBottom = isNearBottom();

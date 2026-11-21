@@ -106,15 +106,16 @@ direct message only an image can be attached: Spring stores shared files for gro
   conversation: a list kept from earlier could miss a teammate's file of the same name.
   Spring never writes over a shared file either: when two people share `notes.md` at the
   same moment, the second upload is refused (409), and the page shares that file again as
-  `notes (2).md`. A refused file inside a folder is left off the message, which says so,
-  since renaming it alone would split its folder.
+  `notes (2).md`. A refused file inside a folder is left off the message, and the sender is
+  told which, since renaming it alone would split its folder.
 - **The message.** It starts with a `[[files:…]]` marker after any reply marker:
   `f~path~size` for a file and `d~path~count~size` for a folder, separated by `;`, with
   `%`, `[`, `]`, `|`, `;`, `~`, `<`, `>`, `&` and control characters escaped as `%XX`.
   The log shows each as an `ocs__file` row (Preview, Download; a folder's Open and .zip),
   and up to four shared images as small previews. A file that fails is left off the
-  message, which says so; if the message itself fails after the upload, the next Send
-  sends it without uploading again.
+  message, and the sender's status line names it; when none go up, they stay in the tray
+  for the next Send. If the message itself fails after the upload, the next Send sends it
+  without uploading again. While a share uploads, Attach is off and new files wait.
 - **The socket.** Spring's `sendFileServer` frame names the file and its size but not its
   bytes, and the page adds nothing to the log for it (the share's message lists the files);
   it only marks the group's file list out of date.

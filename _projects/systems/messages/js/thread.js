@@ -16,7 +16,7 @@ import { FilesMarker } from './files-model.js';
 import { createMessageLog, withTexts } from './message-log.js';
 
 // What the pane says, worded for /dm. A host passes its own wording for any of these in
-// `texts`; {sender} and {filename} are filled in.
+// `texts`.
 export const THREAD_TEXTS = Object.freeze({
   idleTitle: 'Pick a conversation',
   idleHint: 'Or start a new chat, or find a group to join.',
@@ -90,6 +90,7 @@ export function createThread({
   let pendingImage = null; // a data URL attached to the next message, or null
   let replyingTo = null; // { id, sender, excerpt } the next message replies to
   let editingReply = null; // the reply marker of the message being edited, kept on save
+  let editingFiles = []; // the files the message being edited lists, kept on save
   let unsentFiles = null; // files already shared whose message didn't send yet
   let dragDepth = 0;
   let destroyed = false;
@@ -240,6 +241,7 @@ export function createThread({
   function resetEdit() {
     editing = null;
     editingReply = null;
+    editingFiles = [];
     clearReply();
     composer?.clear();
     clearImage();
@@ -254,7 +256,10 @@ export function createThread({
     // The quote isn't editable text: it is set aside and put back on save.
     const { reply, html } = canReply ? richText.extractReplyMarker(message.body) : { reply: null, html: message.body };
     editingReply = reply;
-    composer.setHTML(html);
+    // So is the list of files it shared: an edit changes the words, not what was shared.
+    const { items, html: words } = FilesMarker.extract(html);
+    editingFiles = items;
+    composer.setHTML(words);
     showFormMessage('');
     refreshComposer();
     composer.focus();
@@ -308,7 +313,10 @@ export function createThread({
     showFormMessage('');
     refreshComposer();
     // Only a share waits before the send: a plain message goes out at once.
-    const files = target || !sendingFiles ? [] : await shareFirst();
+    // An edit keeps the files its message lists; only a share waits before a send.
+    let files = [];
+    if (target) files = editingFiles;
+    else if (sendingFiles) files = await shareFirst();
     if (destroyed) return;
     if (files === null) {
       pending = null;
@@ -327,7 +335,7 @@ export function createThread({
       if (target && log.get(target.key)?.deleted) {
         resetEdit();
         showFormMessage(text.editOfDeleted);
-      } else if (files.length) {
+      } else if (!target && files.length) {
         // The files are up; the next Send tries the message again without uploading them twice.
         unsentFiles = files;
         refreshComposer();

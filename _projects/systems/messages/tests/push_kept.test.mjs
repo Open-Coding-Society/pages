@@ -10,7 +10,7 @@ const read = path => readFileSync(new URL(path, import.meta.url), 'utf8');
 test('dm.md imports push-notifications.js and passes push to startMessagesPage', () => {
   const page = read('../navigation/dm.md');
   assert.match(page, /import \* as push from '\{\{ site\.baseurl \}\}\/assets\/js\/api\/push-notifications\.js';/);
-  assert.match(page, /startMessagesPage\(\{[^;]*\bpush \}\);/);
+  assert.match(page, /startMessagesPage\(\{[^;]*\bpush\b[^;]*\}\);/);
   assert.match(page, /id="messagesNotify"/);
 });
 

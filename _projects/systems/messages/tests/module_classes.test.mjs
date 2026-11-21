@@ -1,6 +1,6 @@
 // Messages' modules export classes, the way Java keeps Math.random with its kin on Math:
 // related helpers are static methods on one class (SharedFiles.formatBytes(size)), and
-// anything with state or UI is a class made with `new` (new CommandMenu({ ... })). One
+// anything with state or UI is a class made with `new` (new ComposerFiles({ ... })). One
 // class per module, or a couple when that reads better, keeps the names a page can import
 // few and grouped.
 //

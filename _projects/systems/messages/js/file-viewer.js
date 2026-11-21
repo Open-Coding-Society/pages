@@ -24,6 +24,8 @@ export class FileViewer {
   #root;
   #text;
   #modal = null;
+  // Each viewer's title has its own id: several embeds can share one page.
+  static #count = 0;
   #title = null;
   #body = null;
   #downloadButton = null;
@@ -87,8 +89,8 @@ export class FileViewer {
     this.#modal = null;
   }
 
-  // Listened for in the capture phase and stopped there: the viewer sits over the Shared
-  // panel, whose own Escape would otherwise close it too. One Escape closes one layer.
+  // Listened for in the capture phase and stopped there: the viewer can sit over the Files
+  // dialog, whose own Escape would otherwise close it too. One Escape closes one layer.
   #onKeydown = event => {
     if (event.key !== 'Escape') return;
     event.preventDefault();
@@ -102,14 +104,16 @@ export class FileViewer {
     modal.className = 'ocs__modal hidden';
     modal.setAttribute('role', 'dialog');
     modal.setAttribute('aria-modal', 'true');
-    modal.setAttribute('aria-labelledby', 'messagesFileViewerTitle');
+    FileViewer.#count += 1;
+    const titleId = `messagesFileViewerTitle-${FileViewer.#count}`;
+    modal.setAttribute('aria-labelledby', titleId);
     const card = document.createElement('div');
     card.className = 'ocs__modal-card ocs__modal-card--wide ocs__stack';
     const header = document.createElement('div');
     header.className = 'ocs__modal-header';
     const title = document.createElement('h3');
     title.className = 'ocs__modal-title ocs__truncate';
-    title.id = 'messagesFileViewerTitle';
+    title.id = titleId;
     const actions = document.createElement('div');
     actions.className = 'ocs__links';
     const downloadButton = document.createElement('button');

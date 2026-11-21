@@ -1,4 +1,4 @@
-// A menu a button opens: the composer's Attach menu, a message's More actions. Drawn with
+// A menu a button opens, like the composer's Attach menu. Drawn with
 // the ocs__menu grammar; this only does the behaviour: open and close, the arrow keys,
 // Home and End, Escape (focus back on the button), and closing on a click elsewhere.
 

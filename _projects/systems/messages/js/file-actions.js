@@ -1,6 +1,6 @@
 // What a shared file's buttons do, wherever it's listed (under a message, in the Files
-// panel): download it, preview it, open a folder in the Files panel, or download a folder as
-// a .zip.
+// dialog): download it, preview it, open a folder in the Files dialog, or download a folder
+// as a .zip.
 import { saveBlob } from './dialogs.js';
 import { SharedFiles } from './files-model.js';
 import { ZipStore } from './zip-store.js';
@@ -39,7 +39,7 @@ export class FileActions {
    * @param {object} options.viewer the FileViewer that previews show in
    * @param {Function} options.notify notify(text) says what happened
    * @param {Function|null} options.onOpenFolder onOpenFolder(path) opens a folder in the
-   *   Files panel; without it, a folder's Open downloads its .zip
+   *   Files dialog; without it, a folder's Open downloads its .zip
    * @param {object} options.texts wording over TEXTS
    */
   constructor({ filesFor, viewer, notify, onOpenFolder = null, texts = {} }) {

@@ -6,7 +6,7 @@
 // The form is the box: one bordered field holding the formatting bar, the text, and
 // under them a single row with the controls at its right-hand end.
 // It wraps, and the editor asks for the whole first row, so the same rules lay out /dm
-// (Add image, Cancel, Send) and an embed (Cancel and Send alone) without either
+// (Cancel, Attach, Send) and an embed (Cancel and Send alone) without either
 // needing to know what the other has. `order` puts the row in reading order whatever
 // order the controls come in: thread.js inserts the editor in front of Cancel.
 .dm__composer {

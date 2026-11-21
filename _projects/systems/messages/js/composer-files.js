@@ -37,6 +37,7 @@ export class ComposerFiles {
     shareCancelled: 'Stopped sharing. Your files are still in the tray.',
     partlyShared: '{count} could not be shared: {names}.',
     nothingShared: 'None of the files could be shared. Try again.',
+    waitForShare: 'Wait for these files to finish sharing, then add more.',
   });
 
   #elements;
@@ -61,9 +62,8 @@ export class ComposerFiles {
    * @param {Function} options.onImage onImage(file) sends one image as a picture in the chat
    * @param {Function} options.showMessage showMessage(text) shows a status line
    * @param {object} options.texts wording over TEXTS
-   * @param {Function} options.moreItems moreItems(context) gives more menu items
    */
-  constructor({ elements, groupFiles, onImage, showMessage, texts = {}, moreItems = () => [] }) {
+  constructor({ elements, groupFiles, onImage, showMessage, texts = {} }) {
     const text = { ...ComposerFiles.TEXTS, ...texts };
     this.#elements = elements;
     this.#groupFiles = groupFiles;
@@ -83,7 +83,6 @@ export class ComposerFiles {
           { icon: 'fa-file-arrow-up', label: text.files, hint: text.filesHint, onPick: () => pick(elements.filesInput) },
           { icon: 'fa-folder-plus', label: text.folder, hint: text.folderHint, onPick: () => pick(elements.folderInput) },
         ] : []),
-        ...moreItems(this.#context),
       ],
     });
 
@@ -106,10 +105,9 @@ export class ComposerFiles {
     if (moved) this.#generation += 1;
     this.#context = { ...context, ...next };
     if (moved && !this.#attachments.isUploading()) this.#attachments.clear();
-    this.#elements.attachButton.disabled = !this.#canAttach();
     // Only a group keeps a tray: a DM can't share files.
     if (!this.#inGroup()) this.#attachments.clear();
-    if (!this.#canAttach()) this.#menu.close({ refocus: false });
+    this.#refreshAttach();
   }
 
   /**
@@ -136,6 +134,7 @@ export class ComposerFiles {
     if (plan.problem) return null; // the tray already says why
     const controller = new AbortController();
     const progress = attachments.beginUpload(plan, { onCancel: () => controller.abort() });
+    this.#refreshAttach();
     // A refused file's row waits for its second try before it says how the file went.
     const first = await files.upload(plan.uploads, {
       onProgress: progress.onProgress,
@@ -145,11 +144,14 @@ export class ComposerFiles {
     const result = first.cancelled ? first : await this.#shareRefusedAgain(files, plan, first, progress, controller.signal);
     if (result.cancelled) {
       attachments.endUpload({ keep: true });
+      this.#refreshAttach();
       this.#showMessage(text.shareCancelled);
       return null;
     }
-    attachments.endUpload();
     const { items } = result;
+    // When nothing went up, the files stay in the tray, so the next Send tries them again.
+    attachments.endUpload({ keep: !items.length });
+    this.#refreshAttach();
     if (!items.length) {
       this.#showMessage(text.nothingShared);
       return null;
@@ -195,10 +197,22 @@ export class ComposerFiles {
     return this.#context.loaded && !this.#context.editing && !this.#attachments.isUploading();
   }
 
+  // Attach is off where the conversation can't take files now, and while a share uploads,
+  // since the tray takes nothing new until the upload ends.
+  #refreshAttach() {
+    this.#elements.attachButton.disabled = !this.#canAttach();
+    if (!this.#canAttach()) this.#menu.close({ refocus: false });
+  }
+
   #addFromInput(input) {
     const found = Attachments.fromInput(input.files);
     input.value = '';
-    if (found.length) this.#attachments.add({ entries: found });
+    if (!found.length) return;
+    if (this.#attachments.isUploading()) {
+      this.#showMessage(this.#text.waitForShare);
+      return;
+    }
+    this.#attachments.add({ entries: found });
   }
 
   // ── Dropping on the conversation ───────────────────────────────────────────────
@@ -211,17 +225,25 @@ export class ComposerFiles {
     }
   }
 
+  // A drop is taken, and the hint shown, once a conversation is open and no share uploads.
+  #takesDrops() {
+    return this.#context.loaded && !this.#attachments.isUploading();
+  }
+
+  // Every file drag is cancelled, even before a conversation is open: a file let go of on
+  // the page would otherwise open in the tab and leave /dm.
   #onDragEnter = event => {
-    if (!carriesFiles(event) || !this.#context.loaded) return;
+    if (!carriesFiles(event)) return;
     event.preventDefault();
+    if (!this.#takesDrops()) return;
     this.#dragDepth += 1;
     this.#setDragging(true);
   };
 
   #onDragOver = event => {
-    if (!carriesFiles(event) || !this.#context.loaded) return;
+    if (!carriesFiles(event)) return;
     event.preventDefault();
-    if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
+    if (this.#takesDrops() && event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
   };
 
   #onDragLeave = event => {
@@ -231,12 +253,17 @@ export class ComposerFiles {
   };
 
   #onDrop = async event => {
-    if (!carriesFiles(event) || !this.#context.loaded) return;
+    if (!carriesFiles(event)) return;
     event.preventDefault();
     this.#dragDepth = 0;
     this.#setDragging(false);
+    if (!this.#context.loaded) return;
     if (this.#context.editing) {
       this.#showMessage(this.#text.notWhileEditing);
+      return;
+    }
+    if (this.#attachments.isUploading()) {
+      this.#showMessage(this.#text.waitForShare);
       return;
     }
     const files = [...(event.dataTransfer?.files || [])];

@@ -174,21 +174,28 @@ test('a dropped folder is walked into paths, skipping tool folders without openi
 });
 
 // ── Send shares first ─────────────────────────────────────────────────────────────
-function fakeFilesApi({ failPaths = [], failStatus = 500 } = {}) {
-  const calls = { uploads: [], index: 0 };
+// `gate`, a promise, holds every upload open until it settles; `failPaths` can be changed
+// between Sends.
+function fakeFilesApi({ failPaths = [], failStatus = 500, gate = null } = {}) {
+  const calls = { uploads: [], index: 0, content: [] };
   return {
     calls,
+    failPaths,
     groupFileIndex: async () => { calls.index += 1; return [{ path: 'notes.txt', size: 1 }]; },
-    groupFileContent: async () => new Blob(['x']),
+    groupFileContent: async (groupId, path) => {
+      calls.content.push([groupId, path]);
+      return new Blob(['x']);
+    },
     uploadGroupFileWithProgress: async (groupId, path) => {
       calls.uploads.push(path);
+      if (gate) await gate;
       if (failPaths.includes(path)) throw Object.assign(new Error('nope'), { status: failStatus });
       return {};
     },
   };
 }
 
-function shareThread({ filesApi = fakeFilesApi(), sendFails = 0 } = {}) {
+function shareThread({ filesApi = fakeFilesApi(), sendFails = 0, history = [], dmHistory = [] } = {}) {
   const make = tag => document.createElement(tag);
   const elements = {
     title: make('h2'), subtitle: make('small'), messages: make('div'), formStatus: make('p'),
@@ -203,11 +210,13 @@ function shareThread({ filesApi = fakeFilesApi(), sendFails = 0 } = {}) {
     isEmpty: () => html === '', isOverLimit: () => false, setEnabled() {}, destroy() {},
   };
   const sent = [];
+  const edited = [];
   let failuresLeft = sendFails;
   const api = {
-    groupMessages: async () => [],
-    dmMessages: async () => [],
+    groupMessages: async () => history,
+    dmMessages: async () => dmHistory,
     markDmRead: async () => {},
+    editGroupMessage: async (groupId, messageId, body) => { edited.push(body); },
     sendGroupMessage: async (id, body) => {
       if (failuresLeft > 0) {
         failuresLeft -= 1;
@@ -223,7 +232,7 @@ function shareThread({ filesApi = fakeFilesApi(), sendFails = 0 } = {}) {
     elements, api, socket, me, groupFiles: () => files,
     richText: { ...richText, createRichComposer: () => composer },
   });
-  return { thread, elements, composer, sent, filesApi, files };
+  return { thread, elements, composer, sent, edited, filesApi, files };
 }
 
 function pickFiles(input, list) {
@@ -276,20 +285,93 @@ test('one file answering 503 is left out of the message and named in the notice'
   assert.match(elements.formStatus.textContent, /1 could not be shared: big\.zip/);
 });
 
-test('a files marker typed in a DM renders its rows, and Download gives a notice instead of throwing', async () => {
-  // Spring keeps files only for groups, so a DM's files have nowhere to come from.
-  const host = document.createElement('div');
-  const notices = [];
-  const actions = new FileActions({ filesFor: () => null, viewer: { show() {} }, notify: text => notices.push(text) });
-  const log = createMessageLog(host, {
-    richText, me, onEdit() {}, onDelete() {}, onFile: (action, item, control) => actions.handle(action, item, control),
-  });
-  log.append({ id: 'd1', key: 'd1', senderKey: 'grace', senderName: 'Grace', body: '[[files:f~plan.pdf~5]] look', sentAt: '2026-11-20T10:00:00Z' }, false);
-  const download = buttonsIn(host).find(button => button.getAttribute('aria-label') === 'Download plan.pdf');
+test('a files marker typed in a DM renders its rows, and Download gives a notice instead of reading a group\'s files', async () => {
+  // Spring keeps files only for groups, and its file routes don't check who asks, so a DM's
+  // conversation id must never be used as a group id.
+  const dmHistory = [{ id: 401, conversationId: 4, senderUid: 'grace', senderName: 'Grace Hopper', body: '[[files:f~plan.pdf~5]] look', sentAt: '2026-11-20T10:00:00Z' }];
+  const { thread, elements, filesApi } = shareThread({ dmHistory });
+  thread.open('dm', 4, { title: 'Grace', subtitle: 'Direct message' });
+  await settle();
+  const download = buttonsIn(elements.messages).find(button => button.getAttribute('aria-label') === 'Download plan.pdf');
   assert.ok(download, 'the row has its Download button');
   download.dispatchEvent(fakeEvent('click'));
   await settle();
-  assert.deepEqual(notices, ['Files can be opened in the group they were shared in.']);
+  assert.match(elements.formStatus.textContent, /Files can be opened in the group they were shared in/);
+  assert.deepEqual(filesApi.calls.content, []);
+});
+
+test('when every file fails, the tray keeps them and the next Send shares them', async () => {
+  const filesApi = fakeFilesApi({ failPaths: ['a.txt', 'plan.pdf'], failStatus: 503 });
+  const { thread, elements, composer, sent } = shareThread({ filesApi });
+  thread.open('group', 7, { title: '', subtitle: '' });
+  await settle();
+  pickFiles(elements.filesInput, [file('a.txt', 3), file('plan.pdf', 5)]);
+  composer.setHTML('here they are');
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  await settle();
+  assert.equal(sent.length, 0);
+  assert.match(elements.formStatus.textContent, /None of the files could be shared/);
+  assert.equal(elements.tray.hidden, false);
+  assert.match(elements.tray.textContent, /a\.txt/);
+  assert.match(elements.tray.textContent, /plan\.pdf/);
+
+  filesApi.failPaths.length = 0; // Spring is back
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  await settle();
+  assert.equal(sent[0], '[[files:f~a.txt~3;f~plan.pdf~5]] here they are');
+});
+
+test('while a share uploads, Attach is off and a file picked meanwhile is turned away with a notice', async () => {
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  const { thread, elements, composer, sent } = shareThread({ filesApi: fakeFilesApi({ gate }) });
+  thread.open('group', 7, { title: '', subtitle: '' });
+  await settle();
+  pickFiles(elements.filesInput, [file('a.txt', 3)]);
+  composer.setHTML('one');
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  assert.equal(elements.attachButton.disabled, true, 'Attach is off while the share uploads');
+  pickFiles(elements.filesInput, [file('late.txt', 4)]);
+  assert.match(elements.formStatus.textContent, /finish/);
+  const drop = fakeEvent('drop', { dataTransfer: { types: ['Files'], files: [file('dropped.txt', 2)], items: [{ kind: 'file', webkitGetAsEntry: () => fakeEntry('dropped.txt') }] } });
+  elements.dropZone.dispatchEvent(drop);
+  await settle();
+  assert.equal(drop.defaultPrevented, true);
+  release();
+  await settle();
+  await settle();
+  assert.equal(sent[0], '[[files:f~a.txt~3]] one');
+  assert.equal(elements.attachButton.disabled, false, 'Attach is back once the share is done');
+});
+
+test('a file dropped before a conversation is open is kept from opening in the tab', async () => {
+  const { elements } = shareThread();
+  const dataTransfer = { types: ['Files'], files: [file('a.zip')], items: [{ kind: 'file', webkitGetAsEntry: () => fakeEntry('a.zip') }] };
+  const over = fakeEvent('dragover', { dataTransfer });
+  const drop = fakeEvent('drop', { dataTransfer });
+  elements.dropZone.dispatchEvent(over);
+  elements.dropZone.dispatchEvent(drop);
+  await settle();
+  assert.equal(over.defaultPrevented, true);
+  assert.equal(drop.defaultPrevented, true);
+  assert.equal(elements.tray.hidden, true);
+});
+
+test('editing a files message edits only its words; the files stay on it', async () => {
+  const history = [{ id: 'm1', author: 'Ada Lovelace', author_uid: 'ada', message: '[[files:f~plan.pdf~5]] see this', date: '2026-11-20T10:00:00Z' }];
+  const { thread, elements, composer, edited } = shareThread({ history });
+  thread.open('group', 7, { title: '', subtitle: '' });
+  await settle();
+  const edit = buttonsIn(elements.messages).find(button => button.getAttribute('aria-label') === 'Edit message');
+  edit.dispatchEvent(fakeEvent('click'));
+  assert.equal(composer.getHTML(), 'see this');
+  composer.setHTML('see that');
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  assert.deepEqual(edited, ['[[files:f~plan.pdf~5]] see that']);
 });
 
 test('when the message fails after the files are up, the next Send doesn’t upload them again', async () => {

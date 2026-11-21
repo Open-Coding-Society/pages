@@ -48,7 +48,7 @@ export class FileRows {
   }
 
   /**
-   * Puts a message's files after `after` (its body, or its code block) in `main`, in place
+   * Puts a message's files after `after` (its body) in `main`, in place
    * of any it had.
    * @param {HTMLElement} main the message's column
    * @param {HTMLElement} after
