@@ -288,6 +288,8 @@ export function markCardsForPeriod(container, period) {
 //   feed            announcements only: revealEvent(id) for clicks, onMessage(listener) to refresh
 //   onSelectEvent   called with (event, link) on click instead of feed.revealEvent
 //   showEmpty       say so when a week has no events
+//   tools           a page's own controls for the header row, { start: [nodes], end: node }
+//                   (see WeekRowTools); the course home's calendar button and connection pill
 // The table has one column per school day. When the strip is narrower than
 // NARROW_WIDTH (a sidebar, a phone) it shows one row per day instead, decided
 // from its own width, so it fits wherever it is placed without any CSS.
@@ -339,8 +341,31 @@ function pillTextRoom(pill) {
     - px(own.borderLeftWidth) - px(own.borderRightWidth);
 }
 
+/**
+ * Puts a page's own controls into the week view's header row. Start controls go before the < and >
+ * buttons; an end control goes to the far right, by making the row the left side of an
+ * ocs__card-header (the grammar's title/action row, which wraps on a phone). Nodes already on the
+ * page are moved, not copied.
+ */
+export class WeekRowTools {
+  /**
+   * @param {Element} row - the header row (the ocs__links with < and >)
+   * @param {{start?: Node[], end?: Node|null}} tools
+   * @returns {Element} what now holds the row: the row itself, or the ocs__card-header around it
+   */
+  static place(row, { start = [], end = null }) {
+    [...start].reverse().forEach((node) => row.insertBefore(node, row.firstChild));
+    if (!end) return row;
+    const header = row.ownerDocument.createElement('div');
+    header.className = 'ocs__card-header';
+    row.parentNode.insertBefore(header, row);
+    header.append(row, end);
+    return header;
+  }
+}
+
 export function mountWeekView({
-  slot, host, weeks, getStore, getPeriod = () => 'all', feed, onSelectEvent, showEmpty = false,
+  slot, host, weeks, getStore, getPeriod = () => 'all', feed, onSelectEvent, showEmpty = false, tools = null,
 }) {
   const today = todayIso();
   const thisWeek = findSchoolWeek(weeks, today);
@@ -363,6 +388,7 @@ export function mountWeekView({
     </div>
     <div class="ocs__table-wrap"><table class="ocs__table"></table></div>
     <div class="ocs__text" data-hook="week-empty" hidden>Nothing on the calendar this week.</div>`;
+  if (tools) WeekRowTools.place(body.querySelector('.ocs__links'), tools);
   root.appendChild(body);
   if (!host) slot.appendChild(root);
   const table = body.querySelector('table');

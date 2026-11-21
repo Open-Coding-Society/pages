@@ -101,6 +101,14 @@ Dir.mktmpdir("course-landing-") do |source|
     ticker = home.index("data-ocs-calendar-ticker data-course=\"#{course}\"")
     assert(ticker && ticker < home.index('id="announcementChat"'),
            "#{course} shows its own calendar ticker above the announcements")
+    chat = Nokogiri::HTML(home).at_css("#announcementChat")
+    assert(chat.at_css(".chat-header").nil?, "#{course} has no announcements header box")
+    assert(chat["aria-label"] == "#{course.upcase} Announcements",
+           "#{course} announcements keep their name for screen readers")
+    tools = chat.at_css('[data-hook="calendar-tools"]')
+    assert(tools&.at_css('a.ocs__btn[href="/preview/student/calendar"] > i.fa-calendar') &&
+           tools.at_css("#announcementChatStatusPill"),
+           "#{course} hands its calendar button and connection pill to the week calendar's row")
     assert(!home.include?('class="timeline-container"'), "#{course} has no duplicate sprint timeline")
     assert(!home.include?('id="lesson-pager"'), "#{course} home has no lesson pager")
     assert(home.scan('data-course-entry ').size == 1 &&

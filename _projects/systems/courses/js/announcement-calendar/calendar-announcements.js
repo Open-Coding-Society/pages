@@ -1,6 +1,7 @@
 // Calendar events in the real class announcements (_includes/announcement_chat.html).
 // The chat keeps owning messages and sending; this module adds:
-//   - the calendar strip, always visible above the messages
+//   - the calendar strip, always visible above the messages, with the chat's calendar
+//     button and connection pill in its header row (the chat has no header box)
 //   - the /event slash command in the composer (any signed-in account)
 //   - event cards under announcements that carry [[event:...]] markers
 // Events go through the existing Spring /api/calendar endpoints (calendar-data.js).
@@ -19,6 +20,12 @@ export function attachAnnouncementCalendar({
   const { schoolYear, weeks } = parseSchoolCalendar(schoolCalendar);
   const sourceUrl = `${window.location.origin}${window.location.pathname}`;
   const messageListeners = new Set();
+  // Found once: after the first strip they live in its row, and each new strip takes them over.
+  const toolsHolder = root.querySelector('[data-hook="calendar-tools"]');
+  const rowTools = toolsHolder && {
+    start: [toolsHolder.querySelector('[data-hook="calendar-link"]')].filter(Boolean),
+    end: toolsHolder.querySelector('[data-hook="status"]'),
+  };
   let store = null;
   let strip = null;
 
@@ -45,6 +52,7 @@ export function attachAnnouncementCalendar({
       weeks,
       getStore: () => store,
       getPeriod: () => 'all',
+      tools: rowTools,
       feed: {
         revealEvent: (eventId) => revealAnnouncementForEvent(messagesEl, eventId),
         onMessage(listener) { messageListeners.add(listener); return () => messageListeners.delete(listener); },
