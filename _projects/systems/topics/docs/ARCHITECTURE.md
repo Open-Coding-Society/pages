@@ -34,7 +34,7 @@ Conversion and Jekyll posts/pages
     +---- categories ----> Topics
     |                      ├── Reference browser
     |                      │   ├── Topic Filter - prominent categories
-    |                      │   ├── Categories Filter - remaining categories
+    |                      │   ├── More Categories - remaining categories
     |                      │   ├── Cards / List browsing
     |                      │   └── Scoped full-text Search
     |                      │       ├── Title matches - highlighted cards
@@ -65,13 +65,13 @@ categories: [Java, Algorithms]
 Categories are independent facets, not an ordered parent/child path. Both filter
 groups support multiple selections. Checked boxes in the same group are
 alternatives: Java and Python finds every document in either collection. The two
-groups narrow each other: Java (Topic Filter) and Algorithms (Categories Filter)
+groups narrow each other: Java (Topic Filter) and Algorithms (More Categories)
 finds documents in both. In set terms, each group is a union and the groups are
 intersected.
 
 The Topic Filter has OR and AND buttons. OR, the default, is the rule above. AND
 requires every checked Topic Filter box: Java and Spring finds only documents in
-both collections. Categories Filter boxes remain alternatives in both modes, and
+both collections. More Categories boxes remain alternatives in both modes, and
 the two groups still narrow each other. In set terms, AND makes the Topic group an
 intersection instead of a union.
 
@@ -114,16 +114,16 @@ loaded through relative includes is not expanded into the search text.
 ## Browser and search
 
 The [browser include](../_includes/topics-browser.html) is a full-width page
-with a sidebar (`ocs__split--aside`): Search, a Browse list of topics with counts,
-More categories shortcuts, and a collapsed Advanced filters disclosure. Choosing a
-topic shows its lessons as unit cards; each lesson is a dropdown with its full
+with a sidebar (`ocs__split--aside`): Search and the two visible checkbox
+groups, Topic Filter and More Categories. More Categories orders all remaining
+categories by document count, with alphabetical ties. The landing shows topic
+sections with unit cards and scrollable lesson lists; each lesson is a dropdown with its full
 description and an Open lesson link, and quizzes and FRQ practice sit in the
 unit's Practice row. Units come from lesson titles; their optional names come
 from [`topics_units.yml`](../data/topics_units.yml). Layout details are in the
 [README](../README.md#page-layout).
 
-Advanced filters holds the original two disclosures. Topic Filter defaults open;
-Categories Filter defaults closed. Topic Filter starts with its OR/AND pair:
+Topic Filters holds the two disclosures, both open by default. Topic Filter starts with its OR/AND pair:
 `ocs__btn` buttons in an `ocs__links` group, the current choice filled and
 `aria-pressed`, disabled until the search index loads. Clear Filters belongs to
 that box and clears only category selections. Search has its own clear control.
@@ -138,7 +138,7 @@ Browsing and search use the same category filter:
 
 | Mode | Output |
 | --- | --- |
-| No query | Topic tiles, or the chosen topic's unit cards (lesson dropdowns or cards) |
+| No query | Topic sections with unit cards (lesson dropdowns or cards) |
 | Search query | Title-match cards, followed by text-match cards with excerpts |
 | No matching documents | Explicit empty-result status |
 | Index unavailable | Error status with ordinary document links still available |
@@ -155,7 +155,16 @@ the selected collection rather than replacing it with a global search overlay.
 
 ## Document viewing and navigation
 
-The reference browser opens the original permalink with `?context=topics`.
+The reference browser opens the original permalink with
+`?context=topics&topics_view=1`. Topics opts discovered documents into the
+shared page viewer, including bespoke layouts; a page can also opt into a
+different viewer such as Capstone. Only the first matching viewer activates.
+The Topics adapter hides the reader toolbar and sidebar when present, moves the
+existing Microblog action into the shared toolbar, and leaves content in place.
+On selection the browser saves the displayed, deduplicated order, expanded
+lessons, and page and unit-list scroll positions in session storage. Previous/next use this snapshot, including practice
+and full-text results. The return link restores URL filters and session scroll;
+without a matching snapshot the viewer reports that stepping is unavailable.
 The [shared reader](../../courses/reader/reader.rb) renders one document with a
 Course or Topics sidebar. Its [controller](../../courses/reader/js/browser.js)
 switches navigation without replacing content, runner editors or submission
@@ -169,7 +178,7 @@ into the document shell.
 
 Former `/topics/view/` addresses contain small compatibility redirects. They
 preserve filters and fragments while forwarding to the canonical document.
-The reader's Topics return link restores the category/query state. Its sidebar
+The ordinary reader's Topics return link restores the category/query state. Its sidebar
 uses the same category selection rules as the full browser; full-text search
 and highlighting remain in the full Topics catalog.
 

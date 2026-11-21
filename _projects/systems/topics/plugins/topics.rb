@@ -70,6 +70,13 @@ module Topics
     # Eligible to run in safe mode; run after higher-priority page generators.
     safe true
     priority :lowest
+    VIEWER = {
+      "label" => "Topic Filters",
+      "item" => "document",
+      "home" => "/topics/",
+      "activation_param" => "topics_view",
+      "script" => "/assets/js/projects/topics/viewer.js"
+    }.freeze
 
     # Publishes category data, a JSON search catalog, and legacy redirects.
     #
@@ -103,6 +110,14 @@ module Topics
           !document.data["player_page"]
       end
       documents = documents.uniq(&:url).sort_by { |document| document.data["title"].to_s.downcase }
+      documents.each do |document|
+        viewers = document.data["page_viewers"] ||= []
+        unless viewers.is_a?(Array) && viewers.all? { |viewer| viewer.is_a?(Hash) } &&
+               viewers.none? { |viewer| viewer["activation_param"] == VIEWER["activation_param"] }
+          raise Jekyll::Errors::FatalException, "#{document.relative_path}: page_viewers must have unique activation parameters"
+        end
+        viewers << VIEWER.dup
+      end
       labels = {}
       entries = documents.map do |document|
         names = Topics.categories(document)

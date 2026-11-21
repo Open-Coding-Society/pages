@@ -65,6 +65,10 @@
     background: var(--panel);
     border-right: 1px solid var(--ui-border);
   }
+  &--viewer-focused {
+    .document-reader__toolbar, .document-reader__sidebar, .ocs__pager[data-reader-pager] { display: none; }
+    .document-reader__panes { grid-template-columns: minmax(0, 1fr); }
+  }
   // Collapsed navigation still names the current document, with its review circle.
   &__current {
     display: none;

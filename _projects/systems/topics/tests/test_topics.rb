@@ -94,6 +94,10 @@ class TopicsTest < Minitest::Test
       converted = index.find { |entry| entry["url"] == "/converted-quest/" }
       assert_equal "Quest-Outline.docx", converted["source"]
       assert_equal ["CSA week 14"], lesson["weeks"]
+      %w[lesson.md outline.md].each do |path|
+        source_page = site.pages.find { |page| page.relative_path == path }
+        assert_equal "topics_view", source_page.data.fetch("page_viewers").first.fetch("activation_param")
+      end
       assert_includes lesson["content"], "Algorithm evidence."
       original = File.read(File.join(source, "_site/java/algorithms/index.html"))
       assert_includes original, 'id="course-player"'
@@ -111,13 +115,18 @@ class TopicsTest < Minitest::Test
       assert_includes browser, "Java Algorithms"
       assert_includes browser, "/preview/java/algorithms/?context=topics"
       assert_includes browser, '<h2>Topics</h2>'
+      assert_includes browser, '<h3>Topic Filters</h3>'
+      assert_includes browser, 'OR matches any selected key topic'
+      refute_includes browser, 'data-topics-overview'
       assert_includes browser, '<summary><h3>Topic Filter</h3></summary>'
-      assert_includes browser, '<summary><h3>Categories Filter</h3></summary>'
+      assert_includes browser, '<summary><h3>More Categories</h3></summary>'
       primary = browser.split('<legend class="topics-browser__accessible-label">Topic Filter</legend>', 2).last.split('</fieldset>', 2).first
-      secondary = browser.split('<legend class="topics-browser__accessible-label">Categories Filter</legend>', 2).last.split('</fieldset>', 2).first
+      secondary = browser.split('<legend class="topics-browser__accessible-label">More Categories</legend>', 2).last.split('</fieldset>', 2).first
       assert_match(/<details[^>]*data-topics-primary[^>]*\bopen\b/, browser)
-      assert_match(/<details[^>]*data-topics-secondary/, browser)
-      refute_match(/<details[^>]*data-topics-secondary[^>]*\bopen\b/, browser)
+      assert_match(/<details[^>]*data-topics-secondary[^>]*\bopen\b/, browser)
+      refute_includes browser, 'data-topics-nav'
+      refute_includes browser, 'data-topics-shortcuts'
+      assert_includes secondary, 'class="ocs__btn small accent"'
       match = browser.split('data-topics-match', 2).last.split('</p>', 2).first
       assert_match(/<button[^>]*class="ocs__btn small accent fill"[^>]*value="or"[^>]*aria-pressed="true"[^>]*disabled/, match)
       assert_match(/<button[^>]*class="ocs__btn small accent"[^>]*value="and"[^>]*aria-pressed="false"[^>]*disabled/, match)
@@ -142,6 +151,7 @@ class TopicsTest < Minitest::Test
         refute_includes secondary, "value=\"#{category}\""
       end
       assert_includes secondary, 'value="algorithms"'
+      assert_equal 1, browser.scan('value="algorithms"').size
       assert_includes browser, 'data-topics-body-results'
       refute_includes browser, "js-search-results"
       refute_includes browser, "CSA week 14"

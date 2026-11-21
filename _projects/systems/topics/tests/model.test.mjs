@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { filterGroups, selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, unitOf, unitGroups, isPractice } from '../js/model.js';
+import { filterGroups, selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, categoriesByCount, unitOf, unitGroups, isPractice } from '../js/model.js';
 
 const require = createRequire(import.meta.url);
 const lunr = require('../../../../assets/js/vendor/lunr.min.js');
@@ -32,6 +32,13 @@ test('two Categories Filter boxes are alternatives too', () => {
     { url: '/c/', categories: ['java', 'classes'] },
   ];
   assert.deepEqual(selectedDocuments(docs, ['arrays', 'loops'], null, any).map((doc) => doc.url), ['/a/', '/b/']);
+});
+
+test('more categories retain all options, ordered by count with stable ties', () => {
+  const categories = ['arrays', 'classes', 'loops', 'other'];
+  assert.deepEqual(categoriesByCount(categories, new Map([['arrays', 2], ['classes', 4], ['loops', 2]])),
+    ['classes', 'arrays', 'loops', 'other']);
+  assert.deepEqual(categories, ['arrays', 'classes', 'loops', 'other']);
 });
 
 test('AND requires every checked topic; categories stay alternatives that narrow', () => {

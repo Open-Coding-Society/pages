@@ -1,13 +1,14 @@
-import { selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, unitGroups } from './model.js';
+import { selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, categoriesByCount, unitGroups } from './model.js';
+import { SNAPSHOT_KEY, readSnapshot, orderedDocuments } from './viewer-model.js';
 
 const root = document.querySelector('[data-topics-browser]');
 if (root) {
   const query = root.querySelector('#topics-query');
   const view = root.querySelector('#topics-view');
   const filters = [...root.querySelectorAll('input[type="checkbox"]')];
-  // Topic Filter values; every other checked box belongs to the Categories Filter.
+  // Topic Filter values; every other checked box belongs to More Categories.
   const primary = [...root.querySelectorAll('[data-topics-primary] input[type="checkbox"]')].map((filter) => filter.value);
-  const secondary = filters.map((filter) => filter.value).filter((value) => !primary.includes(value));
+  const secondaryFilters = [...root.querySelectorAll('[data-topics-secondary] input[type="checkbox"]')];
   const matchButtons = [...root.querySelectorAll('[data-topics-match] button')];
   const status = root.querySelector('[data-topics-status]');
   const heading = root.querySelector('[data-topics-heading]');
@@ -15,10 +16,6 @@ if (root) {
   const flat = root.querySelector('[data-topics-flat]');
   const flatGrid = flat.querySelector('.topics-browser__results');
   const groupList = root.querySelector('[data-topics-groups]');
-  const nav = root.querySelector('[data-topics-nav]');
-  const more = root.querySelector('[data-topics-more]');
-  const shortcuts = root.querySelector('[data-topics-shortcuts]');
-  const overview = root.querySelector('[data-topics-overview]');
   const titleHeading = root.querySelector('[data-topics-title-heading]');
   const bodySection = root.querySelector('[data-topics-body-section]');
   const bodyResults = root.querySelector('[data-topics-body-results]');
@@ -29,8 +26,6 @@ if (root) {
   const OTHER = 'other-references';
   // Optional names per topic and unit, from data/topics_units.yml.
   const unitNames = JSON.parse(root.dataset.unitNames || '{}') || {};
-  // The sidebar offers this many of the remaining categories as shortcuts.
-  const SHORTCUTS = 12;
   let state = readState(location.search);
   if (!state.categories.length && root.dataset.initialCategory) {
     state.categories = [root.dataset.initialCategory];
@@ -74,6 +69,7 @@ if (root) {
     if (root.dataset.courseContext !== 'true') {
       url.search = writeState(state);
       url.searchParams.set('context', 'topics');
+      url.searchParams.set('topics_view', '1');
     }
     return url.href;
   }
@@ -87,84 +83,15 @@ if (root) {
     });
   }
 
-  // The sidebar, tiles and shortcuts all select exactly one category (or none for All).
-  function choose(category) {
-    filters.forEach((filter) => { filter.checked = filter.value === category; });
-    if (query.value) query.value = '';
-    update();
-    root.scrollIntoView({ block: 'start' });
-  }
-
   function chosenCategory() {
     return state.categories.length === 1 ? state.categories[0] : '';
-  }
-
-  // Topics with no published lessons stay in Advanced filters but get no link or tile.
-  function liveTopics() {
-    return primary.filter((topic) => counts.get(topic));
-  }
-
-  // A real link (shareable, opens in a new tab) that the page handles in place.
-  function categoryLink(category, text) {
-    const link = element('a');
-    link.href = `?${writeState({ categories: category ? [category] : [], match: 'or', query: '', view: state.view })}`;
-    link.addEventListener('click', (event) => {
-      if (event.metaKey || event.ctrlKey || event.shiftKey) return;
-      event.preventDefault();
-      choose(category);
-    });
-    const active = !state.query.trim() && (category ? chosenCategory() === category : !state.categories.length);
-    if (active) {
-      link.setAttribute('aria-current', 'page');
-      link.append(element('strong', '', text));
-    } else {
-      link.append(text);
-    }
-    return link;
-  }
-
-  function renderNav() {
-    nav.replaceChildren(...['', ...liveTopics()].map((topic) => {
-      const item = element('div', 'ocs__tree-item');
-      item.append(categoryLink(topic, topic ? labels.get(topic) : 'All topics'), ' ',
-        element('span', 'ocs__status', String(topic ? counts.get(topic) : documents.length)));
-      return item;
-    }));
-    const extra = secondary.filter((category) => counts.get(category))
-      .sort((a, b) => counts.get(b) - counts.get(a)).slice(0, SHORTCUTS);
-    shortcuts.replaceChildren(...extra.map((category) => {
-      const shortcut = element('button', `ocs__btn small accent${chosenCategory() === category ? ' fill' : ''}`,
-        `${labels.get(category)} · ${counts.get(category)}`);
-      shortcut.type = 'button';
-      shortcut.addEventListener('click', () => choose(category));
-      return shortcut;
-    }));
-    more.hidden = !extra.length;
-  }
-
-  function unitRange(members) {
-    const units = unitGroups(members).map((group) => group.unit).filter((unit) => unit !== null);
-    if (!units.length) return '';
-    return units.length === 1 ? ` · Unit ${units[0]}` : ` · Units ${units[0]}–${units[units.length - 1]}`;
-  }
-
-  // Landing view: one tile per topic across the full width.
-  function renderOverview() {
-    overview.replaceChildren(...liveTopics().map((topic) => {
-      const members = documents.filter((document) => document.categories.includes(topic));
-      const tile = element('button', 'ocs__hub-card');
-      tile.type = 'button';
-      tile.append(element('strong', 'ocs__hub-card-title', labels.get(topic)),
-        element('span', 'ocs__text', `${members.length} lessons${unitRange(members)}`));
-      tile.addEventListener('click', () => choose(topic));
-      return tile;
-    }));
   }
 
   // One dropdown per lesson: the number and full title; opening it shows the
   // whole description and a link to the lesson.
   function lessonRow(document) {
     const item = element('details', 'topics-browser__category-disclosure');
+    item.dataset.topicsLesson = document.url;
     const number = document.title.match(/^\d+\.\d+/)?.[0];
     const summary = element('summary');
     summary.append(element('span', 'ocs__check', number || '›'), ' ',
@@ -174,6 +101,7 @@ if (root) {
     body.append(element('p', 'ocs__text', description || 'No description yet.'));
     const actions = element('p', 'ocs__links');
     const open = element('a', 'ocs__btn small accent fill', 'Open lesson →');
+    open.dataset.topicsDocument = document.url;
     open.href = contextLink(document);
     actions.append(open);
     body.append(actions);
@@ -196,7 +124,9 @@ if (root) {
       element('span', 'ocs__status', `${lessons.length} lessons`));
     card.append(header);
     if (lessons.length) {
-      const list = element('div', state.view === 'cards' ? 'topics-browser__results' : 'ocs__stack');
+      const list = element('div', `topics-browser__unit-lessons ${state.view === 'cards' ? 'topics-browser__results' : 'ocs__stack'}`);
+      list.tabIndex = 0;
+      list.setAttribute('aria-label', `${unitTitle(topic, unit)} lessons`);
       lessons.forEach((lesson) => list.append(state.view === 'cards' ? cardByUrl.get(lesson.url) : lessonRow(lesson)));
       card.append(list);
     }
@@ -205,6 +135,7 @@ if (root) {
       row.append(element('strong', '', 'Practice'));
       practice.forEach((item) => {
         const link = element('a', 'ocs__btn small accent', item.title);
+        link.dataset.topicsDocument = item.url;
         link.href = contextLink(item);
         row.append(link);
       });
@@ -230,6 +161,10 @@ if (root) {
     filters.forEach((filter) => {
       filter.closest('label').append(` (${counts.get(filter.value) || 0})`);
     });
+    const labelsByCategory = new Map(secondaryFilters.map((filter) => [filter.value, filter.closest('label')]));
+    const fieldset = root.querySelector('[data-topics-secondary] fieldset');
+    categoriesByCount(secondaryFilters.map((filter) => filter.value), counts)
+      .forEach((category) => fieldset.append(labelsByCategory.get(category)));
   }
 
   function headingText(searching) {
@@ -261,17 +196,12 @@ if (root) {
       highlight(link, document.title, titlePositions.get(document.url) || []);
       link.href = contextLink(document);
     });
-    renderNav();
     heading.textContent = headingText(searching);
     // Park every card in the flat grid first so rebuilt sections never drop one.
     flatGrid.append(...cards);
-    const landing = !searching && !state.categories.length;
     flat.hidden = !searching;
-    if (landing) renderOverview(); else overview.replaceChildren();
     if (searching) {
       selected.forEach((document) => flatGrid.append(cardByUrl.get(document.url)));
-      groupList.replaceChildren();
-    } else if (landing) {
       groupList.replaceChildren();
     } else {
       const topics = topicGroups(selected, state.categories, primary, OTHER);
@@ -289,6 +219,7 @@ if (root) {
     for (const match of groups.body) {
       const details = resultDetails(match.document, primary);
       const link = element('a', 'ocs__nav-card');
+      link.dataset.topicsDocument = match.document.url;
       link.href = contextLink(match.document);
       const file = element('span', 'ocs__nav-card-kicker');
       file.append(wrappable(details.file));
@@ -309,8 +240,44 @@ if (root) {
       bodyResults.append(link);
     }
     const count = selected.length + (searching ? groups.body.length : 0);
-    if (landing) status.textContent = `${documents.length} lessons in ${liveTopics().length} topics. Pick one to see its lessons by unit.`;
-    else status.textContent = count ? `${count} lessons` : 'No lessons match these filters and search.';
+    status.textContent = count ? `${count} lessons` : 'No lessons match these filters and search.';
+  }
+
+  function saveViewerState() {
+    const ordered = orderedDocuments(root.querySelectorAll('a[data-topics-document]'), documents);
+    try {
+      window.sessionStorage.setItem(SNAPSHOT_KEY, JSON.stringify({
+        state: writeState(state), documents: ordered, scrollY: window.scrollY,
+        unitScrolls: [...root.querySelectorAll('.topics-browser__unit-lessons')].map((list) => list.scrollTop),
+        openLessons: [...root.querySelectorAll('details[data-topics-lesson][open]')].map((lesson) => lesson.dataset.topicsLesson),
+      }));
+    } catch (error) {
+      console.warn('Could not save Topics navigation state:', error);
+    }
+  }
+
+  function restoreViewerScroll() {
+    const url = new URL(location.href);
+    if (!url.searchParams.has('topics_return')) return;
+    url.searchParams.delete('topics_return');
+    history.replaceState(history.state, '', url);
+    const snapshot = readSnapshot(url.search);
+    if (snapshot && Number.isFinite(snapshot.scrollY)) {
+      window.requestAnimationFrame(() => {
+        if (Array.isArray(snapshot.openLessons)) {
+          const open = new Set(snapshot.openLessons);
+          root.querySelectorAll('details[data-topics-lesson]').forEach((lesson) => {
+            lesson.open = open.has(lesson.dataset.topicsLesson);
+          });
+        }
+        if (Array.isArray(snapshot.unitScrolls)) {
+          root.querySelectorAll('.topics-browser__unit-lessons').forEach((list, index) => {
+            if (Number.isFinite(snapshot.unitScrolls[index])) list.scrollTop = snapshot.unitScrolls[index];
+          });
+        }
+        window.scrollTo(0, snapshot.scrollY);
+      });
+    }
   }
 
   function update() {
@@ -343,6 +310,14 @@ if (root) {
       query.disabled = false;
       showFilterCounts();
       render();
+      if (root.dataset.courseContext !== 'true') {
+        for (const type of ['click', 'auxclick', 'contextmenu']) {
+          root.addEventListener(type, (event) => {
+            if (event.target.closest('a[data-topics-document]')) saveViewerState();
+          });
+        }
+        restoreViewerScroll();
+      }
       query.addEventListener('input', update);
       filters.forEach((filter) => filter.addEventListener('change', update));
       matchButtons.forEach((button) => {

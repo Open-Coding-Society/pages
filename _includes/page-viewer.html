@@ -1,5 +1,5 @@
-{% assign viewer = page.page_viewer %}
-<nav class="ocs__viewer" data-page-viewer data-home-url="{{ viewer.home | relative_url }}" aria-label="{{ viewer.label | escape }} navigation" hidden>
+{% assign viewer = include.viewer %}
+<nav id="page-viewer-{{ viewer.activation_param | escape }}" class="ocs__viewer" data-page-viewer data-viewer-param="{{ viewer.activation_param | escape }}" data-home-url="{{ viewer.home | relative_url }}" aria-label="{{ viewer.label | escape }} navigation" hidden>
   <a class="ocs__btn small accent" data-viewer-home href="{{ viewer.home | relative_url }}">&#8592; {{ viewer.label | escape }}</a>
   <div class="ocs__viewer__steps" aria-label="Previous and next {{ viewer.item | escape }}">
     <a class="ocs__btn ocs__btn--icon small accent" data-viewer-previous aria-label="Previous {{ viewer.item | escape }}" aria-disabled="true" title="Previous {{ viewer.item | escape }}">&#8249;</a>
@@ -9,15 +9,18 @@
   <div class="ocs__viewer__actions" data-viewer-actions></div>
 </nav>
 <script type="module">
-  if (new URLSearchParams(location.search).has({{ viewer.activation_param | jsonify }})) {
+  const parameters = new URLSearchParams(location.search);
+  const activeViewer = [...document.querySelectorAll('[data-page-viewer]')]
+    .find((candidate) => parameters.has(candidate.dataset.viewerParam));
+  if (activeViewer?.dataset.viewerParam === {{ viewer.activation_param | jsonify }}) {
+    const bar = document.getElementById({{ 'page-viewer-' | append: viewer.activation_param | jsonify }});
     Promise.all([
       import({{ '/assets/js/pages/viewer/toolbar.js' | relative_url | jsonify }}),
       import({{ viewer.script | relative_url | jsonify }})
     ]).then(([toolbar, adapter]) => {
-      adapter.startViewer(document.querySelector('[data-page-viewer]'), toolbar);
+      adapter.startViewer(bar, toolbar);
     }).catch((error) => {
       console.error('Could not load page viewer:', error);
-      const bar = document.querySelector('[data-page-viewer]');
       bar.hidden = false;
       bar.querySelector('[data-viewer-status]').textContent = 'Navigation could not load. Use the return link to continue.';
     });

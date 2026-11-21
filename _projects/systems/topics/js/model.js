@@ -1,6 +1,6 @@
 // Checked boxes in the same filter are alternatives (Java or Python); the Topic and
 // Categories filters narrow each other (Java and Algorithms). `primary` lists the
-// Topic Filter values; every other checked value belongs to the Categories Filter.
+// Topic Filter values; every other checked value belongs to More Categories.
 // With `match: 'and'`, every checked Topic Filter box is required (Java and Spring).
 export function filterGroups(categories, { primary = [], match = 'or' } = {}) {
   const topics = categories.filter((category) => primary.includes(category));
@@ -132,6 +132,10 @@ export function categoryCounts(documents) {
   documents.forEach((document) => document.categories.forEach((category) =>
     counts.set(category, (counts.get(category) || 0) + 1)));
   return counts;
+}
+
+export function categoriesByCount(categories, counts) {
+  return [...categories].sort((a, b) => (counts.get(b) || 0) - (counts.get(a) || 0));
 }
 
 // Lesson titles name their unit: "1.01 Variables", "Unit 2 Quiz" or

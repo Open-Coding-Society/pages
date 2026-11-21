@@ -8,10 +8,16 @@
     margin-bottom: 1rem;
   }
   &__filters {
-    border: 1px solid rgba(128, 128, 128, 0.4);
+    border: 1px solid var(--ui-border);
     border-radius: 0.75rem;
     padding: 0.75rem;
     min-width: 0;
+  }
+  &__filter-help { font-size: 0.85rem; color: var(--text-muted); }
+  &__unit-lessons {
+    max-height: 20rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
   &__search {
     h2 { margin-top: 0; }
@@ -32,6 +38,14 @@
     overflow-y: auto;
     padding: 0.75rem;
     label { max-width: 100%; overflow-wrap: break-word; }
+  }
+  &__category-chips label.ocs__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: auto;
+    min-height: 2rem;
+    input { flex-shrink: 0; }
   }
   &__actions {
     display: flex;

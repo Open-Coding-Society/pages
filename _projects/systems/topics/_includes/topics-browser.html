@@ -9,16 +9,8 @@
         <input class="ocs__input" id="topics-query" type="search" placeholder="Search every lesson" autocomplete="off" disabled>
         <button type="button" class="ocs__btn small accent" data-topics-search-clear disabled>Clear Search</button>
       </div>
-      <nav aria-label="Topics">
-        <h3>Browse</h3>
-        <div class="ocs__tree" data-topics-nav></div>
-      </nav>
-      <section data-topics-more hidden>
-        <h3>More categories</h3>
-        <p class="ocs__links" data-topics-shortcuts></p>
-      </section>
-      <details class="topics-browser__category-disclosure" data-topics-advanced>
-        <summary><h3>Advanced filters</h3></summary>
+      <section aria-label="Topic filters">
+        <h3>Topic Filters</h3>
         <div class="topics-browser__filters" id="topics-filters" role="group" aria-label="Topic and category filters">
           <details class="topics-browser__category-disclosure" data-topics-primary open>
             <summary><h3>Topic Filter</h3></summary>
@@ -26,6 +18,7 @@
               <button type="button" class="ocs__btn small accent fill" value="or" aria-pressed="true" title="Show documents in any checked topic" disabled>OR: any</button>
               <button type="button" class="ocs__btn small accent" value="and" aria-pressed="false" title="Show only documents in every checked topic" disabled>AND: all</button>
             </p>
+            <p class="topics-browser__filter-help">OR matches any selected key topic. AND requires all selected key topics. More categories match any selection and narrow the results.</p>
             <fieldset class="topics-browser__categories topics-browser__primary">
               <legend class="topics-browser__accessible-label">Topic Filter</legend>
               {% for category in site.data.topics_primary_categories %}
@@ -33,12 +26,12 @@
               {% endfor %}
             </fieldset>
           </details>
-          <details class="topics-browser__category-disclosure" data-topics-secondary>
-            <summary><h3>Categories Filter</h3></summary>
-            <fieldset class="topics-browser__categories">
-              <legend class="topics-browser__accessible-label">Categories Filter</legend>
+          <details class="topics-browser__category-disclosure" data-topics-secondary open>
+            <summary><h3>More Categories</h3></summary>
+            <fieldset class="topics-browser__categories topics-browser__category-chips">
+              <legend class="topics-browser__accessible-label">More Categories</legend>
               {% for category in site.data.topics_secondary_categories %}
-              <label data-topics-label="{{ category[1] | escape }}"><input type="checkbox" value="{{ category[0] | escape }}"> {{ category[1] | escape }}</label>
+              <label class="ocs__btn small accent" data-topics-label="{{ category[1] | escape }}"><input type="checkbox" value="{{ category[0] | escape }}"> {{ category[1] | escape }}</label>
               {% endfor %}
             </fieldset>
           </details>
@@ -48,21 +41,20 @@
           <label for="topics-view">View</label>
           <select class="ocs__input" id="topics-view"><option value="list">Compact list</option><option value="cards">Cards</option></select>
         </p>
-      </details>
+      </section>
     </aside>
     <div class="ocs__stack">
       <header>
         <h2 data-topics-heading>All topics</h2>
         <p class="ocs__lead" role="status" aria-live="polite" data-topics-status>Loading full-text search…</p>
       </header>
-      <div class="ocs__grid ocs__grid--card" data-topics-overview></div>
       <h2 data-topics-title-heading hidden>Title matches <span class="topics-browser__count" data-topics-title-count></span></h2>
       <div class="ocs__stack" data-topics-results>
         <div data-topics-flat>
           <div class="topics-browser__results">
             {% for document in site.data.topics_catalog %}
             <article class="topics-browser__card" data-topic-url="{{ document.url | escape }}">
-              <h2><a href="{% if topics_course_context %}{{ document.url | relative_url }}{% else %}{{ document.viewUrl | relative_url }}{% endif %}">{{ document.title | escape }}</a></h2>
+              <h2><a data-topics-document="{{ document.url | escape }}" href="{% if topics_course_context %}{{ document.url | relative_url }}{% else %}{{ document.viewUrl | relative_url }}{% endif %}">{{ document.title | escape }}</a></h2>
               {% if document.description != empty %}<p>{{ document.description | escape }}</p>{% endif %}
               <p class="topics-browser__metadata">{{ document.categories | join: ' · ' | escape }}</p>
               {% if topics_course_context and document.weeks.size > 0 %}
