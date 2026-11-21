@@ -2,16 +2,23 @@
 // resolves to the response's JSON (null for an empty body) and rejects with an Error
 // that names the request and carries its HTTP status, so callers can say what failed.
 
-export function createMessagesApi({ javaURI, pythonURI, fetchOptions }) {
-  async function request(base, path, method = 'GET', body) {
+// `createRequest` makes the XMLHttpRequest an upload uses (fetch can't report upload
+// progress); tests pass a stand-in.
+export function createMessagesApi({
+  javaURI, pythonURI, fetchOptions, createRequest = () => new XMLHttpRequest(),
+}) {
+  const failure = (method, path, status) => Object.assign(new Error(`${method} ${path} answered HTTP ${status}`), { status });
+
+  async function send(base, path, method = 'GET', body) {
     const options = { ...fetchOptions, method };
     if (body !== undefined) options.body = JSON.stringify(body);
     const response = await fetch(`${base}${path}`, options);
-    if (!response.ok) {
-      const error = new Error(`${method} ${path} answered HTTP ${response.status}`);
-      error.status = response.status;
-      throw error;
-    }
+    if (!response.ok) throw failure(method, path, response.status);
+    return response;
+  }
+
+  async function request(base, path, method = 'GET', body) {
+    const response = await send(base, path, method, body);
     const text = await response.text();
     if (!text) return null;
     try {
@@ -19,6 +26,42 @@ export function createMessagesApi({ javaURI, pythonURI, fetchOptions }) {
     } catch {
       return text;
     }
+  }
+
+  // A JSON POST through XMLHttpRequest, with the same credentials and headers as fetch, so
+  // a big upload can report how far it has got. Rejects with the status like request(),
+  // and with an AbortError when `signal` aborts it.
+  function postWithProgress(path, body, { onProgress = null, signal = null } = {}) {
+    return new Promise((resolve, reject) => {
+      const xhr = createRequest();
+      xhr.open('POST', `${javaURI}${path}`);
+      xhr.withCredentials = fetchOptions.credentials === 'include';
+      Object.entries(fetchOptions.headers || {}).forEach(([name, value]) => xhr.setRequestHeader(name, value));
+      xhr.upload.onprogress = event => {
+        if (event.lengthComputable && onProgress) onProgress(event.loaded, event.total);
+      };
+      xhr.onload = () => {
+        if (xhr.status < 200 || xhr.status >= 300) {
+          reject(failure('POST', path, xhr.status));
+          return;
+        }
+        try {
+          resolve(xhr.responseText ? JSON.parse(xhr.responseText) : null);
+        } catch {
+          resolve(xhr.responseText);
+        }
+      };
+      xhr.onerror = () => reject(failure('POST', path, 0));
+      xhr.onabort = () => reject(Object.assign(new Error(`POST ${path} was cancelled`), { name: 'AbortError' }));
+      if (signal) {
+        if (signal.aborted) {
+          reject(Object.assign(new Error(`POST ${path} was cancelled`), { name: 'AbortError' }));
+          return;
+        }
+        signal.addEventListener('abort', () => xhr.abort(), { once: true });
+      }
+      xhr.send(JSON.stringify(body));
+    });
   }
 
   const spring = (path, method, body) => request(javaURI, path, method, body);
@@ -70,6 +113,14 @@ export function createMessagesApi({ javaURI, pythonURI, fetchOptions }) {
 
     groupFiles: groupId => spring(`/api/groups/chat/${part(groupId)}/files`),
     uploadGroupFile: (groupId, filename, base64Data) => spring(`/api/groups/chat/${part(groupId)}/files`, 'POST', { filename, base64Data }),
+    // A group's shared files by path, with each one's size and who shared it, but no bytes.
+    groupFileIndex: groupId => spring(`/api/groups/chat/${part(groupId)}/files/index`),
+    // One shared file's bytes, as a Blob.
+    groupFileContent: async (groupId, path) => (await send(javaURI, `/api/groups/chat/${part(groupId)}/files/content?path=${part(path)}`)).blob(),
+    // Shares one file. A file from a folder keeps its folders in `filename` ("project/src/Main.java").
+    uploadGroupFileWithProgress: (groupId, filename, base64Data, options) => postWithProgress(
+      `/api/groups/chat/${part(groupId)}/files`, { filename, base64Data }, options,
+    ),
 
     personaCoverage: userUids => flask('/api/persona/evaluate-group', 'POST', { user_uids: userUids }),
     formGroups: (userUids, groupSize, feedbackRows = []) => flask('/api/persona/form-groups', 'POST', {
