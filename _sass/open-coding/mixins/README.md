@@ -189,6 +189,17 @@ every element can use it.
 
 ---
 
+### `@mixin overlay-panel`
+A surface with a stronger theme-aware border and a soft shadow that lightens
+dark themes and darkens light themes. It does not position, show, hide or add
+a backdrop to the panel. Override its square corners as needed.
+
+```scss
+.my-drawer { @include overlay-panel; }
+```
+
+---
+
 ### `@mixin accent-tint($amount, $ring)`
 The hovered, active or chosen item: the accent mixed into the panel, with an accent ring.
 

@@ -146,6 +146,8 @@ Elements are built from a few shared pieces, so each one adds only what is its o
 
 - `surface` (`mixins/_panel.scss`): the 1px ring, rounded corners, panel and text color
   that cards, rows, menus and previews are drawn on
+- `overlay-panel`: a stronger theme-aware ring and shadow for a panel above page content;
+  its positioning, visibility and any backdrop remain the caller's responsibility
 - `accent-tint`: the accent ring and tint of a hovered, active or chosen item
 - `kicker`: small capitals over a title or a group
 - `.ocs__truncate`, which other parts `@extend` for one line that ends in "…"

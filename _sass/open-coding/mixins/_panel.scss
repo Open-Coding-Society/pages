@@ -198,6 +198,17 @@ $mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   color: $color;
 }
 
+// A panel above page content, without a backdrop or positioning behavior.
+@mixin overlay-panel {
+  @include surface($radius: 0, $border: var(--field-border, var(--ui-border)));
+  box-shadow: 0 0 20px 4px color-mix(in srgb, var(--pref-text-color) 25%, transparent);
+
+  // Preference styles force the generic aside border; keep the overlay ring.
+  .user-theme-active & {
+    border-color: var(--field-border, var(--ui-border)) !important;
+  }
+}
+
 // Accent Tint
 // The hovered, active or chosen item: the accent mixed into the panel, with an accent ring.
 //

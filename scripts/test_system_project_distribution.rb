@@ -206,6 +206,10 @@ class SystemProjectDistributionTest < Minitest::Test
       assert_includes css, ".microblog-panel"
       assert_includes css, ".review-page"
       assert_match(/\.microblog-modal\.ocs__modal\.hidden\s*\{\s*display:\s*none/, css)
+      assert_match(/\.microblog-panel\s*\{[^}]*border:\s*1px solid var\(--field-border, var\(--ui-border\)\);[^}]*box-shadow:/m, css)
+      assert_match(/box-shadow:\s*0 0 20px 4px color-mix\(in srgb, var\(--pref-text-color\) 25%, transparent\)/, css)
+      assert_match(/\.user-theme-active \.microblog-panel\s*\{\s*border-color:\s*var\(--field-border, var\(--ui-border\)\) !important/, css)
+      assert_match(/\.microblog-panel:not\(\.open\)\s*\{\s*box-shadow:\s*none/, css)
       %w[microblog-filter-page microblog-filter-many microblog-icon-btn].each do |name|
         assert_match(/\.#{name}\.ocs__btn\.small[^{]*\{[^}]*padding:\s*0;/, css)
       end
