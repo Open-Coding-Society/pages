@@ -398,7 +398,7 @@ See [`elements/tabs`](elements/tabs). The Dashboard uses this for its tab bar.
 How a page shows/hides the modal (a `hidden`/`open` class, an
 `aria-hidden` attribute) is up to the page — this only styles the chrome.
 - `ocs__modal-card--wide`: a 48rem card for a modal that holds a list or a
-  browser rather than a short form, like a group's shared files
+  browser rather than a short form, like the Files dialog in Messages (`/dm`)
 
 See [`elements/modals`](elements/modals).
 Dashboard and Analytics Dashboard use the plain card+close shape; Calendar
@@ -438,8 +438,8 @@ and Profile's face scanner use the full header/actions shape.
 - `ocs__file-actions`: buttons at the end of the row
 - `ocs__file-preview`: an image, video, PDF frame or `<pre>` of text shown with a file
 
-See [`elements/files`](elements/files). It's for a group's shared files, an upload
-tray, or the files under a chat message.
+See [`elements/files`](elements/files). Messages (`/dm`) shows shared files, the upload
+tray and the files under a message this way.
 
 ### Progress
 
@@ -477,8 +477,8 @@ See [`elements/progress`](elements/progress).
 - `ocs__menu-foot`: a muted line of keyboard help
 
 Write headings, names and hints as `<b>`, `<strong>` and `<em>`, not spans. See
-[`elements/menus`](elements/menus). It's for an attach menu, a slash-command picker
-or a message's More actions.
+[`elements/menus`](elements/menus). Messages uses it for the Attach menu; it fits a
+slash-command picker or a message's More actions too.
 
 ### Nav cards
 

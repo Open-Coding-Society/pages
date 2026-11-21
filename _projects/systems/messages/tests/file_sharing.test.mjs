@@ -263,7 +263,7 @@ test('files that fail are left off the message, which says so', async () => {
 });
 
 test('one file answering 503 is left out of the message and named in the notice', async () => {
-  // Spring answers 503 with Retry-After when S3 can't store or check a file (spring#281).
+  // Spring answers 503 with Retry-After when it can't check S3 for the file's path (spring#281).
   const { thread, elements, composer, sent } = shareThread({ filesApi: fakeFilesApi({ failPaths: ['big.zip'], failStatus: 503 }) });
   thread.open('group', 7, { title: '', subtitle: '' });
   await settle();

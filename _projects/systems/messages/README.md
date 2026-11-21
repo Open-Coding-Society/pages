@@ -13,10 +13,19 @@ same way they reach a direct message.
 | `js/messages-page.js` | Starts the page: who is signed in, the two lists, opening a conversation, the group header buttons, the socket. |
 | `js/conversation-embed.js` | One group chat or direct message inside another page, such as a UI Builder page. See [Embedding a conversation](#embedding-a-conversation). |
 | `js/thread.js` | The open conversation: loads it, follows its socket topic, sends, edits and deletes, and keeps DM read state. An embed's pane can also be read-only, use the host's wording and be destroyed. |
-| `js/message-log.js` | Draws the messages: day dividers, avatars, edit and delete buttons. Also the small text helpers the pane and the embed share. |
+| `js/message-log.js` | Draws the messages: day dividers, avatars, edit and delete buttons, and the image viewer; the files a message shares come from `file-rows.js`. Also the small text helpers the pane and the embed share. |
 | `js/sidebar.js` | The Groups and Direct messages lists, as `ocs__nav-card` links, each starting with an `ocs__avatar` of the name's initials. |
 | `js/new-chat.js` | The New chat dialog. |
-| `js/group-dialogs.js` | Find a group (search, join, make a group), Members (with Delete group at the bottom, for admins), and Files. |
+| `js/group-dialogs.js` | Find a group (search, join, make a group), Members (with Delete group at the bottom, for admins), and the Files dialog, which shows a `FilesTab`. |
+| `js/files-model.js` | `SharedFiles` and `FilesMarker`, static: planning a share (folders keep their paths, clutter is skipped, taken names become "name (2)"), sizes, icons and the folder tree, and the `[[files:…]]` marker. |
+| `js/group-files.js` | `GroupFiles`: one group's shared files. The list without bytes, one file's bytes, a folder's files for a .zip, and uploads with progress, three at a time. |
+| `js/composer-files.js` | `ComposerFiles`: the composer's Attach menu, the Files and Folder pickers, dropping files or folders on the conversation, and sharing them before the message sends. |
+| `js/attachments.js` | `Attachments`: the tray above the composer: what waits to be shared, what was left out and why, and each item's upload progress. `Attachments.fromInput` and `Attachments.fromDrop` read a picker and a dropped folder. |
+| `js/files-panel.js` | `FilesTab`: the Files dialog's list: a group's files as folders, with breadcrumbs, a name filter, previews, downloads and a folder as .zip. |
+| `js/file-actions.js`, `js/file-viewer.js` | `FileActions` and `FileViewer`: what a shared file's buttons do (download, preview, open a folder, .zip), and the preview: an image, video, sound, PDF or the start of a text file. |
+| `js/zip-store.js` | `ZipStore`, static: a stored (uncompressed) ZIP writer, so a shared folder downloads as one file. |
+| `js/popup-menu.js` | `PopupMenu`: a menu a button opens (`ocs__menu`), with the arrow keys, Escape and click-away. |
+| `js/file-rows.js` | `FileRows`: the files a message shares, as `ocs__file` rows with their buttons, and small previews for a few images. |
 | `js/delete-group.js` | The Delete group dialog: says what deleting takes away, and waits for the group's name. |
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
@@ -27,13 +36,22 @@ same way they reach a direct message.
 | `js/chat-socket.js` | The STOMP-over-SockJS connection to Spring's `/ws-chat`, one for `/dm` and one for each embed. |
 | `js/messages-model.js` | Pure functions: one message shape for DMs and groups, labels, roles. |
 | `js/formation-model.js` | Pure functions: the steps of forming groups. |
-| `sass/` | The `/dm` skin, scoped under `.dm`; `.dm--embed` in `_layout.scss` fits an embed into its host's column. It has no palette or scale of its own: `_tokens.scss` aliases the site's theme tokens and the shared scale in `_sass/open-coding/mixins/_variables.scss`, and no partial holds a literal colour. See [Styling under a user theme](#styling-under-a-user-theme). |
-| `tests/*.test.mjs` | Node tests: the two model files, the sidebar, the message log, the pane, the embed, and the shared composer's `enterKey` and `destroy()`. |
+| `sass/` | The `/dm` skin, scoped under `.dm`. File rows, menus and progress bars are the shared grammar (`ocs__file`, `ocs__menu`, `ocs__progress` in `_sass/open-coding/elements/`); `sass/` only places them; `.dm--embed` in `_layout.scss` fits an embed into its host's column. It has no palette or scale of its own: `_tokens.scss` aliases the site's theme tokens and the shared scale in `_sass/open-coding/mixins/_variables.scss`, and no partial holds a literal colour. See [Styling under a user theme](#styling-under-a-user-theme). |
+| `tests/*.test.mjs` | Node tests: the models, the sidebar, the message log, the pane, the embed, the Files dialog, sharing files, the shared composer's `enterKey` and `destroy()`, and `module_classes.test.mjs`, which fails if a newer module exports anything but classes. |
 | `tests/fake-dom.mjs` | A small stand-in for the browser DOM that the pane, log, embed and composer tests run on. |
 
 The modules import each other with `./` paths only. The page imports `config.js` and
 `rich-text.js` with `{{ site.baseurl }}` and passes them to `startMessagesPage`, so no
 module needs a `../` path that breaks when files move.
+
+The newer modules export classes, not loose functions, the way Java keeps `Math.random`
+with its kin on `Math`. Pure helpers are static methods on one class
+(`SharedFiles.formatBytes(size)`, `FilesMarker.extract(body)`), and anything with state or
+UI is made with `new` (`new ComposerFiles({ ... })`) and keeps its state in private fields.
+Each class and method has a JSDoc comment. The older modules (the page, the pane, the log,
+the embed, the models, the dialogs, Add to calendar's `schedule-*.js` and the push
+notifications' `notify-button.js`) keep their function exports for now: other systems
+import them by name, like the UI Builder's chat block with `mountGroupChat`.
 
 ## How a conversation works
 
@@ -67,6 +85,44 @@ module needs a `../` path that breaks when files move.
   summary carries the group counts too (`groups`, by group id), and the sidebar takes
   them from there instead of asking Spring again. `/dm` asks once itself, when the
   groups load.
+
+## Sharing files and folders
+
+In a group chat, Attach (or dropping anything on the conversation) adds files or a whole
+folder to the tray above the composer; Send uploads them, then sends the message. In a
+direct message only an image can be attached: Spring stores shared files for groups only.
+
+- **Paths.** A file from a folder keeps its folders: `team-site/css/main.css`. Spring
+  stores it at that path under the group's shared files, so the Files dialog shows the
+  folder as it was.
+- **What's left out.** `.git`, `node_modules`, `__pycache__`, `.venv`, `venv`,
+  `.ipynb_checkpoints`, `.DS_Store` and `Thumbs.db` are skipped (a dropped folder of that
+  name isn't even opened), and the tray says how many. A file over 35 MB is set aside too:
+  Spring and nginx take 50 MB bodies and base64 makes a file a third bigger. A share holds
+  at most 500 files, and at most 50 loose ones (more go in a folder).
+- **Names already taken.** A second `report.pdf` goes up as `report (2).pdf`, and a second
+  `project` folder as `project (2)`, so an older message's file isn't replaced. Send asks
+  Spring for the group's list first, because the page only hears about shares in the open
+  conversation: a list kept from earlier could miss a teammate's file of the same name.
+  Spring never writes over a shared file either: when two people share `notes.md` at the
+  same moment, the second upload is refused (409), and the page shares that file again as
+  `notes (2).md`. A refused file inside a folder is left off the message, which says so,
+  since renaming it alone would split its folder.
+- **The message.** It starts with a `[[files:…]]` marker after any reply marker:
+  `f~path~size` for a file and `d~path~count~size` for a folder, separated by `;`, with
+  `%`, `[`, `]`, `|`, `;`, `~`, `<`, `>`, `&` and control characters escaped as `%XX`.
+  The log shows each as an `ocs__file` row (Preview, Download; a folder's Open and .zip),
+  and up to four shared images as small previews. A file that fails is left off the
+  message, which says so; if the message itself fails after the upload, the next Send
+  sends it without uploading again.
+- **The socket.** Spring's `sendFileServer` frame names the file and its size but not its
+  bytes, and the page adds nothing to the log for it (the share's message lists the files);
+  it only marks the group's file list out of date.
+- **The Files dialog** (Files in a group's header, or a folder's Open) lists the group's
+  files as they are when it opens, as folders with breadcrumbs, filters by name, previews
+  (images, video, sound, PDF, the first 512 KB of text and code), downloads one file at a
+  time, and zips a folder (up to 1 GB, built in the browser). Files shared before the
+  `[[files:…]]` messages are in it too.
 
 ## Embedding a conversation
 
@@ -140,12 +196,15 @@ back the listeners the pane and its composer put on `document` and `window`, and
 | `you`, `edited`, `deleted` | You; (edited); This message was deleted. |
 | `editMessage`, `deleteMessage` | Edit message; Delete message (button labels) |
 | `imageFrom` | Image from {name} |
+| `imageMessage`, `filesMessage` | Image; Files (what a reply quotes when the message has no text) |
+| `sharedButNotSent` | Your files are shared, but the message didn’t send. Press Send to try again. |
+| `folderFiles` | {files} · {size} (a shared folder's line) |
+| `previewFile`, `downloadFile`, `openFolder`, `zipFolder` | Preview {name}; Download {name}; Open {name} in Files; Download {name} as a .zip (button labels) |
+| `imagePreview` | {name}, shared by {sender} |
 | `openImage`, `closeImage` | View image from {name} larger; Close image (the image viewer) |
 | `today`, `yesterday` | Today; Yesterday (day dividers; older days use the browser's date format) |
-| `fileShared`, `fileSharedBySomeone` | {sender} shared a file:; A file was shared: |
-| `fileGone`, `fileFailed` | {filename} is no longer shared with this group.; Could not download {filename}. Try again. |
 
-`{name}`, `{sender}` and `{filename}` are filled in. `thread.js` also has `idleTitle`,
+`{name}`, `{sender}`, `{files}` and `{size}` are filled in. `thread.js` also has `idleTitle`,
 `idleHint` and `imageUnreadable`, which only `/dm` shows.
 
 Under the embed, `createThread` takes `readOnly`, `emptyState` (`{ title, hint }`), `texts`
@@ -164,9 +223,9 @@ Things to know:
   control.
 - A DM embed marks the conversation read, as `/dm` does. A group embed leaves group unread
   counts alone, so the group stays on the navbar bell until it's opened in `/dm`.
-- An embed has no image attach and no Members or Files dialog (`createDialog` in
-  `dialogs.js` leaves a `document` listener it can't take back). A shared-file line in the
-  log still downloads the file.
+- An embed has no Attach and no Members or Files dialog (`createDialog` in `dialogs.js`
+  leaves a `document` listener it can't take back). Files shared in the group still list
+  under their message, and preview and download from there.
 - Clicking an image in an embed opens it in the log's own viewer, not a new tab. The
   viewer is built on the first click inside the embed's `.dm` root, and `destroy()` takes
   it and its Escape listener off the page, so unlike the dialogs it leaves nothing behind.
@@ -190,8 +249,13 @@ Spring:
 - `GET /api/groups/person/{personId}` (your groups), `GET /api/groups/search?name=`,
   `GET /api/groups` (Form groups only), `POST /api/groups`, `DELETE /api/groups/{id}`,
   `POST` and `DELETE /api/groups/{id}/members/{personId}`
-- `/api/groups/chat/{id}/messages` (read, send, edit, delete), `/api/groups/chat/{id}/files`,
+- `/api/groups/chat/{id}/messages` (read, send, edit, delete),
   `GET /api/groups/chat/unread`, `POST /api/groups/chat/{id}/read`
+- Shared files (spring#280): `POST /api/groups/chat/{id}/files` (`{filename, base64Data}`,
+  sent with XMLHttpRequest for its progress; 409 when that path is already shared, and 503
+  with `Retry-After` when Spring can't check S3 for the path, from spring#281), `GET /api/groups/chat/{id}/files/index` (paths,
+  sizes and who shared them, no bytes) and `GET /api/groups/chat/{id}/files/content?path=`
+  (one file's bytes)
 - STOMP over SockJS at `/ws-chat` (port 8589 on localhost)
 
 Flask, for Form groups: `POST /api/persona/evaluate-group`, `POST /api/persona/form-groups`.
@@ -255,7 +319,7 @@ because it is modal and the header would otherwise sit over its close button.
   `/dm`. The generated project Makefile copies `navigation/*.md` to
   `_posts/projects/messages/` and `js/` to `assets/js/projects/messages/`, which is where a
   host imports `conversation-embed.js` from.
-- `node --test _projects/systems/messages/tests/*.test.mjs`. The pane, log, embed and
-  composer tests run on `tests/fake-dom.mjs`, which has no layout or editing engine: how
+- `node --test _projects/systems/messages/tests/*.test.mjs`. The pane, log, embed,
+  composer and file-sharing tests run on `tests/fake-dom.mjs`, which has no layout or editing engine: how
   the embed looks, and what the browser types into the composer, still need a check in a
   browser.
