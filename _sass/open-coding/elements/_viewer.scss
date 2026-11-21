@@ -1,0 +1,20 @@
+@import "open-coding/mixins/viewer";
+
+.ocs__viewer {
+  @include viewer-toolbar;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  color: var(--pref-text-color);
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--pref-text-color) 20%, transparent);
+
+  &[hidden] { display: none; }
+  &__steps { display: flex; gap: 0.25rem; }
+  &__status { margin: 0; font-size: 0.85rem; }
+  &__actions { margin-left: auto; }
+  [aria-disabled="true"] { opacity: 0.45; cursor: default; }
+
+  @media (max-width: 600px) {
+    &__status:not(:empty) { order: 2; width: 100%; }
+  }
+}

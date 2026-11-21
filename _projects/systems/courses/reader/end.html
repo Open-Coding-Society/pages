@@ -10,7 +10,8 @@
   import { readState, writeState, selectedDocuments } from {{ '/assets/js/projects/topics/model.js' | relative_url | jsonify }};
   import { createNavigationState } from {{ '/assets/js/course-navigation-state.js' | relative_url | jsonify }};
   import { COURSE_ORDER, courseEntryUrl, rememberCourse } from {{ '/assets/js/course-entry.js' | relative_url | jsonify }};
+  import { setViewerLink } from {{ '/assets/js/pages/viewer/toolbar.js' | relative_url | jsonify }};
   startDocumentReader(document.querySelector('[data-document-reader]'), {
-    readState, writeState, selectedDocuments, createNavigationState, COURSE_ORDER, courseEntryUrl, rememberCourse
+    readState, writeState, selectedDocuments, createNavigationState, COURSE_ORDER, courseEntryUrl, rememberCourse, setViewerLink
   });
 </script>

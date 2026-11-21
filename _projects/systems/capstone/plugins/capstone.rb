@@ -150,6 +150,13 @@ module Capstone
     # Eligible to run in safe mode; run late, after higher-priority generators.
     safe true
     priority :lowest
+    VIEWER = {
+      "label" => "Capstone",
+      "item" => "project",
+      "home" => "/capstone/",
+      "activation_param" => "capstone_view",
+      "script" => "/assets/js/projects/capstone/viewer.js"
+    }.freeze
 
     # Populates the data read by the Capstone browser's Liquid template.
     #
@@ -165,13 +172,26 @@ module Capstone
     def generate(site)
       projects = Capstone.catalog(site)
       site.data["capstone_catalog"] = projects
-      game_years = site.posts.docs.filter_map do |document|
+      games = site.posts.docs.select do |document|
+        document.data["game_directory"] == true && document.data["exclude_from_games"] != true
+      end
+      game_years = games.filter_map do |document|
         year = document.data["school_year"].to_s
-        year if document.data["game_directory"] == true &&
-                document.data["exclude_from_games"] != true && !year.empty?
+        year unless year.empty?
       end
       site.data["capstone_years"] = (projects.map { |project| project["school_year"] } + game_years)
         .reject(&:empty?).uniq.sort.reverse
+      roots = (projects.map { |project| project["url"] } + games.map(&:url))
+        .map { |url| url.sub(%r{/+\z}, "") }.reject(&:empty?).uniq
+      (site.posts.docs + site.pages).each do |document|
+        path = document.url.sub(%r{/+\z}, "")
+        next unless roots.any? { |root| path == root || path.start_with?("#{root}/") }
+        existing = document.data["page_viewer"]
+        if existing && existing != VIEWER
+          raise Jekyll::Errors::FatalException, "#{document.relative_path}: page_viewer is already assigned"
+        end
+        document.data["page_viewer"] = VIEWER.dup
+      end
     end
   end
 end

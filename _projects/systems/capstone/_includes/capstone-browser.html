@@ -31,7 +31,7 @@
     {% for project in site.data.capstone_catalog %}
     {% assign project_course = project.course | default: "Other" %}
     <article class="ocs__grid-cell capstone-browser__card {{ project_course }}" data-capstone-card
-      data-course="{{ project_course | escape }}" data-year="{{ project.school_year | escape }}">
+      data-course="{{ project_course | escape }}" data-year="{{ project.school_year | escape }}" data-page-url="{{ project.url | relative_url }}">
       <a class="capstone-browser__image-link" href="{{ project.url | relative_url }}">
         {% if project.image %}
         {% assign image_prefix = project.image | slice: 0, 4 %}

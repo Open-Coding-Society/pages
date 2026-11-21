@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readerContext, readerLink, courseWeeks } from '../_projects/systems/courses/reader/js/model.js';
 import { startDocumentReader } from '../_projects/systems/courses/reader/js/browser.js';
 import { COURSE_ORDER, courseEntryUrl } from '../_projects/systems/courses/js/player/course-entry.js';
+import { setViewerLink } from '../assets/js/pages/viewer/toolbar.js';
 
 const membership = { csp: { week: 0 }, csse: { week: 1 } };
 
@@ -152,7 +153,7 @@ async function startFakeReader(t, {
   }
   await startDocumentReader(root, {
     readState: () => ({ query: '', categories: [] }), writeState: () => '',
-    selectedDocuments: shown => shown, COURSE_ORDER, courseEntryUrl, rememberCourse: course => remembered.push(course),
+    selectedDocuments: shown => shown, COURSE_ORDER, courseEntryUrl, setViewerLink, rememberCourse: course => remembered.push(course),
     // The real helper restores saved sections and opens the current path; the reader must not close any.
     createNavigationState: (_root, _course, panel, sections) => {
       const state = { panel, destroyed: false };

@@ -23,7 +23,7 @@
       <a class="ocs__btn ocs__btn--icon small accent" data-reader-toolbar-next hidden aria-label="Next document" title="Next document"><i class="fas fa-chevron-right" aria-hidden="true"></i></a>
     </nav>
     {% if page.microblog or page.team_teach and page.assignment %}
-    <button id="microblog-toggle-btn" class="ocs__btn small accent document-reader__microblog" type="button" data-reader-microblog aria-controls="microblog-panel" aria-expanded="false">Microblog</button>
+    <button id="microblog-toggle-btn" class="ocs__btn small accent document-reader__microblog" type="button" data-reader-microblog data-viewer-action aria-controls="microblog-panel" aria-expanded="false">Microblog</button>
     {% endif %}
     <p role="status" aria-live="polite" data-reader-status></p>
   </header>

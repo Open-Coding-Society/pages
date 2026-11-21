@@ -55,7 +55,9 @@ Both viewer toolbars start with the Home icon and course/context selector above
 the two panes. Course titles live in the scrolling navigation pane; course home
 pages omit the duplicate body heading. The document reader labels its navigation
 with the course title, not the current lesson week. Lesson titles and identities
-remain unchanged.
+remain unchanged. Its toolbar shares the viewer link helper in
+`assets/js/pages/viewer/toolbar.js` and the viewer toolbar mixin; course ordering
+and reader state remain owned by Courses.
 
 In the legacy fallback player, course overview pages switch courses through the
 OCS dropdown in the breadcrumb bar. It opens the selected course's home,

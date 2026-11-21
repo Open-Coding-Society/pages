@@ -40,6 +40,28 @@ test('reader Microblog button toggles the panel and keeps its expanded state in 
     assert.equal(attributes['aria-expanded'], 'false');
 });
 
+test('viewer actions keep the Microblog button visible while the panel is open', () => {
+    const start = html.indexOf('function openMicroblogPanel()');
+    const end = html.indexOf('// Guest & Mentor quick access:', start);
+    const classes = new Set();
+    const panel = { classList: {
+        add: value => classes.add(value),
+        remove: value => classes.delete(value),
+        contains: value => classes.has(value)
+    } };
+    const button = {
+        style: {},
+        hasAttribute: name => name === 'data-viewer-action',
+        setAttribute: () => {}
+    };
+    vm.runInNewContext(html.slice(start, end), {
+        microblogPanel: panel, microblogFab: button, microblogCloseBtn: {}
+    });
+    button.onclick();
+    assert.equal(classes.has('open'), true);
+    assert.notEqual(button.style.display, 'none');
+});
+
 test('page filter keeps its selection on redraw and exposes both choices as buttons', () => {
     const start = html.indexOf('const pageIcon =');
     const end = html.indexOf('// Create and Page Icons', start);

@@ -1,4 +1,5 @@
 import { matchesProject, normalizeSearch } from './model.js';
+import { SNAPSHOT_KEY, matchingFilters, readFilters, viewerUrl, writeFilters } from './viewer-model.js';
 
 const browser = document.querySelector('[data-capstone-browser]');
 if (browser) {
@@ -12,11 +13,55 @@ if (browser) {
     card,
     [...card.querySelectorAll('h3, p')].map((element) => element.textContent).join(' '),
   ]));
-  let course = new URLSearchParams(window.location.search).get('course')?.toUpperCase() || 'all';
-  let query = '';
-  let year = course === 'CSSE' ? '' : (yearSelect?.value || '');
+  const initial = readFilters(window.location.search);
+  let course = initial.course === 'all' ? 'all' : initial.course.toUpperCase();
+  let query = initial.query;
+  let year = initial.year === null ? (course === 'CSSE' ? '' : (yearSelect?.value || '')) : initial.year;
   if (!courseButtons.some((button) => button.dataset.course.toUpperCase() === course)) course = 'all';
-  if (course === 'CSSE' && yearSelect) yearSelect.value = '';
+  if (searchInput) searchInput.value = query;
+  if (yearSelect) {
+    yearSelect.value = year;
+    year = yearSelect.value;
+  }
+
+  function filters() {
+    return { course, year, query };
+  }
+
+  function updateProjectLinks() {
+    cards.forEach((card) => {
+      const page = new URL(card.dataset.pageUrl, window.location.href);
+      if (page.origin !== window.location.origin) return;
+      const path = page.pathname.replace(/\/+$/, '');
+      card.querySelectorAll('a[href]').forEach((link) => {
+        const url = new URL(link.href, window.location.href);
+        if (url.origin !== page.origin || url.pathname.replace(/\/+$/, '') !== path) return;
+        const target = viewerUrl(url.href, { ...filters(), project: path }, new URL(window.location.href));
+        if (target) {
+          link.href = target.href;
+          link.dataset.capstoneProjectLink = '';
+        }
+      });
+    });
+  }
+
+  function saveSnapshot() {
+    const projects = cards.filter((card) => !card.hidden).map((card) => {
+      const url = new URL(card.dataset.pageUrl, window.location.href);
+      return {
+        path: url.pathname.replace(/\/+$/, ''),
+        url: url.href,
+        title: card.querySelector('h3')?.textContent.trim() || 'Project',
+      };
+    });
+    try {
+      window.sessionStorage.setItem(SNAPSHOT_KEY, JSON.stringify({
+        ...filters(), projects, scrollY: window.scrollY,
+      }));
+    } catch (error) {
+      console.warn('Could not save Capstone navigation state:', error);
+    }
+  }
 
   function clearHighlights(card) {
     card.querySelectorAll('mark[data-capstone-search-mark]').forEach((mark) => {
@@ -96,11 +141,14 @@ if (browser) {
     else status.textContent = visible
       ? `${visible} ${visible === 1 ? 'project matches' : 'projects match'} "${queryText}"${filters ? ` (${filters})` : ''}.`
       : `No projects match "${queryText}"${filters ? ` (${filters})` : ''}.`;
+    const url = writeFilters(new URL(window.location.href), { course, year, query });
+    window.history.replaceState(window.history.state, '', url);
+    updateProjectLinks();
   }
 
-  function selectCourse(nextCourse) {
+  function selectCourse(nextCourse, resetYear = true) {
     course = nextCourse;
-    if (course === 'CSSE' && yearSelect) {
+    if (resetYear && course === 'CSSE' && yearSelect) {
       yearSelect.value = '';
       year = '';
     }
@@ -128,10 +176,32 @@ if (browser) {
     query = searchInput.value;
     applyFilters();
   });
-  selectCourse(course);
+  browser.addEventListener('click', (event) => {
+    if (event.target.closest('a[data-capstone-project-link]')) saveSnapshot();
+  });
+  browser.addEventListener('auxclick', (event) => {
+    if (event.target.closest('a[data-capstone-project-link]')) saveSnapshot();
+  });
+  browser.addEventListener('contextmenu', (event) => {
+    if (event.target.closest('a[data-capstone-project-link]')) saveSnapshot();
+  });
+  selectCourse(course, false);
   window.addEventListener('pageshow', () => {
     query = searchInput?.value || '';
     year = yearSelect?.value || '';
     applyFilters();
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('capstone_return')) {
+      url.searchParams.delete('capstone_return');
+      window.history.replaceState(window.history.state, '', url);
+      try {
+        const snapshot = JSON.parse(window.sessionStorage.getItem(SNAPSHOT_KEY));
+        if (matchingFilters(snapshot, filters()) && Number.isFinite(snapshot.scrollY)) {
+          window.requestAnimationFrame(() => window.scrollTo(0, snapshot.scrollY));
+        }
+      } catch (error) {
+        console.warn('Could not restore Capstone navigation state:', error);
+      }
+    }
   });
 }

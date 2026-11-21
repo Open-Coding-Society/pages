@@ -113,7 +113,7 @@ const microblogCloseBtn = document.getElementById('microblog-close-btn');
 function openMicroblogPanel() {
   microblogPanel.classList.add('open');
   microblogFab.setAttribute('aria-expanded', 'true');
-  if (!microblogFab.hasAttribute('data-reader-microblog')) microblogFab.style.display = 'none';
+  if (!microblogFab.hasAttribute('data-reader-microblog') && !microblogFab.hasAttribute('data-viewer-action')) microblogFab.style.display = 'none';
 }
 function closeMicroblogPanel() {
   microblogPanel.classList.remove('open');

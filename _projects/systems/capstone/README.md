@@ -34,6 +34,19 @@ and team text. `?course=CSSE` continues to select the complete CSSE game
 catalog. Game-directory posts remain authored by their game project and are
 added through the shared `capstone-games.html` include.
 
+Opening a project from the grid shows a lightweight viewer bar without replacing
+its layout. Back to Capstone restores the course, year, search, and session scroll
+position; previous and next follow the filtered card order, including CSSE games.
+The bar stays on same-origin links below the project's URL. Other navigation and
+external links are unchanged. The filtered card list is kept in session storage:
+when it is unavailable (for example, in a shared link opened in another browser),
+the return link retains the filters and explains how to restore previous/next.
+Microblog appears in the bar only on pages that already enable it. The generator
+opts catalog projects, game-directory pages, and their URL descendants into
+the shared page viewer; other pages do not load its toolbar. The generic shell
+and toolbar are shared with other applications, while the filtered-project
+navigation remains in this project.
+
 Create/Edit buttons were removed because creating a project only stored a
 session-scoped draft and editing had no save operation. Published entries are
 now edited in the source post and deployed with the site.

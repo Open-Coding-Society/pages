@@ -1,5 +1,6 @@
 require "minitest/autorun"
 require "jekyll"
+require "sass"
 require_relative "../plugins/capstone"
 
 class CapstoneTest < Minitest::Test
@@ -61,6 +62,39 @@ class CapstoneTest < Minitest::Test
     error = assert_raises(Jekyll::Errors::FatalException) { Capstone.catalog(site) }
 
     assert_includes error.message, "unique URLs"
+  end
+
+  def test_viewer_styles_apply_outside_the_directory
+    source = File.read(File.expand_path("../../../../_sass/open-coding/elements/_viewer.scss", __dir__))
+    css = Sass::Engine.new(source, syntax: :scss, load_paths: [File.expand_path("../../../../_sass", __dir__)]).render
+
+    assert_match(/(?:^|\n)\.ocs__viewer \{[^}]*display: flex;/m, css)
+    assert_match(/\.ocs__viewer\[hidden\] \{\s*display: none;/, css)
+  end
+
+  def test_viewer_is_opted_in_for_catalog_projects_their_descendants_and_games
+    project = document("Presence", "/capstone/presence/", { "course" => "CSH" })
+    child = document("Phase", "/capstone/presence/phases/", nil)
+    unrelated = document("Other", "/capstone/presence-other/", nil)
+    game = document("Game", "/games/game/", nil, "game_directory" => true)
+    game_child = document("Guide", "/games/game/guide/", nil)
+    excluded = document("Excluded", "/games/excluded/", nil, "game_directory" => true, "exclude_from_games" => true)
+    site = Site.new(posts: Posts.new([project, child, unrelated, game, game_child, excluded]), pages: [], data: {})
+
+    Capstone::Generator.new.generate(site)
+
+    [project, child, game, game_child].each do |entry|
+      assert_equal "/assets/js/projects/capstone/viewer.js", entry.data.dig("page_viewer", "script")
+    end
+    [unrelated, excluded].each { |entry| refute entry.data.key?("page_viewer") }
+  end
+
+  def test_viewer_does_not_replace_another_applications_viewer
+    project = document("Presence", "/capstone/presence/", { "course" => "CSH" }, "page_viewer" => { "label" => "Other" })
+    site = Site.new(posts: Posts.new([project]), pages: [], data: {})
+
+    error = assert_raises(Jekyll::Errors::FatalException) { Capstone::Generator.new.generate(site) }
+    assert_includes error.message, "page_viewer is already assigned"
   end
 
   private

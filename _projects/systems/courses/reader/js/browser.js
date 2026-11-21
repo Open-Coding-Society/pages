@@ -2,7 +2,7 @@ import { readerContext, readerLink, courseWeeks } from './model.js';
 
 export async function startDocumentReader(root, tools) {
   if (!root) return;
-  const { readState, writeState, selectedDocuments, createNavigationState, COURSE_ORDER, courseEntryUrl, rememberCourse } = tools;
+  const { readState, writeState, selectedDocuments, createNavigationState, COURSE_ORDER, courseEntryUrl, rememberCourse, setViewerLink } = tools;
   const membership = JSON.parse(root.dataset.membership);
   const base = root.dataset.baseurl;
   const identity = root.dataset.documentUrl;
@@ -332,7 +332,6 @@ export async function startDocumentReader(root, tools) {
       const button = root.querySelector(`[data-reader-toolbar-${hook}]`);
       const available = Boolean(document);
       link.hidden = !available;
-      button.hidden = !available;
       if (available) {
         const href = document.href || readerLink(document.url, base, context, context.course ? '' : writeState(topics));
         link.replaceChildren(...(hook === 'previous'
@@ -341,11 +340,9 @@ export async function startDocumentReader(root, tools) {
         const description = document.resume ? `Continue reading: ${document.title}` : `${label} document: ${document.title}`;
         link.setAttribute('aria-label', description);
         link.href = href;
-        button.href = href;
-        button.setAttribute('aria-label', description);
-        button.title = `${label}: ${document.title}`;
+        setViewerLink(button, { href, label: description, title: `${label}: ${document.title}` }, { hideWhenUnavailable: true });
       } else {
-        button.removeAttribute('href');
+        setViewerLink(button, null, { hideWhenUnavailable: true });
       }
     }
     updateCompletion();
