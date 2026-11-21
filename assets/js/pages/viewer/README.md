@@ -8,6 +8,13 @@ uses the helper inside its reader; each application owns its own navigation,
 URLs, and state. `open-coding/mixins/_viewer.scss` provides their common toolbar
 layout.
 
+`section-navigation.js` supports a sidebar hub whose pages show one section at
+a time. `followSectionHash` opens the section named by the URL and marks the
+current sidebar links, with an optional access check. The host owns the pages,
+sidebar markup, section rendering, and authorization. Grades uses the shared
+`aesthetihawk` layout for its sidebar and phone menu; navigating to another
+page still follows a normal link.
+
 For a standalone viewer, set `page_viewer` on eligible pages with `label`,
 `item`, `home`, `activation_param`, and `script`. The site shell includes
 `_includes/page-viewer.html` only for those pages. When the activation query

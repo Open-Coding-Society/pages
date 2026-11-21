@@ -164,7 +164,7 @@ active_tab: submissions
         applyGradingState, canPetition, clearManualGrade, filePetition, gradePills, hasManualOverride, isFinal,
         parseGradeInput, readGradingResponse, requestAiRegrade, saveManualGrade, showGradingHistory
     } from '{{ site.baseurl }}/assets/js/submissions/grading.js';
-    import { followSectionHash } from '{{ site.baseurl }}/assets/js/grades/page-sections.js';
+    import { followSectionHash } from '{{ site.baseurl }}/assets/js/pages/viewer/section-navigation.js';
 
     const apiUrl = `${javaURI}/api/assignment-submission-view/list`;
     const userInfoUrl = `${javaURI}/api/assignment-submission-view/user-info`;

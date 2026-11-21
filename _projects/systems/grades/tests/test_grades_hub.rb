@@ -3,6 +3,9 @@
 # top nav lists the hub; every section the Grades sidebar lists exists too. Run: bundle exec ruby scripts/test_grades_hub.rb
 require "minitest/autorun"
 require "yaml"
+require "jekyll"
+require "tmpdir"
+require "fileutils"
 
 class GradesHubTest < Minitest::Test
   ROOT = File.expand_path("../../../..", __dir__)
@@ -88,5 +91,35 @@ class GradesHubTest < Minitest::Test
     nav = YAML.load_file(File.join(ROOT, "_config.yml")).dig("minima", "nav_pages")
     assert_includes nav, "navigation/grades.html"
     refute_nil pages_by_permalink["/grades"], "navigation/grades.html serves /grades/"
+  end
+
+  def test_hub_layout_has_no_project_nudge_or_empty_title_row
+    Dir.mktmpdir("grades-layout-") do |source|
+      FileUtils.mkdir_p(File.join(source, "_layouts"))
+      FileUtils.mkdir_p(File.join(source, "_includes/aesthetihawk"))
+      FileUtils.mkdir_p(File.join(source, "_includes/themes/minima"))
+      FileUtils.cp(File.join(ROOT, "_layouts/aesthetihawk.html"), File.join(source, "_layouts"))
+      %w[header-shared.html sidebar.html sidebar-list.html].each do |name|
+        FileUtils.cp(File.join(ROOT, "_includes/aesthetihawk", name), File.join(source, "_includes/aesthetihawk"))
+      end
+      File.write(File.join(source, "_includes/themes/minima/header.html"), "<header>Header</header>")
+      File.write(File.join(source, "grades.html"), "---\nlayout: aesthetihawk\ntitle: Grades\nsidebar: grades_sidebar\n---\n<p>Grades content</p>\n")
+      File.write(File.join(source, "profile.html"), "---\nlayout: aesthetihawk\ntitle: Profile\n---\n<p>Profile content</p>\n")
+      FileUtils.cp(File.join(ROOT, "navigation/toolkit/bathroom_pass.md"), File.join(source, "bathroom_pass.md"))
+      site = Jekyll::Site.new(Jekyll.configuration(
+        "source" => source, "destination" => File.join(source, "_site"),
+        "layouts_dir" => File.join(source, "_layouts"), "includes_dir" => File.join(source, "_includes"),
+        "config" => [], "plugins_dir" => [], "quiet" => true
+      ))
+      site.process
+      grades = File.read(File.join(source, "_site/grades.html"))
+      profile = File.read(File.join(source, "_site/profile.html"))
+      bathroom = site.pages.find { |page| page.name == "bathroom_pass.md" }.output
+      [grades, profile, bathroom].each { |page| refute_includes page, "Got thoughts on a project?" }
+      assert_includes grades, '<h1 class="ocs__hub-viewer-title">Grades</h1>'
+      assert_includes bathroom, '<h2 class="ocs__bathroompass-v2-title">'
+      refute_includes grades, "mt-[53px]"
+      refute_includes grades, "justify-between items-center mb-8"
+    end
   end
 end

@@ -32,7 +32,8 @@ item's `id` matches the `active_tab` of the page it highlights.
 Analytics Dashboard, Retrospective and Submissions have no tab bar. The sidebar
 lists each one's sections under it, indented as an `ocs__tree` (`children` in
 `data/grades_sidebar.yml`), and each links to `page#section`. The page shows the
-section the hash names and marks its link (`js/page-sections.js`). All Submissions
+section the hash names and marks its link using the shared
+`assets/js/pages/viewer/section-navigation.js`. All Submissions
 is marked for teachers; anyone else who opens it stays on My Submissions.
 
 ## Phones
@@ -56,7 +57,7 @@ get it too.
 | `_includes/submissions/creator-dashboard.html` | `_includes/submissions/` | the Assignments You Created / Teacher Dashboard section |
 | `js/analytics/` | `assets/js/analytics/` | sprint and forecast retrospectives, grade calculator |
 | `js/ocs-analytics-dashboard.js` | `assets/js/` | the OCS Analytics section |
-| `js/page-sections.js` | `assets/js/grades/` | opens the section the URL hash names and marks its sidebar link |
+| `js/page-sections.js` | `assets/js/grades/` | compatibility re-export for cached pages; the implementation is in the shared viewer |
 | `js/submissions/` | `assets/js/submissions/` | `grading.js` and `creator-dashboard.js` |
 | `sass/` | `_sass/open-coding/` | the pages' styles, imported in `_sass/open-coding/_main.scss` |
 

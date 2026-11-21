@@ -14,9 +14,9 @@ active_tab: bathroom_pass
 <div class="ocs__bathroompass-v2-page">
     <!-- Header Section -->
     <div class="ocs__bathroompass-v2-header">
-        <h1 class="ocs__bathroompass-v2-title">
+        <h2 class="ocs__bathroompass-v2-title">
             BATHROOM PASS
-        </h1>
+        </h2>
     </div>
 
     <div class="ocs__bathroompass-v2-grid">

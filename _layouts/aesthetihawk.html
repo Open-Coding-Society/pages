@@ -25,7 +25,7 @@
     <!-- navbar -->
     {%- include aesthetihawk/header-shared.html -%}
 
-    <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased mt-[53px] theme-inner">
+    <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased theme-inner">
 
         <!-- Sidebar -->
         <div class="fixed left-0 top-[53px] w-64 h-full border-r flex flex-col max-[768px]:hidden lesson-sidebar">
@@ -63,9 +63,7 @@
                 {%- include aesthetihawk/sidebar.html id_prefix="phone-" -%}
             </details>
 
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-2xl font-bold">{{page.title}}</h1>
-            </div>
+            <h1 class="ocs__hub-viewer-title">{{ page.title }}</h1>
 
             {{ content }}
         </div>

@@ -80,56 +80,6 @@
     pointer-events: auto;
 }
 
-.site-toast-wrap {
-    position: fixed;
-    top: 18px;
-    right: 18px;
-    z-index: 99999;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
-}
-
-.site-toast {
-    pointer-events: auto;
-    background: var(--navbar-surface);
-    color: var(--pref-text-color);
-    border: 1px solid var(--navbar-border);
-    padding: 10px 14px;
-    border-radius: 8px;
-    box-shadow: 0 10px 30px var(--navbar-shadow);
-    display: inline-flex;
-    gap: 12px;
-    align-items: center;
-    max-width: 340px;
-    transform: translateX(18px);
-    opacity: 0;
-    transition: transform 320ms cubic-bezier(.2, .9, .3, 1), opacity 320ms ease;
-    font-size: 14px;
-}
-
-.site-toast.show {
-    transform: translateX(0);
-    opacity: 1;
-}
-
-.site-toast .toast-close {
-    margin-left: auto;
-    background: transparent;
-    border: none;
-    color: var(--navbar-muted);
-    font-size: 14px;
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 6px;
-}
-
-.site-toast .toast-close:hover {
-    color: var(--pref-text-color);
-    background: color-mix(in srgb, var(--pref-accent-color) 12%, transparent);
-}
-
 @media (max-width: 680px) {
     .project-tooltip {
         right: 12px;
@@ -142,16 +92,5 @@
 
     .project-tooltip.visible {
         transform: translateY(0);
-    }
-
-    .site-toast-wrap {
-        right: 12px;
-        left: 12px;
-        top: 12px;
-        align-items: center;
-    }
-
-    .site-toast {
-        max-width: 96%;
     }
 }

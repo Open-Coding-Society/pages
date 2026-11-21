@@ -30,7 +30,7 @@ active_tab: retrospective
 <script type="module">
     import { initSprintReflection, initGrowthOverTime } from '{{ site.baseurl }}/assets/js/analytics/sprint-retrospective.js';
     import { initForecastRetrospective, refreshForecastRetrospective } from '{{ site.baseurl }}/assets/js/analytics/forecast-retrospective.js';
-    import { followSectionHash } from '{{ site.baseurl }}/assets/js/grades/page-sections.js';
+    import { followSectionHash } from '{{ site.baseurl }}/assets/js/pages/viewer/section-navigation.js';
 
     // Each panel loads the first time it opens; the forecast panel refreshes on every visit
     // because Smart Predict on the analytics dashboard may have logged a forecast since.

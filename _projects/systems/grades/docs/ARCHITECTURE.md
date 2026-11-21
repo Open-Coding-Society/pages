@@ -44,7 +44,8 @@ have no tab bar. The sidebar lists an item's `children` under it as an `ocs__tre
 
 Each child links to `url#section`, and the hub links the same way
 (`/analytics-dashboard#grade`). On the page, every section element carries
-`data-section="<name>"`, and `js/page-sections.js` does the rest:
+`data-section="<name>"`, and the shared
+`assets/js/pages/viewer/section-navigation.js` does the rest:
 
 1. `followSectionHash(names, show, canOpen)` calls the page's `show(name)` for the
    section `location.hash` names, then again on every `hashchange`. A sidebar click
@@ -56,6 +57,10 @@ Each child links to `url#section`, and the hub links the same way
    links, so `markSidebarSection` sets `aria-current` on the shown one, in both
    the side column and the phone menu. Tailwind's `aria-[current=true]:` classes
    highlight it.
+
+The old `assets/js/grades/page-sections.js` URL re-exports these functions for
+cached pages. Navigation between different pages remains ordinary links; the
+shared module handles sections within a page.
 
 Each page still checks the viewer's role itself; the hub and the sidebar only label
 teacher links (`audience`). For teachers, `creator-dashboard.js` renames the

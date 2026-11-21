@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { followSectionHash, markSidebarSection, sectionForHash } from "../js/page-sections.js";
+import { followSectionHash, markSidebarSection, sectionForHash } from "../../../../assets/js/pages/viewer/section-navigation.js";
 
 const SECTIONS = ["sprint", "growth", "forecast"];
 
