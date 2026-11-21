@@ -3,14 +3,17 @@
 <section class="topics-browser" data-topics-browser data-course-context="{{ topics_course_context }}" data-initial-category="{{ page.lesson_category | downcase | escape }}" data-index-url="{{ '/assets/js/projects/topics/data.json' | relative_url }}" data-unit-names="{{ site.data.projects.topics.topics_units | jsonify | escape }}">
   <div class="ocs__split ocs__split--aside">
     <aside class="ocs__stack" aria-label="Browse topics">
-      <h2>Topics</h2>
+      <header class="topics-browser__header">
+        <h2>Topics</h2>
+        <label class="topics-browser__accessible-label" for="topics-view">View</label>
+        <select class="ocs__input" id="topics-view"><option value="list">Compact list</option><option value="cards">Cards</option></select>
+      </header>
       <div class="topics-browser__search-input">
         <label class="topics-browser__accessible-label" for="topics-query">Search</label>
         <input class="ocs__input" id="topics-query" type="search" placeholder="Search every lesson" autocomplete="off" disabled>
-        <button type="button" class="ocs__btn small accent" data-topics-search-clear disabled>Clear Search</button>
+        <button type="button" class="ocs__btn topics-browser__search-clear" data-topics-search-clear aria-label="Clear search" aria-controls="topics-query" disabled>&#215;</button>
       </div>
       <section aria-label="Topic filters">
-        <h3>Topic Filters</h3>
         <div class="topics-browser__filters" id="topics-filters" role="group" aria-label="Topic and category filters">
           <details class="topics-browser__category-disclosure" data-topics-primary open>
             <summary><h3>Topic Filter</h3></summary>
@@ -18,7 +21,6 @@
               <button type="button" class="ocs__btn small accent fill" value="or" aria-pressed="true" title="Show documents in any checked topic" disabled>OR: any</button>
               <button type="button" class="ocs__btn small accent" value="and" aria-pressed="false" title="Show only documents in every checked topic" disabled>AND: all</button>
             </p>
-            <p class="topics-browser__filter-help">OR matches any selected key topic. AND requires all selected key topics. More categories match any selection and narrow the results.</p>
             <fieldset class="topics-browser__categories topics-browser__primary">
               <legend class="topics-browser__accessible-label">Topic Filter</legend>
               {% for category in site.data.topics_primary_categories %}
@@ -37,10 +39,6 @@
           </details>
           <button type="button" class="ocs__btn small accent" data-topics-clear aria-controls="topics-filters" disabled>Clear Filters</button>
         </div>
-        <p class="topics-browser__actions">
-          <label for="topics-view">View</label>
-          <select class="ocs__input" id="topics-view"><option value="list">Compact list</option><option value="cards">Cards</option></select>
-        </p>
       </section>
     </aside>
     <div class="ocs__stack">

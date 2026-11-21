@@ -115,8 +115,10 @@ loaded through relative includes is not expanded into the search text.
 
 The [browser include](../_includes/topics-browser.html) is a full-width page
 with a sidebar (`ocs__split--aside`): Search and the two visible checkbox
-groups, Topic Filter and More Categories. More Categories orders all remaining
-categories by document count, with alphabetical ties. The landing shows topic
+groups, Topic Filter and More Categories. More Categories shows categories with
+at least five documents, ordered by count with alphabetical ties. An already
+selected category below the threshold remains visible for clearing; search
+indexes category names as well as document text. The landing shows topic
 sections with unit cards and scrollable lesson lists; each lesson is a dropdown with its full
 description and an Open lesson link, and quizzes and FRQ practice sit in the
 unit's Practice row. Units come from lesson titles; their optional names come
@@ -126,11 +128,11 @@ from [`topics_units.yml`](../data/topics_units.yml). Layout details are in the
 Topic Filters holds the two disclosures, both open by default. Topic Filter starts with its OR/AND pair:
 `ocs__btn` buttons in an `ocs__links` group, the current choice filled and
 `aria-pressed`, disabled until the search index loads. Clear Filters belongs to
-that box and clears only category selections. Search has its own clear control.
+that box and clears only category selections. Search has an in-field clear control.
 Each clear button is dimmed and disabled when its corresponding state is empty.
 
 The [browser controller](../js/browser.js) builds a Lunr index in the client
-from the static catalog. Title, description and content participate in search,
+from the static catalog. Title, description, content and category names participate in search,
 with title matches boosted. User input is tokenized as terms rather than
 interpreted as Lunr query syntax.
 

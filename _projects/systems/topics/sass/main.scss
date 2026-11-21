@@ -13,7 +13,14 @@
     padding: 0.75rem;
     min-width: 0;
   }
-  &__filter-help { font-size: 0.85rem; color: var(--text-muted); }
+  &__header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    h2 { margin: 0; }
+    select { flex: 1 1 8rem; min-width: 0; width: auto; }
+  }
   &__unit-lessons {
     max-height: 20rem;
     overflow-y: auto;
@@ -23,10 +30,23 @@
     h2 { margin-top: 0; }
   }
   &__search-input {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    input { box-sizing: border-box; flex: 1 1 16rem; width: 100%; min-width: 0; }
+    position: relative;
+    input.ocs__input { width: 100%; min-width: 0; padding-right: 3rem; }
+    input::-webkit-search-cancel-button { -webkit-appearance: none; }
+  }
+  &__search-clear.ocs__btn {
+    position: absolute;
+    top: 50%;
+    right: 0.25rem;
+    transform: translateY(-50%);
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--pref-text-color);
+    font-size: 1.4rem;
+    &:hover { transform: translateY(-50%); }
   }
   &__count { font-size: inherit; font-weight: inherit; }
   &__categories {
@@ -46,12 +66,11 @@
     height: auto;
     min-height: 2rem;
     input { flex-shrink: 0; }
+    &[hidden] { display: none; }
   }
-  &__actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+  &__category-chips {
+    max-height: none;
+    overflow: visible;
   }
   &__category-disclosure {
     summary { cursor: pointer; padding: 0.5rem 0; }
@@ -90,6 +109,24 @@
     &[hidden] { display: none; }
   }
   &__metadata { font-size: 0.85rem; }
+  &__practice .ocs__btn {
+    max-width: 100%;
+    height: auto;
+    min-height: 2rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  [data-topics-body-results] .ocs__nav-card > span {
+    max-width: 100%;
+    min-width: 0;
+  }
+  [data-topics-body-results] .ocs__status {
+    display: inline-block;
+    box-sizing: border-box;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
   &--list &__results { grid-template-columns: 1fr; }
 }
 

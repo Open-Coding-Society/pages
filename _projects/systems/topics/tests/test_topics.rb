@@ -115,8 +115,8 @@ class TopicsTest < Minitest::Test
       assert_includes browser, "Java Algorithms"
       assert_includes browser, "/preview/java/algorithms/?context=topics"
       assert_includes browser, '<h2>Topics</h2>'
-      assert_includes browser, '<h3>Topic Filters</h3>'
-      assert_includes browser, 'OR matches any selected key topic'
+      refute_includes browser, '<h3>Topic Filters</h3>'
+      refute_includes browser, 'OR matches any selected key topic'
       refute_includes browser, 'data-topics-overview'
       assert_includes browser, '<summary><h3>Topic Filter</h3></summary>'
       assert_includes browser, '<summary><h3>More Categories</h3></summary>'
@@ -139,11 +139,13 @@ class TopicsTest < Minitest::Test
       filter_box = browser.split('id="topics-filters"', 2).last.split('</div>', 2).first
       assert_includes filter_box, 'data-topics-clear'
       assert_match(/<button[^>]*data-topics-clear[^>]*\bdisabled\b/, filter_box)
-      assert_includes browser, '<label for="topics-view">View</label>'
-      assert_operator browser.index('id="topics-query"'), :<, browser.index('id="topics-view"')
+      assert_includes browser, '<label class="topics-browser__accessible-label" for="topics-view">View</label>'
+      assert_operator browser.index('id="topics-view"'), :<, browser.index('id="topics-query"')
       assert_operator browser.index('data-topics-clear'), :<, browser.index('data-topics-results')
       assert_includes browser, 'aria-controls="topics-filters"'
       assert_includes browser, 'data-topics-search-clear'
+      assert_includes browser, 'aria-label="Clear search"'
+      refute_includes browser, '>Clear Search</button>'
       assert_includes browser, 'data-topics-title-count'
       assert_includes browser, 'data-topics-body-count'
       %w[sass python java javascript flask spring cs111 cs112 cs113].each do |category|

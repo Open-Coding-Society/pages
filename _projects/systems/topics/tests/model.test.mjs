@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { filterGroups, selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, categoriesByCount, unitOf, unitGroups, isPractice } from '../js/model.js';
+import { filterGroups, selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, categoriesByCount, showMoreCategory, createSearchIndex, unitOf, unitGroups, isPractice } from '../js/model.js';
 
 const require = createRequire(import.meta.url);
 const lunr = require('../../../../assets/js/vendor/lunr.min.js');
@@ -39,6 +39,23 @@ test('more categories retain all options, ordered by count with stable ties', ()
   assert.deepEqual(categoriesByCount(categories, new Map([['arrays', 2], ['classes', 4], ['loops', 2]])),
     ['classes', 'arrays', 'loops', 'other']);
   assert.deepEqual(categories, ['arrays', 'classes', 'loops', 'other']);
+});
+
+test('more categories show five or more documents and retain selected older links', () => {
+  assert.equal(showMoreCategory(4, false), false);
+  assert.equal(showMoreCategory(5, false), true);
+  assert.equal(showMoreCategory(4, true), true);
+});
+
+test('search finds a document by a low-count category even when its text does not mention it', () => {
+  const docs = [{
+    url: '/example/', title: 'Charts', description: 'Introduction', content: 'Graphs',
+    categories: ['visualization'], labels: ['Visualization'],
+  }];
+  const index = createSearchIndex(lunr, docs);
+  const groups = groupedMatches(docs, [], index.search('visualization'), any);
+  assert.deepEqual(groups.body.map((match) => match.document.url), ['/example/']);
+  assert.deepEqual(docs[0].categories, ['visualization']);
 });
 
 test('AND requires every checked topic; categories stay alternatives that narrow', () => {

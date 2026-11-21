@@ -138,6 +138,22 @@ export function categoriesByCount(categories, counts) {
   return [...categories].sort((a, b) => (counts.get(b) || 0) - (counts.get(a) || 0));
 }
 
+export function showMoreCategory(count, selected) {
+  return count >= 5 || selected;
+}
+
+export function createSearchIndex(lunr, documents) {
+  return lunr(function () {
+    this.ref('url');
+    this.field('title', { boost: 10 });
+    this.field('description', { boost: 3 });
+    this.field('content');
+    this.field('categories');
+    this.metadataWhitelist = ['position'];
+    documents.forEach((document) => this.add({ ...document, categories: document.labels.join(' ') }));
+  });
+}
+
 // Lesson titles name their unit: "1.01 Variables", "Unit 2 Quiz" or
 // "MCQ1 - Unit 1 Quiz". A year such as "2016 FRQ 3" is not a unit, so a bare
 // number needs the ".01" part.

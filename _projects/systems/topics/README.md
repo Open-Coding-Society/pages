@@ -34,8 +34,8 @@ JavaScript, Flask, Spring, CS111, CS112 and CS113.
 `/topics/` sets `full_width: true` (the base layout's existing full-width rule)
 and lays out with `ocs__split ocs__split--aside`, one column on phones:
 
-- **Sidebar:** Search; the key Topic Filter with OR/AND controls; and More
-  Categories, a scrollable list of checkbox buttons ordered by document count.
+- **Sidebar:** a view selector beside Topics, Search with an in-field clear
+  button, the key Topic Filter with OR/AND controls, and More Categories.
 - **Landing and filtered browsing:** topic sections containing an
   `ocs__grid--col2` of unit cards with scrollable lesson lists. A lesson's
   unit comes from its title ("1.01 …", "Unit 2 Quiz"); lessons without one go to
@@ -48,11 +48,13 @@ and lays out with `ocs__split ocs__split--aside`, one column on phones:
 
 Topic Filters keeps the original controls. Topic Filter, expanded by default,
 holds the primary topics with the OR/AND buttons; More Categories, also expanded
-by default, holds every remaining category. Both are multi-select with document
-counts. More Categories keeps all options rather than limiting the list to
-the largest twelve; equal counts retain alphabetical order.
+by default, lists remaining categories with at least five documents, ordered by
+count with alphabetical ties. An already-selected category below five stays
+visible so a shared or older filter link can be cleared. Both groups are
+multi-select with document counts; search also indexes category names, so
+documents in less common categories remain discoverable.
 Clear Filters clears only topic/category selections, not the OR/AND choice;
-Clear Search clears only the query. Each clear button is dimmed and disabled when
+The search X clears only the query. Each clear button is dimmed and disabled when
 its corresponding selection is empty. The View selector (Compact list, the
 default, or Cards; `?view=cards`) picks lesson dropdowns or cards inside units.
 Both boxes filter `categories`; YAML controls prominence,
@@ -70,7 +72,8 @@ Topics does not infer a language or college course from `lesson_language`,
 One filtered collection powers browsing and Lunr full-text search. Without a
 query, documents appear as cards or a list. With a query, highlighted title
 matches appear as primary cards, followed by Text matches as `ocs__nav-card` links:
-the source file name, the document title, a highlighted body/description excerpt
+the source file name, the document title, a body/description excerpt highlighted
+when it contains the match,
 and its categories as `ocs__status` chips (primary topics first; course-hosted
 browsers add the document's weeks). Converted
 notebooks and Word documents show their original `.ipynb`/`.docx` name. Long

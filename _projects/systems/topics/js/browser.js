@@ -1,4 +1,4 @@
-import { selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, categoriesByCount, unitGroups } from './model.js';
+import { selectedDocuments, readState, writeState, groupedMatches, highlightedParts, resultDetails, wrappableParts, topicGroups, categoryCounts, categoriesByCount, showMoreCategory, createSearchIndex, unitGroups } from './model.js';
 import { SNAPSHOT_KEY, readSnapshot, orderedDocuments } from './viewer-model.js';
 
 const root = document.querySelector('[data-topics-browser]');
@@ -131,7 +131,7 @@ if (root) {
       card.append(list);
     }
     if (practice.length) {
-      const row = element('p', 'ocs__links');
+      const row = element('p', 'ocs__links topics-browser__practice');
       row.append(element('strong', '', 'Practice'));
       practice.forEach((item) => {
         const link = element('a', 'ocs__btn small accent', item.title);
@@ -167,8 +167,8 @@ if (root) {
       .forEach((category) => fieldset.append(labelsByCategory.get(category)));
   }
 
-  function headingText(searching) {
-    if (searching) return `Results for “${state.query.trim()}”`;
+  function headingText(searching, count) {
+    if (searching) return `Results for “${state.query.trim()}” (${count})`;
     if (!state.categories.length) return 'All topics';
     return chosenCategory() ? labels.get(chosenCategory()) : 'Filtered lessons';
   }
@@ -177,6 +177,9 @@ if (root) {
     query.value = state.query;
     view.value = state.view;
     filters.forEach((filter) => { filter.checked = state.categories.includes(filter.value); });
+    secondaryFilters.forEach((filter) => {
+      filter.closest('label').hidden = !showMoreCategory(counts.get(filter.value) || 0, filter.checked);
+    });
     showMatch();
     const rule = { primary, match: state.match };
     const searching = Boolean(state.query.trim());
@@ -196,7 +199,6 @@ if (root) {
       highlight(link, document.title, titlePositions.get(document.url) || []);
       link.href = contextLink(document);
     });
-    heading.textContent = headingText(searching);
     // Park every card in the flat grid first so rebuilt sections never drop one.
     flatGrid.append(...cards);
     flat.hidden = !searching;
@@ -240,7 +242,9 @@ if (root) {
       bodyResults.append(link);
     }
     const count = selected.length + (searching ? groups.body.length : 0);
-    status.textContent = count ? `${count} lessons` : 'No lessons match these filters and search.';
+    heading.textContent = headingText(searching, count);
+    status.classList.toggle('topics-browser__accessible-label', searching && count > 0);
+    status.textContent = count ? `${count} ${searching ? 'results' : 'lessons'}` : 'No lessons match these filters and search.';
   }
 
   function saveViewerState() {
@@ -298,14 +302,7 @@ if (root) {
       if (!response.ok) throw new Error(`Topics index HTTP ${response.status}`);
       documents = await response.json();
       if (!window.lunr) throw new Error('Lunr is unavailable');
-      index = window.lunr(function () {
-        this.ref('url');
-        this.field('title', { boost: 10 });
-        this.field('description', { boost: 3 });
-        this.field('content');
-        this.metadataWhitelist = ['position'];
-        documents.forEach((document) => this.add(document));
-      });
+      index = createSearchIndex(window.lunr, documents);
       counts = categoryCounts(documents);
       query.disabled = false;
       showFilterCounts();
