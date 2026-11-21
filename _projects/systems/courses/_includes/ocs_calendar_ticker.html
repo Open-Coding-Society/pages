@@ -9,24 +9,30 @@
     title    the bar's label                    default: "Coming up"
 
   The bar starts empty and hidden. CalendarTicker (assets/js/chat/calendar/calendar-ticker.js)
-  asks Spring's calendar for the course's events from today through the fifth school day after
-  it and fills the bar. With nothing to show (signed out, or nothing coming up) it stays hidden.
-  On a site without Spring (spring: false) this include writes nothing, so nothing asks Spring.
+  asks Spring's calendar for the course's events and fills the bar: from today through the
+  look-ahead in _config.yml's calendar_ticker (school_days_ahead, or days_ahead without school
+  weeks), and earlier for an event whose own alert has started (at most alert_limit_days ahead).
+  A site without calendar_ticker gets 5, 7 and 30. With nothing to show (signed out, or nothing
+  coming up) it stays hidden. On a site without Spring (spring: false) this include writes
+  nothing, so nothing asks Spring.
 
   It is the ocs__ticker grammar (_sass/open-coding/elements/ticker) with no CSS of its own: the
   bar stays still unless its items don't fit on one row. [hidden] sits on a plain wrapper,
   because ocs__ticker sets display, which beats [hidden]. The school weeks
   (ocs_calendar_card_data.html) and the start-up script go on the page once.
 
-  The Calendar system owns the linked-doc format (CalendarDocLinks.js). make dev doesn't build that
-  system, so the script imports it only when its file is on the site; without it every item opens
-  the calendar.
+  The Calendar system owns the linked-doc and alert formats (CalendarDocLinks.js, CalendarAlerts.js).
+  make dev doesn't build that system, so the script imports each only when its file is on the
+  site; without them every item opens the calendar and keeps to the look-ahead.
 {% endcomment %}
 {%- if site.spring != false -%}
 {%- assign ocs_ticker_course = include.course | default: page.course | default: "all" -%}
 {%- assign ocs_ticker_title = include.title | default: "Coming up" -%}
 {%- assign ocs_ticker_id = ocs_ticker_course | slugify | prepend: "ocs-calendar-ticker-" -%}
-<div data-ocs-calendar-ticker data-course="{{ ocs_ticker_course | escape }}" data-calendar-url="{{ site.baseurl }}/student/calendar" hidden>
+<div data-ocs-calendar-ticker data-course="{{ ocs_ticker_course | escape }}" data-calendar-url="{{ site.baseurl }}/student/calendar"
+  data-school-days-ahead="{{ site.calendar_ticker.school_days_ahead | default: 5 | escape }}"
+  data-days-ahead="{{ site.calendar_ticker.days_ahead | default: 7 | escape }}"
+  data-alert-limit-days="{{ site.calendar_ticker.alert_limit_days | default: 30 | escape }}" hidden>
   <section class="ocs__ticker" aria-labelledby="{{ ocs_ticker_id }}">
     <p class="ocs__ticker-label" id="{{ ocs_ticker_id }}">{{ ocs_ticker_title | escape }}</p>
     <label class="ocs__toggle ocs__ticker-switch">
@@ -43,14 +49,24 @@
 {%- unless ocs_calendar_ticker_script -%}
 {%- assign ocs_calendar_ticker_script = true -%}
 {%- assign ocs_ticker_doc_links = site.static_files | where: "path", "/assets/js/projects/calendar/CalendarDocLinks.js" | first %}
+{%- assign ocs_ticker_alerts = site.static_files | where: "path", "/assets/js/projects/calendar/CalendarAlerts.js" | first %}
 <script type="module">
   import { fetchOptions, javaURI, springEnabled } from '{{ site.baseurl }}/assets/js/api/config.js';
   import { CalendarTicker } from '{{ site.baseurl }}/assets/js/chat/calendar/calendar-ticker.js';
 {%- if ocs_ticker_doc_links %}
   import { splitLinkedDoc } from '{{ site.baseurl }}/assets/js/projects/calendar/CalendarDocLinks.js';
 {%- endif %}
+{%- if ocs_ticker_alerts %}
+  import { CalendarAlerts } from '{{ site.baseurl }}/assets/js/projects/calendar/CalendarAlerts.js';
+{%- endif %}
 
-  CalendarTicker.mountAll(document, { javaURI, fetchOptions, springEnabled, splitLinkedDoc: {% if ocs_ticker_doc_links %}splitLinkedDoc{% else %}null{% endif %} });
+  CalendarTicker.mountAll(document, {
+    javaURI,
+    fetchOptions,
+    springEnabled,
+    splitLinkedDoc: {% if ocs_ticker_doc_links %}splitLinkedDoc{% else %}null{% endif %},
+    calendarAlerts: {% if ocs_ticker_alerts %}CalendarAlerts{% else %}null{% endif %},
+  });
 </script>
 {%- endunless -%}
 {%- endif -%}

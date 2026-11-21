@@ -6,15 +6,16 @@ require "tmpdir"
 
 # The calendar ticker include, from its Courses source, rendered by Jekyll's own include tag with
 # strict Liquid: the empty bar CalendarTicker fills (js/announcement-calendar/calendar-ticker.js),
-# nothing at all on a Flask-only site, its script and school weeks once per page, and the
-# Calendar system's linked-doc reader only when that system is built. The course home puts it
-# above the announcements.
+# with the look-ahead from calendar_ticker in _config.yml, nothing at all on a Flask-only site, its
+# script and school weeks once per page, and the Calendar system's linked-doc and alert readers
+# only when that system is built. The course home puts it above the announcements.
 class CalendarTickerIncludeTest < Minitest::Test
   ROOT = File.expand_path("../../../..", __dir__)
   PROJECT = File.expand_path("..", __dir__)
   DATA = { "school_calendar" => SafeYAML.load_file(File.join(ROOT, "_data/school_calendar.yml")) }.freeze
   TICKER_SCRIPT = "/preview/assets/js/chat/calendar/calendar-ticker.js".freeze
   DOC_LINKS = "/preview/assets/js/projects/calendar/CalendarDocLinks.js".freeze
+  ALERTS = "/preview/assets/js/projects/calendar/CalendarAlerts.js".freeze
   INCLUDES = %w[
     ocs_calendar_ticker.html ocs_calendar_card.html ocs_calendar_card_data.html announcement_chat.html player-pages/home.html
   ].freeze
@@ -23,9 +24,10 @@ class CalendarTickerIncludeTest < Minitest::Test
     INCLUDES.to_h { |name| [name, File.read(File.join(PROJECT, "_includes", name))] }
   end
 
-  # A page's Liquid rendered the way Jekyll renders a page. `spring` is _config.yml's setting;
-  # `calendar_built` puts the Calendar system's published CalendarDocLinks.js on the site.
-  def render(markup, page = {}, spring: nil, calendar_built: true)
+  # A page's Liquid rendered the way Jekyll renders a page. `spring` and `ticker` are _config.yml's
+  # spring and calendar_ticker settings; `calendar_built` puts the Calendar system's published
+  # CalendarDocLinks.js and CalendarAlerts.js on the site.
+  def render(markup, page = {}, spring: nil, ticker: nil, calendar_built: true)
     Dir.mktmpdir("calendar-ticker-") do |source|
       includes.each do |name, text|
         path = File.join(source, "_includes", name)
@@ -37,12 +39,15 @@ class CalendarTickerIncludeTest < Minitest::Test
         "quiet" => true, "baseurl" => "/preview", "liquid" => { "error_mode" => "strict" }
       }
       config["spring"] = spring unless spring.nil?
+      config["calendar_ticker"] = ticker unless ticker.nil?
       site = Jekyll::Site.new(Jekyll.configuration(config))
       site.data = DATA
       if calendar_built
         FileUtils.mkdir_p(File.join(source, "assets/js/projects/calendar"))
-        File.write(File.join(source, "assets/js/projects/calendar/CalendarDocLinks.js"), "")
-        site.static_files << Jekyll::StaticFile.new(site, source, "/assets/js/projects/calendar", "CalendarDocLinks.js")
+        %w[CalendarDocLinks.js CalendarAlerts.js].each do |name|
+          File.write(File.join(source, "assets/js/projects/calendar", name), "")
+          site.static_files << Jekyll::StaticFile.new(site, source, "/assets/js/projects/calendar", name)
+        end
       end
       payload = site.site_payload
       payload["page"] = page
@@ -74,6 +79,25 @@ class CalendarTickerIncludeTest < Minitest::Test
     assert track, "the track CalendarTicker fills"
     assert_empty track.children
     assert_nil section["class"][/ocs__ticker--moving/], "it starts still"
+  end
+
+  def look_ahead(html)
+    wrapper = Nokogiri::HTML.fragment(html).at_css("[data-ocs-calendar-ticker]")
+    %w[data-school-days-ahead data-days-ahead data-alert-limit-days].map { |name| wrapper[name] }
+  end
+
+  def test_the_look_ahead_comes_from_calendar_ticker_in_the_config
+    ticker = { "school_days_ahead" => 3, "days_ahead" => 10, "alert_limit_days" => 14 }
+    assert_equal %w[3 10 14], look_ahead(render("{% include ocs_calendar_ticker.html %}", {}, ticker: ticker))
+  end
+
+  def test_a_site_without_calendar_ticker_gets_the_documented_defaults
+    assert_equal %w[5 7 30], look_ahead(render("{% include ocs_calendar_ticker.html %}"))
+  end
+
+  def test_zero_is_a_setting_not_a_missing_one
+    ticker = { "school_days_ahead" => 0, "days_ahead" => 0, "alert_limit_days" => 0 }
+    assert_equal %w[0 0 0], look_ahead(render("{% include ocs_calendar_ticker.html %}", {}, ticker: ticker))
   end
 
   def test_a_page_without_a_course_shows_every_course
@@ -119,6 +143,16 @@ class CalendarTickerIncludeTest < Minitest::Test
     dev = render("{% include ocs_calendar_ticker.html %}", {}, calendar_built: false)
     assert_equal 0, count(dev, "CalendarDocLinks")
     assert_match(/splitLinkedDoc: null\b/, dev)
+  end
+
+  def test_the_alert_reader_is_imported_only_when_the_calendar_system_is_built
+    built = render("{% include ocs_calendar_ticker.html %}")
+    assert_equal 1, count(built, ALERTS)
+    assert_match(/calendarAlerts: CalendarAlerts\b/, built)
+
+    dev = render("{% include ocs_calendar_ticker.html %}", {}, calendar_built: false)
+    assert_equal 0, count(dev, "CalendarAlerts.js")
+    assert_match(/calendarAlerts: null\b/, dev)
   end
 
   def test_the_course_home_puts_the_ticker_above_the_announcements

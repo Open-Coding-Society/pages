@@ -285,8 +285,12 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
   announcements/calendar inside the reader shell (legacy player as fallback). Legacy chooser/catalog routes remain available.
 - Above the announcements, a calendar ticker (`ocs_calendar_ticker.html`,
   `CalendarTicker` in `js/announcement-calendar/calendar-ticker.js`) shows the
-  course's events from today through the fifth school day after it, each linking
-  to its linked doc on this site or else the calendar. Spring's calendar answers only signed-in
+  course's events from today through the look-ahead in `_config.yml`'s
+  `calendar_ticker` (`school_days_ahead` school days, or `days_ahead` days without
+  school weeks; 5 and 7 when unset), each linking to its linked doc on this site or
+  else the calendar. An event's own Ticker alert (the Calendar system's
+  `CalendarAlerts.js`) shows it that many days before its date instead, at most
+  `alert_limit_days` ahead (30 when unset). Spring's calendar answers only signed-in
   visitors, so signed out, with nothing coming up, or on `spring: false` there is
   no bar. Tests: `node --test tests/calendar_ticker.test.mjs`,
   `bundle exec ruby scripts/test_calendar_ticker.rb`.

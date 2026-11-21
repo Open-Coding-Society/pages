@@ -3,6 +3,7 @@
 // fills on the page (CalendarTicker), run on Messages' fake DOM with Spring's answers stubbed.
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { CalendarAlerts } from '../../calendar/js/CalendarAlerts.js';
 import { splitLinkedDoc } from '../../calendar/js/CalendarDocLinks.js';
 import { installFakeDom, settle } from '../../messages/tests/fake-dom.mjs';
 import { CalendarTicker, TickerItems } from '../js/announcement-calendar/calendar-ticker.js';
@@ -21,6 +22,8 @@ const SCHOOL_CALENDAR = {
   },
 };
 const WEEKS = parseSchoolCalendar(SCHOOL_CALENDAR).weeks;
+// calendar_ticker's defaults in _config.yml, as the include passes them.
+const REACH = { schoolDays: 5, days: 7, alertLimitDays: 30 };
 
 const ORIGIN = 'https://pages.opencodingsociety.com';
 const LINKS = {
@@ -34,20 +37,75 @@ const event = (fields) => ({ id: '1', date: '2026-11-30', title: 'Live Reviews',
 /* ── Which days ─────────────────────────────────────────────────────────── */
 
 test('the ticker looks five school days ahead, past Thanksgiving break', () => {
-  assert.equal(TickerItems.lastDay(WEEKS, '2026-11-20'), '2026-12-04');
+  assert.equal(TickerItems.lastDay(WEEKS, '2026-11-20', REACH), '2026-12-04');
 });
 
 test('five school days ahead crosses a weekend into the next school week', () => {
-  assert.equal(TickerItems.lastDay(WEEKS, '2026-12-01'), '2026-12-08');
+  assert.equal(TickerItems.lastDay(WEEKS, '2026-12-01', REACH), '2026-12-08');
 });
 
 test('a closed school day does not count as one of the five', () => {
   // Monday 11-16 is the non-student day, so the five are Tue 11-17 to Fri 11-20, then Mon 11-30.
-  assert.equal(TickerItems.lastDay(WEEKS, '2026-11-13'), '2026-11-30');
+  assert.equal(TickerItems.lastDay(WEEKS, '2026-11-13', REACH), '2026-11-30');
 });
 
 test('without school weeks (a site with no school calendar) the ticker looks a week ahead', () => {
-  assert.equal(TickerItems.lastDay([], '2026-11-20'), '2026-11-27');
+  assert.equal(TickerItems.lastDay([], '2026-11-20', REACH), '2026-11-27');
+});
+
+test('the look-ahead is the site\'s setting, not a fixed five days', () => {
+  assert.equal(TickerItems.lastDay(WEEKS, '2026-11-20', { schoolDays: 3, days: 7 }), '2026-12-02');
+  assert.equal(TickerItems.lastDay([], '2026-11-20', { schoolDays: 5, days: 10 }), '2026-11-30');
+  assert.equal(TickerItems.lastDay(WEEKS, '2026-11-20', { schoolDays: 0, days: 7 }), '2026-11-20', 'zero is today only');
+});
+
+/* ── An event's own alert ───────────────────────────────────────────────── */
+
+// Today is Friday 11-20; by default the ticker reaches Friday 12-04.
+const ALERTS = { ...LINKS, today: '2026-11-20', lastDay: '2026-12-04', calendarAlerts: CalendarAlerts, alertLimitDays: 30 };
+const shown = (events, options = ALERTS) => TickerItems.from(events, options).map((item) => item.text.split(': ')[1]);
+
+test('an event past the look-ahead shows once its alert reaches today', () => {
+  assert.deepEqual(shown([
+    event({ id: 'a', date: '2026-12-10', title: 'Unit 4 test', description: 'Study\nAlert: 21 days before' }),
+    event({ id: 'b', date: '2026-12-10', title: 'Field trip forms', description: 'Alert: 7 days before' }),
+    event({ id: 'c', date: '2026-12-10', title: 'Team demos' }),
+  ]), ['Unit 4 test']);
+});
+
+test('an event inside the look-ahead waits for its own alert', () => {
+  assert.deepEqual(shown([
+    event({ id: 'a', date: '2026-12-02', title: 'Unit 3 Quiz', description: 'Alert: 1 day before' }),
+    event({ id: 'b', date: '2026-11-20', title: 'Live Reviews', description: 'Alert: 0 days before' }),
+    event({ id: 'c', date: '2026-12-02', title: 'Office hours' }),
+  ]), ['Live Reviews', 'Office hours']);
+});
+
+test('an alert longer than the limit counts as the limit', () => {
+  assert.deepEqual(shown([
+    event({ id: 'a', date: '2026-12-15', title: 'Winter showcase', description: `Alert: 60 days before\nLinked doc: ${ORIGIN}/csa/showcase` }),
+    event({ id: 'b', date: '2027-01-15', title: 'Final project', description: 'Alert: 60 days before' }),
+  ]), ['Winter showcase']);
+});
+
+test('yesterday\'s events never show, whatever their alert', () => {
+  assert.deepEqual(shown([event({ date: '2026-11-19', title: 'Sprint review', description: 'Alert: 30 days before' })]), []);
+});
+
+test('without the Calendar system\'s alert reader every event keeps to the look-ahead', () => {
+  const options = { ...ALERTS, calendarAlerts: null };
+  assert.deepEqual(shown([
+    event({ id: 'a', date: '2026-12-10', title: 'Unit 4 test', description: 'Alert: 21 days before' }),
+    event({ id: 'b', date: '2026-12-02', title: 'Unit 3 Quiz', description: 'Alert: 1 day before' }),
+  ], options), ['Unit 3 Quiz']);
+});
+
+test('it asks the calendar as far as the alert limit only when it can read alerts', () => {
+  const options = { alertLimitDays: 30 };
+  assert.equal(TickerItems.fetchUntil('2026-11-20', '2026-12-04', { ...options, readsAlerts: false }), '2026-12-04');
+  assert.equal(TickerItems.fetchUntil('2026-11-20', '2026-12-04', { ...options, readsAlerts: true }), '2026-12-20');
+  assert.equal(TickerItems.fetchUntil('2026-11-20', '2026-12-04', { alertLimitDays: 3, readsAlerts: true }), '2026-12-04',
+    'a look-ahead longer than the limit still counts');
 });
 
 /* ── How each one reads ─────────────────────────────────────────────────── */
@@ -114,7 +172,7 @@ test('items come in date order, urgent first within a day', () => {
     event({ id: 'd', date: '2026-12-01', title: 'Sprint check-in', priority: 'P1', description: `Linked doc: ${ORIGIN}/csa/sprint-4` }),
   ];
   const wed = formatShortDate('2026-12-02');
-  assert.deepEqual(TickerItems.from(events, { ...LINKS, today: '2026-11-30' }), [
+  assert.deepEqual(TickerItems.from(events, { ...LINKS, today: '2026-11-30', lastDay: '2026-12-07' }), [
     { text: 'Today: Live Reviews', href: '/student/calendar', urgent: false },
     { text: 'Tomorrow: Sprint check-in', href: `${ORIGIN}/csa/sprint-4`, urgent: false },
     { text: `${wed}: Unit 3 Quiz`, href: '/student/calendar', urgent: true },
@@ -158,7 +216,7 @@ class FakeResizeObserver {
 
 // A fresh page with the include's empty bar (ocs_calendar_ticker.html) and the school weeks
 // (ocs_calendar_card_data.html), and Spring answering every request with `answer`.
-function setUp({ status = 200, rows = ROWS, answer } = {}) {
+function setUp({ status = 200, rows = ROWS, answer, reach = {} } = {}) {
   const { document } = installFakeDom();
   const element = (tag, attributes = {}, ...children) => {
     const node = document.createElement(tag);
@@ -189,7 +247,14 @@ function setUp({ status = 200, rows = ROWS, answer } = {}) {
     element('p', { class: 'ocs__ticker-label', id: 'ocs-calendar-ticker-csa' }, 'Coming up'),
     viewport);
   section.style = { setProperty(name, value) { this[name] = value; } };
-  const wrapper = element('div', { 'data-ocs-calendar-ticker': '', 'data-course': 'csa', 'data-calendar-url': '/student/calendar', hidden: '' }, section);
+  const lookAhead = { 'data-school-days-ahead': '5', 'data-days-ahead': '7', 'data-alert-limit-days': '30', ...reach };
+  const wrapper = element('div', {
+    'data-ocs-calendar-ticker': '',
+    'data-course': 'csa',
+    'data-calendar-url': '/student/calendar',
+    ...Object.fromEntries(Object.entries(lookAhead).filter(([, value]) => value !== null)),
+    hidden: '',
+  }, section);
   const data = element('script', { id: 'ocsSchoolCalendarData', type: 'application/json' }, JSON.stringify(SCHOOL_CALENDAR));
   document.body.append(wrapper, data);
 
@@ -232,6 +297,34 @@ test('it asks Spring for this course\'s events from today to the fifth school da
   assert.equal(calls.length, 1);
   assert.equal(calls[0].url, `${SPRING}/api/calendar/events/range?start=2026-11-20&end=2026-12-04`);
   assert.equal(calls[0].init.credentials, 'include');
+});
+
+test('the look-ahead comes from the include, which writes calendar_ticker from _config.yml', async () => {
+  const { calls, mount } = setUp({ reach: { 'data-school-days-ahead': '3' } });
+  mount();
+  await settle();
+  assert.equal(calls[0].url, `${SPRING}/api/calendar/events/range?start=2026-11-20&end=2026-12-02`);
+});
+
+test('a missing or broken look-ahead setting stops the ticker with an error that names it', () => {
+  for (const reach of [{ 'data-days-ahead': null }, { 'data-alert-limit-days': 'lots' }, { 'data-school-days-ahead': '-1' }]) {
+    const { calls, mount } = setUp({ reach });
+    const [attribute] = Object.keys(reach);
+    assert.throws(() => mount(), (error) => error instanceof RangeError && error.message.includes(attribute), attribute);
+    assert.equal(calls.length, 0);
+  }
+});
+
+test('with the alert reader it asks as far as the alert limit and shows an event whose alert has started', async () => {
+  const early = { id: 5, date: '2026-12-10', title: '[P2] Unit 4 test', description: 'Alert: 21 days before', type: 'grade', period: 'CSA', classPeriod: '', break: false };
+  const late = { id: 6, date: '2026-12-10', title: '[P2] Team demos', description: '', type: 'event', period: 'CSA', classPeriod: '', break: false };
+  const { calls, track, mount } = setUp({ rows: [...ROWS, early, late] });
+  mount({ calendarAlerts: CalendarAlerts });
+  await settle();
+  assert.equal(calls[0].url, `${SPRING}/api/calendar/events/range?start=2026-11-20&end=2026-12-20`);
+  const texts = links(lists(track)[0]).map((link) => link.textContent);
+  assert.ok(texts.includes(`${formatShortDate('2026-12-10')}: Unit 4 test`), texts.join(' | '));
+  assert.ok(!texts.some((text) => text.includes('Team demos')), 'an event past the look-ahead without an alert waits');
 });
 
 test('it shows this course\'s events as links, with a hidden copy that closes the loop', async () => {

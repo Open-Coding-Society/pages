@@ -36,6 +36,15 @@ google_client_id: "65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleuserc
 # isn't loaded. See _projects/systems/login/README.md.
 spring: true
 
+# How far ahead the calendar ticker on course homes looks (Courses' ocs_calendar_ticker.html):
+# events from today through the school_days_ahead-th school day, or days_ahead days on a site
+# without a school calendar. An event's own Ticker alert on the calendar page ("Alert: N days
+# before" in its description) overrides that, reaching at most alert_limit_days ahead.
+calendar_ticker:
+  school_days_ahead: 5
+  days_ahead: 7
+  alert_limit_days: 30
+
 # Exclude from Jekyll watch - these are processed by our conversion scripts
 # This prevents double-regeneration when saving notebooks/docx files
 exclude:
