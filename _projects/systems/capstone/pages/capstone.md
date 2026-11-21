@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: opencs 
 title: Capstone
 description: Explore student-led capstone projects, their real-world problems, technical solutions, teams, and project resources.
 type: capstone
