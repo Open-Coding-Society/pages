@@ -2,9 +2,17 @@
 layout: post
 title: Courses Architecture
 description: Course content hierarchy, reusable systems, and ownership boundaries.
+categories: [Systems]
 permalink: /systems/courses/architecture/
 show_reading_time: false
 ---
+
+## View and data source
+
+Courses uses a document reader with a course sidebar, home, sprint and week
+overviews; the home also contains announcements and a calendar. Course YAML
+defines the structure, and published documents' `courses` frontmatter places
+them in weeks. Live announcements and calendar events come from Spring.
 
 ## Courses: a composition system
 

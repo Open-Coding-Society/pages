@@ -1,3 +1,21 @@
+---
+layout: post
+title: Calendar Architecture
+description: Calendar dashboard views, event sources and sprint synchronization modules.
+categories: [Systems]
+permalink: /systems/calendar/architecture/
+show_reading_time: false
+---
+
+## View and data source
+
+The calendar dashboard at `/student/calendar` uses an `opencsplus` sidebar,
+FullCalendar and tabs for CS Pathway, issues and threads. It loads events,
+breaks, issues and comments from Spring APIs; course/sprint synchronization
+also uses school-calendar and lesson data rendered by Courses. The module
+inventory below describes that sprint synchronization interface, not the
+entire dashboard.
+
 # Calendar System Architecture (SRP)
 
 Documentation for the calendar sync system's Single Responsibility Principle (SRP) module architecture — module dependency graph, function inventory, data flows, error handling, and how to extend the system.

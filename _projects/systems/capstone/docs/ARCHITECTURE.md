@@ -2,9 +2,17 @@
 layout: post
 title: Capstone Architecture
 description: Frontmatter-driven student project discovery and browsing.
+categories: [Systems]
 permalink: /systems/capstone/architecture/
 show_reading_time: false
 ---
+
+## View and data source
+
+The Capstone page uses a searchable, course- and year-filtered card grid.
+Its catalog comes from published project posts and pages with
+`capstone_project` frontmatter, plus existing CSSE game-directory metadata.
+The Jekyll generator prepares the catalog; the browser filters it locally.
 
 ## Capstone project discovery
 

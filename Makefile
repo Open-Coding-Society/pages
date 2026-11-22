@@ -37,6 +37,7 @@ ALL_PROJECTS := $(shell grep -v '^\#' $(PROJECT_FILE) 2>/dev/null | grep -v '^$$
 
 # Projects tagged for dev (format: name:dev) - filter comments first!
 DEV_PROJECTS := $(shell grep -v '^\#' $(PROJECT_FILE) 2>/dev/null | grep -v '^$$' | grep ':dev' | cut -d: -f1)
+SYSTEM_DOC_PROJECTS := $(foreach proj,$(filter systems/%,$(ALL_PROJECTS)),$(if $(wildcard _projects/$(proj)/docs/ARCHITECTURE.md),$(proj)))
 
 # Known top-level targets (add to this if needed)
 KNOWN_TARGETS := \
@@ -45,7 +46,7 @@ KNOWN_TARGETS := \
 	build-minima build-cayman build-yat build-so-simple \
 	convert convert-docx convert-docx-config convert-single convert-registered-notebooks \
 	watch-notebooks watch-projects watch-files bundle-install jekyll-serve \
-	generate-makefiles build-project-includes build-registered-projects build-registered-docs build-dev-projects \
+	generate-makefiles build-project-includes build-registered-projects build-registered-docs build-system-docs build-dev-projects \
 	watch-registered-projects clean-registered-projects clean-removed-projects watch-dev-projects \
 	list-projects split-courses clean-courses clean-generated-makefiles use-minima use-cayman use-yat \
 	use-so-simple use-hydejack watch-rebuild
@@ -247,6 +248,7 @@ build-project-includes:
 build-dev-projects: clean-removed-projects build-project-includes
 	@echo "Active DEV Projects: $(ACTIVE_DEV_PROJECTS)"
 	$(call run_projects,$(ACTIVE_DEV_PROJECTS),Building,build)
+	@$(MAKE) build-system-docs
 	@echo "Generating dynamic SASS imports..."
 	@$(PYTHON) scripts/generate_sass_imports.py
 
@@ -257,6 +259,10 @@ convert-registered-notebooks:
 # Build documentation for all registered projects (serve mode only)
 build-registered-docs:
 	$(call run_projects,$(ALL_PROJECTS),Docs,docs)
+
+# Publish registered system architecture documents even when their projects are not built in dev.
+build-system-docs:
+	$(call run_projects,$(SYSTEM_DOC_PROJECTS),System docs,docs)
 
 # Watch all registered projects for changes (dev mode)
 watch-registered-projects:
@@ -670,7 +676,7 @@ list-projects:
 		fi; \
 	done || echo "  None found"
 
-.PHONY: generate-makefiles build-project-includes list-projects build-registered-projects convert-registered-notebooks build-registered-docs watch-registered-projects clean-registered-projects clean-removed-projects clean-generated-makefiles
+.PHONY: generate-makefiles build-project-includes list-projects build-registered-projects convert-registered-notebooks build-registered-docs build-system-docs watch-registered-projects clean-registered-projects clean-removed-projects clean-generated-makefiles
 
 ###########################################
 # Allow unknown targets (project selectors)

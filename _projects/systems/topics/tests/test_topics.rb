@@ -2,6 +2,7 @@ require "minitest/autorun"
 require "jekyll"
 require "tmpdir"
 require "fileutils"
+require "open3"
 require_relative "../../../../scripts/publish_project"
 require_relative "../plugins/topics"
 
@@ -151,7 +152,7 @@ class TopicsTest < Minitest::Test
       refute_includes browser, '>Clear Search</button>'
       assert_includes browser, 'data-topics-title-count'
       assert_includes browser, 'data-topics-body-count'
-      %w[sass python java javascript flask spring cs111 cs112 cs113].each do |category|
+      %w[sass python java javascript flask spring systems cs111 cs112 cs113].each do |category|
         assert_includes primary, "value=\"#{category}\""
         refute_includes secondary, "value=\"#{category}\""
       end
@@ -185,6 +186,44 @@ class TopicsTest < Minitest::Test
       site.read
       error = assert_raises(Jekyll::Errors::FatalException) { Topics::Generator.new.generate(site) }
       assert_includes error.message, "_data/projects/topics/topics_primary.yml"
+    end
+
+    def test_registered_system_architectures_are_published_and_indexed
+      names = %w[blogs calendar capstone courses grades login profile topics ui-builder]
+      Dir.mktmpdir("system-topics-") do |source|
+        FileUtils.mkdir_p(File.join(source, "_projects/_template"))
+        FileUtils.cp(File.join(ROOT, "Makefile"), source)
+        FileUtils.cp(File.join(ROOT, "_projects/.makeprojects"), File.join(source, "_projects"))
+        FileUtils.cp(File.join(ROOT, "_projects/_template/Makefile"), File.join(source, "_projects/_template"))
+        names.each do |name|
+          project = File.join(source, "_projects/systems", name)
+          FileUtils.mkdir_p(File.join(project, "docs"))
+          FileUtils.cp(File.join(ROOT, "_projects/systems", name, "docs/ARCHITECTURE.md"), File.join(project, "docs"))
+          manifest = File.join(ROOT, "_projects/systems", name, "distribution.json")
+          FileUtils.cp(manifest, project) if File.exist?(manifest)
+        end
+        output, status = Open3.capture2e("make", "build-system-docs", chdir: source)
+        assert status.success?, output
+
+        ProjectPublisher.run("publish", PROJECT, source)
+        redirect_layout = File.join(source, "_layouts/projects/courses")
+        FileUtils.mkdir_p(redirect_layout)
+        FileUtils.cp(File.join(ROOT, "_projects/systems/courses/reader/redirect.html"), File.join(redirect_layout, "reader-redirect.html"))
+        File.write(File.join(source, "_layouts/post.html"), "<main>{{ content }}</main>")
+        File.write(File.join(source, "_layouts/opencs.html"), "<main>{{ content }}</main>")
+        site = Jekyll::Site.new(Jekyll.configuration(
+          "source" => source, "destination" => File.join(source, "_site"),
+          "config" => [], "plugins_dir" => [], "quiet" => true, "future" => true
+        ))
+        site.process
+        entries = JSON.parse(File.read(File.join(source, "_site/assets/js/projects/topics/data.json")))
+        systems = entries.select { |entry| entry["categories"].include?("systems") }
+        assert_equal names.map { |name| "/systems/#{name}/architecture/" }.sort, systems.map { |entry| entry["url"] }.sort
+        systems.each do |entry|
+          assert_equal "#{entry['url']}?context=topics", entry["viewUrl"]
+          assert File.exist?(File.join(source, "_site", entry["url"], "index.html")), entry["url"]
+        end
+      end
     end
   end
 end

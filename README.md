@@ -422,8 +422,10 @@ The shared reader uses the original permalink with Course/Topics query context;
 titles, source front matter and canonical submission identity stay unchanged.
 
 `make dev` now retains generated output and performs one incremental build of
-the selected projects instead of cleaning and converting them twice. Use
-`make clean` explicitly when a fresh start is needed. Generated project Makefiles
+the selected projects instead of cleaning and converting them twice. It also
+publishes the documentation of registered systems with an `ARCHITECTURE.md`,
+including systems not built in dev, so their architecture appears in Topics.
+Use `make clean` explicitly when a fresh start is needed. Generated project Makefiles
 are refreshed by registered builds or `make generate-makefiles`, while tracked
 overrides are preserved. After changing the pipeline, restart existing watchers
 so they use the new recipes.

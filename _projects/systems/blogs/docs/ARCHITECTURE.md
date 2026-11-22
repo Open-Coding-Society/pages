@@ -2,9 +2,17 @@
 layout: post
 title: Blogs Architecture
 description: The OCS document publishing foundation, notebook authoring, and interactive viewing systems.
+categories: [Systems]
 permalink: /systems/blogs/architecture/
 show_reading_time: false
 ---
+
+## View and data source
+
+Blogs offers a post catalog, an embedded reader and full document pages using
+the shared post layout and OCS controls. Jekyll discovers published posts and
+their frontmatter; notebook and DOCX sources are converted to posts before the
+site builds. Course-specific catalogs filter those same posts by `courses`.
 
 ## Blogs: the publishing foundation
 

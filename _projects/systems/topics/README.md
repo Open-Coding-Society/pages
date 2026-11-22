@@ -25,7 +25,9 @@ Document membership is discovered at build time from posts/pages.
 Hidden, draft and search-excluded documents are omitted.
 
 [Primary topics YAML](data/topics_primary.yml) orders SASS, Python, Java,
-JavaScript, Flask, Spring, CS111, CS112 and CS113.
+JavaScript, Flask, Spring, Systems, CS111, CS112 and CS113. The Systems filter
+includes the architecture documents in registered systems' `docs/` directories,
+including this system's own architecture.
 
 ### Page layout
 

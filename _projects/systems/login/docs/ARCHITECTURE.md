@@ -2,9 +2,17 @@
 layout: post
 title: Login Architecture
 description: How the sign-in, sign-up and logout pages and the navbar's signed-in state are built, what each part calls, and how it's tested.
+categories: [Systems]
 permalink: /systems/login/architecture/
 show_reading_time: false
 ---
+
+## View and data source
+
+Login presents sign-in, sign-up and logout pages and a site-wide navbar
+account menu. Session and account data come from Flask; when enabled, Spring
+also supplies its session and person data. The pages select backends using
+the shared site configuration.
 
 ## The system
 

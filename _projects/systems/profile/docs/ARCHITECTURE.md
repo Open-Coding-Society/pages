@@ -2,10 +2,17 @@
 layout: post
 title: Profile Architecture
 description: How the profile settings page is built, what each module calls, and how it's tested.
+categories: [Systems]
 permalink: /systems/profile/architecture/
 show_reading_time: false
 ---
 
+## View and data source
+
+Profile is an `opencsplus` sidebar hub with OCS account, class, persona and
+connection cards. Its sidebar and course labels come from project YAML; account,
+class, persona and skill data come from Flask, with Spring adding synchronized
+account fields, course groups, Face ID and optional connections when enabled.
 
 ## The page
 

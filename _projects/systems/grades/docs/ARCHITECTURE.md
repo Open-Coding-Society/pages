@@ -2,9 +2,17 @@
 layout: post
 title: Grades Architecture
 description: How the Grades pages, their sidebar and their section links fit together, and which grading files other systems load.
+categories: [Systems]
 permalink: /systems/grades/architecture/
 show_reading_time: false
 ---
+
+## View and data source
+
+Grades is an `opencsplus` sidebar hub with OCS cards, tables and
+hash-selected dashboard sections. The hub and sidebar links come from
+`data/grades_hub.yml` and `data/grades_sidebar.yml`; submission and grading
+views load their live data from Spring APIs.
 
 ## Where Grades starts
 

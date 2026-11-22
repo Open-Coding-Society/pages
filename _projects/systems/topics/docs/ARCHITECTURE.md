@@ -2,9 +2,17 @@
 layout: post
 title: Topics Architecture
 description: Category-driven reference discovery, scoped search, and interactive document viewing.
+categories: [Systems]
 permalink: /systems/topics/architecture/
 show_reading_time: false
 ---
+
+## View and data source
+
+Topics is a filterable reference browser with compact lists or cards and a
+context-preserving document viewer. Jekyll indexes the `categories` and content
+of eligible published posts and pages; `data/topics_primary.yml` selects the
+featured filters, and the browser searches the generated JSON catalog.
 
 ## Topics: reference discovery
 
@@ -70,7 +78,7 @@ Java OR Algorithms includes documents in either collection, while Java AND
 Algorithms includes only documents in both.
 
 The [primary topics configuration](../data/topics_primary.yml) orders prominent
-categories: SASS, Python, Java, JavaScript, Flask, Spring, CS111, CS112 and CS113.
+categories: SASS, Python, Java, JavaScript, Flask, Spring, Systems, CS111, CS112 and CS113.
 This YAML controls visibility and order, not membership. Primary categories
 remain selectable even when their collection is empty. Remaining discovered
 categories appear in the secondary group.

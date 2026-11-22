@@ -2,9 +2,17 @@
 layout: post
 title: UI Builder Architecture
 description: How the UI Builder stores, checks, renders and publishes student pages, what each module does, and how it's tested.
+categories: [Systems]
 permalink: /systems/ui-builder/architecture/
 show_reading_time: false
 ---
+
+## View and data source
+
+UI Builder provides an editor with an iframe preview and code view, a published
+page viewer and a gallery. The editor uses project YAML registries for blocks
+and text; page documents are stored in the browser on Flask-only sites or in
+Spring when enabled. Live blocks use their respective backend APIs.
 
 ## What it is
 
