@@ -20,8 +20,8 @@ Topics organizes published learning material by subject rather than by teaching
 time. It provides category selection, filtered browsing, full-text search and
 context-preserving document navigation.
 
-[Blogs](../../blogs/docs/ARCHITECTURE.md) supplies the document publishing and
-interactive viewing foundation. [Courses](../../courses/docs/ARCHITECTURE.md)
+[Blogs]({{ '/systems/blogs/architecture/' | relative_url }}) supplies the document publishing and
+interactive viewing foundation. [Courses]({{ '/systems/courses/architecture/' | relative_url }})
 organizes documents into curriculum, sprints and weeks. Topics supplies another
 entry into the same authored material, independent of schedules, announcements
 and course chat.
@@ -77,7 +77,7 @@ each document appearing once. AND requires every checked category. For example,
 Java OR Algorithms includes documents in either collection, while Java AND
 Algorithms includes only documents in both.
 
-The [primary topics configuration](../data/topics_primary.yml) orders prominent
+The [primary topics configuration](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/topics/data/topics_primary.yml) orders prominent
 categories: SASS, Python, Java, JavaScript, Flask, Spring, Systems, CS111, CS112 and CS113.
 This YAML controls visibility and order, not membership. Primary categories
 remain selectable even when their collection is empty. Remaining discovered
@@ -90,7 +90,7 @@ from an outline do not automatically assign those categories to linked lessons.
 
 ## Build-time discovery
 
-The [Topics generator](../plugins/topics.rb) discovers categorized Jekyll posts
+The [Topics generator](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/topics/plugins/topics.rb) discovers categorized Jekyll posts
 and pages. It omits hidden documents, drafts, search-excluded content and
 generated course player pages. Documents are deduplicated by original URL and
 sorted by title for ordinary browsing.
@@ -115,7 +115,7 @@ loaded through relative includes is not expanded into the search text.
 
 ## Browser and search
 
-The [browser include](../_includes/topics-browser.html) is a full-width page
+The [browser include](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/topics/_includes/topics-browser.html) is a full-width page
 with a sidebar (`ocs__split--aside`): Search and the two visible checkbox
 groups, Topic Filter and More Categories. More Categories shows categories with
 at least five documents, ordered by count with alphabetical ties. An already
@@ -124,8 +124,8 @@ indexes category names as well as document text. The landing shows topic
 sections with unit cards and scrollable lesson lists; each lesson is a dropdown with its full
 description and an Open lesson link, and quizzes and FRQ practice sit in the
 unit's Practice row. Units come from lesson titles; their optional names come
-from [`topics_units.yml`](../data/topics_units.yml). Layout details are in the
-[README](../README.md#page-layout).
+from [`topics_units.yml`](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/topics/data/topics_units.yml). Layout details are in the
+[README](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/topics/README.md#page-layout).
 
 Topic Filters holds the two disclosures, both open by default. Topic Filter starts with OR, AND and CLEAR:
 `ocs__btn` buttons in an `ocs__links` group, the current choice filled and
@@ -133,7 +133,7 @@ Topic Filters holds the two disclosures, both open by default. Topic Filter star
 selections. Search has an in-field clear control.
 Each clear button is dimmed and disabled when its corresponding state is empty.
 
-The [browser controller](../js/browser.js) builds a Lunr index in the client
+The [browser controller](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/topics/js/browser.js) builds a Lunr index in the client
 from the static catalog. Title, description, content and category names participate in search,
 with title matches boosted. User input is tokenized as terms rather than
 interpreted as Lunr query syntax.
@@ -152,7 +152,7 @@ otherwise content or description supplies the excerpt. Each group preserves
 search relevance ordering and displays its count beside its heading. Search
 uses title cards regardless of the browsing view selection.
 
-The [model helpers](../js/model.js) implement the category filter, URL state,
+The [model helpers](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/topics/js/model.js) implement the category filter, URL state,
 match grouping and excerpt construction. Highlights are created with text nodes
 and `mark` elements, not injected document HTML. Search results remain within
 the selected collection rather than replacing it with a global search overlay.
@@ -169,12 +169,12 @@ On selection the browser saves the displayed, deduplicated order, expanded
 lessons, and page and unit-list scroll positions in session storage. Previous/next use this snapshot, including practice
 and full-text results. The return link restores URL filters and session scroll;
 without a matching snapshot the viewer reports that stepping is unavailable.
-The [shared reader](../../courses/reader/reader.rb) renders one document with a
-Course or Topics sidebar. Its [controller](../../courses/reader/js/browser.js)
+The [shared reader](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/courses/reader/reader.rb) renders one document with a
+Course or Topics sidebar. Its [controller](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/courses/reader/js/browser.js)
 switches navigation without replacing content, runner editors or submission
 forms. Course options come only from the document's own course placements.
 
-The [Blogs post layout](../../blogs/layouts/post.html) retains the original
+The [Blogs post layout](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/blogs/layouts/post.html) retains the original
 document URL as submission identity and uses its existing forms and feedback
 checks in both contexts. Chat is not disabled by making a reference copy: there
 is no copy. Bespoke application layouts remain intact rather than being forced
@@ -221,19 +221,19 @@ own authentication and backend requirements.
 
 | Source | Responsibility |
 | --- | --- |
-| [Pages](../pages/) | `/topics/` landing and `/search/` compatibility redirect |
-| [Includes](../_includes/) | Browser and document navigation |
-| [Generator](../plugins/topics.rb) | Catalog, category collections and generated views |
-| [Primary-topic YAML](../data/topics_primary.yml) | Prominent category labels and order |
-| [JavaScript](../js/) | Browser state, search and document link context |
-| [SCSS](../sass/main.scss) | Topics layout and component styling |
-| [Tests](../tests/) | Discovery, rendering, filtering, search and identity contracts |
-| [Distribution manifest](../distribution.json) | Stable Jekyll and browser publication destinations |
+| [Pages](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/topics/pages) | `/topics/` landing and `/search/` compatibility redirect |
+| [Includes](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/topics/_includes) | Browser and document navigation |
+| [Generator](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/topics/plugins/topics.rb) | Catalog, category collections and generated views |
+| [Primary-topic YAML](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/topics/data/topics_primary.yml) | Prominent category labels and order |
+| [JavaScript](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/topics/js) | Browser state, search and document link context |
+| [SCSS](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/topics/sass/main.scss) | Topics layout and component styling |
+| [Tests](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/topics/tests) | Discovery, rendering, filtering, search and identity contracts |
+| [Distribution manifest](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/topics/distribution.json) | Stable Jekyll and browser publication destinations |
 
 Topics is registered as `systems/topics:dev` in the
-[project registry](../../../.makeprojects). The shared project Makefile publishes
+[project registry](https://github.com/Open-Coding-Society/pages/blob/main/_projects/.makeprojects). The shared project Makefile publishes
 resources through its manifest; documentation uses the shared `docs` target.
-The root [Makefile](../../../../Makefile) coordinates publication, conversion
+The root [Makefile](https://github.com/Open-Coding-Society/pages/blob/main/Makefile) coordinates publication, conversion
 and Jekyll build/serve. Runtime copies and converted posts are generated outputs,
 not authoring locations.
 

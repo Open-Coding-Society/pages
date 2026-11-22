@@ -26,7 +26,7 @@ The calendar system manages school sprint schedules — syncing formative/summat
 
 The system follows **Single Responsibility Principle (SRP)**: the original monolithic `calendar.js` (~1500 lines) was decomposed into **5 focused modules**, each with a clearly-defined responsibility.
 
-> **Run the test suite:** Open the [Calendar Test Runner](/{{site.baseurl}}/calendar/tests) to verify all modules in the browser.
+> **Run the test suite:** Open the [Calendar Test Runner]({{ '/calendar/tests' | relative_url }}) to verify all modules in the browser.
 
 ## Module Dependency Graph
 

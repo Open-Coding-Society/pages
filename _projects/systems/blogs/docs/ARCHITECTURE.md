@@ -27,7 +27,7 @@ experience with documents. A blog is therefore more than a chronological
 article: it can be a lesson, assignment, reference, interactive exercise or
 project document.
 
-[Courses](../../courses/docs/ARCHITECTURE.md) adds curriculum organization around
+[Courses]({{ '/systems/courses/architecture/' | relative_url }}) adds curriculum organization around
 this foundation. A document can be viewed independently or within a course;
 its authored content is not owned by the course navigation.
 
@@ -71,9 +71,9 @@ association and optional capabilities. Markdown provides narrative structure;
 IPYNB provides cell-based authoring with code and outputs; DOCX provides
 document-based authoring.
 
-The [notebook converter](../../../../scripts/convert_notebooks.py) translates
+The [notebook converter](https://github.com/Open-Coding-Society/pages/blob/main/scripts/convert_notebooks.py) translates
 notebook cells and runner declarations into Markdown, Liquid includes and
-browser-facing components. The [DOCX converter](../../../../scripts/convert_docx.py)
+browser-facing components. The [DOCX converter](https://github.com/Open-Coding-Society/pages/blob/main/scripts/convert_docx.py)
 produces Markdown for the same publishing pipeline. Jekyll resolves layouts,
 includes and metadata to produce the static site served by GitHub Pages.
 
@@ -153,15 +153,15 @@ backend services supply their functionality.
 
 | Resource | Responsibility |
 | --- | --- |
-| [Layouts](../layouts/) | Post, catalog, reader, notebook and study/capture presentation |
-| [Includes](../_includes/) | Catalog, document cards, embedded reader and submission UI |
-| [JavaScript](../js/) | Document completion, catalog search and study/capture behavior |
-| [Styles](../sass/) | Shared document/player and submission presentation |
-| [Distribution manifest](../distribution.json) | Published Jekyll and browser destinations |
-| [Tests](../tests/) | Catalog, independent rendering and publication contracts |
+| [Layouts](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/blogs/layouts) | Post, catalog, reader, notebook and study/capture presentation |
+| [Includes](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/blogs/_includes) | Catalog, document cards, embedded reader and submission UI |
+| [JavaScript](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/blogs/js) | Document completion, catalog search and study/capture behavior |
+| [Styles](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/blogs/sass) | Shared document/player and submission presentation |
+| [Distribution manifest](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/blogs/distribution.json) | Published Jekyll and browser destinations |
+| [Tests](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/blogs/tests) | Catalog, independent rendering and publication contracts |
 
 The post layout renders ordinary documents without Courses. Course metadata or
-`player_page` activates the [Courses document adapter](../../courses/_includes/course-document-player.html),
+`player_page` activates the [Courses document adapter](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/courses/_includes/course-document-player.html),
 which supplies course navigation and contextual controls. The embedded reader
 is also reusable through a standalone layout or a course page include.
 
@@ -174,12 +174,12 @@ document views.
 ## Build and runtime contracts
 
 Blogs is registered as `systems/blogs:dev` in the
-[project registry](../../../.makeprojects). The shared generated project
+[project registry](https://github.com/Open-Coding-Society/pages/blob/main/_projects/.makeprojects). The shared generated project
 Makefile publishes its manifest resources to Jekyll/runtime directories.
 Courses has its own disjoint publication manifest. Source files remain in their
 owning projects; published copies are generated resources.
 
-The root [Makefile](../../../../Makefile) coordinates project publication,
+The root [Makefile](https://github.com/Open-Coding-Society/pages/blob/main/Makefile) coordinates project publication,
 conversion, course splitting and Jekyll build/serve workflows. Published
 permalinks, include/layout names, asset URLs and document state keys connect
 these layers.

@@ -187,41 +187,60 @@ class TopicsTest < Minitest::Test
       error = assert_raises(Jekyll::Errors::FatalException) { Topics::Generator.new.generate(site) }
       assert_includes error.message, "_data/projects/topics/topics_primary.yml"
     end
+  end
 
-    def test_registered_system_architectures_are_published_and_indexed
-      names = %w[blogs calendar capstone courses grades login profile topics ui-builder]
-      Dir.mktmpdir("system-topics-") do |source|
-        FileUtils.mkdir_p(File.join(source, "_projects/_template"))
-        FileUtils.cp(File.join(ROOT, "Makefile"), source)
-        FileUtils.cp(File.join(ROOT, "_projects/.makeprojects"), File.join(source, "_projects"))
-        FileUtils.cp(File.join(ROOT, "_projects/_template/Makefile"), File.join(source, "_projects/_template"))
-        names.each do |name|
-          project = File.join(source, "_projects/systems", name)
-          FileUtils.mkdir_p(File.join(project, "docs"))
-          FileUtils.cp(File.join(ROOT, "_projects/systems", name, "docs/ARCHITECTURE.md"), File.join(project, "docs"))
-          manifest = File.join(ROOT, "_projects/systems", name, "distribution.json")
-          FileUtils.cp(manifest, project) if File.exist?(manifest)
-        end
-        output, status = Open3.capture2e("make", "build-system-docs", chdir: source)
-        assert status.success?, output
+  def test_registered_system_architectures_are_published_and_indexed
+    names = %w[blogs calendar capstone courses grades login profile topics ui-builder]
+    Dir.mktmpdir("system-topics-") do |source|
+      FileUtils.mkdir_p(File.join(source, "_projects/_template"))
+      FileUtils.cp(File.join(ROOT, "Makefile"), source)
+      FileUtils.cp(File.join(ROOT, "_projects/.makeprojects"), File.join(source, "_projects"))
+      FileUtils.cp(File.join(ROOT, "_projects/_template/Makefile"), File.join(source, "_projects/_template"))
+      names.each do |name|
+        project = File.join(source, "_projects/systems", name)
+        FileUtils.mkdir_p(File.join(project, "docs"))
+        FileUtils.cp(File.join(ROOT, "_projects/systems", name, "docs/ARCHITECTURE.md"), File.join(project, "docs"))
+        manifest = File.join(ROOT, "_projects/systems", name, "distribution.json")
+        FileUtils.cp(manifest, project) if File.exist?(manifest)
+      end
+      output, status = Open3.capture2e("make", "build-system-docs", chdir: source)
+      assert status.success?, output
 
-        ProjectPublisher.run("publish", PROJECT, source)
-        redirect_layout = File.join(source, "_layouts/projects/courses")
-        FileUtils.mkdir_p(redirect_layout)
-        FileUtils.cp(File.join(ROOT, "_projects/systems/courses/reader/redirect.html"), File.join(redirect_layout, "reader-redirect.html"))
-        File.write(File.join(source, "_layouts/post.html"), "<main>{{ content }}</main>")
-        File.write(File.join(source, "_layouts/opencs.html"), "<main>{{ content }}</main>")
-        site = Jekyll::Site.new(Jekyll.configuration(
-          "source" => source, "destination" => File.join(source, "_site"),
-          "config" => [], "plugins_dir" => [], "quiet" => true, "future" => true
-        ))
-        site.process
-        entries = JSON.parse(File.read(File.join(source, "_site/assets/js/projects/topics/data.json")))
-        systems = entries.select { |entry| entry["categories"].include?("systems") }
-        assert_equal names.map { |name| "/systems/#{name}/architecture/" }.sort, systems.map { |entry| entry["url"] }.sort
-        systems.each do |entry|
-          assert_equal "#{entry['url']}?context=topics", entry["viewUrl"]
-          assert File.exist?(File.join(source, "_site", entry["url"], "index.html")), entry["url"]
+      ProjectPublisher.run("publish", PROJECT, source)
+      redirect_layout = File.join(source, "_layouts/projects/courses")
+      FileUtils.mkdir_p(redirect_layout)
+      FileUtils.cp(File.join(ROOT, "_projects/systems/courses/reader/redirect.html"), File.join(redirect_layout, "reader-redirect.html"))
+      File.write(File.join(source, "_layouts/post.html"), "<main>{{ content }}</main>")
+      File.write(File.join(source, "_layouts/opencs.html"), "<main>{{ content }}</main>")
+      site = Jekyll::Site.new(Jekyll.configuration(
+        "source" => source, "destination" => File.join(source, "_site"),
+        "layouts_dir" => File.join(source, "_layouts"), "includes_dir" => File.join(source, "_includes"),
+        "config" => [], "plugins_dir" => [], "quiet" => true, "future" => true, "baseurl" => "/preview"
+      ))
+      site.process
+      entries = JSON.parse(File.read(File.join(source, "_site/assets/js/projects/topics/data.json")))
+      systems = entries.select { |entry| entry["categories"].include?("systems") }
+      assert_equal names.map { |name| "/systems/#{name}/architecture/" }.sort, systems.map { |entry| entry["url"] }.sort
+      systems.each do |entry|
+        assert_equal "#{entry['url']}?context=topics", entry["viewUrl"]
+        assert File.exist?(File.join(source, "_site", entry["url"], "index.html")), entry["url"]
+      end
+
+      architecture = File.read(File.join(source, "_site/systems/topics/architecture/index.html"))
+      generator = "https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/topics/plugins/topics.rb"
+      assert_equal 2, architecture.scan("href=\"#{generator}\"").size
+      %w[blogs courses].each { |name| assert_includes architecture, "href=\"/preview/systems/#{name}/architecture/\"" }
+      assert_includes File.read(File.join(source, "_site/systems/blogs/architecture/index.html")),
+                      'href="/preview/systems/courses/architecture/"'
+      assert_includes File.read(File.join(source, "_site/systems/courses/architecture/index.html")),
+                      'href="/preview/systems/blogs/architecture/"'
+      assert_includes File.read(File.join(source, "_site/systems/calendar/architecture/index.html")),
+                      'href="/preview/calendar/tests"'
+      names.each do |name|
+        html = File.read(File.join(source, "_site/systems", name, "architecture/index.html"))
+        refute_match(/href="(?:\.\.\/|\/\/)/, html, "#{name} has a source-relative or protocol-relative link")
+        html.scan(%r{href="https://github\.com/Open-Coding-Society/pages/(?:blob|tree)/main/([^"#]+)}).flatten.each do |path|
+          assert File.exist?(File.join(ROOT, path)), "Missing source: #{path}"
         end
       end
     end

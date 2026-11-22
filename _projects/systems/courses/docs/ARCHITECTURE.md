@@ -22,7 +22,7 @@ not a separate software system.
 
 Blogs provides the underlying document publishing and viewing foundation.
 Courses composes that foundation with schedules, navigation, Calendar and Chat
-to present a curriculum. See [Blogs architecture](../../blogs/docs/ARCHITECTURE.md)
+to present a curriculum. See [Blogs architecture]({{ '/systems/blogs/architecture/' | relative_url }})
 for the publishing, authoring and interactive-document model.
 
 ## Content hierarchy
@@ -104,15 +104,15 @@ communication infrastructure.
 
 ### Courses owns curriculum composition
 
-- [Course YAML](../data/) and [course home sources](../navigation/).
-- [Generated page definitions](../plugins/lesson_player_pages.rb).
+- [Course YAML](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/courses/data) and [course home sources](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/courses/navigation).
+- [Generated page definitions](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/courses/plugins/lesson_player_pages.rb).
 - Course pills, title, sidebar, top bar, mobile drawer and sprint/week views.
-- [Course document player adapter](../_includes/course-document-player.html):
+- [Course document player adapter](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/courses/_includes/course-document-player.html):
   course home, sprint, week and Blogs pages.
-- [Shared document reader](../reader/reader.rb): one canonical document with
-  Course/Topics navigation; [reader controller](../reader/js/browser.js) changes
+- [Shared document reader](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/courses/reader/reader.rb): one canonical document with
+  Course/Topics navigation; [reader controller](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/courses/reader/js/browser.js) changes
   navigation without remounting runners or submission forms.
-- [Course Blogs adapter](../_includes/player-pages/blogs.html): delegates to
+- [Course Blogs adapter](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/courses/_includes/player-pages/blogs.html): delegates to
   the reusable Blogs reader, without duplicating it.
 - Course selection and per-course/per-panel navigation state.
 - Sprint views, course chooser and the global catalog's course
@@ -120,9 +120,9 @@ communication infrastructure.
 
 ### Blogs owns reusable document viewing
 
-- [Shared layouts](../../blogs/layouts/): post, blogs, notebook, study/capture
+- [Shared layouts](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/blogs/layouts): post, blogs, notebook, study/capture
   viewers, and an optional standalone embedded-reader layout.
-- [Catalog, cards and reader](../../blogs/_includes/).
+- [Catalog, cards and reader](https://github.com/Open-Coding-Society/pages/tree/main/_projects/systems/blogs/_includes).
 - Document completion and study/capture scripts.
 - Shared document/player styles, including existing submission UI styles.
 - Catalog, independent rendering, and publication-boundary tests.
@@ -157,7 +157,7 @@ view while representing different responsibilities.
 ## Build and runtime contracts
 
 Both `systems/blogs:dev` and `systems/courses:dev` are registered in the
-[project registry](../../../.makeprojects). Their manifests publish disjoint
+[project registry](https://github.com/Open-Coding-Society/pages/blob/main/_projects/.makeprojects). Their manifests publish disjoint
 outputs through the shared generated Makefile. Layout/include names, script
 URLs, permalinks and storage keys are runtime contracts. The publisher tracks
 output ownership and rejects duplicate destinations.
