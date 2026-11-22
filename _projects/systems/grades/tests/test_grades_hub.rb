@@ -18,6 +18,7 @@ class GradesHubTest < Minitest::Test
   # Front matter of page sources (committed or new), keyed by permalink without a trailing slash.
   def pages_by_permalink
     @pages_by_permalink ||= `git -C #{ROOT} ls-files --cached --others --exclude-standard '*.md' '*.html'`.split("\n").each_with_object({}) do |path, pages|
+      next unless File.file?(File.join(ROOT, path))
       text = File.read(File.join(ROOT, path))
       front = text[/\A---\s*\n(.*?)\n---/m, 1] or next
       permalink = front[/^permalink:\s*(\S+)/, 1] or next
@@ -98,14 +99,24 @@ class GradesHubTest < Minitest::Test
       FileUtils.mkdir_p(File.join(source, "_layouts"))
       FileUtils.mkdir_p(File.join(source, "_includes/aesthetihawk"))
       FileUtils.mkdir_p(File.join(source, "_includes/themes/minima"))
+      FileUtils.cp(File.join(ROOT, "_layouts/opencsplus.html"), File.join(source, "_layouts"))
+      FileUtils.cp(File.join(ROOT, "_layouts/opencs.html"), File.join(source, "_layouts"))
       FileUtils.cp(File.join(ROOT, "_layouts/aesthetihawk.html"), File.join(source, "_layouts"))
+      FileUtils.cp(File.join(ROOT, "_includes/themes/minima/base.html"), File.join(source, "_includes/themes/minima"))
+      FileUtils.cp(File.join(ROOT, "_includes/head-custom.html"), File.join(source, "_includes"))
       %w[header-shared.html sidebar.html sidebar-list.html].each do |name|
         FileUtils.cp(File.join(ROOT, "_includes/aesthetihawk", name), File.join(source, "_includes/aesthetihawk"))
       end
+      File.write(File.join(source, "_includes/head.html"), "<head>{% include head-custom.html %}</head>")
       File.write(File.join(source, "_includes/themes/minima/header.html"), "<header>Header</header>")
-      File.write(File.join(source, "grades.html"), "---\nlayout: aesthetihawk\ntitle: Grades\nsidebar: grades_sidebar\n---\n<p>Grades content</p>\n")
-      File.write(File.join(source, "profile.html"), "---\nlayout: aesthetihawk\ntitle: Profile\n---\n<p>Profile content</p>\n")
+      File.write(File.join(source, "_includes/themes/minima/footer.html"), "<footer>Footer</footer>")
+      File.write(File.join(source, "_includes/mermaid.html"), "")
+      File.write(File.join(source, "_layouts/profile.html"), "---\nlayout: opencsplus\n---\n<p>Profile layout</p>{{ content }}")
+      File.write(File.join(source, "grades.html"), "---\nlayout: opencsplus\ntitle: Grades\nsidebar: grades_sidebar\n---\n<p>Grades content</p>\n")
+      File.write(File.join(source, "profile.html"), "---\nlayout: profile\ntitle: Profile\nopencsplus: true\n---\n<p>Profile content</p>\n")
+      File.write(File.join(source, "legacy.html"), "---\nlayout: aesthetihawk\ntitle: Legacy\n---\n<p>Legacy content</p>\n")
       FileUtils.cp(File.join(ROOT, "navigation/toolkit/bathroom_pass.md"), File.join(source, "bathroom_pass.md"))
+      FileUtils.cp(File.join(ROOT, "navigation/toolkit/bathroom_queue.md"), File.join(source, "bathroom_queue.md"))
       site = Jekyll::Site.new(Jekyll.configuration(
         "source" => source, "destination" => File.join(source, "_site"),
         "layouts_dir" => File.join(source, "_layouts"), "includes_dir" => File.join(source, "_includes"),
@@ -114,10 +125,35 @@ class GradesHubTest < Minitest::Test
       site.process
       grades = File.read(File.join(source, "_site/grades.html"))
       profile = File.read(File.join(source, "_site/profile.html"))
+      legacy = File.read(File.join(source, "_site/legacy.html"))
       bathroom = site.pages.find { |page| page.name == "bathroom_pass.md" }.output
-      [grades, profile, bathroom].each { |page| refute_includes page, "Got thoughts on a project?" }
+      bathroom_queue = site.pages.find { |page| page.name == "bathroom_queue.md" }.output
+      [grades, profile, legacy, bathroom, bathroom_queue].each { |page| refute_includes page, "Got thoughts on a project?" }
       assert_includes grades, '<h1 class="ocs__hub-viewer-title">Grades</h1>'
+      assert_includes grades, 'data-sidebar-role="default"'
+      assert_includes grades, '<footer>Footer</footer>'
+      assert_includes grades, "opencsplus-page"
+      assert_includes profile, "<p>Profile layout</p>"
+      assert_equal 1, grades.scan("<html").size
+      assert_equal 1, grades.scan("<head>").size
+      assert_equal 1, grades.scan("<body>").size
+      assert_equal 1, grades.scan("https://cdn.tailwindcss.com").size
+      assert_equal 0, grades.scan("toastify.min.css").size
+      assert_equal 1, profile.scan("<head>").size
+      assert_equal 1, profile.scan("https://cdn.tailwindcss.com").size
+      assert_equal 1, legacy.scan("<html").size
+      assert_equal 1, legacy.scan("<head>").size
+      assert_equal 1, legacy.scan("<body>").size
+      assert_includes legacy, "opencsplus-page"
+      assert_includes legacy, "<p>Legacy content</p>"
+      assert_equal 1, legacy.scan("toastify.min.css").size
       assert_includes bathroom, '<h2 class="ocs__bathroompass-v2-title">'
+      assert_equal 1, bathroom.scan("<head>").size
+      assert_equal 1, bathroom.scan("toastify.min.css").size
+      assert_equal 1, bathroom.scan("face-api.js").size
+      assert_equal 1, bathroom_queue.scan("<head>").size
+      assert_equal 1, bathroom_queue.scan("toastify.min.css").size
+      assert_equal 0, bathroom_queue.scan("face-api.js").size
       refute_includes grades, "mt-[53px]"
       refute_includes grades, "justify-between items-center mb-8"
     end

@@ -68,7 +68,7 @@ teacher links (`audience`). For teachers, `creator-dashboard.js` renames the
 
 ## Phones
 
-`_layouts/aesthetihawk.html` has a viewport tag. At 768px and below it hides the
+`_layouts/opencsplus.html` uses the viewport from the shared `opencs` layout. At 768px and below it hides the
 side column (`max-[768px]:hidden`) and drops its 16rem margin, and a `<details>`
 **Menu** above the page holds a second copy of the sidebar include. That copy
 passes `id_prefix="phone-"`, so no link id repeats.

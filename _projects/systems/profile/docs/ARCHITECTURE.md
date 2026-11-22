@@ -10,7 +10,7 @@ show_reading_time: false
 ## The page
 
 `/profile` (`pages/profile.md`) uses `layouts/profile.html`, which sits inside the
-toolkit's `aesthetihawk` layout. The layout holds:
+shared `opencsplus` layout. The layout holds:
 
 - the markup: the top card, then the Account, Classes, Persona, Skill check-in and
   Face ID cards, then the Gist card include. Face ID and the Gist card are built only

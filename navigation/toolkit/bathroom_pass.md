@@ -1,15 +1,11 @@
 ---
-layout: aesthetihawk
+layout: opencsplus
 title: Bathroom Pass
 permalink: /student/bathroom_pass
 active_tab: bathroom_pass
+face_api: true
+toastify: true
 ---
-
-<head>
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
-</head>
 
 <div class="ocs__bathroompass-v2-page">
     <!-- Header Section -->

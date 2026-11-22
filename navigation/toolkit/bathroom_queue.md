@@ -1,13 +1,9 @@
 ---
-layout: aesthetihawk
+layout: opencsplus
 title: Bathroom Queue
 permalink: /bathroom_queue/
+toastify: true
 ---
-
-<head>
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-</head>
 
 <div class="max-w-[75vw] mx-auto px-4 py-12">
     <!-- Centered Header -->

@@ -4,6 +4,7 @@ title: Retrospective
 permalink: /retrospective
 active_tab: retrospective
 sidebar: grades_sidebar
+opencsplus: true
 comments: false
 ---
 

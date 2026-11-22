@@ -1,7 +1,8 @@
 ---
-layout: aesthetihawk
+layout: opencsplus
 active_tab: grades
 sidebar: grades_sidebar
+opencsplus: true
 title: Viewing Grades
 permalink: /student/view-grades
 comments: false

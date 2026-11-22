@@ -25,8 +25,8 @@
           {% include admin_foundation.html %}
         {% endif %}
 
-        <main class="page-content{% if page.url contains '/capstone/' or page.permalink contains '/capstone/' or page.categories contains 'Capstone' or page.full_width %} capstone-page{% endif %}" aria-label="Content">
-            <div class="wrapper">
+        <main class="page-content{% if page.opencsplus or page.layout == 'opencsplus' or page.layout == 'aesthetihawk' %} opencsplus-page{% endif %}{% if page.url contains '/capstone/' or page.permalink contains '/capstone/' or page.categories contains 'Capstone' or page.full_width %} capstone-page{% endif %}" aria-label="Content">
+            <div class="wrapper{% if page.opencsplus or page.layout == 'opencsplus' or page.layout == 'aesthetihawk' %} opencsplus-wrapper{% endif %}">
                                 <div class="opencs_root">
                                     {{ content }}
                                 </div>

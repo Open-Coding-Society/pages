@@ -42,6 +42,24 @@
 	<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 {%- endif -%}
 
+{%- if page.opencsplus or page.layout == 'opencsplus' or page.layout == 'aesthetihawk' -%}
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+{%- endif -%}
+
+{%- if page.toastify or page.layout == 'aesthetihawk' -%}
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+{%- endif -%}
+
+{%- if page.face_api -%}
+<script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+{%- endif -%}
+
+{%- if page.bathroom_issue_styles -%}
+<link rel="stylesheet" href="{{ '/assets/Bathroom/report-issues.css' | relative_url }}">
+{%- endif -%}
+
 {%- if page.jquery or page.microblog -%}
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

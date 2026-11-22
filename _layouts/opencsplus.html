@@ -1,0 +1,72 @@
+---
+layout: opencs
+---
+<div class="min-h-screen flex flex-col flex-auto flex-shrink-0 transition-colors theme-inner page-{{ page.active_tab | default: 'opencsplus' | slugify }}">
+    <div class="fixed left-0 top-[53px] w-64 h-full border-r flex flex-col max-[768px]:hidden lesson-sidebar">
+        <div class="overflow-y-auto flex-grow">
+            {%- include aesthetihawk/sidebar.html -%}
+        </div>
+    </div>
+
+    <div class="p-4 min-[769px]:ml-64 min-[769px]:p-8 lesson-main">
+        <div id="role-bar" class="ocs__callout mb-6" hidden>
+            <b id="role-bar-badge" class="ocs__status-pill ocs__status-pill--good">Mentor</b>
+            <span id="role-bar-text">You are signed in with a mentor account.</span>
+            <button type="button" id="role-view-switch" class="ocs__btn small pill">Switch to student view</button>
+        </div>
+        <script>
+            try { if (localStorage.getItem('ocsMentorSidebar') === 'mentor') document.getElementById('role-bar').hidden = false; } catch (e) { /* storage unavailable */ }
+        </script>
+        {%- include aesthetihawk/header-shared.html minima_header=false -%}
+
+        <details class="ocs__card mb-6 min-[769px]:hidden">
+            <summary class="cursor-pointer font-medium">Menu</summary>
+            {%- include aesthetihawk/sidebar.html id_prefix="phone-" -%}
+        </details>
+
+        <h1 class="ocs__hub-viewer-title">{{ page.title }}</h1>
+        {{ content }}
+    </div>
+</div>
+
+<script type="module">
+    import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { viewFor, roleNames, isMentorAccount, switchView, clearRoleViewCache, showRoleSidebars } from '{{ site.baseurl }}/assets/js/api/role-view.js';
+
+    const roleBar = document.getElementById('role-bar');
+    const roleBadge = document.getElementById('role-bar-badge');
+    const roleText = document.getElementById('role-bar-text');
+    const switchButton = document.getElementById('role-view-switch');
+
+    function showSidebar(isMentorView, isMentorAccountHolder) {
+        showRoleSidebars(document, isMentorView);
+        roleBar.hidden = !isMentorAccountHolder;
+        roleBadge.textContent = isMentorView ? 'Mentor' : 'Student view';
+        roleBadge.classList.toggle('ocs__status-pill--good', isMentorView);
+        roleBadge.classList.toggle('ocs__status-pill--neutral', !isMentorView);
+        roleText.textContent = isMentorView
+            ? 'You are signed in with a mentor account.'
+            : 'Your mentor account is viewing the site as a student.';
+        switchButton.textContent = isMentorView ? 'Switch to student view' : 'Switch to mentor view';
+        try {
+            localStorage.setItem('ocsMentorSidebar', isMentorView ? 'mentor' : 'default');
+        } catch (e) {
+            console.warn('Could not cache the sidebar choice', e);
+        }
+    }
+
+    try {
+        const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+        if (!response.ok) {
+            showSidebar(false, false);
+            clearRoleViewCache();
+        } else {
+            const roles = roleNames(await response.json());
+            switchButton.onclick = () => switchView(roles);
+            showSidebar(viewFor(roles) === 'mentor', isMentorAccount(roles));
+        }
+    } catch (error) {
+        console.error('Mentor role check failed', error);
+        showSidebar(false, false);
+    }
+</script>

@@ -39,7 +39,7 @@ is marked for teachers; anyone else who opens it stays on My Submissions.
 ## Phones
 
 At 768px and below the side column is hidden, and the same links fold into a
-**Menu** at the top of the page (`_layouts/aesthetihawk.html`), so the Profile pages
+**Menu** at the top of the page (`_layouts/opencsplus.html`), so the Profile pages
 get it too.
 
 ## Files
@@ -53,6 +53,7 @@ get it too.
 | `pages/retrospective.md` | `navigation/authentication/` | the `/retrospective` page |
 | `pages/analytics-dashboard.md`, `pages/analytics-dashboard-v2.md` | `navigation/authentication/` | the `/analytics-dashboard` page and its redirect |
 | `pages/submissions.md`, `pages/submissions-v2.md` | `navigation/authentication/` | the `/submissions` page and its redirect |
+| `pages/2024-10-29-submissions.md`, `pages/2025-01-21-grader_view.md` | `_posts/projects/grades/` | legacy student submission and grader pages, with their original URLs |
 | `layouts/` | `_layouts/` | the Retrospective, Analytics Dashboard and Submissions layouts |
 | `_includes/submissions/creator-dashboard.html` | `_includes/submissions/` | the Assignments You Created / Teacher Dashboard section |
 | `js/analytics/` | `assets/js/analytics/` | sprint and forecast retrospectives, grade calculator |
