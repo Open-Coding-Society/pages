@@ -20,7 +20,7 @@ chains to `opencs` and reuses the sidebar include, which reads `page.sidebar`
 as the name of a data file, optionally under `page.sidebar_project`:
 
 ```liquid
-{% raw %}{% assign sidebar_name = page.sidebar | default: "aesthetihawk_sidebar" %}
+{% raw %}{% assign sidebar_name = page.sidebar %}
 {% assign sidebar_data = site.data.projects[page.sidebar_project][sidebar_name] %}
 {% for section in sidebar_data %}{% endraw %}
 ```

@@ -2,11 +2,13 @@
   A page picks its sidebar with `sidebar: <data file>` and optional
   `sidebar_project: <project>`; without them, the Profile sidebar shows.
 {% endcomment %}
-{% assign sidebar_name = page.sidebar | default: "aesthetihawk_sidebar" %}
-{% if page.sidebar_project %}
+{% assign sidebar_name = page.sidebar %}
+{% if page.sidebar_project and sidebar_name %}
   {% assign sidebar_data = site.data.projects[page.sidebar_project][sidebar_name] %}
-{% else %}
+{% elsif sidebar_name %}
   {% assign sidebar_data = site.data[sidebar_name] %}
+{% else %}
+  {% assign sidebar_data = site.data.projects.profile.profile_sidebar %}
 {% endif %}
 <!-- Two sidebars are pre-rendered; JS in _layouts/opencsplus.html toggles which
      one is visible based on the live ROLE_MENTOR check. The mentor one is the
@@ -20,7 +22,7 @@
 </div>
 <div data-sidebar-role="mentor" hidden>
   {% include aesthetihawk/sidebar-list.html data=sidebar_data id_prefix=include.id_prefix prefix="mentor-" exclude="bathroom_pass,analytics,grades,submissions" %}
-  {% include aesthetihawk/sidebar-list.html data=site.data.aesthetihawk_sidebar_mentor id_prefix=include.id_prefix prefix="mentor-" %}
+  {% include aesthetihawk/sidebar-list.html data=site.data.projects.profile.mentor_sidebar id_prefix=include.id_prefix prefix="mentor-" %}
 </div>
 <script>
   // Apply the last-known role synchronously, before first paint, so navigating

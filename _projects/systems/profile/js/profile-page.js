@@ -1,4 +1,4 @@
-// Starts every part of /profile (layouts/profile.html in this system) and keeps the
+// Starts every part of /profile (index.md in this system) and keeps the
 // identity card and the setup checklist at the top of the page in step with them.
 // `profile` (js/profile-backend.js) is what every part loads and saves through: a
 // FlaskProfile, or a SpringProfile on a site that runs Spring. The layout's starter builds

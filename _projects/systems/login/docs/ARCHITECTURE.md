@@ -42,7 +42,7 @@ and passes them to the module's start function.
 
 Each starter builds the session with `createSession(createBackends({ pythonURI, javaURI,
 fetchOptions, springEnabled }))`. That gives a `FlaskSession` on a Flask-only site and a
-`SpringSession` on a site with Spring. Profile's layout (`_projects/systems/profile/layouts/profile.html`)
+`SpringSession` on a site with Spring. Profile's page (`_projects/systems/profile/index.md`)
 also uses `createBackends`, to build its `FlaskProfile` or `SpringProfile`, so a change to
 `Backend` reaches `/profile` too.
 

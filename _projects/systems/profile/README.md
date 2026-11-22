@@ -1,9 +1,9 @@
 # Profile
 
-Profile is the student's settings page at `/profile`: who they are, their account
+Profile is the student's settings page and sidebar hub at `/profile`: who they are, their account
 details, classes, persona, skill check-in, Face ID and GitHub Gist connection. It
-is built only from the OCS grammar (`_sass/open-coding/elements/`, documented in
-`_sass/open-coding/README.md`) and has no page stylesheet.
+uses the OCS grammar (`_sass/open-coding/elements/`, documented in
+`_sass/open-coding/README.md`), with a small Gist card stylesheet.
 
 See [Profile architecture](docs/ARCHITECTURE.md) for how the page fits together,
 the backend endpoints each part calls, and how it's tested.
@@ -27,7 +27,7 @@ What Profile does in each:
 | Optional AI connections (grading and AI themes) | left out | Gemini/Groq keys save independently in Spring |
 | Setup list | Classes, Persona | Classes, Persona, Face ID, GitHub |
 
-The layout leaves the Spring cards out, and its starter picks the profile class once: a
+The page leaves the Spring cards out, and its starter picks the profile class once: a
 `FlaskProfile` on a Flask-only site, or a `SpringProfile`, which extends it, on a site
 with Spring. The modules ask the profile, never `springEnabled` (see
 [Profile classes](docs/ARCHITECTURE.md#profile-classes)).
@@ -45,20 +45,21 @@ with Spring. The modules ask the profile, never `springEnabled` (see
 
 | Source | Published to | What it is |
 |---|---|---|
-| `pages/profile.md` | `navigation/authentication/profile.md` | the `/profile` page |
-| `pages/profile-v2.md` | `navigation/authentication/profile-v2.md` | sends `/profile/v2` to `/profile` |
-| `layouts/profile.html` | `_layouts/profile.html` | the page's markup and starter script |
-| `_includes/profile-gist-connection.html` | `_includes/` | the GitHub Gist card |
-| `_includes/profile-ai-connections.html` | `_includes/` | optional Gemini/Groq connection card using shared OCS controls |
-| `js/` | `assets/js/profile/` | the page's modules |
-| `sass/profile-gist-connection.scss` | `_sass/open-coding/` | the Gist card's styles |
+| `index.md` | `navigation/projects/profile/index.md` | the `/profile` page and starter |
+| `data/` | `_data/projects/profile/` | default and mentor sidebars, also used by toolkit pages |
+| `_includes/` | `_includes/projects/profile/` | Gist and optional AI connection cards |
+| `js/` | `assets/js/projects/profile/` | the page's modules |
+| `sass/` | `_sass/projects/profile/` | the Gist card's styles |
 
-`make` publishes these (see `_projects/REGISTRATION.md`), and git ignores the
-published copies. Edit the sources here.
+`distribution.json` opts into standard directory publication and maps the home
+page and old `assets/js/profile/` URLs as exceptions. The latter preserve cached
+pages; new pages use `assets/js/projects/profile/`. The publisher removes old
+cached outputs, while `make clean` and republishing handle project directories
+(see `_projects/REGISTRATION.md`). Edit sources, not ignored published copies.
 
 ## Imports
 
-The layout's starter script imports `assets/js/api/config.js` and Login's
+The page's starter script imports `assets/js/api/config.js` and Login's
 `assets/js/login/backend.js` with `{{ site.baseurl }}`, builds the profile with
 `createProfile(createBackends({ pythonURI, javaURI, fetchOptions, springEnabled }))`,
 and passes it to `initProfilePage({ profile })`. The Gist include imports `javaURI` the
@@ -80,10 +81,12 @@ test from this system's `tests/` folder.
 - `node --test tests/profile_page.test.mjs`: the whole page on the Messages system's fake
   DOM, with fake Flask and Spring servers. A Flask-only page sends nothing to Spring,
   from loading to every save, and every status text is the one the page always showed.
-- `node --test tests/profile_starter.test.mjs`: each name the layout's starter imports is
+- `node --test tests/profile_starter.test.mjs`: each name the page's starter imports is
   exported by the file published at that path, and the modules import only `./` files.
 - `node --test tests/test_gist_connection.mjs`: the Gist card.
 - `node --test tests/test_ai_connections.mjs`: independent AI-key saves, replacement, disconnect and failures.
 - `bundle exec ruby tests/test_ai_profile_layout.rb`: AI card rendering, shared controls,
   publication paths and Flask-only omission. AI credentials are optional and do not add
   a required step to the setup checklist.
+- `bundle exec ruby scripts/test_system_project_distribution.rb`: migration, clean,
+  republication, and the Profile and toolkit sidebars in both configurations.

@@ -59,7 +59,7 @@ textarea,
 select {
     background-color: $background;
 }
-@import "profile-gist-connection";
+@import "projects/profile/profile-gist-connection";
 @import "dashboard-v2";
 @import "preferences";
 @import "projects/grades/analytics-dashboard";

@@ -21,7 +21,7 @@ sidebar fit together and which shared files other systems load.
 
 Every page above sets `sidebar: grades_sidebar` and `sidebar_project: grades`, so it shows the Grades sidebar
 (`data/grades_sidebar.yml`). Profile, Dashboard/Preferences and the toolkit pages
-keep the Profile sidebar (`_data/aesthetihawk_sidebar.yml`), which no longer lists
+keep the Profile sidebar (`_data/projects/profile/profile_sidebar.yml`), which no longer lists
 grading pages. The shared include `_includes/aesthetihawk/sidebar.html` picks the
 file named by the page's `sidebar:` and falls back to the Profile sidebar. Each
 item's `id` matches the `active_tab` of the page it highlights.

@@ -9,7 +9,7 @@ class ProfileSourceInclude < Liquid::Tag
 
   def initialize(name, markup, tokens)
     super
-    @filename = markup.strip
+    @filename = markup.strip.delete_prefix('projects/profile/')
     raise 'Unexpected Profile include' unless %w[profile-gist-connection.html profile-ai-connections.html].include?(@filename)
   end
 
@@ -24,7 +24,7 @@ class AiProfileLayoutTest < Minitest::Test
   PROFILE = File.expand_path('../_projects/systems/profile', __dir__)
 
   def render_profile(spring)
-    source = File.read(File.join(PROFILE, 'layouts/profile.html')).sub(/\A---\s*\n.*?\n---\s*\n/m, '')
+    source = File.read(File.join(PROFILE, 'index.md')).sub(/\A---\s*\n.*?\n---\s*\n/m, '')
     Liquid::Template.parse(source, error_mode: :strict).render!(
       'site' => { 'spring' => spring, 'baseurl' => '/preview', 'data' => {} }
     )
@@ -44,7 +44,7 @@ class AiProfileLayoutTest < Minitest::Test
       assert input.key?('disabled')
       assert document.at_css("label[for='ai-#{provider}-key']")
     end
-    assert_includes html, '/preview/assets/js/profile/ai-connections.js'
+    assert_includes html, '/preview/assets/js/projects/profile/ai-connections.js'
     assert_includes html, "import { javaURI, fetchOptions } from '/preview/assets/js/api/config.js'"
     assert_includes html, '{ javaURI, fetchOptions }'
   end
@@ -72,9 +72,9 @@ class AiProfileLayoutTest < Minitest::Test
   end
 
   def test_existing_distribution_publishes_ai_sources_without_parent_imports
-    files = JSON.parse(File.read(File.join(PROFILE, 'distribution.json'))).fetch('files')
-    assert_includes files, { 'source' => '_includes', 'destination' => '_includes' }
-    assert_includes files, { 'source' => 'js', 'destination' => 'assets/js/profile' }
+    manifest = JSON.parse(File.read(File.join(PROFILE, 'distribution.json')))
+    assert_equal true, manifest.fetch('standard')
+    assert_includes manifest.fetch('files'), { 'source' => 'js', 'destination' => 'assets/js/profile' }
     source = File.read(File.join(PROFILE, 'js/ai-connections.js'))
     refute_match(/import .*['"]\.\.\//, source)
   end

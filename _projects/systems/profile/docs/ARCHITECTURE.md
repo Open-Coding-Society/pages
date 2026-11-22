@@ -9,8 +9,8 @@ show_reading_time: false
 
 ## The page
 
-`/profile` (`pages/profile.md`) uses `layouts/profile.html`, which sits inside the
-shared `opencsplus` layout. The layout holds:
+`/profile` is `index.md`, published as `navigation/projects/profile/index.md` and
+hosted directly in the shared `opencsplus` layout. The page holds:
 
 - the markup: the top card, then the Account, Classes, Persona, Skill check-in and
   Face ID cards, then the Gist card include. Face ID and the Gist card are built only
@@ -21,6 +21,11 @@ shared `opencsplus` layout. The layout holds:
   builds the profile with `createProfile(createBackends({ pythonURI, javaURI,
   fetchOptions, springEnabled }))` (see Profile classes below), and calls
   `initProfilePage({ profile })`
+
+The shared sidebar reads `data/profile_sidebar.yml` by default, including on
+toolkit pages, and appends `data/mentor_sidebar.yml` for mentor view. Both
+publish under `_data/projects/profile/`. Other hubs can select their own sidebar
+with `sidebar` and `sidebar_project`.
 
 ## Modules
 
@@ -91,11 +96,11 @@ Each part saves on its own, so no single Save button covers the whole page:
   session stops working once it changes.
 - Course changes run one at a time, so Spring's course groups never get a stale list.
 - Persona cards and course rows are built with `textContent`, not HTML strings.
-- The layout reads `site.spring` to decide which cards exist, and the starter reads
+- The page reads `site.spring` to decide which cards exist, and the starter reads
   `springEnabled` from `config.js` to pick the profile class. Both treat a missing
   setting as Spring on, so the cards on the page and the calls the profile makes always
   agree.
-- `config.js` and `pages/profile.md` have `regenerate: true` in their front matter.
+- `config.js` and `index.md` have `regenerate: true` in their front matter.
   Incremental builds don't notice a change to `_config.yml`, so without it they would
   keep the old `springEnabled` after `spring` changes.
 - Text that must keep an accent color is in an element preset themes don't recolor,

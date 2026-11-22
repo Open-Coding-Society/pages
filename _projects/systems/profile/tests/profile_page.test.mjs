@@ -84,7 +84,7 @@ function answerFor(state, key, body) {
     }
 }
 
-// The elements layouts/profile.html gives the modules. The Face ID card is built only on a Spring
+// The elements index.md gives the modules. The Face ID card is built only on a Spring
 // site, as in the layout. The page's setup list ignores the Gist card when it isn't there.
 function buildPage({ spring }) {
     const { document, window } = installFakeDom();

@@ -64,6 +64,8 @@ class SystemProjectDistributionTest < Minitest::Test
       end
     end
     JSON.parse(manifest).fetch("files").map { |entry| entry.fetch("source") }.uniq.each do |relative|
+      next if File.exist?(File.join(project, relative))
+
       FileUtils.mkdir_p(File.dirname(File.join(project, relative)))
       FileUtils.cp_r(File.join(source, relative), File.join(project, relative))
     end
@@ -113,6 +115,72 @@ class SystemProjectDistributionTest < Minitest::Test
         assert_equal ["Grades"], document.css("a.page-link[href='/grades/']").map(&:text)
         assert document.at_css("a[href='/submissions#my-submissions']")
       end
+    end
+  end
+
+  def test_profile_migrates_to_project_paths_and_keeps_shared_sidebars
+    in_workspace do |workspace|
+      project = project_copy(workspace, "profile")
+      manifest = File.join(project, "distribution.json")
+      current = File.read(manifest)
+      legacy = [
+        ["index.md", "navigation/authentication/profile.md"],
+        ["_includes", "_includes"],
+        ["js", "assets/js/profile"],
+        ["sass/profile-gist-connection.scss", "_sass/open-coding/profile-gist-connection.scss"]
+      ]
+      FileUtils.mkdir_p(File.join(project, "old"))
+      File.write(File.join(project, "old/profile.html"), "old layout")
+      File.write(File.join(project, "old/profile-v2.md"), "old redirect")
+      legacy += [["old/profile.html", "_layouts/profile.html"], ["old/profile-v2.md", "navigation/authentication/profile-v2.md"]]
+      File.write(manifest, JSON.generate("files" => legacy.map { |source, destination| { "source" => source, "destination" => destination } }))
+      ProjectPublisher.run("publish", project, workspace)
+      old_paths = ProjectPublisher.files(project, workspace).map(&:last)
+      File.write(manifest, current)
+      command("make", "-f", TEMPLATE, "-C", project, "index", "WORKSPACE_ROOT=#{workspace}")
+      new_paths = ProjectPublisher.files(project, workspace).map(&:last)
+      (old_paths - new_paths).each { |path| refute File.exist?(path), path }
+      assert_equal File.read(File.join(project, "js/profile-page.js")),
+                   File.read(File.join(workspace, "assets/js/profile/profile-page.js"))
+      ProjectPublisher.files(project, workspace).each do |source, destination|
+        assert_equal File.binread(source), File.binread(destination)
+        command("git", "-C", workspace, "check-ignore", "-q", "--", destination)
+      end
+
+      FileUtils.mkdir_p(File.join(workspace, "_layouts"))
+      FileUtils.mkdir_p(File.join(workspace, "_includes/aesthetihawk"))
+      %w[sidebar.html sidebar-list.html].each do |name|
+        FileUtils.cp(File.join(ROOT, "_includes/aesthetihawk", name), File.join(workspace, "_includes/aesthetihawk"))
+      end
+      File.write(File.join(workspace, "_layouts/opencsplus.html"),
+                 "---\n---\n{% include aesthetihawk/sidebar.html %}{% include aesthetihawk/sidebar.html id_prefix='phone-' %}{{ content }}")
+      File.write(File.join(workspace, "toolkit.md"), "---\nlayout: opencsplus\npermalink: /toolkit/\n---\nToolkit\n")
+      [true, false].each do |spring|
+        site = Jekyll::Site.new(Jekyll.configuration(
+          "source" => workspace, "destination" => File.join(workspace, "_site"), "config" => [],
+          "plugins_dir" => [], "quiet" => true, "baseurl" => "/preview", "spring" => spring,
+          "incremental" => false, "layouts_dir" => File.join(workspace, "_layouts"),
+          "includes_dir" => File.join(workspace, "_includes")
+        ))
+        site.process
+        matches = site.pages.select { |page| page.url == "/profile" }
+        assert_equal 1, matches.size
+        assert_empty site.posts.docs.select { |post| post.url == "/profile" }
+        profile = Nokogiri::HTML(matches.first.output)
+        assert_equal 1, profile.css("#profileSettingsForm").size
+        assert_equal spring ? 1 : 0, profile.css("#ai-connections").size
+        assert_equal spring ? 1 : 0, profile.css(".gist-connection").size
+        [profile, Nokogiri::HTML(site.pages.find { |page| page.url == "/toolkit/" }.output)].each do |document|
+          assert_equal 2, document.css('[data-sidebar-role="default"] a[href="/preview/profile"]').size
+          assert_equal 2, document.css('[data-sidebar-role="mentor"] a[href="/preview/capstone/"]').size
+          assert_empty document.css('[data-sidebar-role="mentor"] a[href="/preview/student/bathroom_pass"]')
+        end
+      end
+      command("make", "-f", TEMPLATE, "-C", project, "clean", "WORKSPACE_ROOT=#{workspace}")
+      refute File.exist?(File.join(workspace, "navigation/projects/profile/index.md"))
+      refute File.exist?(File.join(workspace, "_data/projects/profile/profile_sidebar.yml"))
+      command("make", "-f", TEMPLATE, "-C", project, "index", "WORKSPACE_ROOT=#{workspace}")
+      assert File.file?(File.join(workspace, "_data/projects/profile/profile_sidebar.yml"))
     end
   end
 

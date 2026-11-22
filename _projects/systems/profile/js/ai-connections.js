@@ -1,5 +1,5 @@
 // The layout/include supplies shared configuration, so this module works before
-// and after the Profile project's files are published to assets/js/profile/.
+// and after the Profile project's files are published to assets/js/projects/profile/.
 export function initAiConnections(root, { request = fetch, javaURI, fetchOptions } = {}) {
   if (!root) return Promise.resolve();
   const availability = root.querySelector('[data-ai-availability]');

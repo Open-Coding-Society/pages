@@ -116,6 +116,8 @@ class GradesHubTest < Minitest::Test
       FileUtils.mkdir_p(File.join(source, "_includes/projects/grades/submissions"))
       FileUtils.mkdir_p(File.join(source, "_data/projects/grades"))
       FileUtils.cp(File.join(SYSTEM, "data/grades_sidebar.yml"), File.join(source, "_data/projects/grades"))
+      FileUtils.mkdir_p(File.join(source, "_data/projects/profile"))
+      FileUtils.cp_r(Dir[File.join(ROOT, "_projects/systems/profile/data/*.yml")], File.join(source, "_data/projects/profile"))
       FileUtils.cp(File.join(ROOT, "_layouts/opencsplus.html"), File.join(source, "_layouts"))
       FileUtils.cp(File.join(ROOT, "_layouts/opencs.html"), File.join(source, "_layouts"))
       FileUtils.cp(File.join(ROOT, "_layouts/aesthetihawk.html"), File.join(source, "_layouts"))
@@ -165,6 +167,11 @@ class GradesHubTest < Minitest::Test
       assert_includes grades, '<footer>Footer</footer>'
       assert_includes grades, "opencsplus-page"
       assert_includes profile, "<p>Profile layout</p>"
+      profile_document = Nokogiri::HTML(profile)
+      assert_equal 2, profile_document.css('[data-sidebar-role="default"] a[href="/profile"]').size
+      assert_equal 2, profile_document.css('[data-sidebar-role="mentor"] a[href="/capstone/"]').size
+      assert_empty profile_document.css('[data-sidebar-role="mentor"] a[href="/student/bathroom_pass"]')
+      assert_equal 2, Nokogiri::HTML(bathroom).css('[data-sidebar-role="default"] a[href="/profile"]').size
       assert_equal 1, grades.scan("<html").size
       assert_equal 1, grades.scan("<head>").size
       assert_equal 1, grades.scan("<body>").size

@@ -275,7 +275,7 @@ function initialsOf(name) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => Array.from(word)[0]).join('').toUpperCase();
 }
 
-// abbr.ocs__avatar beside the name, as on _projects/systems/profile/layouts/profile.html (an abbr
+// abbr.ocs__avatar beside the name, as on _projects/systems/profile/index.md (an abbr
 // keeps the accent under presets), in an ocs__entity-list like presence-system-technical.md.
 function team(settings, ctx) {
   const people = listOf(settings, 'items', ctx, 'team').map((item) => {

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { test } from 'node:test';
 
-// The layout's starter is where the page's modules meet the site: it imports each helper with the
+// The page's starter is where the modules meet the site: it imports each helper with the
 // site.baseurl path, and the browser refuses the whole script when one name isn't exported where
 // the starter looks. Node can't load the published copies, so this checks each import against the
 // source that gets published there.
@@ -15,7 +15,13 @@ function publishedSources() {
     const sources = new Map();
     for (const system of ['login', 'profile']) {
         const base = `_projects/systems/${system}/`;
-        for (const { source, destination } of JSON.parse(read(`${base}distribution.json`)).files) {
+        const manifest = JSON.parse(read(`${base}distribution.json`));
+        if (manifest.standard) {
+            for (const file of readdirSync(new URL(`${base}js/`, root))) {
+                sources.set(`assets/js/projects/${system}/${file}`, `${base}js/${file}`);
+            }
+        }
+        for (const { source, destination } of manifest.files) {
             const path = `${base}${source}`;
             if (!statSync(new URL(path, root)).isDirectory()) sources.set(destination, path);
             else for (const file of readdirSync(new URL(`${path}/`, root))) sources.set(`${destination}/${file}`, `${path}/${file}`);
@@ -26,10 +32,10 @@ function publishedSources() {
 
 const exportsOf = (code) => new Set([...code.matchAll(/^export (?:async )?(?:function|class|const|var|let) (\w+)/gm)].map((match) => match[1]));
 
-test("the layout's starter imports each name from a file published there that exports it", () => {
-    const layout = read('_projects/systems/profile/layouts/profile.html');
-    const start = layout.lastIndexOf('<script type="module">');
-    const starter = layout.slice(start, layout.indexOf('</script>', start));
+test("the page's starter imports each name from a file published there that exports it", () => {
+    const page = read('_projects/systems/profile/index.md');
+    const start = page.lastIndexOf('<script type="module">');
+    const starter = page.slice(start, page.indexOf('</script>', start));
     const imports = [...starter.matchAll(/import \{([^}]*)\} from '\{\{ ?site\.baseurl ?\}\}\/([^']+)'/g)];
     assert.ok(imports.length > 0, 'the starter imports nothing');
     const sources = publishedSources();
@@ -44,7 +50,7 @@ test("the layout's starter imports each name from a file published there that ex
     }
 });
 
-// The modules are published together to assets/js/profile/, so they may import only each other.
+// The modules are published together, so they may import only each other.
 test('profile modules import only ./ paths to files in the same folder', () => {
     for (const file of readdirSync(new URL(MODULES, root)).filter((name) => name.endsWith('.js'))) {
         const code = read(`${MODULES}${file}`);

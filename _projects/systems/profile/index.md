@@ -1,9 +1,17 @@
 ---
-title: Profile Settings
 layout: opencsplus
+title: Your Profile
+permalink: /profile
 active_tab: profile
+opencsplus: true
+regenerate: true
 ---
-{%- comment -%}
+
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD033 -->
+
+{::nomarkdown}
+{% comment -%}
 /profile: profile settings built only from the ocs__ grammar
 (_sass/open-coding/README.md), with no page stylesheet. Source: _projects/systems/profile
 (see its README). profile-page.js starts the account form, classes, personas, skill
@@ -188,9 +196,9 @@ Gist card need Spring, so a Flask-only site (spring: false in _config.yml) leave
 
     <!-- GitHub Gist connection (its own include) -->
     <div id="github">
-        {% include profile-gist-connection.html %}
+        {% include projects/profile/profile-gist-connection.html %}
     </div>
-    {% include profile-ai-connections.html %}
+    {% include projects/profile/profile-ai-connections.html %}
     {%- endif %}
 </div>
 
@@ -200,7 +208,10 @@ Gist card need Spring, so a Flask-only site (spring: false in _config.yml) leave
     // runs Spring. The page's modules get only the profile and import each other with ./ paths.
     import { fetchOptions, javaURI, pythonURI, springEnabled } from '{{ site.baseurl }}/assets/js/api/config.js';
     import { createBackends } from '{{ site.baseurl }}/assets/js/login/backend.js';
-    import { createProfile } from '{{ site.baseurl }}/assets/js/profile/profile-backend.js';
-    import { initProfilePage } from '{{ site.baseurl }}/assets/js/profile/profile-page.js';
+    import { createProfile } from '{{ site.baseurl }}/assets/js/projects/profile/profile-backend.js';
+    import { initProfilePage } from '{{ site.baseurl }}/assets/js/projects/profile/profile-page.js';
     initProfilePage({ profile: createProfile(createBackends({ pythonURI, javaURI, fetchOptions, springEnabled })) });
 </script>
+{:/}
+
+<!-- markdownlint-restore -->
