@@ -1,4 +1,4 @@
-# The Grades hub (/grades/, navigation/grades.html) shows these sections in
+# The Grades hub (/grades/, navigation/projects/grades/index.md) shows these sections in
 # order. Every link opens a page or tab that already exists; a `#name` opens
 # that tab. `audience` labels links that only teachers or admins can use, and
 # `spring_path` links open the Spring backend (skipped when `spring: false`).

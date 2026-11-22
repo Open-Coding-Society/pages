@@ -150,7 +150,7 @@ minima:
   nav_pages:
     - navigation/course.md
     - navigation/projects/topics/topics.md
-    - navigation/grades.html
+    - navigation/projects/grades/index.md
     - navigation/projects/capstone/capstone.md
 exclude:
 # Jekyll defaults

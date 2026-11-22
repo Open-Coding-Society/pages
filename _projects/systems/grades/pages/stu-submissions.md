@@ -5,6 +5,9 @@ active_tab: submissions
 permalink: /student/submissions
 ---
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD033 -->
+
 <div class="container mx-auto px-4 py-8 max-w-3xl">
     <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border border-neutral-700">
         <h1 class="text-3xl font-bold text-gray-100 mb-6 border-b border-neutral-700 pb-2">Assignment Submissions</h1>
@@ -395,3 +398,5 @@ permalink: /student/submissions
         }
     }
 </script>
+
+<!-- markdownlint-restore -->

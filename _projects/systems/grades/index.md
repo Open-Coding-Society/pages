@@ -17,6 +17,9 @@ search_exclude: true
   teacher and admin links instead of hiding them.
 {% endcomment %}
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD033 -->
+
 <div class="ocs__container ocs__container--fill">
   <h2 class="ocs__section-title">Grades</h2>
   <p>See and predict your grades, reflect on each sprint, and manage submissions.</p>
@@ -50,3 +53,5 @@ search_exclude: true
     link.href = javaURI + link.dataset.springPath;
   });
 </script>
+
+<!-- markdownlint-restore -->

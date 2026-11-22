@@ -8,6 +8,9 @@ permalink: /student/view-grades
 comments: false
 ---
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD033 -->
+
 <div class="ocs__view-grades-v2-page">
   <div class="ocs__card ocs__view-grades-v2-card">
     <h2 class="ocs__section-title ocs__view-grades-v2-title">Your Grades</h2>
@@ -145,3 +148,5 @@ comments: false
 
     window.onload = loadGrades;
 </script>
+
+<!-- markdownlint-restore -->

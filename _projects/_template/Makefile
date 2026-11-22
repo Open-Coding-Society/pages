@@ -101,7 +101,7 @@ assets:
 		fi; \
 	fi
 
-# Index target - copy either index.ipynb or index.md (not both) AFTER assets are ready
+# Index target - publish either index.ipynb or index.md (not both) AFTER assets are ready
 # This triggers Jekyll rebuild, so it must run last
 index: assets
 	@if [ -f "index.ipynb" ] && [ -f "index.md" ]; then \
@@ -109,10 +109,24 @@ index: assets
 		exit 1; \
 	fi
 	@if [ -f "index.md" ]; then \
-		mkdir -p $(WORKSPACE_ROOT)/_posts/projects; \
-		if ! cmp -s index.md "$(WORKSPACE_ROOT)/_posts/projects/$(MARKDOWN_FILENAME)"; then \
-			cp index.md "$(WORKSPACE_ROOT)/_posts/projects/$(MARKDOWN_FILENAME)" || exit 1; \
-			touch /tmp/.jekyll_rebuild_trigger; \
+		MANAGED_INDEX=false; \
+		if [ -f "distribution.json" ]; then \
+			MANAGED_INDEX=$$(ruby -rjson -e 'puts JSON.parse(File.read("distribution.json")).fetch("files").any? { |entry| entry["source"] == "index.md" }') || exit 1; \
+		fi; \
+		OLD_INDEX="$(WORKSPACE_ROOT)/_posts/projects/$(MARKDOWN_FILENAME)"; \
+		if [ "$$MANAGED_INDEX" = "true" ]; then \
+			if [ -f "$$OLD_INDEX" ]; then \
+				if git -C "$(WORKSPACE_ROOT)" ls-files --error-unmatch "_posts/projects/$(MARKDOWN_FILENAME)" >/dev/null 2>&1 || ! cmp -s index.md "$$OLD_INDEX"; then \
+					echo "Refusing to remove tracked or modified old index: $$OLD_INDEX" >&2; exit 1; \
+				fi; \
+				rm "$$OLD_INDEX"; \
+			fi; \
+		else \
+			mkdir -p $(WORKSPACE_ROOT)/_posts/projects; \
+			if ! cmp -s index.md "$$OLD_INDEX"; then \
+				cp index.md "$$OLD_INDEX" || exit 1; \
+				touch /tmp/.jekyll_rebuild_trigger; \
+			fi; \
 		fi; \
 	fi
 

@@ -17,9 +17,6 @@ sidebar fit together and which shared files other systems load.
 | Retrospective: Sprint Reflection, Growth Over Time, Forecast Retrospective | `/retrospective` | Retrospective |
 | Submissions: My Submissions, Assignments You Created / Teacher Dashboard, All Submissions | `/submissions` | Submissions |
 
-`/student/view-grades/v2`, `/analytics-dashboard/v2` and `/submissions/v2` redirect
-to their main pages.
-
 ## Sidebars
 
 Every page above sets `sidebar: grades_sidebar`, so it shows the Grades sidebar
@@ -46,15 +43,15 @@ get it too.
 
 | Source | Published to | What it is |
 |---|---|---|
-| `pages/grades.html` | `navigation/grades.html` | the `/grades/` hub |
+| `index.md` | `navigation/projects/grades/index.md` | the `/grades/` hub |
 | `data/grades_hub.yml` | `_data/` | the hub's sections and links |
 | `data/grades_sidebar.yml` | `_data/` | the Grades sidebar |
-| `pages/view-grades.md`, `pages/view-grades-v2.md` | `_posts/student_toolkit/assignments/2025-01-21-gradeviewer*.md` | View Grades and its `/v2` redirect |
+| `pages/view-grades.md` | `_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md` | View Grades |
 | `pages/retrospective.md` | `navigation/authentication/` | the `/retrospective` page |
-| `pages/analytics-dashboard.md`, `pages/analytics-dashboard-v2.md` | `navigation/authentication/` | the `/analytics-dashboard` page and its redirect |
-| `pages/submissions.md`, `pages/submissions-v2.md` | `navigation/authentication/` | the `/submissions` page and its redirect |
-| `pages/2024-10-29-submissions.md`, `pages/2025-01-21-grader_view.md` | `_posts/projects/grades/` | legacy student submission and grader pages, with their original URLs |
-| `layouts/` | `_layouts/` | the Retrospective, Analytics Dashboard and Submissions layouts |
+| `pages/analytics-dashboard.md` | `navigation/authentication/` | the `/analytics-dashboard` page |
+| `pages/submissions.md` | `navigation/authentication/` | the `/submissions` page |
+| `pages/stu-submissions.md` | `navigation/projects/grades/stu-submissions.md` | legacy student submission page at `/student/submissions` |
+| `pages/assign-grades.md` | `navigation/projects/grades/assign-grades.md` | legacy grader page at `/student/assign-grades` |
 | `_includes/submissions/creator-dashboard.html` | `_includes/submissions/` | the Assignments You Created / Teacher Dashboard section |
 | `js/analytics/` | `assets/js/analytics/` | sprint and forecast retrospectives, grade calculator |
 | `js/ocs-analytics-dashboard.js` | `assets/js/` | the OCS Analytics section |
@@ -63,9 +60,9 @@ get it too.
 | `sass/` | `_sass/open-coding/` | the pages' styles, imported in `_sass/open-coding/_main.scss` |
 
 `make` publishes these through `distribution.json` (see `_projects/REGISTRATION.md`).
-Files that moved here are published to the paths they had before the move, so no
-address or import changes. Git ignores
-the published copies: edit the sources here.
+The hub and the legacy student submission and grader pages are published under
+`navigation/projects/grades/`; their addresses are unchanged. Git ignores the
+published copies: edit the sources here.
 
 ## Tests
 
@@ -76,8 +73,10 @@ the published copies: edit the sources here.
   a hash opens, and which sidebar link is marked.
 - `node --test tests/test_submission_grading.mjs tests/test_creator_dashboard.mjs`:
   the grading calls and the creator dashboard.
-- `node --test tests/v2_pages.test.mjs`: the main pages, their `/v2` redirects, and
+- `node --test tests/v2_pages.test.mjs`: the main pages, remaining `/v2` redirects, and
   that every `-v2` partial is imported.
+- `bundle exec ruby scripts/test_system_project_distribution.rb`: publication and
+  migration of the Grades pages, including their original routes and removal of old posts.
 
-The root files are one-line shims that load the tests in `tests/` here, so they run
-before a build.
+The Grades hub, submission grading and creator dashboard root tests load the tests
+in `tests/` here, so they run before a build.

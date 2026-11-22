@@ -99,6 +99,14 @@ Files under `notebooks/` are converted directly into posts under
 directory. The `index.md` and `index.ipynb` files represent the project index,
 so a project may provide at most one of them.
 
+By default, `index.md` is published as a dated post. For an application home
+page, map `index.md` in `distribution.json` to a standalone page such as
+`navigation/projects/<name>/index.md` and give it an explicit permalink. The
+template then skips the post copy. If an older post copy exists, it removes it
+only when it is untracked and identical to the source; otherwise the build stops
+so the differing file can be reviewed. Update `_config.yml` when the page is
+listed in the top navigation.
+
 One Python invocation handles a project's index, lesson, and navigation
 notebooks, with at most four conversion workers by default. A content-based
 cache in `.notebook-conversion-cache/` skips unchanged sources, invalidates when

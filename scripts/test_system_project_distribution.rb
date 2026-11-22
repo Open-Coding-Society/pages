@@ -55,52 +55,6 @@ class SystemProjectDistributionTest < Minitest::Test
         FileUtils.cp_r(File.join(source, directory), project) if File.directory?(File.join(source, directory))
       end
 
-      def test_class_management_and_grades_publish_moved_posts_with_original_routes
-        expected = {
-          "class_manage" => {
-            "2025-08-01-ClassroomManagement.md" => "/student/classrooms",
-            "2025-04-04-TeamTeachToolkit_Signup.md" => "/student/TeamTeachToolkit/signup"
-          },
-          "grades" => {
-            "2024-10-29-submissions.md" => "/student/submissions",
-            "2025-01-21-grader_view.md" => "/student/assign-grades"
-          }
-        }
-        registry = File.readlines(File.join(ROOT, "_projects/.makeprojects"), chomp: true)
-        assert_includes registry, "systems/class_manage:dev"
-
-        in_workspace do |workspace|
-          expected.each do |name, pages|
-            project = project_copy(workspace, name)
-            ProjectPublisher.run("publish", project, workspace)
-            pages.each do |filename, permalink|
-              source = File.join(project, "pages", filename)
-              published = File.join(workspace, "_posts/projects", name, filename)
-              assert_equal File.binread(source), File.binread(published)
-              frontmatter = File.read(published)[/\A---\s*\n(.*?)\n---/m, 1]
-              assert_equal permalink, YAML.safe_load(frontmatter).fetch("permalink")
-              command("git", "-C", workspace, "check-ignore", "-q", "--", published)
-            end
-
-            def test_class_management_notebooks_keep_their_routes
-              expected = {
-                "2024-10-31-bathroom" => "/hallpass_queue",
-                "2024-10-31-reporting_issues" => "/bathroom/issues",
-                "2024-12-17-statistics" => "/bathroom/statistics",
-                "2024-12-18-hallpass" => "/hallpass_queue/hallpass",
-                "2025-01-25-request_pass" => "/hallpass/requestpass"
-              }
-              expected.each do |name, permalink|
-                source = File.join(ROOT, "_projects/systems/class_manage/notebooks", "#{name}.ipynb")
-                first_cell = JSON.parse(File.read(source)).fetch("cells").first.fetch("source").join
-                frontmatter = first_cell[/\A---\s*\n(.*?)\n---/m, 1]
-                assert_equal permalink, YAML.safe_load(frontmatter).fetch("permalink")
-                refute File.exist?(File.join(ROOT, "_notebooks/student_toolkit/BathroomPass", "#{name}.ipynb"))
-              end
-            end
-          end
-        end
-      end
       return project
     end
     manifest = File.read(File.join(source, "distribution.json"))
@@ -110,6 +64,196 @@ class SystemProjectDistributionTest < Minitest::Test
     end
     File.write(File.join(project, "distribution.json"), manifest)
     project
+  end
+
+  def test_grades_index_migrates_from_old_page_and_remains_in_top_navigation
+    in_workspace do |workspace|
+      project = project_copy(workspace, "grades")
+      manifest = File.join(project, "distribution.json")
+      current = File.read(manifest)
+      legacy = JSON.parse(current)
+      legacy.fetch("files").find { |entry| entry["source"] == "index.md" }["destination"] = "navigation/grades.html"
+      File.write(manifest, JSON.generate(legacy))
+      ProjectPublisher.run("publish", project, workspace)
+      old_page = File.join(workspace, "navigation/grades.html")
+      assert File.file?(old_page)
+
+      File.write(manifest, current)
+      command("make", "-f", TEMPLATE, "-C", project, "index", "WORKSPACE_ROOT=#{workspace}")
+      page = File.join(workspace, "navigation/projects/grades/index.md")
+      refute File.exist?(old_page)
+      assert_equal File.binread(File.join(project, "index.md")), File.binread(page)
+      refute File.exist?(File.join(workspace, "_posts/projects/2026-04-15-grades.md"))
+
+      Dir.mktmpdir("grades-nav-") do |source|
+        FileUtils.mkdir_p(File.join(source, "navigation/projects/grades"))
+        FileUtils.cp(page, File.join(source, "navigation/projects/grades/index.md"))
+        FileUtils.mkdir_p(File.join(source, "_data"))
+        FileUtils.cp(File.join(project, "data/grades_hub.yml"), File.join(source, "_data"))
+        FileUtils.mkdir_p(File.join(source, "_layouts"))
+        FileUtils.mkdir_p(File.join(source, "_includes/themes/minima"))
+        FileUtils.cp(File.join(ROOT, "_includes/themes/minima/header.html"), File.join(source, "_includes/themes/minima"))
+        File.write(File.join(source, "_layouts/opencsplus.html"), "{% include themes/minima/header.html %}{{ content }}")
+        site = Jekyll::Site.new(Jekyll.configuration(
+          "source" => source, "destination" => File.join(source, "_site"), "config" => [],
+          "layouts_dir" => File.join(source, "_layouts"), "includes_dir" => File.join(source, "_includes"),
+          "plugins_dir" => [], "quiet" => true,
+          "minima" => { "nav_pages" => ["navigation/projects/grades/index.md"] }
+        ))
+        site.process
+        matching = site.pages.select { |item| item.url == "/grades/" }
+        assert_equal 1, matching.size
+        assert_empty site.posts.docs.select { |item| item.url == "/grades/" }
+        document = Nokogiri::HTML(matching.first.output)
+        assert_equal ["Grades"], document.css("a.page-link[href='/grades/']").map(&:text)
+        assert document.at_css("a[href='/submissions#my-submissions']")
+      end
+    end
+  end
+
+  def test_index_publication_preserves_unmanaged_projects_and_modified_old_posts
+    in_workspace do |workspace|
+      project = File.join(workspace, "_projects/systems/example")
+      FileUtils.mkdir_p(project)
+      File.write(File.join(project, "index.md"), "---\npermalink: /example/\n---\nExample\n")
+      command("make", "-f", TEMPLATE, "-C", project, "index", "WORKSPACE_ROOT=#{workspace}")
+      post = File.join(workspace, "_posts/projects/2026-04-15-example.md")
+      assert_equal File.binread(File.join(project, "index.md")), File.binread(post)
+
+      File.write(File.join(project, "distribution.json"), JSON.generate("files" => [
+        { "source" => "index.md", "destination" => "navigation/projects/example/index.md" }
+      ]))
+      File.write(post, "edited output")
+      stdout, stderr, status = Open3.capture3("make", "-f", TEMPLATE, "-C", project, "index", "WORKSPACE_ROOT=#{workspace}")
+      refute status.success?, "#{stdout}\n#{stderr}"
+      assert_includes stderr, "Refusing to remove tracked or modified old index"
+      assert_equal "edited output", File.read(post)
+
+      FileUtils.cp(File.join(project, "index.md"), post)
+      command("make", "-f", TEMPLATE, "-C", project, "index", "WORKSPACE_ROOT=#{workspace}")
+      refute File.exist?(post)
+      assert File.file?(File.join(workspace, "navigation/projects/example/index.md"))
+    end
+  end
+
+  def test_class_management_publishes_moved_posts_with_original_routes
+    expected = {
+      "class_manage" => {
+        "2025-08-01-ClassroomManagement.md" => "/student/classrooms",
+        "2025-04-04-TeamTeachToolkit_Signup.md" => "/student/TeamTeachToolkit/signup"
+      }
+    }
+    registry = File.readlines(File.join(ROOT, "_projects/.makeprojects"), chomp: true)
+    assert_includes registry, "systems/class_manage:dev"
+
+    in_workspace do |workspace|
+      expected.each do |name, pages|
+        project = project_copy(workspace, name)
+        ProjectPublisher.run("publish", project, workspace)
+        pages.each do |filename, permalink|
+          source = File.join(project, "pages", filename)
+          published = File.join(workspace, "_posts/projects", name, filename)
+          assert_equal File.binread(source), File.binread(published)
+          frontmatter = File.read(published)[/\A---\s*\n(.*?)\n---/m, 1]
+          assert_equal permalink, YAML.safe_load(frontmatter).fetch("permalink")
+          command("git", "-C", workspace, "check-ignore", "-q", "--", published)
+        end
+      end
+    end
+  end
+
+  def test_legacy_grades_pages_migrate_from_posts_without_changing_routes_or_content
+    in_workspace do |workspace|
+      project = project_copy(workspace, "grades")
+      manifest = File.join(project, "distribution.json")
+      current = File.read(manifest)
+      legacy = JSON.parse(current)
+      pages = {
+        "stu-submissions.md" => ["2024-10-29-submissions.md", "/student/submissions"],
+        "assign-grades.md" => ["2025-01-21-grader_view.md", "/student/assign-grades"]
+      }
+      pages.each do |name, (old_name, _)|
+        entry = legacy.fetch("files").find { |item| item["source"] == "pages/#{name}" }
+        entry["destination"] = "_posts/projects/grades/#{old_name}"
+      end
+      File.write(manifest, JSON.generate(legacy))
+      ProjectPublisher.run("publish", project, workspace)
+
+      FileUtils.mkdir_p(File.join(workspace, "_layouts"))
+      File.write(File.join(workspace, "_layouts/opencsplus.html"), "<main>{{ content }}</main>")
+      config = {
+        "source" => workspace, "destination" => File.join(workspace, "_site"), "config" => [],
+        "plugins_dir" => [], "quiet" => true, "future" => true
+      }
+      old_site = Jekyll::Site.new(Jekyll.configuration(config))
+      old_site.process
+      old_outputs = pages.transform_values do |(_, url)|
+        matches = old_site.posts.docs.select { |post| post.url == url }
+        assert_equal 1, matches.size, "old post for #{url}"
+        matches.first.output
+      end
+
+      File.write(manifest, current)
+      ProjectPublisher.run("publish", project, workspace)
+      pages.each do |name, (old_name, _)|
+        refute File.exist?(File.join(workspace, "_posts/projects/grades", old_name))
+        published = File.join(workspace, "navigation/projects/grades", name)
+        assert_equal File.binread(File.join(project, "pages", name)), File.binread(published)
+        command("git", "-C", workspace, "check-ignore", "-q", "--", published)
+      end
+
+      site = Jekyll::Site.new(Jekyll.configuration(config))
+      site.process
+      pages.each do |name, (_, url)|
+        matches = site.pages.select { |page| page.url == url }
+        assert_equal 1, matches.size, "page for #{url}"
+        assert_empty site.posts.docs.select { |post| post.url == url }
+        assert_equal old_outputs.fetch(name), matches.first.output, "#{url} content"
+      end
+    end
+  end
+
+  def test_class_management_notebooks_keep_their_routes
+    expected = {
+      "2024-10-31-bathroom" => "/hallpass_queue",
+      "2024-10-31-reporting_issues" => "/bathroom/issues",
+      "2024-12-17-statistics" => "/bathroom/statistics",
+      "2024-12-18-hallpass" => "/hallpass_queue/hallpass",
+      "2025-01-25-request_pass" => "/hallpass/requestpass"
+    }
+    expected.each do |name, permalink|
+      source = File.join(ROOT, "_projects/systems/class_manage/notebooks", "#{name}.ipynb")
+      first_cell = JSON.parse(File.read(source)).fetch("cells").first.fetch("source").join
+      frontmatter = first_cell[/\A---\s*\n(.*?)\n---/m, 1]
+      assert_equal permalink, YAML.safe_load(frontmatter).fetch("permalink")
+      refute File.exist?(File.join(ROOT, "_notebooks/student_toolkit/BathroomPass", "#{name}.ipynb"))
+    end
+  end
+
+  def test_grades_publication_removes_old_cached_v2_redirects
+    in_workspace do |workspace|
+      project = project_copy(workspace, "grades")
+      manifest = File.join(project, "distribution.json")
+      current = File.read(manifest)
+      legacy = JSON.parse(current)
+      old_outputs = {
+        "view-grades-v2.md" => "_posts/student_toolkit/assignments/2025-01-21-gradeviewer-v2.md",
+        "analytics-dashboard-v2.md" => "navigation/authentication/analytics-dashboard-v2.md",
+        "submissions-v2.md" => "navigation/authentication/submissions-v2.md"
+      }
+      old_outputs.each do |name, destination|
+        File.write(File.join(project, "pages", name), "old redirect")
+        legacy.fetch("files") << { "source" => "pages/#{name}", "destination" => destination }
+      end
+      File.write(manifest, JSON.generate(legacy))
+      ProjectPublisher.run("publish", project, workspace)
+      old_outputs.each_value { |path| assert File.file?(File.join(workspace, path)) }
+
+      File.write(manifest, current)
+      ProjectPublisher.run("publish", project, workspace)
+      old_outputs.each_value { |path| refute File.exist?(File.join(workspace, path)) }
+      assert File.file?(File.join(workspace, "navigation/authentication/submissions.md"))
+    end
   end
 
   def test_topics_and_capstone_migrate_clean_and_republish_only_ignored_outputs

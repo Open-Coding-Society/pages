@@ -7,6 +7,9 @@ permalink: /student/assign-grades
 comments: false
 ---
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD033 -->
+
 <div class="p-6 text-gray-100">
   <table class="w-full mt-6 border-collapse rounded-lg overflow-hidden bg-gray-900">
     <thead>
@@ -188,3 +191,5 @@ comments: false
       });
   }
 </script>
+
+<!-- markdownlint-restore -->

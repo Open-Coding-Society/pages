@@ -8,15 +8,16 @@ show_reading_time: false
 
 ## Where Grades starts
 
-The top nav's **Grades** link (`navigation/grades.html` in `_config.yml`'s
+The top nav's **Grades** link (`navigation/projects/grades/index.md` in `_config.yml`'s
 `nav_pages`) opens `/grades/`. That hub page loops over `data/grades_hub.yml`
 and shows three cards, Grade, Reflect and Submissions, of links to the pages and
 sections that already exist. It builds no page of its own for any of them.
 
 ## Sidebar
 
-All Grades pages use the `aesthetihawk` layout, the same one Profile's toolkit
-pages use. Its sidebar include reads `page.sidebar` as the name of a data file:
+Grades pages use the `opencsplus` layout, as do Profile and toolkit pages. It
+chains to `opencs` and reuses the sidebar include, which reads `page.sidebar`
+as the name of a data file:
 
 ```liquid
 {% raw %}{% assign sidebar_name = page.sidebar | default: "aesthetihawk_sidebar" %}

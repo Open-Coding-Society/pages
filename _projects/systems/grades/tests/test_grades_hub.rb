@@ -90,8 +90,20 @@ class GradesHubTest < Minitest::Test
 
   def test_top_nav_lists_the_hub
     nav = YAML.load_file(File.join(ROOT, "_config.yml")).dig("minima", "nav_pages")
-    assert_includes nav, "navigation/grades.html"
-    refute_nil pages_by_permalink["/grades"], "navigation/grades.html serves /grades/"
+    assert_includes nav, "navigation/projects/grades/index.md"
+    refute_nil pages_by_permalink["/grades"], "Grades index serves /grades/"
+  end
+
+  def test_page_html_and_scripts_survive_markdown
+    converter = Jekyll::Converters::Markdown.new(Jekyll.configuration("config" => [], "quiet" => true))
+    %w[analytics-dashboard retrospective submissions].each do |name|
+      page = File.read(File.join(SYSTEM, "pages/#{name}.md"))
+      assert_match(/^layout: opencsplus$/, page, "#{name} uses the shared layout")
+      body = page[/\{::nomarkdown\}\n(.*?)\n\{:\/\}/m, 1]
+      refute_nil body, "#{name} HTML must be protected from Markdown conversion"
+      markdown = page.sub(/\A---\s*\n.*?\n---\s*\n/m, "")
+      assert_includes converter.convert(markdown), body
+    end
   end
 
   def test_hub_layout_has_no_project_nudge_or_empty_title_row
@@ -99,6 +111,7 @@ class GradesHubTest < Minitest::Test
       FileUtils.mkdir_p(File.join(source, "_layouts"))
       FileUtils.mkdir_p(File.join(source, "_includes/aesthetihawk"))
       FileUtils.mkdir_p(File.join(source, "_includes/themes/minima"))
+      FileUtils.mkdir_p(File.join(source, "_includes/submissions"))
       FileUtils.cp(File.join(ROOT, "_layouts/opencsplus.html"), File.join(source, "_layouts"))
       FileUtils.cp(File.join(ROOT, "_layouts/opencs.html"), File.join(source, "_layouts"))
       FileUtils.cp(File.join(ROOT, "_layouts/aesthetihawk.html"), File.join(source, "_layouts"))
@@ -117,6 +130,10 @@ class GradesHubTest < Minitest::Test
       File.write(File.join(source, "legacy.html"), "---\nlayout: aesthetihawk\ntitle: Legacy\n---\n<p>Legacy content</p>\n")
       FileUtils.cp(File.join(ROOT, "navigation/toolkit/bathroom_pass.md"), File.join(source, "bathroom_pass.md"))
       FileUtils.cp(File.join(ROOT, "navigation/toolkit/bathroom_queue.md"), File.join(source, "bathroom_queue.md"))
+      %w[retrospective submissions].each do |name|
+        FileUtils.cp(File.join(SYSTEM, "pages/#{name}.md"), File.join(source, "#{name}.md"))
+      end
+      FileUtils.cp(File.join(SYSTEM, "_includes/submissions/creator-dashboard.html"), File.join(source, "_includes/submissions"))
       site = Jekyll::Site.new(Jekyll.configuration(
         "source" => source, "destination" => File.join(source, "_site"),
         "layouts_dir" => File.join(source, "_layouts"), "includes_dir" => File.join(source, "_includes"),
@@ -128,6 +145,12 @@ class GradesHubTest < Minitest::Test
       legacy = File.read(File.join(source, "_site/legacy.html"))
       bathroom = site.pages.find { |page| page.name == "bathroom_pass.md" }.output
       bathroom_queue = site.pages.find { |page| page.name == "bathroom_queue.md" }.output
+      retrospective = site.pages.find { |page| page.name == "retrospective.md" }.output
+      submissions = site.pages.find { |page| page.name == "submissions.md" }.output
+      %w[sprint growth forecast].each { |section| assert_includes retrospective, %(data-section="#{section}") }
+      %w[my-submissions created-assignments all-submissions].each { |section| assert_includes submissions, %(data-section="#{section}") }
+      assert_includes submissions, 'id="creator-dashboard-summary"'
+      assert_includes submissions, "document.addEventListener('DOMContentLoaded', init);"
       [grades, profile, legacy, bathroom, bathroom_queue].each { |page| refute_includes page, "Got thoughts on a project?" }
       assert_includes grades, '<h1 class="ocs__hub-viewer-title">Grades</h1>'
       assert_includes grades, 'data-sidebar-role="default"'
