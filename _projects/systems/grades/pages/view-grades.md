@@ -2,6 +2,7 @@
 layout: opencsplus
 active_tab: grades
 sidebar: grades_sidebar
+sidebar_project: grades
 opencsplus: true
 title: Viewing Grades
 permalink: /student/view-grades

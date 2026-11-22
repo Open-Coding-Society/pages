@@ -1,9 +1,13 @@
 {% comment %}
-  A page picks its sidebar with `sidebar: <data file>` in its front matter;
-  the Grades pages use grades_sidebar. Without it, the Profile sidebar shows.
+  A page picks its sidebar with `sidebar: <data file>` and optional
+  `sidebar_project: <project>`; without them, the Profile sidebar shows.
 {% endcomment %}
 {% assign sidebar_name = page.sidebar | default: "aesthetihawk_sidebar" %}
-{% assign sidebar_data = site.data[sidebar_name] %}
+{% if page.sidebar_project %}
+  {% assign sidebar_data = site.data.projects[page.sidebar_project][sidebar_name] %}
+{% else %}
+  {% assign sidebar_data = site.data[sidebar_name] %}
+{% endif %}
 <!-- Two sidebars are pre-rendered; JS in _layouts/opencsplus.html toggles which
      one is visible based on the live ROLE_MENTOR check. The mentor one is the
      student menu minus the student-only items (grades, analytics, submissions,

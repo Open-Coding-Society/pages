@@ -47,7 +47,7 @@
 @import "documentation";
 @import "api-documentation";
 @import "migration-runbook";
-@import "submissions";
+@import "projects/grades/submissions";
 @import "open-coding/pixel-submit-widget";
 @import "open-coding/grading_modules";
 
@@ -62,10 +62,10 @@ select {
 @import "profile-gist-connection";
 @import "dashboard-v2";
 @import "preferences";
-@import "analytics-dashboard";
+@import "projects/grades/analytics-dashboard";
 @import "calendar-v2";
 @import "bathroom-pass-v2";
-@import "view-grades";
+@import "projects/grades/view-grades";
 @import "opencsplus-shell";
 
 // Shared by page partials above: several of them toggle the

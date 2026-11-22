@@ -10,7 +10,7 @@
 // line each. Growth Over Time charts each item across the year's sprints. Everything is stored in
 // Spring (/api/sprint-retros); the items come from SprintRetroTemplate there, so this file only
 // relies on their ids.
-import { javaURI, fetchOptions } from '../api/config.js';
+import { javaURI, fetchOptions } from '../../../api/config.js';
 
 const api = `${javaURI}/api/sprint-retros`;
 const SPRINT_KEY = 'sprint-retro:sprint';

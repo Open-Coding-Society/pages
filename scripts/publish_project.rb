@@ -5,14 +5,31 @@ require "pathname"
 
 module ProjectPublisher
   DESTINATIONS = %w[_includes _layouts _plugins _data _posts navigation assets _sass].freeze
+  STANDARD_DIRECTORIES = {
+    "pages" => "navigation/projects", "js" => "assets/js/projects",
+    "sass" => "_sass/projects", "_includes" => "_includes/projects",
+    "data" => "_data/projects"
+  }.freeze
 
   def self.files(project, workspace)
     manifest = File.join(project, "distribution.json")
     return [] unless File.file?(manifest)
 
-    entries = JSON.parse(File.read(manifest)).fetch("files")
+    configuration = JSON.parse(File.read(manifest))
+    entries = configuration.fetch("files")
     raise "distribution.json files must be an array" unless entries.is_a?(Array)
 
+    standard = configuration.fetch("standard", false)
+    raise "distribution.json standard must be true or false" unless [true, false].include?(standard)
+
+    if standard
+      name = File.basename(project)
+      entries = entries + STANDARD_DIRECTORIES.filter_map do |source, destination|
+        next unless File.directory?(File.join(project, source))
+
+        { "source" => source, "destination" => "#{destination}/#{name}" }
+      end
+    end
     mappings = entries.flat_map do |entry|
       source = resolve(project, entry.fetch("source"))
       destination_path = entry.fetch("destination")

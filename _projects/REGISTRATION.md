@@ -131,6 +131,15 @@ Use `distribution.json` with the shared publisher when a project needs other
 resources or exceptional destinations. It can place resources under these
 generic ignored project roots:
 
+Projects can set `"standard": true` in their manifest to publish entire
+`pages/`, `js/`, `sass/`, `_includes/`, and `data/` directories into the
+corresponding project roots below. The `files` array then lists only exceptions.
+The publisher tracks those directories in its checksum cache, so additions,
+deletions, watcher updates, and clean are handled without individual entries.
+This option is explicit because some existing projects use `data/` for JS or
+publish only selected files. Do not separately map a standard directory to the
+same destination.
+
 | Resource | Destination |
 | --- | --- |
 | Includes | `_includes/projects/<name>/` |
@@ -147,8 +156,8 @@ Use explicit permalinks on standalone pages to preserve public routes without
 turning navigation into blog posts. Includes use `projects/<name>/<file>`;
 data is namespaced as `site.data.projects.<name>`. Jekyll loads nested plugins
 automatically. Reference nested layouts as `projects/<name>/<layout>`.
-These roots do not imply automatic copies of every `data/` folder (some
-projects use `data/` for JavaScript).
+Without `"standard": true`, these roots do not imply automatic copies of every
+`data/` folder (some projects use `data/` for JavaScript).
 The shared template cleans all of these project directories, and
 `clean-removed-projects` handles them after a project is deleted.
 

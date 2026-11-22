@@ -1,4 +1,4 @@
-# The Grades sidebar, shown on every page that sets `sidebar: grades_sidebar`
+# The Grades sidebar, shown with `sidebar: grades_sidebar` and `sidebar_project: grades`
 # (the grading pages in this system). Profile and the toolkit keep
 # _data/aesthetihawk_sidebar.yml. Each id matches a page's active_tab.
 # `children` are sections of that page, listed under it; each `section` is a

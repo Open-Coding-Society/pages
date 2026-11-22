@@ -5,6 +5,7 @@ permalink: /submissions
 comments: false
 active_tab: submissions
 sidebar: grades_sidebar
+sidebar_project: grades
 opencsplus: true
 ---
 
@@ -26,7 +27,7 @@ opencsplus: true
                 <div id="my-submissions-container" class="ocs__table-wrap"></div>
             </div>
 
-            {% include submissions/creator-dashboard.html %}
+            {% include projects/grades/submissions/creator-dashboard.html %}
 
             <!-- All Submissions tab content (Admin only) -->
             <section id="tab-content-all-submissions" data-section="all-submissions" class="tab-content ocs__admin-submissions hidden">
@@ -167,11 +168,11 @@ opencsplus: true
 
 <script type="module">
     import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
-    import { createCreatorDashboard } from '{{ site.baseurl }}/assets/js/submissions/creator-dashboard.js';
+    import { createCreatorDashboard } from '{{ site.baseurl }}/assets/js/projects/grades/submissions/creator-dashboard.js';
     import {
         applyGradingState, canPetition, clearManualGrade, filePetition, gradePills, hasManualOverride, isFinal,
         parseGradeInput, readGradingResponse, requestAiRegrade, saveManualGrade, showGradingHistory
-    } from '{{ site.baseurl }}/assets/js/submissions/grading.js';
+    } from '{{ site.baseurl }}/assets/js/projects/grades/submissions/grading.js';
     import { followSectionHash } from '{{ site.baseurl }}/assets/js/pages/viewer/section-navigation.js';
 
     const apiUrl = `${javaURI}/api/assignment-submission-view/list`;

@@ -5,6 +5,7 @@ description: Every grading page in one place, to see, predict and reflect on gra
 permalink: /grades/
 active_tab: grades-home
 sidebar: grades_sidebar
+sidebar_project: grades
 opencsplus: true
 comments: false
 search_exclude: true
@@ -12,7 +13,7 @@ search_exclude: true
 
 {% comment %}
   Grades hub: links to the grading pages and tabs that already exist, grouped
-  as Grade, Reflect and Submissions. The links live in _data/grades_hub.yml.
+  as Grade, Reflect and Submissions. The links live in the Grades project data.
   Each page checks the viewer's role itself, so the hub only labels the
   teacher and admin links instead of hiding them.
 {% endcomment %}
@@ -24,7 +25,7 @@ search_exclude: true
   <h2 class="ocs__section-title">Grades</h2>
   <p>See and predict your grades, reflect on each sprint, and manage submissions.</p>
 
-  {% for section in site.data.grades_hub %}
+  {% for section in site.data.projects.grades.grades_hub %}
     <section class="ocs__card" aria-labelledby="grades-{{ section.id }}">
       <h3 class="ocs__section-title" id="grades-{{ section.id }}">{{ section.title }}</h3>
       <p>{{ section.description }}</p>

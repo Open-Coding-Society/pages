@@ -5,6 +5,7 @@ permalink: /analytics-dashboard
 comments: false
 active_tab: analytics
 sidebar: grades_sidebar
+sidebar_project: grades
 opencsplus: true
 ---
 
@@ -234,7 +235,7 @@ score += gists * 0.5
                     </div>
                 </div>
 
-                <!-- Grade Calculator, rendered by assets/js/analytics/grade-calculator.js -->
+                <!-- Grade Calculator, rendered by the Grades project module -->
                 <div id="grade-calculator-root" style="margin-top: 2rem;"></div>
 
 
@@ -368,9 +369,9 @@ score += gists * 0.5
                 <!-- Analytics JS -->
                 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
-    import { initOCSAnalyticsDashboard } from '{{ site.baseurl }}/assets/js/ocs-analytics-dashboard.js';
-    import { recordForecast } from '{{ site.baseurl }}/assets/js/analytics/forecast-retrospective.js';
-    import { initGradeCalculator } from '{{ site.baseurl }}/assets/js/analytics/grade-calculator.js';
+    import { initOCSAnalyticsDashboard } from '{{ site.baseurl }}/assets/js/projects/grades/ocs-analytics-dashboard.js';
+    import { recordForecast } from '{{ site.baseurl }}/assets/js/projects/grades/analytics/forecast-retrospective.js';
+    import { initGradeCalculator } from '{{ site.baseurl }}/assets/js/projects/grades/analytics/grade-calculator.js';
     import { followSectionHash } from '{{ site.baseurl }}/assets/js/pages/viewer/section-navigation.js';
 
     // Under the predictor: the student's own Grade Calculator (scores copied from their gradebook, plus

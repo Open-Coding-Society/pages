@@ -79,6 +79,6 @@ test('every Grades stylesheet is imported into the site stylesheet', () => {
     .map((name) => name.replace(/^_/, '').replace(/\.scss$/, ''));
   assert.ok(partials.length > 0, 'found Grades stylesheets');
   for (const partial of partials) {
-    assert.ok(main.includes(`@import "${partial}";`), `_main.scss imports ${partial}`);
+    assert.ok(main.includes(`@import "projects/grades/${partial}";`), `_main.scss imports ${partial}`);
   }
 });

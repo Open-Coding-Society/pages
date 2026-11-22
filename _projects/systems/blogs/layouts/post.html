@@ -462,7 +462,7 @@ Sprint and blogs pages are not part of one week, so their current_week is null.
 
       // Text for a refused submission, e.g. one to a closed assignment.
       async function submissionErrorBlog(response) {
-        const { readGradingResponse } = await import('{{ site.baseurl }}/assets/js/submissions/grading.js');
+        const { readGradingResponse } = await import('{{ site.baseurl }}/assets/js/projects/grades/submissions/grading.js');
         return (await readGradingResponse(response)).message;
       }
 

@@ -19,7 +19,7 @@ sidebar fit together and which shared files other systems load.
 
 ## Sidebars
 
-Every page above sets `sidebar: grades_sidebar`, so it shows the Grades sidebar
+Every page above sets `sidebar: grades_sidebar` and `sidebar_project: grades`, so it shows the Grades sidebar
 (`data/grades_sidebar.yml`). Profile, Dashboard/Preferences and the toolkit pages
 keep the Profile sidebar (`_data/aesthetihawk_sidebar.yml`), which no longer lists
 grading pages. The shared include `_includes/aesthetihawk/sidebar.html` picks the
@@ -44,25 +44,17 @@ get it too.
 | Source | Published to | What it is |
 |---|---|---|
 | `index.md` | `navigation/projects/grades/index.md` | the `/grades/` hub |
-| `data/grades_hub.yml` | `_data/` | the hub's sections and links |
-| `data/grades_sidebar.yml` | `_data/` | the Grades sidebar |
-| `pages/view-grades.md` | `_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md` | View Grades |
-| `pages/retrospective.md` | `navigation/authentication/` | the `/retrospective` page |
-| `pages/analytics-dashboard.md` | `navigation/authentication/` | the `/analytics-dashboard` page |
-| `pages/submissions.md` | `navigation/authentication/` | the `/submissions` page |
-| `pages/stu-submissions.md` | `navigation/projects/grades/stu-submissions.md` | legacy student submission page at `/student/submissions` |
-| `pages/assign-grades.md` | `navigation/projects/grades/assign-grades.md` | legacy grader page at `/student/assign-grades` |
-| `_includes/submissions/creator-dashboard.html` | `_includes/submissions/` | the Assignments You Created / Teacher Dashboard section |
-| `js/analytics/` | `assets/js/analytics/` | sprint and forecast retrospectives, grade calculator |
-| `js/ocs-analytics-dashboard.js` | `assets/js/` | the OCS Analytics section |
-| `js/page-sections.js` | `assets/js/grades/` | compatibility re-export for cached pages; the implementation is in the shared viewer |
-| `js/submissions/` | `assets/js/submissions/` | `grading.js` and `creator-dashboard.js` |
-| `sass/` | `_sass/open-coding/` | the pages' styles, imported in `_sass/open-coding/_main.scss` |
+| `data/` | `_data/projects/grades/` | hub links and sidebar, accessed as `site.data.projects.grades` |
+| `pages/` | `navigation/projects/grades/` | all Grades pages, with unchanged permalinks |
+| `_includes/` | `_includes/projects/grades/` | the Teacher Dashboard section |
+| `js/` | `assets/js/projects/grades/` | analytics, grading and shared-section modules |
+| `sass/` | `_sass/projects/grades/` | page styles, imported in `_sass/open-coding/_main.scss` |
+| `compatibility/` | `assets/js/` | re-exports for cached pages using old module URLs |
 
-`make` publishes these through `distribution.json` (see `_projects/REGISTRATION.md`).
-The hub and the legacy student submission and grader pages are published under
-`navigation/projects/grades/`; their addresses are unchanged. Git ignores the
-published copies: edit the sources here.
+`distribution.json` opts into standard directory publication and maps only the
+hub and compatibility URLs as exceptions (see `_projects/REGISTRATION.md`).
+The publisher removes obsolete cached outputs and handles new or deleted files.
+Git ignores the published copies: edit the sources here.
 
 ## Styles
 

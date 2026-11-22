@@ -38,6 +38,7 @@ class GradesHubTest < Minitest::Test
   end
 
   def first_existing(dirs, name)
+    name = name.delete_prefix("projects/grades/")
     dirs.flat_map { |dir| [File.join(SYSTEM, dir), File.join(ROOT, dir)] }
         .map { |dir| File.join(dir, name) }.find { |path| File.exist?(path) }
   end
@@ -112,7 +113,9 @@ class GradesHubTest < Minitest::Test
       FileUtils.mkdir_p(File.join(source, "_layouts"))
       FileUtils.mkdir_p(File.join(source, "_includes/aesthetihawk"))
       FileUtils.mkdir_p(File.join(source, "_includes/themes/minima"))
-      FileUtils.mkdir_p(File.join(source, "_includes/submissions"))
+      FileUtils.mkdir_p(File.join(source, "_includes/projects/grades/submissions"))
+      FileUtils.mkdir_p(File.join(source, "_data/projects/grades"))
+      FileUtils.cp(File.join(SYSTEM, "data/grades_sidebar.yml"), File.join(source, "_data/projects/grades"))
       FileUtils.cp(File.join(ROOT, "_layouts/opencsplus.html"), File.join(source, "_layouts"))
       FileUtils.cp(File.join(ROOT, "_layouts/opencs.html"), File.join(source, "_layouts"))
       FileUtils.cp(File.join(ROOT, "_layouts/aesthetihawk.html"), File.join(source, "_layouts"))
@@ -126,7 +129,7 @@ class GradesHubTest < Minitest::Test
       File.write(File.join(source, "_includes/themes/minima/footer.html"), "<footer>Footer</footer>")
       File.write(File.join(source, "_includes/mermaid.html"), "")
       File.write(File.join(source, "_layouts/profile.html"), "---\nlayout: opencsplus\n---\n<p>Profile layout</p>{{ content }}")
-      File.write(File.join(source, "grades.html"), "---\nlayout: opencsplus\ntitle: Grades\nsidebar: grades_sidebar\n---\n<p>Grades content</p>\n")
+      File.write(File.join(source, "grades.html"), "---\nlayout: opencsplus\ntitle: Grades\nsidebar: grades_sidebar\nsidebar_project: grades\n---\n<p>Grades content</p>\n")
       File.write(File.join(source, "profile.html"), "---\nlayout: profile\ntitle: Profile\nopencsplus: true\n---\n<p>Profile content</p>\n")
       File.write(File.join(source, "legacy.html"), "---\nlayout: aesthetihawk\ntitle: Legacy\n---\n<p>Legacy content</p>\n")
       FileUtils.cp(File.join(ROOT, "navigation/toolkit/bathroom_pass.md"), File.join(source, "bathroom_pass.md"))
@@ -134,7 +137,7 @@ class GradesHubTest < Minitest::Test
       %w[retrospective submissions].each do |name|
         FileUtils.cp(File.join(SYSTEM, "pages/#{name}.md"), File.join(source, "#{name}.md"))
       end
-      FileUtils.cp(File.join(SYSTEM, "_includes/submissions/creator-dashboard.html"), File.join(source, "_includes/submissions"))
+      FileUtils.cp(File.join(SYSTEM, "_includes/submissions/creator-dashboard.html"), File.join(source, "_includes/projects/grades/submissions"))
       site = Jekyll::Site.new(Jekyll.configuration(
         "source" => source, "destination" => File.join(source, "_site"),
         "layouts_dir" => File.join(source, "_layouts"), "includes_dir" => File.join(source, "_includes"),
@@ -158,6 +161,7 @@ class GradesHubTest < Minitest::Test
       [grades, profile, legacy, bathroom, bathroom_queue].each { |page| refute_includes page, "Got thoughts on a project?" }
       assert_includes grades, '<h1 class="ocs__hub-viewer-title">Grades</h1>'
       assert_includes grades, 'data-sidebar-role="default"'
+      assert_includes grades, "View Grades"
       assert_includes grades, '<footer>Footer</footer>'
       assert_includes grades, "opencsplus-page"
       assert_includes profile, "<p>Profile layout</p>"

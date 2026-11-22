@@ -9,7 +9,7 @@
 //      questions to ask your teacher where your ratings disagree.
 //   3. How well you judge yourself: whether your grade guesses are getting closer to your real
 //      grade (from your Grade Calculator; the official gradebook has no API).
-import { javaURI, fetchOptions, baseurl } from '../api/config.js';
+import { javaURI, fetchOptions, baseurl } from '../../../api/config.js';
 
 // Grade Predictor slider name -> Spring field name and label, in dashboard order.
 export const SKILLS = [

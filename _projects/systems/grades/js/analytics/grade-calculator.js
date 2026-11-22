@@ -5,7 +5,7 @@
 // sheet is saved to Spring (/api/grade-calculator) and answers two questions: "what happens to
 // my grade if I get X on this?" (what-if scores) and "what do I need on this to reach a B?"
 // (neededScore). The grade rules match GradeCalculatorService in Spring; keep the two in step.
-import { javaURI, fetchOptions } from '../api/config.js';
+import { javaURI, fetchOptions } from '../../../api/config.js';
 
 const api = `${javaURI}/api/grade-calculator`;
 const SAVE_DELAY_MS = 800;

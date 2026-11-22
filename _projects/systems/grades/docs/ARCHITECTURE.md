@@ -17,14 +17,15 @@ sections that already exist. It builds no page of its own for any of them.
 
 Grades pages use the `opencsplus` layout, as do Profile and toolkit pages. It
 chains to `opencs` and reuses the sidebar include, which reads `page.sidebar`
-as the name of a data file:
+as the name of a data file, optionally under `page.sidebar_project`:
 
 ```liquid
 {% raw %}{% assign sidebar_name = page.sidebar | default: "aesthetihawk_sidebar" %}
-{% for section in site.data[sidebar_name] %}{% endraw %}
+{% assign sidebar_data = site.data.projects[page.sidebar_project][sidebar_name] %}
+{% for section in sidebar_data %}{% endraw %}
 ```
 
-Grades pages set `sidebar: grades_sidebar`; every other page keeps the Profile
+Grades pages set `sidebar: grades_sidebar` and `sidebar_project: grades`; other pages keep the Profile
 sidebar. The `sidebar:` must be in the page's own front matter, not its layout's,
 because Liquid's `page` doesn't see layout front matter. The same goes for
 `active_tab`, which is why `pages/retrospective.md` sets it itself.
@@ -82,15 +83,16 @@ sets `spring: false`.
 
 ## Files other systems load
 
-Grades publishes every file to the path it had before it moved here, so these
-still work:
+Grades publishes its standard directories under `projects/grades`. Blogs and
+Courses load `assets/js/projects/grades/submissions/grading.js`. The old JS
+URLs remain re-exports for cached pages, including:
 
-- `assets/js/submissions/grading.js`: the Blogs post layout and the Courses
-  document player import `readGradingResponse` from it by URL.
-- `assets/js/analytics/forecast-retrospective.js`: loaded by both Retrospective
-  and the Analytics Dashboard.
-- The modules in `js/analytics/` import `../api/config.js`, which resolves from
-  their published folder, `assets/js/analytics/`.
+- `assets/js/submissions/grading.js`: the shared submission grading API.
+- `assets/js/analytics/forecast-retrospective.js`: the retrospective module.
+
+The analytics modules import `../../../api/config.js` relative to their
+published project folder. The manifest maps only the home page and the old
+compatibility URLs; the publisher tracks the other files by directory.
 
 ## Tests
 

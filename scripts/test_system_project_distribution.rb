@@ -58,6 +58,11 @@ class SystemProjectDistributionTest < Minitest::Test
       return project
     end
     manifest = File.read(File.join(source, "distribution.json"))
+    if JSON.parse(manifest)["standard"]
+      ProjectPublisher::STANDARD_DIRECTORIES.each_key do |directory|
+        FileUtils.cp_r(File.join(source, directory), project) if File.directory?(File.join(source, directory))
+      end
+    end
     JSON.parse(manifest).fetch("files").map { |entry| entry.fetch("source") }.uniq.each do |relative|
       FileUtils.mkdir_p(File.dirname(File.join(project, relative)))
       FileUtils.cp_r(File.join(source, relative), File.join(project, relative))
@@ -88,8 +93,8 @@ class SystemProjectDistributionTest < Minitest::Test
       Dir.mktmpdir("grades-nav-") do |source|
         FileUtils.mkdir_p(File.join(source, "navigation/projects/grades"))
         FileUtils.cp(page, File.join(source, "navigation/projects/grades/index.md"))
-        FileUtils.mkdir_p(File.join(source, "_data"))
-        FileUtils.cp(File.join(project, "data/grades_hub.yml"), File.join(source, "_data"))
+        FileUtils.mkdir_p(File.join(source, "_data/projects/grades"))
+        FileUtils.cp(File.join(project, "data/grades_hub.yml"), File.join(source, "_data/projects/grades"))
         FileUtils.mkdir_p(File.join(source, "_layouts"))
         FileUtils.mkdir_p(File.join(source, "_includes/themes/minima"))
         FileUtils.cp(File.join(ROOT, "_includes/themes/minima/header.html"), File.join(source, "_includes/themes/minima"))
@@ -167,14 +172,13 @@ class SystemProjectDistributionTest < Minitest::Test
       project = project_copy(workspace, "grades")
       manifest = File.join(project, "distribution.json")
       current = File.read(manifest)
-      legacy = JSON.parse(current)
+      legacy = { "files" => [] }
       pages = {
         "stu-submissions.md" => ["2024-10-29-submissions.md", "/student/submissions"],
         "assign-grades.md" => ["2025-01-21-grader_view.md", "/student/assign-grades"]
       }
       pages.each do |name, (old_name, _)|
-        entry = legacy.fetch("files").find { |item| item["source"] == "pages/#{name}" }
-        entry["destination"] = "_posts/projects/grades/#{old_name}"
+        legacy.fetch("files") << { "source" => "pages/#{name}", "destination" => "_posts/projects/grades/#{old_name}" }
       end
       File.write(manifest, JSON.generate(legacy))
       ProjectPublisher.run("publish", project, workspace)
@@ -250,9 +254,10 @@ class SystemProjectDistributionTest < Minitest::Test
       old_outputs.each_value { |path| assert File.file?(File.join(workspace, path)) }
 
       File.write(manifest, current)
+      old_outputs.each_key { |name| FileUtils.rm(File.join(project, "pages", name)) }
       ProjectPublisher.run("publish", project, workspace)
       old_outputs.each_value { |path| refute File.exist?(File.join(workspace, path)) }
-      assert File.file?(File.join(workspace, "navigation/authentication/submissions.md"))
+      assert File.file?(File.join(workspace, "navigation/projects/grades/submissions.md"))
     end
   end
 
@@ -272,13 +277,67 @@ class SystemProjectDistributionTest < Minitest::Test
       old_names.each { |name| assert File.file?(File.join(workspace, "_sass/open-coding", name)) }
 
       File.write(manifest, current)
+      old_names.each { |name| FileUtils.rm(File.join(project, "sass", name)) }
       ProjectPublisher.run("publish", project, workspace)
       old_names.each { |name| refute File.exist?(File.join(workspace, "_sass/open-coding", name)) }
       %w[analytics-dashboard.scss submissions.scss view-grades.scss].each do |name|
-        published = File.join(workspace, "_sass/open-coding", name)
+        published = File.join(workspace, "_sass/projects/grades", name)
         assert_equal File.binread(File.join(project, "sass", name)), File.binread(published)
         command("git", "-C", workspace, "check-ignore", "-q", "--", published)
       end
+    end
+  end
+
+  def test_grades_standard_directories_migrate_and_track_additions_and_deletions
+    in_workspace do |workspace|
+      project = project_copy(workspace, "grades")
+      manifest = File.join(project, "distribution.json")
+      current = File.read(manifest)
+      old = [
+        ["pages/view-grades.md", "_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md"],
+        ["pages/retrospective.md", "navigation/authentication/retrospective.md"],
+        ["pages/analytics-dashboard.md", "navigation/authentication/analytics-dashboard.md"],
+        ["pages/submissions.md", "navigation/authentication/submissions.md"],
+        ["data/grades_sidebar.yml", "_data/grades_sidebar.yml"],
+        ["data/grades_hub.yml", "_data/grades_hub.yml"],
+        ["_includes/submissions/creator-dashboard.html", "_includes/submissions/creator-dashboard.html"],
+        ["sass/submissions.scss", "_sass/open-coding/submissions.scss"],
+        ["js/analytics/grade-calculator.js", "assets/js/analytics/grade-calculator.js"]
+      ]
+      File.write(manifest, JSON.generate("files" => old.map { |source, destination| { "source" => source, "destination" => destination } }))
+      ProjectPublisher.run("publish", project, workspace)
+      File.write(manifest, current)
+      extras = {
+        "pages/new-page.md" => "navigation/projects/grades/new-page.md",
+        "js/new.js" => "assets/js/projects/grades/new.js",
+        "sass/new.scss" => "_sass/projects/grades/new.scss",
+        "_includes/new.html" => "_includes/projects/grades/new.html",
+        "data/new.yml" => "_data/projects/grades/new.yml"
+      }
+      before = command("ruby", File.join(workspace, "scripts/publish_project.rb"), "fingerprint", project, workspace)
+      extras.each_key { |source| File.write(File.join(project, source), "new file") }
+      after = command("ruby", File.join(workspace, "scripts/publish_project.rb"), "fingerprint", project, workspace)
+      refute_equal before, after
+      command("make", "-f", TEMPLATE, "-C", project, "assets", "WORKSPACE_ROOT=#{workspace}")
+      old.each do |_, destination|
+        next if destination == "assets/js/analytics/grade-calculator.js"
+        refute File.exist?(File.join(workspace, destination)), destination
+      end
+      ProjectPublisher.files(project, workspace).each do |source, destination|
+        assert_equal File.binread(source), File.binread(destination)
+        command("git", "-C", workspace, "check-ignore", "-q", "--", destination)
+      end
+      extras.each do |source, destination|
+        assert_equal "new file", File.read(File.join(workspace, destination))
+        FileUtils.rm(File.join(project, source))
+      end
+      assert_equal before, command("ruby", File.join(workspace, "scripts/publish_project.rb"), "fingerprint", project, workspace)
+      command("make", "-f", TEMPLATE, "-C", project, "assets", "WORKSPACE_ROOT=#{workspace}")
+      extras.each_value { |destination| refute File.exist?(File.join(workspace, destination)) }
+      command("make", "-f", TEMPLATE, "-C", project, "clean", "WORKSPACE_ROOT=#{workspace}")
+      refute File.exist?(File.join(workspace, "_data/projects/grades/grades_hub.yml"))
+      command("make", "-f", TEMPLATE, "-C", project, "assets", "WORKSPACE_ROOT=#{workspace}")
+      assert File.file?(File.join(workspace, "_data/projects/grades/grades_hub.yml"))
     end
   end
 
