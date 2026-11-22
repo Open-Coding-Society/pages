@@ -281,3 +281,22 @@ test('highlightParts keeps markup in a message as text', () => {
     { text: ' move', match: false },
   ]);
 });
+
+test('a reactionsServer frame classifies as reactions', () => {
+  const reactions = [{ reaction: 'like', people: [{ uid: 'ada', name: 'Ada' }] }];
+  assert.deepEqual(classifyGroupEvent({ context: 'reactionsServer', groupId: 3, messageId: 'm1', reactions }),
+    { type: 'reactions', id: 'm1', reactions });
+  assert.deepEqual(classifyGroupEvent({ context: 'reactionsServer', messageId: 'm1' }),
+    { type: 'reactions', id: 'm1', reactions: [] });
+});
+
+test('a DM reactions frame classifies as reactions, even for a message the log has', () => {
+  const reactions = [{ reaction: 'haha', people: [{ uid: 'ada', name: 'Ada' }] }];
+  const frame = { id: 42, conversationId: 7, type: 'reactions', deleted: false, edited: false, reactions };
+  assert.deepEqual(classifyDmEvent(frame, 7, () => true), { type: 'reactions', id: '42', reactions });
+});
+
+test('a DM reactions frame for another conversation is other', () => {
+  const frame = { id: 42, conversationId: 8, type: 'reactions', reactions: [] };
+  assert.deepEqual(classifyDmEvent(frame, 7, () => true), { type: 'other' });
+});

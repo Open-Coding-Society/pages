@@ -66,6 +66,8 @@ export function classifyGroupEvent(event) {
       return { type: 'delete', id: asId(event.messageId) };
     case 'sendFileServer':
       return { type: 'file', sender: event.sender || '', filename: event.filename || '' };
+    case 'reactionsServer':
+      return { type: 'reactions', id: asId(event.messageId), reactions: event.reactions || [] };
     case 'errorServer':
       return { type: 'error', text: event.error || 'The chat server reported an error.' };
     default:
@@ -80,6 +82,8 @@ export function classifyDmEvent(event, activeConversationId, isKnown) {
   if (!event || event.conversationId !== activeConversationId) return { type: 'other' };
   const id = asId(event.id);
   const type = String(event.type || '').toLowerCase();
+  // A reaction changes no message, so it is read before the rules below could take it for one.
+  if (type === 'reactions') return { type: 'reactions', id, reactions: event.reactions || [] };
   if (event.deleted === true || ['deleted', 'message-deleted', 'message_deleted'].includes(type)) {
     return { type: 'delete', id, senderUid: event.senderUid || '' };
   }
