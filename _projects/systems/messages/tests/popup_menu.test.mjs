@@ -45,3 +45,15 @@ test('destroy() lets go of the button: a click no longer opens anything', () => 
   assert.equal(button.listenerCount('keydown'), 0);
   assert.equal(container.querySelector('.ocs__menu'), null);
 });
+
+test('an item with a glyph shows it as text in the icon slot', () => {
+  const { button, menu } = makeMenu([{ glyph: '👍', label: 'Like', onPick: () => {} }]);
+  button.dispatchEvent(fakeEvent('click'));
+
+  const icon = menu.element.querySelector('.ocs__menu-icon');
+  assert.equal(icon.tagName, 'I');
+  assert.equal(icon.textContent, '👍');
+  assert.equal(icon.classList.contains('fas'), false);
+  assert.equal(icon.getAttribute('aria-hidden'), 'true');
+  assert.equal(menu.element.querySelector('.ocs__menu-name').textContent, 'Like');
+});

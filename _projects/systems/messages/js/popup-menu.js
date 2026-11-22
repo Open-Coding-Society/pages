@@ -20,7 +20,8 @@ export class PopupMenu {
    * @param {HTMLElement} options.button what opens it
    * @param {HTMLElement} options.container where the menu goes
    * @param {string} options.label its name for assistive technology
-   * @param {Array|Function} options.items [{ icon, label, hint, onPick(button), disabled }],
+   * @param {Array|Function} options.items [{ icon, label, hint, onPick(button), disabled }], where
+   *   an item may give glyph (text, such as an emoji) in place of icon,
    *   or a function that gives them as it opens, so a menu can offer different things in
    *   different conversations
    */
@@ -120,8 +121,14 @@ export class PopupMenu {
       choice.className = 'ocs__menu-item';
       choice.setAttribute('role', 'menuitem');
       choice.disabled = Boolean(item.disabled);
+      // An emoji (glyph) sits in the same slot as a Font Awesome icon.
       const icon = document.createElement('i');
-      icon.className = `fas ${item.icon} ocs__menu-icon`;
+      if (item.glyph) {
+        icon.className = 'ocs__menu-icon';
+        icon.textContent = item.glyph;
+      } else {
+        icon.className = `fas ${item.icon} ocs__menu-icon`;
+      }
       icon.setAttribute('aria-hidden', 'true');
       const name = document.createElement('strong');
       name.className = 'ocs__menu-name';
