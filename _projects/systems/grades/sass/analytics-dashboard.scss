@@ -225,12 +225,10 @@
 }
 
 .ocs__analytics-help-callout {
+    @include surface(0.5rem, 1rem,
+        color-mix(in srgb, var(--pref-accent-color) 40%, transparent),
+        color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel)));
     margin-bottom: 1.5rem;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
-    border: 1px solid color-mix(in srgb, var(--pref-accent-color) 40%, transparent);
-    color: var(--pref-text-color);
 }
 
 .ocs__analytics-help-subheading {
@@ -262,16 +260,15 @@
 // headers instead of a page-scoped duplicate.
 
 // .ocs__modal / .ocs__modal-card (elements/modals) now cover this modal's
-// chrome; this page's dialog is wider/shorter and flex-column than the
-// shared default, so that delta stays here, paired in markup with
-// .ocs__modal-card. JS still shows/hides the modal by toggling the
+// chrome and .ocs__modal-card--wide supplies its width. This dialog is
+// shorter and flex-column than the shared default, so that delta stays
+// here. JS still shows/hides the modal by toggling the
 // literal class "hidden" (now a single rule at the end of _main.scss) and
 // finds its close control via the literal class "close"
 // (dataModal.querySelector(".close")) -- the close control's own visual
 // styling now comes from ocs__btn ocs__btn--icon small, paired with
 // .ocs__modal-close for its positioning, instead of page-scoped CSS.
 .ocs__analytics-modal-card {
-    max-width: 48rem;
     max-height: 24rem;
     display: flex;
     flex-direction: column;

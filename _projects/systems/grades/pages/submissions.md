@@ -12,8 +12,8 @@ opencsplus: true
 <!-- markdownlint-disable MD033 -->
 
 {::nomarkdown}
-<div class="ocs__submissions-v2-page">
-    <div class="ocs__submissions-v2-stack">
+<div class="ocs__submissions-page">
+    <div class="ocs__stack ocs__stack--wide">
         <!-- sections, one shown at a time (see setupSections) -->
         <div id="tab-content-container" class="ocs__tabs-panels">
 
@@ -93,9 +93,9 @@ opencsplus: true
     </div>
 </div>
 
-<div id="submission-edit-modal" class="edit-modal hidden" aria-hidden="true">
+<div id="submission-edit-modal" class="ocs__modal edit-modal hidden" aria-hidden="true">
     <div class="edit-modal-backdrop" data-close-edit-modal></div>
-    <div class="edit-modal-panel" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+    <div class="ocs__modal-card edit-modal-panel" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
         <div class="edit-modal-header">
             <div>
                 <p class="edit-modal-kicker">Edit submission</p>

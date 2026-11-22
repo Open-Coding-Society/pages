@@ -64,6 +64,14 @@ The hub and the legacy student submission and grader pages are published under
 `navigation/projects/grades/`; their addresses are unchanged. Git ignores the
 published copies: edit the sources here.
 
+## Styles
+
+The pages reuse OCS cards, tables, controls, status and loading elements.
+Submissions uses the shared stack, modal and spinner; its dialog and spinner
+rules keep the page-specific dimensions, backdrop and loading adjustments. Grades styles also
+use the shared `surface` and `kicker` mixins for page-specific panels and labels.
+Analytics retains its responsive chart layout and modal sizing.
+
 ## Tests
 
 - `bundle exec ruby scripts/test_grades_hub.rb`: every hub link and every section
@@ -73,8 +81,8 @@ published copies: edit the sources here.
   a hash opens, and which sidebar link is marked.
 - `node --test tests/test_submission_grading.mjs tests/test_creator_dashboard.mjs`:
   the grading calls and the creator dashboard.
-- `node --test tests/v2_pages.test.mjs`: the main pages, remaining `/v2` redirects, and
-  that every `-v2` partial is imported.
+- `node --test tests/v2_pages.test.mjs`: the main pages, remaining `/v2` redirects,
+  and that the Grades and remaining `-v2` stylesheets are imported.
 - `bundle exec ruby scripts/test_system_project_distribution.rb`: publication and
   migration of the Grades pages, including their original routes and removal of old posts.
 

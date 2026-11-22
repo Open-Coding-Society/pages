@@ -347,7 +347,7 @@ score += gists * 0.5
 
 <!-- Modal for info details -->
 <div id="dataModal" class="hidden ocs__modal" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="ocs__modal-card ocs__analytics-modal-card">
+    <div class="ocs__modal-card ocs__modal-card--wide ocs__analytics-modal-card">
         <span class="close ocs__btn ocs__btn--icon small ocs__modal-close" title="Close modal">&times;</span>
         <div class="ocs__analytics-modal-body">
             <pre id="modalData" class="ocs__analytics-modal-pre"></pre>

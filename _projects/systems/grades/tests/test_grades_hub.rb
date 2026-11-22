@@ -4,6 +4,7 @@
 require "minitest/autorun"
 require "yaml"
 require "jekyll"
+require "nokogiri"
 require "tmpdir"
 require "fileutils"
 
@@ -151,6 +152,9 @@ class GradesHubTest < Minitest::Test
       %w[my-submissions created-assignments all-submissions].each { |section| assert_includes submissions, %(data-section="#{section}") }
       assert_includes submissions, 'id="creator-dashboard-summary"'
       assert_includes submissions, "document.addEventListener('DOMContentLoaded', init);"
+      document = Nokogiri::HTML(submissions)
+      assert document.at_css("#submission-edit-modal.ocs__modal.edit-modal.hidden[aria-hidden='true'] .ocs__modal-card[role='dialog']")
+      assert document.at_css("#created-assignments-loading .ocs__spinner[aria-hidden='true']")
       [grades, profile, legacy, bathroom, bathroom_queue].each { |page| refute_includes page, "Got thoughts on a project?" }
       assert_includes grades, '<h1 class="ocs__hub-viewer-title">Grades</h1>'
       assert_includes grades, 'data-sidebar-role="default"'

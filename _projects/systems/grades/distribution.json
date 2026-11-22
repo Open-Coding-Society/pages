@@ -6,20 +6,19 @@
     { "source": "data/grades_hub.yml", "destination": "_data/grades_hub.yml" },
     { "source": "data/grades_sidebar.yml", "destination": "_data/grades_sidebar.yml" },
     { "source": "pages/view-grades.md", "destination": "_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md" },
-    { "source": "sass/view-grades-v2.scss", "destination": "_sass/open-coding/view-grades-v2.scss" },
+    { "source": "sass/view-grades.scss", "destination": "_sass/open-coding/view-grades.scss" },
     { "source": "pages/retrospective.md", "destination": "navigation/authentication/retrospective.md" },
     { "source": "js/analytics/sprint-retrospective.js", "destination": "assets/js/analytics/sprint-retrospective.js" },
     { "source": "js/analytics/forecast-retrospective.js", "destination": "assets/js/analytics/forecast-retrospective.js" },
     { "source": "js/analytics/grade-calculator.js", "destination": "assets/js/analytics/grade-calculator.js" },
     { "source": "pages/analytics-dashboard.md", "destination": "navigation/authentication/analytics-dashboard.md" },
     { "source": "js/ocs-analytics-dashboard.js", "destination": "assets/js/ocs-analytics-dashboard.js" },
-    { "source": "sass/analytics-dashboard-v2.scss", "destination": "_sass/open-coding/analytics-dashboard-v2.scss" },
+    { "source": "sass/analytics-dashboard.scss", "destination": "_sass/open-coding/analytics-dashboard.scss" },
     { "source": "pages/submissions.md", "destination": "navigation/authentication/submissions.md" },
     { "source": "_includes/submissions/creator-dashboard.html", "destination": "_includes/submissions/creator-dashboard.html" },
     { "source": "js/submissions/grading.js", "destination": "assets/js/submissions/grading.js" },
     { "source": "js/submissions/creator-dashboard.js", "destination": "assets/js/submissions/creator-dashboard.js" },
     { "source": "js/page-sections.js", "destination": "assets/js/grades/page-sections.js" },
-    { "source": "sass/submissions.scss", "destination": "_sass/open-coding/submissions.scss" },
-    { "source": "sass/submissions-v2.scss", "destination": "_sass/open-coding/submissions-v2.scss" }
+    { "source": "sass/submissions.scss", "destination": "_sass/open-coding/submissions.scss" }
   ]
 }

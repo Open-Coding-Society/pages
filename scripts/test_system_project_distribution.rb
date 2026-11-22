@@ -256,6 +256,32 @@ class SystemProjectDistributionTest < Minitest::Test
     end
   end
 
+  def test_grades_publication_replaces_cached_v2_stylesheets
+    in_workspace do |workspace|
+      project = project_copy(workspace, "grades")
+      manifest = File.join(project, "distribution.json")
+      current = File.read(manifest)
+      legacy = JSON.parse(current)
+      old_names = %w[analytics-dashboard-v2.scss submissions-v2.scss view-grades-v2.scss]
+      old_names.each do |name|
+        File.write(File.join(project, "sass", name), "old stylesheet")
+        legacy.fetch("files") << { "source" => "sass/#{name}", "destination" => "_sass/open-coding/#{name}" }
+      end
+      File.write(manifest, JSON.generate(legacy))
+      ProjectPublisher.run("publish", project, workspace)
+      old_names.each { |name| assert File.file?(File.join(workspace, "_sass/open-coding", name)) }
+
+      File.write(manifest, current)
+      ProjectPublisher.run("publish", project, workspace)
+      old_names.each { |name| refute File.exist?(File.join(workspace, "_sass/open-coding", name)) }
+      %w[analytics-dashboard.scss submissions.scss view-grades.scss].each do |name|
+        published = File.join(workspace, "_sass/open-coding", name)
+        assert_equal File.binread(File.join(project, "sass", name)), File.binread(published)
+        command("git", "-C", workspace, "check-ignore", "-q", "--", published)
+      end
+    end
+  end
+
   def test_topics_and_capstone_migrate_clean_and_republish_only_ignored_outputs
     LEGACY.each do |name, entries|
       in_workspace do |workspace|
