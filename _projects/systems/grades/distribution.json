@@ -1,6 +1,8 @@
 {
   "files": [
     { "source": "pages/grades.html", "destination": "navigation/grades.html" },
+    { "source": "pages/2024-10-29-submissions.md", "destination": "_posts/projects/grades/2024-10-29-submissions.md" },
+    { "source": "pages/2025-01-21-grader_view.md", "destination": "_posts/projects/grades/2025-01-21-grader_view.md" },
     { "source": "data/grades_hub.yml", "destination": "_data/grades_hub.yml" },
     { "source": "data/grades_sidebar.yml", "destination": "_data/grades_sidebar.yml" },
     { "source": "pages/view-grades.md", "destination": "_posts/student_toolkit/assignments/2025-01-21-gradeviewer.md" },

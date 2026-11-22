@@ -1,0 +1,6 @@
+{
+  "files": [
+    { "source": "pages/2025-08-01-ClassroomManagement.md", "destination": "_posts/projects/class_manage/2025-08-01-ClassroomManagement.md" },
+    { "source": "pages/2025-04-04-TeamTeachToolkit_Signup.md", "destination": "_posts/projects/class_manage/2025-04-04-TeamTeachToolkit_Signup.md" }
+  ]
+}

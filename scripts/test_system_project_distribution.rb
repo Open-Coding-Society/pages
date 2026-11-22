@@ -54,6 +54,53 @@ class SystemProjectDistributionTest < Minitest::Test
       %w[navigation pages js sass].each do |directory|
         FileUtils.cp_r(File.join(source, directory), project) if File.directory?(File.join(source, directory))
       end
+
+      def test_class_management_and_grades_publish_moved_posts_with_original_routes
+        expected = {
+          "class_manage" => {
+            "2025-08-01-ClassroomManagement.md" => "/student/classrooms",
+            "2025-04-04-TeamTeachToolkit_Signup.md" => "/student/TeamTeachToolkit/signup"
+          },
+          "grades" => {
+            "2024-10-29-submissions.md" => "/student/submissions",
+            "2025-01-21-grader_view.md" => "/student/assign-grades"
+          }
+        }
+        registry = File.readlines(File.join(ROOT, "_projects/.makeprojects"), chomp: true)
+        assert_includes registry, "systems/class_manage:dev"
+
+        in_workspace do |workspace|
+          expected.each do |name, pages|
+            project = project_copy(workspace, name)
+            ProjectPublisher.run("publish", project, workspace)
+            pages.each do |filename, permalink|
+              source = File.join(project, "pages", filename)
+              published = File.join(workspace, "_posts/projects", name, filename)
+              assert_equal File.binread(source), File.binread(published)
+              frontmatter = File.read(published)[/\A---\s*\n(.*?)\n---/m, 1]
+              assert_equal permalink, YAML.safe_load(frontmatter).fetch("permalink")
+              command("git", "-C", workspace, "check-ignore", "-q", "--", published)
+            end
+
+            def test_class_management_notebooks_keep_their_routes
+              expected = {
+                "2024-10-31-bathroom" => "/hallpass_queue",
+                "2024-10-31-reporting_issues" => "/bathroom/issues",
+                "2024-12-17-statistics" => "/bathroom/statistics",
+                "2024-12-18-hallpass" => "/hallpass_queue/hallpass",
+                "2025-01-25-request_pass" => "/hallpass/requestpass"
+              }
+              expected.each do |name, permalink|
+                source = File.join(ROOT, "_projects/systems/class_manage/notebooks", "#{name}.ipynb")
+                first_cell = JSON.parse(File.read(source)).fetch("cells").first.fetch("source").join
+                frontmatter = first_cell[/\A---\s*\n(.*?)\n---/m, 1]
+                assert_equal permalink, YAML.safe_load(frontmatter).fetch("permalink")
+                refute File.exist?(File.join(ROOT, "_notebooks/student_toolkit/BathroomPass", "#{name}.ipynb"))
+              end
+            end
+          end
+        end
+      end
       return project
     end
     manifest = File.read(File.join(source, "distribution.json"))

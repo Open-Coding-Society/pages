@@ -75,6 +75,29 @@ class RemovedProjectCleanupTest < Minitest::Test
     refute exist?("_projects/systems/student-management-groups"), "The emptied project folder goes too"
   end
 
+  def test_removes_only_ignored_outputs_of_moved_class_management_notebooks
+    name = "2024-10-31-bathroom"
+    old_source = "_notebooks/student_toolkit/BathroomPass/#{name}.ipynb"
+    new_source = "_projects/systems/class_manage/notebooks/#{name}.ipynb"
+    output = "_posts/student_toolkit/BathroomPass/#{name}_IPYNB_2_.md"
+    write(output)
+    clean
+    assert exist?(output), "An output is kept until the new source exists"
+    write(new_source, "{}")
+    write(old_source, "{}")
+    clean
+    assert exist?(output), "A notebook still at the old location keeps its output"
+
+    File.delete(File.join(@workspace, old_source))
+    clean
+    refute exist?(output)
+
+    write(output)
+    git("add", "-f", output)
+    clean
+    assert exist?(output), "Tracked files are never removed"
+  end
+
   def test_keeps_what_current_and_uncommitted_projects_built
     outputs = %w[
       _posts/projects/messages/2026-09-12-dm.md

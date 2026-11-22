@@ -18,6 +18,10 @@ module RemovedProjectCleaner
   # The template's index target copies index.md to _posts/projects/<date>-<project>.md.
   INDEX_POST = /\A\d{4}-\d{2}-\d{2}-(.+)\.md\z/
   CACHE_ROOT = ".project-distribution-cache"
+  MOVED_CLASS_MANAGE_NOTEBOOKS = %w[
+    2024-10-31-bathroom 2024-10-31-reporting_issues 2024-12-17-statistics
+    2024-12-18-hallpass 2025-01-25-request_pass
+  ].freeze
 
   def self.run(workspace, out: $stdout)
     workspace = File.expand_path(workspace)
@@ -26,6 +30,7 @@ module RemovedProjectCleaner
       return
     end
 
+    clean_moved_notebooks(workspace, out)
     current = current_projects(workspace)
     caches = stale_caches(workspace, current)
     paths = stale_paths(workspace, current)
@@ -46,6 +51,26 @@ module RemovedProjectCleaner
     paths.each do |path|
       reason = keep_reason(path, tracked, owned)
       out.puts "   #{reason ? "Keeping #{path} (#{reason})" : remove_path(workspace, path)}"
+    end
+  end
+
+  def self.clean_moved_notebooks(workspace, out)
+    tracked = git_files(workspace).to_set
+    MOVED_CLASS_MANAGE_NOTEBOOKS.each do |name|
+      old_source = "_notebooks/student_toolkit/BathroomPass/#{name}.ipynb"
+      new_source = "_projects/systems/class_manage/notebooks/#{name}.ipynb"
+      output = "_posts/student_toolkit/BathroomPass/#{name}_IPYNB_2_.md"
+      next if File.exist?(File.join(workspace, old_source))
+      next unless File.file?(File.join(workspace, new_source))
+      next unless File.file?(File.join(workspace, output))
+      next if tracked.include?(output)
+
+      _, stderr, status = Open3.capture3("git", "-C", workspace, "check-ignore", "-q", "--", output)
+      raise "git check-ignore failed for #{output}: #{stderr.strip}" if status.exitstatus > 1
+      next unless status.success?
+
+      File.delete(File.join(workspace, output))
+      out.puts "🧹 Removed obsolete notebook output: #{output}"
     end
   end
 
