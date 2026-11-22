@@ -12,8 +12,8 @@ capstone_project:
   description: "Immersive AP CSP Unit 4 training built in Godot with OpenXR for the Meta Quest. Students assemble a computer and build a network step by step; the game checks and scores each mission and saves progress to the team's Flask backend."
   team: "Aryan M, Aaditya P, Chetan T, Ishaan S, Jake R, Kashyap T, Ryden B, Yash P"
   links:
-    frontend: https://github.com/OCSVR/frontend_pages
-    backend: https://github.com/OCSVR/backend
+    frontend: https://github.com/Open-Coding-Society/ocs_frontend
+    backend: https://github.com/Open-Coding-Society/ocs_backend
 ---
 
 <!-- markdownlint-capture -->
