@@ -120,6 +120,10 @@ export async function startMessagesPage({ config, richText, push }) {
       dialog: byId('filesDialog'), title: byId('filesTitle'), body: byId('filesBody'), status: byId('filesStatus'),
     },
   });
+  const help = new HelpDialog({
+    elements: { dialog: byId('helpDialog'), body: byId('helpBody') },
+    isMac: /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || ''),
+  });
   let scheduleDialog = null; // wired up below, once the thread exists
   const thread = createThread({
     api,
@@ -131,7 +135,8 @@ export async function startMessagesPage({ config, richText, push }) {
     viewer,
     linkCards: html => githubCards.forBody(html),
     runCode: (language, code) => api.runCode(language, code),
-    profileUrl: `${config.baseurl || ''}/profile`,
+    // /dm sits at the site's root, so Profile is beside it, base path and all (a fork's /repo).
+    profileUrl: new URL('profile', window.location.href).pathname,
     // The slash commands that open something on the page rather than in the composer.
     onCommand: name => {
       if (name === 'files') byId('messagesFiles').click();
@@ -165,10 +170,6 @@ export async function startMessagesPage({ config, richText, push }) {
     },
     onGroupRead: id => markGroupRead(findItem('group', id)),
     onFileShared: id => files.refreshIfShowing(id),
-  });
-  const help = new HelpDialog({
-    elements: { dialog: byId('helpDialog'), body: byId('helpBody') },
-    isMac: /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || ''),
   });
 
   const groupActions = byId('messagesGroupActions');

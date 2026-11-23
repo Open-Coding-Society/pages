@@ -470,10 +470,10 @@ the open conversation each start with a bar of the same height.
 </script>
 
 <script type="module">
-  import { baseurl, javaURI, javaWebSocketURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { javaURI, javaWebSocketURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
   import * as richText from '{{ site.baseurl }}/assets/js/chat/rich-text.js';
   import * as push from '{{ site.baseurl }}/assets/js/api/push-notifications.js';
   import { startMessagesPage } from '{{ site.baseurl }}/assets/js/projects/messages/messages-page.js';
 
-  startMessagesPage({ config: { baseurl, javaURI, javaWebSocketURI, pythonURI, fetchOptions }, richText, push });
+  startMessagesPage({ config: { javaURI, javaWebSocketURI, pythonURI, fetchOptions }, richText, push });
 </script>

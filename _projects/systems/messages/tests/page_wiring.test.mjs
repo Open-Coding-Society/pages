@@ -26,8 +26,8 @@ test('the page gives the thread a command menu and a code box, and wires /help a
   has(script, /showCommands: \(\) => thread\.showCommands\(\)/, 'a shortcut opens the command menu');
 });
 
-test('dm.md hands the page its base URL, for the Profile link the gist command gives', () => {
-  has(page, /import \{ baseurl, [^}]*\} from '\{\{ site\.baseurl \}\}\/assets\/js\/api\/config\.js';/, 'dm.md imports baseurl');
-  has(page, /startMessagesPage\(\{ config: \{ baseurl, /, 'dm.md passes baseurl in the config');
-  has(script, /profileUrl: `\$\{config\.baseurl \|\| ''\}\/profile`/, 'the page builds the Profile link from it');
+test('the gist command’s Profile link sits beside /dm, so a site under a base path keeps it', () => {
+  has(script, /profileUrl: new URL\('profile', window\.location\.href\)\.pathname/, 'the page finds Profile beside itself');
+  assert.equal(new URL('profile', 'https://student.github.io/pages/dm?group=12').pathname, '/pages/profile');
+  assert.equal(new URL('profile', 'https://pages.opencodingsociety.com/dm').pathname, '/profile');
 });
