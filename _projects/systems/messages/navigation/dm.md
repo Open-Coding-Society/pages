@@ -124,6 +124,11 @@ the open conversation each start with a bar of the same height.
       {%- endcomment -%}
       <div class="dm__tray" id="messagesAttachTray" hidden></div>
 
+      {%- comment -%}
+        The code box /code and /gist open (js/code-composer.js).
+      {%- endcomment -%}
+      <div class="dm__code-host" id="messagesCodeHost"></div>
+
       <div class="dm__attach-preview hidden" id="messagesImagePreview">
         <img id="messagesImageThumb" alt="Image attached to your next message">
         <button type="button" class="dm__action" id="messagesImageRemove">Remove</button>
@@ -138,6 +143,11 @@ the open conversation each start with a bar of the same height.
         The inputs are out of the tab order because the menu is how they are reached.
       {%- endcomment -%}
       <form class="dm__composer" id="messagesForm" autocomplete="off">
+        {%- comment -%}
+          The slash-command menu (js/command-menu.js) opens here, over the composer, when a
+          message starts with "/".
+        {%- endcomment -%}
+        <div class="dm__command-host" id="messagesCommandHost"></div>
         <button class="dm__action dm-cancel-edit" id="messagesCancelEdit" type="button" hidden>Cancel</button>
         <div class="dm__attach" id="messagesAttach">
           <input class="dm__file-input" id="messagesImage" type="file" accept="image/*" tabindex="-1" aria-hidden="true">
@@ -321,6 +331,19 @@ the open conversation each start with a bar of the same height.
     </div>
   </div>
 
+  {%- comment -%}
+    /help (js/help-dialog.js): the keyboard shortcuts and every slash command.
+  {%- endcomment -%}
+  <div class="ocs__modal hidden" id="helpDialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="ocs__modal-card ocs__modal-card--wide ocs__stack">
+      <div class="ocs__modal-header">
+        <h3 class="ocs__modal-title" id="helpTitle">Commands and keys</h3>
+        <button type="button" class="ocs__btn small" data-close aria-label="Close" data-focus>&times;</button>
+      </div>
+      <div class="ocs__stack dm__help" id="helpBody"></div>
+    </div>
+  </div>
+
   <div class="ocs__modal hidden" id="formGroupsDialog" role="dialog" aria-modal="true" aria-labelledby="formGroupsTitle">
     <div class="ocs__modal-card ocs__stack">
       <div class="ocs__modal-header">
@@ -447,10 +470,10 @@ the open conversation each start with a bar of the same height.
 </script>
 
 <script type="module">
-  import { javaURI, javaWebSocketURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { baseurl, javaURI, javaWebSocketURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
   import * as richText from '{{ site.baseurl }}/assets/js/chat/rich-text.js';
   import * as push from '{{ site.baseurl }}/assets/js/api/push-notifications.js';
   import { startMessagesPage } from '{{ site.baseurl }}/assets/js/projects/messages/messages-page.js';
 
-  startMessagesPage({ config: { javaURI, javaWebSocketURI, pythonURI, fetchOptions }, richText, push });
+  startMessagesPage({ config: { baseurl, javaURI, javaWebSocketURI, pythonURI, fetchOptions }, richText, push });
 </script>

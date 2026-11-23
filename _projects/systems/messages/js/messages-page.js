@@ -11,6 +11,7 @@ import { GitHubSource } from './github-source.js';
 import { initGroupFormation } from './group-formation.js';
 import { initFiles, initFindGroup, initMembers } from './group-dialogs.js';
 import { GroupFiles } from './group-files.js';
+import { HelpDialog } from './help-dialog.js';
 import { initMessageSearch } from './message-search.js';
 import { createMessagesApi } from './messages-api.js';
 import {
@@ -19,6 +20,7 @@ import {
 import { initNewChat } from './new-chat.js';
 import { initNotifyButton } from './notify-button.js';
 import { initScheduleDialog } from './schedule-dialog.js';
+import { Shortcuts } from './shortcuts.js';
 import { conversationHref, createSidebar } from './sidebar.js';
 import { createThread } from './thread.js';
 
@@ -75,7 +77,8 @@ export async function startMessagesPage({ config, richText, push }) {
     onOpen: (kind, id) => openConversation(kind, id),
   });
   const render = () => sidebar.render(state);
-  // "Find a conversation" narrows both lists as you type; Escape clears it.
+  // "Find a conversation" narrows both lists as you type; Enter opens the first one left,
+  // and Escape clears it.
   const conversationSearch = byId('messagesConversationSearch');
   if (conversationSearch) {
     conversationSearch.addEventListener('input', () => {
@@ -83,6 +86,11 @@ export async function startMessagesPage({ config, richText, push }) {
       render();
     });
     conversationSearch.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        document.querySelector('#messagesGroupList a, #messagesDmList a')?.click();
+        return;
+      }
       if (event.key !== 'Escape' || !conversationSearch.value) return;
       event.preventDefault();
       conversationSearch.value = '';
@@ -122,6 +130,17 @@ export async function startMessagesPage({ config, richText, push }) {
     groupFiles,
     viewer,
     linkCards: html => githubCards.forBody(html),
+    runCode: (language, code) => api.runCode(language, code),
+    profileUrl: `${config.baseurl || ''}/profile`,
+    // The slash commands that open something on the page rather than in the composer.
+    onCommand: name => {
+      if (name === 'files') byId('messagesFiles').click();
+      else if (name === 'members') byId('messagesMembers').click();
+      else if (name === 'search') byId('messagesSearch').focus();
+      else if (name === 'help') help.open(byId('messagesForm'));
+    },
+    // Where the slash commands are, said where people type.
+    texts: { placeholder: 'Write a message, or type / for commands' },
     // A folder's Open button in the chat opens it in the Files dialog.
     onOpenFolder: (groupId, path) => {
       const group = findItem('group', groupId);
@@ -136,6 +155,7 @@ export async function startMessagesPage({ config, richText, push }) {
       attachButton: byId('messagesAttachButton'), attachMenuHost: byId('messagesAttach'),
       filesInput: byId('messagesFilesInput'), folderInput: byId('messagesFolder'), tray: byId('messagesAttachTray'),
       dropZone: document.querySelector('.dm__thread'), dropHint: byId('messagesDropHint'),
+      commandHost: byId('messagesCommandHost'), codeHost: byId('messagesCodeHost'),
     },
     onDmRead: id => {
       const conversation = findItem('dm', id);
@@ -145,6 +165,10 @@ export async function startMessagesPage({ config, richText, push }) {
     },
     onGroupRead: id => markGroupRead(findItem('group', id)),
     onFileShared: id => files.refreshIfShowing(id),
+  });
+  const help = new HelpDialog({
+    elements: { dialog: byId('helpDialog'), body: byId('helpBody') },
+    isMac: /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || ''),
   });
 
   const groupActions = byId('messagesGroupActions');
@@ -194,6 +218,34 @@ export async function startMessagesPage({ config, richText, push }) {
     // Nothing to scroll to on a phone: the page shows one pane at a time there (dm.md's
     // inline script swaps the list for the conversation), and the pane fills the window.
     return true;
+  }
+
+  // Ctrl/Cmd+K, Alt+↑/↓ and Ctrl/Cmd+/ (js/shortcuts.js). Alt+↑/↓ follow the sidebar's
+  // order after any search, read from its links so the keys and the lists never disagree.
+  function startShortcuts() {
+    const page = document.querySelector('.dm');
+    const sidebarOrder = () => [...document.querySelectorAll('#messagesGroupList a, #messagesDmList a')].map(link => {
+      const params = new URL(link.href, window.location.href).searchParams;
+      return params.has('group') ? { kind: 'group', id: Number(params.get('group')) } : { kind: 'dm', id: Number(params.get('dm')) };
+    }).filter(item => Number.isInteger(item.id));
+    new Shortcuts({
+      order: sidebarOrder,
+      active: () => state.active,
+      open: (kind, id) => {
+        const opened = openConversation(kind, id);
+        // On a phone the list and the conversation share the screen; show the conversation.
+        if (opened) page?.setAttribute('data-dm-view', 'thread');
+        return opened;
+      },
+      findConversation: () => {
+        page?.removeAttribute('data-dm-view');
+        conversationSearch?.focus();
+      },
+      showCommands: () => thread.showCommands(),
+      // From the conversation search, and from an empty message box.
+      canSwitchFrom: target => target === conversationSearch
+        || (Boolean(target.closest?.('.rt-editor')) && !target.closest('.rt-editor').textContent.trim()),
+    });
   }
 
   function closeConversation() {
@@ -384,6 +436,7 @@ export async function startMessagesPage({ config, richText, push }) {
   byId('messagesNewChat').disabled = false;
   initNotifyButton({ push, button: byId('messagesNotify'), notice });
   if (conversationSearch) conversationSearch.disabled = false;
+  startShortcuts();
 
   // The navbar bell's summary keeps the unread counts current, and shows conversations
   // someone else started since the list loaded.

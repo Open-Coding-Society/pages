@@ -3,6 +3,8 @@
 // with its avatar, sender and time, a Reply button, and edit and delete buttons on your
 // own messages (none in a read-only log). A reply shows a quote of the message it
 // answers, from the [[reply:...]] marker at the start of its body (assets/js/chat/chat-reply.js).
+import { CodeBlock } from './code-block.js';
+import { CodeBlocks } from './code-model.js';
 import { FileRows } from './file-rows.js';
 import { FilesMarker } from './files-model.js';
 import { dayKey, dayLabel, initialsFor, pfpSrc, tintFor } from './messages-model.js';
@@ -28,6 +30,16 @@ export const LOG_TEXTS = Object.freeze({
   openFolder: 'Open {name} in Files',
   zipFolder: 'Download {name} as a .zip',
   imagePreview: '{name}, shared by {sender}',
+  copyCode: 'Copy',
+  copied: 'Copied',
+  copyFailed: 'Select and copy it',
+  runCode: 'Run',
+  running: 'Running…',
+  output: 'Output',
+  runFailed: 'Could not run it: {reason}',
+  noOutput: '(no output)',
+  saveGist: 'Save as gist',
+  savedGist: 'Saved to your gists:',
 });
 
 // Fills a text's {slot}s, the way the UI Builder's registry text marks them. A slot with
@@ -73,10 +85,12 @@ function splitReply(richText, body) {
 // onFile(action, item, control), when given, is what a shared file's buttons do ('preview',
 // 'download', 'folder', 'zip'); thumbnail(item) resolves a URL for an image's inline preview.
 // linkCards(html) returns a box of previews for the links in a message's text (the GitHub
-// cards, GitHubCards.forBody), or null when there are none.
+// cards, GitHubCards.forBody), or null when there are none. runCode(language, code)
+// resolves a code block's output (the /run routes the lesson runners use); saveGist(language,
+// code) resolves the URL of a secret gist made from it.
 export function createMessageLog(element, {
   richText, me, onEdit, onDelete, onReply = null, onSchedule = null, readOnly = false, texts = {}, formatBody = null,
-  onFile = null, thumbnail = null, linkCards = null,
+  onFile = null, thumbnail = null, linkCards = null, runCode = null, saveGist = null,
 }) {
   if (formatBody !== null && typeof formatBody !== 'function') {
     throw new TypeError('createMessageLog: formatBody must be a function or null');
@@ -261,19 +275,27 @@ export function createMessageLog(element, {
 
   // The body's reply quote (if any) goes just before the body; formatBody sees the rest.
   // Clicking the quote scrolls to the original and marks it, as a search result does.
-  // The files shared with the message go after the body. Returns the text it showed, without
-  // the quote's and the files' markers, which is what the cards are made from.
+  // A code block goes after the body, then the files shared with the message. Returns the
+  // text it showed, without the quote's, the files' and the code's markers, which is what the
+  // cards are made from: a link inside code makes no card.
   function renderBody(body, stored) {
     const { reply, html: withFiles } = splitReply(richText, stored.body);
-    const { items, html } = FilesMarker.extract(withFiles);
+    const { items, html: withCode } = FilesMarker.extract(withFiles);
+    const { language, code, html } = CodeBlocks.extractMarker(withCode);
     const main = body.parentNode;
     main.querySelector('.chat-reply-quote')?.remove();
+    main.querySelector('.chat-code')?.remove();
     if (reply && typeof richText.renderReplyQuote === 'function') {
       main.insertBefore(richText.renderReplyQuote(reply, { onJump: id => reveal(String(id)) }), body);
     }
     body.replaceChildren();
     richText.renderRichMessage(body, shownBody({ ...stored, body: html }, formatBody));
-    fileRows.render(main, body, items, stored.isSelf ? text.you : stored.senderName);
+    let after = body;
+    if (code !== null) {
+      after = new CodeBlock(language, code, { runCode, saveGist, text }).element;
+      main.insertBefore(after, body.nextSibling);
+    }
+    fileRows.render(main, after, items, stored.isSelf ? text.you : stored.senderName);
     return html;
   }
 
@@ -433,6 +455,7 @@ export function createMessageLog(element, {
     if (!row) return;
     showDeleted(row.querySelector('.chat-msg-body'));
     row.querySelector('.chat-reply-quote')?.remove();
+    row.querySelector('.chat-code')?.remove();
     row.querySelector('.chat-files')?.remove();
     row.querySelector('.chat-file-gallery')?.remove();
     row.querySelector('.chat-cards')?.remove();

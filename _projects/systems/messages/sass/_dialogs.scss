@@ -254,6 +254,12 @@
   }
 }
 
+// /help's tables show in full: the dialog scrolls, not each table.
+.dm .dm__help .ocs__table-wrap {
+  max-height: none;
+  overflow: visible;
+}
+
 // ── Cards and callouts inside dialogs ──────────────────────────────────────────
 .dm .ocs__card {
   padding: var(--dm-space-md) 0;

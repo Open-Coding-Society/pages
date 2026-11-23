@@ -362,3 +362,68 @@
   line-height: 1.5;
   color: var(--dm-ink);
 }
+
+// ── Slash commands ──────────────────────────────────────────────────────────────
+// The menu (the grammar's ocs__menu, elements/menus) rises from the composer's top edge.
+.dm__command-host {
+  position: absolute;
+  bottom: calc(100% + var(--dm-space-xs));
+  left: 0;
+  z-index: 8;
+  width: 100%;
+  pointer-events: none;
+}
+
+.dm__command-host .ocs__menu {
+  width: 100%;
+  max-width: 34rem;
+  pointer-events: auto;
+}
+
+// ── The code box (/code, /gist) ────────────────────────────────────────────────────
+.dm__code-box {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--dm-space-xs);
+  margin: 0 var(--dm-gutter) var(--dm-space-xs);
+}
+
+.dm__code-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dm-space-xs);
+}
+
+.dm__code-title {
+  margin-right: auto;
+  font-family: var(--dm-font);
+  font-size: $text-sm;
+  color: var(--dm-ink);
+}
+
+.dm .dm__code-language,
+.dm .dm__code-filename {
+  width: auto;
+  min-width: 0;
+  padding: 0.3rem 0.5rem;
+  font-size: $text-sm;
+}
+
+.dm .dm__code-filename {
+  flex: 0 1 14rem;
+}
+
+.dm .dm__code-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 9rem;
+  max-height: 40vh;
+  resize: vertical;
+  font-family: $mono-font;
+  font-size: $text-sm;
+  line-height: 1.5;
+  tab-size: 2;
+  white-space: pre;
+}
