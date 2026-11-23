@@ -1,11 +1,44 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
 import '../../../../assets/js/GameEnginev1.1/test/register-assets.mjs';
 
-const { startIdentityGate } = await import('../js/identity-gate.js');
+const { startIdentityCookieGate } = await import('../js/identity-cookie-gate-runner.js');
 const { default: GameLevel } = await import('../../../../assets/js/GameEnginev1.1/essentials/GameLevel.js');
 
-test('nested cookie game saves, retries failures, then ends through GameControl', async () => {
+test('Identity Forge driver reads its base URL from the page container', () => {
+  const root = { id: 'onboarding-identity-game', dataset: { baseurl: '/pages' } };
+  const game = {};
+  const started = [];
+  const source = readFileSync(new URL('../js/identity-forge-driver.js', import.meta.url), 'utf8')
+    .replace(/^import .*;\n/gm, '');
+  runInNewContext(source, {
+    pythonURI: '',
+    fetchOptions: {},
+    Backend: class {},
+    FlaskProfile: class {},
+    OnboardingStore: class {},
+    GameLevelCsPath0Forge: class {},
+    startFullPageLevel: options => {
+      started.push(options);
+      return game;
+    },
+    startIdentityCookieGate: () => assert.fail('The gate should not start outside an embedded gate session.'),
+    document: {
+      getElementById: () => root,
+      querySelector: () => ({}),
+    },
+    location: { search: '' },
+    window: { parent: null },
+    URLSearchParams,
+  });
+  assert.equal(started.length, 1);
+  assert.equal(started[0].containerId, root.id);
+  assert.equal(started[0].path, '/pages');
+});
+
+test('Identity Forge cookie gate saves, retries failures, then ends through GameControl', async () => {
   const keys = new Map();
   const messages = [];
   const classes = new Set();
@@ -13,6 +46,8 @@ test('nested cookie game saves, retries failures, then ends through GameControl'
   const retry = { hidden: true, addEventListener(_type, listener) { this.click = listener; } };
   const status = { hidden: true, querySelector: selector => selector.includes('message') ? message : retry };
   const host = {
+    innerWidth: 700,
+    innerHeight: 500,
     parent: { postMessage: value => messages.push(value) },
     location: { origin: 'https://site.test' },
     document: {
@@ -34,7 +69,7 @@ test('nested cookie game saves, retries failures, then ends through GameControl'
     constructor(_game, levels, options) {
       nested = this;
       assert.equal(options.parentControl, parent);
-      const level = new levels[0]({ innerWidth: 700, innerHeight: 500, path: '/pages' });
+      const level = new levels[0]({ game, innerWidth: 700, innerHeight: 500, path: '/pages' });
       const descriptors = new GameLevel(parent).expandDescriptor(level.classes[0]);
       this.currentLevel = { gameEnv: { gameObjects: descriptors.map(({ class: Clicker, data }) => {
         const cookie = Object.create(Clicker.prototype);
@@ -49,7 +84,7 @@ test('nested cookie game saves, retries failures, then ends through GameControl'
   const oldError = console.error;
   console.error = () => {};
   try {
-    startIdentityGate(game, { status, store, host, Control: FakeControl });
+    startIdentityCookieGate(game, { status, store, host, Control: FakeControl });
     assert.equal(parent.isPaused, true);
     const cookies = nested.currentLevel.gameEnv.gameObjects;
     cookies[0].handleClick();

@@ -46,7 +46,9 @@ if (!challenge) {
   let gateGameId = null;
   let progressRevision = 0;
   let paused = false;
-  const identityGate = challenge.id === 'identity-forge';
+  const identityGate = challenge.gate === 'identity-cookie';
+  const toolchainGate = challenge.gate === 'toolchain-cookie';
+  const gated = identityGate || toolchainGate;
 
   function stop() {
     if (activeFrame) {
@@ -73,11 +75,11 @@ if (!challenge) {
 
   function start() {
     if (activeFrame || unlocked === null) return;
-    activeFrame = unlocked || identityGate ? challengeFrame : gateFrame;
-    const url = new URL(`${baseurl}${unlocked || identityGate ? challenge.url : '/onboarding/gate/'}`, location.origin);
+    activeFrame = toolchainGate && !unlocked ? gateFrame : challengeFrame;
+    const url = new URL(`${baseurl}${activeFrame === gateFrame ? '/onboarding/gate/' : challenge.url}`, location.origin);
     url.searchParams.set('onboarding_embed', '1');
     if (identityGate && !unlocked) url.searchParams.set('onboarding_gate', '1');
-    if (!unlocked && !identityGate) url.searchParams.set('challenge', challenge.id);
+    if (activeFrame === gateFrame) url.searchParams.set('challenge', challenge.id);
     activeFrame.src = url.href;
     activeFrame.hidden = false;
     startButton.disabled = true;
@@ -91,18 +93,21 @@ if (!challenge) {
     isGuest = !progress.user;
     isOffline = progress.offline === true;
     const nextUnlocked = progress.unlocked.includes(challenge.id);
-    status.textContent = progress.offline
+    status.textContent = !gated
+      ? 'This challenge is ready to play.'
+      : progress.offline
       ? `Account service unavailable. ${nextUnlocked ? 'Unlocked' : 'Playing'} offline. Unlocks transfer to the next signed-in account; guest game profile changes may not. Reconnect to replay.`
       : progress.user
       ? (nextUnlocked ? 'Unlocked and saved to your account.' : 'Play the unlock game to begin.')
       : (nextUnlocked ? 'Unlocked on this browser. Sign in to save it to your account.' : 'Guest play: your unlock will transfer when you sign in.');
+    resetButton.hidden = !gated;
     resetButton.disabled = isOffline;
-    gate.hidden = nextUnlocked || identityGate;
-    challengeSection.hidden = !nextUnlocked && !identityGate;
-    challengeLink.hidden = !nextUnlocked;
-    root.querySelector('[data-challenge-note]').textContent = nextUnlocked
+    gate.hidden = !toolchainGate || nextUnlocked;
+    challengeSection.hidden = toolchainGate && !nextUnlocked;
+    challengeLink.hidden = gated && !nextUnlocked;
+    root.querySelector('[data-challenge-note]').textContent = !toolchainGate || nextUnlocked
       ? 'Play here or open the challenge in a new tab.'
-      : 'Collect five moving cookies in the game to unlock Identity Forge.';
+      : 'Collect five cookies in the game to unlock Toolchain Trail.';
     controls.hidden = false;
     if (unlocked !== nextUnlocked) {
       if (identityGate && unlocked === false && nextUnlocked && activeFrame === challengeFrame) {
@@ -160,7 +165,7 @@ if (!challenge) {
     }
   });
   resetButton.addEventListener('click', async () => {
-    if (busy || gateSaving || !window.confirm("Clear this challenge's unlock and replay its cookie game? Your avatar, theme and other unlocks will not change.")) return;
+    if (busy || gateSaving || !window.confirm("Clear this challenge's unlock and replay its gate? Your avatar, theme and other unlocks will not change.")) return;
     busy = true;
     resetButton.disabled = true;
     try {
@@ -224,7 +229,11 @@ if (!challenge) {
     }
   });
 
-  refresh();
-  window.addEventListener('focus', refresh);
-  window.setInterval(() => { if (isGuest) refresh(); }, 10000);
+  if (gated) {
+    refresh();
+    window.addEventListener('focus', refresh);
+    window.setInterval(() => { if (isGuest) refresh(); }, 10000);
+  } else {
+    show({ user: null, unlocked: [] });
+  }
 }

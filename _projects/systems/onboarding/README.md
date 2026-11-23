@@ -1,24 +1,30 @@
 # Onboarding
 
-The home page redirects to `/onboarding/`, a card-based adventure with a link to
-the unchanged `/cs-pathway`. A five-cookie GameEngine game unlocks each Pathway
-challenge. Identity Forge launches moving cookies as a nested GameEngine level;
-click each sprite (or press Space) and, once the unlock is saved, the same Forge
-session resumes. If saving fails, use the game's retry button. The other
-Pathway challenges use the separate cookie gate. Game Workbench and UI Builder open directly in the same tab, using the
-full page; neither has a cookie gate. The gate is a navigation aid, not a skill
-assessment or security boundary.
+The home page redirects to `/onboarding/`, the card grid for individual
+experiences, with a link to the unchanged `/cs-pathway`. Each gated experience
+declares its own gate in `js/onboarding-data.js`: Identity Forge uses its
+moving-cookie gate, and Toolchain Trail uses the separate five-cookie game.
+Wayfinding World, AI Review Challenge and Assessment Observatory open directly
+until they have their own gates. Game Workbench and UI Builder also open directly
+in the same tab. Gates are navigation aids, not skill assessments or security
+boundaries.
 
-The separate gate declares its goal and progress in its level and saves through
-the engine's level completion sequence. It sends generic game progress events
-to the viewer; the account and browser storage keys remain Onboarding-specific.
-If saving fails, the viewer's retry button repeats the save without restarting
-the game.
+Gate files are named after the experience and role: `identity-forge-driver.js`
+starts the Forge level using the page's `data-baseurl` and conditionally attaches
+the Identity gate. `identity-cookie-gate-level.js` exports that gate's level;
+`identity-cookie-gate-runner.js` coordinates its nested-game behavior.
+`toolchain-cookie-gate-level.js` exports the Toolchain level, while
+`toolchain-cookie-gate-runner.js` starts the standalone game. The page source is
+`pages/toolchain-cookie-gate.md`; its existing `/onboarding/gate/` URL stays
+unchanged. The Toolchain level declares its goal and progress, and saves through
+the engine's level-completion sequence. It sends generic progress events to the
+viewer; account and browser storage remain Onboarding-specific. If saving fails,
+the viewer's retry button repeats the save without restarting the game.
 
 The viewer has start, pause/resume, stop and fullscreen controls. Stop unloads the
 game; start runs it again. A game dialog may already have paused the level, in
 which case close the dialog before using the pause control. Clear Cookies & Replay
-asks for confirmation and resets only that challenge's unlock on the current
+asks for confirmation and resets only a gated challenge's unlock on the current
 account or browser; it does not clear login cookies, avatar, theme or other unlocks.
 
 Guest unlocks stay in this browser and transfer to the next signed-in account.

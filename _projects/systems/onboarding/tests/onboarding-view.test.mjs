@@ -24,12 +24,14 @@ async function viewer(id, { offline = false, viewerMode = true } = {}) {
   const root = { dataset: { baseurl: '' }, querySelector: element };
   const listeners = {};
   const progress = { user: null, unlocked: [], ...(offline ? { offline: true } : {}) };
+  let progressReads = 0;
   let releaseRead;
   let waitForRead;
   let releaseReset;
   let waitForReset;
   class Store {
     async read() {
+      progressReads++;
       const snapshot = { ...progress, unlocked: [...progress.unlocked] };
       if (waitForRead) await waitForRead;
       return snapshot;
@@ -46,12 +48,20 @@ async function viewer(id, { offline = false, viewerMode = true } = {}) {
   runInNewContext(source, {
     document: { querySelector: () => root }, location, window: host, URL, URLSearchParams,
     pythonURI: '', fetchOptions: {}, Backend: class {}, FlaskProfile: class {}, OnboardingStore: Store,
-    challengeById: () => ({ id, title: 'Challenge', description: 'Description', url: '/challenge/' }),
+    challengeById: () => ({
+      id,
+      title: 'Challenge',
+      description: 'Description',
+      url: '/challenge/',
+      ...(id === 'identity-forge' ? { gate: 'identity-cookie' } : {}),
+      ...(id === 'toolchain-trail' ? { gate: 'toolchain-cookie' } : {}),
+    }),
     console: { error() {} },
   });
   await new Promise(resolve => setImmediate(resolve));
   return {
     element, listeners, frameMessages,
+    get progressReads() { return progressReads; },
     delayRead: () => { waitForRead = new Promise(resolve => { releaseRead = resolve; }); },
     releaseRead: () => { waitForRead = null; releaseRead(); },
     delayReset: () => { waitForReset = new Promise(resolve => { releaseReset = resolve; }); },
@@ -85,17 +95,27 @@ test('Identity Forge keeps the game frame when the nested level saves', async ()
   assert.equal(env.frameMessages.length, 0);
 });
 
-test('other challenges still switch from the separate gate to their game', async () => {
+test('Toolchain Trail switches from its cookie gate to the game', async () => {
   const env = await viewer('toolchain-trail');
   const gate = env.element('[data-gate-frame]');
   assert.match(gate.src, /\/onboarding\/gate\//);
   assert.match(gate.src, /challenge=toolchain-trail/);
   await env.listeners.message({
     origin: 'https://site.test', source: gate.contentWindow,
-    data: { type: 'ocs-game-progress', game: { id: 'cookie-gate', challengeId: 'toolchain-trail' }, status: 'completed', result: { user: null, unlocked: ['toolchain-trail'] } },
+    data: { type: 'ocs-game-progress', game: { id: 'toolchain-cookie-gate', challengeId: 'toolchain-trail' }, status: 'completed', result: { user: null, unlocked: ['toolchain-trail'] } },
   });
   assert.equal(env.element('[data-gate]').hidden, true);
   assert.match(env.element('[data-challenge-frame]').src, /\/challenge\//);
+});
+
+test('ungated challenges open directly without showing cookie unlock controls', async () => {
+  const env = await viewer('wayfinding-world');
+  assert.match(env.element('[data-challenge-frame]').src, /\/challenge\//);
+  assert.equal(env.element('[data-gate]').hidden, true);
+  assert.equal(env.element('[data-challenge]').hidden, false);
+  assert.equal(env.element('[data-challenge-open]').hidden, false);
+  assert.equal(env.element('[data-game-reset]').hidden, true);
+  assert.equal(env.progressReads, 0);
 });
 
 test('a stale progress refresh does not undo a completed nested level', async () => {
@@ -123,23 +143,23 @@ test('the separate gate can retry a failed save', async () => {
   assert.equal(env.frameMessages.length, 0);
   await env.listeners.message({
     origin: 'https://site.test', source: gate.contentWindow,
-    data: { type: 'ocs-game-progress', game: { id: 'cookie-gate', challengeId: 'toolchain-trail' }, status: 'completing' },
+    data: { type: 'ocs-game-progress', game: { id: 'toolchain-cookie-gate', challengeId: 'toolchain-trail' }, status: 'completing' },
   });
   assert.match(env.element('[data-challenge-status]').textContent, /Saving/);
   assert.equal(env.frameMessages.at(-1).action, 'allow');
-  assert.equal(env.frameMessages.at(-1).gameId, 'cookie-gate');
+  assert.equal(env.frameMessages.at(-1).gameId, 'toolchain-cookie-gate');
   await env.listeners.message({
     origin: 'https://site.test', source: gate.contentWindow,
-    data: { type: 'ocs-game-progress', game: { id: 'cookie-gate', challengeId: 'toolchain-trail' }, status: 'failed', error: 'offline' },
+    data: { type: 'ocs-game-progress', game: { id: 'toolchain-cookie-gate', challengeId: 'toolchain-trail' }, status: 'failed', error: 'offline' },
   });
   assert.equal(env.element('[data-unlock-retry]').hidden, false);
   await env.element('[data-unlock-retry]').click();
   assert.equal(env.frameMessages.at(-1).type, 'ocs-game-completion-control');
   assert.equal(env.frameMessages.at(-1).action, 'retry');
-  assert.equal(env.frameMessages.at(-1).gameId, 'cookie-gate');
+  assert.equal(env.frameMessages.at(-1).gameId, 'toolchain-cookie-gate');
   await env.listeners.message({
     origin: 'https://site.test', source: gate.contentWindow,
-    data: { type: 'ocs-game-progress', game: { id: 'cookie-gate', challengeId: 'toolchain-trail' }, status: 'completed', result: { user: null, unlocked: ['toolchain-trail'] } },
+    data: { type: 'ocs-game-progress', game: { id: 'toolchain-cookie-gate', challengeId: 'toolchain-trail' }, status: 'completed', result: { user: null, unlocked: ['toolchain-trail'] } },
   });
   assert.match(env.element('[data-challenge-frame]').src, /\/challenge\//);
 });
@@ -151,7 +171,7 @@ test('a gate save waits for an in-flight replay and is discarded when replay suc
   const gate = env.element('[data-gate-frame]');
   await env.listeners.message({
     origin: 'https://site.test', source: gate.contentWindow,
-    data: { type: 'ocs-game-progress', game: { id: 'cookie-gate', challengeId: 'toolchain-trail' }, status: 'completing' },
+    data: { type: 'ocs-game-progress', game: { id: 'toolchain-cookie-gate', challengeId: 'toolchain-trail' }, status: 'completing' },
   });
   assert.equal(env.frameMessages.length, 0);
   env.releaseReset();

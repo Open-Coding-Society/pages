@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import GameControl from '../../../../assets/js/GameEnginev1.1/essentials/GameControl.js';
 
-test('cookie completion saves once, retries failures, then exits to the viewer', async t => {
+test('Toolchain cookie completion saves once, retries failures, then exits to the viewer', async t => {
   const frames = [];
   const previousFrame = globalThis.requestAnimationFrame;
   const previousDocument = globalThis.document;
@@ -50,7 +50,7 @@ test('cookie completion saves once, retries failures, then exits to the viewer',
       const game = { path: '', environment: options };
       const control = game.gameControl = new GameControl(game, [options.gameLevelClasses[0]]);
       const gameLevel = new options.gameLevelClasses[0]({
-        path: '', innerWidth: 400, innerHeight: 300, gameControl: control,
+        game, path: '', innerWidth: 400, innerHeight: 300, gameControl: control,
       });
       const cookie = new Clicker(gameLevel.classes[0].data);
       control.currentLevel = {
@@ -61,19 +61,25 @@ test('cookie completion saves once, retries failures, then exits to the viewer',
       return game;
     },
   };
-  const source = readFileSync(new URL('../js/onboarding-gate.js', import.meta.url), 'utf8')
-    .replace(/^import .*;\n/gm, '');
-  runInNewContext(source, {
+  const context = {
     Game, GameControl, Clicker, pythonURI: '', fetchOptions: {}, Backend: class {}, FlaskProfile: class {},
-    OnboardingStore: Store, challengeById: id => id === 'toolchain-trail' ? { id } : null,
+    OnboardingStore: Store, challengeById: id => id === 'toolchain-trail' ? { id, gate: 'toolchain-cookie' } : null,
     connectGameControls() {}, URLSearchParams, console,
     location: { origin: 'https://site.test', search: '?challenge=toolchain-trail' },
     document: { querySelector: () => root, getElementById: () => stage },
     window: host,
-  });
+  };
+  const levelSource = readFileSync(new URL('../js/toolchain-cookie-gate-level.js', import.meta.url), 'utf8')
+    .replace(/^import .*;\n/gm, '')
+    .replace('export default class ToolchainCookieGate', 'class ToolchainCookieGate')
+    .concat('\nglobalThis.ToolchainCookieGate = ToolchainCookieGate;');
+  runInNewContext(levelSource, context);
+  const runnerSource = readFileSync(new URL('../js/toolchain-cookie-gate-runner.js', import.meta.url), 'utf8')
+    .replace(/^import .*;\n/gm, '');
+  runInNewContext(runnerSource, context);
 
   assert.equal(messages[0].type, 'ocs-game-progress');
-  assert.equal(messages[0].game.id, 'cookie-gate');
+  assert.equal(messages[0].game.id, 'toolchain-cookie-gate');
   assert.equal(messages[0].game.goal, 5);
   assert.equal(messages[0].game.current, 0);
   for (let i = 0; i < 6; i++) element('[data-gate-click]').click();
@@ -83,7 +89,7 @@ test('cookie completion saves once, retries failures, then exits to the viewer',
   frames.shift()();
   await Promise.resolve();
   assert.equal(messages.at(-1).status, 'completing');
-  const control = action => ({ type: 'ocs-game-completion-control', gameId: 'cookie-gate', action });
+  const control = action => ({ type: 'ocs-game-completion-control', gameId: 'toolchain-cookie-gate', action });
   listeners.message({ origin: 'https://other.test', source: parent, data: control('allow') });
   assert.equal(attempts, 0);
   listeners.message({ origin: 'https://site.test', source: parent, data: { ...control('allow'), gameId: 'other' } });
