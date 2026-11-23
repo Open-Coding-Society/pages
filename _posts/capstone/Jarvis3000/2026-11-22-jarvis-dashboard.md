@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: Jarvis
-description: Open the Jarvis dashboard from CS Pathway.
+description: Open the Jarvis3000 dashboard.
 permalink: /jarvis/
 hide: true
 toc: false
