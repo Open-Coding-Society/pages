@@ -53,3 +53,11 @@ test('only Python, Java and JavaScript run; every listed language has a label', 
   assert.deepEqual(['python', 'java', 'javascript', 'html', 'text'].map(CodeBlocks.isRunnable), [true, true, true, false, false]);
   CodeBlocks.LANGUAGES.forEach(language => assert.ok(language.label && language.extension, language.id));
 });
+
+test('the Shared panel’s tabs are commands in any conversation: /media, /links and /pinned', () => {
+  for (const kind of ['group', 'dm']) {
+    const chat = SlashCommands.match('/', { kind }).find(group => group.id === 'chat').commands.map(command => command.name);
+    assert.ok(['media', 'links', 'pinned'].every(name => chat.includes(name)), kind);
+  }
+  assert.deepEqual(names(SlashCommands.match('/pinn', { kind: 'dm' })), ['pinned']);
+});

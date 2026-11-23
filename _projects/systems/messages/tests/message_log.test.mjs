@@ -296,3 +296,90 @@ test('cards come from what the message shows: a link formatBody takes out makes 
   assert.deepEqual(asked, ['see (link removed)']);
   assert.equal(mainOf(element, 'm1').querySelector('.chat-cards'), null);
 });
+
+// ── Pins ─────────────────────────────────────────────────────────────────────────────
+// A pin is a message of its own ([[pin:<id>]]); the log draws it as a one-line note and
+// marks the message it pins.
+const pinRow = (id, senderName, body, extra = {}) => ({ ...message(id, body, extra), senderKey: senderName, senderName });
+
+test('a pin message shows as a note that names who pinned what, and the message gets marked', () => {
+  const pinned = [];
+  const { element, log } = makeLog({ onPin: (stored, isPinned) => pinned.push([stored.id, isPinned]) });
+  log.append(pinRow('m1', 'Grace', 'Demo is Friday at 3'), false);
+  log.append(pinRow('m2', 'Ada Lovelace', '[[pin:m1]]'), true);
+  const note = element.querySelector('.chat-pin-note');
+  assert.match(note.textContent, /You pinned a message:/);
+  assert.match(note.textContent, /Demo is Friday at 3/);
+  const target = element.querySelector('[data-key="m1"]');
+  assert.equal(target.classList.contains('is-pinned'), true);
+  assert.match(target.textContent, /Pinned/);
+  const pinButton = target.querySelector('[data-action="pin"]');
+  assert.equal(pinButton.getAttribute('aria-label'), 'Unpin');
+  assert.equal(pinButton.getAttribute('aria-pressed'), 'true');
+  pinButton.dispatchEvent(fakeEvent('click'));
+  assert.deepEqual(pinned, [['m1', true]]);
+  assert.equal(log.isPinned('m1'), true);
+  assert.equal(element.querySelector('[data-key="m2"]').querySelector('[data-action="pin"]'), null, 'a pin note has no Pin button');
+});
+
+test('an unpin, or deleting the pin message, takes the pin away', () => {
+  const { element, log } = makeLog({ onPin() {} });
+  log.append(pinRow('m1', 'Grace', 'hello'), false);
+  log.append(pinRow('p1', 'Grace', '[[pin:m1]]'), false);
+  assert.equal(log.isPinned('m1'), true);
+  log.markDeleted('p1');
+  assert.equal(log.isPinned('m1'), false);
+  assert.equal(element.querySelector('.chat-pin-note'), null);
+  log.append(pinRow('p2', 'Alan', '[[pin:m1]]'), false);
+  log.append(pinRow('p3', 'Alan', '[[unpin:m1]]'), false);
+  assert.equal(log.isPinned('m1'), false);
+  assert.match(element.textContent, /Alan unpinned a message:/);
+  assert.equal(element.querySelector('[data-key="m1"]').classList.contains('is-pinned'), false);
+});
+
+test('a pinned message that is deleted drops out, and a read-only log has no Pin buttons', () => {
+  const { element, log } = makeLog({ onPin() {} });
+  log.append(pinRow('m1', 'Grace', 'hello'), false);
+  log.append(pinRow('p1', 'Grace', '[[pin:m1]]'), false);
+  log.markDeleted('m1');
+  assert.equal(log.isPinned('m1'), false);
+  assert.equal(element.querySelector('[data-key="m1"]').querySelector('.chat-msg-pinned'), null);
+
+  const readOnly = makeLog({ readOnly: true });
+  readOnly.log.append(pinRow('m1', 'Grace', 'hello'), false);
+  readOnly.log.append(pinRow('p1', 'Grace', '[[pin:m1]]'), false);
+  assert.equal(readOnly.element.querySelector('[data-action="pin"]'), null);
+  assert.equal(readOnly.log.isPinned('m1'), true, 'the mark still shows who pinned what');
+});
+
+test('list() gives the messages as loaded, oldest first, pin notes included', () => {
+  const { log } = makeLog({ onPin() {} });
+  log.append(pinRow('m1', 'Grace', 'hello'), false);
+  log.append(pinRow('p1', 'Grace', '[[pin:m1]]'), false);
+  assert.deepEqual(log.list().map(stored => stored.key), ['m1', 'p1']);
+});
+
+test('the log says when its messages change: an append, an edit, a delete', () => {
+  let changes = 0;
+  const { log } = makeLog({ onChange: () => { changes += 1; } });
+  log.append(pinRow('m1', 'Grace', 'hello'), false);
+  log.updateBody('m1', 'hello there');
+  log.markDeleted('m1');
+  assert.equal(changes, 3);
+});
+
+test('a message edited into a pin marker shows as text and pins nothing, now and after a reload', () => {
+  const { element, log } = makeLog({ onPin() {} });
+  log.append(pinRow('m1', 'Grace', 'hello'), false);
+  log.append(pinRow('m2', 'Grace', 'typo'), false);
+  log.updateBody('m2', '[[pin:m1]]');
+  assert.equal(log.isPinned('m1'), false);
+  assert.equal(element.querySelector('.chat-pin-note'), null);
+
+  const reloaded = makeLog({ onPin() {} });
+  reloaded.log.append(pinRow('m1', 'Grace', 'hello'), false);
+  reloaded.log.append(pinRow('m2', 'Grace', '[[pin:m1]]', { edited: true }), false);
+  assert.equal(reloaded.log.isPinned('m1'), false);
+  assert.equal(reloaded.element.querySelector('.chat-pin-note'), null);
+  assert.match(bodyOf(reloaded.element, 'm2').textContent, /\[\[pin:m1\]\]/);
+});

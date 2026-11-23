@@ -12,6 +12,7 @@ import { ChatCommands } from './chat-commands.js';
 import { CodeBlocks } from './code-model.js';
 import { CodeComposer } from './code-composer.js';
 import { CommandMenu } from './command-menu.js';
+import { Conversation } from './conversation-model.js';
 import { ComposerFiles } from './composer-files.js';
 import { readImageFile } from './dialogs.js';
 import { FileActions } from './file-actions.js';
@@ -35,6 +36,7 @@ export const THREAD_TEXTS = Object.freeze({
   editOfDeleted: 'That message was deleted, so your edit was not saved.',
   deleteFailed: 'Could not delete the message. Try again.',
   waitForSave: 'Wait for your message to finish saving first.',
+  pinFailed: 'Could not change the pin. Try again.',
   imageUnreadable: 'Could not read that image. Try a different file.',
   imageOnly: 'Drop an image or screenshot here.',
   imageWhileEditing: 'Images can’t be added while you edit a message.',
@@ -59,13 +61,13 @@ export const EMPTY_STATES = Object.freeze({
 
 // groupFiles(id) is that group's GroupFiles (group-files.js): with it, shared files under a
 // message open and download, and a composer with an Attach button can share files and
-// folders. onOpenFolder(groupId, path) opens a shared folder in the page's Files dialog.
+// folders. onOpenFolder(groupId, path) opens a shared folder in the Shared panel's Files tab.
 export function createThread({
   elements, api, socket, richText, me,
   onDmRead = () => {}, onGroupRead = () => {}, onFileShared = () => {},
   readOnly = false, onSchedule = null, emptyState = null, texts = {}, formatBody = null,
   groupFiles = null, onOpenFolder = null, viewer: sharedViewer = null, linkCards = null,
-  runCode = null, onCommand = () => {}, profileUrl = '/profile',
+  runCode = null, onCommand = () => {}, profileUrl = '/profile', onChanged = () => {},
 }) {
   if (emptyState !== null && (typeof emptyState !== 'object' || typeof emptyState.title !== 'string')) {
     throw new TypeError('createThread: emptyState must be null or { title, hint }');
@@ -127,6 +129,8 @@ export function createThread({
   const log = createMessageLog(elements.messages, {
     richText, me, onEdit: beginEdit, onDelete: deleteMessage, onReply: canReply ? beginReply : null,
     onSchedule, readOnly, texts, formatBody, linkCards, runCode,
+    onPin: readOnly ? null : (message, pinned) => togglePin(message, pinned),
+    onChange: () => noteChange(),
     // Any code block in the chat can be saved to your own gists (commands is made below).
     saveGist: readOnly || !api.createGist ? null
       : (language, code) => commands.saveGist(language, code, `snippet.${CodeBlocks.languageOf(language)?.extension || 'txt'}`),
@@ -453,6 +457,42 @@ export function createThread({
   }
 
   // A group send answers with the chat's messages, a DM send with the saved message's event.
+  // onChanged(kind, id) after the open conversation's messages change, once per burst: a
+  // history of a hundred messages loading is one change, so the Shared panel draws once.
+  let changeQueued = false;
+  function noteChange() {
+    if (changeQueued) return;
+    changeQueued = true;
+    queueMicrotask(() => {
+      changeQueued = false;
+      if (current && !destroyed) onChanged(current.kind, current.id);
+    });
+  }
+
+  // Pins or unpins a message by sending a pin message ([[pin:<id>]], conversation-model.js),
+  // so everyone in the conversation sees the same pins.
+  async function togglePin(message, pinned) {
+    if (!current?.loaded || !message?.id) return false;
+    if (pending) {
+      showFormMessage(text.waitForSave);
+      return false;
+    }
+    const { kind, id } = current;
+    showFormMessage('');
+    try {
+      const body = pinned ? Conversation.unpinMarker(message.id) : Conversation.pinMarker(message.id);
+      const saved = await kinds[kind].send(id, body, null);
+      if (destroyed || !isOpen(kind, id)) return true;
+      showSaved(kind, id, saved);
+      if (!socket.isConnected()) loadNew(kind, id);
+      return true;
+    } catch (error) {
+      console.warn('Messages: could not change the pin', error);
+      if (!destroyed && isOpen(kind, id)) showFormMessage(text.pinFailed);
+      return false;
+    }
+  }
+
   function showSaved(kind, id, saved) {
     if (kind === 'group' && Array.isArray(saved)) {
       saved.map(groupMessage).forEach(message => log.append(message, isMine(kind, message)));
@@ -705,8 +745,12 @@ export function createThread({
   close();
 
   return {
-    open, close, resume, setHeading, showMessage, destroy,
+    open, close, resume, setHeading, showMessage, destroy, togglePin,
     current: () => (current ? { kind: current.kind, id: current.id } : null),
+    // The open conversation's messages as loaded, oldest first: the Shared panel reads its
+    // media, links and pins from them.
+    messages: () => (current?.loaded ? log.list() : []),
+    isPinned: messageId => log.isPinned(messageId),
     // Ctrl or Cmd+/ (shortcuts.js) opens the commands as if / had been typed. With a draft
     // in the box the menu would replace it, so /help lists the commands instead.
     showCommands: () => commandMenu?.open() || onCommand('help'),

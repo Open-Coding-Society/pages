@@ -26,6 +26,14 @@ test('the page gives the thread a command menu and a code box, and wires /help a
   has(script, /showCommands: \(\) => thread\.showCommands\(\)/, 'a shortcut opens the command menu');
 });
 
+test('Shared, a folder’s Open and /files, /media, /links, /pinned open the Shared panel', () => {
+  has(script, /\['files', 'media', 'links', 'pinned'\]\.includes\(name\)\) openPanel\(\{ tab: name \}\)/, 'the commands open their tab');
+  has(script, /byId\('messagesSharedButton'\)\.addEventListener\('click', event => openPanel\(\{\}, event\.currentTarget\)\)/, 'the header button opens it');
+  has(script, /tab: 'files', folderPath: path/, 'a folder opens at its place in Files');
+  has(page, /id="conversationPanel"/, 'dm.md has the panel');
+  assert.ok(!/id="filesDialog"/.test(page), 'the Files dialog is gone');
+});
+
 test('the gist command’s Profile link sits beside /dm, so a site under a base path keeps it', () => {
   has(script, /profileUrl: new URL\('profile', window\.location\.href\)\.pathname/, 'the page finds Profile beside itself');
   assert.equal(new URL('profile', 'https://student.github.io/pages/dm?group=12').pathname, '/pages/profile');

@@ -1,9 +1,8 @@
-// The group dialogs: find a group to join or make a new one, see and change a group's
-// members, and see the files shared with a group. Leaving a group is a button in the
-// conversation header (messages-page.js). Deleting one starts at the bottom of Members, for
-// site admins only, and is confirmed in delete-group.js.
+// The group dialogs: find a group to join or make a new one, and see and change a group's
+// members. Leaving a group is a button in the conversation header (messages-page.js).
+// Deleting one starts at the bottom of Members, for site admins only, and is confirmed in
+// delete-group.js. Shared files are the Shared panel's (conversation-panel.js).
 import { button, cell, createDialog } from './dialogs.js';
-import { FilesTab } from './files-panel.js';
 import {
   canDeleteGroup, deleteGroupWarning, groupSubtitle, isClassGroup, isCourseChannel, isGroupMember, sortGroups,
 } from './messages-model.js';
@@ -242,43 +241,6 @@ export function initMembers({ elements, api, me, onChanged, onDelete }) {
       reset();
       render();
       dialog.open(opener);
-    },
-  };
-}
-
-// The Files dialog: everything shared with a group, as folders (FilesTab), from Spring's
-// index, with Download and Preview for a file and a .zip for a folder. makeFileActions({
-// filesFor, notify }) makes the FileActions its buttons use, so they open the dialog's group
-// and speak in its status line. Files go up from the composer's Attach (onShare opens it).
-export function initFiles({ elements, groupFilesFor, makeFileActions, onShare = null }) {
-  let group = null;
-  const notify = message => { elements.status.textContent = message; };
-  const actions = makeFileActions({ filesFor: () => (group ? groupFilesFor(group.id) : null), notify });
-  const tab = new FilesTab({
-    host: elements.body, notify, groupFilesFor, actions, onShare, onClose: () => dialog.close(),
-  });
-  const dialog = createDialog(elements.dialog, {
-    onClose: () => {
-      tab.hide();
-      actions.clear();
-      group = null;
-    },
-  });
-
-  return {
-    // folderPath opens straight into a shared folder.
-    open(current, opener, { folderPath = '' } = {}) {
-      group = current;
-      elements.title.textContent = `Files in ${group.name}`;
-      notify('');
-      dialog.open(opener);
-      tab.show(group, { folderPath });
-    },
-    // Someone shared a file while the dialog shows this group's files.
-    refreshIfShowing(groupId) {
-      if (!dialog.isOpen() || group?.id !== groupId) return;
-      groupFilesFor(groupId).refresh();
-      tab.refreshIfShowing(groupId);
     },
   };
 }

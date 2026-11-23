@@ -5,6 +5,7 @@
 // answers, from the [[reply:...]] marker at the start of its body (assets/js/chat/chat-reply.js).
 import { CodeBlock } from './code-block.js';
 import { CodeBlocks } from './code-model.js';
+import { Conversation } from './conversation-model.js';
 import { FileRows } from './file-rows.js';
 import { FilesMarker } from './files-model.js';
 import { dayKey, dayLabel, initialsFor, pfpSrc, tintFor } from './messages-model.js';
@@ -40,6 +41,12 @@ export const LOG_TEXTS = Object.freeze({
   noOutput: '(no output)',
   saveGist: 'Save as gist',
   savedGist: 'Saved to your gists:',
+  pinMessage: 'Pin',
+  unpinMessage: 'Unpin',
+  pinned: 'Pinned',
+  pinnedNote: '{name} pinned a message:',
+  unpinnedNote: '{name} unpinned a message:',
+  aMessage: 'a message',
 });
 
 // Fills a text's {slot}s, the way the UI Builder's registry text marks them. A slot with
@@ -87,16 +94,21 @@ function splitReply(richText, body) {
 // linkCards(html) returns a box of previews for the links in a message's text (the GitHub
 // cards, GitHubCards.forBody), or null when there are none. runCode(language, code)
 // resolves a code block's output (the /run routes the lesson runners use); saveGist(language,
-// code) resolves the URL of a secret gist made from it.
+// code) resolves the URL of a secret gist made from it. onPin(message, isPinned), when
+// given, adds Pin/Unpin to each message; which messages are pinned comes from the
+// [[pin:…]] messages the log holds (conversation-model.js), each drawn as a one-line note.
+// onChange() is called after each append, edit and delete (the Shared panel redraws).
 export function createMessageLog(element, {
   richText, me, onEdit, onDelete, onReply = null, onSchedule = null, readOnly = false, texts = {}, formatBody = null,
-  onFile = null, thumbnail = null, linkCards = null, runCode = null, saveGist = null,
+  onFile = null, thumbnail = null, linkCards = null, runCode = null, saveGist = null, onPin = null, onChange = () => {},
 }) {
   if (formatBody !== null && typeof formatBody !== 'function') {
     throw new TypeError('createMessageLog: formatBody must be a function or null');
   }
   const text = withTexts(LOG_TEXTS, texts);
   const messages = new Map();
+  const keyById = new Map(); // a message's id → its key, for its pin mark
+  let pinnedIds = new Set();
   let lastDay = null;
   const fileRows = new FileRows({ onFile, thumbnail, text });
 
@@ -106,6 +118,8 @@ export function createMessageLog(element, {
   function clear() {
     element.replaceChildren();
     messages.clear();
+    keyById.clear();
+    pinnedIds = new Set();
     lastDay = null;
   }
 
@@ -326,6 +340,75 @@ export function createMessageLog(element, {
     return button;
   }
 
+  // Which messages are pinned is worked out again only when a pin message comes or goes, a
+  // message is deleted or edited, and only rows whose state changed are touched, so a long
+  // chat loads without going over every row for every message.
+  function refreshPins() {
+    const before = pinnedIds;
+    pinnedIds = new Set(Conversation.currentPins([...messages.values()]).map(pin => String(pin.message.id)));
+    new Set([...before, ...pinnedIds]).forEach(id => {
+      if (before.has(id) !== pinnedIds.has(id)) showPinned(id);
+    });
+  }
+
+  // A message's Pinned mark in its header, and its Pin button's label.
+  function showPinned(id) {
+    const key = keyById.get(id);
+    const row = key === undefined ? null : rowFor(key);
+    if (!row || messages.get(key)?.pinNote) return;
+    const pinned = pinnedIds.has(id);
+    row.classList.toggle('is-pinned', pinned);
+    const mark = row.querySelector('.chat-msg-pinned');
+    if (pinned && !mark) {
+      const tag = document.createElement('b');
+      tag.className = 'chat-msg-pinned';
+      const glyph = document.createElement('i');
+      glyph.className = 'fas fa-thumbtack';
+      glyph.setAttribute('aria-hidden', 'true');
+      tag.append(glyph, ` ${text.pinned}`);
+      row.querySelector('.chat-msg-meta')?.appendChild(tag);
+    } else if (!pinned && mark) {
+      mark.remove();
+    }
+    const button = row.querySelector('[data-action="pin"]');
+    if (button) {
+      const label = pinned ? text.unpinMessage : text.pinMessage;
+      button.setAttribute('aria-label', label);
+      button.title = label;
+      button.setAttribute('aria-pressed', String(pinned));
+    }
+  }
+
+  // A pin or unpin message is a one-line note: who did it, and the message's words as a
+  // link to it (cut like a reply's quote).
+  function appendPinNote(message, pin, isSelf) {
+    messages.set(message.key, { ...message, isSelf, pinNote: pin });
+    const row = document.createElement('div');
+    row.className = 'chat-pin-note';
+    row.dataset.key = message.key;
+    const line = document.createElement('p');
+    line.className = 'chat-system';
+    const glyph = document.createElement('i');
+    glyph.className = 'fas fa-thumbtack';
+    glyph.setAttribute('aria-hidden', 'true');
+    const name = isSelf ? text.you : message.senderName;
+    line.append(glyph, ` ${fillText(pin.action === 'pin' ? text.pinnedNote : text.unpinnedNote, { name })} `);
+    const targetKey = keyById.get(pin.id);
+    const target = targetKey === undefined ? null : messages.get(targetKey);
+    const words = target && !target.deleted ? Conversation.plainText(splitReply(richText, target.body).html) : '';
+    const jump = document.createElement('button');
+    jump.type = 'button';
+    jump.className = 'chat-system-link';
+    jump.textContent = words ? (words.length > 90 ? `${words.slice(0, 89)}…` : words) : text.aMessage;
+    jump.addEventListener('click', () => {
+      const key = keyById.get(pin.id);
+      if (key !== undefined) reveal(key);
+    });
+    line.appendChild(jump);
+    row.appendChild(line);
+    element.appendChild(row);
+  }
+
   function append(message, isSelf) {
     if (messages.has(message.key)) return;
     element.querySelector('[data-empty]')?.remove();
@@ -342,6 +425,17 @@ export function createMessageLog(element, {
       divider.textContent = dayText(when);
       element.appendChild(divider);
     }
+
+    // An edited message is never a pin (Conversation.currentPins), so it draws as text.
+    const pin = message.deleted || message.edited ? null : Conversation.extractPinMarker(message.body);
+    if (pin?.action) {
+      appendPinNote(message, pin, isSelf);
+      refreshPins();
+      if (stickToBottom) element.scrollTop = element.scrollHeight;
+      onChange();
+      return;
+    }
+    if (message.id !== undefined && message.id !== null) keyById.set(String(message.id), message.key);
 
     const row = document.createElement('div');
     row.className = isSelf ? 'chat-msg is-self' : 'chat-msg';
@@ -413,6 +507,12 @@ export function createMessageLog(element, {
     if (!readOnly && message.id && !message.deleted) {
       const buttons = [];
       if (onReply) buttons.push(actionButton('fa-reply', text.replyMessage, () => onReply(messages.get(message.key))));
+      if (onPin) {
+        const pinButton = actionButton('fa-thumbtack', text.pinMessage, () => onPin(messages.get(message.key), pinnedIds.has(String(message.id))));
+        pinButton.dataset.action = 'pin';
+        pinButton.setAttribute('aria-pressed', 'false');
+        buttons.push(pinButton);
+      }
       if (onSchedule) buttons.push(actionButton('fa-calendar-plus', text.addToCalendar, button => onSchedule(messages.get(message.key), button)));
       if (isSelf) {
         buttons.push(
@@ -430,28 +530,43 @@ export function createMessageLog(element, {
 
     row.append(avatarFor(message, isSelf), main);
     element.appendChild(row);
+    if (message.id !== undefined && message.id !== null && pinnedIds.has(String(message.id))) showPinned(String(message.id));
     if (stickToBottom) element.scrollTop = element.scrollHeight;
+    onChange();
   }
 
   function updateBody(key, body) {
     const stored = messages.get(key);
-    if (!stored || stored.deleted) return;
+    // A pin note has no body to draw again; a pin isn't changed by editing.
+    if (!stored || stored.deleted || stored.pinNote) return;
     stored.body = body;
     stored.edited = true;
+    refreshPins();
     const row = rowFor(key);
-    if (!row) return;
-    const bodyElement = row.querySelector('.chat-msg-body');
-    renderCards(bodyElement.parentNode, renderBody(bodyElement, stored));
-    const meta = row.querySelector('.chat-msg-meta');
-    if (!meta.querySelector('.chat-msg-edited')) meta.appendChild(editedTag());
+    if (row) {
+      const bodyElement = row.querySelector('.chat-msg-body');
+      renderCards(bodyElement.parentNode, renderBody(bodyElement, stored));
+      const meta = row.querySelector('.chat-msg-meta');
+      if (!meta.querySelector('.chat-msg-edited')) meta.appendChild(editedTag());
+    }
+    onChange();
   }
 
   function markDeleted(key) {
     const stored = messages.get(key);
+    // A deleted pin message takes its pin, and its note, with it.
+    if (stored?.pinNote) {
+      stored.deleted = true;
+      rowFor(key)?.remove();
+      refreshPins();
+      onChange();
+      return;
+    }
     if (stored) {
       stored.deleted = true;
       stored.body = '';
     }
+    refreshPins(); // a deleted message is no longer pinned
     const row = rowFor(key);
     if (!row) return;
     showDeleted(row.querySelector('.chat-msg-body'));
@@ -466,6 +581,7 @@ export function createMessageLog(element, {
     // than leave it open over a conversation that no longer has that image.
     if (viewerKey === key) closeViewer();
     row.querySelector('.chat-msg-image-link')?.remove();
+    onChange();
   }
 
   // A line between messages that isn't anyone's message. `link` turns part of the line
@@ -492,6 +608,9 @@ export function createMessageLog(element, {
     clear, showEmpty, append, updateBody, markDeleted, note, reveal, destroy,
     has: key => messages.has(key),
     get: key => messages.get(key),
+    // The messages as loaded, oldest first, pin notes included (the Shared panel reads them).
+    list: () => [...messages.values()],
+    isPinned: id => pinnedIds.has(String(id)),
     // For tests and a host that wants to close the viewer itself.
     isViewerOpen: () => Boolean(viewer) && !viewer.classList.contains('hidden'),
     closeViewer,

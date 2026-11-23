@@ -70,14 +70,11 @@ test('"/" opens the grouped menu; typing narrows it; Escape closes it', () => {
 
 test('the arrow keys move the highlight, and Enter runs a command that needs nothing more', () => {
   const { composer, host, ran } = menuFor();
-  composer.type('/re');
+  composer.type('/li');
   const selected = () => host.querySelectorAll('[aria-selected="true"]').map(item => item.id);
-  assert.match(selected()[0], /-repo$/);
+  assert.match(selected()[0], /-links$/);
   composer.type('/m');
-  assert.match(selected()[0], /-members$/);
   key(composer.element, 'ArrowDown');
-  assert.match(selected()[0], /-me$/);
-  key(composer.element, 'ArrowUp');
   assert.match(selected()[0], /-members$/);
   const enter = key(composer.element, 'Enter');
   assert.equal(enter.stopped, true, 'the composer never sees it, so nothing is sent');
@@ -104,7 +101,7 @@ test('a direct message’s menu leaves out a group’s commands', () => {
 });
 
 // ── The pane runs commands ─────────────────────────────────────────────────────────
-function commandThread(kind = 'group') {
+function commandThread(kind = 'group', extra = {}) {
   const make = tag => document.createElement(tag);
   const elements = {
     title: make('h2'), subtitle: make('small'), messages: make('div'), formStatus: make('p'),
@@ -128,6 +125,7 @@ function commandThread(kind = 'group') {
     socket: { follow() {}, unfollow() {}, isConnected: () => true },
     richText: { renderRichMessage(container, raw) { container.appendChild(document.createTextNode(String(raw))); }, createRichComposer: () => composer },
     onCommand: name => commands.push(name),
+    ...extra,
   });
   return { thread, elements, composer, sent, gists, commands, kind, api };
 }
@@ -370,4 +368,54 @@ test('code changed while its message sends stays in the box for the next message
   assert.equal(sent.length, 1);
   assert.equal(elements.codeHost.querySelector('.dm__code-box').hidden, false, 'the box keeps the newer code');
   assert.equal(area.value, 'print(2)');
+});
+
+test('Pin on a message sends a pin message, and on a pinned one an unpin; the pane lists what it loaded', async () => {
+  const { thread, api, elements, sent } = commandThread();
+  api.groupMessages = async () => [
+    { id: 'm1', author: 'Grace Hopper', author_uid: 'grace', message: 'Demo Friday', date: '2026-11-22T10:00:00Z' },
+    { id: 'm2', author: 'Alan Turing', author_uid: 'alan', message: 'Bring the slides', date: '2026-11-22T10:05:00Z' },
+    { id: 'p1', author: 'Alan Turing', author_uid: 'alan', message: '[[pin:m2]]', date: '2026-11-22T10:06:00Z' },
+  ];
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  const pinOf = key => elements.messages.querySelector(`[data-key="${key}"]`).querySelector('[data-action="pin"]');
+  pinOf('m1').dispatchEvent(fakeEvent('click'));
+  await settle();
+  pinOf('m2').dispatchEvent(fakeEvent('click'));
+  await settle();
+  assert.deepEqual(sent, ['[[pin:m1]]', '[[unpin:m2]]']);
+  assert.deepEqual(thread.messages().map(message => message.id), ['m1', 'm2', 'p1']);
+  assert.equal(thread.isPinned('m2'), true);
+});
+
+test('/media, /links and /pinned go to the page, which opens that tab of the Shared panel', async () => {
+  const { thread, composer, commands } = commandThread();
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  for (const name of ['media', 'links', 'pinned']) {
+    composer.type(`/${name}`);
+    key(composer.element, 'Enter');
+  }
+  assert.deepEqual(commands, ['media', 'links', 'pinned']);
+});
+
+test('the pane tells the page once per burst when its conversation’s messages change', async () => {
+  const changes = [];
+  const { thread, composer, api, elements } = commandThread('group', { onChanged: (kind, id) => changes.push([kind, id]) });
+  const history = [
+    { id: 'm1', author: 'Grace Hopper', author_uid: 'grace', message: 'one', date: '2026-11-22T10:00:00Z' },
+    { id: 'm2', author: 'Grace Hopper', author_uid: 'grace', message: 'two', date: '2026-11-22T10:01:00Z' },
+    { id: 'm3', author: 'Grace Hopper', author_uid: 'grace', message: 'three', date: '2026-11-22T10:02:00Z' },
+  ];
+  api.groupMessages = async () => history;
+  api.sendGroupMessage = async (id, body) => [...history, { id: 'm4', author: 'Ada Lovelace', author_uid: 'ada', message: body, date: '2026-11-22T10:03:00Z' }];
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  assert.deepEqual(changes, [['group', 12]], 'three messages loading are one change');
+  composer.setHTML('hello');
+  elements.form.dispatchEvent(fakeEvent('submit')); // the stub composer has no Enter-to-send
+  await settle();
+  await settle();
+  assert.deepEqual(changes, [['group', 12], ['group', 12]]);
 });

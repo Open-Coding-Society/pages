@@ -867,5 +867,12 @@ text:
     gistConnect: "Connect GitHub on your Profile to save gists:"
     gistConnectLink: GitHub Gist connection
     gistFailed: Could not save the gist. Try again.
+    pinMessage: Pin
+    unpinMessage: Unpin
+    pinned: Pinned
+    pinnedNote: "{name} pinned a message:"
+    unpinnedNote: "{name} unpinned a message:"
+    aMessage: a message
+    pinFailed: Could not change the pin. Try again.
     idleTitle: Pick a conversation
     idleHint: Or start a new chat, or find a group to join.
