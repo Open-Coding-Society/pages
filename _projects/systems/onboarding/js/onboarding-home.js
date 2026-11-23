@@ -16,8 +16,9 @@ function render(unlocked) {
     card.className = 'ocs__grid-cell';
     const link = document.createElement('a');
     link.href = viewerPath(challenge.id, baseurl);
+    link.setAttribute('aria-label', `Open ${challenge.title}`);
     const image = document.createElement('img');
-    image.className = 'ocs__image-frame ocs__image-frame--thumbnail';
+    image.className = 'ocs__image-frame onboarding__card-image';
     image.src = `${baseurl}${challenge.image}`;
     image.alt = '';
     image.loading = 'lazy';

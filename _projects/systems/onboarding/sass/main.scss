@@ -1,4 +1,9 @@
 .onboarding {
+  &__card-image {
+    width: 100%;
+    height: 10rem;
+  }
+
   &__gate,
   &__challenge {
     display: block;

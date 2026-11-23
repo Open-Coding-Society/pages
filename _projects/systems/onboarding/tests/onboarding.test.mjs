@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
 import { CHALLENGES, viewerPath } from '../js/onboarding-data.js';
 import { OnboardingStore } from '../js/onboarding-store.js';
 
@@ -37,6 +38,17 @@ test('builders open directly while games use the viewer', () => {
   assert.equal(viewerPath('ui-builder', '/pages'), '/pages/ui-builder/');
   assert.equal(viewerPath('game-workbench', '/pages'), '/pages/gamebuilder/v2/');
   assert.equal(viewerPath('identity-forge', '/pages'), '/pages/onboarding/view/?onboarding_view=1&challenge=identity-forge');
+});
+
+test('cards use distinct available illustrations rather than game backgrounds', () => {
+  assert.equal(new Set(CHALLENGES.map(item => item.image)).size, CHALLENGES.length);
+  for (const challenge of CHALLENGES) {
+    assert.doesNotMatch(challenge.image, /projects\/cs-pathway\/bg/);
+    const path = challenge.image.startsWith('/images/projects/onboarding/')
+      ? new URL(`../images/${challenge.image.split('/').pop()}`, import.meta.url)
+      : new URL(`../../../../${challenge.image.slice(1)}`, import.meta.url);
+    assert.ok(existsSync(path), `${challenge.title}: ${challenge.image}`);
+  }
 });
 
 test('replay clears only the selected unlock and preserves identity and other unlocks', async () => {
