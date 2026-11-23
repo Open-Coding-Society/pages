@@ -248,3 +248,21 @@ test('showMessage with no conversation open does nothing', () => {
   thread.showMessage('1');
   assert.equal(elements.messages.querySelector('.is-found'), null);
 });
+
+test('a GitHub link in a DM shows its card under the message', async () => {
+  const api = stubApi({ dmMessages: [{ id: 1, senderUid: 'grace', senderName: 'Grace', body: 'my PR https://github.com/Open-Coding-Society/pages/pull/2066', sentAt: '2026-10-20T10:00:00Z' }] });
+  const asked = [];
+  const linkCards = html => {
+    asked.push(html);
+    const box = document.createElement('div');
+    box.appendChild(document.createElement('a'));
+    return box;
+  };
+  const { thread, elements } = makeThread({ api, linkCards });
+
+  thread.open('dm', 5, { title: 'Grace', subtitle: 'Direct message' });
+  await settle();
+
+  assert.equal(elements.messages.querySelectorAll('.chat-cards').length, 1);
+  assert.match(asked[0], /pages\/pull\/2066/);
+});

@@ -849,5 +849,23 @@ text:
     openFolder: "Open {name} in Files"
     zipFolder: "Download {name} as a .zip"
     imagePreview: "{name}, shared by {sender}"
+    copyCode: Copy
+    copied: Copied
+    copyFailed: Select and copy it
+    runCode: Run
+    running: Running…
+    output: Output
+    runFailed: "Could not run it: {reason}"
+    noOutput: (no output)
+    saveGist: Save as gist
+    savedGist: "Saved to your gists:"
+    codeMessage: Code
+    badGitHubRef: Write it like owner/repo#12, owner/repo@abc1234 or owner/repo, or paste a GitHub link.
+    newIssueNeedsRepo: "Say which repository first: /newissue owner/repo What went wrong"
+    newIssueBody: "From the OCS chat “{chat}”: {link}"
+    tooLongForDm: "That's too long for a direct message. Save it as a gist instead (/gist)."
+    gistConnect: "Connect GitHub on your Profile to save gists:"
+    gistConnectLink: GitHub Gist connection
+    gistFailed: Could not save the gist. Try again.
     idleTitle: Pick a conversation
     idleHint: Or start a new chat, or find a group to join.

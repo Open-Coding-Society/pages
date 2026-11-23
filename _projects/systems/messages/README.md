@@ -8,9 +8,9 @@ same way they reach a direct message.
 
 | File | What it does |
 | --- | --- |
-| `navigation/dm.md` | The page (`/dm`) and its six dialogs, styled by `sass/` under `.dm`. It fills the window under the site header: `full_width: true` widens the layout, and a few lines of inline script measure the header into `--dm-top` and, on a phone, swap the list for the open conversation. The message list keeps the `chat-*` class names the course chats use, but none of their `.announcement-chat` rules. |
+| `navigation/dm.md` | The page (`/dm`) and its eight dialogs, styled by `sass/` under `.dm`. It fills the window under the site header: `full_width: true` widens the layout, and a few lines of inline script measure the header into `--dm-top` and, on a phone, swap the list for the open conversation. The message list keeps the `chat-*` class names the course chats use, but none of their `.announcement-chat` rules. |
 | `navigation/groups-redirect.md`, `navigation/group-dashboard-redirect.md` | `/student/groups/` and `/student/groups/dashboard/` send people to `/dm`. |
-| `js/messages-page.js` | Starts the page: who is signed in, the two lists, opening a conversation, the group header buttons, the socket. |
+| `js/messages-page.js` | Starts the page: who is signed in, the two lists, opening a conversation, the group header buttons, the keyboard shortcuts, the socket. |
 | `js/conversation-embed.js` | One group chat or direct message inside another page, such as a UI Builder page. See [Embedding a conversation](#embedding-a-conversation). |
 | `js/thread.js` | The open conversation: loads it, follows its socket topic, sends, edits and deletes, and keeps DM read state. An embed's pane can also be read-only, use the host's wording and be destroyed. |
 | `js/message-log.js` | Draws the messages: day dividers, avatars, edit and delete buttons, and the image viewer; the files a message shares come from `file-rows.js`. Also the small text helpers the pane and the embed share. |
@@ -30,6 +30,16 @@ same way they reach a direct message.
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
 | `js/messages-api.js` | Every Spring and Flask request. |
+| `js/github-links.js` | `GitHubLinks`, static: reads a GitHub link (issue, pull request, commit, repository, gist), finds the first three different ones in a message, and builds the link `/issue`, `/pr`, `/commit` and `/repo` post. |
+| `js/github-source.js` | `GitHubSource`: asks api.github.com from the browser and keeps each answer 10 minutes (in memory and in localStorage under `ocs-github:`). Keeping one first removes copies older than that, because the rest of the site shares localStorage. After GitHub's rate limit it asks nothing until GitHub's reset time, or its `Retry-After`. Gists come through Spring. |
+| `js/github-cards.js` | `GitHubCards`: a card (a compact `ocs__nav-card`) under a message for each GitHub link, drawn from the link at once and filled in when it scrolls near the screen. |
+| `js/slash-commands.js` | `SlashCommands`, static: every slash command, its group and hint, and which ones a DM or a group gets. |
+| `js/command-menu.js` | `CommandMenu`: the menu (`ocs__menu`) that opens when a message starts with `/`. Typing narrows it, ↑/↓ move, Enter or Tab picks, Esc closes. |
+| `js/chat-commands.js` | `ChatCommands`: what each command does, and saving a gist. |
+| `js/code-model.js` | `CodeBlocks`, static: the languages, which ones run, and the `[[code:…]]` marker. |
+| `js/code-block.js` | `CodeBlock`: a code block in the log, with Copy, Run and Save as gist. |
+| `js/code-composer.js` | `CodeComposer`: the code box `/code` and `/gist` open above the composer. |
+| `js/help-dialog.js`, `js/shortcuts.js` | `HelpDialog` and `Shortcuts`: `/help`'s list of every command and key, and the keys themselves. |
 | `js/message-search.js` | The search box in a direct message's header: debounced query for that chat, matches listed under the header with the match marked, and jumping to the one picked. |
 | `js/schedule-model.js` | "Add to calendar" without the page: the plain text of a message, the date and time it mentions (today, Friday, Nov 20, 3pm...), a starting title, and the request Spring's calendar takes. A message is turned into text once, and the description it writes holds no raw `<`, because `/student/calendar` shows a description as HTML. |
 | `js/schedule-dialog.js` | The dialog opened by the calendar button on a message: title, day and optional time, then saves one event to your own calendar. A reply's `[[reply:...]]` marker is left out of the text (`richText.stripChatMarkers`). |
@@ -37,7 +47,7 @@ same way they reach a direct message.
 | `js/messages-model.js` | Pure functions: one message shape for DMs and groups, labels, roles. |
 | `js/formation-model.js` | Pure functions: the steps of forming groups. |
 | `sass/` | The `/dm` skin, scoped under `.dm`. File rows, menus and progress bars are the shared grammar (`ocs__file`, `ocs__menu`, `ocs__progress` in `_sass/open-coding/elements/`); `sass/` only places them; `.dm--embed` in `_layout.scss` fits an embed into its host's column. It has no palette or scale of its own: `_tokens.scss` aliases the site's theme tokens and the shared scale in `_sass/open-coding/mixins/_variables.scss`, and no partial holds a literal colour. See [Styling under a user theme](#styling-under-a-user-theme). |
-| `tests/*.test.mjs` | Node tests: the models, the sidebar, the message log, the pane, the embed, the Files dialog, sharing files, the shared composer's `enterKey` and `destroy()`, and `module_classes.test.mjs`, which fails if a newer module exports anything but classes. |
+| `tests/*.test.mjs` | Node tests: the models, the sidebar, the message log, the pane, the embed, the Files dialog, sharing files, GitHub links and cards, the commands and code blocks, the shared composer's `enterKey` and `destroy()`, `page_wiring.test.mjs` (every id the page script looks up is in `dm.md`), and `module_classes.test.mjs`, which fails if a newer module exports anything but classes. |
 | `tests/fake-dom.mjs` | A small stand-in for the browser DOM that the pane, log, embed and composer tests run on. |
 
 The modules import each other with `./` paths only. The page imports `config.js` and
@@ -124,6 +134,43 @@ direct message only an image can be attached: Spring stores shared files for gro
   (images, video, sound, PDF, the first 512 KB of text and code), downloads one file at a
   time, and zips a folder (up to 1 GB, built in the browser). Files shared before the
   `[[files:…]]` messages are in it too.
+
+## GitHub cards, slash commands and code
+
+Both work in direct messages and group chats.
+
+- **GitHub cards.** Each of the first three different GitHub links in a message (an issue,
+  a pull request, a commit, a repository or a gist) gets a card under the message: its
+  title, and for an issue or pull request whether it is open, closed or merged, who opened
+  it and when, and an open pull request's checks. The browser asks api.github.com itself,
+  signed out, so a private
+  repository's card says so, and GitHub allows 60 of those requests an hour per network.
+  That is why each answer is kept for 10 minutes and a card only asks once it scrolls near
+  the screen. When the hour's requests are used up, the cards say when details come back.
+  A gist's card is read through Spring.
+- **Slash commands.** Typing `/` at the start of a message opens a menu grouped Share,
+  GitHub, This chat and Message, and `/help` lists them all. `/file`, `/folder`, `/files` and
+  `/members` are for groups; `/search` searches a direct message.
+  - `/code [language]` opens a code box above the composer, and `/gist [file name]` does
+    too but saves the code as a secret gist on the sender's GitHub and posts its link.
+  - `/issue`, `/pr`, `/commit` and `/repo` post a GitHub link, which shows as a card. After
+    one link, `#12` alone means the same repository.
+  - `/newissue owner/repo title` opens GitHub's new-issue form, filled in with a link back
+    to the chat.
+  - `/files`, `/members`, `/search` and `/help` open what the page already has.
+  - `/me` and `/shrug` change the message itself.
+- **Code blocks.** A code message starts with a `[[code:<language>|<code>]]` marker after
+  any reply and files markers, with `%`, `[`, `]`, `|`, `<`, `>`, `&` and control
+  characters escaped as `%XX`, up to 20,000 characters of code. The log draws it with Copy,
+  Run for Python and JavaScript (Flask) and Java (Spring), and Save as gist; the output
+  shows under the code. A direct message holds 2,000 characters, so a longer one points
+  to `/gist` instead. Editing the message changes its words and leaves the code as it was.
+- **Gists** need the GitHub Gist connection on Profile. Without it, Spring answers 409 and
+  the page links to that part of Profile.
+- **Keys.** Ctrl/Cmd+K finds a conversation (Enter opens the first one left), Alt+↑/↓
+  open the conversation above or below, as the lists show them, and Ctrl/Cmd+/ opens the
+  command menu. With a half-written message in the box it opens `/help` instead and leaves
+  the message alone.
 
 ## Embedding a conversation
 
@@ -258,8 +305,14 @@ Spring:
   sizes and who shared them, no bytes) and `GET /api/groups/chat/{id}/files/content?path=`
   (one file's bytes)
 - STOMP over SockJS at `/ws-chat` (port 8589 on localhost)
+- Gists: `GET /api/grades/read-gist/{id}` (a gist's card) and `POST /api/grades/create-gist`
+  (`{files, description}`, saved with the sender's GitHub Gist connection)
+- `POST /run/java` (`{code}`, answers `{output}`)
 
-Flask, for Form groups: `POST /api/persona/evaluate-group`, `POST /api/persona/form-groups`.
+Flask: `POST /run/python` and `POST /run/javascript` (`{code}`, answers `{output}`), and for
+Form groups `POST /api/persona/evaluate-group`, `POST /api/persona/form-groups`.
+
+GitHub: `api.github.com`, from the browser, signed out, for the cards.
 
 ## Groups the page leaves alone
 

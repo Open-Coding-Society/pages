@@ -9,6 +9,8 @@
 //   chat.destroy(); // before the element goes
 import { createChatSocket } from './chat-socket.js';
 import { FileViewer } from './file-viewer.js';
+import { GitHubCards } from './github-cards.js';
+import { GitHubSource } from './github-source.js';
 import { GroupFiles } from './group-files.js';
 import { LOG_TEXTS, withTexts } from './message-log.js';
 import { createMessagesApi } from './messages-api.js';
@@ -204,12 +206,14 @@ async function mount(kind, root, options) {
   let thread = null;
   let socket = null;
   let viewer = null;
+  let githubCards = null;
   let destroyed = false;
   function destroy() {
     if (destroyed) return;
     destroyed = true;
     thread?.destroy();
     viewer?.destroy();
+    githubCards?.destroy();
     socket?.disconnect();
     root.replaceChildren();
     mountedRoots.delete(root);
@@ -244,10 +248,13 @@ async function mount(kind, root, options) {
     // A preview opens inside the embed's .dm frame, where the pane's styles reach it; the
     // pane isn't in the frame yet when the thread is made, so the frame is handed in.
     viewer = files ? new FileViewer({ root: frame }) : null;
+    // GitHub links get their cards here too, read the same way as on /dm.
+    githubCards = new GitHubCards({ source: new GitHubSource({ readGist: id => api.readGist(id), storage: GitHubSource.browserStorage() }) });
     thread = createThread({
       api, socket, richText, me, readOnly, formatBody,
       groupFiles: files ? () => files : null,
       viewer,
+      linkCards: html => githubCards.forBody(html),
       elements: pane.elements,
       texts: t,
       emptyState: { title: t.emptyTitle, hint: t.emptyHint },

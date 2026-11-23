@@ -241,6 +241,79 @@
   }
 }
 
+// The GitHub cards under a message (js/github-cards.js): the grammar's compact nav cards,
+// one under another, no wider than the message's text.
+.dm .chat-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dm-space-xs);
+  max-width: min(100%, var(--dm-measure));
+  margin-top: var(--dm-space-xs);
+}
+
+// ── Code blocks ([[code:…]], js/code-block.js) ──────────────────────────────────────
+// The site's own pre (base/_code.scss) draws the code; this frames it with a bar on top.
+.dm .chat-code {
+  max-width: var(--dm-measure);
+  margin: var(--dm-space-xs) 0 0;
+  overflow: hidden;
+  border: 1px solid var(--dm-rule-strong);
+  border-radius: var(--dm-radius);
+}
+
+.dm .chat-code-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dm-space-xs);
+  padding: 0.3rem var(--dm-space-sm);
+  border-bottom: 1px solid var(--dm-rule);
+  background: var(--dm-surface);
+  font-family: var(--dm-font);
+  font-size: $text-sm;
+  color: var(--dm-ink);
+}
+
+.dm .chat-code-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dm-space-xs);
+}
+
+.dm .chat-code-body,
+.dm .chat-code-output {
+  max-height: 24rem;
+  margin: 0;
+  overflow: auto;
+  border: 0;
+  border-radius: 0;
+  font-size: $text-sm;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+// The runner's answer under the code, labelled Output in the grammar's kicker.
+.dm .chat-code-output {
+  border-top: 1px dashed var(--dm-rule-strong);
+
+  &::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.25rem;
+    font-family: var(--dm-font);
+    @include kicker($text-xs);
+    color: var(--dm-muted);
+  }
+}
+
+.dm .chat-code-note {
+  margin: 0;
+  padding: 0.3rem var(--dm-space-sm);
+  font-family: var(--dm-font);
+  font-size: $text-sm;
+}
+
 // An image in a message. Bounded on both axes so it never dominates the log and never
 // arrives as a postage stamp: it fills the measure when it is wide enough to, stops
 // short of it when it is not, and is capped in height so a tall portrait photo cannot
