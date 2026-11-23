@@ -16,12 +16,14 @@ same way they reach a direct message.
 | `js/message-log.js` | Draws the messages: day dividers, avatars, edit and delete buttons, and the image viewer; the files a message shares come from `file-rows.js`. Also the small text helpers the pane and the embed share. |
 | `js/sidebar.js` | The Groups and Direct messages lists, as `ocs__nav-card` links, each starting with an `ocs__avatar` of the name's initials. |
 | `js/new-chat.js` | The New chat dialog. |
-| `js/group-dialogs.js` | Find a group (search, join, make a group), Members (with Delete group at the bottom, for admins), and the Files dialog, which shows a `FilesTab`. |
+| `js/group-dialogs.js` | Find a group (search, join, make a group), and Members (with Delete group at the bottom, for admins). |
 | `js/files-model.js` | `SharedFiles` and `FilesMarker`, static: planning a share (folders keep their paths, clutter is skipped, taken names become "name (2)"), sizes, icons and the folder tree, and the `[[files:…]]` marker. |
 | `js/group-files.js` | `GroupFiles`: one group's shared files. The list without bytes, one file's bytes, a folder's files for a .zip, and uploads with progress, three at a time. |
 | `js/composer-files.js` | `ComposerFiles`: the composer's Attach menu, the Files and Folder pickers, dropping files or folders on the conversation, and sharing them before the message sends. |
 | `js/attachments.js` | `Attachments`: the tray above the composer: what waits to be shared, what was left out and why, and each item's upload progress. `Attachments.fromInput` and `Attachments.fromDrop` read a picker and a dropped folder. |
-| `js/files-panel.js` | `FilesTab`: the Files dialog's list: a group's files as folders, with breadcrumbs, a name filter, previews, downloads and a folder as .zip. |
+| `js/files-panel.js` | `FilesTab`: the Shared panel's Files tab: a group's files as folders, with breadcrumbs, a name filter, previews, downloads and a folder as .zip. |
+| `js/conversation-panel.js` | `ConversationPanel`: the Shared panel. Files (groups only), Media, Links (GitHub first) and Pinned, in the grammar's tabs, each with Show in the chat. |
+| `js/conversation-model.js` | `Conversation`, static: pin and unpin markers, which messages are pinned, and the links and media in the loaded messages. |
 | `js/file-actions.js`, `js/file-viewer.js` | `FileActions` and `FileViewer`: what a shared file's buttons do (download, preview, open a folder, .zip), and the preview: an image, video, sound, PDF or the start of a text file. |
 | `js/zip-store.js` | `ZipStore`, static: a stored (uncompressed) ZIP writer, so a shared folder downloads as one file. |
 | `js/popup-menu.js` | `PopupMenu`: a menu a button opens (`ocs__menu`), with the arrow keys, Escape and click-away. |
@@ -47,7 +49,7 @@ same way they reach a direct message.
 | `js/messages-model.js` | Pure functions: one message shape for DMs and groups, labels, roles. |
 | `js/formation-model.js` | Pure functions: the steps of forming groups. |
 | `sass/` | The `/dm` skin, scoped under `.dm`. File rows, menus and progress bars are the shared grammar (`ocs__file`, `ocs__menu`, `ocs__progress` in `_sass/open-coding/elements/`); `sass/` only places them; `.dm--embed` in `_layout.scss` fits an embed into its host's column. It has no palette or scale of its own: `_tokens.scss` aliases the site's theme tokens and the shared scale in `_sass/open-coding/mixins/_variables.scss`, and no partial holds a literal colour. See [Styling under a user theme](#styling-under-a-user-theme). |
-| `tests/*.test.mjs` | Node tests: the models, the sidebar, the message log, the pane, the embed, the Files dialog, sharing files, GitHub links and cards, the commands and code blocks, the shared composer's `enterKey` and `destroy()`, `page_wiring.test.mjs` (every id the page script looks up is in `dm.md`), and `module_classes.test.mjs`, which fails if a newer module exports anything but classes. |
+| `tests/*.test.mjs` | Node tests: the models, the sidebar, the message log, the pane, the embed, the Shared panel and pins, sharing files, GitHub links and cards, the commands and code blocks, the shared composer's `enterKey` and `destroy()`, `page_wiring.test.mjs` (every id the page script looks up is in `dm.md`), and `module_classes.test.mjs`, which fails if a newer module exports anything but classes. |
 | `tests/fake-dom.mjs` | A small stand-in for the browser DOM that the pane, log, embed and composer tests run on. |
 
 The modules import each other with `./` paths only. The page imports `config.js` and
@@ -103,7 +105,7 @@ folder to the tray above the composer; Send uploads them, then sends the message
 direct message only an image can be attached: Spring stores shared files for groups only.
 
 - **Paths.** A file from a folder keeps its folders: `team-site/css/main.css`. Spring
-  stores it at that path under the group's shared files, so the Files dialog shows the
+  stores it at that path under the group's shared files, so the Files tab shows the
   folder as it was.
 - **What's left out.** `.git`, `node_modules`, `__pycache__`, `.venv`, `venv`,
   `.ipynb_checkpoints`, `.DS_Store` and `Thumbs.db` are skipped (a dropped folder of that
@@ -129,11 +131,25 @@ direct message only an image can be attached: Spring stores shared files for gro
 - **The socket.** Spring's `sendFileServer` frame names the file and its size but not its
   bytes, and the page adds nothing to the log for it (the share's message lists the files);
   it only marks the group's file list out of date.
-- **The Files dialog** (Files in a group's header, or a folder's Open) lists the group's
+- **The Files tab** (Shared in a group's header, or a folder's Open) lists the group's
   files as they are when it opens, as folders with breadcrumbs, filters by name, previews
   (images, video, sound, PDF, the first 512 KB of text and code), downloads one file at a
   time, and zips a folder (up to 1 GB, built in the browser). Files shared before the
   `[[files:…]]` messages are in it too.
+
+## The Shared panel and pins
+
+- **Shared** in the conversation header (any DM or group) opens one panel with tabs: Files
+  (groups only), Media (pictures sent and image or video files shared), Links (each link
+  once, GitHub first, newest first) and Pinned. Each row has Show in the chat. Media, Links
+  and Pinned read the messages the conversation already loaded, so they cost no request;
+  older history that isn't loaded isn't in them.
+- **Pins.** Each message has Pin. A pin is a message of its own whose body is just
+  `[[pin:<message id>]]` (or `[[unpin:…]]`), so everyone in the conversation sees the same
+  pins with no new storage. The log draws it as a one-line note ("Ada pinned a message:"
+  and the message's words as a link to it) and marks the message Pinned. Pinning again
+  keeps the first pin; deleting the pin message, or the pinned message, takes the pin away.
+  An embed shows the pins too, but the Shared panel is `/dm`'s.
 
 ## GitHub cards, slash commands and code
 
@@ -157,7 +173,8 @@ Both work in direct messages and group chats.
     one link, `#12` alone means the same repository.
   - `/newissue owner/repo title` opens GitHub's new-issue form, filled in with a link back
     to the chat.
-  - `/files`, `/members`, `/search` and `/help` open what the page already has.
+  - `/files`, `/media`, `/links` and `/pinned` open that tab of the Shared panel, and
+    `/members`, `/search` and `/help` open what the page already has.
   - `/me` and `/shrug` change the message itself.
 - **Code blocks.** A code message starts with a `[[code:<language>|<code>]]` marker after
   any reply and files markers, with `%`, `[`, `]`, `|`, `<`, `>`, `&` and control
@@ -271,7 +288,7 @@ Things to know:
   control.
 - A DM embed marks the conversation read, as `/dm` does. A group embed leaves group unread
   counts alone, so the group stays on the navbar bell until it's opened in `/dm`.
-- An embed has no Attach and no Members or Files dialog (`createDialog` in `dialogs.js`
+- An embed has no Attach, no Members dialog and no Shared panel (`createDialog` in `dialogs.js`
   leaves a `document` listener it can't take back). Files shared in the group still list
   under their message, and preview and download from there.
 - Clicking an image in an embed opens it in the log's own viewer, not a new tab. The
