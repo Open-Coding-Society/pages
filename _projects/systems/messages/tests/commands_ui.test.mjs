@@ -371,3 +371,22 @@ test('code changed while its message sends stays in the box for the next message
   assert.equal(elements.codeHost.querySelector('.dm__code-box').hidden, false, 'the box keeps the newer code');
   assert.equal(area.value, 'print(2)');
 });
+
+test('Pin on a message sends a pin message, and on a pinned one an unpin; the pane lists what it loaded', async () => {
+  const { thread, api, elements, sent } = commandThread();
+  api.groupMessages = async () => [
+    { id: 'm1', author: 'Grace Hopper', author_uid: 'grace', message: 'Demo Friday', date: '2026-11-22T10:00:00Z' },
+    { id: 'm2', author: 'Alan Turing', author_uid: 'alan', message: 'Bring the slides', date: '2026-11-22T10:05:00Z' },
+    { id: 'p1', author: 'Alan Turing', author_uid: 'alan', message: '[[pin:m2]]', date: '2026-11-22T10:06:00Z' },
+  ];
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  const pinOf = key => elements.messages.querySelector(`[data-key="${key}"]`).querySelector('[data-action="pin"]');
+  pinOf('m1').dispatchEvent(fakeEvent('click'));
+  await settle();
+  pinOf('m2').dispatchEvent(fakeEvent('click'));
+  await settle();
+  assert.deepEqual(sent, ['[[pin:m1]]', '[[unpin:m2]]']);
+  assert.deepEqual(thread.messages().map(message => message.id), ['m1', 'm2', 'p1']);
+  assert.equal(thread.isPinned('m2'), true);
+});
