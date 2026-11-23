@@ -80,10 +80,11 @@ export class CommandMenu {
 
   /**
    * Puts "/" in an empty composer and opens the menu on every command. A draft is never
-   * replaced: with words in the box, nothing changes.
+   * replaced: with words in the box, or no conversation open, nothing changes.
    * @returns {boolean} whether the menu opened
    */
   open() {
+    if (!this.#kindOf()) return false; // no conversation open: no commands to show
     const draft = plain(this.#composer).trim();
     if (draft && draft !== '/') return false;
     this.#composer.setHTML('/');

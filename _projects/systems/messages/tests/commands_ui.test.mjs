@@ -300,3 +300,74 @@ test('editing a message with a code block edits only its words: the block stays 
 
   assert.deepEqual(edits, [CodeBlocks.addMarker('see this one', 'python', 'print("hi")')]);
 });
+
+test('code over the limit stops the send, so the words never go without it', async () => {
+  const { thread, composer, sent, elements } = commandThread();
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  composer.type('/code python');
+  key(composer.element, 'Enter');
+  elements.codeHost.querySelector('textarea').value = 'x'.repeat(CodeBlocks.MAX_LENGTH + 1);
+  composer.setHTML('see this');
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  assert.deepEqual(sent, []);
+  assert.equal(composer.getHTML(), 'see this', 'the words wait with the code');
+  assert.equal(elements.codeHost.querySelector('.dm__code-box').hidden, false);
+});
+
+test('/me and /shrug send their words as they are, even words that look like a command', async () => {
+  const { thread, composer, sent, commands } = commandThread();
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  composer.type('/me /help');
+  key(composer.element, 'Enter');
+  await settle();
+  assert.equal(sent.at(-1), '<i>/help</i>');
+  composer.type('/shrug /file');
+  key(composer.element, 'Enter');
+  await settle();
+  assert.equal(sent.at(-1), '/file ¯\\_(ツ)_/¯');
+  assert.deepEqual(commands, []);
+});
+
+test('Ctrl+/ with no conversation open shows /help and leaves the box alone', () => {
+  const { thread, composer, commands } = commandThread();
+  thread.showCommands();
+  assert.equal(composer.getHTML(), '');
+  assert.deepEqual(commands, ['help']);
+});
+
+test('an edit can take out all of a code message’s words: the code saves on its own', async () => {
+  const { thread, composer, api, elements } = commandThread();
+  const edits = [];
+  api.groupMessages = async () => [{ id: 'm1', author: 'Ada Lovelace', author_uid: 'ada', message: CodeBlocks.addMarker('see this', 'python', 'print("hi")'), date: '2026-11-22T10:00:00Z' }];
+  api.editGroupMessage = async (id, messageId, body) => { edits.push(body); };
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  elements.messages.querySelectorAll('button').find(button => button.getAttribute('aria-label') === 'Edit message').dispatchEvent(fakeEvent('click'));
+  composer.setHTML('');
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  assert.deepEqual(edits, [CodeBlocks.addMarker('', 'python', 'print("hi")')]);
+});
+
+test('code changed while its message sends stays in the box for the next message', async () => {
+  const { thread, composer, sent, api, elements } = commandThread();
+  let finish = null;
+  api.sendGroupMessage = (id, body) => new Promise(resolve => { finish = () => { sent.push(body); resolve([]); }; });
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  composer.type('/code python');
+  key(composer.element, 'Enter');
+  const area = elements.codeHost.querySelector('textarea');
+  area.value = 'print(1)';
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  area.value = 'print(2)';
+  finish();
+  await settle();
+  assert.equal(sent.length, 1);
+  assert.equal(elements.codeHost.querySelector('.dm__code-box').hidden, false, 'the box keeps the newer code');
+  assert.equal(area.value, 'print(2)');
+});

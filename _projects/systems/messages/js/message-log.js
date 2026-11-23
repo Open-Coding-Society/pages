@@ -275,9 +275,9 @@ export function createMessageLog(element, {
 
   // The body's reply quote (if any) goes just before the body; formatBody sees the rest.
   // Clicking the quote scrolls to the original and marks it, as a search result does.
-  // A code block goes after the body, then the files shared with the message. Returns the
-  // text it showed, without the quote's, the files' and the code's markers, which is what the
-  // cards are made from: a link inside code makes no card.
+  // A code block goes after the body, then the files shared with the message. Returns what
+  // it showed (after formatBody), without the quote's, the files' and the code's markers,
+  // which is what the cards are made from: a link inside code makes no card.
   function renderBody(body, stored) {
     const { reply, html: withFiles } = splitReply(richText, stored.body);
     const { items, html: withCode } = FilesMarker.extract(withFiles);
@@ -289,14 +289,15 @@ export function createMessageLog(element, {
       main.insertBefore(richText.renderReplyQuote(reply, { onJump: id => reveal(String(id)) }), body);
     }
     body.replaceChildren();
-    richText.renderRichMessage(body, shownBody({ ...stored, body: html }, formatBody));
+    const shown = shownBody({ ...stored, body: html }, formatBody);
+    richText.renderRichMessage(body, shown);
     let after = body;
     if (code !== null) {
       after = new CodeBlock(language, code, { runCode, saveGist, text }).element;
       main.insertBefore(after, body.nextSibling);
     }
     fileRows.render(main, after, items, stored.isSelf ? text.you : stored.senderName);
-    return html;
+    return shown;
   }
 
   // Previews of the links in the message's own text, last before the action bar, so a link

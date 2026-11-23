@@ -137,7 +137,7 @@ export function createThread({
   const composer = readOnly
     ? null
     : richText.createRichComposer({
-      placeholder: text.placeholder, maxLength: 2000, onSubmit: submit,
+      placeholder: text.placeholder, maxLength: 2000, onSubmit: () => submit(),
       onPasteImage: elements.imageInput ? pasteImage : null,
     });
   if (composer) {
@@ -337,9 +337,10 @@ export function createThread({
     return shared ? shared.items : null;
   }
 
-  async function submit() {
+  // asCommand false sends what a command made (/me's words) without reading it as one.
+  async function submit({ asCommand = true } = {}) {
     // A finished slash command runs instead of sending ("/issue a/b#3" from the Send button).
-    const typed = !editing ? commandMenu?.typedCommand() : null;
+    const typed = asCommand && !editing ? commandMenu?.typedCommand() : null;
     if (typed && !pending && current?.loaded) {
       composer.clear();
       commands.run(typed.command, typed.args);
@@ -350,8 +351,12 @@ export function createThread({
     const sendingImage = !editing && pendingImage;
     const sendingFiles = !editing && (Boolean(unsentFiles) || Boolean(composerFiles?.hasFiles()));
     const code = !editing ? codeBox?.value() : null;
+    // Code the box can't send (over its limit, which its hint says) holds the words back too,
+    // so they never go without it.
+    if (!editing && !code && codeBox?.hasCode()) return;
     if (pending || !current?.loaded || composer.isOverLimit()) return;
-    if (composer.isEmpty() && !sendingImage && !sendingFiles && !code) return;
+    // An edit may take out all of a code message's words: its code is still a message.
+    if (composer.isEmpty() && !sendingImage && !sendingFiles && !code && !(editing && editingCode)) return;
     if (sendingFiles && composerFiles?.problem()) return; // the tray says why
     const { kind, id } = current;
     const target = editing;
@@ -417,7 +422,8 @@ export function createThread({
       return;
     }
     unsentFiles = null;
-    if (code) codeBox.close();
+    // Code changed while the message was saving stays in the box for the next one.
+    if (code && codeBox.value()?.code === code.code) codeBox.close();
     // A pane destroyed while the message was saving has nothing left to update or fetch.
     if (destroyed) return;
     pending = null;
@@ -443,7 +449,7 @@ export function createThread({
   // Sends a message a command made (a GitHub link, /me, /shrug) as if it had been typed.
   function sendHtml(html) {
     composer.setHTML(html);
-    submit();
+    submit({ asCommand: false });
   }
 
   // A group send answers with the chat's messages, a DM send with the saved message's event.

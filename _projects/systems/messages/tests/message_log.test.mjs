@@ -288,3 +288,11 @@ test('a link only inside the quote of a reply makes no card', () => {
 
   assert.deepEqual(asked, [' thanks!']);
 });
+
+test('cards come from what the message shows: a link formatBody takes out makes no card', () => {
+  const { element, log, asked } = cardLog({ formatBody: body => body.replace(/https:\/\/\S+/g, '(link removed)') });
+  log.append(message('m1', 'see https://github.com/a/b/pull/1'), false);
+
+  assert.deepEqual(asked, ['see (link removed)']);
+  assert.equal(mainOf(element, 'm1').querySelector('.chat-cards'), null);
+});
