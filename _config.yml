@@ -24,6 +24,9 @@ baseurl: ""
 future: true
 default_course: csse
 
+# Set to the HTTPS Jarvis URL on the same site once NetBird and DNS are configured.
+jarvis_embed_url: ""
+
 # Single source of truth for the Google OAuth client id -- assets/js/api/config.js's
 # GOOGLE_CLIENT_ID and login.md's #g_id_onload data-client_id both pull from this at
 # build time via Liquid, so the two can never drift out of sync with each other again.
