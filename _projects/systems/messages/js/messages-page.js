@@ -6,6 +6,8 @@ import { createChatSocket } from './chat-socket.js';
 import { initDeleteGroup } from './delete-group.js';
 import { FileActions } from './file-actions.js';
 import { FileViewer } from './file-viewer.js';
+import { GitHubCards } from './github-cards.js';
+import { GitHubSource } from './github-source.js';
 import { initGroupFormation } from './group-formation.js';
 import { initFiles, initFindGroup, initMembers } from './group-dialogs.js';
 import { GroupFiles } from './group-files.js';
@@ -98,6 +100,9 @@ export async function startMessagesPage({ config, richText, push }) {
     return filesByGroup.get(id);
   };
   const viewer = new FileViewer({ root: document.querySelector('.dm') || document.body });
+  // A GitHub link in a message, DM or group, shows as a card: GitHub's API from the browser,
+  // gists through Spring, kept 10 minutes in localStorage where the browser allows it.
+  const githubCards = new GitHubCards({ source: new GitHubSource({ readGist: id => api.readGist(id), storage: GitHubSource.browserStorage() }) });
   const files = initFiles({
     groupFilesFor: groupFiles,
     makeFileActions: ({ filesFor, notify }) => new FileActions({ filesFor, viewer, notify }),
@@ -116,6 +121,7 @@ export async function startMessagesPage({ config, richText, push }) {
     me,
     groupFiles,
     viewer,
+    linkCards: html => githubCards.forBody(html),
     // A folder's Open button in the chat opens it in the Files dialog.
     onOpenFolder: (groupId, path) => {
       const group = findItem('group', groupId);

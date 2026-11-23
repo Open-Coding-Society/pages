@@ -1,6 +1,7 @@
 // The Groups and Direct messages lists. Rows are built by js/sidebar.js as
 // .ocs__nav-card links holding an .ocs__avatar, so the grammar's class names are what
-// gets styled here.
+// gets styled here, inside a .dm__list only: a nav card elsewhere on the page, like a
+// GitHub card in a message, keeps the grammar's own look.
 
 // Search inside the open direct message: a box in the chat's header (js/message-search.js
 // shows it only while a DM is open) and a panel of matches between the header and the log.
@@ -53,7 +54,7 @@
 // A match is a button, not a link: it scrolls the open chat rather than going anywhere.
 // It is an ocs__nav-card like a conversation row, but it has no avatar and no count, so
 // it lays itself out: who said it and when on one line, then the excerpt across both.
-.dm .ocs__nav-card.dm__hit {
+.dm__list .ocs__nav-card.dm__hit {
   grid-template-columns: minmax(0, 1fr) auto;
   width: 100%;
   font: inherit;
@@ -61,20 +62,20 @@
   cursor: pointer;
 }
 
-.dm .ocs__nav-card.dm__hit .ocs__nav-card-title {
+.dm__list .ocs__nav-card.dm__hit .ocs__nav-card-title {
   grid-column: 1;
   grid-row: 1;
   font-weight: 600;
 }
 
-.dm .ocs__nav-card.dm__hit > .ocs__text {
+.dm__list .ocs__nav-card.dm__hit > .ocs__text {
   grid-column: 2;
   grid-row: 1;
 }
 
 // A result's excerpt. The match keeps the ink colour on an accent tint, the pairing the
 // themes are checked for, rather than the browser's yellow.
-.dm .ocs__nav-card.dm__hit > .dm__hit-text {
+.dm__list .ocs__nav-card.dm__hit > .dm__hit-text {
   grid-column: 1 / -1;
   grid-row: 2;
   font-family: var(--dm-font);
@@ -162,7 +163,7 @@
 // One conversation: its avatar, its name over an optional second line, and on the far
 // side how many messages are waiting. The avatar and the count span both lines; a row
 // with no second line is simply one line tall.
-.dm .ocs__nav-card {
+.dm__list .ocs__nav-card {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -190,7 +191,7 @@
 // The shared avatar, at the size of a list row. A person is round, as the grammar draws
 // it; a group takes the square corners everything else on the page has, so the two
 // lists can be told apart before a name is read.
-.dm .ocs__nav-card .ocs__avatar {
+.dm__list .ocs__nav-card .ocs__avatar {
   grid-row: 1 / span 2;
   width: 2rem;
   height: 2rem;
@@ -203,17 +204,17 @@
   color: var(--dm-ink);
 }
 
-.dm .ocs__nav-card[data-kind='group'] .ocs__avatar {
+.dm__list .ocs__nav-card[data-kind='group'] .ocs__avatar {
   border-radius: var(--dm-radius);
 }
 
-.dm .ocs__nav-card.is-active .ocs__avatar {
+.dm__list .ocs__nav-card.is-active .ocs__avatar {
   border-color: var(--dm-accent);
   background: var(--dm-accent);
   color: var(--dm-bg);
 }
 
-.dm .ocs__nav-card .ocs__nav-card-title {
+.dm__list .ocs__nav-card .ocs__nav-card-title {
   grid-column: 2;
   overflow: hidden;
   font-family: var(--dm-font);
@@ -230,12 +231,12 @@
 
 // A row with no second line (a direct message) is one line tall, so its name takes
 // both rows and sits level with the middle of the avatar.
-.dm .ocs__nav-card:not(:has(> .ocs__text)) .ocs__nav-card-title {
+.dm__list .ocs__nav-card:not(:has(> .ocs__text)) .ocs__nav-card-title {
   grid-row: 1 / span 2;
 }
 
 // The row's second line (a group's class and period).
-.dm .ocs__nav-card > .ocs__text {
+.dm__list .ocs__nav-card > .ocs__text {
   grid-column: 2;
   grid-row: 2;
   overflow: hidden;
@@ -251,7 +252,7 @@
 // How many are waiting: the accent as a small solid tag. Square-cornered like the
 // buttons, and the one filled thing in the list, so an unread conversation is found at
 // a glance.
-.dm .ocs__nav-card-cta {
+.dm__list .ocs__nav-card-cta {
   grid-column: 3;
   grid-row: 1 / span 2;
   margin: 0;
@@ -271,6 +272,6 @@
 }
 
 // An unread row's name is heavier than a read one's.
-.dm .ocs__nav-card:has(.ocs__nav-card-cta) .ocs__nav-card-title {
+.dm__list .ocs__nav-card:has(.ocs__nav-card-cta) .ocs__nav-card-title {
   font-weight: 700;
 }

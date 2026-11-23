@@ -72,9 +72,11 @@ function splitReply(richText, body) {
 
 // onFile(action, item, control), when given, is what a shared file's buttons do ('preview',
 // 'download', 'folder', 'zip'); thumbnail(item) resolves a URL for an image's inline preview.
+// linkCards(html) returns a box of previews for the links in a message's text (the GitHub
+// cards, GitHubCards.forBody), or null when there are none.
 export function createMessageLog(element, {
   richText, me, onEdit, onDelete, onReply = null, onSchedule = null, readOnly = false, texts = {}, formatBody = null,
-  onFile = null, thumbnail = null,
+  onFile = null, thumbnail = null, linkCards = null,
 }) {
   if (formatBody !== null && typeof formatBody !== 'function') {
     throw new TypeError('createMessageLog: formatBody must be a function or null');
@@ -259,7 +261,8 @@ export function createMessageLog(element, {
 
   // The body's reply quote (if any) goes just before the body; formatBody sees the rest.
   // Clicking the quote scrolls to the original and marks it, as a search result does.
-  // The files shared with the message go after the body.
+  // The files shared with the message go after the body. Returns the text it showed, without
+  // the quote's and the files' markers, which is what the cards are made from.
   function renderBody(body, stored) {
     const { reply, html: withFiles } = splitReply(richText, stored.body);
     const { items, html } = FilesMarker.extract(withFiles);
@@ -271,6 +274,19 @@ export function createMessageLog(element, {
     body.replaceChildren();
     richText.renderRichMessage(body, shownBody({ ...stored, body: html }, formatBody));
     fileRows.render(main, body, items, stored.isSelf ? text.you : stored.senderName);
+    return html;
+  }
+
+  // Previews of the links in the message's own text, last before the action bar, so a link
+  // only inside a reply's quote makes none.
+  function renderCards(main, html) {
+    main.querySelector('.chat-cards')?.remove();
+    const cards = linkCards ? linkCards(html) : null;
+    if (!cards) return;
+    cards.classList.add('chat-cards');
+    const actions = main.querySelector('.chat-msg-actions');
+    if (actions) main.insertBefore(cards, actions);
+    else main.appendChild(cards);
   }
 
   function actionButton(icon, label, handler) {
@@ -330,7 +346,7 @@ export function createMessageLog(element, {
     if (message.deleted) {
       showDeleted(body);
     } else {
-      renderBody(body, messages.get(message.key));
+      const shown = renderBody(body, messages.get(message.key));
       if (message.image) {
         const imageSource = pfpSrc(message.image);
         const imageLink = document.createElement('a');
@@ -367,6 +383,7 @@ export function createMessageLog(element, {
         imageLink.appendChild(image);
         main.appendChild(imageLink);
       }
+      renderCards(main, shown);
     }
     // A message saved before ids existed can't be replied to, edited or deleted. Anyone's
     // message can go on your calendar, so that button is not limited to your own.
@@ -400,7 +417,8 @@ export function createMessageLog(element, {
     stored.edited = true;
     const row = rowFor(key);
     if (!row) return;
-    renderBody(row.querySelector('.chat-msg-body'), stored);
+    const bodyElement = row.querySelector('.chat-msg-body');
+    renderCards(bodyElement.parentNode, renderBody(bodyElement, stored));
     const meta = row.querySelector('.chat-msg-meta');
     if (!meta.querySelector('.chat-msg-edited')) meta.appendChild(editedTag());
   }
@@ -417,6 +435,7 @@ export function createMessageLog(element, {
     row.querySelector('.chat-reply-quote')?.remove();
     row.querySelector('.chat-files')?.remove();
     row.querySelector('.chat-file-gallery')?.remove();
+    row.querySelector('.chat-cards')?.remove();
     row.querySelector('.chat-msg-actions')?.remove();
     row.querySelector('.chat-msg-edited')?.remove();
     // If the viewer is showing the image of the message just deleted, close it rather

@@ -237,3 +237,54 @@ test('no Add to calendar button in a read-only log, on a deleted message, or wit
   plain.log.append(message('m3', 'hi'), false);
   assert.equal(plain.element.querySelector('.chat-msg-actions'), null);
 });
+
+// ── GitHub cards ─────────────────────────────────────────────────────────────────────
+// linkCards(html) is what the page passes: GitHubCards.forBody, a box of cards or null.
+function cardLog(options = {}) {
+  const asked = [];
+  const { element, log } = makeLog({
+    linkCards: html => {
+      asked.push(html);
+      if (!/github\.com/.test(html)) return null;
+      const box = document.createElement('div');
+      const card = document.createElement('a');
+      card.className = 'ocs__nav-card ocs__nav-card--compact';
+      box.appendChild(card);
+      return box;
+    },
+    onReply() {},
+    ...options,
+  });
+  return { element, log, asked };
+}
+const mainOf = (element, key) => element.querySelector(`[data-key="${key}"]`).querySelector('.chat-msg-main');
+const partsOf = (element, key) => mainOf(element, key).children.map(child => child.className);
+
+test('a message with a GitHub link gets its cards last, before the action bar', () => {
+  const { element, log } = cardLog();
+  log.append(message('m1', 'look https://github.com/Open-Coding-Society/pages/pull/2066'), false);
+  log.append(message('m2', 'no links here'), false);
+
+  assert.deepEqual(partsOf(element, 'm1'), ['chat-msg-meta', 'chat-msg-body', 'chat-cards', 'chat-msg-actions']);
+  assert.equal(mainOf(element, 'm2').querySelector('.chat-cards'), null);
+});
+
+test('an edit redraws the cards, and a deleted message drops them', () => {
+  const { element, log } = cardLog();
+  log.append(message('m1', 'see https://github.com/a/b/pull/1'), true);
+
+  log.updateBody('m1', 'nothing to show now');
+  assert.equal(mainOf(element, 'm1').querySelector('.chat-cards'), null);
+  log.updateBody('m1', 'back: https://github.com/a/b/pull/2');
+  assert.deepEqual(partsOf(element, 'm1'), ['chat-msg-meta', 'chat-msg-body', 'chat-cards', 'chat-msg-actions']);
+
+  log.markDeleted('m1');
+  assert.equal(mainOf(element, 'm1').querySelector('.chat-cards'), null);
+});
+
+test('a link only inside the quote of a reply makes no card', () => {
+  const { log, asked } = cardLog({ richText: { ...richText, extractReplyMarker: body => ({ reply: { id: '9' }, html: body.replace(/^\[\[reply:[^\]]*\]\]/, '') }) } });
+  log.append(message('m1', '[[reply:9|Grace|see https://github.com/a/b/pull/1]] thanks!'), false);
+
+  assert.deepEqual(asked, [' thanks!']);
+});

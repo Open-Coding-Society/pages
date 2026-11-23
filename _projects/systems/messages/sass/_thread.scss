@@ -241,6 +241,16 @@
   }
 }
 
+// The GitHub cards under a message (js/github-cards.js): the grammar's compact nav cards,
+// one under another, no wider than the message's text.
+.dm .chat-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dm-space-xs);
+  max-width: min(100%, var(--dm-measure));
+  margin-top: var(--dm-space-xs);
+}
+
 // An image in a message. Bounded on both axes so it never dominates the log and never
 // arrives as a postage stamp: it fills the measure when it is wide enough to, stops
 // short of it when it is not, and is capped in height so a tall portrait photo cannot

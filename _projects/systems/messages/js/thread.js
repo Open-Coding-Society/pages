@@ -52,7 +52,7 @@ export function createThread({
   elements, api, socket, richText, me,
   onDmRead = () => {}, onGroupRead = () => {}, onFileShared = () => {},
   readOnly = false, onSchedule = null, emptyState = null, texts = {}, formatBody = null,
-  groupFiles = null, onOpenFolder = null, viewer: sharedViewer = null,
+  groupFiles = null, onOpenFolder = null, viewer: sharedViewer = null, linkCards = null,
 }) {
   if (emptyState !== null && (typeof emptyState !== 'object' || typeof emptyState.title !== 'string')) {
     throw new TypeError('createThread: emptyState must be null or { title, hint }');
@@ -112,7 +112,7 @@ export function createThread({
   // reply, edit or delete.
   const log = createMessageLog(elements.messages, {
     richText, me, onEdit: beginEdit, onDelete: deleteMessage, onReply: canReply ? beginReply : null,
-    onSchedule, readOnly, texts, formatBody,
+    onSchedule, readOnly, texts, formatBody, linkCards,
     onFile: fileActions ? (action, item, control) => fileActions.handle(action, item, control) : null,
     thumbnail: fileActions ? item => fileActions.thumbnail(item) : null,
   });

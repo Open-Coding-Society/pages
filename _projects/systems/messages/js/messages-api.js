@@ -88,6 +88,9 @@ export function createMessagesApi({
     // Adds one event to the signed-in person's calendar (Spring files it under them when no
     // `individual` is sent).
     addCalendarEvent: event => spring('/api/calendar/add_event', 'POST', event),
+    // A gist, read through Spring for its GitHub card: it doesn't count against GitHub's
+    // hourly limit for the network.
+    readGist: id => spring(`/api/grades/read-gist/${part(id)}`),
 
     myGroups: personId => spring(`/api/groups/person/${part(personId)}`),
     allGroups: () => spring('/api/groups'),

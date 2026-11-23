@@ -38,6 +38,18 @@ export class GitHubSource {
     };
   }
 
+  /**
+   * The browser's localStorage, or null where it can't be used (a private window, or storage turned off).
+   * @returns {Storage|null}
+   */
+  static browserStorage() {
+    try {
+      return window.localStorage ?? null;
+    } catch {
+      return null;
+    }
+  }
+
   #fetchJson;
   #readGist;
   #storage;
