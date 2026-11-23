@@ -97,13 +97,9 @@ the open conversation each start with a bar of the same height.
         <form class="dm__search" id="messagesSearchForm" role="search" autocomplete="off" hidden>
           <input class="ocs__input" id="messagesSearch" type="search" placeholder="Search this chat" aria-label="Search this chat" disabled>
         </form>
-        {%- comment -%}
-          Shared opens the Shared panel (files, media, links, pins) for any open
-          conversation; Members and Leave are a group's.
-        {%- endcomment -%}
-        <div class="dm__thread-actions hidden" id="messagesThreadActions">
-          <button type="button" class="dm__action" id="messagesSharedButton" title="Files, media, links and pins"><i class="fas fa-folder-open" aria-hidden="true"></i> Shared</button>
+        <div class="dm__thread-actions hidden" id="messagesGroupActions">
           <button type="button" class="dm__action" id="messagesMembers">Members</button>
+          <button type="button" class="dm__action" id="messagesSharedButton" title="Files, media, links and pins"><i class="fas fa-folder-open" aria-hidden="true"></i> Shared</button>
           <button type="button" class="dm__action" id="messagesLeaveGroup">Leave</button>
         </div>
       </header>

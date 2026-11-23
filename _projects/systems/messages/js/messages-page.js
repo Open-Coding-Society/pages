@@ -113,6 +113,8 @@ export async function startMessagesPage({ config, richText, push }) {
   // gists through Spring, kept 10 minutes in localStorage where the browser allows it.
   const githubCards = new GitHubCards({ source: new GitHubSource({ readGist: id => api.readGist(id), storage: GitHubSource.browserStorage() }) });
   let panel = null; // the Shared panel, made once the thread exists (it reads the thread)
+  // The Shared panel's Files tab, as a group's file share reaches it (the thread's onFileShared).
+  const files = { refreshIfShowing: groupId => panel.refreshIfShowing('group', groupId) };
   const help = new HelpDialog({
     elements: { dialog: byId('helpDialog'), body: byId('helpBody') },
     isMac: /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || ''),
@@ -127,6 +129,8 @@ export async function startMessagesPage({ config, richText, push }) {
     groupFiles,
     viewer,
     linkCards: html => githubCards.forBody(html),
+    // The Shared panel's Media, Links and Pinned follow the chat while it's open.
+    onChanged: (kind, id) => panel?.refreshMessages(kind, id),
     runCode: (language, code) => api.runCode(language, code),
     // /dm sits at the site's root, so Profile is beside it, base path and all (a fork's /repo).
     profileUrl: new URL('profile', window.location.href).pathname,
@@ -162,9 +166,21 @@ export async function startMessagesPage({ config, richText, push }) {
       render();
     },
     onGroupRead: id => markGroupRead(findItem('group', id)),
-    onFileShared: id => panel.refreshIfShowing('group', id),
-    onChanged: (kind, id) => panel?.refreshMessages(kind, id),
+    onFileShared: id => files.refreshIfShowing(id),
   });
+
+  const groupActions = byId('messagesGroupActions');
+  const openGroup = () => (state.active?.kind === 'group' ? findItem('group', state.active.id) : null);
+
+  // The shared .hidden class, not the hidden attribute: ocs__btn and ocs__links set
+  // their own display, which beats [hidden]. The box holds Shared too, which shows for any
+  // open conversation; Members and Leave are a group's, and a class group has no Leave.
+  function showGroupActions(group) {
+    groupActions.classList.toggle('hidden', !state.active);
+    byId('messagesMembers').classList.toggle('hidden', !group);
+    byId('messagesLeaveGroup').classList.toggle('hidden', !group || isClassGroup(group));
+  }
+
   panel = new ConversationPanel({
     elements: {
       dialog: byId('conversationPanel'), title: byId('conversationPanelTitle'), tabList: byId('conversationPanelTabs'),
@@ -188,18 +204,6 @@ export async function startMessagesPage({ config, richText, push }) {
     if (!item) return;
     const name = state.active.kind === 'group' ? item.name : conversationLabel(item);
     panel.open({ kind: state.active.kind, id: state.active.id, name }, opener, options);
-  }
-
-  const threadActions = byId('messagesThreadActions');
-  const openGroup = () => (state.active?.kind === 'group' ? findItem('group', state.active.id) : null);
-
-  // The shared .hidden class, not the hidden attribute: ocs__btn and ocs__links set
-  // their own display, which beats [hidden]. Shared shows for any open conversation;
-  // Members and Leave are a group's, and a class group has no Leave.
-  function showGroupActions(group) {
-    threadActions.classList.toggle('hidden', !state.active);
-    byId('messagesMembers').classList.toggle('hidden', !group);
-    byId('messagesLeaveGroup').classList.toggle('hidden', !group || isClassGroup(group));
   }
 
   // Clears the badge straight away, then tells Spring, then the navbar bell. The count is
