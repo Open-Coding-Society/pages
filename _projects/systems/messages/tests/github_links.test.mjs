@@ -43,3 +43,10 @@ test('newIssueUrl fills GitHub’s new-issue form', () => {
   assert.equal(url.searchParams.get('body'), 'Steps & more');
   assert.equal(GitHubLinks.newIssueUrl('not a repo', { title: 'x' }), null);
 });
+
+test('a link right before an HTML entity still reads: a space typed after it is saved as &nbsp;', () => {
+  const urls = body => GitHubLinks.find(body).map(link => link.url);
+  assert.deepEqual(urls('look https://github.com/o/r/pull/3&nbsp;'), ['https://github.com/o/r/pull/3']);
+  assert.deepEqual(urls('&lt;https://github.com/o/r/issues/4&gt;'), ['https://github.com/o/r/issues/4']);
+  assert.deepEqual(urls('https://github.com/o/r/pull/5?w=1&amp;x=2'), ['https://github.com/o/r/pull/5']);
+});

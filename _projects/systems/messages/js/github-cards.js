@@ -132,6 +132,8 @@ export class GitHubCards {
     const list = runs.check_runs || [];
     if (list.some(run => run.status !== 'completed')) return this.#pill(text.checksRunning, 'warn');
     if (list.some(run => ['failure', 'timed_out', 'cancelled', 'action_required'].includes(run.conclusion))) return this.#pill(text.checksFailed, 'bad');
+    // GitHub sends at most 100 checks at once, and "passed" has to mean all of them.
+    if (list.length < runs.total_count) return null;
     return this.#pill(text.checksPassed, 'good');
   }
 
@@ -254,12 +256,21 @@ export class GitHubCards {
       return;
     }
     if (!this.#watcher) {
-      this.#watcher = new IntersectionObserver(entries => entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        this.#watcher.unobserve(entry.target);
-        this.#waiting.get(entry.target)?.();
-        this.#waiting.delete(entry.target);
-      }), { rootMargin: '200px' });
+      this.#watcher = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          this.#watcher.unobserve(entry.target);
+          this.#waiting.get(entry.target)?.();
+          this.#waiting.delete(entry.target);
+        });
+        // A card whose message left the page (another conversation opened, or an edit drew it
+        // again) never scrolls into view, so it's let go here instead of kept until destroy().
+        this.#waiting.forEach((onVisible, element) => {
+          if (element.isConnected) return;
+          this.#watcher.unobserve(element);
+          this.#waiting.delete(element);
+        });
+      }, { rootMargin: '200px' });
     }
     this.#waiting.set(element, onVisible);
     this.#watcher.observe(element);

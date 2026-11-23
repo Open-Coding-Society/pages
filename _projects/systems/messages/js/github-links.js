@@ -12,7 +12,9 @@ const PATTERNS = [
 const GIST = /^https:\/\/gist\.github\.com\/(?:([A-Za-z0-9-]{1,39})\/)?([0-9a-f]{6,64})(?:[/?#].*)?$/;
 // Account pages that look like owner/repo but aren't repositories.
 const NOT_OWNERS = new Set(['orgs', 'settings', 'marketplace', 'features', 'topics', 'collections', 'sponsors', 'notifications', 'explore', 'login']);
-const URL_PATTERN = /https:\/\/(?:gist\.)?github\.com\/[^\s<>"')\]]+/g;
+// A link ends at whitespace, a tag, a quote or a closing bracket, and at "&": in a message's
+// HTML a space typed after a link is "&nbsp;", and what follows the item (a query) isn't needed.
+const URL_PATTERN = /https:\/\/(?:gist\.)?github\.com\/[^\s<>"')\]&]+/g;
 const trimUrl = url => url.replace(/[.,;:!?]+$/, '');
 const OWNER_REPO = new RegExp(`^(${NAME})/(${REPO})$`);
 

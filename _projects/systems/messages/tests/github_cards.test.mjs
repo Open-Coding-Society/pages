@@ -168,3 +168,42 @@ test('forBody makes a box of cards for a message, at most three in order, or not
 
   assert.deepEqual(box.children.map(card => card.href), ['https://github.com/a/b/pull/1', 'https://github.com/a/b/issues/2', 'https://github.com/a/b']);
 });
+
+test('"Checks passed" needs every check: past GitHub’s first 100, a card says nothing about them', async () => {
+  const pull = ok({ title: 'Big', state: 'open', draft: false, merged: false, user: { login: 'ada' }, head: { sha: 'abc1234' }, created_at: '2026-11-18T20:00:00Z', changed_files: 1, additions: 1, deletions: 0 });
+  const passing = Array.from({ length: 100 }, () => ({ status: 'completed', conclusion: 'success' }));
+  const { cards } = makeCards({
+    '/repos/o/r/pulls/9': pull,
+    '/repos/o/r/commits/abc1234/check-runs?per_page=100': ok({ total_count: 101, check_runs: passing }),
+  });
+  const card = cards.render(GitHubLinks.parse('https://github.com/o/r/pull/9'));
+  await settle();
+  await settle();
+  assert.match(textOf(card), /Big/);
+  assert.doesNotMatch(textOf(card), /Checks/);
+});
+
+test('a card whose message left the page stops being watched (another conversation, or an edit)', async () => {
+  const watched = new Set();
+  let report = null;
+  globalThis.IntersectionObserver = class {
+    constructor(callback) { report = entries => callback(entries); }
+    observe(element) { watched.add(element); }
+    unobserve(element) { watched.delete(element); }
+    disconnect() { watched.clear(); }
+  };
+  try {
+    const source = new GitHubSource({ fetchJson: async () => ok({ full_name: 'o/r' }), storage: null, now: () => NOW });
+    const cards = new GitHubCards({ source, now: () => NOW });
+    const gone = cards.render(GitHubLinks.parse('https://github.com/o/gone'));
+    const shown = cards.render(GitHubLinks.parse('https://github.com/o/shown'));
+    Object.defineProperty(gone, 'isConnected', { value: false });
+    Object.defineProperty(shown, 'isConnected', { value: true });
+    assert.equal(watched.size, 2);
+    report([{ target: shown, isIntersecting: true }]);
+    await settle();
+    assert.deepEqual([...watched], [], 'the shown card loaded and the gone one was let go');
+  } finally {
+    delete globalThis.IntersectionObserver;
+  }
+});
