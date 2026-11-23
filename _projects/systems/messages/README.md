@@ -31,7 +31,7 @@ same way they reach a direct message.
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
 | `js/messages-api.js` | Every Spring and Flask request. |
 | `js/github-links.js` | `GitHubLinks`, static: reads a GitHub link (issue, pull request, commit, repository, gist), finds the first three different ones in a message, and builds the link `/issue`, `/pr`, `/commit` and `/repo` post. |
-| `js/github-source.js` | `GitHubSource`: asks api.github.com from the browser and keeps each answer 10 minutes (in memory and in localStorage under `ocs-github:`); after GitHub's rate limit it asks nothing until GitHub's reset time. Gists come through Spring. |
+| `js/github-source.js` | `GitHubSource`: asks api.github.com from the browser and keeps each answer 10 minutes (in memory and in localStorage under `ocs-github:`). Keeping one first removes copies older than that, because the rest of the site shares localStorage. After GitHub's rate limit it asks nothing until GitHub's reset time, or its `Retry-After`. Gists come through Spring. |
 | `js/github-cards.js` | `GitHubCards`: a card (a compact `ocs__nav-card`) under a message for each GitHub link, drawn from the link at once and filled in when it scrolls near the screen. |
 | `js/slash-commands.js` | `SlashCommands`, static: every slash command, its group and hint, and which ones a DM or a group gets. |
 | `js/command-menu.js` | `CommandMenu`: the menu (`ocs__menu`) that opens when a message starts with `/`. Typing narrows it, ↑/↓ move, Enter or Tab picks, Esc closes. |
