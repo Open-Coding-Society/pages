@@ -149,7 +149,7 @@ Both work in direct messages and group chats.
   the screen. When the hour's requests are used up, the cards say when details come back.
   A gist's card is read through Spring.
 - **Slash commands.** Typing `/` at the start of a message opens a menu grouped Share,
-  GitHub, Chat and Message, and `/help` lists them all. `/file`, `/folder`, `/files` and
+  GitHub, This chat and Message, and `/help` lists them all. `/file`, `/folder`, `/files` and
   `/members` are for groups; `/search` searches a direct message.
   - `/code [language]` opens a code box above the composer, and `/gist [file name]` does
     too but saves the code as a secret gist on the sender's GitHub and posts its link.
