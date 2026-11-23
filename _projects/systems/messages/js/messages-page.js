@@ -163,6 +163,7 @@ export async function startMessagesPage({ config, richText, push }) {
     },
     onGroupRead: id => markGroupRead(findItem('group', id)),
     onFileShared: id => panel.refreshIfShowing('group', id),
+    onChanged: (kind, id) => panel?.refreshMessages(kind, id),
   });
   panel = new ConversationPanel({
     elements: {

@@ -358,3 +358,28 @@ test('list() gives the messages as loaded, oldest first, pin notes included', ()
   log.append(pinRow('p1', 'Grace', '[[pin:m1]]'), false);
   assert.deepEqual(log.list().map(stored => stored.key), ['m1', 'p1']);
 });
+
+test('the log says when its messages change: an append, an edit, a delete', () => {
+  let changes = 0;
+  const { log } = makeLog({ onChange: () => { changes += 1; } });
+  log.append(pinRow('m1', 'Grace', 'hello'), false);
+  log.updateBody('m1', 'hello there');
+  log.markDeleted('m1');
+  assert.equal(changes, 3);
+});
+
+test('a message edited into a pin marker shows as text and pins nothing, now and after a reload', () => {
+  const { element, log } = makeLog({ onPin() {} });
+  log.append(pinRow('m1', 'Grace', 'hello'), false);
+  log.append(pinRow('m2', 'Grace', 'typo'), false);
+  log.updateBody('m2', '[[pin:m1]]');
+  assert.equal(log.isPinned('m1'), false);
+  assert.equal(element.querySelector('.chat-pin-note'), null);
+
+  const reloaded = makeLog({ onPin() {} });
+  reloaded.log.append(pinRow('m1', 'Grace', 'hello'), false);
+  reloaded.log.append(pinRow('m2', 'Grace', '[[pin:m1]]', { edited: true }), false);
+  assert.equal(reloaded.log.isPinned('m1'), false);
+  assert.equal(reloaded.element.querySelector('.chat-pin-note'), null);
+  assert.match(bodyOf(reloaded.element, 'm2').textContent, /\[\[pin:m1\]\]/);
+});

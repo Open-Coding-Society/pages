@@ -163,7 +163,19 @@ export class ConversationPanel {
   }
 
   /**
-   * Redraws the panel if it shows this conversation: a new message, pin or shared file.
+   * Redraws Media, Links and Pinned if the panel shows this conversation and its messages
+   * changed (a new message, an edit, a pin). They read the loaded messages, so it costs no
+   * request; the Files tab waits for refreshIfShowing.
+   * @param {string} kind
+   * @param {number} id
+   */
+  refreshMessages(kind, id) {
+    if (!this.#dialog.isOpen() || this.#conversation?.kind !== kind || this.#conversation?.id !== id) return;
+    this.#render();
+  }
+
+  /**
+   * Redraws the panel, its Files tab too, if it shows this conversation: a shared file.
    * @param {string} kind
    * @param {number} id
    */
@@ -241,6 +253,7 @@ export class ConversationPanel {
           this.#notify(text.pictureFailed);
           return;
         }
+        if (!this.#dialog.isOpen()) return; // closed while the picture was read
         this.#viewer.show({ name: fill(text.imageFrom, { name: entry.sender || text.someone }), blob, preview: 'image' }, cell);
       });
       grid.appendChild(cell);
@@ -309,7 +322,8 @@ export class ConversationPanel {
         iconButton('fa-comment', text.showInChat, () => this.#showInChat(pin.message.key)),
         iconButton('fa-thumbtack-slash', text.unpin, async control => {
           control.disabled = true;
-          if (await this.#thread.togglePin(pin.message, true)) row.remove();
+          // Drawn again rather than the row taken out, so the count and the empty text follow.
+          if (await this.#thread.togglePin(pin.message, true)) this.#render();
           else control.disabled = false;
         }),
       );

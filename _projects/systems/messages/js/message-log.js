@@ -97,9 +97,10 @@ function splitReply(richText, body) {
 // code) resolves the URL of a secret gist made from it. onPin(message, isPinned), when
 // given, adds Pin/Unpin to each message; which messages are pinned comes from the
 // [[pin:…]] messages the log holds (conversation-model.js), each drawn as a one-line note.
+// onChange() is called after each append, edit and delete (the Shared panel redraws).
 export function createMessageLog(element, {
   richText, me, onEdit, onDelete, onReply = null, onSchedule = null, readOnly = false, texts = {}, formatBody = null,
-  onFile = null, thumbnail = null, linkCards = null, runCode = null, saveGist = null, onPin = null,
+  onFile = null, thumbnail = null, linkCards = null, runCode = null, saveGist = null, onPin = null, onChange = () => {},
 }) {
   if (formatBody !== null && typeof formatBody !== 'function') {
     throw new TypeError('createMessageLog: formatBody must be a function or null');
@@ -425,11 +426,13 @@ export function createMessageLog(element, {
       element.appendChild(divider);
     }
 
-    const pin = message.deleted ? null : Conversation.extractPinMarker(message.body);
+    // An edited message is never a pin (Conversation.currentPins), so it draws as text.
+    const pin = message.deleted || message.edited ? null : Conversation.extractPinMarker(message.body);
     if (pin?.action) {
       appendPinNote(message, pin, isSelf);
       refreshPins();
       if (stickToBottom) element.scrollTop = element.scrollHeight;
+      onChange();
       return;
     }
     if (message.id !== undefined && message.id !== null) keyById.set(String(message.id), message.key);
@@ -529,6 +532,7 @@ export function createMessageLog(element, {
     element.appendChild(row);
     if (message.id !== undefined && message.id !== null && pinnedIds.has(String(message.id))) showPinned(String(message.id));
     if (stickToBottom) element.scrollTop = element.scrollHeight;
+    onChange();
   }
 
   function updateBody(key, body) {
@@ -539,11 +543,13 @@ export function createMessageLog(element, {
     stored.edited = true;
     refreshPins();
     const row = rowFor(key);
-    if (!row) return;
-    const bodyElement = row.querySelector('.chat-msg-body');
-    renderCards(bodyElement.parentNode, renderBody(bodyElement, stored));
-    const meta = row.querySelector('.chat-msg-meta');
-    if (!meta.querySelector('.chat-msg-edited')) meta.appendChild(editedTag());
+    if (row) {
+      const bodyElement = row.querySelector('.chat-msg-body');
+      renderCards(bodyElement.parentNode, renderBody(bodyElement, stored));
+      const meta = row.querySelector('.chat-msg-meta');
+      if (!meta.querySelector('.chat-msg-edited')) meta.appendChild(editedTag());
+    }
+    onChange();
   }
 
   function markDeleted(key) {
@@ -553,6 +559,7 @@ export function createMessageLog(element, {
       stored.deleted = true;
       rowFor(key)?.remove();
       refreshPins();
+      onChange();
       return;
     }
     if (stored) {
@@ -574,6 +581,7 @@ export function createMessageLog(element, {
     // than leave it open over a conversation that no longer has that image.
     if (viewerKey === key) closeViewer();
     row.querySelector('.chat-msg-image-link')?.remove();
+    onChange();
   }
 
   // A line between messages that isn't anyone's message. `link` turns part of the line

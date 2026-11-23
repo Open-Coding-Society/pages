@@ -141,8 +141,9 @@ direct message only an image can be attached: Spring stores shared files for gro
 
 - **Shared** in the conversation header (any DM or group) opens one panel with tabs: Files
   (groups only), Media (pictures sent and image or video files shared), Links (each link
-  once, GitHub first, newest first) and Pinned. Each row has Show in the chat. Media, Links
-  and Pinned read the messages the conversation already loaded, so they cost no request;
+  once, GitHub first, newest first) and Pinned. Links and Pinned rows have Show in the chat,
+  and a Media tile opens its picture or video. Media, Links and Pinned read the messages the
+  conversation already loaded, so they cost no request;
   older history that isn't loaded isn't in them.
 - **Pins.** Each message has Pin. A pin is a message of its own whose body is just
   `[[pin:<message id>]]` (or `[[unpin:…]]`), so everyone in the conversation sees the same

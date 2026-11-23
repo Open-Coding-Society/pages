@@ -55,3 +55,27 @@ test('mediaIn gathers sent images and shared image and video files, newest first
   assert.equal(media[0].file.path, 'shots/a.png');
   assert.equal(media[2].src, 'data:image/png;base64,AAA');
 });
+
+test('a pin counts only from a message never edited, at a message that is not itself a pin; ids are trimmed', () => {
+  const messages = [
+    message('a', 'first'),
+    message('p1', '[[pin:a]]', { edited: true }),
+    message('p2', '[[pin: a ]]'),
+    message('p3', '[[pin:p2]]'),
+  ];
+  const pins = Conversation.currentPins(messages);
+  assert.deepEqual(pins.map(pin => pin.message.key), ['a']);
+  assert.equal(Conversation.extractPinMarker('[[pin: a ]]').id, 'a');
+});
+
+test('mediaIn gives a picture stored as bare base64 a data URL, as the log shows it', () => {
+  const [picture] = Conversation.mediaIn([message('1', 'pic', { image: 'iVBORw0KGgo=' })]);
+  assert.equal(picture.src, 'data:image/png;base64,iVBORw0KGgo=');
+});
+
+test('linksIn reads a named link’s address, and keeps a link’s own closing parenthesis', () => {
+  const urls = body => Conversation.linksIn([message('1', body)]).map(link => link.url);
+  assert.deepEqual(urls('the <a href="https://example.com/report?a=1&amp;b=2">Report</a>'), ['https://example.com/report?a=1&b=2']);
+  assert.deepEqual(urls('see https://en.wikipedia.org/wiki/Computer_(programming).'), ['https://en.wikipedia.org/wiki/Computer_(programming)']);
+  assert.deepEqual(urls('(docs at https://example.com/guide)'), ['https://example.com/guide']);
+});

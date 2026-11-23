@@ -101,7 +101,7 @@ test('a direct message’s menu leaves out a group’s commands', () => {
 });
 
 // ── The pane runs commands ─────────────────────────────────────────────────────────
-function commandThread(kind = 'group') {
+function commandThread(kind = 'group', extra = {}) {
   const make = tag => document.createElement(tag);
   const elements = {
     title: make('h2'), subtitle: make('small'), messages: make('div'), formStatus: make('p'),
@@ -125,6 +125,7 @@ function commandThread(kind = 'group') {
     socket: { follow() {}, unfollow() {}, isConnected: () => true },
     richText: { renderRichMessage(container, raw) { container.appendChild(document.createTextNode(String(raw))); }, createRichComposer: () => composer },
     onCommand: name => commands.push(name),
+    ...extra,
   });
   return { thread, elements, composer, sent, gists, commands, kind, api };
 }
@@ -397,4 +398,24 @@ test('/media, /links and /pinned go to the page, which opens that tab of the Sha
     key(composer.element, 'Enter');
   }
   assert.deepEqual(commands, ['media', 'links', 'pinned']);
+});
+
+test('the pane tells the page once per burst when its conversation’s messages change', async () => {
+  const changes = [];
+  const { thread, composer, api, elements } = commandThread('group', { onChanged: (kind, id) => changes.push([kind, id]) });
+  const history = [
+    { id: 'm1', author: 'Grace Hopper', author_uid: 'grace', message: 'one', date: '2026-11-22T10:00:00Z' },
+    { id: 'm2', author: 'Grace Hopper', author_uid: 'grace', message: 'two', date: '2026-11-22T10:01:00Z' },
+    { id: 'm3', author: 'Grace Hopper', author_uid: 'grace', message: 'three', date: '2026-11-22T10:02:00Z' },
+  ];
+  api.groupMessages = async () => history;
+  api.sendGroupMessage = async (id, body) => [...history, { id: 'm4', author: 'Ada Lovelace', author_uid: 'ada', message: body, date: '2026-11-22T10:03:00Z' }];
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  assert.deepEqual(changes, [['group', 12]], 'three messages loading are one change');
+  composer.setHTML('hello');
+  elements.form.dispatchEvent(fakeEvent('submit')); // the stub composer has no Enter-to-send
+  await settle();
+  await settle();
+  assert.deepEqual(changes, [['group', 12], ['group', 12]]);
 });

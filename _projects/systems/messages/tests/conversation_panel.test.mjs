@@ -40,14 +40,18 @@ function panelElements() {
   };
 }
 
-function makePanel(messages, { files = [], groupFiles = null, viewer = { show() {} } } = {}) {
+function makePanel(messages, { files = [], groupFiles = null, viewer = { show() {} }, afterToggle = () => {} } = {}) {
   const elements = panelElements();
   const shown = [];
   const unpinned = [];
   const thread = {
     messages: () => messages,
     showMessage: key => shown.push(key),
-    togglePin: async (message, pinned) => { unpinned.push([message.id, pinned]); return true; },
+    togglePin: async (message, pinned) => {
+      unpinned.push([message.id, pinned]);
+      afterToggle(message, pinned);
+      return true;
+    },
   };
   const filesOfGroup = groupFiles || new GroupFiles({ api: { groupFileIndex: async () => files }, groupId: 12 });
   const panel = new ConversationPanel({
@@ -300,4 +304,43 @@ test('a folder opens as a tree and its .zip holds the files under it', async () 
   } finally {
     downloads.restore();
   }
+});
+
+test('an open panel redraws Media, Links and Pinned when its conversation changes, and only that one', () => {
+  const messages = [row('m1', 'Grace', 'Demo Friday')];
+  const { panel, elements } = makePanel(messages);
+  panel.open({ kind: 'dm', id: 4, name: 'Grace' }, null, { tab: 'pinned' });
+  assert.match(elements.panels.pinned.textContent, /Nothing pinned yet/);
+  messages.push(row('p1', 'Alan', '[[pin:m1]]'));
+  panel.refreshMessages('dm', 5);
+  assert.match(elements.panels.pinned.textContent, /Nothing pinned yet/, 'another conversation leaves it alone');
+  panel.refreshMessages('dm', 4);
+  assert.match(elements.panels.pinned.textContent, /Demo Friday/);
+  assert.deepEqual(tabsOf(elements), ['Media', 'Links', 'Pinned 1']);
+});
+
+test('Unpin in the Pinned tab draws the tab again: the count drops and the empty text shows', async () => {
+  const messages = [row('m1', 'Grace', 'Demo Friday'), row('p1', 'Alan', '[[pin:m1]]')];
+  const { panel, elements } = makePanel(messages, { afterToggle: () => messages.push(row('p2', 'Ada', '[[unpin:m1]]')) });
+  panel.open({ kind: 'dm', id: 4, name: 'Grace' }, null, { tab: 'pinned' });
+  labelsIn(elements.panels.pinned);
+  elements.panels.pinned.querySelectorAll('button')[1].dispatchEvent(fakeEvent('click'));
+  await settle();
+  assert.match(elements.panels.pinned.textContent, /Nothing pinned yet/);
+  assert.deepEqual(tabsOf(elements), ['Media', 'Links', 'Pinned']);
+});
+
+test('a picture whose panel closed while it was being read does not open', async () => {
+  const opened = [];
+  const { panel, elements } = makePanel([row('m1', 'Grace', 'pic', { image: 'data:image/png;base64,iVBORw0KGgo=' })], {
+    viewer: { show: file => opened.push(file) },
+  });
+  panel.open({ kind: 'dm', id: 4, name: 'Grace' }, null);
+  const cell = elements.panels.media.querySelector('button');
+  cell.dispatchEvent(fakeEvent('click'));
+  document.dispatchEvent(fakeEvent('keydown', { key: 'Escape' }));
+  await settle();
+  await settle();
+  assert.equal(panel.isOpen(), false);
+  assert.deepEqual(opened, []);
 });

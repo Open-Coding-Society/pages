@@ -67,7 +67,7 @@ export function createThread({
   onDmRead = () => {}, onGroupRead = () => {}, onFileShared = () => {},
   readOnly = false, onSchedule = null, emptyState = null, texts = {}, formatBody = null,
   groupFiles = null, onOpenFolder = null, viewer: sharedViewer = null, linkCards = null,
-  runCode = null, onCommand = () => {}, profileUrl = '/profile',
+  runCode = null, onCommand = () => {}, profileUrl = '/profile', onChanged = () => {},
 }) {
   if (emptyState !== null && (typeof emptyState !== 'object' || typeof emptyState.title !== 'string')) {
     throw new TypeError('createThread: emptyState must be null or { title, hint }');
@@ -130,6 +130,7 @@ export function createThread({
     richText, me, onEdit: beginEdit, onDelete: deleteMessage, onReply: canReply ? beginReply : null,
     onSchedule, readOnly, texts, formatBody, linkCards, runCode,
     onPin: readOnly ? null : (message, pinned) => togglePin(message, pinned),
+    onChange: () => noteChange(),
     // Any code block in the chat can be saved to your own gists (commands is made below).
     saveGist: readOnly || !api.createGist ? null
       : (language, code) => commands.saveGist(language, code, `snippet.${CodeBlocks.languageOf(language)?.extension || 'txt'}`),
@@ -456,6 +457,18 @@ export function createThread({
   }
 
   // A group send answers with the chat's messages, a DM send with the saved message's event.
+  // onChanged(kind, id) after the open conversation's messages change, once per burst: a
+  // history of a hundred messages loading is one change, so the Shared panel draws once.
+  let changeQueued = false;
+  function noteChange() {
+    if (changeQueued) return;
+    changeQueued = true;
+    queueMicrotask(() => {
+      changeQueued = false;
+      if (current && !destroyed) onChanged(current.kind, current.id);
+    });
+  }
+
   // Pins or unpins a message by sending a pin message ([[pin:<id>]], conversation-model.js),
   // so everyone in the conversation sees the same pins.
   async function togglePin(message, pinned) {
