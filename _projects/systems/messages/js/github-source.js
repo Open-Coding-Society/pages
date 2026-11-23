@@ -10,6 +10,10 @@
 const PREFIX = 'ocs-github:';
 const LIMIT_KEY = `${PREFIX}limited-until`;
 
+// GitHub says it hit a limit in its rate-limit headers, which its CORS exposes, and in the body.
+const isLimit = answer => answer.status === 429 || (answer.status === 403 && (answer.headers?.['x-ratelimit-remaining'] === '0'
+  || answer.headers?.['retry-after'] || /rate limit/i.test(answer.body?.message || '')));
+
 /**
  * GitHub's API with a 10-minute copy and the hourly limit kept.
  */
@@ -54,7 +58,8 @@ export class GitHubSource {
   #readGist;
   #storage;
   #now;
-  #memory = new Map(); // path → Promise of { status, body }
+  #memory = new Map(); // path → { at, answer: Promise of { status, body } }
+  #limitedUntil = 0; // also kept here, for a browser that can't store it
 
   /**
    * @param {object} options
@@ -81,7 +86,7 @@ export class GitHubSource {
    * @returns {number} milliseconds
    */
   limitedUntil() {
-    return Number(this.#read(LIMIT_KEY) || 0);
+    return Math.max(this.#limitedUntil, Number(this.#read(LIMIT_KEY) || 0));
   }
 
   /**
@@ -91,41 +96,42 @@ export class GitHubSource {
    *   'limited' while the hourly limit is used up, or 'failed' when GitHub couldn't be reached
    */
   load(path) {
-    const memory = this.#memory;
-    if (memory.has(path)) return memory.get(path);
+    const now = this.#now();
+    const kept = this.#memory.get(path);
+    if (kept && now - kept.at < GitHubSource.CACHE_MINUTES * 60000) return kept.answer;
+    this.#memory.delete(path);
     const stored = this.#read(PREFIX + path);
     if (stored) {
       try {
         const { at, status, body } = JSON.parse(stored);
-        if (this.#now() - at < GitHubSource.CACHE_MINUTES * 60000) {
+        if (now - at < GitHubSource.CACHE_MINUTES * 60000) {
           const hit = Promise.resolve({ status, body });
-          memory.set(path, hit);
+          this.#memory.set(path, { at, answer: hit });
           return hit;
         }
       } catch {
         // A damaged entry is asked for again.
       }
     }
-    if (this.limitedUntil() > this.#now()) return Promise.resolve({ status: 'limited' });
+    if (this.limitedUntil() > now) return Promise.resolve({ status: 'limited' });
     const asked = Promise.resolve(this.#fetchJson(path)).then(answer => {
-      // GitHub says so in its rate-limit headers, which its CORS exposes, and in the body.
-      const limited = answer.status === 429 || (answer.status === 403 && (answer.headers?.['x-ratelimit-remaining'] === '0'
-        || answer.headers?.['retry-after'] || /rate limit/i.test(answer.body?.message || '')));
-      if (limited) {
-        const reset = Number(answer.headers?.['x-ratelimit-reset']) * 1000 || this.#now() + 15 * 60000;
-        this.#write(LIMIT_KEY, String(reset));
-        memory.delete(path);
+      if (isLimit(answer)) {
+        this.#limit(answer.headers);
+        this.#forget(path, asked);
         return { status: 'limited' };
       }
       if (answer.status === 200 || answer.status === 404) {
-        this.#write(PREFIX + path, JSON.stringify({ at: this.#now(), status: answer.status, body: answer.body }));
+        this.#keep(path, { at: this.#now(), status: answer.status, body: answer.body });
+      } else {
+        // GitHub couldn't answer (a 5xx, say), so the next card asks again.
+        this.#forget(path, asked);
       }
       return { status: answer.status, body: answer.body };
     }, () => {
-      memory.delete(path);
+      this.#forget(path, asked);
       return { status: 'failed' };
     });
-    memory.set(path, asked);
+    this.#memory.set(path, { at: now, answer: asked });
     return asked;
   }
 
@@ -137,6 +143,53 @@ export class GitHubSource {
   async gist(id) {
     if (!this.#readGist) throw new Error('Gists are read through Spring, and this site has none');
     return this.#readGist(id);
+  }
+
+  // A secondary limit says how long to wait in Retry-After; the hourly one says when it resets.
+  #limit(headers) {
+    const now = this.#now();
+    const retryAfter = Number(headers?.['retry-after']);
+    const reset = Number(headers?.['x-ratelimit-reset']) * 1000;
+    const until = retryAfter > 0 ? now + retryAfter * 1000 : reset > now ? reset : now + 15 * 60000;
+    this.#limitedUntil = until;
+    this.#write(LIMIT_KEY, String(until));
+  }
+
+  // Drops a path's answer from this page, unless a newer request has replaced it.
+  #forget(path, answer) {
+    if (this.#memory.get(path)?.answer === answer) this.#memory.delete(path);
+  }
+
+  // Keeps a copy in storage. Copies older than ten minutes are never read again, so they're
+  // removed first: localStorage is shared with the rest of the site (runner code, preferences).
+  #keep(path, entry) {
+    this.#prune(entry.at);
+    this.#write(PREFIX + path, JSON.stringify(entry));
+  }
+
+  #prune(now) {
+    const storage = this.#storage;
+    if (!storage) return;
+    try {
+      const old = [];
+      for (let index = 0; index < storage.length; index += 1) {
+        const key = storage.key(index);
+        if (key?.startsWith(PREFIX) && this.#isOld(key, now)) old.push(key);
+      }
+      old.forEach(key => storage.removeItem(key));
+    } catch {
+      // Storage that can't be listed keeps its copies; each is replaced when it's asked for again.
+    }
+  }
+
+  #isOld(key, now) {
+    const value = this.#read(key);
+    if (key === LIMIT_KEY) return Number(value || 0) <= now;
+    try {
+      return now - JSON.parse(value).at >= GitHubSource.CACHE_MINUTES * 60000;
+    } catch {
+      return true;
+    }
   }
 
   #read(key) {
