@@ -32,9 +32,19 @@ export class OnboardingStore {
     if (!saved || saved[key] !== value) throw new Error('The server did not confirm the unlock change.');
   }
 
+  async account() {
+    try {
+      return await this.profile.signedInAccount();
+    } catch (error) {
+      if (error?.status === 0 || error?.cause?.status === 0) return undefined;
+      throw error;
+    }
+  }
+
   async read() {
-    const user = await this.profile.signedInAccount();
+    const user = await this.account();
     const guest = this.guestUnlocks();
+    if (user === undefined) return { user: null, unlocked: guest, offline: true };
     if (!user) return { user: null, unlocked: guest };
     const profile = await this.loadProgress();
     const unlocked = new Set(CHALLENGES.filter(item => profile[`${PREFIX}${item.id}`] === true).map(item => item.id));
@@ -48,13 +58,14 @@ export class OnboardingStore {
 
   async unlock(id) {
     if (!challengeById(id)) throw new Error(`Unknown challenge: ${id}`);
-    const user = await this.profile.signedInAccount();
+    const user = await this.account();
     if (user) {
       await this.saveAccountUnlock(id);
     } else {
       const unlocked = new Set(this.guestUnlocks());
       unlocked.add(id);
       this.storage.setItem(GUEST_KEY, JSON.stringify([...unlocked]));
+      if (user === undefined) return { user: null, unlocked: [...unlocked], offline: true };
     }
     return this.read();
   }
@@ -62,7 +73,8 @@ export class OnboardingStore {
   async reset(id) {
     if (!challengeById(id) || challengeById(id).direct) throw new Error(`Unknown gated challenge: ${id}`);
     const guest = this.guestUnlocks();
-    const user = await this.profile.signedInAccount();
+    const user = await this.account();
+    if (user === undefined) throw new Error('Reconnect to reset account progress.');
     if (user) await this.saveAccountUnlock(id, false);
     const remaining = guest.filter(item => item !== id);
     if (remaining.length) this.storage.setItem(GUEST_KEY, JSON.stringify(remaining));

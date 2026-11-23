@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { CHALLENGES, viewerPath } from '../js/onboarding-data.js';
 import { OnboardingStore } from '../js/onboarding-store.js';
+import { FlaskProfile } from '../../profile/js/profile-backend.js';
 
 function setup() {
   const data = new Map();
@@ -124,4 +125,41 @@ test('unknown challenges and malformed guest progress are rejected', async () =>
   await assert.rejects(env.store.unlock('unknown'), /Unknown challenge/);
   env.storage.setItem('ocs-onboarding-guest-unlocks', JSON.stringify({ bad: true }));
   await assert.rejects(env.store.read(), /invalid/);
+});
+
+test('an unreachable account service permits browser-only play and transfers later', async () => {
+  const env = setup();
+  const data = new Map();
+  const storage = {
+    getItem: key => data.get(key) ?? null,
+    setItem: (key, value) => data.set(key, value),
+    removeItem: key => data.delete(key),
+  };
+  let offline = true;
+  const flask = { request: async (path, options) => {
+    if (offline) throw Object.assign(new Error('unreachable'), { status: 0, cause: new TypeError('Failed to fetch') });
+    if (path === '/api/id') return { uid: 'first' };
+    if (options?.method === 'PUT') {
+      env.profiles.set('first', options.body._game_profile);
+      return env.profiles.get('first');
+    }
+    return env.profiles.get('first') ?? null;
+  } };
+  const store = new OnboardingStore({ profile: new FlaskProfile({ flask }), storage });
+  assert.deepEqual(await store.read(), { user: null, unlocked: [], offline: true });
+  assert.deepEqual(await store.unlock('identity-forge'), { user: null, unlocked: ['identity-forge'], offline: true });
+  await assert.rejects(store.reset('identity-forge'), /Reconnect/);
+  offline = false;
+  assert.deepEqual((await store.read()).unlocked, ['identity-forge']);
+  assert.equal(env.profiles.get('first')['onboarding_unlock_identity-forge'], true);
+  assert.deepEqual(store.guestUnlocks(), []);
+});
+
+test('account errors other than an unreachable service remain errors', async () => {
+  const env = setup();
+  const flask = { request: async () => { throw Object.assign(new Error('HTTP 500'), { status: 500 }); } };
+  const store = new OnboardingStore({ profile: new FlaskProfile({ flask }), storage: env.storage });
+  await assert.rejects(store.read(), /500/);
+  await assert.rejects(store.unlock('identity-forge'), /500/);
+  assert.deepEqual(store.guestUnlocks(), []);
 });

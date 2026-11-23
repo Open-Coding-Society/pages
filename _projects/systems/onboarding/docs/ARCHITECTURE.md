@@ -26,6 +26,11 @@ are not labeled as failures.
 Each account unlock is a distinct top-level `onboarding_unlock_<id>` field, so
 updates do not replace the game profile. Guest unlocks are removed only after
 successful transfer. The gate is not an authorization boundary.
+If the account service is unreachable, play uses browser-only guest unlocks;
+the viewer reports this and disables replay until account progress is available.
+Identity Forge pauses its GameEngine control and starts a nested cookie level.
+The mini-game saves completion before ending, so a failed save can be retried
+without losing the collected cookies; GameEngine resumes the Forge.
 Start and stop mount or unload the active iframe. Pause and resume use a
 same-origin, parent-checked bridge to GameEngine's active control; an in-game
 dialog must close first. Replay resets only the selected challenge's unlock,

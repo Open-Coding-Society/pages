@@ -2,7 +2,10 @@
 
 The home page redirects to `/onboarding/`, a card-based adventure with a link to
 the unchanged `/cs-pathway`. A five-cookie GameEngine game unlocks each Pathway
-challenge. Game Workbench and UI Builder open directly in the same tab, using the
+challenge. Identity Forge launches moving cookies as a nested GameEngine level;
+click each sprite (or press Space) and, once the unlock is saved, the same Forge
+session resumes. If saving fails, use the game's retry button. The other
+Pathway challenges use the separate cookie gate. Game Workbench and UI Builder open directly in the same tab, using the
 full page; neither has a cookie gate. The gate is a navigation aid, not a skill
 assessment or security boundary.
 
@@ -13,6 +16,10 @@ asks for confirmation and resets only that challenge's unlock on the current
 account or browser; it does not clear login cookies, avatar, theme or other unlocks.
 
 Guest unlocks stay in this browser and transfer to the next signed-in account.
+When the account service cannot be reached, games can still be played offline;
+unlocks remain in the browser and transfer to the next signed-in account after
+the service returns. Guest game profile changes may not transfer. Replay requires
+the service so it can also reset account progress.
 Account unlocks are separate top-level fields in the Flask game profile, leaving
 the existing Pathway avatar and theme intact. The optional Profile evidence card
 shows saved Identity Forge and Toolchain completion separately from self-ratings.

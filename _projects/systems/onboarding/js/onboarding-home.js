@@ -45,7 +45,9 @@ async function start() {
     const store = new OnboardingStore({ profile });
     const progress = await store.read();
     render(progress.unlocked);
-    status.textContent = '';
+    status.textContent = progress.offline
+      ? 'Account service unavailable. Offline unlocks stay in this browser and transfer to the next signed-in account.'
+      : '';
   } catch (error) {
     console.error('Onboarding progress could not load:', error);
     status.textContent = `Progress could not load: ${error.message} Reload to try again.`;

@@ -53,3 +53,27 @@ body:has(.onboarding-gate) {
     overflow: hidden;
   }
 }
+
+body.onboarding-identity-gated {
+  #csse-profile-panel,
+  #cs-pathway-scoreboard,
+  .cs-pathway-next-level,
+  .present {
+    display: none !important;
+  }
+}
+
+.onboarding-identity-gate-status {
+  position: fixed;
+  z-index: 1000;
+  top: 1rem;
+  left: 1rem;
+  margin: 0;
+  padding: 0.5rem;
+  color: var(--pref-text-color);
+  background: var(--panel);
+
+  [hidden] {
+    display: none;
+  }
+}

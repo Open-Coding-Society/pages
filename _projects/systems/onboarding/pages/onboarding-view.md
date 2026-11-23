@@ -17,7 +17,7 @@ page_viewer:
 <!-- markdownlint-disable MD033 -->
 
 <main class="onboarding" data-onboarding-view data-baseurl="{{ site.baseurl | escape }}">
-  <p><a href="{{ '/onboarding/' | relative_url }}">Back to onboarding</a></p>
+  <p data-standalone-back hidden><a href="{{ '/onboarding/' | relative_url }}">Back to onboarding</a></p>
   <h1 data-challenge-title>Onboarding challenge</h1>
   <p data-challenge-description></p>
   <p role="status" aria-live="polite" data-challenge-status>Loading your progress...</p>
@@ -29,6 +29,7 @@ page_viewer:
     <button class="ocs__btn" type="button" data-game-reset>Clear Cookies &amp; Replay</button>
   </div>
   <p data-game-status role="status" aria-live="polite"></p>
+  <button class="ocs__btn" type="button" data-unlock-retry hidden>Retry saving unlock</button>
   <section class="ocs__card" data-gate hidden>
     <h2>Unlock this challenge</h2>
     <p>Collect five cookies in the game to unlock the challenge.</p>
@@ -40,7 +41,7 @@ page_viewer:
     <a class="ocs__btn accent" data-challenge-open target="_blank" rel="noopener noreferrer">Open challenge in a new tab</a>
     <iframe class="onboarding__challenge" title="Onboarding challenge" data-challenge-frame allowfullscreen hidden></iframe>
   </section>
-  <noscript><p>JavaScript is required to play this challenge.</p></noscript>
+  <noscript><p>JavaScript is required to play this challenge. <a href="{{ '/onboarding/' | relative_url }}">Back to onboarding</a></p></noscript>
 </main>
 <script type="module" src="{{ '/assets/js/projects/onboarding/onboarding-view.js' | relative_url }}"></script>
 
