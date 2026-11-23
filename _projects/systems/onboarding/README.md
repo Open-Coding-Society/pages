@@ -1,14 +1,22 @@
 # Onboarding
 
 The Onboarding system provides `/onboarding/`, a card-based prototype alongside
-the unchanged `/cs-pathway`. A five-cookie GameEngine game unlocks each existing
-challenge; UI Builder opens in a new tab because it blocks embedding. The gate
-is a navigation aid, not a skill assessment or security boundary.
+the unchanged `/cs-pathway`. A five-cookie GameEngine game unlocks each Pathway
+challenge. Game Workbench and UI Builder open directly in the same tab, using the
+full page; neither has a cookie gate. The gate is a navigation aid, not a skill
+assessment or security boundary.
+
+The viewer has start, pause/resume, stop and fullscreen controls. Stop unloads the
+game; start runs it again. A game dialog may already have paused the level, in
+which case close the dialog before using the pause control. Clear Cookies & Replay
+asks for confirmation and resets only that challenge's unlock on the current
+account or browser; it does not clear login cookies, avatar, theme or other unlocks.
 
 Guest unlocks stay in this browser and transfer to the next signed-in account.
 Account unlocks are separate top-level fields in the Flask game profile, leaving
 the existing Pathway avatar and theme intact. The optional Profile evidence card
 shows saved Identity Forge and Toolchain completion separately from self-ratings.
+Onboarding reads and updates account game progress through Profile's backend.
 
 See [architecture](docs/ARCHITECTURE.md). Register `systems/onboarding:dev` in
 `_projects/.makeprojects`; the shared project template publishes `pages/`, `js/`,

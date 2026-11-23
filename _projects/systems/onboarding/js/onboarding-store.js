@@ -4,11 +4,9 @@ const GUEST_KEY = 'ocs-onboarding-guest-unlocks';
 const PREFIX = 'onboarding_unlock_';
 
 export class OnboardingStore {
-  constructor({ pythonURI, fetchOptions, storage = window.localStorage, fetcher = (...args) => fetch(...args) }) {
-    this.base = pythonURI;
-    this.options = fetchOptions;
+  constructor({ profile, storage = window.localStorage }) {
+    this.profile = profile;
     this.storage = storage;
-    this.fetcher = fetcher;
   }
 
   guestUnlocks() {
@@ -21,44 +19,24 @@ export class OnboardingStore {
     return ids.filter(id => challengeById(id));
   }
 
-  async request(path, options = {}) {
-    return this.fetcher(`${this.base}${path}`, { ...this.options, ...options });
-  }
-
-  async account() {
-    const response = await this.request('/api/id');
-    if (response.status === 401 || response.status === 403) return null;
-    if (!response.ok) throw new Error(`Could not check sign-in (HTTP ${response.status}).`);
-    const user = await response.json();
-    if (!user || typeof user.uid !== 'string' || !user.uid) throw new Error('The account response has no user ID.');
-    return user;
-  }
-
-  async profile() {
-    const response = await this.request('/api/profile/game', { cache: 'no-store' });
-    if (response.status === 404) return {};
-    if (!response.ok) throw new Error(`Could not load game progress (HTTP ${response.status}).`);
-    const data = await response.json();
+  async loadProgress() {
+    const data = await this.profile.gameProfile();
+    if (data === null) return {};
     if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('The game profile response is invalid.');
     return data;
   }
 
-  async saveAccountUnlock(id) {
+  async saveAccountUnlock(id, value = true) {
     const key = `${PREFIX}${id}`;
-    const response = await this.request('/api/profile/game', {
-      method: 'PUT',
-      body: JSON.stringify({ _game_profile: { [key]: true } }),
-    });
-    if (!response.ok) throw new Error(`Could not save unlock (HTTP ${response.status}).`);
-    const saved = await response.json();
-    if (saved[key] !== true) throw new Error('The server did not confirm the unlock.');
+    const saved = await this.profile.updateGameProfile({ [key]: value });
+    if (!saved || saved[key] !== value) throw new Error('The server did not confirm the unlock change.');
   }
 
   async read() {
-    const user = await this.account();
+    const user = await this.profile.signedInAccount();
     const guest = this.guestUnlocks();
     if (!user) return { user: null, unlocked: guest };
-    const profile = await this.profile();
+    const profile = await this.loadProgress();
     const unlocked = new Set(CHALLENGES.filter(item => profile[`${PREFIX}${item.id}`] === true).map(item => item.id));
     for (const id of guest) {
       if (!unlocked.has(id)) await this.saveAccountUnlock(id);
@@ -70,7 +48,7 @@ export class OnboardingStore {
 
   async unlock(id) {
     if (!challengeById(id)) throw new Error(`Unknown challenge: ${id}`);
-    const user = await this.account();
+    const user = await this.profile.signedInAccount();
     if (user) {
       await this.saveAccountUnlock(id);
     } else {
@@ -78,6 +56,17 @@ export class OnboardingStore {
       unlocked.add(id);
       this.storage.setItem(GUEST_KEY, JSON.stringify([...unlocked]));
     }
+    return this.read();
+  }
+
+  async reset(id) {
+    if (!challengeById(id) || challengeById(id).direct) throw new Error(`Unknown gated challenge: ${id}`);
+    const guest = this.guestUnlocks();
+    const user = await this.profile.signedInAccount();
+    if (user) await this.saveAccountUnlock(id, false);
+    const remaining = guest.filter(item => item !== id);
+    if (remaining.length) this.storage.setItem(GUEST_KEY, JSON.stringify(remaining));
+    else this.storage.removeItem(GUEST_KEY);
     return this.read();
   }
 }

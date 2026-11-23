@@ -4,8 +4,8 @@ export const CHALLENGES = [
   { id: 'wayfinding-world', title: 'Wayfinding World', description: 'Find your place in the community and share your story.', image: '/images/projects/cs-pathway/bg1/wayfinding-world-city.png', url: '/cs-pathway/wayfinding' },
   { id: 'mission-tools', title: 'Mission Tools', description: 'Practice the tools and workflows used to build a project.', image: '/images/projects/cs-pathway/bg2/mission-tools-city.png', url: '/cs-pathway/mission-tools' },
   { id: 'assessment-observatory', title: 'Assessment Observatory', description: 'Explore your learning, progress and next steps.', image: '/images/projects/cs-pathway/bg3/assessment-observatory-city.png', url: '/cs-pathway/assessment-observatory' },
-  { id: 'game-workbench', title: 'Game Workbench', description: 'Build a game world, configure its characters and explore the code.', image: '/images/projects/cs-pathway/bg/toolchain-trail-space.png', url: '/gamebuilder/v2/' },
-  { id: 'ui-builder', title: 'UI Builder', description: 'Design a page from blocks and bring your project to life.', image: '/images/projects/cs-pathway/bg1/wayfinding-world-city.png', url: '/ui-builder/', external: true },
+  { id: 'game-workbench', title: 'Game Workbench', description: 'Build a game world, configure its characters and explore the code.', image: '/images/projects/cs-pathway/bg/toolchain-trail-space.png', url: '/gamebuilder/v2/', direct: true },
+  { id: 'ui-builder', title: 'UI Builder', description: 'Design a page from blocks and bring your project to life.', image: '/images/projects/cs-pathway/bg1/wayfinding-world-city.png', url: '/ui-builder/', direct: true },
 ];
 
 export function challengeById(id) {
@@ -13,6 +13,8 @@ export function challengeById(id) {
 }
 
 export function viewerPath(id, baseurl = '') {
+  const challenge = challengeById(id);
+  if (challenge?.direct) return `${baseurl}${challenge.url}`;
   const query = new URLSearchParams({ onboarding_view: '1', challenge: id });
   return `${baseurl}/onboarding/view/?${query}`;
 }

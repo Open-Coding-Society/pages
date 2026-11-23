@@ -77,6 +77,23 @@ test('game profile distinguishes no progress from a backend failure', async () =
     await assert.rejects(profileOn(false).gameProfile(), /500/);
 });
 
+test('onboarding can check sign-in and update game data through Profile', async () => {
+    const id = `GET ${FLASK}/api/id`;
+    const game = `PUT ${FLASK}/api/profile/game`;
+    network({ [id]: { status: 401 } });
+    assert.equal(await profileOn(false).signedInAccount(), null);
+    network({ [id]: { status: 500 } });
+    await assert.rejects(profileOn(false).signedInAccount(), /500/);
+    const requests = network({
+        [id]: { body: ID_ANSWER },
+        [game]: { body: { onboarding_unlock_identity: true } },
+    });
+    const profile = profileOn(false);
+    assert.equal((await profile.signedInAccount()).uid, ID_ANSWER.uid);
+    await profile.updateGameProfile({ onboarding_unlock_identity: true });
+    assert.deepEqual(bodyOf(requests, game), { _game_profile: { onboarding_unlock_identity: true } });
+});
+
 test('FlaskProfile never calls Spring', async () => {
     const requests = network(FLASK_ANSWERS);
     const profile = profileOn(false);

@@ -83,6 +83,27 @@ export class FlaskProfile {
             throw failure(error);
         }
     }
+
+    async signedInAccount() {
+        let user;
+        try {
+            user = await this.flask.request('/api/id');
+        } catch (error) {
+            if (error.status === 401 || error.status === 403) return null;
+            throw failure(error);
+        }
+        if (!isObject(user) || typeof user.uid !== 'string' || !user.uid) {
+            throw new Error('The account response has no user ID.');
+        }
+        return user;
+    }
+
+    async updateGameProfile(fields) {
+        return ask(this.flask, '/api/profile/game', {
+            method: 'PUT',
+            body: { _game_profile: fields },
+        });
+    }
 }
 
 export class SpringProfile extends FlaskProfile {

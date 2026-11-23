@@ -30,7 +30,7 @@ export function startFullPageLevel({ containerId, levelClass, path, stage }) {
   }
 
   // Same options the game runner passes, but sized to the stage or the whole window.
-  return Game.main({
+  const game = Game.main({
     path,
     gameContainer,
     gameLevelClasses: [levelClass],
@@ -39,6 +39,12 @@ export function startFullPageLevel({ containerId, levelClass, path, stage }) {
     disablePauseMenu: true,
     disableContainerAdjustment: true,
   }, GameControl);
+  if (new URLSearchParams(location.search).get('onboarding_embed') === '1') {
+    import(`${path}/assets/js/projects/onboarding/game-bridge.js`)
+      .then(({ connectGameControls }) => connectGameControls(game))
+      .catch(error => console.error('Onboarding game controls could not connect:', error));
+  }
+  return game;
 }
 
 // Scales the stage to the largest size that fits the window and centres it.

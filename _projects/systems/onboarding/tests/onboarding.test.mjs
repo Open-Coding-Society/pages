@@ -13,27 +13,18 @@ function setup() {
   let user = null;
   const profiles = new Map();
   let saveError = 0;
-  const fetcher = async (url, options) => {
-    const path = new URL(url).pathname;
-    let status = 200;
-    let body;
-    if (path === '/api/id') {
-      status = user ? 200 : 401;
-      body = user && { uid: user };
-    } else if (options.method === 'PUT') {
-      status = saveError || 200;
-      if (!saveError) {
-        body = { ...profiles.get(user), ...JSON.parse(options.body)._game_profile };
-        profiles.set(user, body);
-      }
-    } else {
-      body = profiles.get(user);
-      if (!body) status = 404;
-    }
-    return { status, ok: status >= 200 && status < 300, json: async () => body };
+  const profile = {
+    signedInAccount: async () => user ? { uid: user } : null,
+    gameProfile: async () => profiles.get(user) ?? null,
+    updateGameProfile: async fields => {
+      if (saveError) throw new Error(`HTTP ${saveError}`);
+      const saved = { ...profiles.get(user), ...fields };
+      profiles.set(user, saved);
+      return saved;
+    },
   };
   return {
-    store: new OnboardingStore({ pythonURI: 'http://flask', fetchOptions: {}, storage, fetcher }),
+    store: new OnboardingStore({ profile, storage }),
     signIn: uid => { user = uid; },
     failSave: status => { saveError = status; },
     profiles,
@@ -41,12 +32,37 @@ function setup() {
   };
 }
 
-test('cards have distinct viewer routes and UI Builder is external', () => {
+test('builders open directly while games use the viewer', () => {
   assert.equal(new Set(CHALLENGES.map(item => item.id)).size, 7);
-  assert.equal(CHALLENGES.find(item => item.id === 'ui-builder').external, true);
+  assert.equal(viewerPath('ui-builder', '/pages'), '/pages/ui-builder/');
+  assert.equal(viewerPath('game-workbench', '/pages'), '/pages/gamebuilder/v2/');
   assert.equal(viewerPath('identity-forge', '/pages'), '/pages/onboarding/view/?onboarding_view=1&challenge=identity-forge');
 });
 
+test('replay clears only the selected unlock and preserves identity and other unlocks', async () => {
+  const env = setup();
+  await env.store.unlock('identity-forge');
+  await env.store.unlock('toolchain-trail');
+  env.signIn('first');
+  env.profiles.set('first', { game_profile: { avatar: 'existing' } });
+  await env.store.read();
+  assert.deepEqual((await env.store.reset('identity-forge')).unlocked, ['toolchain-trail']);
+  assert.deepEqual(env.profiles.get('first').game_profile, { avatar: 'existing' });
+  assert.equal(env.profiles.get('first')['onboarding_unlock_identity-forge'], false);
+  env.signIn(null);
+  await env.store.unlock('identity-forge');
+  await env.store.unlock('toolchain-trail');
+  assert.deepEqual((await env.store.reset('identity-forge')).unlocked, ['toolchain-trail']);
+});
+
+test('a failed account replay keeps the saved and guest unlocks', async () => {
+  const env = setup();
+  await env.store.unlock('identity-forge');
+  env.signIn('first');
+  env.failSave(500);
+  await assert.rejects(env.store.reset('identity-forge'), /500/);
+  assert.deepEqual(env.store.guestUnlocks(), ['identity-forge']);
+});
 test('guest unlock transfers once without replacing saved identity; other accounts remain separate', async () => {
   const env = setup();
   await env.store.unlock('identity-forge');

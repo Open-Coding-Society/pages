@@ -1,4 +1,6 @@
 import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
+import { Backend } from '@assets/js/login/backend.js';
+import { FlaskProfile } from '@assets/js/projects/profile/profile-backend.js';
 import { CHALLENGES, viewerPath } from './onboarding-data.js';
 import { OnboardingStore } from './onboarding-store.js';
 
@@ -29,7 +31,7 @@ function render(unlocked) {
     description.textContent = challenge.description;
     const progress = document.createElement('p');
     progress.className = 'ocs__status';
-    progress.textContent = unlocked.includes(challenge.id) ? 'Unlocked' : 'Play to unlock';
+    progress.textContent = challenge.direct ? 'Open builder' : unlocked.includes(challenge.id) ? 'Unlocked' : 'Play to unlock';
     card.append(link, heading, description, progress);
     grid.append(card);
   }
@@ -37,7 +39,8 @@ function render(unlocked) {
 
 async function start() {
   try {
-    const store = new OnboardingStore({ pythonURI, fetchOptions });
+    const profile = new FlaskProfile({ flask: new Backend(pythonURI, fetchOptions) });
+    const store = new OnboardingStore({ profile });
     const progress = await store.read();
     render(progress.unlocked);
     status.textContent = progress.user

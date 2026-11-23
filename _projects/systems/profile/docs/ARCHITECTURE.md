@@ -76,6 +76,8 @@ and `createProfile` picks `SpringProfile` only when there is a Spring backend.
 | `personas()`, `chosenPersonas()` | `GET /api/persona`, `GET /api/user/personas` (no choices when Flask refuses) | |
 | `choosePersona(personaId)` | `POST /api/user/persona` | |
 | `saveSkillSnapshot(snapshot)` | `POST /api/user/skill-snapshot` | |
+| `signedInAccount()` | `GET /api/id`; returns null for an unauthenticated visitor | |
+| `gameProfile()`, `updateGameProfile(fields)` | `GET` and `PUT /api/profile/game` for Onboarding; 404 means no saved game profile | |
 | `person()`, `registerFace(faceData)` | | `GET /api/person/get`, `POST /api/face/register` |
 
 A failed request rejects with the reason the page shows after "Couldn't …:", in the

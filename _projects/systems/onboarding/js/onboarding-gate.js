@@ -1,6 +1,7 @@
 import Game from '@assets/js/GameEnginev1.1/essentials/Game.js';
 import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
 import Clicker from '@assets/js/GameEnginev1.1/essentials/Clicker.js';
+import { connectGameControls } from './game-bridge.js';
 
 const root = document.querySelector('.onboarding-gate');
 const stage = document.getElementById('onboarding-gate-stage');
@@ -44,6 +45,7 @@ try {
     disablePauseMenu: true,
     disableContainerAdjustment: true,
   }, GameControl);
+  connectGameControls(game, { onPauseChange: paused => { button.disabled = paused; } });
   button.addEventListener('click', () => {
     const cookie = game.gameControl.currentLevel.gameEnv.gameObjects.find(object => object.spriteData?.id === 'onboarding-cookie');
     if (!cookie) {

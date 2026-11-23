@@ -6,6 +6,9 @@ hide: true
 toc: false
 ---
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable MD033 -->
+
 <div class="onboarding-gate" data-baseurl="{{ site.baseurl | escape }}">
   <p data-gate-count role="status" aria-live="polite">Cookies: 0 / 5</p>
   <div class="onboarding-gate__stage" id="onboarding-gate-stage"></div>
@@ -13,3 +16,5 @@ toc: false
   <p data-gate-error role="alert"></p>
 </div>
 <script type="module" src="{{ '/assets/js/projects/onboarding/onboarding-gate.js' | relative_url }}"></script>
+
+<!-- markdownlint-restore -->

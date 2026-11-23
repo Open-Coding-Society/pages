@@ -8,6 +8,13 @@
     background: var(--panel);
   }
 
+  &__gate:fullscreen,
+  &__challenge:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+  }
+
   &__gate {
     height: 22rem;
   }
