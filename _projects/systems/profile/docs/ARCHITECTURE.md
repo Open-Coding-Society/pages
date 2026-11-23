@@ -13,6 +13,8 @@ Profile is an `opencsplus` sidebar hub with OCS account, class, persona and
 connection cards. Its sidebar and course labels come from project YAML; account,
 class, persona and skill data come from Flask, with Spring adding synchronized
 account fields, course groups, Face ID and optional connections when enabled.
+When Onboarding is installed, its Profile evidence component reads saved game
+progress through Profile's Flask backend, separately from skill self-ratings.
 
 ## The page
 

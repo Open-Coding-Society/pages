@@ -1,0 +1,41 @@
+.onboarding {
+  &__gate,
+  &__challenge {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--ui-border);
+    border-radius: 0.5rem;
+    background: var(--panel);
+  }
+
+  &__gate {
+    height: 22rem;
+  }
+
+  &__challenge {
+    height: 75vh;
+    min-height: 34rem;
+    margin-top: 1rem;
+  }
+
+  [hidden] {
+    display: none;
+  }
+}
+
+body:has(.onboarding-gate) {
+  .site-header {
+    display: none;
+  }
+}
+
+.onboarding-gate {
+  text-align: center;
+
+  &__stage {
+    position: relative;
+    width: 100%;
+    height: 14rem;
+    overflow: hidden;
+  }
+}

@@ -168,6 +168,7 @@ class SystemProjectDistributionTest < Minitest::Test
         assert_empty site.posts.docs.select { |post| post.url == "/profile" }
         profile = Nokogiri::HTML(matches.first.output)
         assert_equal 1, profile.css("#profileSettingsForm").size
+        assert_empty profile.css("#pathwayEvidence")
         assert_equal spring ? 1 : 0, profile.css("#ai-connections").size
         assert_equal spring ? 1 : 0, profile.css(".gist-connection").size
         [profile, Nokogiri::HTML(site.pages.find { |page| page.url == "/toolkit/" }.output)].each do |document|
@@ -176,6 +177,19 @@ class SystemProjectDistributionTest < Minitest::Test
           assert_empty document.css('[data-sidebar-role="mentor"] a[href="/preview/student/bathroom_pass"]')
         end
       end
+      onboarding = project_copy(workspace, "onboarding")
+      ProjectPublisher.run("publish", onboarding, workspace)
+      site = Jekyll::Site.new(Jekyll.configuration(
+        "source" => workspace, "destination" => File.join(workspace, "_site"), "config" => [],
+        "plugins_dir" => [], "quiet" => true, "baseurl" => "/preview", "spring" => false,
+        "incremental" => false, "layouts_dir" => File.join(workspace, "_layouts"),
+        "includes_dir" => File.join(workspace, "_includes")
+      ))
+      site.process
+      profile = Nokogiri::HTML(site.pages.find { |page| page.url == "/profile" }.output)
+      assert_equal 1, profile.css("#pathwayEvidence").size
+      assert_includes profile.to_html, "/preview/assets/js/projects/onboarding/profile-evidence.js"
+      assert_equal 1, site.pages.count { |page| page.url == "/onboarding/" }
       command("make", "-f", TEMPLATE, "-C", project, "clean", "WORKSPACE_ROOT=#{workspace}")
       refute File.exist?(File.join(workspace, "navigation/projects/profile/index.md"))
       refute File.exist?(File.join(workspace, "_data/projects/profile/profile_sidebar.yml"))

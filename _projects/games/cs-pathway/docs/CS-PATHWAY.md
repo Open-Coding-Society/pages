@@ -4,6 +4,9 @@
 
 The CS Pathway Game is an **immersive educational experience** designed to onboard students into Computer Science through **exploratory gameplay** rather than traditional instruction. Students progress through a gamified journey that introduces core concepts naturally through interaction and discovery.
 
+The separate [Onboarding system](../../../systems/onboarding/README.md) provides
+a card-based entry point to these games without replacing `/cs-pathway`.
+
 ## Design Philosophy
 
 ### Player Movement and Animation

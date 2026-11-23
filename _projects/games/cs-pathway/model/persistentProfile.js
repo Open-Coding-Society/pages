@@ -333,6 +333,11 @@ class PersistentProfile {
         return null;
       }
 
+      // Unlocks may be saved before the student has created a game profile.
+      if (Object.keys(data).every(key => key.startsWith('onboarding_unlock_'))) {
+        return null;
+      }
+
       // Backend returns: { game_profile: { /* complete localStorage structure */ } }
       const gameProfile = data.game_profile || data._game_profile || {};
       

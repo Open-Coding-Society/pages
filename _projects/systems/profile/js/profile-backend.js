@@ -74,6 +74,15 @@ export class FlaskProfile {
     async saveSkillSnapshot(snapshot) {
         return ask(this.flask, '/api/user/skill-snapshot', { method: 'POST', body: snapshot }, messageOf);
     }
+
+    async gameProfile() {
+        try {
+            return await this.flask.request('/api/profile/game');
+        } catch (error) {
+            if (error.status === 404) return null;
+            throw failure(error);
+        }
+    }
 }
 
 export class SpringProfile extends FlaskProfile {

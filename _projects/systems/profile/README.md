@@ -23,6 +23,7 @@ What Profile does in each:
 | Account Save | each changed field to Flask (`PUT /api/user`) | to Flask and to Spring (`POST /api/person/update`) |
 | Classes | saved in Flask | saved in Flask, then Spring's course groups updated |
 | Persona and Skill check-in | saved in Flask | saved in Flask |
+| Pathway evidence | reads saved game progress from Flask | reads saved game progress from Flask |
 | Face ID and GitHub Gist cards | left out | shown; both save in Spring |
 | Optional AI connections (grading and AI themes) | left out | Gemini/Groq keys save independently in Spring |
 | Setup list | Classes, Persona | Classes, Persona, Face ID, GitHub |
@@ -83,6 +84,8 @@ test from this system's `tests/` folder.
   from loading to every save, and every status text is the one the page always showed.
 - `node --test tests/profile_starter.test.mjs`: each name the page's starter imports is
   exported by the file published at that path, and the modules import only `./` files.
+- The optional [Onboarding system](../onboarding/README.md) owns the Pathway evidence
+  card. It reads through Profile's backend without changing skill self-ratings.
 - `node --test tests/test_gist_connection.mjs`: the Gist card.
 - `node --test tests/test_ai_connections.mjs`: independent AI-key saves, replacement, disconnect and failures.
 - `bundle exec ruby tests/test_ai_profile_layout.rb`: AI card rendering, shared controls,

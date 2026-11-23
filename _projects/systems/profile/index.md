@@ -159,6 +159,11 @@ Gist card need Spring, so a Flask-only site (spring: false in _config.yml) leave
         </form>
     </section>
 
+    {% assign onboarding_evidence_asset = site.static_files | where: "path", "/assets/js/projects/onboarding/profile-evidence.js" | first %}
+    {% if onboarding_evidence_asset %}
+        {% include projects/onboarding/profile-evidence.html %}
+    {% endif %}
+
     {%- if site.spring != false %}
     <!-- Face ID: used by the Bathroom Pass -->
     <section class="ocs__card" aria-labelledby="face-id">
@@ -210,7 +215,16 @@ Gist card need Spring, so a Flask-only site (spring: false in _config.yml) leave
     import { createBackends } from '{{ site.baseurl }}/assets/js/login/backend.js';
     import { createProfile } from '{{ site.baseurl }}/assets/js/projects/profile/profile-backend.js';
     import { initProfilePage } from '{{ site.baseurl }}/assets/js/projects/profile/profile-page.js';
-    initProfilePage({ profile: createProfile(createBackends({ pythonURI, javaURI, fetchOptions, springEnabled })) });
+    const profile = createProfile(createBackends({ pythonURI, javaURI, fetchOptions, springEnabled }));
+    initProfilePage({ profile });
+    {% if onboarding_evidence_asset %}
+    import { initPathwayEvidence } from '{{ site.baseurl }}/assets/js/projects/onboarding/profile-evidence.js';
+    initPathwayEvidence({
+        profile,
+        list: document.getElementById('pathwayEvidence'),
+        status: document.getElementById('pathwayEvidenceStatus'),
+    });
+    {% endif %}
 </script>
 {:/}
 

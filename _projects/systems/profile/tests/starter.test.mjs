@@ -13,7 +13,7 @@ const MODULES = '_projects/systems/profile/js/';
 // Published path -> source file, from the Login and Profile systems' distribution.json.
 function publishedSources() {
     const sources = new Map();
-    for (const system of ['login', 'profile']) {
+    for (const system of ['login', 'profile', 'onboarding']) {
         const base = `_projects/systems/${system}/`;
         const manifest = JSON.parse(read(`${base}distribution.json`));
         if (manifest.standard) {

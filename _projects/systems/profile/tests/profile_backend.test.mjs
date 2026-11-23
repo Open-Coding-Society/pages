@@ -66,6 +66,17 @@ const FLASK_ANSWERS = {
     [`POST ${FLASK}/api/user/skill-snapshot`]: { status: 201, body: { id: 1, ...SNAPSHOT } },
 };
 
+test('game profile distinguishes no progress from a backend failure', async () => {
+    const url = `GET ${FLASK}/api/profile/game`;
+    network({ [url]: { status: 404 } });
+    assert.equal(await profileOn(false).gameProfile(), null);
+    const saved = { game_profile: { 'identity-forge': { progress: { identityUnlocked: true } } } };
+    network({ [url]: { body: saved } });
+    assert.deepEqual(await profileOn(false).gameProfile(), saved);
+    network({ [url]: { status: 500 } });
+    await assert.rejects(profileOn(false).gameProfile(), /500/);
+});
+
 test('FlaskProfile never calls Spring', async () => {
     const requests = network(FLASK_ANSWERS);
     const profile = profileOn(false);
