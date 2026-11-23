@@ -593,3 +593,123 @@ test('a connection that fails keeps the lobby, its camera and Join', async () =>
   assert.ok(env.livekit.lk.previews.every((track) => !track.stopped), 'the preview keeps running for the next try');
 });
 
+test('the lobby\'s toggles wait while a join is on its way', async () => {
+  const env = await open({ routes: spring({ 'POST /api/calls/7/token': () => new Promise(() => {}) }) });
+  await click(hook(env.root, 'join'));
+  assert.equal(hook(env.root, 'lobby-camera').disabled, true);
+  assert.equal(hook(env.root, 'lobby-mic').disabled, true);
+});
+
+test('a refused join gives the toggles back', async () => {
+  const env = await open({ routes: spring({ 'POST /api/calls/7/token': answer(503, { reason: 'MEDIA_UNAVAILABLE' }) }) });
+  await click(hook(env.root, 'join'));
+  assert.equal(hook(env.root, 'lobby-camera').disabled, false);
+  assert.equal(hook(env.root, 'lobby-mic').disabled, false);
+});
+
+test('a sound button that fails can be pressed again', async () => {
+  const env = await joinCall();
+  env.livekit.lk.failures.audio = new Error('NotAllowedError');
+  lkRoom(env).blockAudio();
+  await settle();
+  await click(hook(env.root, 'start-audio'));
+  assert.ok(hook(env.root, 'start-audio'), 'still there after a failed try');
+  env.livekit.lk.failures.audio = null;
+  await click(hook(env.root, 'start-audio'));
+  assert.equal(lkRoom(env).audioStarts, 2);
+  assert.equal(hook(env.root, 'start-audio'), null);
+});
+
+test('an open Manage stays open while people talk and come and go', async () => {
+  const env = await joinCall({ routes: spring({ 'POST /api/calls/7/token': answer(200, { ...TOKEN, canModerate: true }) }) });
+  lkRoom(env).join({ identity: 'ada-id', name: 'Ada' });
+  await settle();
+  const manage = () => hook(env.root, 'people').querySelector('[data-person="ada-id"]').querySelector('details');
+  manage().open = true;
+  lkRoom(env).speak(['ada-id']);
+  lkRoom(env).speak(['me-id']);
+  await settle();
+  assert.equal(manage().open, true, 'still open after people talk');
+  lkRoom(env).join({ identity: 'bo-id', name: 'Bo' });
+  await settle();
+  assert.equal(manage().open, true, 'still open after someone joins');
+});
+
+test('pressing Join while waiting asks again now and keeps a single watch on the room', async () => {
+  const env = await open({
+    routes: spring({ 'POST /api/calls/7/token': answer(403, { reason: 'WAITING_FOR_SUPERVISOR' }), 'GET /api/calls/7': roomWith(1) }),
+  });
+  await click(hook(env.root, 'join'));
+  assert.equal(env.timers.pending.size, 1);
+  assert.equal(hook(env.root, 'join').disabled, false, 'Join stays usable while waiting');
+  await click(hook(env.root, 'join'));
+  assert.equal(tokenAsks(env), 2);
+  assert.equal(env.page.state, 'waiting');
+  assert.equal(env.timers.pending.size, 1, 'one watch, not two');
+  env.page.destroy();
+  assert.equal(env.timers.pending.size, 0);
+});
+
+test('a Join pressed while the camera toggle is still opening the camera waits for it', async () => {
+  const env = await open({ holdDevices: true });
+  env.livekit.lk.release();
+  await env.begun;
+  await settle();
+  await click(hook(env.root, 'lobby-camera')); // off
+  await click(hook(env.root, 'lobby-camera')); // on again: the browser is asked, and holds
+  await click(hook(env.root, 'join'));
+  assert.equal(lkRoom(env), undefined, 'nothing connects before the camera answers');
+  env.livekit.lk.release();
+  await settle();
+  await settle();
+  assert.equal(env.page.state, 'ready');
+  assert.deepEqual(lkRoom(env).localParticipant.published.map((track) => track.kind).sort(), ['audio', 'video']);
+});
+
+test('the no-devices line goes once a device works', async () => {
+  const denied = mediaError('NotAllowedError');
+  const env = await open({ failures: { camera: denied, microphone: denied } });
+  assert.ok(env.root.textContent.includes(env.t.lobby_no_devices));
+  env.livekit.lk.failures.camera = null;
+  await click(hook(env.root, 'lobby-camera'));
+  assert.ok(env.root.querySelector('video'), 'the camera works now');
+  assert.ok(!env.root.textContent.includes(env.t.lobby_no_devices));
+});
+
+test('keyboard focus stays on a teacher\'s Manage when the people list changes', async () => {
+  const env = await joinCall({ routes: spring({ 'POST /api/calls/7/token': answer(200, { ...TOKEN, canModerate: true }) }) });
+  lkRoom(env).join({ identity: 'ada-id', name: 'Ada' });
+  await settle();
+  const summary = () => hook(env.root, 'people').querySelector('[data-person="ada-id"]').querySelector('summary');
+  summary().focus();
+  lkRoom(env).join({ identity: 'bo-id', name: 'Bo' });
+  await settle();
+  // A boolean, not the elements: a failure here carries the whole fake page, which stalls the runner.
+  assert.ok(document.activeElement === summary(), 'focus moved to Ada\'s new Manage');
+});
+
+test('the lobby\'s status sits right under its heading, above the preview', async () => {
+  const env = await open({
+    routes: spring({ 'POST /api/calls/7/token': answer(403, { reason: 'WAITING_FOR_SUPERVISOR' }), 'GET /api/calls/7': roomWith(1) }),
+  });
+  await click(hook(env.root, 'join'));
+  const card = hook(env.root, 'lobby');
+  const [heading, status] = card.children;
+  assert.equal(heading.tagName, 'H2');
+  assert.equal(status.textContent, env.t.waiting_supervisor);
+});
+
+test('while you\'re paused, everyone else shows as initials, since nothing reaches you', async () => {
+  const env = await joinCall();
+  lkRoom(env).join({ identity: 'ada-id', name: 'Ada Lovelace' });
+  await settle();
+  assert.ok(cellOf(env.root, 'ada-id').querySelector('video'));
+  lkRoom(env).pauseSelf(true);
+  await settle();
+  assert.ok(cellOf(env.root, 'ada-id').querySelector('video') === null, 'no video while paused');
+  assert.equal(cellOf(env.root, 'ada-id').querySelector('abbr').textContent, 'AL');
+  lkRoom(env).pauseSelf(false);
+  await settle();
+  assert.ok(cellOf(env.root, 'ada-id').querySelector('video'), 'back once you are');
+});
+

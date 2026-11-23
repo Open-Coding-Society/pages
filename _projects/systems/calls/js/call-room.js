@@ -156,8 +156,10 @@ export class CallRoom {
     const restores = [];
     if (this.wants.microphone) restores.push(local.setMicrophoneEnabled(true));
     if (this.wants.camera) restores.push(local.setCameraEnabled(true));
-    Promise.allSettled(restores).then(() => {
-      if (!this.ended) this.changed('resumed');
+    Promise.allSettled(restores).then((results) => {
+      if (this.ended) return;
+      if (results.some((result) => result.status === 'rejected')) this.changed('device');
+      this.changed('resumed');
     });
   }
 

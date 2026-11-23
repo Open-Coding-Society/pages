@@ -90,17 +90,18 @@ test('ids must be positive whole numbers', async () => {
   assert.equal(calls.length, 0);
 });
 
-test('the live list asks about one course', async () => {
-  const { api, calls } = apiWith(() => answer(200, [{ id: 7, title: 'CSA', contextType: 'COURSE', count: 2, oneOnOne: false }]));
-  const live = await api.live('csa');
-  assert.equal(calls[0].path, '/api/calls/live?course=csa');
-  assert.equal(live[0].count, 2);
-});
-
 test('the request options are copied, never changed', async () => {
   const options = structuredClone(CONFIG.fetchOptions);
   const scripted = scriptedFetch(CONFIG.javaURI, () => answer(200, ROOM));
   const api = new CallsApi({ javaURI: CONFIG.javaURI, fetchOptions: options, fetch: scripted.fetch });
   await api.open({ contextType: 'GROUP', contextKey: '12' });
   assert.deepEqual(options, CONFIG.fetchOptions);
+});
+
+test('a body that can\'t be read is a CallsApiError too', async () => {
+  const broken = (status) => ({ ok: status < 300, status, headers: { get: () => null }, text: async () => { throw new TypeError('network error'); } });
+  const ok = apiWith(() => broken(200)).api;
+  await assert.rejects(ok.get(7), (error) => error instanceof CallsApiError && error.status === 0 && error.reason === 'NETWORK' && error.cause instanceof TypeError);
+  const refused = apiWith(() => broken(403)).api;
+  await assert.rejects(refused.get(7), (error) => error instanceof CallsApiError && error.status === 403 && error.reason === null);
 });

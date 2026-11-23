@@ -18,8 +18,8 @@ export class CallLobby {
     this.missing = false; // a device the browser refused or doesn't have
     this.busy = false;
     this.opening = new Set(); // 'audio' or 'video' while the browser is still asked for it
+    this.pending = new Set(); // those requests, so a Join can wait for every one of them
     this.destroyed = false;
-    this.ready = Promise.resolve();
     this.preview = CallDom.video(this.t.camera);
     this.previewTrack = null;
     this.cameraOff = CallDom.el('abbr', 'ocs__avatar', { attrs: { title: this.t.camera_off } });
@@ -33,7 +33,8 @@ export class CallLobby {
     this.status = CallDom.el('p', 'ocs__text', { attrs: { role: 'status' } });
     const row = CallDom.el('div', 'ocs__links');
     row.append(this.mic, this.camera, this.join);
-    this.card.append(CallDom.el('h2', 'ocs__section-title', { text: this.t.lobby_title }), this.view, row, this.status);
+    // The status (waiting for a teacher, devices missing) goes above the preview, where it is seen.
+    this.card.append(CallDom.el('h2', 'ocs__section-title', { text: this.t.lobby_title }), this.status, this.view, row);
     root.appendChild(this.card);
 
     this.onMic = () => this.toggle('audio');
@@ -46,14 +47,18 @@ export class CallLobby {
 
   /**
    * Asks for the camera and microphone the purpose wants, each on its own, so one missing doesn't
-   * stop the other. `ready` settles when both have answered; a Join pressed before then waits for it.
+   * stop the other. Resolves when both have answered.
    */
   start() {
     const kinds = ['audio', 'video'].filter((kind) => this.wants[kind]);
     kinds.forEach((kind) => this.opening.add(kind));
     this.draw();
-    this.ready = Promise.all(kinds.map((kind) => this.open(kind))).then(() => { if (!this.destroyed) this.draw(); });
-    return this.ready;
+    return Promise.all(kinds.map((kind) => this.open(kind))).then(() => { if (!this.destroyed) this.draw(); });
+  }
+
+  /** Settles when every device the lobby is still asking for has answered; a Join waits for it. */
+  get ready() {
+    return Promise.all([...this.pending]).then(() => undefined);
   }
 
   /** The tracks to send when the call starts; null for a device that is off. */
@@ -74,11 +79,12 @@ export class CallLobby {
     this.status.textContent = text;
   }
 
-  /** While a join is in flight (or waiting), Join is off and says so. */
+  /** While a join is in flight, Join says so and nothing in the lobby changes under it. */
   setBusy(busy) {
     this.busy = busy;
     this.join.disabled = busy;
     this.join.textContent = busy ? this.t.joining : this.t.join;
+    this.lockToggles();
   }
 
   destroy() {
@@ -94,7 +100,14 @@ export class CallLobby {
     this.card.remove();
   }
 
-  async open(kind) {
+  open(kind) {
+    const request = this.request(kind);
+    this.pending.add(request);
+    request.finally(() => this.pending.delete(request));
+    return request;
+  }
+
+  async request(kind) {
     this.opening.add(kind);
     try {
       const track = kind === 'audio'
@@ -118,7 +131,7 @@ export class CallLobby {
   }
 
   async toggle(kind) {
-    if (this.opening.has(kind) || this.destroyed) return;
+    if (this.busy || this.opening.has(kind) || this.destroyed) return;
     if (this[kind]) {
       if (kind === 'video') this.previewTrack?.detach(this.preview);
       this[kind].stop();
@@ -132,11 +145,16 @@ export class CallLobby {
     if (!this.destroyed) this.draw();
   }
 
+  // A toggle waits while its device is opening or a join is taking the tracks.
+  lockToggles() {
+    this.mic.disabled = this.busy || this.opening.has('audio');
+    this.camera.disabled = this.busy || this.opening.has('video');
+  }
+
   draw() {
     CallDom.setToggle(this.mic, Boolean(this.audio), MIC_ICONS);
     CallDom.setToggle(this.camera, Boolean(this.video), CAMERA_ICONS);
-    this.mic.disabled = this.opening.has('audio');
-    this.camera.disabled = this.opening.has('video');
+    this.lockToggles();
     if (this.video && this.previewTrack !== this.video) {
       this.video.attach(this.preview);
       this.previewTrack = this.video;
@@ -145,5 +163,6 @@ export class CallLobby {
     const shown = this.video ? this.preview : this.cameraOff;
     if (this.view.firstChild !== shown) this.view.replaceChildren(shown);
     if (!this.audio && !this.video && this.missing) this.setStatus(this.t.lobby_no_devices);
+    else if (this.status.textContent === this.t.lobby_no_devices) this.setStatus('');
   }
 }

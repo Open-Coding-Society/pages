@@ -55,6 +55,7 @@ export class CallPage {
     this.state = 'loading';
     this.notices = new Map(); // kind -> its callout
     this.retry = null;
+    this.waits = 0; // numbers each watch on the room while waiting, so only the newest one acts
     this.joining = false;
     this.destroyed = false;
   }
@@ -93,8 +94,7 @@ export class CallPage {
   destroy() {
     if (this.destroyed) return;
     this.destroyed = true;
-    if (this.retry !== null) this.timers.clear(this.retry);
-    this.retry = null;
+    this.stopWaiting();
     this.confirm?.destroy();
     this.lobby?.destroy();
     this.lobby = null;
@@ -146,6 +146,7 @@ export class CallPage {
 
   async join() {
     if (this.joining || this.destroyed) return;
+    this.stopWaiting();
     this.joining = true;
     this.lobby.setBusy(true);
     try {
@@ -163,6 +164,8 @@ export class CallPage {
     if (CallModel.isWaiting(reason)) {
       // The safety rules: a mentor or a minor waits until a teacher (or a second adult) is in.
       this.lobby.setStatus(CallModel.reasonText(reason, this.strings));
+      // Nothing is in flight while waiting: the toggles and Join (which asks again now) stay usable.
+      this.lobby.setBusy(false);
       this.state = 'waiting';
       this.waitForChange();
       return;
@@ -181,22 +184,29 @@ export class CallPage {
   // the page looks at the room instead (a 200), and asks for a token again only when someone has
   // come or gone, Spring can't say, or wait_looks_per_try looks have passed.
   async waitForChange() {
+    const wait = this.waits;
     const before = await this.peopleInRoom();
-    if (this.destroyed) return;
+    if (this.destroyed || wait !== this.waits) return;
     let looks = 0;
     const look = async () => {
       this.retry = null;
       const now = await this.peopleInRoom();
-      if (this.destroyed) return;
+      if (this.destroyed || wait !== this.waits) return;
       looks += 1;
       if (now === null || before === null || now !== before || looks >= this.strings.wait_looks_per_try) {
-        this.lobby?.setBusy(false);
         this.join();
         return;
       }
       this.retry = this.timers.set(look, this.strings.wait_retry_seconds * 1000);
     };
     this.retry = this.timers.set(look, this.strings.wait_retry_seconds * 1000);
+  }
+
+  // A join (pressed, or the watch's own) ends the watch before it.
+  stopWaiting() {
+    this.waits += 1;
+    if (this.retry !== null) this.timers.clear(this.retry);
+    this.retry = null;
   }
 
   async peopleInRoom() {
@@ -280,9 +290,10 @@ export class CallPage {
   soundNotice() {
     const callout = CallDom.callout(`${this.t.audio_blocked} `);
     const button = CallDom.button(this.t.start_audio, 'ocs__btn small accent fill', { hook: 'start-audio' });
+    // Stays pressable until the sound plays: redraw() takes the notice away once it does.
     button.addEventListener('click', () => {
       this.call?.startAudio().catch((error) => console.warn('Calls: the sound could not start', error));
-    }, { once: true });
+    });
     callout.appendChild(button);
     return callout;
   }

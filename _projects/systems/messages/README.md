@@ -78,7 +78,7 @@ import them by name, like the UI Builder's chat block with `mountGroupChat`.
   sidebar's DM counts current. Groups have their own counts
   (`GET /api/groups/chat/unread`): opening a group, or a message arriving while it is
   open, posts `/api/groups/chat/{id}/read` and fires `dm:group-read` for the bell.
-- **Calls**, when the site runs Spring and `_config.yml` has `calls: enabled: true`: dm.md
+- **Calls**, when the site runs Spring and `_config.yml` has `enabled: true` under `calls:`: dm.md
   adds a Call link to the thread header and a line under it, and hands
   `startMessagesPage` the calls system's `CallEntry` as `calls`. Opening a group or DM
   points the link at its call (`/calls/?group=<id>` or `?dm=<id>`). Spring's

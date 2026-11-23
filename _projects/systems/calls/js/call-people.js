@@ -26,12 +26,39 @@ export class CallPeople {
     this.card.append(header, this.list);
     root.appendChild(this.card);
     this.buttons = []; // [button, handler] to take back on the next render
+    this.manage = new Map(); // identity -> its Manage <details>
+    this.shown = null; // what the list shows, to skip redraws that would change nothing
   }
 
+  // The list redraws only when what it shows changes (talking and muting don't show here), and
+  // a Manage someone had open stays open, so a teacher can reach Pause in a lively call.
   render(snapshot) {
+    const people = CallModel.order(snapshot.people);
+    const shown = JSON.stringify(people.map((p) => [p.identity, p.name, p.isSelf, p.paused, p.metadata]));
+    if (shown === this.shown) return;
+    this.shown = shown;
+    const open = new Set([...this.manage].filter(([, details]) => details.open).map(([identity]) => identity));
+    const focus = this.focused();
     this.release();
-    const rows = CallModel.order(snapshot.people).map((person) => this.row(person));
-    this.list.replaceChildren(...rows);
+    this.manage = new Map();
+    this.list.replaceChildren(...people.map((person) => this.row(person)));
+    open.forEach((identity) => { if (this.manage.has(identity)) this.manage.get(identity).open = true; });
+    if (focus) this.refocus(focus);
+  }
+
+  // Which control in the list has keyboard focus, as a person and a control, to give it back after a redraw.
+  focused() {
+    const active = document.activeElement;
+    if (!active || !this.list.contains(active)) return null;
+    const row = active.closest('[data-person]');
+    if (!row) return null;
+    return { identity: row.dataset.person, action: active.dataset.action ?? null, summary: active.tagName === 'SUMMARY' };
+  }
+
+  refocus({ identity, action, summary }) {
+    const row = [...this.list.children].find((item) => item.dataset.person === identity);
+    const target = action ? row?.querySelector(`[data-action="${action}"]`) : (summary ? row?.querySelector('summary') : null);
+    target?.focus();
   }
 
   destroy() {
@@ -52,6 +79,7 @@ export class CallPeople {
   // Kept behind Manage so Remove isn't in the everyday view.
   tools(person) {
     const details = CallDom.el('details');
+    this.manage.set(person.identity, details);
     details.appendChild(CallDom.el('summary', 'ocs__btn small', { text: this.t.manage }));
     const row = CallDom.el('div', 'ocs__links');
     const pause = person.paused ? 'resume' : 'pause';

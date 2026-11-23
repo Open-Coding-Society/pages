@@ -26,7 +26,9 @@ export class CallStage {
     this.grid.classList.toggle('ocs__grid--card', !small);
     const present = new Set(people.map((person) => person.identity));
     [...this.cells.keys()].filter((identity) => !present.has(identity)).forEach((identity) => this.dropCell(identity));
-    people.forEach((person) => this.updateCell(this.cells.get(person.identity) ?? this.makeCell(person), person));
+    // While you're paused nothing reaches you, so others show as initials instead of frozen video.
+    const shown = snapshot.paused ? people.map((person) => (person.isSelf ? person : { ...person, camera: null })) : people;
+    shown.forEach((person) => this.updateCell(this.cells.get(person.identity) ?? this.makeCell(person), person));
     const order = people.map((person) => this.cells.get(person.identity).cell);
     if (order.some((cell, index) => this.grid.childNodes[index] !== cell)) order.forEach((cell) => this.grid.appendChild(cell));
   }

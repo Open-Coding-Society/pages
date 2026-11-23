@@ -191,6 +191,7 @@ export function createFakeLiveKit({ failures = {}, holdDevices = false } = {}) {
 
     async startAudio() {
       this.audioStarts += 1;
+      if (lk.failures.audio) throw lk.failures.audio;
       this.canPlaybackAudio = true;
       this.emit(RoomEvent.AudioPlaybackStatusChanged, true);
     }
@@ -241,9 +242,11 @@ export function createFakeLiveKit({ failures = {}, holdDevices = false } = {}) {
       const before = { ...this.localParticipant.permissions };
       this.localParticipant.permissions = { ...(paused ? PAUSED : FULL) };
       if (paused) {
-        // LiveKit takes the tracks of someone who may no longer publish.
+        // LiveKit unpublishes the tracks of someone who may no longer publish, and livekit-client
+        // stops them (stopLocalTrackOnUnpublish), so a resume needs new ones.
         [...this.localParticipant.publications.values()].forEach((publication) => {
           this.localParticipant.publications.delete(publication.source);
+          publication.track.stop();
           this.emit(RoomEvent.LocalTrackUnpublished, publication, this.localParticipant);
         });
       }
@@ -261,9 +264,10 @@ export function createFakeLiveKit({ failures = {}, holdDevices = false } = {}) {
     }
   }
 
-  const preview = (kind, source, failure) => async () => {
+  // The failure is read when the device is asked for, so a test can let a refused device through later.
+  const preview = (kind, source, key) => async () => {
     if (holdDevices) await new Promise((resolve) => lk.held.push(resolve));
-    if (failure) throw failure;
+    if (lk.failures[key]) throw lk.failures[key];
     const track = new FakeTrack(kind, source);
     lk.previews.push(track);
     return track;
@@ -275,8 +279,8 @@ export function createFakeLiveKit({ failures = {}, holdDevices = false } = {}) {
     RoomEvent,
     Track,
     DisconnectReason,
-    createLocalAudioTrack: preview('audio', Track.Source.Microphone, lk.failures.microphone),
-    createLocalVideoTrack: preview('video', Track.Source.Camera, lk.failures.camera),
+    createLocalAudioTrack: preview('audio', Track.Source.Microphone, 'microphone'),
+    createLocalVideoTrack: preview('video', Track.Source.Camera, 'camera'),
   };
 }
 

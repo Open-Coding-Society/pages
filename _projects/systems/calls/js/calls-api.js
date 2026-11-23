@@ -45,11 +45,6 @@ export class CallsApi {
     return this.request('POST', `/${CallsApi.id(id)}/token`);
   }
 
-  /** The live calls the signed-in person may join, for one course: GET /api/calls/live?course=. */
-  live(course) {
-    return this.request('GET', `/live?course=${encodeURIComponent(course)}`);
-  }
-
   /** A moderator cuts someone off until they are resumed. */
   pause(id, identity) {
     return this.participant(id, identity, 'pause');
@@ -90,7 +85,13 @@ export class CallsApi {
     } catch (error) {
       throw Object.assign(new CallsApiError(0, 'NETWORK'), { cause: error });
     }
-    const text = await response.text();
+    let text = '';
+    try {
+      text = await response.text();
+    } catch (error) {
+      // The connection dropped while the answer was read: like no answer, unless the status already said no.
+      if (response.ok) throw Object.assign(new CallsApiError(0, 'NETWORK'), { cause: error });
+    }
     if (!response.ok) {
       const seconds = Number.parseInt(response.headers.get('Retry-After') ?? '', 10);
       throw new CallsApiError(response.status, CallsApi.reasonIn(text), Number.isFinite(seconds) ? seconds : null);

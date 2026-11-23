@@ -15,14 +15,19 @@ See [Calls architecture](docs/ARCHITECTURE.md) for the modules, the page's state
 
 Calls are off by default, with two switches, and either one hides them:
 
-- Pages `_config.yml`: `calls: enabled: false`. With it off, or on a Flask-only site (`spring: false`),
+- Pages `_config.yml`: `enabled: false` under `calls:`. With it off, or on a Flask-only site (`spring: false`),
   `/calls/` only says calls aren't turned on, `/dm` has no Call link, and nothing is asked of Spring.
 - Spring: `calls.enabled=false` in its settings. Its routes then answer 404, and the page says calls
   aren't available.
 
 To turn them on: run a LiveKit server, give Spring `LIVEKIT_URL`, `LIVEKIT_API_KEY` and
 `LIVEKIT_API_SECRET` with `calls.enabled=true` (Spring's `docs/calls-deployment.md`), then set
-`calls: enabled: true` here.
+the Pages switch in `_config.yml`:
+
+```yaml
+calls:
+  enabled: true
+```
 
 ## What's on the page
 
@@ -69,7 +74,7 @@ the roles a join token carries, and how the lobby waits for a teacher: it looks 
 
 1. Start Spring with calls on and LiveKit set up. Locally, `livekit-server --dev` gives the key
    `devkey` and the secret `secret`.
-2. Set `calls: enabled: true` in `_config.yml`, then run `make`.
+2. In `_config.yml`, set `enabled: true` under `calls:`, then run `make`.
 3. Sign in, open a group in `/dm` and press Call, then Join. Open the same link in a second
    browser signed in as someone else in the group.
 4. To see the safety rules, join first as a mentor: the lobby says it's waiting for a teacher.

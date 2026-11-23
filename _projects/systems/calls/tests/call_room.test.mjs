@@ -112,6 +112,7 @@ test('a refused screen share rejects', async () => {
 test('paused takes the tracks away; resumed puts back what you had on', async () => {
   const { lkRoom, room, events } = await joined();
   await room.setCamera(false);
+  const micBefore = lkRoom.localParticipant.getTrackPublication('microphone').track;
   lkRoom.pauseSelf(true);
   assert.equal(room.snapshot().paused, true);
   assert.equal(events.at(-1).type, 'paused');
@@ -123,6 +124,17 @@ test('paused takes the tracks away; resumed puts back what you had on', async ()
   assert.equal(events.at(-1).type, 'resumed');
   assert.equal(self(room).micOn, true, 'the mic was on, so it comes back');
   assert.equal(self(room).cameraOn, false, 'the camera was off, so it stays off');
+  assert.equal(micBefore.stopped, true);
+  assert.notEqual(lkRoom.localParticipant.getTrackPublication('microphone').track, micBefore, 'a new mic, not the stopped one');
+});
+
+test('a device that won\'t come back after a pause is reported', async () => {
+  const { livekit, lkRoom, events } = await joined();
+  lkRoom.pauseSelf(true);
+  livekit.lk.failures.microphone = mediaError('NotReadableError');
+  lkRoom.pauseSelf(false);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.deepEqual(events.slice(-2).map((event) => event.type).sort(), ['device', 'resumed']);
 });
 
 test('each way a call ends says why', async () => {

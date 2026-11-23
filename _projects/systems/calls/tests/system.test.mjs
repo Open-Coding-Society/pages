@@ -27,7 +27,17 @@ test('the system publishes its page, data and scripts to the generic project roo
   files.forEach(({ source }) => assert.ok(existsSync(new URL(source, system)), `missing ${source}`));
 });
 
-test('every published copy is git-ignored, so copies are never committed', () => {
+// An export of the tree (git archive) has no .git to ask.
+const inGitCheckout = (() => {
+  try {
+    execFileSync('git', ['-C', fileURLToPath(root), 'rev-parse', '--is-inside-work-tree'], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
+test('every published copy is git-ignored, so copies are never committed', { skip: inGitCheckout ? false : 'not in a git checkout' }, () => {
   const paths = ['navigation/projects/calls/calls.md', '_data/projects/calls/calls.yml', 'assets/js/projects/calls/call-page.js'];
   const ignored = execFileSync('git', ['-C', fileURLToPath(root), 'check-ignore', ...paths], { encoding: 'utf8' }).trim().split('\n');
   assert.deepEqual(ignored, paths);
