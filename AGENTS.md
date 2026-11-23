@@ -163,6 +163,8 @@ while preserving all critical instructions. The agent must still communicate wit
 
 ## 测试规则
 
+* **GameEngine 关卡完成：** 关卡可定义 `isComplete()` 与可异步的 `onComplete()`；`GameControl` 冻结更新并只运行一次退出流程，成功后走现有关卡转换，失败时调用 `onCompletionError`，由 `retryLevelCompletion()` 重试。关卡自行阻止完成期间的输入。关卡可用 `getProgress()` 提供带 `id` 的对象，并在变化时调用 `reportProgress()`；`onProgress` 接收通用状态与快照，详见测试 README。Onboarding 的独立 CookieGate 自己保存进度；viewer 协调 replay 与保存并保留嵌入控制。测试：`node --test assets/js/GameEnginev1.1/test/level-completion.test.mjs _projects/systems/onboarding/tests/*.test.mjs`。
+
 * **Platformer 碰撞：** 玩家保持圆形；`Barrier` 在共享 `GameObject.isCollision` 中使用完整矩形表面（默认缩减为零），不是细长平台中心的小圆。相切算接触，接触面由法向确定。游戏只处理落地/顶头响应，不覆盖检测器；落地后同步 canvas，再检测其他对象。测试要调用真实 `collisionChecks`，覆盖平台端部落地、持续支撑、W 跳跃与走出边缘，不能只伪造 `touchPoints`。验证：`node --import ./assets/js/GameEnginev1.1/test/register-assets.mjs --test assets/js/GameEnginev1.1/test/barrier-collision.test.mjs _projects/games/platformer/tests/platformer-player.test.mjs`，并在浏览器检查。
 
 * Flask Markdown publication mirrors sources into `_posts/projects/flask/docs/` (not `_posts/flask/docs/`) so the shared project cleanup and ignore rules apply. Verify migration, cleanup, and republication with `bundle exec ruby scripts/test_course_distribution.rb`; edit sources under `_projects/lessons/flask/docs/`, never generated copies.

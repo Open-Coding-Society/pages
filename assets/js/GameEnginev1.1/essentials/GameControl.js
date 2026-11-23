@@ -107,6 +107,11 @@ class GameControl {
         }
         // Track whether the animation loop is currently running to avoid duplicates
         this._loopRunning = false;
+        this._completion = null;
+        this.onProgress = options.onProgress ?? game.environment?.onProgress ?? null;
+        if (this.onProgress !== null && typeof this.onProgress !== 'function') {
+            throw new TypeError('onProgress must be a function.');
+        }
     }
 
     /**
@@ -244,6 +249,7 @@ class GameControl {
      * 3. Starting the game loop
      */ 
     transitionToLevel() {
+        this._completion = null;
         // Clean up any lingering interaction handlers
         this.cleanupInteractionHandlers();
 
@@ -292,13 +298,75 @@ class GameControl {
             return;
         }
 
-        if (!this.isPaused) {
-        this.currentLevel.update();
-        this.handleInLevelLogic();
+        if (!this.isPaused && !this._completion) {
+            const level = this.currentLevel;
+            level.update();
+            if (this.currentLevel === level && level.continue) {
+                this.handleInLevelLogic();
+                if (typeof level.gameLevel.isComplete === 'function' && level.gameLevel.isComplete()) {
+                    this.startLevelCompletion(level);
+                }
+            }
         }
 
         // Always continue loop
         requestAnimationFrame(this.gameLoop.bind(this));
+    }
+
+    /**
+     * Report a snapshot of the current level's optional progress.
+     */
+    reportProgress(status = 'active', details = {}, level = this.currentLevel) {
+        const event = this.progressEvent(status, details, level);
+        if (event) this.onProgress(event);
+    }
+
+    progressEvent(status, details, level) {
+        if (typeof this.onProgress !== 'function' || typeof level?.gameLevel.getProgress !== 'function') return null;
+        const progress = level.gameLevel.getProgress();
+        if (!progress || typeof progress !== 'object' || Array.isArray(progress) ||
+            typeof progress.id !== 'string' || !progress.id.trim()) {
+            throw new Error('Level progress must be an object with a non-empty id.');
+        }
+        return { ...details, status, game: { ...progress } };
+    }
+
+    /**
+     * Freeze gameplay while the level runs its optional completion sequence.
+     */
+    startLevelCompletion(level) {
+        const completion = { level, state: 'running' };
+        this._completion = completion;
+        this.reportProgress('completing', {}, level);
+        Promise.resolve()
+            .then(() => {
+                if (this._completion === completion && this.currentLevel === level) {
+                    return level.gameLevel.onComplete?.();
+                }
+            })
+            .then(result => {
+                if (this._completion === completion && this.currentLevel === level) {
+                    completion.state = 'complete';
+                    completion.result = result;
+                    this.endLevel();
+                }
+            }, error => {
+                if (this._completion !== completion || this.currentLevel !== level) return;
+                completion.state = 'failed';
+                console.error('Level completion failed:', error);
+                if (typeof level.gameLevel.onCompletionError === 'function') {
+                    level.gameLevel.onCompletionError(error);
+                }
+                this.reportProgress('failed', { error: error?.message || String(error) }, level);
+            });
+    }
+
+    /**
+     * Retry a failed completion sequence without restarting the level.
+     */
+    retryLevelCompletion() {
+        if (this._completion?.state !== 'failed' || this._completion.level !== this.currentLevel) return;
+        this.startLevelCompletion(this.currentLevel);
     }
 
 
@@ -324,6 +392,8 @@ class GameControl {
     handleLevelEnd() {
         // Ensure the running-loop flag is cleared so new transitions can start the loop
         this._loopRunning = false;
+        const completion = this._completion;
+        this._completion = null;
 
         // Notify the user that the level has ended
         if (this.currentLevelIndex < this.levelClasses.length - 1) {
@@ -335,8 +405,12 @@ class GameControl {
         // Clean up any lingering interaction handlers
         this.cleanupInteractionHandlers();
         
-        this.currentLevel.destroy();
+        const level = this.currentLevel;
+        const completedEvent = completion?.state === 'complete' && completion.level === level
+            ? this.progressEvent('completed', { result: completion.result }, level) : null;
+        level.destroy();
         this.currentLevel = null;
+        if (completedEvent) this.onProgress(completedEvent);
         
         // Call the gameOver callback if it exists
         // If this control was registered as the active game on the host, unset it
@@ -348,6 +422,7 @@ class GameControl {
 
         // If this is a nested game (game-in-game), attempt to restore the parent control
         if (this.isNested && this.parentControl) {
+            this.removeExitKeyListener();
             try {
                 // Restore parent's level classes and index if we saved them
                 if (this.parentControl._savedLevelClasses) {
@@ -383,9 +458,11 @@ class GameControl {
 
         if (this.gameOver) {
             this.gameOver();
-        } else if (!this.isNested) {
+        } else if (this.currentLevelIndex < this.levelClasses.length - 1) {
             this.currentLevelIndex++;
             this.transitionToLevel();
+        } else {
+            this.removeExitKeyListener();
         }
     }
 

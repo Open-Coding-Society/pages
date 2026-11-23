@@ -9,6 +9,34 @@ node --import ./assets/js/GameEnginev1.1/test/register-assets.mjs --test assets/
 
 ## Shared behavior
 
+Levels can optionally define `isComplete()` and `onComplete()`. After an update,
+GameControl checks `isComplete()` and, when true, stops level updates while
+`onComplete()` runs once. That hook may return a promise for an exit banner,
+animation, or save; without a hook the level exits immediately. The engine
+then uses the normal level transition, or resumes the parent for a nested game.
+The last level stops rather than trying to load a nonexistent next level.
+
+If `onComplete()` throws or rejects, the engine logs the error and calls the
+level's optional `onCompletionError(error)`. The level remains frozen until
+`gameControl.retryLevelCompletion()` retries the exit sequence. Level authors
+should block their own input while finishing and provide a retry control for
+operations that can fail. The engine does not persist objectives or manage
+application UI; `isComplete()` reads progress owned by the level. Existing
+`endLevel()` calls still use the original transition path.
+
+For reusable progress, a level can expose `getProgress()` returning an object
+with a non-empty `id` and its own fields, for example
+`{ id: 'cookie-gate', title: 'Cookie Gate', current: 2, goal: 5 }`. The level
+calls `gameEnv.gameControl.reportProgress()` when that data changes. Set
+`onProgress(event)` in the `Game.main` environment before the game starts, or
+on the control later. Events contain a shallow `game` snapshot and a `status`:
+`active`, `completing`, `failed`, or `completed`. Failed events include `error`;
+completed events include the result returned by `onComplete()` and are sent
+after level cleanup. A configured listener only receives lifecycle events for
+levels that implement `getProgress()`. Call `reportProgress()` after installing
+a late listener to publish the current state. Game-specific bridges choose how
+to transport these events; neither the events nor game IDs are storage keys.
+
 `Character` owns the optional behavior-controller contract:
 `setController({ update(character) { ... } })`, `updateController()`, and
 `applyControlActions({ up, down, left, right })`. Actions are boolean snapshots;

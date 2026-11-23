@@ -31,6 +31,16 @@ the viewer reports this and disables replay until account progress is available.
 Identity Forge pauses its GameEngine control and starts a nested cookie level.
 The mini-game saves completion before ending, so a failed save can be retried
 without losing the collected cookies; GameEngine resumes the Forge.
+The separate cookie gate declares its completion condition and asynchronous save
+sequence on its GameEngine level. Its definition supplies the game ID, title
+and goal, and its progress object includes the challenge ID and current count.
+The engine reports generic progress snapshots; the gate's iframe bridge sends
+them as `ocs-game-progress` messages. The viewer uses completion status to
+coordinate the save with replay. The engine stops level updates while saving,
+then exits the level; saved progress reaches the viewer only after the exit.
+On failure the viewer's retry button asks the gate to retry that same sequence
+without resetting the cookie count. The viewer remains responsible for hosting
+the separate challenge pages and playback controls.
 Start and stop mount or unload the active iframe. Pause and resume use a
 same-origin, parent-checked bridge to GameEngine's active control; an in-game
 dialog must close first. Replay resets only the selected challenge's unlock,

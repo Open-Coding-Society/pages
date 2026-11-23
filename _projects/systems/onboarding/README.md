@@ -9,6 +9,12 @@ Pathway challenges use the separate cookie gate. Game Workbench and UI Builder o
 full page; neither has a cookie gate. The gate is a navigation aid, not a skill
 assessment or security boundary.
 
+The separate gate declares its goal and progress in its level and saves through
+the engine's level completion sequence. It sends generic game progress events
+to the viewer; the account and browser storage keys remain Onboarding-specific.
+If saving fails, the viewer's retry button repeats the save without restarting
+the game.
+
 The viewer has start, pause/resume, stop and fullscreen controls. Stop unloads the
 game; start runs it again. A game dialog may already have paused the level, in
 which case close the dialog before using the pause control. Clear Cookies & Replay

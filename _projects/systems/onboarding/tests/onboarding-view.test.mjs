@@ -24,25 +24,25 @@ async function viewer(id, { offline = false, viewerMode = true } = {}) {
   const root = { dataset: { baseurl: '' }, querySelector: element };
   const listeners = {};
   const progress = { user: null, unlocked: [], ...(offline ? { offline: true } : {}) };
-  let fail = false;
   let releaseRead;
   let waitForRead;
+  let releaseReset;
+  let waitForReset;
   class Store {
     async read() {
       const snapshot = { ...progress, unlocked: [...progress.unlocked] };
       if (waitForRead) await waitForRead;
       return snapshot;
     }
-    async unlock(challenge) {
-      if (fail) throw new Error('offline');
-      progress.unlocked = [challenge];
-      return progress;
+    async reset() {
+      if (waitForReset) await waitForReset;
+      return { ...progress, unlocked: [] };
     }
   }
   const source = readFileSync(new URL('../js/onboarding-view.js', import.meta.url), 'utf8')
     .replace(/^import .*;\n/gm, '');
   const location = { origin: 'https://site.test', search: `?challenge=${id}${viewerMode ? '&onboarding_view=1' : ''}` };
-  const host = { addEventListener: (type, handler) => { listeners[type] = handler; }, setInterval() {} };
+  const host = { addEventListener: (type, handler) => { listeners[type] = handler; }, setInterval() {}, confirm: () => true };
   runInNewContext(source, {
     document: { querySelector: () => root }, location, window: host, URL, URLSearchParams,
     pythonURI: '', fetchOptions: {}, Backend: class {}, FlaskProfile: class {}, OnboardingStore: Store,
@@ -52,9 +52,10 @@ async function viewer(id, { offline = false, viewerMode = true } = {}) {
   await new Promise(resolve => setImmediate(resolve));
   return {
     element, listeners, frameMessages,
-    failSave: value => { fail = value; },
     delayRead: () => { waitForRead = new Promise(resolve => { releaseRead = resolve; }); },
     releaseRead: () => { waitForRead = null; releaseRead(); },
+    delayReset: () => { waitForReset = new Promise(resolve => { releaseReset = resolve; }); },
+    releaseReset: () => { waitForReset = null; releaseReset(); },
   };
 }
 
@@ -88,9 +89,10 @@ test('other challenges still switch from the separate gate to their game', async
   const env = await viewer('toolchain-trail');
   const gate = env.element('[data-gate-frame]');
   assert.match(gate.src, /\/onboarding\/gate\//);
+  assert.match(gate.src, /challenge=toolchain-trail/);
   await env.listeners.message({
     origin: 'https://site.test', source: gate.contentWindow,
-    data: { type: 'ocs-onboarding-gate-complete' },
+    data: { type: 'ocs-game-progress', game: { id: 'cookie-gate', challengeId: 'toolchain-trail' }, status: 'completed', result: { user: null, unlocked: ['toolchain-trail'] } },
   });
   assert.equal(env.element('[data-gate]').hidden, true);
   assert.match(env.element('[data-challenge-frame]').src, /\/challenge\//);
@@ -113,13 +115,47 @@ test('a stale progress refresh does not undo a completed nested level', async ()
 
 test('the separate gate can retry a failed save', async () => {
   const env = await viewer('toolchain-trail');
-  env.failSave(true);
+  const gate = env.element('[data-gate-frame]');
   await env.listeners.message({
-    origin: 'https://site.test', source: env.element('[data-gate-frame]').contentWindow,
-    data: { type: 'ocs-onboarding-gate-complete' },
+    origin: 'https://site.test', source: gate.contentWindow,
+    data: { type: 'ocs-game-progress', game: { id: 'other', challengeId: 'wayfinding-world' }, status: 'completing' },
+  });
+  assert.equal(env.frameMessages.length, 0);
+  await env.listeners.message({
+    origin: 'https://site.test', source: gate.contentWindow,
+    data: { type: 'ocs-game-progress', game: { id: 'cookie-gate', challengeId: 'toolchain-trail' }, status: 'completing' },
+  });
+  assert.match(env.element('[data-challenge-status]').textContent, /Saving/);
+  assert.equal(env.frameMessages.at(-1).action, 'allow');
+  assert.equal(env.frameMessages.at(-1).gameId, 'cookie-gate');
+  await env.listeners.message({
+    origin: 'https://site.test', source: gate.contentWindow,
+    data: { type: 'ocs-game-progress', game: { id: 'cookie-gate', challengeId: 'toolchain-trail' }, status: 'failed', error: 'offline' },
   });
   assert.equal(env.element('[data-unlock-retry]').hidden, false);
-  env.failSave(false);
   await env.element('[data-unlock-retry]').click();
+  assert.equal(env.frameMessages.at(-1).type, 'ocs-game-completion-control');
+  assert.equal(env.frameMessages.at(-1).action, 'retry');
+  assert.equal(env.frameMessages.at(-1).gameId, 'cookie-gate');
+  await env.listeners.message({
+    origin: 'https://site.test', source: gate.contentWindow,
+    data: { type: 'ocs-game-progress', game: { id: 'cookie-gate', challengeId: 'toolchain-trail' }, status: 'completed', result: { user: null, unlocked: ['toolchain-trail'] } },
+  });
   assert.match(env.element('[data-challenge-frame]').src, /\/challenge\//);
+});
+
+test('a gate save waits for an in-flight replay and is discarded when replay succeeds', async () => {
+  const env = await viewer('toolchain-trail');
+  env.delayReset();
+  const reset = env.element('[data-game-reset]').click();
+  const gate = env.element('[data-gate-frame]');
+  await env.listeners.message({
+    origin: 'https://site.test', source: gate.contentWindow,
+    data: { type: 'ocs-game-progress', game: { id: 'cookie-gate', challengeId: 'toolchain-trail' }, status: 'completing' },
+  });
+  assert.equal(env.frameMessages.length, 0);
+  env.releaseReset();
+  await reset;
+  assert.equal(env.frameMessages.length, 0);
+  assert.match(gate.src, /\/onboarding\/gate\//);
 });

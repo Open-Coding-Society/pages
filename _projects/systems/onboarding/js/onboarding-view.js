@@ -41,7 +41,9 @@ if (!challenge) {
   let isOffline = false;
   let unlocked = null;
   let activeFrame = null;
-  let pendingGate = false;
+  let gateSaving = false;
+  let pendingGateSave = false;
+  let gateGameId = null;
   let progressRevision = 0;
   let paused = false;
   const identityGate = challenge.id === 'identity-forge';
@@ -53,8 +55,11 @@ if (!challenge) {
       activeFrame = null;
     }
     paused = false;
-    pendingGate = false;
+    gateSaving = false;
+    pendingGateSave = false;
+    gateGameId = null;
     retryButton.hidden = true;
+    resetButton.disabled = isOffline;
     startButton.disabled = false;
     stopButton.disabled = true;
     pauseButton.disabled = true;
@@ -72,6 +77,7 @@ if (!challenge) {
     const url = new URL(`${baseurl}${unlocked || identityGate ? challenge.url : '/onboarding/gate/'}`, location.origin);
     url.searchParams.set('onboarding_embed', '1');
     if (identityGate && !unlocked) url.searchParams.set('onboarding_gate', '1');
+    if (!unlocked && !identityGate) url.searchParams.set('challenge', challenge.id);
     activeFrame.src = url.href;
     activeFrame.hidden = false;
     startButton.disabled = true;
@@ -110,32 +116,14 @@ if (!challenge) {
     }
   }
 
-  async function saveGate() {
-    if (busy) {
-      pendingGate = true;
-      return;
-    }
-    if (activeFrame !== gateFrame) return;
-    busy = true;
-    retryButton.hidden = true;
-    status.textContent = 'Saving your unlock...';
-    try {
-      show(await store.unlock(challenge.id));
-    } catch (error) {
-      console.error('Onboarding unlock could not save:', error);
-      status.textContent = `Unlock could not be saved: ${error.message} Try again.`;
-      if (activeFrame === gateFrame) retryButton.hidden = false;
-    } finally {
-      busy = false;
-      if (pendingGate && activeFrame === gateFrame) {
-        pendingGate = false;
-        void saveGate();
-      }
-    }
+  function allowGateSave() {
+    if (!pendingGateSave || busy || activeFrame !== gateFrame) return;
+    pendingGateSave = false;
+    gateFrame.contentWindow.postMessage({ type: 'ocs-game-completion-control', gameId: gateGameId, action: 'allow' }, location.origin);
   }
 
   async function refresh() {
-    if (busy) return;
+    if (busy || gateSaving) return;
     busy = true;
     const revision = progressRevision;
     try {
@@ -146,16 +134,17 @@ if (!challenge) {
       if (revision === progressRevision) status.textContent = `Progress could not load: ${error.message} Reload to try again.`;
     } finally {
       busy = false;
-      if (pendingGate) {
-        pendingGate = false;
-        void saveGate();
-      }
+      allowGateSave();
     }
   }
 
   startButton.addEventListener('click', start);
   stopButton.addEventListener('click', stop);
-  retryButton.addEventListener('click', saveGate);
+  retryButton.addEventListener('click', () => {
+    if (activeFrame !== gateFrame) return;
+    retryButton.hidden = true;
+    activeFrame.contentWindow.postMessage({ type: 'ocs-game-completion-control', gameId: gateGameId, action: 'retry' }, location.origin);
+  });
   pauseButton.addEventListener('click', () => {
     if (!activeFrame) return;
     pauseButton.disabled = true;
@@ -171,7 +160,7 @@ if (!challenge) {
     }
   });
   resetButton.addEventListener('click', async () => {
-    if (busy || !window.confirm("Clear this challenge's unlock and replay its cookie game? Your avatar, theme and other unlocks will not change.")) return;
+    if (busy || gateSaving || !window.confirm("Clear this challenge's unlock and replay its cookie game? Your avatar, theme and other unlocks will not change.")) return;
     busy = true;
     resetButton.disabled = true;
     try {
@@ -184,11 +173,8 @@ if (!challenge) {
       status.textContent = `Unlock could not be cleared: ${error.message} Try again.`;
     } finally {
       busy = false;
-      resetButton.disabled = isOffline;
-      if (pendingGate) {
-        pendingGate = false;
-        void saveGate();
-      }
+      resetButton.disabled = isOffline || gateSaving;
+      allowGateSave();
     }
   });
 
@@ -207,12 +193,34 @@ if (!challenge) {
       pauseButton.disabled = false;
       gameStatus.textContent = event.data.error || (paused ? 'Game paused.' : 'Game running.');
     } else if (event.data?.type === 'ocs-onboarding-gate-saved' && identityGate &&
-      activeFrame === challengeFrame && Array.isArray(event.data.progress?.unlocked) &&
+      activeFrame === challengeFrame &&
+      Array.isArray(event.data.progress?.unlocked) &&
       event.data.progress.unlocked.includes(challenge.id)) {
       progressRevision++;
       show(event.data.progress);
-    } else if (event.data?.type === 'ocs-onboarding-gate-complete' && activeFrame === gateFrame) {
-      await saveGate();
+    } else if (event.data?.type === 'ocs-game-progress' && activeFrame === gateFrame &&
+      typeof event.data.game?.id === 'string' && event.data.game.id.trim() &&
+      event.data.game.challengeId === challenge.id &&
+      (!gateGameId || gateGameId === event.data.game.id)) {
+      gateGameId = event.data.game.id;
+      if (event.data.status === 'completing') {
+        progressRevision++;
+        gateSaving = true;
+        pendingGateSave = true;
+        resetButton.disabled = true;
+        retryButton.hidden = true;
+        status.textContent = 'Saving your unlock...';
+        allowGateSave();
+      } else if (event.data.status === 'failed') {
+        gateSaving = false;
+        resetButton.disabled = isOffline;
+        status.textContent = `Unlock could not be saved: ${event.data.error} Try again.`;
+        retryButton.hidden = false;
+      } else if (event.data.status === 'completed' &&
+        Array.isArray(event.data.result?.unlocked) && event.data.result.unlocked.includes(challenge.id)) {
+        progressRevision++;
+        show(event.data.result);
+      }
     }
   });
 
