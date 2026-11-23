@@ -7,9 +7,12 @@ hide: true
 toc: false
 ---
 
-{% include projects/cs-pathway/cs-pathway-menu.html %}
 {% assign jarvis_url = site.jarvis_embed_url | strip %}
 {% assign jarvis_link = jarvis_url | default: 'https://jarvis.eu1.netbird.services/' %}
+
+{% if jarvis_url != empty %}
+<link rel="stylesheet" href="{{ '/assets/css/jarvis.css' | relative_url }}">
+{% endif %}
 
 <div class="ocs__container">
   <p>
@@ -17,7 +20,7 @@ toc: false
   </p>
   {% if jarvis_url != empty %}
   <iframe
-    class="cs-pathway-jarvis-frame"
+    class="jarvis-dashboard-frame"
     src="{{ jarvis_url | escape }}"
     title="Jarvis dashboard"
     referrerpolicy="no-referrer"
