@@ -59,3 +59,8 @@ test('excerpts and search results leave out /dm’s code blocks', () => {
   assert.equal(stripChatMarkers('[[code:python|print(%22hi%22)%0A]] try this'), 'try this');
   assert.equal(replyExcerpt('[[reply:9|Bob|hey]] [[code:java|int x = 1;]] like this?'), 'like this?');
 });
+
+test('excerpts and search results leave out /dm’s pin and unpin messages', () => {
+  assert.equal(stripChatMarkers('[[pin:401]]'), '');
+  assert.equal(replyExcerpt('[[unpin:g7]] '), '');
+});
