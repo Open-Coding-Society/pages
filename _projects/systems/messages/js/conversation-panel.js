@@ -1,7 +1,8 @@
 // The conversation panel: what a chat has collected, in tabs. Files (a group's shared files,
 // files-panel.js), Media (pictures and videos), Links (GitHub first) and Pinned. Opened from
 // the header's Shared button, a folder's Open, or a slash command. Media, Links and Pinned
-// read the messages the open conversation already loaded, so they cost no request.
+// come from the messages the conversation loaded (its whole history); Media downloads each
+// shared image for its thumbnail.
 import { createDialog } from './dialogs.js';
 import { Conversation } from './conversation-model.js';
 import { FilesMarker } from './files-model.js';
