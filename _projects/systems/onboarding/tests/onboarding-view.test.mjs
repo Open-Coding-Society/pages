@@ -6,6 +6,7 @@ import { runInNewContext } from 'node:vm';
 async function viewer(id, { offline = false, viewerMode = true } = {}) {
   const elements = new Map();
   const listeners = {};
+  const observers = [];
   const runs = [];
   let session;
   let reads = 0;
@@ -18,9 +19,10 @@ async function viewer(id, { offline = false, viewerMode = true } = {}) {
   function element(selector) {
     if (!elements.has(selector)) {
       elements.set(selector, {
-        hidden: false, disabled: false, textContent: '', dataset: {},
+        hidden: false, disabled: false, textContent: '', dataset: {}, children: [],
         clientWidth: 800, clientHeight: 450,
         classList: { add() {} }, style: { setProperty() {} },
+        querySelector: element,
         addEventListener(type, handler) { this[type] = handler; },
       });
     }
@@ -55,6 +57,10 @@ async function viewer(id, { offline = false, viewerMode = true } = {}) {
       ...(id === 'toolchain-trail' ? { gate: 'toolchain-snake' } : {}),
     }),
     ResizeObserver: class { observe() {} },
+    MutationObserver: class {
+      constructor(callback) { observers.push(callback); }
+      observe() {}
+    },
     console: { error() {} },
   });
   await new Promise(resolve => setImmediate(resolve));
@@ -67,6 +73,7 @@ async function viewer(id, { offline = false, viewerMode = true } = {}) {
     releaseReset() { releaseReset(); },
     delayUnlock() { unlockWait = new Promise(resolve => { releaseUnlock = resolve; }); },
     releaseUnlock() { releaseUnlock(); },
+    notifyMutations() { observers.forEach(callback => callback()); },
     setUnlocked(value) { progress.unlocked = value ? [id] : []; },
   };
 }
@@ -89,6 +96,44 @@ test('ungated games do not read profile progress', async () => {
   assert.match(env.controller.code, /wayfinding-world-game\.js/);
   assert.equal(env.element('[data-gate]').hidden, true);
   assert.equal(env.element('[data-game-reset]').hidden, true);
+});
+
+test('game messages and hints stay in the viewer and clear on restart', async () => {
+  const env = await viewer('identity-forge');
+  const hud = env.session.pathwayHud;
+  hud.setMessage('<b>Saved</b>');
+  hud.setHint('Press E');
+  assert.equal(env.element('[data-game-message]').textContent, '<b>Saved</b>');
+  assert.equal(env.element('[data-game-message]').hidden, false);
+  assert.equal(env.element('[data-game-hint]').textContent, 'Press E');
+  hud.clear();
+  assert.equal(env.element('[data-game-message]').hidden, true);
+  assert.equal(env.element('[data-game-hint]').hidden, true);
+  assert.equal(env.element('[data-game-details]').hidden, true);
+});
+
+test('scores replace only the running status while available', async () => {
+  const env = await viewer('identity-forge');
+  const status = env.element('.control-panel > .game-status');
+  const statusText = env.element('.status-text');
+  const scores = env.element('[data-game-scores]');
+  statusText.textContent = 'Running';
+  env.notifyMutations();
+  assert.equal(status.hidden, false);
+  assert.equal(scores.hidden, true);
+  scores.children.push({});
+  env.notifyMutations();
+  assert.equal(status.hidden, true);
+  assert.equal(scores.hidden, false);
+  statusText.textContent = 'Paused';
+  env.notifyMutations();
+  assert.equal(status.hidden, false);
+  assert.equal(scores.hidden, true);
+  statusText.textContent = 'Running';
+  scores.children.pop();
+  env.notifyMutations();
+  assert.equal(status.hidden, false);
+  assert.equal(scores.hidden, true);
 });
 
 test('gate completion updates the viewer without restarting the runner', async () => {
@@ -146,5 +191,6 @@ test('viewer markup uses the shared runner without an iframe or level selector',
   const page = readFileSync(new URL('../pages/onboarding-view.md', import.meta.url), 'utf8');
   assert.match(page, /include runners\/game\.html/);
   assert.match(page, /hide_level_select="true"/);
+  assert.match(page, /extra_controls=onboarding_reset status_content=onboarding_scores/);
   assert.doesNotMatch(page, /<iframe/i);
 });

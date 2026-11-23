@@ -18,6 +18,7 @@ import { pythonURI, javaURI, fetchOptions } from '@assets/js/api/config.js';
 import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/courseNavigation.js';
 const PROFILE_PANEL_ID = 'csse-profile-panel';
 import PathwayScoreboard from './PathwayScoreboard.js';
+import { profilePanelOptions, scoreboardOptions } from './PathwayHud.js';
 import { completeLevelTask, getNextLevel } from '../model/pathwayScores.js';
 
 // Track player progress and choices per session.
@@ -968,6 +969,12 @@ class GameLevelCsPath0Forge {
       const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
       if (!isActiveLevel) return;
 
+      const hud = this.gameEnv.game?.environment?.pathwayHud;
+      if (hud) {
+        hud.setMessage(message);
+        return;
+      }
+
       const host = document.body;
       if (!host) return;
 
@@ -998,6 +1005,12 @@ class GameLevelCsPath0Forge {
       const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
       if (!isActiveLevel) return;
 
+      const hud = this.gameEnv.game?.environment?.pathwayHud;
+      if (hud) {
+        hud.setHint(message);
+        return;
+      }
+
       const host = document.body;
       if (!host) return;
 
@@ -1015,6 +1028,7 @@ class GameLevelCsPath0Forge {
      * Clear zone alert. Remove the zone alert element from the DOM.
      */
     this.clearZoneAlert = function() {
+      this.gameEnv.game?.environment?.pathwayHud?.setHint('');
       if (this._zoneAlertEl?.parentNode) {
         this._zoneAlertEl.parentNode.removeChild(this._zoneAlertEl);
       }
@@ -1629,11 +1643,12 @@ class GameLevelCsPath0Forge {
         }
       ],
       theme: uiTheme,
+      ...profilePanelOptions(this.gameEnv),
     };
     this.profilePanelView = new StatusPanel(profilePanelConfig);
     // Render and seed the panel immediately (mirror other levels).
     this.profilePanelView.render();
-    this.scoreboard = new PathwayScoreboard({ currentLevelKey: 'identity-forge', basePath: this.gameEnv.path });
+    this.scoreboard = new PathwayScoreboard({ currentLevelKey: 'identity-forge', basePath: this.gameEnv.path, ...scoreboardOptions(this.gameEnv) });
     this.scoreboard.show();
     this.profilePanelView.update({
       name: this.profileData?.name || '—',

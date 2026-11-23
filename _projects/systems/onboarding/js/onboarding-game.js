@@ -15,6 +15,7 @@ export function createOnboardingGame(level, gate) {
     constructor(game, levels) {
       super(game, levels, { onProgress: event => activeSession.onProgress(event) });
       activeSession.control = this;
+      if (activeSession.pathwayHud) game.environment.pathwayHud = activeSession.pathwayHud;
       if (activeSession.challenge.id === 'toolchain-trail') {
         game.environment.fixedStage = { width: 1600, height: 900 };
         game.environment.innerWidth = 1600;
@@ -49,7 +50,10 @@ export function createOnboardingGame(level, gate) {
 
     destroy() {
       super.destroy();
-      if (activeSession.control === this) activeSession.control = null;
+      if (activeSession.control === this) {
+        activeSession.control = null;
+        activeSession.pathwayHud?.clear();
+      }
     }
   }
 

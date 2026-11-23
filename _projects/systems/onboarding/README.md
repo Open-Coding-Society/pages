@@ -22,8 +22,13 @@ Toolchain Trail, steer the constantly moving snake with WASD, arrow keys or
 the touch controls to collect five apples. Each apple adds a segment; hitting
 a wall or the snake's body resets its score.
 
-The viewer uses the runner's start, pause/resume, stop and fullscreen controls,
-without a level selector. Stop destroys the game; start runs it again. A game dialog may already have paused the level, in
+The viewer uses the runner's start, pause/resume, stop, reset and fullscreen controls,
+without a level selector. Game messages and nearby interaction prompts appear
+above the controls; the expandable Game profile section contains the level's
+profile and actions. Level scores replace the running status when available;
+paused, stopped and error states remain visible. The viewer replaces the game's Next Level
+link. Standalone CS Pathway pages retain their own overlays and navigation.
+Stop destroys the game; start runs it again. A game dialog may already have paused the level, in
 which case close the dialog before using the pause control. Reset & Replay
 asks for confirmation and resets only a gated challenge's unlock on the current
 account or browser; it does not clear login cookies, avatar, theme or other unlocks.

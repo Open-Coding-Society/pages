@@ -7,6 +7,7 @@ import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import { pythonURI, javaURI, fetchOptions } from '@assets/js/api/config.js';
 import PathwayScoreboard from './PathwayScoreboard.js';
+import { profilePanelOptions, scoreboardOptions } from './PathwayHud.js';
 import { completeLevelTask } from '../model/pathwayScores.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 
@@ -120,9 +121,10 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       padding: '12px 14px',
       zIndex: '10000',
       fontFamily: '"Courier New", monospace',
+      ...profilePanelOptions(this.gameEnv),
     });
     this.profilePanelView.render();
-    this.scoreboard = new PathwayScoreboard({ currentLevelKey: 'assessment-observatory', basePath: this.gameEnv.path });
+    this.scoreboard = new PathwayScoreboard({ currentLevelKey: 'assessment-observatory', basePath: this.gameEnv.path, ...scoreboardOptions(this.gameEnv) });
     this.scoreboard.show();
     this.profilePanelView.update({ grade: '—' });
 

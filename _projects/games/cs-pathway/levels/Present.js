@@ -4,6 +4,7 @@
 class Present {
   constructor(level, options = {}) {
     this.level = level;
+    this.hud = level.gameEnv?.game?.environment?.pathwayHud;
     this.options = {
       toastDuration: Number(options.toastDuration || 2200),
       ignoreToasts: new Set(options.ignoreToasts || []),
@@ -37,6 +38,11 @@ class Present {
       return null;
     }
 
+    if (this.hud) {
+      this.hud.setMessage(msg);
+      return null;
+    }
+
     if (this.nodes.toast?.parentNode) {
       this.nodes.toast.parentNode.removeChild(this.nodes.toast);
     }
@@ -64,6 +70,10 @@ class Present {
   }
 
   alerts(msg = '') {
+    if (this.hud) {
+      if (this._isActiveLevel()) this.hud.setHint(msg);
+      return null;
+    }
     return this._renderPersistent('alerts', msg);
   }
 
@@ -80,6 +90,7 @@ class Present {
   }
 
   clearAlerts() {
+    if (this.hud) this.hud.setHint('');
     this._removeNode('alerts');
   }
 
@@ -88,6 +99,7 @@ class Present {
   }
 
   destroy() {
+    if (this.hud) this.hud.setHint('');
     if (typeof window !== 'undefined') {
       window.removeEventListener('resize', this._boundViewportSync);
     }

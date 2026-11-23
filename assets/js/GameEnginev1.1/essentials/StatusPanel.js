@@ -7,6 +7,7 @@ class StatusPanel {
       actions: [], // Array of { label, onClick, danger, title }
       className: 'ocs-status-panel',
       mountTo: null,
+      layout: 'fixed',
       width: '260px',
       padding: '12px 14px',
       borderRadius: '10px',
@@ -47,11 +48,12 @@ class StatusPanel {
     panel.className = this.config.className;
 
     Object.assign(panel.style, {
-      position: 'fixed',
+      position: this.config.layout === 'inline' ? 'static' : 'fixed',
       top: this.config.position?.top || '16px',
       left: this.config.position?.left || '16px',
       zIndex: this.config.zIndex,
       width: this.collapsed ? 'auto' : this.config.width,
+      boxSizing: this.config.layout === 'inline' ? 'border-box' : '',
       padding: this.collapsed ? '6px 10px' : this.config.padding,
       borderRadius: this.config.borderRadius,
       fontFamily: this.config.fontFamily,

@@ -47,6 +47,7 @@
     <button type="button" class="ocs__btn utility run" data-hook="run" title="Start Game" aria-label="Start Game"></button>
     <button type="button" class="ocs__btn utility pause" data-hook="pause" title="Pause Game" aria-label="Pause Game"></button>
     <button type="button" class="ocs__btn utility stop" data-hook="stop" title="Stop Game" aria-label="Stop Game"></button>
+    {{ include.extra_controls }}
     <button type="button" class="ocs__btn utility fullscreen" data-hook="fullscreen" title="Toggle Fullscreen" aria-label="Toggle Fullscreen"></button>
     <select class="engineVersionSelect ocs__input" title="Select Game Engine Version"{% if include.hide_engine_select == 'true' %} hidden{% endif %}>
       <option value="GameEnginev1">Engine v1</option>
@@ -63,6 +64,7 @@
       <span class="game-status">Game Status: 
         <span class="status-text">Not Started</span> 
       </span>
+      {{ include.status_content }}
       <span class="game-status"> 
         <span id="{{ include.runner_id }}-metric"></span>
       </span>

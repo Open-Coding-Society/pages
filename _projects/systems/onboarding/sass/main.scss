@@ -6,7 +6,26 @@
     text-shadow: none;
   }
 
+  &__game-details {
+    margin: 0.75rem 0;
+  }
+
+  [data-game-scores] {
+    min-width: 0;
+    .cs-pathway-scoreboard {
+      position: static;
+      transform: none;
+      max-width: 100%;
+      flex-wrap: wrap;
+      border-radius: 0.5rem;
+    }
+  }
+
   [hidden] {
+    display: none;
+  }
+
+  .game-runner-container [data-game-reset][hidden] {
     display: none;
   }
 }

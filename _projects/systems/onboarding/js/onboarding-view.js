@@ -27,6 +27,37 @@ if (!challenge) {
   const error = root.querySelector('[data-gate-error]');
   const reset = root.querySelector('[data-game-reset]');
   const retry = root.querySelector('[data-unlock-retry]');
+  const message = root.querySelector('[data-game-message]');
+  const hint = root.querySelector('[data-game-hint]');
+  const runnerStatus = shell.querySelector('.control-panel > .game-status');
+  const runnerStatusText = runnerStatus.querySelector('.status-text');
+  const scores = root.querySelector('[data-game-scores]');
+  function updateScoreVisibility() {
+    const showScores = runnerStatusText.textContent === 'Running' && scores.children.length > 0;
+    runnerStatus.hidden = showScores;
+    scores.hidden = !showScores;
+  }
+  const scoreObserver = new MutationObserver(updateScoreVisibility);
+  scoreObserver.observe(runnerStatusText, { childList: true, characterData: true, subtree: true });
+  scoreObserver.observe(scores, { childList: true });
+  updateScoreVisibility();
+  function setLine(element, text) {
+    const value = String(text || '');
+    if (element.textContent !== value) element.textContent = value;
+    element.hidden = !value;
+  }
+  const pathwayHud = {
+    details: root.querySelector('[data-game-details]'),
+    profile: root.querySelector('[data-game-profile]'),
+    scores,
+    setMessage: text => setLine(message, text),
+    setHint: text => setLine(hint, text),
+    clear() {
+      this.details.hidden = true;
+      this.setMessage('');
+      this.setHint('');
+    },
+  };
   const gated = Boolean(challenge.gate);
   const store = gated
     ? new OnboardingStore({ profile: new FlaskProfile({ flask: new Backend(pythonURI, fetchOptions) }) })
@@ -80,8 +111,9 @@ if (!challenge) {
   async function start(next) {
     if (!controller) return;
     session = {
-      challenge, unlocked: next.unlocked.includes(challenge.id), counter, error, onProgress,
+      challenge, unlocked: next.unlocked.includes(challenge.id), counter, error, onProgress, pathwayHud,
       onStart() {
+        pathwayHud.clear();
         retry.hidden = true;
         error.textContent = '';
         if (!saving) show(progress);

@@ -17,11 +17,11 @@ import NextLevelLink from './NextLevelLink.js';
 class PathwayScoreboard {
   // mountTo: element the bar is added to (a level's game container keeps it
   // scaled with the map on a fitted full-page stage).
-  constructor({ currentLevelKey, basePath = '', mountTo = document.body }) {
+  constructor({ currentLevelKey, basePath = '', mountTo = document.body, showNextLevel = true }) {
     this.currentLevelKey = currentLevelKey;
     this.mountTo = mountTo;
     const nextLevel = getNextLevel(currentLevelKey);
-    this.nextLevelLink = nextLevel ? new NextLevelLink({ nextLevel, basePath }) : null;
+    this.nextLevelLink = showNextLevel && nextLevel ? new NextLevelLink({ nextLevel, basePath }) : null;
     this.element = null;
     this.percentElements = new Map();
     this.onScoresUpdated = () => this.refresh();

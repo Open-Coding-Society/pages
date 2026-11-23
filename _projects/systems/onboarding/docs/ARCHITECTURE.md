@@ -36,6 +36,12 @@ without a gate. The GameRunner hides
 its level and engine selectors. Toolchain runs on a 1600-by-900 stage scaled to
 fit the available space.
 
+Onboarding passes a presentation host to CS Pathway: profile actions live in an
+expandable viewer section, level scores replace the running status when present,
+and messages and proximity hints appear above the runner controls. The reset
+control is part of the runner toolbar. The redundant Next Level link is omitted
+there; standalone Pathway pages keep their existing presentation.
+
 The engine freezes each gate during its asynchronous save and advances only on
 success. Progress callbacks coordinate replay with pending saves; retry repeats
 the save without resetting gate progress. Stop destroys the active game,
