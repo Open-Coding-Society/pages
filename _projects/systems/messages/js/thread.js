@@ -61,7 +61,7 @@ export const EMPTY_STATES = Object.freeze({
 
 // groupFiles(id) is that group's GroupFiles (group-files.js): with it, shared files under a
 // message open and download, and a composer with an Attach button can share files and
-// folders. onOpenFolder(groupId, path) opens a shared folder in the page's Files dialog.
+// folders. onOpenFolder(groupId, path) opens a shared folder in the Shared panel's Files tab.
 export function createThread({
   elements, api, socket, richText, me,
   onDmRead = () => {}, onGroupRead = () => {}, onFileShared = () => {},

@@ -3,13 +3,14 @@
 // in config.js and rich-text.js, which it imports with {{ site.baseurl }}, so the modules
 // here only import each other, with ./ paths.
 import { createChatSocket } from './chat-socket.js';
+import { ConversationPanel } from './conversation-panel.js';
 import { initDeleteGroup } from './delete-group.js';
 import { FileActions } from './file-actions.js';
 import { FileViewer } from './file-viewer.js';
 import { GitHubCards } from './github-cards.js';
 import { GitHubSource } from './github-source.js';
 import { initGroupFormation } from './group-formation.js';
-import { initFiles, initFindGroup, initMembers } from './group-dialogs.js';
+import { initFindGroup, initMembers } from './group-dialogs.js';
 import { GroupFiles } from './group-files.js';
 import { HelpDialog } from './help-dialog.js';
 import { initMessageSearch } from './message-search.js';
@@ -101,7 +102,7 @@ export async function startMessagesPage({ config, richText, push }) {
 
   const socket = createChatSocket(config.javaWebSocketURI, { onClose: () => setStatus('disconnected', 'is-error') });
   // One GroupFiles per group, so a group's file list is fetched once and shared by the
-  // thread, the files under its messages and the Files dialog.
+  // thread, the files under its messages and the Shared panel's Files tab.
   const filesByGroup = new Map();
   const groupFiles = id => {
     if (!filesByGroup.has(id)) filesByGroup.set(id, new GroupFiles({ api, groupId: id }));
@@ -111,15 +112,7 @@ export async function startMessagesPage({ config, richText, push }) {
   // A GitHub link in a message, DM or group, shows as a card: GitHub's API from the browser,
   // gists through Spring, kept 10 minutes in localStorage where the browser allows it.
   const githubCards = new GitHubCards({ source: new GitHubSource({ readGist: id => api.readGist(id), storage: GitHubSource.browserStorage() }) });
-  const files = initFiles({
-    groupFilesFor: groupFiles,
-    makeFileActions: ({ filesFor, notify }) => new FileActions({ filesFor, viewer, notify }),
-    // Sharing starts from the composer, so the chat says what was shared.
-    onShare: () => byId('messagesAttachButton').click(),
-    elements: {
-      dialog: byId('filesDialog'), title: byId('filesTitle'), body: byId('filesBody'), status: byId('filesStatus'),
-    },
-  });
+  let panel = null; // the Shared panel, made once the thread exists (it reads the thread)
   const help = new HelpDialog({
     elements: { dialog: byId('helpDialog'), body: byId('helpBody') },
     isMac: /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || ''),
@@ -139,17 +132,17 @@ export async function startMessagesPage({ config, richText, push }) {
     profileUrl: new URL('profile', window.location.href).pathname,
     // The slash commands that open something on the page rather than in the composer.
     onCommand: name => {
-      if (name === 'files') byId('messagesFiles').click();
+      if (['files', 'media', 'links', 'pinned'].includes(name)) openPanel({ tab: name });
       else if (name === 'members') byId('messagesMembers').click();
       else if (name === 'search') byId('messagesSearch').focus();
       else if (name === 'help') help.open(byId('messagesForm'));
     },
     // Where the slash commands are, said where people type.
     texts: { placeholder: 'Write a message, or type / for commands' },
-    // A folder's Open button in the chat opens it in the Files dialog.
+    // A folder's Open button in the chat opens it in the Shared panel's Files tab.
     onOpenFolder: (groupId, path) => {
       const group = findItem('group', groupId);
-      if (group) files.open(group, byId('messagesFiles'), { folderPath: path });
+      if (group) panel.open({ kind: 'group', id: group.id, name: group.name }, byId('messagesSharedButton'), { tab: 'files', folderPath: path });
     },
     elements: {
       title: byId('messagesThreadTitle'), subtitle: byId('messagesThreadSubtitle'), messages: byId('messagesLog'),
@@ -169,18 +162,43 @@ export async function startMessagesPage({ config, richText, push }) {
       render();
     },
     onGroupRead: id => markGroupRead(findItem('group', id)),
-    onFileShared: id => files.refreshIfShowing(id),
+    onFileShared: id => panel.refreshIfShowing('group', id),
   });
+  panel = new ConversationPanel({
+    elements: {
+      dialog: byId('conversationPanel'), title: byId('conversationPanelTitle'), tabList: byId('conversationPanelTabs'),
+      status: byId('conversationPanelStatus'),
+      panels: {
+        files: byId('conversationPanelFiles'), media: byId('conversationPanelMedia'),
+        links: byId('conversationPanelLinks'), pinned: byId('conversationPanelPinned'),
+      },
+    },
+    thread,
+    groupFilesFor: groupFiles,
+    viewer,
+    makeFileActions: ({ filesFor, notify }) => new FileActions({ filesFor, viewer, notify }),
+    // Sharing starts from the composer, so the chat says what was shared.
+    onShare: () => byId('messagesAttachButton').click(),
+  });
+  // The Shared panel for the open conversation, on whichever tab is asked for.
+  function openPanel(options = {}, opener = byId('messagesSharedButton')) {
+    if (!state.active) return;
+    const item = findItem(state.active.kind, state.active.id);
+    if (!item) return;
+    const name = state.active.kind === 'group' ? item.name : conversationLabel(item);
+    panel.open({ kind: state.active.kind, id: state.active.id, name }, opener, options);
+  }
 
-  const groupActions = byId('messagesGroupActions');
+  const threadActions = byId('messagesThreadActions');
   const openGroup = () => (state.active?.kind === 'group' ? findItem('group', state.active.id) : null);
 
   // The shared .hidden class, not the hidden attribute: ocs__btn and ocs__links set
-  // their own display, which beats [hidden].
+  // their own display, which beats [hidden]. Shared shows for any open conversation;
+  // Members and Leave are a group's, and a class group has no Leave.
   function showGroupActions(group) {
-    groupActions.classList.toggle('hidden', !group);
-    if (!group) return;
-    byId('messagesLeaveGroup').classList.toggle('hidden', isClassGroup(group));
+    threadActions.classList.toggle('hidden', !state.active);
+    byId('messagesMembers').classList.toggle('hidden', !group);
+    byId('messagesLeaveGroup').classList.toggle('hidden', !group || isClassGroup(group));
   }
 
   // Clears the badge straight away, then tells Spring, then the navbar bell. The count is
@@ -350,10 +368,7 @@ export async function startMessagesPage({ config, richText, push }) {
     const group = openGroup();
     if (group) members.open(group, event.currentTarget);
   });
-  byId('messagesFiles').addEventListener('click', event => {
-    const group = openGroup();
-    if (group) files.open(group, event.currentTarget);
-  });
+  byId('messagesSharedButton').addEventListener('click', event => openPanel({}, event.currentTarget));
   byId('messagesLeaveGroup').addEventListener('click', async () => {
     const group = openGroup();
     if (!group || !window.confirm(`Leave ${group.name}? You can join it again from Find a group.`)) return;

@@ -251,6 +251,31 @@
   margin-top: var(--dm-space-xs);
 }
 
+// ── Pins ([[pin:…]], js/message-log.js) ──────────────────────────────────────────────
+// A pinned message gets a faint accent wash and "Pinned" in its meta line. Text on the wash
+// keeps the text colour; the accent is only the wash and the thumbtack.
+.dm .chat-msg.is-pinned {
+  background: color-mix(in srgb, var(--dm-accent) 6%, transparent);
+}
+
+.dm .chat-msg-pinned {
+  font-family: var(--dm-font);
+  font-size: $text-xs;
+  font-weight: 600;
+  color: var(--dm-ink);
+
+  .fas {
+    color: var(--dm-accent);
+  }
+}
+
+// A pin or unpin note: one line, like the day dividers, with the message's words as its link.
+.dm .chat-pin-note .chat-system-link {
+  display: inline;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
 // ── Code blocks ([[code:…]], js/code-block.js) ──────────────────────────────────────
 // The site's own pre (base/_code.scss) draws the code; this frames it with a bar on top.
 .dm .chat-code {

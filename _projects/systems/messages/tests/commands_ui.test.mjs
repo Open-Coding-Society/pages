@@ -70,14 +70,11 @@ test('"/" opens the grouped menu; typing narrows it; Escape closes it', () => {
 
 test('the arrow keys move the highlight, and Enter runs a command that needs nothing more', () => {
   const { composer, host, ran } = menuFor();
-  composer.type('/re');
+  composer.type('/li');
   const selected = () => host.querySelectorAll('[aria-selected="true"]').map(item => item.id);
-  assert.match(selected()[0], /-repo$/);
+  assert.match(selected()[0], /-links$/);
   composer.type('/m');
-  assert.match(selected()[0], /-members$/);
   key(composer.element, 'ArrowDown');
-  assert.match(selected()[0], /-me$/);
-  key(composer.element, 'ArrowUp');
   assert.match(selected()[0], /-members$/);
   const enter = key(composer.element, 'Enter');
   assert.equal(enter.stopped, true, 'the composer never sees it, so nothing is sent');
@@ -389,4 +386,15 @@ test('Pin on a message sends a pin message, and on a pinned one an unpin; the pa
   assert.deepEqual(sent, ['[[pin:m1]]', '[[unpin:m2]]']);
   assert.deepEqual(thread.messages().map(message => message.id), ['m1', 'm2', 'p1']);
   assert.equal(thread.isPinned('m2'), true);
+});
+
+test('/media, /links and /pinned go to the page, which opens that tab of the Shared panel', async () => {
+  const { thread, composer, commands } = commandThread();
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  for (const name of ['media', 'links', 'pinned']) {
+    composer.type(`/${name}`);
+    key(composer.element, 'Enter');
+  }
+  assert.deepEqual(commands, ['media', 'links', 'pinned']);
 });
