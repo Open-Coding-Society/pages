@@ -28,4 +28,51 @@
     font-weight: 700;
   }
   &__links summary { cursor: pointer; }
+  &__choices { margin-bottom: 1rem; }
+  &__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 0.75rem;
+  }
+  &__toolbar {
+    align-items: center;
+    justify-content: space-between;
+  }
+  &__toolbar-end { margin-left: auto; }
+  &__card--project {
+    display: flex;
+    flex-direction: column;
+  }
+  &__card-body { flex: 1; }
+  &__card-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+  &__card-names {
+    margin: 0;
+    color: var(--text-muted);
+  }
+  &__card-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    &[hidden] { display: none; }
+  }
+  // No opacity on the card: its text must keep 4.5:1 in every theme.
+  &__card.ocs__grid-cell.capstone-browser__card--skipped {
+    background: var(--ui-bg);
+    color: var(--text-muted);
+    &:hover {
+      background: var(--ui-bg);
+      border-color: var(--ui-border);
+      box-shadow: none;
+      transform: none;
+    }
+    h3, h3 a, p, summary { color: var(--text-muted); }
+    img { filter: grayscale(1) brightness(0.55); }
+  }
 }

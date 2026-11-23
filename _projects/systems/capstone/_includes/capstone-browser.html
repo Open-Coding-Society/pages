@@ -27,11 +27,43 @@
     placeholder="Search projects, descriptions, or team members" autocomplete="off">
   <p class="capstone-browser__status" role="status" aria-live="polite" data-capstone-status></p>
 
+  {% if site.spring != false %}
+  {% assign mentoring = site.data.projects.capstone.capstone_mentoring %}
+  <section class="capstone-browser__choices" aria-label="{{ mentoring.text.panel_label | escape }}" data-capstone-choices hidden>
+    <p class="capstone-browser__summary" data-capstone-summary></p>
+    <div class="ocs__links capstone-browser__toolbar">
+      <div class="ocs__links" role="group" aria-label="{{ mentoring.text.filter_label | escape }}">
+        {% for filter in mentoring.filters %}
+        <button class="ocs__btn small{% if forloop.first %} fill alert-green{% endif %}" type="button" data-capstone-filter="{{ filter.id }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">{{ filter.label | escape }}</button>
+        {% endfor %}
+      </div>
+      <button class="ocs__btn small capstone-browser__toolbar-end" type="button" data-capstone-reset>{{ mentoring.text.reset | escape }}</button>
+    </div>
+    <p class="ocs__callout" role="alert" data-capstone-error hidden></p>
+  </section>
+
+  <div class="ocs__modal hidden" role="dialog" aria-modal="true" aria-labelledby="capstone-reset-title" data-capstone-reset-modal>
+    <div class="ocs__modal-card">
+      <div class="ocs__modal-header">
+        <h3 class="ocs__modal-title" id="capstone-reset-title">{{ mentoring.text.reset_title | escape }}</h3>
+        <button class="ocs__btn ocs__btn--icon small ocs__modal-close" type="button" aria-label="{{ mentoring.text.reset_close | escape }}" data-capstone-reset-cancel>&times;</button>
+      </div>
+      <p data-capstone-reset-message></p>
+      <div class="ocs__modal-actions">
+        <button class="ocs__btn medium" type="button" data-capstone-reset-cancel>{{ mentoring.text.reset_keep | escape }}</button>
+        <button class="ocs__btn accent fill medium" type="button" data-capstone-reset-confirm>{{ mentoring.text.reset | escape }}</button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <div id="capstone-grid" class="ocs__grid ocs__grid--card cols-3">
     {% for project in site.data.capstone_catalog %}
     {% assign project_course = project.course | default: "Other" %}
-    <article class="ocs__grid-cell capstone-browser__card {{ project_course }}" data-capstone-card
+    <article class="ocs__grid-cell capstone-browser__card capstone-browser__card--project {{ project_course }}" data-capstone-card
+      data-capstone-project="{{ project.url | escape }}"
       data-course="{{ project_course | escape }}" data-year="{{ project.school_year | escape }}" data-page-url="{{ project.url | relative_url }}">
+      <div class="capstone-browser__card-body" data-capstone-card-body>
       <a class="capstone-browser__image-link" href="{{ project.url | relative_url }}">
         {% if project.image %}
         {% assign image_prefix = project.image | slice: 0, 4 %}
@@ -52,9 +84,35 @@
           {% endfor %}
         </ul>
       </details>
+      </div>
+      <div class="capstone-browser__card-footer" data-capstone-card-footer>
+        <p class="capstone-browser__card-names" data-capstone-names hidden></p>
+        <div class="capstone-browser__card-controls" data-capstone-controls hidden>
+          <b class="ocs__status-pill" data-capstone-state hidden></b>
+          <div class="ocs__links" data-capstone-actions></div>
+        </div>
+      </div>
     </article>
     {% endfor %}
     {% include capstone-games.html %}
   </div>
 </section>
 <script type="module" src="{{ '/assets/js/projects/capstone/browser.js' | relative_url }}"></script>
+{% if site.spring != false %}
+<script type="application/json" data-capstone-mentoring-config>{{ site.data.projects.capstone.capstone_mentoring | jsonify }}</script>
+<script type="module">
+  import { javaURI, fetchOptions } from '{{ "/assets/js/api/config.js" | relative_url }}';
+  import { roleNames, viewFor } from '{{ "/assets/js/api/role-view.js" | relative_url }}';
+  import { createCapstoneApi } from '{{ "/assets/js/projects/capstone/mentor-api.js" | relative_url }}';
+  import { startCapstoneMentoring } from '{{ "/assets/js/projects/capstone/mentor-page.js" | relative_url }}';
+
+  const config = JSON.parse(document.querySelector('[data-capstone-mentoring-config]').textContent);
+  startCapstoneMentoring({
+    browser: document.querySelector('[data-capstone-browser]'),
+    api: createCapstoneApi({ javaURI, fetchOptions, text: config.text }),
+    config,
+    roleNames,
+    viewFor,
+  });
+</script>
+{% endif %}
