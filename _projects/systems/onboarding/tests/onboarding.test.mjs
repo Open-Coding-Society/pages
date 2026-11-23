@@ -38,7 +38,7 @@ function setup() {
 test('builders open directly while games use the viewer', () => {
   assert.equal(new Set(CHALLENGES.map(item => item.id)).size, 7);
   assert.equal(CHALLENGES.find(item => item.id === 'identity-forge').gate, 'identity-cookie');
-  assert.equal(CHALLENGES.find(item => item.id === 'toolchain-trail').gate, 'toolchain-cookie');
+  assert.equal(CHALLENGES.find(item => item.id === 'toolchain-trail').gate, 'toolchain-snake');
   assert.equal(CHALLENGES.find(item => item.id === 'wayfinding-world').gate, undefined);
   assert.equal(viewerPath('ui-builder', '/pages'), '/pages/ui-builder/');
   assert.equal(viewerPath('game-workbench', '/pages'), '/pages/gamebuilder/v2/');

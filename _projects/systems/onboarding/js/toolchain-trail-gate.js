@@ -1,54 +1,35 @@
-import Clicker from '@assets/js/GameEnginev1.1/essentials/Clicker.js';
+import { SnakeApple, SnakePlayer } from './toolchain-snake.js';
 
 export default class ToolchainTrailGate {
-  static definition = { id: 'toolchain-cookie-gate', title: 'Toolchain Cookie Gate', goal: 5 };
-
   constructor(env) {
-    const { challenge, store, counter, button, errorMessage } =
-      env.game.environment.toolchainCookieGate;
-    this.progress = { ...ToolchainTrailGate.definition, challengeId: challenge.id, current: 0 };
+    const { challenge, save, counter, errorMessage } = env.game.environment.toolchainSnakeGate;
     this.gameControl = env.gameControl;
-    this.store = store;
-    this.challenge = challenge;
+    this.save = save;
+    this.counter = counter;
     this.errorMessage = errorMessage;
-    this.savedProgress = null;
-    this.onKey = event => {
-      if (event.code !== 'Space' || event.repeat || this.isComplete() || this.gameControl.isPaused) return;
-      event.preventDefault();
-      const object = env.gameObjects.find(item => item.spriteData?.id === 'toolchain-cookie');
-      object?.handleClick();
-    };
-    counter.textContent = `Cookies: ${this.progress.current} / ${this.progress.goal}`;
-    const cookie = {
-      id: 'toolchain-cookie',
-      greeting: false,
-      src: `${env.path}/hacks/cookie-clicker/assets/baseCookie.png`,
-      SCALE_FACTOR: 3,
-      pixels: { height: 512, width: 512 },
-      INIT_POSITION: { x: env.innerWidth * 0.35, y: env.innerHeight * 0.15 },
-      orientation: { rows: 1, columns: 1 },
-      down: { row: 0, start: 0, columns: 1 },
-      up: { row: 0, start: 0, columns: 1 },
-      left: { row: 0, start: 0, columns: 1 },
-      right: { row: 0, start: 0, columns: 1 },
-      speed: 0,
-      interact: () => {
-        if (this.isComplete() || this.gameControl.isPaused) return;
-        this.progress.current++;
-        counter.textContent = `Cookies: ${this.progress.current} / ${this.progress.goal}`;
-        this.gameControl.reportProgress();
-        if (this.isComplete()) button.disabled = true;
-      },
-    };
-    this.classes = [{ class: Clicker, data: cookie }];
+    this.progress = { id: 'toolchain-snake-gate', challengeId: challenge.id, current: 0, goal: 5 };
+    this.showScore();
+    this.classes = [
+      { class: SnakePlayer, data: { id: 'toolchain-snake', gate: this } },
+      { class: SnakeApple, data: { id: 'toolchain-apple' } },
+    ];
   }
 
-  initialize() {
-    document.addEventListener('keydown', this.onKey);
+  showScore() {
+    this.counter.textContent = `Apples: ${this.progress.current} / ${this.progress.goal}`;
   }
 
-  destroy() {
-    document.removeEventListener('keydown', this.onKey);
+  recordApple() {
+    if (this.isComplete()) return;
+    this.progress.current++;
+    this.showScore();
+    this.gameControl.reportProgress();
+  }
+
+  resetScore() {
+    this.progress.current = 0;
+    this.showScore();
+    this.gameControl.reportProgress();
   }
 
   getProgress() {
@@ -59,10 +40,9 @@ export default class ToolchainTrailGate {
     return this.progress.current >= this.progress.goal;
   }
 
-  async onComplete() {
+  onComplete() {
     this.errorMessage.textContent = '';
-    this.savedProgress = await this.store.unlock(this.challenge.id);
-    return this.savedProgress;
+    return this.save();
   }
 
   onCompletionError(error) {

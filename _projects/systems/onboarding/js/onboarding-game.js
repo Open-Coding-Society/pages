@@ -36,13 +36,11 @@ export function createOnboardingGame(level, gate) {
           save: () => activeSession.save(),
         };
         activeSession.counter.textContent = 'Collect five moving cookies. Click them or press Space. 0 / 5';
-      } else if (activeSession.challenge.gate === 'toolchain-cookie') {
-        activeSession.cookieButton.disabled = false;
-        game.environment.toolchainCookieGate = {
+      } else if (activeSession.challenge.gate === 'toolchain-snake') {
+        game.environment.toolchainSnakeGate = {
           challenge: activeSession.challenge,
-          store: { unlock: () => activeSession.save() },
+          save: () => activeSession.save(),
           counter: activeSession.counter,
-          button: activeSession.cookieButton,
           errorMessage: activeSession.error,
         };
       }

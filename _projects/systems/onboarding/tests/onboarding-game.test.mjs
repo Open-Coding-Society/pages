@@ -5,14 +5,15 @@ import '../../../../assets/js/GameEnginev1.1/test/register-assets.mjs';
 const { configureOnboardingGame, createOnboardingGame } = await import('../js/onboarding-game.js');
 const { default: IdentityForgeGate } = await import('../js/identity-forge-gate.js');
 const { default: ToolchainTrailGate } = await import('../js/toolchain-trail-gate.js');
+const { SnakePlayer, SnakeApple } = await import('../js/toolchain-snake.js');
 const { default: GameLevel } = await import('../../../../assets/js/GameEnginev1.1/essentials/GameLevel.js');
 
 test('each game composes only its own gate and level, skipping a saved gate', () => {
   class Level {}
   class Gate {}
   const session = {
-    challenge: { id: 'toolchain-trail', gate: 'toolchain-cookie' }, unlocked: false,
-    counter: {}, cookieButton: {}, error: {}, onProgress() {}, save() {},
+    challenge: { id: 'toolchain-trail', gate: 'toolchain-snake' }, unlocked: false,
+    counter: {}, error: {}, onProgress() {}, save() {},
   };
   configureOnboardingGame(session);
   let game = createOnboardingGame(Level, Gate);
@@ -71,32 +72,79 @@ test('Identity gate collects distinct cookies, respects pause and saves before f
   assert.equal(key, null);
 });
 
-test('Toolchain gate supports Space and removes its keyboard listener', t => {
-  const oldDocument = globalThis.document;
-  let key;
-  globalThis.document = {
-    addEventListener(_type, listener) { key = listener; },
-    removeEventListener(_type, listener) { assert.equal(listener, key); key = null; },
-  };
-  t.after(() => { globalThis.document = oldDocument; });
-  let clicks = 0;
+function snakeFixture() {
+  const control = { isPaused: false, reportProgress() {} };
+  const counter = {};
   const env = {
-    path: '', innerWidth: 800, innerHeight: 450,
-    gameControl: { isPaused: false },
-    gameObjects: [{ spriteData: { id: 'toolchain-cookie' }, handleClick() { clicks++; } }],
-    game: { environment: { toolchainCookieGate: {
-      challenge: { id: 'toolchain-trail' }, store: {}, counter: {}, button: {}, errorMessage: {},
+    gameControl: control, gameObjects: [],
+    game: { environment: { toolchainSnakeGate: {
+      challenge: { id: 'toolchain-trail' }, save: async () => 'saved', counter, errorMessage: {},
     } } },
   };
   const gate = new ToolchainTrailGate(env);
-  gate.initialize();
-  key({ code: 'Space', preventDefault() {} });
-  assert.equal(clicks, 1);
-  env.gameControl.isPaused = true;
-  key({ code: 'Space', preventDefault() {} });
-  assert.equal(clicks, 1);
-  gate.destroy();
-  assert.equal(key, null);
+  const player = Object.create(SnakePlayer.prototype);
+  Object.assign(player, {
+    gameEnv: env, gate, segments: [{ x: 4, y: 6 }],
+    direction: { x: 1, y: 0 }, nextDirection: { x: 1, y: 0 },
+  });
+  const apple = Object.create(SnakeApple.prototype);
+  apple.cell = { x: 5, y: 6 };
+  env.gameObjects = [player, apple];
+  return { player, apple, gate, control, counter };
+}
+
+test('snake steers without reversing and ignores input while paused', () => {
+  const { player, control } = snakeFixture();
+  const key = keyCode => player.handleKeyDown({ keyCode, preventDefault() {} });
+  key(65);
+  assert.deepEqual(player.nextDirection, { x: 1, y: 0 });
+  key(87);
+  assert.deepEqual(player.nextDirection, { x: 0, y: -1 });
+  control.isPaused = true;
+  key(83);
+  assert.deepEqual(player.nextDirection, { x: 0, y: -1 });
+});
+
+test('snake grows on apples and resets after hitting walls or its body', () => {
+  const { player, apple, gate, counter } = snakeFixture();
+  player.step();
+  assert.equal(player.segments.length, 2);
+  assert.equal(counter.textContent, 'Apples: 1 / 5');
+  assert.equal(player.segments.some(segment => segment.x === apple.cell.x && segment.y === apple.cell.y), false);
+  player.segments = [{ x: 19, y: 6 }, { x: 18, y: 6 }];
+  player.step();
+  assert.equal(player.segments.length, 1);
+  assert.equal(gate.progress.current, 0);
+  player.segments = [{ x: 5, y: 5 }, { x: 5, y: 6 }, { x: 4, y: 6 }, { x: 4, y: 5 }];
+  player.direction = player.nextDirection = { x: 0, y: 1 };
+  player.step();
+  assert.deepEqual(player.segments, [{ x: 4, y: 6 }]);
+  assert.equal(counter.textContent, 'Apples: 0 / 5');
+});
+
+test('snake moves on elapsed time and does not catch up after pause', t => {
+  const { player, control } = snakeFixture();
+  let now = 0;
+  t.mock.method(performance, 'now', () => now);
+  player.draw = () => {};
+  player.resetAnimationClock();
+  now = 219;
+  player.update();
+  assert.equal(player.segments[0].x, 4);
+  now = 220;
+  player.update();
+  assert.equal(player.segments[0].x, 5);
+  control.isPaused = true;
+  now = 5000;
+  player.update();
+  assert.equal(player.segments[0].x, 5);
+  player.resetAnimationClock();
+  control.isPaused = false;
+  player.update();
+  assert.equal(player.segments[0].x, 5);
+  now = 5220;
+  player.update();
+  assert.equal(player.segments[0].x, 6);
 });
 
 test('Toolchain gate retries a failed save before advancing to its game', async t => {
@@ -114,9 +162,6 @@ test('Toolchain gate retries a failed save before advancing to its game', async 
     this.gameEnv.innerWidth = 1600;
     this.gameEnv.innerHeight = 900;
     this.gameLevel = new Level(this.gameEnv);
-    if (this.gameLevel instanceof ToolchainTrailGate) {
-      this.gameEnv.gameObjects = [{ handleClick: () => this.gameLevel.classes[0].data.interact() }];
-    }
   };
   GameLevel.prototype.destroy = function () { this.gameLevel.destroy?.(); };
   t.after(() => {
@@ -130,8 +175,8 @@ test('Toolchain gate retries a failed save before advancing to its game', async 
   let attempts = 0;
   const statuses = [];
   const session = {
-    challenge: { id: 'toolchain-trail', gate: 'toolchain-cookie' }, unlocked: false,
-    counter: {}, cookieButton: {}, error: {},
+    challenge: { id: 'toolchain-trail', gate: 'toolchain-snake' }, unlocked: false,
+    counter: {}, error: {},
     onProgress: event => statuses.push(event.status),
     async save() {
       if (++attempts === 1) throw new Error('save failed');
@@ -144,9 +189,21 @@ test('Toolchain gate retries a failed save before advancing to its game', async 
   const host = { path: '', environment: {}, gameContainer: null };
   const control = new GameControl(host, gameLevelClasses);
   control.transitionToLevel();
-  const cookie = control.currentLevel.gameEnv.gameObjects[0];
-  for (let i = 0; i < 6; i++) cookie.handleClick();
-  assert.equal(session.counter.textContent, 'Cookies: 5 / 5');
+  const gate = control.currentLevel.gameLevel;
+  const snake = Object.create(SnakePlayer.prototype);
+  const apple = Object.create(SnakeApple.prototype);
+  Object.assign(snake, {
+    gameEnv: control.currentLevel.gameEnv, gate, segments: [{ x: 4, y: 6 }],
+    direction: { x: 1, y: 0 }, nextDirection: { x: 1, y: 0 },
+  });
+  control.currentLevel.gameEnv.gameObjects = [snake, apple];
+  for (let x = 5; x <= 9; x++) {
+    apple.cell = { x, y: 6 };
+    snake.step();
+  }
+  assert.equal(snake.segments.length, 6);
+  assert.equal(session.counter.textContent, 'Apples: 5 / 5');
+  control.currentLevel.gameEnv.gameObjects = [];
   frames.shift()();
   await new Promise(resolve => setImmediate(resolve));
   assert.match(session.error.textContent, /save failed/);

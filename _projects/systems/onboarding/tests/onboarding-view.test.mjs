@@ -52,7 +52,7 @@ async function viewer(id, { offline = false, viewerMode = true } = {}) {
     challengeById: () => ({
       id, title: 'Challenge', description: 'Description', url: '/challenge/',
       ...(id === 'identity-forge' ? { gate: 'identity-cookie' } : {}),
-      ...(id === 'toolchain-trail' ? { gate: 'toolchain-cookie' } : {}),
+      ...(id === 'toolchain-trail' ? { gate: 'toolchain-snake' } : {}),
     }),
     ResizeObserver: class { observe() {} },
     console: { error() {} },

@@ -21,12 +21,11 @@ page_viewer:
   <h2 data-challenge-title>Onboarding challenge</h2>
   <p data-challenge-description></p>
   <p role="status" aria-live="polite" data-challenge-status>Loading your progress...</p>
-  <button class="ocs__btn" type="button" data-game-reset hidden>Clear Cookies &amp; Replay</button>
+  <button class="ocs__btn" type="button" data-game-reset hidden>Reset &amp; Replay</button>
   <button class="ocs__btn" type="button" data-unlock-retry hidden>Retry saving unlock</button>
   <div data-gate hidden>
     <p data-gate-count></p>
-    <p data-gate-instructions hidden>Click the cookie or press Space.</p>
-    <button class="ocs__btn" type="button" data-gate-click hidden>Click cookie</button>
+    <p data-gate-instructions hidden>Steer with WASD, arrow keys, or the touch controls. Collect five apples; hitting a wall or your tail resets the score.</p>
     <p role="alert" data-gate-error></p>
   </div>
   <div data-runner-shell hidden>

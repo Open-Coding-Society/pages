@@ -29,14 +29,16 @@ successful transfer. The gate is not an authorization boundary.
 If the account service is unreachable, play uses browser-only guest unlocks;
 the viewer reports this and disables replay until account progress is available.
 Each `<challenge>-game.js` combines that challenge's level with its optional
-gate through `onboarding-game.js`. Identity Forge and Toolchain Trail have
-separate cookie gates; the other games run without a gate. The GameRunner hides
+gate through `onboarding-game.js`. Identity Forge has a cookie gate; Toolchain
+Trail uses a Snake gate with GameEngine Player and NPC classes. Five apples
+complete it; wall or self-collision resets the score. The other games run
+without a gate. The GameRunner hides
 its level and engine selectors. Toolchain runs on a 1600-by-900 stage scaled to
 fit the available space.
 
 The engine freezes each gate during its asynchronous save and advances only on
 success. Progress callbacks coordinate replay with pending saves; retry repeats
-the save without resetting collected cookies. Stop destroys the active game,
+the save without resetting gate progress. Stop destroys the active game,
 including its loop and input handlers. Pause controls the active GameControl;
 an in-game dialog must close first. Replay resets only the selected challenge's
 unlock, not login cookies or other profile data.

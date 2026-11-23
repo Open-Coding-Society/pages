@@ -3,7 +3,7 @@
 The home page redirects to `/onboarding/`, the card grid for individual
 experiences, with a link to the unchanged `/cs-pathway`. Each gated experience
 declares its own gate in `js/onboarding-data.js`: Identity Forge uses its
-moving-cookie gate, and Toolchain Trail uses the separate five-cookie game.
+moving-cookie gate, and Toolchain Trail uses a Snake gate.
 Wayfinding World, AI Review Challenge and Assessment Observatory open directly
 until they have their own gates. Game Workbench and UI Builder also open directly
 in the same tab. Gates are navigation aids, not skill assessments or security
@@ -17,11 +17,14 @@ Identity and Toolchain gates are defined separately in
 (`ToolchainTrailGate`). They
 save through the engine's level-completion sequence before advancing to the
 game. If saving fails, the viewer's retry button repeats the save without
-restarting the gate. Click the cookies or press Space.
+restarting the gate. For Identity Forge, click cookies or press Space. In
+Toolchain Trail, steer the constantly moving snake with WASD, arrow keys or
+the touch controls to collect five apples. Each apple adds a segment; hitting
+a wall or the snake's body resets its score.
 
 The viewer uses the runner's start, pause/resume, stop and fullscreen controls,
 without a level selector. Stop destroys the game; start runs it again. A game dialog may already have paused the level, in
-which case close the dialog before using the pause control. Clear Cookies & Replay
+which case close the dialog before using the pause control. Reset & Replay
 asks for confirmation and resets only a gated challenge's unlock on the current
 account or browser; it does not clear login cookies, avatar, theme or other unlocks.
 

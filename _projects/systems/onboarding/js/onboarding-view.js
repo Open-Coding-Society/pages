@@ -23,7 +23,6 @@ if (!challenge) {
   const shell = root.querySelector('[data-runner-shell]');
   const gate = root.querySelector('[data-gate]');
   const counter = root.querySelector('[data-gate-count]');
-  const cookieButton = root.querySelector('[data-gate-click]');
   const gateInstructions = root.querySelector('[data-gate-instructions]');
   const error = root.querySelector('[data-gate-error]');
   const reset = root.querySelector('[data-game-reset]');
@@ -49,8 +48,7 @@ if (!challenge) {
       : next.user ? (unlocked ? 'Unlocked and saved to your account.' : 'Play the unlock game to begin.')
       : (unlocked ? 'Unlocked on this browser. Sign in to save it to your account.' : 'Guest play: your unlock will transfer when you sign in.');
     gate.hidden = !gated || unlocked;
-    cookieButton.hidden = challenge.gate !== 'toolchain-cookie' || unlocked;
-    gateInstructions.hidden = cookieButton.hidden;
+    gateInstructions.hidden = challenge.gate !== 'toolchain-snake' || unlocked;
     reset.hidden = !gated;
     reset.disabled = next.offline === true || busy || saving;
   }
@@ -82,7 +80,7 @@ if (!challenge) {
   async function start(next) {
     if (!controller) return;
     session = {
-      challenge, unlocked: next.unlocked.includes(challenge.id), counter, cookieButton, error, onProgress,
+      challenge, unlocked: next.unlocked.includes(challenge.id), counter, error, onProgress,
       onStart() {
         retry.hidden = true;
         error.textContent = '';
@@ -115,7 +113,6 @@ if (!challenge) {
       },
     };
     configureOnboardingGame(session);
-    cookieButton.disabled = false;
     error.textContent = '';
     retry.hidden = true;
     shell.hidden = false;
@@ -147,16 +144,6 @@ if (!challenge) {
     }
   }
 
-  cookieButton.addEventListener('click', () => {
-    const control = session?.control;
-    if (!control || control.isPaused) return;
-    const cookie = control.currentLevel?.gameEnv.gameObjects.find(object => object.spriteData?.id === 'toolchain-cookie');
-    if (!cookie) {
-      error.textContent = 'The cookie game is still loading. Try again.';
-      return;
-    }
-    cookie.handleClick();
-  });
   retry.addEventListener('click', () => {
     retry.hidden = true;
     session?.control?.retryLevelCompletion();
