@@ -11,8 +11,11 @@
 
 export const DOC_LINK_PREFIX = 'Linked doc:';
 
-const DOC_LINK_LINE = /(?:\s|<br\s*\/?>)*Linked doc:\s*(\S+)\s*$/i;
+// Only the doc line itself. trimLineBreaks removes the blank lines before it: a pattern
+// that starts with them re-reads a long run of them from every position in the run.
+const DOC_LINK_LINE = /Linked doc:\s*(\S+)\s*$/i;
 const BARE_URL = /https?:\/\/[^\s<>"']+/gi;
+const BREAK_TAG = /^<br\s*\/?>$/i;
 
 /**
  * Turn a pasted link or a site path into an absolute http(s) URL.
@@ -34,6 +37,22 @@ export function normalizeDocUrl(value, origin) {
 }
 
 /**
+ * Remove the spaces, newlines and <br> tags at the end of a text.
+ * @param {string} text
+ * @returns {string}
+ */
+function trimLineBreaks(text) {
+  let body = text.trimEnd();
+  // A <br> tag has no "<" inside it, so a text that ends with one has it after its last "<".
+  let tagStart = body.lastIndexOf('<');
+  while (tagStart !== -1 && BREAK_TAG.test(body.slice(tagStart))) {
+    body = body.slice(0, tagStart).trimEnd();
+    tagStart = body.lastIndexOf('<');
+  }
+  return body;
+}
+
+/**
  * Separate the linked doc from the rest of an event description.
  * @param {string} description - description as stored by the backend
  * @param {string} origin - window.location.origin, to recognise sprint-synced lesson URLs
@@ -43,7 +62,7 @@ export function splitLinkedDoc(description, origin) {
   const text = String(description || '');
   const match = text.match(DOC_LINK_LINE);
   if (match) {
-    return { body: text.slice(0, match.index).trimEnd(), docUrl: normalizeDocUrl(match[1], origin) };
+    return { body: trimLineBreaks(text.slice(0, match.index)), docUrl: normalizeDocUrl(match[1], origin) };
   }
   // Sprint-synced events carry the lesson URL inside the text; leave the text as is.
   const siteUrl = (text.match(BARE_URL) || []).find(url => normalizeDocUrl(url, origin).startsWith(`${origin}/`));
