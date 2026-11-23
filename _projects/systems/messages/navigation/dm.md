@@ -38,6 +38,13 @@ the open conversation each start with a bar of the same height.
 {%- capture period_options -%}
 {%- for period in (1..5) -%}<option value="{{ period }}">Period {{ period }}</option>{%- endfor -%}
 {%- endcapture -%}
+{%- comment -%}
+  Calls (_projects/systems/calls/): a Call link in the thread header and a line while a call is
+  on, through the calls system's CallEntry. Only on a site that runs Spring with _config.yml's
+  calls.enabled set to true; otherwise none of it is on the page.
+{%- endcomment -%}
+{%- assign calls_text = nil -%}
+{%- if site.spring != false and site.calls.enabled == true -%}{%- assign calls_text = site.data.projects.calls.calls.text -%}{%- endif -%}
 
 <div class="dm">
 
@@ -97,6 +104,9 @@ the open conversation each start with a bar of the same height.
         <form class="dm__search" id="messagesSearchForm" role="search" autocomplete="off" hidden>
           <input class="ocs__input" id="messagesSearch" type="search" placeholder="Search this chat" aria-label="Search this chat" disabled>
         </form>
+        {%- if calls_text %}
+        <a class="dm__action hidden" id="messagesCall"></a>
+        {%- endif %}
         <div class="dm__thread-actions hidden" id="messagesGroupActions">
           <button type="button" class="dm__action" id="messagesMembers">Members</button>
           <button type="button" class="dm__action" id="messagesFiles">Files</button>
@@ -108,6 +118,9 @@ the open conversation each start with a bar of the same height.
         <p class="dm__search-status" id="messagesSearchStatus" role="status"></p>
         <div class="dm__list dm__search-results" id="messagesSearchResults"></div>
       </div>
+      {%- if calls_text %}
+      <p class="dm__notice" id="messagesCallNotice" role="status"></p>
+      {%- endif %}
 
       <div class="dm__log" id="messagesLog" role="log" aria-live="polite" tabindex="0"></div>
 
@@ -451,6 +464,9 @@ the open conversation each start with a bar of the same height.
   import * as richText from '{{ site.baseurl }}/assets/js/chat/rich-text.js';
   import * as push from '{{ site.baseurl }}/assets/js/api/push-notifications.js';
   import { startMessagesPage } from '{{ site.baseurl }}/assets/js/projects/messages/messages-page.js';
+  {%- if calls_text %}
+  import { CallEntry } from '{{ site.baseurl }}/assets/js/projects/calls/call-entry.js';
+  {%- endif %}
 
-  startMessagesPage({ config: { javaURI, javaWebSocketURI, pythonURI, fetchOptions }, richText, push });
+  startMessagesPage({ config: { javaURI, javaWebSocketURI, pythonURI, fetchOptions }, richText, push{% if calls_text %}, calls: new CallEntry({ javaURI, fetchOptions, baseurl: {{ site.baseurl | jsonify }}, text: {{ calls_text | jsonify }} }){% endif %} });
 </script>

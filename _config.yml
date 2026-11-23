@@ -45,6 +45,12 @@ calendar_ticker:
   days_ahead: 7
   alert_limit_days: 30
 
+# Video calls (/calls/, _projects/systems/calls/): a group's, DM's or course's call, with Messages'
+# Call link. Off until the site's Spring has calls.enabled=true and a LiveKit server; a site with
+# spring: false never shows them. See _projects/systems/calls/README.md.
+calls:
+  enabled: false
+
 # Exclude from Jekyll watch - these are processed by our conversion scripts
 # This prevents double-regeneration when saving notebooks/docx files
 exclude:

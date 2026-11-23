@@ -1,0 +1,100 @@
+# Everything the call page says, and the call purposes it offers. Published to
+# _data/projects/calls/calls.yml, read as site.data.projects.calls.calls, and handed
+# to js/call-page.js as JSON, so no module writes its own visible text.
+#
+# {name}, {count} and {reason} are filled in by CallModel.format.
+
+# The purposes Spring allows (calls.purposes in application.properties). A link can ask
+# for one with &purpose=standup; anything else opens a meeting.
+purposes:
+  meeting:
+    label: Meeting
+    camera: true
+  standup:
+    label: Standup
+    camera: true
+
+# While someone waits for a teacher, the lobby looks at the room every wait_retry_seconds and
+# asks for a token again when someone has come or gone, or after wait_looks_per_try looks.
+wait_retry_seconds: 10
+wait_looks_per_try: 6
+
+# A call of up to this many shows big cells, two a row (one on a phone); a bigger call uses
+# the card grid's smaller cells.
+large_cells_up_to: 4
+
+# Labels for the roles a join token carries (Spring's calls.policy.* role lists). Roles
+# without a label, such as ROLE_STUDENT, show no pill.
+roles:
+  ROLE_TEACHER: Teacher
+  ROLE_ADMIN: Admin
+  ROLE_MENTOR: Mentor
+
+text:
+  page_title: Call
+  dm_title: Direct message
+  turned_off: Calls aren’t turned on for this site.
+  no_room: Start a call from a group or a direct message in Messages.
+  to_messages: Open Messages
+  loading: Getting the call ready…
+  signed_out: Sign in to join this call.
+  sign_in: Sign in
+  unavailable: Calls aren’t available right now. Try again in a minute.
+  try_again: Try again
+  not_a_member: Only the members of this group or conversation can join its call.
+  not_found: This call doesn’t exist.
+  removed: You were removed from this call.
+  waiting_supervisor: Waiting for a teacher to join. You’ll go in as soon as one does.
+  waiting_second_adult: Waiting for a second adult to join. You’ll go in as soon as one does.
+  refused: That didn’t work. Try again.
+  not_a_moderator: Only a teacher can do that.
+  participant_gone: They already left the call.
+  stays_paused: They stay paused until a teacher is in the call.
+
+  lobby_title: Ready to join?
+  lobby_no_devices: Your camera or microphone isn’t available. You can still join to listen.
+  join: Join
+  joining: Joining…
+
+  # The toggles keep one label; aria-pressed and the filled look say whether each is on.
+  controls: Call controls
+  mic: Mic
+  camera: Camera
+  camera_off: Camera off
+  share: Share screen
+  leave: Leave
+  people_count: "{count} in the call"
+  device_failed: Your browser didn’t let the call use your camera or microphone.
+  share_failed: Screen sharing didn’t start.
+  audio_blocked: Your browser is holding the call’s sound.
+  start_audio: Turn on sound
+
+  you: You
+  speaking: Speaking
+  muted: Muted
+  paused: Paused
+  paused_notice: You’re paused until a teacher is in the call.
+  screen_of: "{name}’s screen"
+
+  people: People
+  chat: Chat
+  manage: Manage
+  pause: Pause
+  resume: Resume
+  remove: Remove
+  remove_title: "Remove {name}?"
+  remove_text: They leave the call and can’t come back until it ends.
+  end_for_all: End call for everyone
+  end_title: End the call for everyone?
+  end_text: Everyone leaves the call, and the room closes.
+  cancel: Cancel
+
+  ended: The call was ended for everyone.
+  left: You left the call.
+  disconnected: The call disconnected.
+  rejoin: Rejoin
+
+  # Messages (/dm), through js/call-entry.js: the Call link in a group's or DM's header, and
+  # the line shown while a call is on there.
+  call: Call
+  live_call: "A call is on with {count} in it."
