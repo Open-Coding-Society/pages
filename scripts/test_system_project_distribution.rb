@@ -98,6 +98,33 @@ class SystemProjectDistributionTest < Minitest::Test
     end
   end
 
+  def test_onboarding_removes_retired_game_outputs_from_existing_checkouts
+    in_workspace do |workspace|
+      project = project_copy(workspace, "onboarding")
+      old_files = {
+        "js/identity-forge-driver.js" => "assets/js/projects/onboarding/identity-forge-driver.js",
+        "js/identity-cookie-gate-runner.js" => "assets/js/projects/onboarding/identity-cookie-gate-runner.js",
+        "js/toolchain-cookie-gate-runner.js" => "assets/js/projects/onboarding/toolchain-cookie-gate-runner.js",
+        "js/identity-cookie-gate-level.js" => "assets/js/projects/onboarding/identity-cookie-gate-level.js",
+        "js/toolchain-cookie-gate-level.js" => "assets/js/projects/onboarding/toolchain-cookie-gate-level.js",
+        "js/game-bridge.js" => "assets/js/projects/onboarding/game-bridge.js",
+        "pages/onboarding-identity-game.md" => "navigation/projects/onboarding/onboarding-identity-game.md",
+        "pages/toolchain-cookie-gate.md" => "navigation/projects/onboarding/toolchain-cookie-gate.md"
+      }
+      old_files.each_key { |source| File.write(File.join(project, source), "retired") }
+      ProjectPublisher.run("publish", project, workspace)
+      old_files.each_value { |destination| assert File.file?(File.join(workspace, destination)) }
+
+      old_files.each_key { |source| FileUtils.rm(File.join(project, source)) }
+      ProjectPublisher.run("publish", project, workspace)
+      old_files.each_value { |destination| refute File.exist?(File.join(workspace, destination)) }
+      assert File.file?(File.join(workspace, "assets/js/projects/onboarding/identity-forge-game.js"))
+      assert File.file?(File.join(workspace, "assets/js/projects/onboarding/identity-forge-gate.js"))
+      assert File.file?(File.join(workspace, "assets/js/projects/onboarding/toolchain-trail-gate.js"))
+      assert File.file?(File.join(workspace, "navigation/projects/onboarding/onboarding-view.md"))
+    end
+  end
+
   def test_grades_index_migrates_from_old_page_and_remains_in_top_navigation
     in_workspace do |workspace|
       project = project_copy(workspace, "grades")
@@ -204,6 +231,8 @@ class SystemProjectDistributionTest < Minitest::Test
       end
       onboarding = project_copy(workspace, "onboarding")
       ProjectPublisher.run("publish", onboarding, workspace)
+      FileUtils.mkdir_p(File.join(workspace, "_includes/runners"))
+      FileUtils.cp(File.join(ROOT, "_includes/runners/game.html"), File.join(workspace, "_includes/runners"))
       site = Jekyll::Site.new(Jekyll.configuration(
         "source" => workspace, "destination" => File.join(workspace, "_site"), "config" => [],
         "plugins_dir" => [], "quiet" => true, "baseurl" => "/preview", "spring" => false,

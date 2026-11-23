@@ -6,74 +6,21 @@
     text-shadow: none;
   }
 
-  &__gate,
-  &__challenge {
-    display: block;
-    width: 100%;
-    border: 1px solid var(--ui-border);
-    border-radius: 0.5rem;
-    background: var(--panel);
-  }
-
-  &__gate:fullscreen,
-  &__challenge:fullscreen {
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-  }
-
-  &__gate {
-    height: 22rem;
-  }
-
-  &__challenge {
-    height: 75vh;
-    min-height: 34rem;
-    margin-top: 1rem;
-  }
-
   [hidden] {
     display: none;
   }
 }
 
-body:has(.onboarding-gate) {
-  .site-header {
-    display: none;
-  }
-}
+.game-output.onboarding-toolchain-stage {
+  aspect-ratio: 1.7777778;
 
-.onboarding-gate {
-  text-align: center;
-
-  &__stage {
-    position: relative;
-    width: 100%;
-    height: 14rem;
-    overflow: hidden;
-  }
-}
-
-body.onboarding-identity-gated {
-  #csse-profile-panel,
-  #cs-pathway-scoreboard,
-  .cs-pathway-next-level,
-  .present {
-    display: none !important;
-  }
-}
-
-.onboarding-identity-gate-status {
-  position: fixed;
-  z-index: 1000;
-  top: 1rem;
-  left: 1rem;
-  margin: 0;
-  padding: 0.5rem;
-  color: var(--pref-text-color);
-  background: var(--panel);
-
-  [hidden] {
-    display: none;
+  .gameContainer.gameContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1600px;
+    height: 900px;
+    transform: translate(var(--onboarding-stage-x, 0), var(--onboarding-stage-y, 0)) scale(var(--onboarding-stage-scale, 1));
+    transform-origin: top left;
   }
 }

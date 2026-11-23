@@ -107,6 +107,8 @@ class GameControl {
         }
         // Track whether the animation loop is currently running to avoid duplicates
         this._loopRunning = false;
+        this._destroyed = false;
+        this._animationFrame = null;
         this._completion = null;
         this.onProgress = options.onProgress ?? game.environment?.onProgress ?? null;
         if (this.onProgress !== null && typeof this.onProgress !== 'function') {
@@ -249,6 +251,7 @@ class GameControl {
      * 3. Starting the game loop
      */ 
     transitionToLevel() {
+        if (this._destroyed) return;
         this._completion = null;
         // Clean up any lingering interaction handlers
         this.cleanupInteractionHandlers();
@@ -287,6 +290,7 @@ class GameControl {
      * The main game loop 
      */
     gameLoop() {
+        if (this._destroyed) return;
         // Mark loop as running so transitionToLevel won't start another one
         this._loopRunning = true;
         if (!this.currentLevel) {
@@ -310,7 +314,29 @@ class GameControl {
         }
 
         // Always continue loop
-        requestAnimationFrame(this.gameLoop.bind(this));
+        if (!this._destroyed) {
+            this._animationFrame = requestAnimationFrame(this.gameLoop.bind(this));
+        }
+    }
+
+    /**
+     * Stop this control without advancing or restoring a parent level.
+     */
+    destroy() {
+        if (this._destroyed) return;
+        this._destroyed = true;
+        this._completion = null;
+        if (this._animationFrame !== null && typeof cancelAnimationFrame === 'function') {
+            cancelAnimationFrame(this._animationFrame);
+        }
+        this._animationFrame = null;
+        this._loopRunning = false;
+        this.removeExitKeyListener();
+        this.cleanupInteractionHandlers();
+        this.savedInteractionHandlers.clear();
+        const level = this.currentLevel;
+        this.currentLevel = null;
+        if (level) level.destroy();
     }
 
     /**
@@ -504,6 +530,7 @@ class GameControl {
     
     // Helper method to add exit key listener
     addExitKeyListener() {
+        if (this.game?.handlesEscapeKey) return;
         document.addEventListener('keydown', this.exitKeyListener);
     }
 

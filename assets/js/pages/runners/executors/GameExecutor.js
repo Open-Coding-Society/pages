@@ -34,6 +34,7 @@ export class GameExecutor {
     this.isFullscreen = false;
     this.fullscreenOverlay = null;
     this.originalGameOutput = null;
+    this.runGeneration = 0;
   }
 
   getCanvasHeight() {
@@ -43,6 +44,8 @@ export class GameExecutor {
   }
 
   stop() {
+    this.runGeneration++;
+    if (this.isFullscreen) this.toggleFullscreen();
     if (this._transitionTimer) {
       clearTimeout(this._transitionTimer);
       this._transitionTimer = null;
@@ -77,27 +80,50 @@ export class GameExecutor {
     if (this.stopButton) this.stopButton.disabled = true;
     if (this.fullscreenButton) this.fullscreenButton.disabled = true;
     if (this.levelSelect) this.levelSelect.disabled = false;
+    this.updatePauseButton();
+  }
+
+  updatePauseButton() {
+    if (!this.pauseButton) return;
+    const paused = (this.gameCore?.activeGameControl || this.gameControl)?.isPaused === true;
+    const label = paused ? 'Resume Game' : 'Pause Game';
+    this.pauseButton.classList.toggle('pause', !paused);
+    this.pauseButton.classList.toggle('run', paused);
+    this.pauseButton.title = label;
+    this.pauseButton.setAttribute('aria-label', label);
+    this.syncFullscreenButtons();
+  }
+
+  syncFullscreenButtons() {
+    for (const [original, clone] of this.fullscreenButtons || []) {
+      clone.disabled = original.disabled;
+      clone.className = original.className;
+      clone.title = original.title;
+      clone.setAttribute('aria-label', original.getAttribute('aria-label') || original.title);
+    }
   }
 
   togglePause() {
-    if (!this.gameControl) return;
+    const control = this.gameCore?.activeGameControl || this.gameControl;
+    if (!control) return;
 
-    const currentlyPaused = this.gameControl.isPaused;
+    const currentlyPaused = control.isPaused;
     if (currentlyPaused) {
-      if (this.gameControl.pauseFeature && typeof this.gameControl.pauseFeature.hide === 'function') {
-        this.gameControl.pauseFeature.hide();
-      } else if (this.gameControl.resume) {
-        this.gameControl.resume();
+      if (control.pauseFeature && typeof control.pauseFeature.hide === 'function') {
+        control.pauseFeature.hide();
+      } else if (control.resume) {
+        control.resume();
       }
       this.updateStatus('Running');
     } else {
-      if (this.gameControl.pauseFeature && typeof this.gameControl.pauseFeature.show === 'function') {
-        this.gameControl.pauseFeature.show();
-      } else if (this.gameControl.pause) {
-        this.gameControl.pause();
+      if (control.pauseFeature && typeof control.pauseFeature.show === 'function') {
+        control.pauseFeature.show();
+      } else if (control.pause) {
+        control.pause();
       }
       this.updateStatus('Paused');
     }
+    this.updatePauseButton();
   }
 
   populateLevelSelector(gameLevelClasses, preferredIndex = null) {
@@ -191,6 +217,7 @@ export class GameExecutor {
   }
 
   async run() {
+    let generation;
     try {
       // Save both the index AND the actual class reference so we can find it
       // in the freshly-imported gameLevelClasses after restart.  This handles
@@ -219,6 +246,7 @@ export class GameExecutor {
       })();
 
       this.stop();
+      generation = this.runGeneration;
 
       let code = this.getCode();
       if (!code.trim()) {
@@ -230,8 +258,6 @@ export class GameExecutor {
       if (this.runButton) this.runButton.disabled = true;
       if (this.pauseButton) {
         this.pauseButton.disabled = false;
-        this.pauseButton.textContent = '⏸';
-        this.pauseButton.title = 'Pause Game';
       }
       if (this.stopButton) this.stopButton.disabled = false;
       if (this.fullscreenButton) this.fullscreenButton.disabled = false;
@@ -278,6 +304,7 @@ export class GameExecutor {
       });
 
       const GameModule = await import(baseUrl + '/assets/js/' + selectedVersion + '/essentials/Game.js');
+      if (generation !== this.runGeneration) return;
       const Game = GameModule.default;
 
       const blob = new Blob([code], { type: 'application/javascript' });
@@ -285,6 +312,7 @@ export class GameExecutor {
 
       try {
         const userModule = await import(blobUrl);
+        if (generation !== this.runGeneration) return;
         const GameControl = userModule.GameControl;
         const gameLevelClasses = userModule.gameLevelClasses;
 
@@ -344,30 +372,25 @@ export class GameExecutor {
         }
 
         this.updateStatus('Running');
+        this.updatePauseButton();
 
         this.gameStateMonitor = setInterval(() => {
-          if (this.gameControl && this.gameControl.isPaused) {
+          const control = this.gameCore?.activeGameControl || this.gameControl;
+          if (control?.isPaused) {
             this.updateStatus('Paused');
-          } else if (this.gameControl) {
+          } else if (control) {
             this.updateStatus('Running');
           }
+          this.updatePauseButton();
         }, 200);
       } finally {
         URL.revokeObjectURL(blobUrl);
       }
     } catch (error) {
+      if (generation !== this.runGeneration) return;
+      this.stop();
       this.updateStatus('Error: ' + error.message);
       console.error('Game error:', error);
-      if (this.runButton) this.runButton.disabled = false;
-      if (this.pauseButton) this.pauseButton.disabled = true;
-      if (this.stopButton) this.stopButton.disabled = true;
-      if (this.fullscreenButton) this.fullscreenButton.disabled = true;
-      if (this.levelSelect) this.levelSelect.disabled = false;
-
-      if (this.gameStateMonitor) {
-        clearInterval(this.gameStateMonitor);
-        this.gameStateMonitor = null;
-      }
     }
   }
 
@@ -380,8 +403,9 @@ export class GameExecutor {
       return;
     }
 
-    const resolvedWidth = this.getGameContainer?.()?.clientWidth || gameOutput?.clientWidth || gameOutput?.parentElement?.clientWidth || window.innerWidth;
-    const resolvedHeight = Math.max(1, viewportHeight);
+    const fixedStage = this.gameCore?.environment?.fixedStage;
+    const resolvedWidth = fixedStage?.width || this.getGameContainer?.()?.clientWidth || gameOutput?.clientWidth || gameOutput?.parentElement?.clientWidth || window.innerWidth;
+    const resolvedHeight = fixedStage?.height || Math.max(1, viewportHeight);
 
     if (this.gameCore?.environment) {
       this.gameCore.environment.innerWidth = resolvedWidth;
@@ -446,6 +470,12 @@ export class GameExecutor {
       const clonedPauseButton = this.pauseButton ? this.pauseButton.cloneNode(true) : null;
       const clonedStopButton = this.stopButton ? this.stopButton.cloneNode(true) : null;
       const clonedFullscreenButton = this.fullscreenButton ? this.fullscreenButton.cloneNode(true) : null;
+      this.fullscreenButtons = [
+        [this.runButton, clonedRunButton],
+        [this.pauseButton, clonedPauseButton],
+        [this.stopButton, clonedStopButton],
+        [this.fullscreenButton, clonedFullscreenButton],
+      ].filter(([original, clone]) => original && clone);
       const clonedEngineSelect = this.engineVersionSelect ? this.engineVersionSelect.cloneNode(true) : null;
       const clonedLevelSelect = this.levelSelect ? this.levelSelect.cloneNode(true) : null;
 
@@ -528,11 +558,12 @@ export class GameExecutor {
 
       // Update button text
       if (this.fullscreenButton) {
-        this.fullscreenButton.textContent = '⛶';
         this.fullscreenButton.title = 'Exit Fullscreen';
+        this.fullscreenButton.setAttribute('aria-label', 'Exit Fullscreen');
       }
 
       this.isFullscreen = true;
+      this.syncFullscreenButtons();
 
       // Resize the active level in place so fullscreen does not replay startup dialogue.
       this._resizeGameForViewport(gameOutput, viewportHeight);
@@ -540,10 +571,11 @@ export class GameExecutor {
       // Handle ESC key to exit fullscreen
       this.escapeHandler = (e) => {
         if (e.key === 'Escape' && this.isFullscreen) {
+          e.stopImmediatePropagation();
           this.toggleFullscreen();
         }
       };
-      document.addEventListener('keydown', this.escapeHandler);
+      document.addEventListener('keydown', this.escapeHandler, true);
 
     } else {
       // Exit fullscreen mode
@@ -561,6 +593,7 @@ export class GameExecutor {
         // Remove overlay
         this.fullscreenOverlay.remove();
         this.fullscreenOverlay = null;
+        this.fullscreenButtons = null;
       }
 
       // Restore original height
@@ -572,15 +605,15 @@ export class GameExecutor {
 
       // Update button text
       if (this.fullscreenButton) {
-        this.fullscreenButton.textContent = '⛶';
         this.fullscreenButton.title = 'Enter Fullscreen';
+        this.fullscreenButton.setAttribute('aria-label', 'Enter Fullscreen');
       }
 
       this.isFullscreen = false;
 
       // Remove ESC key handler
       if (this.escapeHandler) {
-        document.removeEventListener('keydown', this.escapeHandler);
+        document.removeEventListener('keydown', this.escapeHandler, true);
         this.escapeHandler = null;
       }
 

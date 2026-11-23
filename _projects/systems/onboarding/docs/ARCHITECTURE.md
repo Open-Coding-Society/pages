@@ -9,8 +9,8 @@ show_reading_time: false
 
 ## View and data source
 
-Onboarding uses an OCS card grid and the shared page viewer, with embedded
-GameEngine and CS Pathway challenges. Card definitions come from Onboarding's
+Onboarding uses an OCS card grid and the shared page viewer, with a GameRunner
+for the selected GameEngine and CS Pathway challenge, without an iframe. Card definitions come from Onboarding's
 JavaScript; guest unlocks live in browser storage and signed-in unlocks in the
 Flask game profile through Profile's backend. Game Workbench and UI Builder open
 directly without a gate, occupying the full page.
@@ -28,22 +28,17 @@ updates do not replace the game profile. Guest unlocks are removed only after
 successful transfer. The gate is not an authorization boundary.
 If the account service is unreachable, play uses browser-only guest unlocks;
 the viewer reports this and disables replay until account progress is available.
-Identity Forge pauses its GameEngine control and starts a nested cookie level.
-The mini-game saves completion before ending, so a failed save can be retried
-without losing the collected cookies; GameEngine resumes the Forge.
-Identity Forge and Toolchain Trail have separate named cookie gates. Their level
-modules only export the level class; their runner modules set up GameEngine and
-the page/viewer integration. Toolchain Trail's level declares its completion
-condition and asynchronous save sequence. Its progress snapshots include the
-challenge ID and current count; the iframe bridge sends them as
-`ocs-game-progress` messages. The viewer uses completion status to coordinate
-the save with replay. The engine stops level updates while saving, then exits
-the level; saved progress reaches the viewer only after the exit. On failure,
-the viewer's retry button repeats that sequence without resetting the count.
-Other challenges without a configured gate open directly.
-Start and stop mount or unload the active iframe. Pause and resume use a
-same-origin, parent-checked bridge to GameEngine's active control; an in-game
-dialog must close first. Replay resets only the selected challenge's unlock,
-not login cookies or other profile data.
+Each `<challenge>-game.js` combines that challenge's level with its optional
+gate through `onboarding-game.js`. Identity Forge and Toolchain Trail have
+separate cookie gates; the other games run without a gate. The GameRunner hides
+its level and engine selectors. Toolchain runs on a 1600-by-900 stage scaled to
+fit the available space.
+
+The engine freezes each gate during its asynchronous save and advances only on
+success. Progress callbacks coordinate replay with pending saves; retry repeats
+the save without resetting collected cookies. Stop destroys the active game,
+including its loop and input handlers. Pause controls the active GameControl;
+an in-game dialog must close first. Replay resets only the selected challenge's
+unlock, not login cookies or other profile data.
 
 Build and test commands are in the [Onboarding README](https://github.com/Open-Coding-Society/pages/blob/main/_projects/systems/onboarding/README.md).

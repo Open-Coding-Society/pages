@@ -36,6 +36,8 @@ class GameCore {
     this.uid = null;
     this.id = null;
     this.gname = null;
+    this.handlesEscapeKey = true;
+    this.destroyed = false;
 
     // Snapshot the starting level list so we can reliably reset after the final level
     this.initialLevelClasses = [...(environment.gameLevelClasses || [])];
@@ -49,7 +51,12 @@ class GameCore {
     // If GameControlClass provided, use it immediately
     if (GameControlClass) {
         this.gameControl = new GameControlClass(this, gameLevelClasses);
-        this.gameControl.start();
+        try {
+            this.gameControl.start();
+        } catch (error) {
+            this.destroy();
+            throw error;
+        }
         // Initialize PauseFeature for handling pause/resume
         this._initializePauseFeature();
         // Setup Escape key for pause/resume
@@ -76,6 +83,7 @@ class GameCore {
     async _initializeGameControlAsync(gameLevelClasses) {
         try {
             const mod = await import(`${this.path}/assets/js/GameEnginev1.1/essentials/GameControl.js`);
+            if (this.destroyed) return;
             const DefaultGameControl = mod.default || mod;
             this.gameControl = new DefaultGameControl(this, gameLevelClasses);
             this.gameControl.start();
@@ -102,6 +110,21 @@ class GameCore {
 
     static main(environment, GameControlClass) {
         return new GameCore(environment, GameControlClass);
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+        this.destroyed = true;
+        if (this.escapeKeyHandler) {
+            document.removeEventListener('keydown', this.escapeKeyHandler);
+            this.escapeKeyHandler = null;
+        }
+        if (this.activeGameControl && this.activeGameControl !== this.gameControl) {
+            this.activeGameControl.destroy();
+        }
+        this.gameControl?.destroy();
+        this.activeGameControl = null;
+        this.gameControl = null;
     }
 
     returnHome() {
@@ -156,6 +179,7 @@ class GameCore {
         try {
             // v1.1 stores the pause code in PauseMenu.js (not "PauseFeature").
             import(`${this.path}/assets/js/GameEnginev1.1/essentials/PauseMenu.js`).then(mod => {
+                if (this.destroyed || !this.gameControl) return;
                 const PauseMenu = mod.default;
                 // PauseMenu expects the gameControl instance directly
                 const pauseMenuInstance = new PauseMenu(this.gameControl, {});
@@ -536,6 +560,12 @@ class GameCore {
         this.escapeKeyHandler = (e) => {
             if (e.key === 'Escape') {
                 e.preventDefault();
+                if (this.environment.disablePauseMenu) {
+                    const ctrl = this.getActiveControl();
+                    if (ctrl?.isPaused) ctrl.resume();
+                    else ctrl?.pause();
+                    return;
+                }
                 
                 // If there's already a pause modal open, close it and resume
                 const existingModal = document.getElementById('pauseModal');

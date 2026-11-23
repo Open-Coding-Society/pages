@@ -9,20 +9,18 @@ until they have their own gates. Game Workbench and UI Builder also open directl
 in the same tab. Gates are navigation aids, not skill assessments or security
 boundaries.
 
-Gate files are named after the experience and role: `identity-forge-driver.js`
-starts the Forge level using the page's `data-baseurl` and conditionally attaches
-the Identity gate. `identity-cookie-gate-level.js` exports that gate's level;
-`identity-cookie-gate-runner.js` coordinates its nested-game behavior.
-`toolchain-cookie-gate-level.js` exports the Toolchain level, while
-`toolchain-cookie-gate-runner.js` starts the standalone game. The page source is
-`pages/toolchain-cookie-gate.md`; its existing `/onboarding/gate/` URL stays
-unchanged. The Toolchain level declares its goal and progress, and saves through
-the engine's level-completion sequence. It sends generic progress events to the
-viewer; account and browser storage remain Onboarding-specific. If saving fails,
-the viewer's retry button repeats the save without restarting the game.
+The viewer uses the shared GameRunner directly, without a notebook or iframe.
+Each `<challenge>-game.js` combines that card's CS Pathway level with its
+optional gate; `onboarding-game.js` supplies the shared runner integration.
+Identity and Toolchain gates are defined separately in
+`identity-forge-gate.js` (`IdentityForgeGate`) and `toolchain-trail-gate.js`
+(`ToolchainTrailGate`). They
+save through the engine's level-completion sequence before advancing to the
+game. If saving fails, the viewer's retry button repeats the save without
+restarting the gate. Click the cookies or press Space.
 
-The viewer has start, pause/resume, stop and fullscreen controls. Stop unloads the
-game; start runs it again. A game dialog may already have paused the level, in
+The viewer uses the runner's start, pause/resume, stop and fullscreen controls,
+without a level selector. Stop destroys the game; start runs it again. A game dialog may already have paused the level, in
 which case close the dialog before using the pause control. Clear Cookies & Replay
 asks for confirmation and resets only a gated challenge's unlock on the current
 account or browser; it does not clear login cookies, avatar, theme or other unlocks.

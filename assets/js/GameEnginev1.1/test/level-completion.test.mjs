@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import GameControl from '../essentials/GameControl.js';
 import GameLevel from '../essentials/GameLevel.js';
+import GameEnv from '../essentials/GameEnv.js';
+import { GameCore } from '../essentials/Game.js';
 
 function harness(t, levels, options = {}) {
   const frames = [];
@@ -163,4 +165,106 @@ test('a progress listener configured at start sees immediate completion', async 
   await new Promise(resolve => setImmediate(resolve));
   frame();
   assert.deepEqual(statuses, ['completing', 'completed']);
+});
+
+test('destroy cancels a pending completion and prevents further updates', async t => {
+  let release;
+  let updates = 0;
+  let destroyed = 0;
+  class First {
+    update() { updates++; }
+    isComplete() { return true; }
+    onComplete() { return new Promise(resolve => { release = resolve; }); }
+    destroy() { destroyed++; }
+  }
+  class Second {}
+  const { control, frame } = harness(t, [First, Second]);
+  await Promise.resolve();
+  control.destroy();
+  release();
+  await new Promise(resolve => setImmediate(resolve));
+  frame();
+  assert.equal(updates, 1);
+  assert.equal(destroyed, 1);
+  assert.equal(control.currentLevel, null);
+  assert.equal(control.currentLevelIndex, 0);
+});
+
+test('embedded Escape toggles pause without opening the skip menu', t => {
+  let listener;
+  const previousDocument = globalThis.document;
+  globalThis.document = {
+    addEventListener(_type, handler) { listener = handler; },
+    removeEventListener() {},
+  };
+  t.after(() => { globalThis.document = previousDocument; });
+  const control = {
+    isPaused: false,
+    pause() { this.isPaused = true; },
+    resume() { this.isPaused = false; },
+  };
+  const game = Object.assign(Object.create(GameCore.prototype), {
+    environment: { disablePauseMenu: true },
+    gameControl: control,
+    showPauseModal() { assert.fail('Embedded games must not open the skip menu'); },
+  });
+  game._setupEscapeKey();
+  listener({ key: 'Escape', preventDefault() {} });
+  assert.equal(control.isPaused, true);
+  listener({ key: 'Escape', preventDefault() {} });
+  assert.equal(control.isPaused, false);
+});
+
+test('level resize listener is removed with the same callback', t => {
+  const previousWindow = globalThis.window;
+  let added;
+  let removed;
+  globalThis.window = {
+    addEventListener(_type, handler) { added = handler; },
+    removeEventListener(_type, handler) { removed = handler; },
+  };
+  t.after(() => { globalThis.window = previousWindow; });
+  const level = new GameLevel({ game: {}, path: '' });
+  level.gameEnv.create = () => {};
+  level.gameEnv.destroy = () => {};
+  level.create(class { constructor() { this.classes = []; } });
+  level.destroy();
+  assert.equal(removed, added);
+});
+
+test('resizing reuses the level canvas and teardown removes it', t => {
+  const previousDocument = globalThis.document;
+  const previousWindow = globalThis.window;
+  const children = [];
+  const container = {
+    appendChild(canvas) { children.push(canvas); canvas.parentNode = this; },
+    removeChild(canvas) { children.splice(children.indexOf(canvas), 1); canvas.parentNode = null; },
+  };
+  globalThis.document = {
+    createElement() { return { style: {}, getContext() { return {}; } }; },
+    querySelector() { return null; },
+  };
+  globalThis.window = { innerWidth: 800, innerHeight: 600 };
+  t.after(() => { globalThis.document = previousDocument; globalThis.window = previousWindow; });
+  const env = new GameEnv();
+  env.gameContainer = container;
+  env.game = { environment: { innerWidth: 800, innerHeight: 600 } };
+  env.create();
+  const canvas = env.canvas;
+  env.resize();
+  env.resize();
+  assert.equal(env.canvas, canvas);
+  assert.equal(children.length, 1);
+  env.destroy();
+  assert.equal(children.length, 0);
+});
+
+test('a game that fails during startup destroys its control', () => {
+  let destroyed = 0;
+  class Control {
+    start() { throw new Error('level failed'); }
+    destroy() { destroyed++; }
+  }
+  assert.throws(() => GameCore.main({ gameLevelClasses: [] }, Control), /level failed/);
+  assert.equal(destroyed, 1);
 });
