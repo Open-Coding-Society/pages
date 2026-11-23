@@ -78,12 +78,19 @@ export class CommandMenu {
     editor.addEventListener('blur', this.#onBlur);
   }
 
-  /** Puts "/" in the composer and opens the menu on every command. */
+  /**
+   * Puts "/" in an empty composer and opens the menu on every command. A draft is never
+   * replaced: with words in the box, nothing changes.
+   * @returns {boolean} whether the menu opened
+   */
   open() {
+    const draft = plain(this.#composer).trim();
+    if (draft && draft !== '/') return false;
     this.#composer.setHTML('/');
     this.#composer.focus();
     caretToEnd(this.#editor);
     this.#update();
+    return true;
   }
 
   /** Closes the menu. */

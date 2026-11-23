@@ -701,7 +701,8 @@ export function createThread({
   return {
     open, close, resume, setHeading, showMessage, destroy,
     current: () => (current ? { kind: current.kind, id: current.id } : null),
-    // Ctrl or Cmd+/ (shortcuts.js) opens the commands as if / had been typed.
-    showCommands: () => commandMenu?.open(),
+    // Ctrl or Cmd+/ (shortcuts.js) opens the commands as if / had been typed. With a draft
+    // in the box the menu would replace it, so /help lists the commands instead.
+    showCommands: () => commandMenu?.open() || onCommand('help'),
   };
 }

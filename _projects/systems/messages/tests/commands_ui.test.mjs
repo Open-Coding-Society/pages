@@ -172,6 +172,20 @@ test('/newissue opens GitHub’s filled-in form; /me and /shrug send formatted t
   assert.deepEqual(commands, ['members']);
 });
 
+test('Ctrl+/ on an empty box opens the menu; on a draft it keeps the draft and shows /help', async () => {
+  const { thread, composer, commands, elements } = commandThread();
+  thread.open('group', 12, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  thread.showCommands();
+  assert.equal(composer.getHTML(), '/');
+  assert.ok(elements.commandHost.querySelectorAll('.ocs__menu-heading').length > 0, 'the menu lists the commands');
+  key(composer.element, 'Escape');
+  composer.type('half a thought');
+  thread.showCommands();
+  assert.equal(composer.getHTML(), 'half a thought');
+  assert.deepEqual(commands, ['help']);
+});
+
 test('/code posts a code block with the message as its caption; /gist saves it and posts the link', async () => {
   const { thread, composer, sent, gists, elements } = commandThread();
   thread.open('group', 12, { title: 'Team Turing', subtitle: '' });

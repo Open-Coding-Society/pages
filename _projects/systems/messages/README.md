@@ -169,7 +169,8 @@ Both work in direct messages and group chats.
   the page links to that part of Profile.
 - **Keys.** Ctrl/Cmd+K finds a conversation (Enter opens the first one left), Alt+↑/↓
   open the conversation above or below, as the lists show them, and Ctrl/Cmd+/ opens the
-  command menu.
+  command menu. With a half-written message in the box it opens `/help` instead and leaves
+  the message alone.
 
 ## Embedding a conversation
 
