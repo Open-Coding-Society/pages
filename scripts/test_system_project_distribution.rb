@@ -73,6 +73,31 @@ class SystemProjectDistributionTest < Minitest::Test
     project
   end
 
+  def test_onboarding_index_replaces_old_page_without_duplicate_permalink
+    in_workspace do |workspace|
+      project = project_copy(workspace, "onboarding")
+      manifest = File.join(project, "distribution.json")
+      current = File.read(manifest)
+      index = File.join(project, "index.md")
+      previous_source = File.join(project, "pages/onboarding.md")
+      FileUtils.mv(index, previous_source)
+      File.write(manifest, JSON.generate("standard" => true, "files" => []))
+      ProjectPublisher.run("publish", project, workspace)
+      previous_page = File.join(workspace, "navigation/projects/onboarding/onboarding.md")
+      assert File.file?(previous_page)
+
+      FileUtils.mv(previous_source, index)
+      File.write(manifest, current)
+      command("make", "-f", TEMPLATE, "-C", project, "index", "WORKSPACE_ROOT=#{workspace}")
+      page = File.join(workspace, "navigation/projects/onboarding/index.md")
+      refute File.exist?(previous_page)
+      assert_equal File.binread(index), File.binread(page)
+      assert File.file?(File.join(workspace, "navigation/projects/onboarding/onboarding-view.md"))
+      refute File.exist?(File.join(workspace, "_posts/projects/2026-04-15-onboarding.md"))
+      assert_match(/^permalink: \/onboarding\/$/, File.read(page))
+    end
+  end
+
   def test_grades_index_migrates_from_old_page_and_remains_in_top_navigation
     in_workspace do |workspace|
       project = project_copy(workspace, "grades")

@@ -18,7 +18,7 @@ function render(unlocked) {
     link.href = viewerPath(challenge.id, baseurl);
     link.setAttribute('aria-label', `Open ${challenge.title}`);
     const image = document.createElement('img');
-    image.className = 'ocs__image-frame onboarding__card-image';
+    image.className = 'ocs__image-frame ocs__image-frame--thumbnail';
     image.src = `${baseurl}${challenge.image}`;
     image.alt = '';
     image.loading = 'lazy';
@@ -29,6 +29,7 @@ function render(unlocked) {
     title.textContent = challenge.title;
     heading.append(title);
     const description = document.createElement('p');
+    description.className = 'ocs__card-description';
     description.textContent = challenge.description;
     const progress = document.createElement('p');
     progress.className = 'ocs__status';
@@ -44,9 +45,7 @@ async function start() {
     const store = new OnboardingStore({ profile });
     const progress = await store.read();
     render(progress.unlocked);
-    status.textContent = progress.user
-      ? 'Unlocks are saved to your account.'
-      : 'Guest unlocks are saved on this browser and transferred when you sign in.';
+    status.textContent = '';
   } catch (error) {
     console.error('Onboarding progress could not load:', error);
     status.textContent = `Progress could not load: ${error.message} Reload to try again.`;

@@ -1,6 +1,6 @@
 # Onboarding
 
-The Onboarding system provides `/onboarding/`, a card-based prototype alongside
+The home page redirects to `/onboarding/`, a card-based adventure with a link to
 the unchanged `/cs-pathway`. A five-cookie GameEngine game unlocks each Pathway
 challenge. Game Workbench and UI Builder open directly in the same tab, using the
 full page; neither has a cookie gate. The gate is a navigation aid, not a skill
@@ -19,8 +19,9 @@ shows saved Identity Forge and Toolchain completion separately from self-ratings
 Onboarding reads and updates account game progress through Profile's backend.
 
 See [architecture](docs/ARCHITECTURE.md). Register `systems/onboarding:dev` in
-`_projects/.makeprojects`; the shared project template publishes `pages/`, `js/`,
-`sass/`, and `_includes/` under the `projects/onboarding` namespaces.
+`_projects/.makeprojects`; the shared project template publishes `index.md` as
+`navigation/projects/onboarding/index.md` and `pages/`, `js/`, `sass/`, and
+`_includes/` under the `projects/onboarding` namespaces.
 
 Build via `make generate-makefiles` and `make -C _projects/systems/onboarding build`;
 regenerate Sass imports as part of the root Makefile's project build. Run

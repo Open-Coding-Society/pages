@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
 import { CHALLENGES, viewerPath } from '../js/onboarding-data.js';
 import { OnboardingStore } from '../js/onboarding-store.js';
 
@@ -38,6 +39,21 @@ test('builders open directly while games use the viewer', () => {
   assert.equal(viewerPath('ui-builder', '/pages'), '/pages/ui-builder/');
   assert.equal(viewerPath('game-workbench', '/pages'), '/pages/gamebuilder/v2/');
   assert.equal(viewerPath('identity-forge', '/pages'), '/pages/onboarding/view/?onboarding_view=1&challenge=identity-forge');
+});
+
+test('home redirects to onboarding while retaining the special host destination', () => {
+  const source = readFileSync(new URL('../../../../index.md', import.meta.url), 'utf8');
+  const script = source.match(/<script>([\s\S]*?)<\/script>/)[1]
+    .replaceAll('{{ site.baseurl }}', '/pages')
+    .replace("{{ '/onboarding/' | relative_url | jsonify }}", '"/pages/onboarding/"');
+  for (const [hostname, expected] of [
+    ['localhost', '/pages/onboarding/'],
+    ['vanshikak210.github.io', '/pages/capstone/shoreline-volunteer/'],
+  ]) {
+    let destination;
+    runInNewContext(script, { window: { location: { hostname, replace: url => { destination = url; } } } });
+    assert.equal(destination, expected);
+  }
 });
 
 test('cards use distinct available illustrations rather than game backgrounds', () => {

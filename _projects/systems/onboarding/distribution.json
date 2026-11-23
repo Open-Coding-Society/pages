@@ -1,4 +1,6 @@
 {
   "standard": true,
-  "files": []
+  "files": [
+    { "source": "index.md", "destination": "navigation/projects/onboarding/index.md" }
+  ]
 }
