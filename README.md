@@ -20,6 +20,13 @@ Exchange of information from this repository to you personal GitHub Pages can be
 
 ---
 
+## Game runner level selector
+
+When including `runners/game.html` directly, pass `hide_level_select="true"`
+to omit the level selector, or `hide_engine_select="true"` to hide the engine
+selector. Both are shown by default. Hiding a selector does not prevent game
+code from changing levels.
+
 ## Progressive runner dependencies
 
 Code, pseudocode, UI/HTML, and editable game runners can carry saved code between

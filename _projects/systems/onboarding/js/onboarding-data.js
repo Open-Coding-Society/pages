@@ -1,6 +1,6 @@
 export const CHALLENGES = [
-  { id: 'identity-forge', title: 'Identity Forge', description: 'Create your identity, choose an avatar and make the world your own.', image: '/images/tools/accounts.png', url: '/onboarding/identity-game/' },
-  { id: 'toolchain-trail', title: 'Toolchain Trail', description: 'Explore the tools and stations that bring your development environment to life.', image: '/images/tools/os.png', url: '/cs-pathway/toolchain-trail' },
+  { id: 'identity-forge', title: 'Identity Forge', description: 'Create your identity, choose an avatar and make the world your own.', image: '/images/tools/accounts.png', gate: 'identity-cookie' },
+  { id: 'toolchain-trail', title: 'Toolchain Trail', description: 'Explore the tools and stations that bring your development environment to life.', image: '/images/tools/os.png', url: '/cs-pathway/toolchain-trail', gate: 'toolchain-snake' },
   { id: 'wayfinding-world', title: 'Wayfinding World', description: 'Find your place in the community and share your story.', image: '/images/projects/onboarding/wayfinding.svg', url: '/cs-pathway/wayfinding' },
   { id: 'mission-tools', title: 'AI Review Challenge', description: 'Answer AI-generated questions about tools, files, the SDLC and teamwork to boost your score.', image: '/images/projects/onboarding/ai-review.svg', url: '/cs-pathway/mission-tools' },
   { id: 'assessment-observatory', title: 'Assessment Observatory', description: 'Explore your learning, progress and next steps.', image: '/images/toolkit-nav-buttons/grades.png', url: '/cs-pathway/assessment-observatory' },

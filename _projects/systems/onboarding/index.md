@@ -1,6 +1,6 @@
 ---
 layout: opencs
-title: Onboarding
+title: Onboarding Adventure
 description: Explore the CS Pathway through games and hands-on challenges.
 permalink: /onboarding/
 full_width: true
@@ -12,8 +12,7 @@ hide: true
 
 <section class="onboarding" data-onboarding data-baseurl="{{ site.baseurl | escape }}">
   <header>
-    <h1>Start your journey</h1>
-    <p>Pick a world, play its unlock game, and explore a hands-on challenge. The builders open directly. Your avatar and theme travel with you through the Pathway games.</p>
+    <h1 class="onboarding__title">Onboarding Adventure</h1>
     <p><a href="{{ '/cs-pathway' | relative_url }}">Open the original CS Pathway</a></p>
   </header>
   <p role="status" data-onboarding-status>Loading your journey...</p>

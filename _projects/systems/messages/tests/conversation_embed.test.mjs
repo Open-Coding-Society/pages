@@ -514,3 +514,19 @@ test('two embeds on one page keep to their own conversations, and destroying one
   assert.match(logOf(rootB).textContent, /still here/);
   b.destroy();
 });
+
+test('an embedded chat shows GitHub cards too, and destroy() stops them', async () => {
+  fakeSpring({
+    'GET /api/dm/conversations/5/messages': { body: [{ id: 1, senderUid: 'grace', senderName: 'Grace Hopper', body: 'see https://github.com/Open-Coding-Society/pages/pull/2066', sentAt: '2026-10-20T10:00:00Z' }] },
+    'POST /api/dm/conversations/5/read': { status: 200 },
+  });
+  fakeStomp();
+  const root = newRoot();
+  const chat = await mountConversation(root, { conversationId: '5', config, richText: stubRichText() });
+  await settle();
+
+  const cards = logOf(root).querySelectorAll('.chat-cards');
+  assert.equal(cards.length, 1);
+  assert.equal(cards[0].querySelector('a').href, 'https://github.com/Open-Coding-Society/pages/pull/2066');
+  chat.destroy();
+});

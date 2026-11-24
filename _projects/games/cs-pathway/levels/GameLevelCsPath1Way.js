@@ -17,6 +17,7 @@ import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/co
 import SprintSuccessModule from './SprintSuccessModule.js';
 import PersonaTrial from './PersonaTrial.js';
 import PathwayScoreboard from './PathwayScoreboard.js';
+import { profilePanelOptions, scoreboardOptions } from './PathwayHud.js';
 import { completeLevelTask } from '../model/pathwayScores.js';
 
 /**
@@ -59,6 +60,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       padding: '12px 14px',
       zIndex: '10000',
       fontFamily: '"Courier New", monospace',
+      ...profilePanelOptions(this.gameEnv),
     });
     this.profilePanelView.render();
     this.profilePanelView.update({
@@ -67,7 +69,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       skill: '—',
       ...this._getCompletionPanelValues(),
     });
-    this.scoreboard = new PathwayScoreboard({ currentLevelKey: 'wayfinding-world', basePath: this.gameEnv.path });
+    this.scoreboard = new PathwayScoreboard({ currentLevelKey: 'wayfinding-world', basePath: this.gameEnv.path, ...scoreboardOptions(this.gameEnv) });
     this.scoreboard.show();
 
     /**

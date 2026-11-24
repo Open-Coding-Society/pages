@@ -4,6 +4,7 @@ class GameLevel {
 
   constructor(gameControl) {
     this.gameEnv = new GameEnv()
+    this.resizeHandler = this.resize.bind(this)
     this.gameEnv.game = gameControl.game
     this.gameEnv.path = gameControl.path
     this.gameEnv.gameContainer = gameControl.gameContainer
@@ -258,11 +259,11 @@ class GameLevel {
         this.gameLevel.initialize()
     }
 
-    window.addEventListener("resize", this.resize.bind(this))
+    window.addEventListener("resize", this.resizeHandler)
   }
 
   destroy() {
-    if (typeof this.gameLevel.destroy === "function") {
+    if (typeof this.gameLevel?.destroy === "function") {
       this.gameLevel.destroy()
     }
 
@@ -280,7 +281,7 @@ class GameLevel {
       this.gameEnv.destroy();
     }
     
-    window.removeEventListener("resize", this.resize.bind(this))
+    window.removeEventListener("resize", this.resizeHandler)
   }
 
   update() {

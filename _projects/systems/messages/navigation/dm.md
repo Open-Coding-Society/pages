@@ -99,7 +99,7 @@ the open conversation each start with a bar of the same height.
         </form>
         <div class="dm__thread-actions hidden" id="messagesGroupActions">
           <button type="button" class="dm__action" id="messagesMembers">Members</button>
-          <button type="button" class="dm__action" id="messagesFiles">Files</button>
+          <button type="button" class="dm__action" id="messagesSharedButton" title="Files, media, links and pins"><i class="fas fa-folder-open" aria-hidden="true"></i> Shared</button>
           <button type="button" class="dm__action" id="messagesLeaveGroup">Leave</button>
         </div>
       </header>
@@ -124,6 +124,11 @@ the open conversation each start with a bar of the same height.
       {%- endcomment -%}
       <div class="dm__tray" id="messagesAttachTray" hidden></div>
 
+      {%- comment -%}
+        The code box /code and /gist open (js/code-composer.js).
+      {%- endcomment -%}
+      <div class="dm__code-host" id="messagesCodeHost"></div>
+
       <div class="dm__attach-preview hidden" id="messagesImagePreview">
         <img id="messagesImageThumb" alt="Image attached to your next message">
         <button type="button" class="dm__action" id="messagesImageRemove">Remove</button>
@@ -138,6 +143,11 @@ the open conversation each start with a bar of the same height.
         The inputs are out of the tab order because the menu is how they are reached.
       {%- endcomment -%}
       <form class="dm__composer" id="messagesForm" autocomplete="off">
+        {%- comment -%}
+          The slash-command menu (js/command-menu.js) opens here, over the composer, when a
+          message starts with "/".
+        {%- endcomment -%}
+        <div class="dm__command-host" id="messagesCommandHost"></div>
         <button class="dm__action dm-cancel-edit" id="messagesCancelEdit" type="button" hidden>Cancel</button>
         <div class="dm__attach" id="messagesAttach">
           <input class="dm__file-input" id="messagesImage" type="file" accept="image/*" tabindex="-1" aria-hidden="true">
@@ -307,17 +317,40 @@ the open conversation each start with a bar of the same height.
     </form>
   </div>
 
-  <div class="ocs__modal hidden" id="filesDialog" role="dialog" aria-modal="true" aria-labelledby="filesTitle">
+  {%- comment -%}
+    The Shared panel (js/conversation-panel.js): a group's Files (js/files-panel.js), and
+    any conversation's Media, Links and Pinned, in the grammar's tabs. The script fills the
+    tab bar.
+  {%- endcomment -%}
+  <div class="ocs__modal hidden" id="conversationPanel" role="dialog" aria-modal="true" aria-labelledby="conversationPanelTitle">
     <div class="ocs__modal-card ocs__modal-card--wide ocs__stack">
       <div class="ocs__modal-header">
-        <h3 class="ocs__modal-title" id="filesTitle">Files</h3>
+        <h3 class="ocs__modal-title" id="conversationPanelTitle">Shared</h3>
         <button type="button" class="ocs__btn small" data-close aria-label="Close" data-focus>&times;</button>
       </div>
-      {%- comment -%}
-        js/files-panel.js draws the group's files here, as folders, from Spring's index.
-      {%- endcomment -%}
-      <div class="ocs__stack" id="filesBody"></div>
-      <p class="ocs__text" id="filesStatus" role="status"></p>
+      <div class="ocs__tabs">
+        <ul class="ocs__tabs-list" id="conversationPanelTabs"></ul>
+      </div>
+      <div class="ocs__tabs-panels">
+        <div class="ocs__tabs-panel ocs__stack" id="conversationPanelFiles"></div>
+        <div class="ocs__tabs-panel hidden" id="conversationPanelMedia"></div>
+        <div class="ocs__tabs-panel hidden" id="conversationPanelLinks"></div>
+        <div class="ocs__tabs-panel hidden" id="conversationPanelPinned"></div>
+      </div>
+      <p class="ocs__text" id="conversationPanelStatus" role="status"></p>
+    </div>
+  </div>
+
+  {%- comment -%}
+    /help (js/help-dialog.js): the keyboard shortcuts and every slash command.
+  {%- endcomment -%}
+  <div class="ocs__modal hidden" id="helpDialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="ocs__modal-card ocs__modal-card--wide ocs__stack">
+      <div class="ocs__modal-header">
+        <h3 class="ocs__modal-title" id="helpTitle">Commands and keys</h3>
+        <button type="button" class="ocs__btn small" data-close aria-label="Close" data-focus>&times;</button>
+      </div>
+      <div class="ocs__stack dm__help" id="helpBody"></div>
     </div>
   </div>
 

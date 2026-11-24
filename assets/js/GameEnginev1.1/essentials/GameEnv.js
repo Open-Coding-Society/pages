@@ -67,6 +67,10 @@ class GameEnv {
      */
     create() {
         this.setCanvas();
+        this.resize();
+    }
+
+    resize() {
         this.setTop();
         this.setBottom();
         
@@ -170,11 +174,6 @@ class GameEnv {
     }
 
 
-    resize() {
-        this.create();
-    }
-
- 
     clear() {
         if (!this.ctx) {
             return;

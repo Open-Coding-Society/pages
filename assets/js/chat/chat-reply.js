@@ -18,8 +18,8 @@ export const REPLY_EXCERPT_LENGTH = 90;
 
 const REPLY_PATTERN = /^\s*\[\[reply:([^|\]]*)\|([^|\]]*)\|([^\]]*)\]\]\s*/;
 // Chat markers, which never belong in a quoted excerpt or a search result. /dm adds
-// [[files:…]] (shared files).
-const ANY_MARKER_PATTERN = /\[\[(?:reply|event|lesson|files):[^\]]*\]\]/g;
+// [[files:…]] (shared files), [[code:…]] (a code block) and [[pin:…]]/[[unpin:…]] (pins).
+const ANY_MARKER_PATTERN = /\[\[(?:reply|event|lesson|files|code|pin|unpin):[^\]]*\]\]/g;
 const ENTITIES = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&nbsp;': ' ' };
 
 function safeDecode(value) {

@@ -1,5 +1,5 @@
-// Everything shared with a group, as folders: the Files dialog's list (group-dialogs.js
-// initFiles). It lists the folder you're in with breadcrumbs back up, filters every file by
+// Everything shared with a group, as folders: the Shared panel's Files tab
+// (conversation-panel.js). It lists the folder you're in with breadcrumbs back up, filters every file by
 // name as you type, and previews, downloads or zips. Sharing starts from the composer, so whatever goes up is
 // announced in the chat.
 import { SharedFiles } from './files-model.js';

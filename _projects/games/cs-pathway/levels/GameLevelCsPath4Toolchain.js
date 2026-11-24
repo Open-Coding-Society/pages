@@ -53,6 +53,7 @@ import StationVerificationTrial from './StationVerificationTrial.js';
 import { javaURI, fetchOptions } from '@assets/js/api/config.js';
 import TrailPath from './TrailPath.js';
 import PathwayScoreboard from './PathwayScoreboard.js';
+import { profilePanelOptions, scoreboardOptions } from './PathwayHud.js';
 import MacSetupCheck from './MacSetupCheck.js';
 import SystemSetupCheck from './SystemSetupCheck.js';
 import ChatHelper from './ChatHelper.js';
@@ -828,6 +829,12 @@ class GameLevelCsPath4Toolchain {
       const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
       if (!isActiveLevel) return;
 
+      const hud = this.gameEnv.game?.environment?.pathwayHud;
+      if (hud) {
+        hud.setMessage(message);
+        return;
+      }
+
       if (this._toastEl?.parentNode) this._toastEl.parentNode.removeChild(this._toastEl);
       if (this._toastTimer) clearTimeout(this._toastTimer);
 
@@ -846,6 +853,11 @@ class GameLevelCsPath4Toolchain {
     this.setZoneAlert = function (message) {
       const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
       if (!isActiveLevel) return;
+      const hud = this.gameEnv.game?.environment?.pathwayHud;
+      if (hud) {
+        hud.setHint(message);
+        return;
+      }
       if (!this._zoneAlertEl) {
         const zoneAlert = document.createElement('div');
         zoneAlert.style.cssText = createNotificationStyle('auto', 100010);
@@ -862,6 +874,7 @@ class GameLevelCsPath4Toolchain {
     };
 
     this.clearZoneAlert = function () {
+      this.gameEnv.game?.environment?.pathwayHud?.setHint('');
       if (this._zoneAlertEl?.parentNode) this._zoneAlertEl.parentNode.removeChild(this._zoneAlertEl);
       this._zoneAlertEl = null;
     };
@@ -925,11 +938,12 @@ class GameLevelCsPath4Toolchain {
         },
       ],
       theme: uiTheme,
+      ...profilePanelOptions(this.gameEnv),
     };
 
     this.profilePanelView = new StatusPanel(panelConfig);
     this.profilePanelView.render();
-    this.scoreboard = new PathwayScoreboard({ currentLevelKey: 'toolchain-trail', basePath: this.gameEnv.path, mountTo: hudMount });
+    this.scoreboard = new PathwayScoreboard({ currentLevelKey: 'toolchain-trail', basePath: this.gameEnv.path, mountTo: hudMount, ...scoreboardOptions(this.gameEnv) });
     this.scoreboard.show();
     // Mac setup agent trigger: only offered when macOS is the selected OS.
     this.macSetupCheck = new MacSetupCheck();
@@ -1541,7 +1555,7 @@ class GameLevelCsPath4Toolchain {
     const out = [];
     ids.forEach((id) => {
       const el = document.getElementById(id);
-      if (!el) return;
+      if (!el || !container.contains(el)) return;
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0) return;
       const l = (r.left - origin.left) / screenScale - pad, t = (r.top - origin.top) / screenScale - pad;

@@ -2,168 +2,239 @@ import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 import { Backend } from '@assets/js/login/backend.js';
 import { FlaskProfile } from '@assets/js/projects/profile/profile-backend.js';
 import { challengeById } from './onboarding-data.js';
+import { configureOnboardingGame } from './onboarding-game.js';
 import { OnboardingStore } from './onboarding-store.js';
 
 const root = document.querySelector('[data-onboarding-view]');
-const baseurl = root.dataset.baseurl;
-const challenge = challengeById(new URLSearchParams(location.search).get('challenge'));
+const params = new URLSearchParams(location.search);
+const challenge = challengeById(params.get('challenge'));
 const status = root.querySelector('[data-challenge-status]');
-const gate = root.querySelector('[data-gate]');
-const gateFrame = root.querySelector('[data-gate-frame]');
-const challengeSection = root.querySelector('[data-challenge]');
-const challengeFrame = root.querySelector('[data-challenge-frame]');
-const challengeLink = root.querySelector('[data-challenge-open]');
+root.querySelector('[data-standalone-back]').hidden = params.has('onboarding_view');
 
 if (!challenge) {
   status.textContent = 'Challenge not found. Return to onboarding to choose one.';
 } else if (challenge.direct) {
-  location.replace(`${baseurl}${challenge.url}`);
+  location.replace(`${root.dataset.baseurl}${challenge.url}`);
 } else {
+  root.dataset.challengeId = challenge.id;
   root.querySelector('[data-challenge-title]').textContent = challenge.title;
   root.querySelector('[data-challenge-description]').textContent = challenge.description;
-  root.querySelector('[data-challenge-note]').textContent = 'Play here or open the challenge in a new tab.';
-  challengeLink.href = `${baseurl}${challenge.url}`;
 
-  const controls = root.querySelector('[data-game-controls]');
-  const startButton = root.querySelector('[data-game-start]');
-  const pauseButton = root.querySelector('[data-game-pause]');
-  const stopButton = root.querySelector('[data-game-stop]');
-  const fullscreenButton = root.querySelector('[data-game-fullscreen]');
-  const resetButton = root.querySelector('[data-game-reset]');
-  const gameStatus = root.querySelector('[data-game-status]');
-  const profile = new FlaskProfile({ flask: new Backend(pythonURI, fetchOptions) });
-  const store = new OnboardingStore({ profile });
+  const shell = root.querySelector('[data-runner-shell]');
+  const gate = root.querySelector('[data-gate]');
+  const counter = root.querySelector('[data-gate-count]');
+  const gateInstructions = root.querySelector('[data-gate-instructions]');
+  const error = root.querySelector('[data-gate-error]');
+  const reset = root.querySelector('[data-game-reset]');
+  const retry = root.querySelector('[data-unlock-retry]');
+  const message = root.querySelector('[data-game-message]');
+  const hint = root.querySelector('[data-game-hint]');
+  const runnerStatus = shell.querySelector('.control-panel > .game-status');
+  const runnerStatusText = runnerStatus.querySelector('.status-text');
+  const scores = root.querySelector('[data-game-scores]');
+  function updateScoreVisibility() {
+    const showScores = runnerStatusText.textContent === 'Running' && scores.children.length > 0;
+    runnerStatus.hidden = showScores;
+    scores.hidden = !showScores;
+  }
+  const scoreObserver = new MutationObserver(updateScoreVisibility);
+  scoreObserver.observe(runnerStatusText, { childList: true, characterData: true, subtree: true });
+  scoreObserver.observe(scores, { childList: true });
+  updateScoreVisibility();
+  function setLine(element, text) {
+    const value = String(text || '');
+    if (element.textContent !== value) element.textContent = value;
+    element.hidden = !value;
+  }
+  const pathwayHud = {
+    details: root.querySelector('[data-game-details]'),
+    profile: root.querySelector('[data-game-profile]'),
+    scores,
+    setMessage: text => setLine(message, text),
+    setHint: text => setLine(hint, text),
+    clear() {
+      this.details.hidden = true;
+      this.setMessage('');
+      this.setHint('');
+    },
+  };
+  const gated = Boolean(challenge.gate);
+  const store = gated
+    ? new OnboardingStore({ profile: new FlaskProfile({ flask: new Backend(pythonURI, fetchOptions) }) })
+    : null;
+  let controller;
+  let progress;
   let busy = false;
-  let isGuest = false;
-  let unlocked = null;
-  let activeFrame = null;
-  let paused = false;
+  let saving = false;
+  let resetOperation = null;
+  let revision = 0;
+  let session;
 
-  function stop() {
-    if (activeFrame) {
-      activeFrame.removeAttribute('src');
-      activeFrame.hidden = true;
-      activeFrame = null;
-    }
-    paused = false;
-    startButton.disabled = false;
-    stopButton.disabled = true;
-    pauseButton.disabled = true;
-    fullscreenButton.disabled = true;
-    pauseButton.classList.remove('run');
-    pauseButton.classList.add('pause');
-    pauseButton.title = 'Pause Game';
-    pauseButton.setAttribute('aria-label', 'Pause Game');
-    gameStatus.textContent = 'Game stopped.';
+  function show(next) {
+    progress = next;
+    const unlocked = next.unlocked.includes(challenge.id);
+    if (session) session.unlocked = unlocked;
+    status.textContent = !gated ? 'This challenge is ready to play.'
+      : next.offline ? `Account service unavailable. ${unlocked ? 'Unlocked' : 'Playing'} offline. Unlocks transfer to the next signed-in account; guest game profile changes may not. Reconnect to replay.`
+      : next.user ? (unlocked ? 'Unlocked and saved to your account.' : 'Play the unlock game to begin.')
+      : (unlocked ? 'Unlocked on this browser. Sign in to save it to your account.' : 'Guest play: your unlock will transfer when you sign in.');
+    gate.hidden = !gated || unlocked;
+    gateInstructions.hidden = challenge.gate !== 'toolchain-snake' || unlocked;
+    reset.hidden = !gated;
+    reset.disabled = next.offline === true || busy || saving;
   }
 
-  function start() {
-    if (activeFrame || unlocked === null) return;
-    activeFrame = unlocked ? challengeFrame : gateFrame;
-    const url = new URL(`${baseurl}${unlocked ? challenge.url : '/onboarding/gate/'}`, location.origin);
-    url.searchParams.set('onboarding_embed', '1');
-    activeFrame.src = url.href;
-    activeFrame.hidden = false;
-    startButton.disabled = true;
-    stopButton.disabled = false;
-    fullscreenButton.disabled = false;
-    pauseButton.disabled = true;
-    gameStatus.textContent = 'Game starting...';
+  function onProgress(event) {
+    if (!session || event.game?.challengeId !== challenge.id) return;
+    if (event.status === 'completing') {
+      revision++;
+      saving = true;
+      reset.disabled = true;
+      retry.hidden = true;
+      status.textContent = 'Saving your unlock...';
+    } else if (event.status === 'failed') {
+      saving = false;
+      reset.disabled = progress.offline === true || busy;
+      status.textContent = `Unlock could not be saved: ${event.error} Try again.`;
+      retry.hidden = false;
+    } else if (event.status === 'completed') {
+      saving = false;
+      revision++;
+      if (!Array.isArray(event.result?.unlocked) || !event.result.unlocked.includes(challenge.id)) {
+        status.textContent = 'The saved unlock could not be confirmed. Reload to try again.';
+        return;
+      }
+      show(event.result);
+    }
   }
 
-  function show(progress) {
-    isGuest = !progress.user;
-    const nextUnlocked = progress.unlocked.includes(challenge.id);
-    status.textContent = progress.user
-      ? (nextUnlocked ? 'Unlocked and saved to your account.' : 'Play the unlock game to begin.')
-      : (nextUnlocked ? 'Unlocked on this browser. Sign in to save it to your account.' : 'Guest play: your unlock will transfer when you sign in.');
-    gate.hidden = nextUnlocked;
-    challengeSection.hidden = !nextUnlocked;
-    controls.hidden = false;
-    if (unlocked !== nextUnlocked) {
-      const shouldStart = unlocked === null || activeFrame !== null;
-      stop();
-      unlocked = nextUnlocked;
-      if (shouldStart) start();
-    }
+  async function start(next) {
+    if (!controller) return;
+    session = {
+      challenge, unlocked: next.unlocked.includes(challenge.id), counter, error, onProgress, pathwayHud,
+      onStart() {
+        pathwayHud.clear();
+        retry.hidden = true;
+        error.textContent = '';
+        if (!saving) show(progress);
+      },
+      async save() {
+        if (resetOperation) await resetOperation;
+        if (session !== this) throw new Error('This game was restarted.');
+        const savingControl = this.control;
+        try {
+          const next = await store.unlock(challenge.id);
+          if (session === this && this.control !== savingControl) {
+            saving = false;
+            revision++;
+            show(next);
+            if (this.control) {
+              controller.stop();
+              await start(next);
+            }
+          }
+          return next;
+        } catch (failure) {
+          if (session === this && this.control !== savingControl) {
+            saving = false;
+            reset.disabled = progress.offline === true || busy;
+            status.textContent = `Unlock could not be saved: ${failure.message} Start the gate again to retry.`;
+          }
+          throw failure;
+        }
+      },
+    };
+    configureOnboardingGame(session);
+    error.textContent = '';
+    retry.hidden = true;
+    shell.hidden = false;
+    controller.setCode(`import { createGame } from '@assets/js/projects/onboarding/${challenge.id}-game.js';\nconst { gameLevelClasses, GameControl } = createGame();\nexport { gameLevelClasses, GameControl };`);
+    await controller.run();
   }
 
   async function refresh() {
-    if (busy) return;
+    if (busy || saving) return;
     busy = true;
+    const currentRevision = revision;
     try {
-      show(await store.read());
-    } catch (error) {
-      console.error('Onboarding progress could not load:', error);
-      status.textContent = `Progress could not load: ${error.message} Reload to try again.`;
+      const next = await store.read();
+      if (revision !== currentRevision) return;
+      const first = !progress;
+      const changed = !first && progress.unlocked.includes(challenge.id) !== next.unlocked.includes(challenge.id);
+      show(next);
+      if (first) await start(next);
+      else if (changed && session?.control) {
+        controller.stop();
+        await start(next);
+      }
+    } catch (failure) {
+      console.error('Onboarding progress could not load:', failure);
+      status.textContent = `Progress could not load: ${failure.message} Reload to try again.`;
     } finally {
       busy = false;
+      if (progress) reset.disabled = progress.offline === true || saving;
     }
   }
 
-  startButton.addEventListener('click', start);
-  stopButton.addEventListener('click', stop);
-  pauseButton.addEventListener('click', () => {
-    if (!activeFrame) return;
-    pauseButton.disabled = true;
-    activeFrame.contentWindow.postMessage({ type: 'ocs-onboarding-game-control', action: paused ? 'resume' : 'pause' }, location.origin);
+  retry.addEventListener('click', () => {
+    retry.hidden = true;
+    session?.control?.retryLevelCompletion();
   });
-  fullscreenButton.addEventListener('click', async () => {
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else if (activeFrame) await activeFrame.requestFullscreen();
-    } catch (error) {
-      console.error('Fullscreen could not be opened:', error);
-      gameStatus.textContent = `Fullscreen could not be opened: ${error.message}`;
-    }
-  });
-  resetButton.addEventListener('click', async () => {
-    if (busy || !window.confirm("Clear this challenge's unlock and replay its cookie game? Your avatar, theme and other unlocks will not change.")) return;
+  reset.addEventListener('click', () => {
+    if (busy || saving || !window.confirm("Clear this challenge's unlock and replay its gate? Your avatar, theme and other unlocks will not change.")) return;
     busy = true;
-    resetButton.disabled = true;
-    try {
-      const progress = await store.reset(challenge.id);
-      stop();
-      unlocked = null;
-      show(progress);
-    } catch (error) {
-      console.error('Onboarding unlock could not be cleared:', error);
-      status.textContent = `Unlock could not be cleared: ${error.message} Try again.`;
-    } finally {
-      busy = false;
-      resetButton.disabled = false;
-    }
-  });
-
-  window.addEventListener('message', async event => {
-    if (event.origin !== location.origin || !activeFrame || event.source !== activeFrame.contentWindow) return;
-    if (event.data?.type === 'ocs-onboarding-game-ready') {
-      pauseButton.disabled = false;
-      gameStatus.textContent = 'Game running.';
-    } else if (event.data?.type === 'ocs-onboarding-game-state') {
-      paused = event.data.paused === true;
-      const label = paused ? 'Resume Game' : 'Pause Game';
-      pauseButton.classList.toggle('pause', !paused);
-      pauseButton.classList.toggle('run', paused);
-      pauseButton.title = label;
-      pauseButton.setAttribute('aria-label', label);
-      pauseButton.disabled = false;
-      gameStatus.textContent = event.data.error || (paused ? 'Game paused.' : 'Game running.');
-    } else if (event.data?.type === 'ocs-onboarding-gate-complete' && activeFrame === gateFrame && !busy) {
-      busy = true;
-      status.textContent = 'Saving your unlock...';
+    reset.disabled = true;
+    resetOperation = (async () => {
       try {
-        show(await store.unlock(challenge.id));
-      } catch (error) {
-        console.error('Onboarding unlock could not save:', error);
-        status.textContent = `Unlock could not be saved: ${error.message} Clear cookies and try again.`;
+        const next = await store.reset(challenge.id);
+        revision++;
+        controller.stop();
+        saving = false;
+        show(next);
+        await start(next);
+      } catch (failure) {
+        console.error('Onboarding unlock could not be cleared:', failure);
+        status.textContent = `Unlock could not be cleared: ${failure.message} Try again.`;
       } finally {
         busy = false;
+        reset.disabled = progress.offline === true || saving;
       }
-    }
+    })();
+    resetOperation.finally(() => { resetOperation = null; });
   });
 
-  refresh();
-  window.addEventListener('focus', refresh);
-  window.setInterval(() => { if (isGuest) refresh(); }, 10000);
+  function ready(found) {
+    if (controller) return;
+    controller = found;
+    if (gated) {
+      void refresh();
+      window.addEventListener('focus', refresh);
+      window.setInterval(() => { if (!progress?.user) void refresh(); }, 10000);
+    } else {
+      const next = { user: null, unlocked: [] };
+      show(next);
+      void start(next);
+    }
+  }
+
+  window.addEventListener('ocs:game-runner-ready', event => {
+    if (event.detail.runnerId === 'onboarding') ready(event.detail.controller);
+  });
+  if (window.OCSGameRunners?.onboarding) ready(window.OCSGameRunners.onboarding);
+
+  if (challenge.id === 'toolchain-trail') {
+    const output = root.querySelector('.game-output');
+    const stage = root.querySelector('.gameContainer');
+    output.classList.add('onboarding-toolchain-stage');
+    const fit = () => {
+      const scale = Math.min(output.clientWidth / 1600, output.clientHeight / 900);
+      if (scale > 0) {
+        stage.style.setProperty('--onboarding-stage-scale', scale);
+        stage.style.setProperty('--onboarding-stage-x', `${(output.clientWidth - 1600 * scale) / 2}px`);
+        stage.style.setProperty('--onboarding-stage-y', `${(output.clientHeight - 900 * scale) / 2}px`);
+      }
+    };
+    new ResizeObserver(fit).observe(output);
+    fit();
+  }
 }

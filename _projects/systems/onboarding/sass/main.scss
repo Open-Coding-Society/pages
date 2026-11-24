@@ -1,53 +1,45 @@
 .onboarding {
-  &__card-image {
-    width: 100%;
-    height: 10rem;
-  }
-
-  &__gate,
-  &__challenge {
+  &__title {
     display: block;
-    width: 100%;
-    border: 1px solid var(--ui-border);
-    border-radius: 0.5rem;
-    background: var(--panel);
+    color: var(--pref-text-color);
+    font-size: 2rem;
+    text-shadow: none;
   }
 
-  &__gate:fullscreen,
-  &__challenge:fullscreen {
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
+  &__game-details {
+    margin: 0.75rem 0;
   }
 
-  &__gate {
-    height: 22rem;
-  }
-
-  &__challenge {
-    height: 75vh;
-    min-height: 34rem;
-    margin-top: 1rem;
+  [data-game-scores] {
+    min-width: 0;
+    .cs-pathway-scoreboard {
+      position: static;
+      transform: none;
+      max-width: 100%;
+      flex-wrap: wrap;
+      border-radius: 0.5rem;
+    }
   }
 
   [hidden] {
     display: none;
   }
-}
 
-body:has(.onboarding-gate) {
-  .site-header {
+  .game-runner-container [data-game-reset][hidden] {
     display: none;
   }
 }
 
-.onboarding-gate {
-  text-align: center;
+.game-output.onboarding-toolchain-stage {
+  aspect-ratio: 1.7777778;
 
-  &__stage {
-    position: relative;
-    width: 100%;
-    height: 14rem;
-    overflow: hidden;
+  .gameContainer.gameContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1600px;
+    height: 900px;
+    transform: translate(var(--onboarding-stage-x, 0), var(--onboarding-stage-y, 0)) scale(var(--onboarding-stage-scale, 1));
+    transform-origin: top left;
   }
 }

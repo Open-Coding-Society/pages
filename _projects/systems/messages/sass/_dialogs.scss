@@ -254,6 +254,69 @@
   }
 }
 
+// ── The Shared panel (js/conversation-panel.js) ─────────────────────────────────────
+// The grammar's tab panels keep 400px for a dashboard; a dialog needs less.
+.dm .ocs__tabs-panels {
+  min-height: 16rem;
+}
+
+.dm .ocs__tabs-panel {
+  padding: var(--dm-space-md) 0 0;
+}
+
+// Underline tabs in every theme: a theme paints each button with a panel background and
+// an accent border, which would box the tabs in.
+.dm .ocs__tabs-btn {
+  padding: var(--dm-space-sm) var(--dm-space-md);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+}
+
+// On a phone the tabs drop their icons so all four share one row down to a 360px screen.
+@include dm-below($breakpoint-mobile) {
+  .dm .ocs__tabs-btn {
+    padding: var(--dm-space-xs);
+  }
+
+  .dm .ocs__tabs-btn > .fas {
+    display: none;
+  }
+}
+
+.dm__tab-count {
+  margin-left: 0.15rem;
+  font-size: $text-xs;
+  font-weight: 700;
+}
+
+// Media tiles: the grammar's gallery (ocs__grid--gallery) with a picture filling each square.
+.dm .dm__media-cell {
+  justify-content: center;
+  padding: 0;
+  cursor: zoom-in;
+
+  @include dm-focus-ring(2px);
+}
+
+.dm__media-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dm .dm__media-icon {
+  font-size: 2rem;
+  color: var(--dm-accent);
+}
+
+// /help's tables show in full: the dialog scrolls, not each table.
+.dm .dm__help .ocs__table-wrap {
+  max-height: none;
+  overflow: visible;
+}
+
 // ── Cards and callouts inside dialogs ──────────────────────────────────────────
 .dm .ocs__card {
   padding: var(--dm-space-md) 0;
@@ -374,7 +437,7 @@
   }
 }
 
-// ── The Files dialog's list (js/files-panel.js) ──────────────────────────────────
+// ── The Shared panel's Files tab (js/files-panel.js) ─────────────────────────────
 .dm__files-bar {
   display: flex;
   flex-wrap: wrap;

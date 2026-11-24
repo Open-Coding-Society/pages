@@ -88,6 +88,20 @@ export function createMessagesApi({
     // Adds one event to the signed-in person's calendar (Spring files it under them when no
     // `individual` is sent).
     addCalendarEvent: event => spring('/api/calendar/add_event', 'POST', event),
+    // A gist, read through Spring for its GitHub card: it doesn't count against GitHub's
+    // hourly limit for the network.
+    readGist: id => spring(`/api/grades/read-gist/${part(id)}`),
+    // A secret gist made with the signed-in student's GitHub token, which Spring keeps
+    // (Profile's Gist card): files is { name: { content } }. Resolves { success, url }; 409
+    // when no token is connected.
+    createGist: (files, description) => spring('/api/grades/create-gist', 'POST', { files, description }),
+    // Runs a code block on the routes the lesson code runners use: Flask runs Python and
+    // JavaScript, Spring runs Java. Resolves the program's output.
+    runCode: async (language, code) => {
+      const [base, path] = language === 'java' ? [javaURI, '/run/java'] : [pythonURI, `/run/${part(language)}`];
+      const result = await request(base, path, 'POST', { code });
+      return String(result?.output ?? '');
+    },
 
     myGroups: personId => spring(`/api/groups/person/${part(personId)}`),
     allGroups: () => spring('/api/groups'),

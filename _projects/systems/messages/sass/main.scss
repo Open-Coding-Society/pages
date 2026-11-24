@@ -11,6 +11,9 @@
 // only and emits no CSS, so importing it twice costs nothing. Colours are not imported:
 // _tokens.scss reads the site palette through its :root custom properties instead.
 @import "open-coding/mixins/variables";
+// The grammar's panel mixins: the code blocks' Output label is its kicker, and the code
+// box writes in its $mono-font. Like variables, it declares and emits nothing.
+@import "open-coding/mixins/panel";
 
 @import "tokens";
 @import "layout";
