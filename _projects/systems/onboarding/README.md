@@ -42,7 +42,10 @@ Identity Forge is the reference implementation of this presentation standard.
 Its level routes every message through CS Pathway's `Present`
 (`_projects/games/cs-pathway/levels/Present.js`), which writes to the viewer's
 presentation host when embedded and uses floating overlays only standalone —
-levels must not keep hand-rolled toast or zone-alert copies alongside it. Help
+levels must not keep hand-rolled toast or zone-alert copies alongside it.
+Persistent station-result panels (Present's `panel` surface, such as Course
+Enlistment's recommendation) carry a × so a student can dismiss one that a
+station flow forgot to clear. Help
 is the Station Helper (`levels/ChatHelper.js`), the 💬 button in the lower right
 of the game box: Spring's level-aware chat endpoint (`/api/cs-pathway/chat`)
 already accepts every level key, and `model/forgeChatContext.js` tells it which

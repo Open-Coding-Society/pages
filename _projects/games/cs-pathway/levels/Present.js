@@ -129,8 +129,37 @@ class Present {
 
     const node = this.nodes[kind] || this._createNode(kind);
     node.innerHTML = msg;
+    // Panels wait for the level to clear them; the × lets a student dismiss one
+    // that a station flow forgot about.
+    if (kind === 'panel') {
+      node.appendChild(this._createDismissButton());
+    }
     this._styleContent(kind, node);
     return node;
+  }
+
+  _createDismissButton() {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = '×';
+    button.setAttribute('aria-label', 'Dismiss this message');
+    Object.assign(button.style, {
+      position: 'absolute',
+      top: '2px',
+      right: '4px',
+      // The panel itself ignores the pointer; only the × is clickable.
+      pointerEvents: 'auto',
+      cursor: 'pointer',
+      background: 'transparent',
+      border: 'none',
+      color: 'inherit',
+      font: 'inherit',
+      fontSize: '16px',
+      lineHeight: '1',
+      padding: '2px 4px',
+    });
+    button.addEventListener('click', () => this.clearPanel());
+    return button;
   }
 
   _createNode(kind) {
@@ -245,6 +274,7 @@ class Present {
       panel: {
         top: compact ? '132px' : '148px',
         zIndex: '1202',
+        paddingRight: '26px', // room for the × dismiss button
       },
       score: {
         top: 'auto',

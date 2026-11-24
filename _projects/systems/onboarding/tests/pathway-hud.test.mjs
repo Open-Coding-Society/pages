@@ -66,6 +66,28 @@ test('embedded presentation routes messages and hints without floating overlays'
   assert.deepEqual(hints, ['Press E', '', '']);
 });
 
+test('a lingering panel can be dismissed by hand', t => {
+  const previousDocument = globalThis.document;
+  const previousWindow = globalThis.window;
+  t.after(() => { globalThis.document = previousDocument; globalThis.window = previousWindow; });
+  const { document } = installFakeDom();
+  document.getElementById = () => null;
+  const present = new Present({ gameEnv: { game: { environment: {} } } }, {});
+  const node = present.panel('CSP Creative computing, projects, and broader CS concepts.');
+  assert.ok(document.body.children.includes(node));
+  const dismiss = node.children.find(child => child.getAttribute('aria-label') === 'Dismiss this message');
+  assert.ok(dismiss, 'the panel offers a dismiss button');
+  assert.equal(dismiss.style.pointerEvents, 'auto');
+  // Updating the panel keeps exactly one dismiss button.
+  const updated = present.panel('Updated advice');
+  assert.equal(updated.children.filter(child => child.getAttribute('aria-label') === 'Dismiss this message').length, 1);
+  dismiss.dispatchEvent(fakeEvent('click'));
+  assert.equal(document.body.children.length, 0);
+  assert.equal(present.nodes.panel, null);
+  // A dismissed panel stays dismissed until a station writes a new one.
+  present.destroy();
+});
+
 test('embedded scores retain updates without creating standalone next-level links', t => {
   const previousDocument = globalThis.document;
   const previousWindow = globalThis.window;
