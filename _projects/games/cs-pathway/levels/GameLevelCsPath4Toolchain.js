@@ -54,6 +54,7 @@ import { javaURI, fetchOptions } from '@assets/js/api/config.js';
 import TrailPath from './TrailPath.js';
 import PathwayScoreboard from './PathwayScoreboard.js';
 import { profilePanelOptions, scoreboardOptions } from './PathwayHud.js';
+import Present from './Present.js';
 import MacSetupCheck from './MacSetupCheck.js';
 import SystemSetupCheck from './SystemSetupCheck.js';
 import ChatHelper from './ChatHelper.js';
@@ -809,75 +810,29 @@ class GameLevelCsPath4Toolchain {
     };
 
     /**
-     * Section: toast + zone alert (self-contained, same visual language as Level 1).
+     * Section: toast + zone alert, through the shared Present helper (the
+     * Identity Forge standard): the viewer's presentation host when embedded,
+     * floating overlays only standalone. The standalone interaction prompt
+     * keeps its bottom placement, away from the top-right scoreboard.
      */
-    const createNotificationStyle = (top, zIndex) => `
-      position: fixed; top: ${top}; right: 20px;
-      z-index: ${zIndex}; pointer-events: none;
-      background: ${uiTheme.background};
-      border: 2px solid ${uiTheme.borderColor};
-      color: ${uiTheme.accentColor};
-      font-family: "Courier New", monospace;
-      font-size: 13px;
-      padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-      box-shadow: ${uiTheme.boxShadow};
-      width: min(360px, 32vw); text-align: left;
-    `;
-
-    this.showToast = function (message) {
-      if (message === 'Press E to interact') return;
-      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
-      if (!isActiveLevel) return;
-
-      const hud = this.gameEnv.game?.environment?.pathwayHud;
-      if (hud) {
-        hud.setMessage(message);
-        return;
-      }
-
-      if (this._toastEl?.parentNode) this._toastEl.parentNode.removeChild(this._toastEl);
-      if (this._toastTimer) clearTimeout(this._toastTimer);
-
-      const toast = document.createElement('div');
-      toast.style.cssText = createNotificationStyle('20px', 100020);
-      toast.textContent = message;
-      document.body.appendChild(toast);
-
-      this._toastEl = toast;
-      this._toastTimer = setTimeout(() => {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-        if (this._toastEl === toast) this._toastEl = null;
-      }, 2200);
-    };
-
-    this.setZoneAlert = function (message) {
-      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
-      if (!isActiveLevel) return;
-      const hud = this.gameEnv.game?.environment?.pathwayHud;
-      if (hud) {
-        hud.setHint(message);
-        return;
-      }
-      if (!this._zoneAlertEl) {
-        const zoneAlert = document.createElement('div');
-        zoneAlert.style.cssText = createNotificationStyle('auto', 100010);
-        // Keep the interaction prompt completely away from the top-right scoreboard.
-        zoneAlert.style.bottom = '16px';
-        zoneAlert.style.right = 'auto';
-        zoneAlert.style.left = '20px';
-        zoneAlert.style.width = 'min(360px, calc(100vw - 40px))';
-        zoneAlert.style.textAlign = 'center';
-        document.body.appendChild(zoneAlert);
-        this._zoneAlertEl = zoneAlert;
-      }
-      this._zoneAlertEl.textContent = message;
-    };
-
-    this.clearZoneAlert = function () {
-      this.gameEnv.game?.environment?.pathwayHud?.setHint('');
-      if (this._zoneAlertEl?.parentNode) this._zoneAlertEl.parentNode.removeChild(this._zoneAlertEl);
-      this._zoneAlertEl = null;
-    };
+    this.present = new Present(this, {
+      toastDuration: 2200,
+      ignoreToasts: ['Press E to interact'],
+      isActiveLevel: () => this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this,
+      placements: {
+        alerts: {
+          top: 'auto',
+          bottom: '16px',
+          right: 'auto',
+          left: '20px',
+          width: 'min(360px, calc(100vw - 40px))',
+          textAlign: 'center',
+        },
+      },
+    });
+    this.showToast = (message) => this.present.toast(message);
+    this.setZoneAlert = (message) => this.present.alerts(message);
+    this.clearZoneAlert = () => this.present.clearAlerts();
 
     /**
      * Section: sidebar (PLAYER PROFILE carried over + new Toolchain Trail block).
@@ -2141,8 +2096,7 @@ class GameLevelCsPath4Toolchain {
     this._removeLogoBadges();
     if (this._onTerminalTextInput) document.removeEventListener('input', this._onTerminalTextInput, true);
     if (this._onTerminalPaste) document.removeEventListener('paste', this._onTerminalPaste, true);
-    this.clearZoneAlert?.();
-    if (this._toastEl?.parentNode) this._toastEl.parentNode.removeChild(this._toastEl);
+    this.present?.destroy();
     if (this.levelDialogueSystem) {
       if (typeof this.levelDialogueSystem.destroy === 'function') {
         this.levelDialogueSystem.destroy();

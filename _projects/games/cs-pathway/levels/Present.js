@@ -9,6 +9,10 @@ class Present {
       toastDuration: Number(options.toastDuration || 2200),
       ignoreToasts: new Set(options.ignoreToasts || []),
       isActiveLevel: typeof options.isActiveLevel === 'function' ? options.isActiveLevel : () => true,
+      // Optional standalone style overrides per surface, e.g.
+      // { alerts: { top: 'auto', bottom: '16px' } } keeps a prompt away from
+      // other fixed overlays. Embedded hosts are unaffected.
+      placements: options.placements || {},
     };
 
     this.nodes = {
@@ -287,7 +291,7 @@ class Present {
       },
     };
 
-    const styles = { ...base, ...(overridesByKind[kind] || {}) };
+    const styles = { ...base, ...(overridesByKind[kind] || {}), ...(this.options.placements[kind] || {}) };
     Object.assign(node.style, styles);
   }
 

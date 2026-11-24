@@ -88,6 +88,26 @@ test('a lingering panel can be dismissed by hand', t => {
   present.destroy();
 });
 
+test('standalone placements keep the Toolchain prompt at the bottom of the screen', t => {
+  const previousDocument = globalThis.document;
+  const previousWindow = globalThis.window;
+  t.after(() => { globalThis.document = previousDocument; globalThis.window = previousWindow; });
+  const { document } = installFakeDom();
+  document.getElementById = () => null;
+  const present = new Present({ gameEnv: { game: { environment: {} } } }, {
+    placements: { alerts: { top: 'auto', bottom: '16px', right: 'auto', left: '20px' } },
+  });
+  const alert = present.alerts('Terminal Town: Press E to open the station');
+  assert.equal(alert.style.bottom, '16px');
+  assert.equal(alert.style.top, 'auto');
+  assert.equal(alert.style.left, '20px');
+  // Only the chosen surface moves: toasts keep their default top placement.
+  const toast = present.toast('✦ Terminal Town verified');
+  assert.equal(toast.style.top, '20px');
+  present.destroy();
+  assert.equal(document.body.children.length, 0);
+});
+
 test('embedded scores retain updates without creating standalone next-level links', t => {
   const previousDocument = globalThis.document;
   const previousWindow = globalThis.window;
