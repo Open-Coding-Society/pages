@@ -319,4 +319,9 @@ col_page: Page
 col_status: Status
 col_updated: Updated
 col_actions: Actions
+# ---- Studio (plans/2026-11-13-ui-builder-studio.md)
+# The canvas's section chrome (canvas.js)
+canvas_add_section: Add section
+canvas_edit_section: Edit
+canvas_section_tools: "Section {n}"
 # Store errors are worded by text.store in ui_builder.yml (page-store.js storeErrorText).

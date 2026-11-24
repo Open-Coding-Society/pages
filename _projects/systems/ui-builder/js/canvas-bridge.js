@@ -61,12 +61,18 @@ export function waitForCanvas(iframe, { nonce, timeoutMs = 10000, win = globalTh
   });
 }
 
+// The section toolbar's actions the editor runs; anything else from the canvas is ignored.
+export const SECTION_ACTIONS = Object.freeze(['edit', 'move_up', 'move_down', 'duplicate', 'remove']);
+
 // Owns the iframe: loads it, handshakes on every load and re-sends the last render. Callbacks:
-// onSelect(id|null), onHover(id|null), onAddRequest({sectionId, cellIndex}), onKey(keyEvent:
-// the key fields plus nodeId, the part with focus), onStatus('loading'|'ready'|'failed', error?).
+// onSelect(id|null), onHover(id|null), onAddRequest({sectionId, cellIndex}), onSectionAction(
+// {sectionId, action}) from a section's toolbar, onAddSection({index}) from an Add section pill,
+// onKey(keyEvent: the key fields plus nodeId, the part with focus), onStatus('loading'|'ready'|
+// 'failed', error?).
 export function createCanvasBridge({
   iframe, baseurl = '', win = globalThis.window, timeoutMs = 10000, nonceOf = makeNonce,
-  onSelect = () => {}, onHover = () => {}, onAddRequest = () => {}, onKey = () => {}, onStatus = () => {},
+  onSelect = () => {}, onHover = () => {}, onAddRequest = () => {}, onSectionAction = () => {}, onAddSection = () => {},
+  onKey = () => {}, onStatus = () => {},
 } = {}) {
   let nonce = null;
   let canvas = null;
@@ -87,6 +93,16 @@ export function createCanvasBridge({
       if (sectionId) onAddRequest({ sectionId, cellIndex });
     },
     key: (event) => { if (!destroyed && event && typeof event === 'object') onKey(event); },
+    sectionAction: (request) => {
+      if (destroyed || !request || typeof request !== 'object') return;
+      const sectionId = idOf(request.sectionId);
+      const action = typeof request.action === 'string' && SECTION_ACTIONS.includes(request.action) ? request.action : null;
+      if (sectionId && action) onSectionAction({ sectionId, action });
+    },
+    addSection: (request) => {
+      if (destroyed || !request || typeof request !== 'object') return;
+      if (Number.isInteger(request.index) && request.index >= 0) onAddSection({ index: request.index });
+    },
   };
 
   function send(target) {
@@ -106,6 +122,9 @@ export function createCanvasBridge({
       found.onHover(callbacks.hover);
       found.onAddRequest(callbacks.add);
       found.onKey(callbacks.key);
+      // A canvas from before the Studio has no section toolbar to listen to.
+      if (typeof found.onSectionAction === 'function') found.onSectionAction(callbacks.sectionAction);
+      if (typeof found.onAddSection === 'function') found.onAddSection(callbacks.addSection);
       canvas = found;
       await send(found);
       if (mine === attempt && !destroyed) onStatus('ready');
@@ -125,8 +144,8 @@ export function createCanvasBridge({
 
   return {
     get ready() { return Boolean(canvas); },
-    render(page, { realData = false } = {}) {
-      last = { specJson: JSON.stringify(page), options: { realData: realData === true } };
+    render(page, { realData = false, editable = true } = {}) {
+      last = { specJson: JSON.stringify(page), options: { realData: realData === true, editable: editable !== false } };
       return canvas ? send(canvas) : Promise.resolve();
     },
     select(id) {

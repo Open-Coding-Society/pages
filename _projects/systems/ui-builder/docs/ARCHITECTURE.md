@@ -143,6 +143,11 @@ are unchanged.
   lists. The band element (`_sass/open-coding/elements/bands`) mixes its colors from theme
   variables. In every preset theme, text on every band stays above 6:1 and links above 4.5:1
   (lowest: a link on Light's card, 4.6:1, the same as on any panel).
+- **Editing on the page.** The canvas puts an Add section pill above each section (and one after
+  the last) and a toolbar on each section (Edit, Move up, Move down, Duplicate, Remove), shown on
+  hover, selection or focus, and only while the page can be edited (`render(spec, {editable})`).
+  They only report: `onAddSection({index})` and `onSectionAction({sectionId, action})` through
+  `canvas-bridge.js`, which drops anything but the five actions.
 
 ## Rendering and safety
 
