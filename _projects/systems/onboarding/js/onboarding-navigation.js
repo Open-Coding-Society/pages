@@ -1,6 +1,6 @@
 import { CHALLENGES, viewerPath } from './onboarding-data.js';
 
-export function startViewer(bar, { setViewerLink }) {
+export function startViewer(bar, { setViewerLink, mountViewerAction }) {
   const id = new URLSearchParams(location.search).get('challenge');
   const index = CHALLENGES.findIndex(challenge => challenge.id === id);
   const baseurl = document.querySelector('[data-onboarding-view]').dataset.baseurl;
@@ -18,5 +18,12 @@ export function startViewer(bar, { setViewerLink }) {
       label: `${direction}: ${item.title}`,
       title: `${direction}: ${item.title}`,
     } : null);
+  }
+  // The challenge's microblog (topic per challenge) sits at the far right of the toolbar.
+  const microblog = document.getElementById('microblog-toggle-btn');
+  if (microblog) {
+    mountViewerAction(bar.querySelector('[data-viewer-actions]'), microblog, {
+      removeClasses: ['microblog-fab', 'microblog-fab-top', 'fill', 'pill'],
+    });
   }
 }

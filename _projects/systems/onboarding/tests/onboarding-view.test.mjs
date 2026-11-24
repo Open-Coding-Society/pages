@@ -8,6 +8,7 @@ async function viewer(id, { offline = false, viewerMode = true } = {}) {
   const listeners = {};
   const observers = [];
   const runs = [];
+  const timers = [];
   let session;
   let reads = 0;
   let unlocks = 0;
@@ -23,6 +24,7 @@ async function viewer(id, { offline = false, viewerMode = true } = {}) {
         clientWidth: 800, clientHeight: 450,
         classList: { add() {} }, style: { setProperty() {} },
         querySelector: element,
+        append(...nodes) { this.children.push(...nodes); },
         addEventListener(type, handler) { this[type] = handler; },
       });
     }
@@ -43,6 +45,8 @@ async function viewer(id, { offline = false, viewerMode = true } = {}) {
     OCSGameRunners: { onboarding: controller },
     addEventListener(type, handler) { listeners[type] = handler; },
     setInterval() {}, confirm: () => true,
+    setTimeout(handler) { timers.push(handler); return timers.length; },
+    clearTimeout(id) { if (id) timers[id - 1] = null; },
   };
   const source = readFileSync(new URL('../js/onboarding-view.js', import.meta.url), 'utf8')
     .replace(/^import .*;\n/gm, '');
@@ -74,6 +78,7 @@ async function viewer(id, { offline = false, viewerMode = true } = {}) {
     delayUnlock() { unlockWait = new Promise(resolve => { releaseUnlock = resolve; }); },
     releaseUnlock() { releaseUnlock(); },
     notifyMutations() { observers.forEach(callback => callback()); },
+    fireToastTimers() { timers.splice(0).forEach(handler => handler && handler()); },
     setUnlocked(value) { progress.unlocked = value ? [id] : []; },
   };
 }
@@ -98,16 +103,22 @@ test('ungated games do not read profile progress', async () => {
   assert.equal(env.element('[data-game-reset]').hidden, true);
 });
 
-test('game messages and hints stay in the viewer and clear on restart', async () => {
+test('game messages overlay the game area, fade on their own and clear on restart', async () => {
   const env = await viewer('identity-forge');
+  assert.ok(env.element('.game-output').children.includes(env.element('[data-game-overlay]')));
   const hud = env.session.pathwayHud;
   hud.setMessage('<b>Saved</b>');
   hud.setHint('Press E');
   assert.equal(env.element('[data-game-message]').textContent, '<b>Saved</b>');
   assert.equal(env.element('[data-game-message]').hidden, false);
   assert.equal(env.element('[data-game-hint]').textContent, 'Press E');
+  env.fireToastTimers();
+  assert.equal(env.element('[data-game-message]').hidden, true);
+  assert.equal(env.element('[data-game-hint]').hidden, false);
+  hud.setMessage('Another toast');
   hud.clear();
   assert.equal(env.element('[data-game-message]').hidden, true);
+  env.fireToastTimers();
   assert.equal(env.element('[data-game-hint]').hidden, true);
   assert.equal(env.element('[data-game-details]').hidden, true);
 });
@@ -191,6 +202,13 @@ test('viewer markup uses the shared runner without an iframe or level selector',
   const page = readFileSync(new URL('../pages/onboarding-view.md', import.meta.url), 'utf8');
   assert.match(page, /include runners\/game\.html/);
   assert.match(page, /hide_level_select="true"/);
-  assert.match(page, /extra_controls=onboarding_reset status_content=onboarding_scores/);
+  assert.match(page, /extra_controls=onboarding_controls status_content=onboarding_scores/);
   assert.doesNotMatch(page, /<iframe/i);
+  // The gate's counter and instructions sit beside the game controls.
+  assert.match(page, /onboarding_controls %}<button[^]*data-game-reset[^]*data-gate[^]*data-gate-instructions[^]*endcapture/);
+  // Toasts and hints overlay the game area, inside the runner shell.
+  assert.match(page, /data-game-overlay[^]*data-game-message[^]*data-game-hint/);
+  // The microblog panel opens per challenge.
+  assert.match(page, /microblog: true/);
+  assert.match(page, /microblog_topic_param: challenge/);
 });

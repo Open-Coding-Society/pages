@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-    normalizeTopicPath, topicFromSearch, buildReviewUrl, titleForTopic, remainingChars, REVIEW_PATH,
+    normalizeTopicPath, topicFromSearch, topicWithParam, buildReviewUrl, titleForTopic, remainingChars, REVIEW_PATH,
 } from '../_projects/systems/microblog/js/microblog-review.js';
 
 test('normalizeTopicPath keeps a site path and drops its query and hash', () => {
@@ -26,6 +26,23 @@ test('topicFromSearch reads and checks ?topic=', () => {
     assert.equal(topicFromSearch('?topic=https%3A%2F%2Fevil.example'), null);
     assert.equal(topicFromSearch(''), null);
     assert.equal(topicFromSearch('?other=1'), null);
+});
+
+test('topicWithParam makes one topic per item as a subpath of the page', () => {
+    const permalink = '/onboarding/view/';
+    assert.equal(
+        topicWithParam({ permalink, param: 'challenge', search: '?onboarding_view=1&challenge=identity-forge' }),
+        '/onboarding/view/identity-forge/',
+    );
+    assert.equal(topicWithParam({ permalink: '/onboarding/view', param: 'challenge', search: '?challenge=ui-builder' }),
+        '/onboarding/view/ui-builder/');
+    // Without the parameter (or without opting in) the topic stays the permalink.
+    assert.equal(topicWithParam({ permalink, param: 'challenge', search: '?onboarding_view=1' }), permalink);
+    assert.equal(topicWithParam({ permalink, param: null, search: '?challenge=identity-forge' }), permalink);
+    // A value that does not make a clean topic path cannot change the topic.
+    for (const bad of ['../secrets', 'a b', '<img src=x>', 'https://evil.example']) {
+        assert.equal(topicWithParam({ permalink, param: 'challenge', search: `?challenge=${encodeURIComponent(bad)}` }), permalink);
+    }
 });
 
 test('buildReviewUrl encodes the topic and honours the base URL', () => {

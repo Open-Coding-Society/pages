@@ -212,10 +212,12 @@ initQuickAccess();
 // Imports for APIs used on this page
 import { fetchPosts, createPost, updatePost, deletePost, createReply, fetchReplies, fetchCurrentUser, setPostResolved, setReplyResolved, isStatusMarker, getResolution, getReplyResolution, normalizeAuthorUids, postChannel, matchesViewFilter, matchesSearch, normalizeSurveyOptions, getSurveyResults, voteInSurvey, SURVEY_LIMITS } from '{{ site.baseurl }}/assets/js/projects/microblog/microblog.js';
 import { markMicroblogSeen } from '{{ site.baseurl }}/assets/js/projects/microblog/microblog-notifications.js';
-import { buildReviewUrl } from '{{ site.baseurl }}/assets/js/projects/microblog/microblog-review.js';
+import { buildReviewUrl, topicWithParam } from '{{ site.baseurl }}/assets/js/projects/microblog/microblog-review.js';
 
-// Default Key for New MicroBlog Posts
-const pagePermalink = '{{page.permalink}}';
+// Default Key for New MicroBlog Posts. A page can split its posts per item with
+// `microblog_topic_param`: the named query parameter becomes a topic subpath
+// (e.g. /onboarding/view/ + ?challenge=identity-forge -> /onboarding/view/identity-forge/).
+const pagePermalink = topicWithParam({ permalink: '{{page.permalink}}', param: {{ page.microblog_topic_param | jsonify }}, search: location.search });
 const sfiArchivedPosts = {% if page.sfi_correspondence_microblog %}{{ site.data.sfi_partner_correspondence | jsonify }}{% else %}[]{% endif %};
 // Page author uids from front matter (`authors:`): they can resolve posts, and
 // get a notification badge for new activity on this page

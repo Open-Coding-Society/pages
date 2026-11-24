@@ -23,15 +23,34 @@ the touch controls to collect five apples. Each apple adds a segment; hitting
 a wall or the snake's body resets its score.
 
 The viewer uses the runner's start, pause/resume, stop, reset and fullscreen controls,
-without a level selector. Game messages and nearby interaction prompts appear
-above the controls; the expandable Game profile section contains the level's
-profile and actions. Level scores replace the running status when available;
+without a level selector. The layout is dense by design, with one place per kind
+of information: the persistence bar at the top pairs the expandable Game profile
+(the level's account data and actions) with the unlock status, the title and
+description share one line, and the gate's counter and instructions sit beside
+the runner controls. Game toasts and nearby interaction prompts overlay the top
+of the game area where the action is; toasts fade on their own after a few
+seconds, while proximity hints stay until the level clears them. Level scores
+replace the running status when available;
 paused, stopped and error states remain visible. The viewer replaces the game's Next Level
 link. Standalone CS Pathway pages retain their own overlays and navigation.
 Stop destroys the game; start runs it again. A game dialog may already have paused the level, in
 which case close the dialog before using the pause control. Reset & Replay
 asks for confirmation and resets only a gated challenge's unlock on the current
 account or browser; it does not clear login cookies, avatar, theme or other unlocks.
+
+Identity Forge is the reference implementation of this presentation standard.
+Its level routes every message through CS Pathway's `Present`
+(`_projects/games/cs-pathway/levels/Present.js`), which writes to the viewer's
+presentation host when embedded and uses floating overlays only standalone —
+levels must not keep hand-rolled toast or zone-alert copies alongside it. Help
+is the Station Helper (`levels/ChatHelper.js`), the 💬 button in the lower right
+of the game box: Spring's level-aware chat endpoint (`/api/cs-pathway/chat`)
+already accepts every level key, and `model/forgeChatContext.js` tells it which
+Identity Forge station the student is at and which tasks are done, so answers
+are specific to this level without a separate "?" help control. Each challenge
+also has its own microblog topic (`/onboarding/view/<challenge>/`) through the
+shared panel's `microblog_topic_param`; the viewer toolbar hosts the microblog
+button at its far right.
 
 Guest unlocks stay in this browser and transfer to the next signed-in account.
 When the account service cannot be reached, games can still be played offline;

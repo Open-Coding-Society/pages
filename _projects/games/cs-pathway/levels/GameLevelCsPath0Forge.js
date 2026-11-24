@@ -19,7 +19,9 @@ import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/co
 const PROFILE_PANEL_ID = 'csse-profile-panel';
 import PathwayScoreboard from './PathwayScoreboard.js';
 import { profilePanelOptions, scoreboardOptions } from './PathwayHud.js';
-import { completeLevelTask, getNextLevel } from '../model/pathwayScores.js';
+import ChatHelper from './ChatHelper.js';
+import { buildForgeChatProgress } from '../model/forgeChatContext.js';
+import { completeLevelTask, getCompletedLevelTasks, getNextLevel } from '../model/pathwayScores.js';
 
 // Track player progress and choices per session.
 const identityState = {
@@ -488,6 +490,7 @@ class GameLevelCsPath0Forge {
               level.levelDialogueSystem.closeDialogue?.();
               level.levelDialogueSystem.destroy?.();
             }
+            level.chatHelper?.destroy?.();
             level.clearZoneAlert?.();
             level.clearPanel?.();
 
@@ -938,101 +941,6 @@ class GameLevelCsPath0Forge {
 
         showStep();
       });
-    };
-
-
-    /**
-     * Create notification style. Shared styling for toast and zone alert overlays.
-     * @private
-     */
-    const createNotificationStyle = (top, zIndex) => `
-      position: fixed; top: ${top}; right: 20px;
-      z-index: ${zIndex}; pointer-events: none;
-      background: ${uiTheme.background}; 
-      border: 2px solid ${uiTheme.borderColor};
-      color: ${uiTheme.accentColor}; 
-      font-family: ${uiTheme.fontFamily || "'Courier New', monospace"}; 
-      font-size: 13px;
-      padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-      box-shadow: ${uiTheme.boxShadow};
-      width: min(360px, 32vw); text-align: left;
-    `;
-
-    /**
-     * Show toast. Display a timed status overlay at the top-right of the screen.
-     */
-    this.showToast = function(message) {
-      if (message === 'Press E to interact') {
-        return;
-      }
-
-      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
-      if (!isActiveLevel) return;
-
-      const hud = this.gameEnv.game?.environment?.pathwayHud;
-      if (hud) {
-        hud.setMessage(message);
-        return;
-      }
-
-      const host = document.body;
-      if (!host) return;
-
-      if (this._toastEl?.parentNode) {
-        this._toastEl.parentNode.removeChild(this._toastEl);
-      }
-      if (this._toastTimer) {
-        clearTimeout(this._toastTimer);
-      }
-
-      const toast = document.createElement('div');
-      toast.style.cssText = createNotificationStyle('20px', 100020);
-      toast.textContent = message;
-      host.appendChild(toast);
-
-      this._toastEl = toast;
-      this._toastTimer = setTimeout(() => {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-        if (this._toastEl === toast) this._toastEl = null;
-        this._toastTimer = null;
-      }, 2200);
-    };
-
-    /**
-     * Set zone alert. Display a persistent proximity message below the toast area.
-     */
-    this.setZoneAlert = function(message) {
-      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
-      if (!isActiveLevel) return;
-
-      const hud = this.gameEnv.game?.environment?.pathwayHud;
-      if (hud) {
-        hud.setHint(message);
-        return;
-      }
-
-      const host = document.body;
-      if (!host) return;
-
-      if (!this._zoneAlertEl) {
-        const zoneAlert = document.createElement('div');
-        zoneAlert.style.cssText = createNotificationStyle('84px', 100010);
-        document.body.appendChild(zoneAlert);
-        this._zoneAlertEl = zoneAlert;
-      }
-
-      this._zoneAlertEl.textContent = message;
-    };
-
-    /**
-     * Clear zone alert. Remove the zone alert element from the DOM.
-     */
-    this.clearZoneAlert = function() {
-      this.gameEnv.game?.environment?.pathwayHud?.setHint('');
-      if (this._zoneAlertEl?.parentNode) {
-        this._zoneAlertEl.parentNode.removeChild(this._zoneAlertEl);
-      }
-      this._zoneAlertEl = null;
     };
 
 
@@ -1650,6 +1558,16 @@ class GameLevelCsPath0Forge {
     this.profilePanelView.render();
     this.scoreboard = new PathwayScoreboard({ currentLevelKey: 'identity-forge', basePath: this.gameEnv.path, ...scoreboardOptions(this.gameEnv) });
     this.scoreboard.show();
+    // Station helper (the level's help): answers questions about the station the
+    // student is standing at, through Spring's level-aware chat endpoint.
+    this.chatHelper = new ChatHelper({
+      levelKey: 'identity-forge',
+      mountTo: this.gameEnv.container || document.body,
+      getProgress: () => buildForgeChatProgress({
+        completedIds: getCompletedLevelTasks('identity-forge'),
+        activeGatekeeperId: this._activeZoneGatekeeperId || null,
+      }),
+    });
     this.profilePanelView.update({
       name: this.profileData?.name || '—',
       email: this.profileData?.email || '—',
@@ -2443,6 +2361,7 @@ class GameLevelCsPath0Forge {
     this.clearZoneAlert();
     this.levelDialogueSystem?.closeDialogue?.(); // close any open dialogue before leaving
     this.present?.destroy();
+    this.chatHelper?.destroy();
     if (this.profilePanelView) {
       this.profilePanelView.destroy();
     }

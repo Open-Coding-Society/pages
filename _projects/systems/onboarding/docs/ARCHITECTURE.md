@@ -36,10 +36,19 @@ without a gate. The GameRunner hides
 its level and engine selectors. Toolchain runs on a 1600-by-900 stage scaled to
 fit the available space.
 
-Onboarding passes a presentation host to CS Pathway: profile actions live in an
-expandable viewer section, level scores replace the running status when present,
-and messages and proximity hints appear above the runner controls. The reset
-control is part of the runner toolbar. The redundant Next Level link is omitted
+Onboarding passes a presentation host to CS Pathway with one writer per surface:
+profile actions live in the expandable Game profile beside the unlock status
+(the persistence bar), level scores replace the running status when present,
+and toasts and proximity hints overlay the top of the game area — toasts fade
+on their own, hints stay until the level clears them. The gate's counter and
+instructions sit beside the runner controls, and the reset
+control is part of the runner toolbar. Identity Forge is the reference level:
+it routes all messages through CS Pathway's shared Present helper instead of
+hand-rolled overlays, and mounts the Station Helper chat (💬, lower right of
+the game box) as its page-specific help through Spring's level-aware chat
+endpoint. Each challenge gets its own microblog topic as a subpath of the
+viewer's permalink, and the viewer toolbar hosts the microblog button. The
+redundant Next Level link is omitted
 there; standalone Pathway pages keep their existing presentation.
 
 The engine freezes each gate during its asynchronous save and advances only on

@@ -26,6 +26,17 @@ export function topicFromSearch(search) {
     return normalizeTopicPath(params.get('topic'));
 }
 
+// A per-item topic under one page: the page's permalink plus the value of one query
+// parameter as a subpath, e.g. /onboarding/view/ with ?challenge=identity-forge becomes
+// /onboarding/view/identity-forge/. Falls back to the plain permalink when the parameter
+// is missing or the value does not make a clean topic path.
+export function topicWithParam({ permalink, param, search }) {
+    const value = param ? new URLSearchParams(search || '').get(param) : null;
+    if (!value) return permalink;
+    const base = permalink.endsWith('/') ? permalink : `${permalink}/`;
+    return normalizeTopicPath(`${base}${value}/`) || permalink;
+}
+
 // The address a QR code encodes: the review page for one project. `baseurl` is the
 // site's base URL ("" on pages.opencodingsociety.com, "/pages" on a fork).
 export function buildReviewUrl({ origin, baseurl = '', topicPath }) {

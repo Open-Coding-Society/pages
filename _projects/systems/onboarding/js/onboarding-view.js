@@ -21,6 +21,8 @@ if (!challenge) {
   root.querySelector('[data-challenge-description]').textContent = challenge.description;
 
   const shell = root.querySelector('[data-runner-shell]');
+  // Toasts and hints appear where the action is: over the top of the game area.
+  shell.querySelector('.game-output').append(root.querySelector('[data-game-overlay]'));
   const gate = root.querySelector('[data-gate]');
   const counter = root.querySelector('[data-gate-count]');
   const gateInstructions = root.querySelector('[data-gate-instructions]');
@@ -46,16 +48,24 @@ if (!challenge) {
     if (element.textContent !== value) element.textContent = value;
     element.hidden = !value;
   }
+  const TOAST_FADE_MS = 4000;
+  let toastTimer = 0;
   const pathwayHud = {
     details: root.querySelector('[data-game-details]'),
     profile: root.querySelector('[data-game-profile]'),
     scores,
-    setMessage: text => setLine(message, text),
+    // Toasts fade on their own; hints stay until the game clears them.
+    setMessage(text) {
+      window.clearTimeout(toastTimer);
+      setLine(message, text);
+      if (!message.hidden) toastTimer = window.setTimeout(() => setLine(message, ''), TOAST_FADE_MS);
+    },
     setHint: text => setLine(hint, text),
     clear() {
       this.details.hidden = true;
-      this.setMessage('');
-      this.setHint('');
+      window.clearTimeout(toastTimer);
+      setLine(message, '');
+      setLine(hint, '');
     },
   };
   const gated = Boolean(challenge.gate);

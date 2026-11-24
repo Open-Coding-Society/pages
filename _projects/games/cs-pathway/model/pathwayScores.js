@@ -94,6 +94,12 @@ async function recordPercent(levelKey, percent) {
   }
 }
 
+/** @returns {string[]} the finished task ids of a task-based level. */
+export function getCompletedLevelTasks(levelKey) {
+  findLevel(levelKey);
+  return readJson(TASKS_STORAGE_KEY)[levelKey] || [];
+}
+
 /** Marks one task of a task-based level as done and saves the new percent. */
 export function completeLevelTask(levelKey, taskId) {
   const level = findLevel(levelKey);

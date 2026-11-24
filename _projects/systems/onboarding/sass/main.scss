@@ -6,8 +6,86 @@
     text-shadow: none;
   }
 
+  // Title and description condensed to one line (wrapping on small screens).
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+    margin: 0.5rem 0;
+
+    [data-challenge-title] {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    [data-challenge-description] {
+      margin: 0;
+      color: var(--text-muted, inherit);
+    }
+  }
+
+  // Persistence bar: Game profile (account data), unlock status and retry on one row.
+  &__persistence {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
+    margin: 0.5rem 0;
+
+    [data-challenge-status] {
+      margin: 0;
+    }
+  }
+
   &__game-details {
-    margin: 0.75rem 0;
+    margin: 0;
+
+    > summary {
+      cursor: pointer;
+    }
+  }
+
+  // Gate counter, instructions and errors sit beside the game controls.
+  &__gate {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.75rem;
+
+    [data-gate-error]:not(:empty) {
+      color: var(--ocs-game-score-accent, #f59e0b);
+    }
+  }
+
+  // Toasts and hints overlay the top of the game area, where the action is.
+  &__overlay {
+    position: absolute;
+    top: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: min(92%, 40rem);
+    pointer-events: none;
+    z-index: 20;
+
+    p {
+      margin: 0;
+      padding: 0.4rem 0.9rem;
+      border-radius: 0.5rem;
+      border: 2px solid var(--ocs-game-accent, #4ecca3);
+      background: var(--ocs-game-panel-bg, rgba(13, 13, 26, 0.92));
+      color: var(--ocs-game-text, #e8f2ef);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    [data-game-hint] {
+      border-color: var(--ocs-game-muted, #c7f2d4);
+    }
   }
 
   [data-game-scores] {
