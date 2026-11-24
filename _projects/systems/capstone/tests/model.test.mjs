@@ -3,7 +3,7 @@ import test from 'node:test';
 import { matchesProject, normalizeSearch } from '../js/model.js';
 import { readFileSync } from 'node:fs';
 import { CapstoneApiError, createCapstoneApi } from '../js/mentor-api.js';
-import { cardState, countStates, describeState, matchesChoiceFilter, resetMessage, resettableCount } from '../js/mentor-model.js';
+import { cardState, countStates, createActionQueue, describeState, matchesChoiceFilter, resetMessage, resettableCount } from '../js/mentor-model.js';
 
 test('search normalization ignores accents and letter case', () => {
   assert.equal(normalizeSearch('  Café Robotics  '), 'cafe robotics');
@@ -29,7 +29,7 @@ const mentoring = {
     interested: { pill: 'Interested', tone: 'neutral', actions: ['remove-interest', 'skip', 'apply'] },
     skipped: { pill: 'Skipped', tone: 'neutral', actions: ['undo-skip'] },
     pending: { pill: 'Pending approval', tone: 'warn', actions: ['cancel'] },
-    approved: { pill: 'Mentoring', tone: 'good', actions: [] },
+    approved: { actions: [] },
     denied: { pill: 'Not approved', tone: 'bad', actions: ['interested', 'skip', 'apply-again'] },
   },
   filters: [
@@ -53,6 +53,33 @@ test('the data file drives each card state, and it matches the data on disk', ()
   for (const [state, { actions }] of Object.entries(mentoring.states)) {
     assert.match(yaml, new RegExp(`  ${state}:[\\s\\S]*?actions: \\[${actions.join(', ')}\\]`));
   }
+});
+
+test('an approved card shows the mentor no pill and no actions', () => {
+  assert.deepEqual(describeState(mentoring, 'approved'), { pill: null, tone: null, actions: [] });
+  const yaml = readFileSync(new URL('../data/capstone_mentoring.yml', import.meta.url), 'utf8');
+  assert.match(yaml, /\n  approved:\n    actions: \[\]\n/);
+});
+
+test('quick actions save in click order, even when the first response is slowest', async () => {
+  const enqueue = createActionQueue();
+  const events = [];
+  const save = (name, delay) => enqueue(async () => {
+    events.push(`start ${name}`);
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    events.push(`end ${name}`);
+    return name;
+  });
+  assert.deepEqual(await Promise.all([save('first', 30), save('second', 1), save('third', 1)]), ['first', 'second', 'third']);
+  assert.deepEqual(events, ['start first', 'end first', 'start second', 'end second', 'start third', 'end third']);
+});
+
+test('one failed save does not block the next one', async () => {
+  const enqueue = createActionQueue();
+  const failed = enqueue(async () => { throw new Error('refused'); });
+  const next = enqueue(async () => 'saved');
+  await assert.rejects(failed, /refused/);
+  assert.equal(await next, 'saved');
 });
 
 test('Apply is the only primary action', () => {

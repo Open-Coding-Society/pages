@@ -1,9 +1,9 @@
 // Wires the Capstone page's mentor controls together. The role check here is presentation only:
 // Spring decides what an account may do.
-import { cardState, countStates, matchesChoiceFilter, resetMessage, resettableCount } from './mentor-model.js';
+import { cardState, countStates, createActionQueue, matchesChoiceFilter, resetMessage, resettableCount } from './mentor-model.js';
 import { focusCardAction, renderCardControls, renderMentorNames, setCardBusy } from './mentor-card.js';
 
-function startResetDialog({ browser, api, config, currentChoices, onReset, showError }) {
+function startResetDialog({ browser, api, config, currentChoices, enqueue, onReset, showError }) {
   const modal = browser.querySelector('[data-capstone-reset-modal]');
   const message = modal.querySelector('[data-capstone-reset-message]');
   const confirmButton = modal.querySelector('[data-capstone-reset-confirm]');
@@ -30,8 +30,10 @@ function startResetDialog({ browser, api, config, currentChoices, onReset, showE
     confirmButton.disabled = true;
     showError('');
     try {
-      await api.resetChoices();
-      await onReset();
+      await enqueue(async () => {
+        await api.resetChoices();
+        await onReset();
+      });
     } catch (error) {
       showError(error.message);
     }
@@ -52,6 +54,8 @@ async function startMentorControls({ browser, api, config, cards }) {
   const errorBox = panel.querySelector('[data-capstone-error]');
   const filterButtons = [...panel.querySelectorAll('[data-capstone-filter]')];
   const projects = cards.map((card) => card.dataset.capstoneProject);
+  const enqueue = createActionQueue();
+  const savingCards = new Set();
   let choices = {};
   let filter = 'all';
 
@@ -70,7 +74,11 @@ async function startMentorControls({ browser, api, config, cards }) {
   }
 
   function render() {
-    cards.forEach((card) => renderCardControls(card, config, cardState(choices, card.dataset.capstoneProject)));
+    cards.forEach((card) => {
+      renderCardControls(card, config, cardState(choices, card.dataset.capstoneProject));
+      // Redrawing makes new buttons, so a card still waiting to save must stay disabled.
+      setCardBusy(card, savingCards.has(card));
+    });
     const counts = countStates(projects, choices);
     summary.replaceChildren(...Object.entries(config.summary)
       .map(([state, label]) => summaryPill(label, counts[state])));
@@ -91,13 +99,18 @@ async function startMentorControls({ browser, api, config, cards }) {
     const button = event.target.closest('[data-capstone-action]');
     if (!button) return;
     const card = button.closest('[data-capstone-card]');
+    const action = runAction[button.dataset.capstoneAction];
+    savingCards.add(card);
     setCardBusy(card, true);
     showError('');
     try {
-      choices = await runAction[button.dataset.capstoneAction](card.dataset.capstoneProject);
+      const saved = await enqueue(() => action(card.dataset.capstoneProject));
+      choices = saved;
+      savingCards.delete(card);
       render();
-      focusCardAction(card);
+      if (document.activeElement === document.body) focusCardAction(card);
     } catch (error) {
+      savingCards.delete(card);
       showError(`${card.querySelector('h3')?.textContent.trim() || ''}: ${error.message}`);
       setCardBusy(card, false);
     }
@@ -119,7 +132,7 @@ async function startMentorControls({ browser, api, config, cards }) {
     render();
   }
 
-  startResetDialog({ browser, api, config, currentChoices: () => choices, onReset: refresh, showError });
+  startResetDialog({ browser, api, config, currentChoices: () => choices, enqueue, onReset: refresh, showError });
   await refresh();
   panel.hidden = false;
 }

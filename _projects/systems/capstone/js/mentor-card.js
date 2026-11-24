@@ -25,7 +25,8 @@ export function renderCardControls(card, config, state) {
   statusPill.textContent = pill || '';
   statusPill.className = tone ? `ocs__status-pill ocs__status-pill--${tone}` : 'ocs__status-pill';
   card.querySelector('[data-capstone-actions]').replaceChildren(...actions.map(actionButton));
-  card.querySelector('[data-capstone-controls]').hidden = false;
+  // An approved card has nothing to show here; its public mentor name stays above.
+  card.querySelector('[data-capstone-controls]').hidden = !pill && actions.length === 0;
   // Undo skip lives outside this body, so keyboard users reach it and nothing else.
   card.querySelector('[data-capstone-card-body]').inert = skipped;
   card.classList.toggle('capstone-browser__card--skipped', skipped);

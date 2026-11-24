@@ -40,6 +40,16 @@ export function resettableCount(choices) {
     .filter(({ status }) => status === 'interested' || status === 'skipped').length;
 }
 
+// Runs saves one at a time, so a slow response can never replace a newer one on screen.
+export function createActionQueue() {
+  let last = Promise.resolve();
+  return (task) => {
+    const result = last.then(task);
+    last = result.catch(() => {});
+    return result;
+  };
+}
+
 export function resetMessage(config, count) {
   if (count === 0) return config.text.reset_none;
   return count === 1 ? config.text.reset_one : config.text.reset_many.replace('{count}', String(count));
