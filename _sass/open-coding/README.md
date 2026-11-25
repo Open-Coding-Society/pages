@@ -164,6 +164,7 @@ Elements are built from a few shared pieces, so each one adds only what is its o
 | `ocs__section-title`, `ocs__stat-label` | `kicker` |
 | `ocs__file`, `ocs__file-preview` | `surface`; `accent-tint` on a row that opens something; `.ocs__truncate` for the name and details |
 | `ocs__menu` | `surface` with a stronger ring; `kicker` for headings; `accent-tint` without a ring on the highlighted item; `.ocs__truncate` for names and hints |
+| `ocs__toolbar` | `overlay-panel` with `$radius-pill` ends |
 | `ocs__badge`, `ocs__status`, `ocs__progress` | `$radius-pill` |
 
 Start a new element from these. See [`mixins/README.md`](mixins/README.md).
@@ -483,6 +484,39 @@ See [`elements/progress`](elements/progress).
 Write headings, names and hints as `<b>`, `<strong>` and `<em>`, not spans. See
 [`elements/menus`](elements/menus). Messages uses it for the Attach menu; it fits a
 slash-command picker or a message's More actions too.
+
+### Toolbars
+
+```html
+<section class="ocs__stack ocs__float-host">
+  <div class="ocs__toolbar ocs__float ocs__float--end" role="toolbar" aria-label="Section 2">
+    <button class="ocs__btn ocs__btn--icon small accent fill" type="button">
+      <i class="fa-solid fa-pen" aria-hidden="true"></i>Edit
+    </button>
+    <button class="ocs__btn ocs__btn--icon small" type="button" aria-label="Move up" title="Move up">
+      <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div class="ocs__float ocs__float--center">
+    <button class="ocs__btn ocs__btn--icon small accent fill" type="button">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>Add section
+    </button>
+  </div>
+  <h2>Our client</h2>
+</section>
+```
+
+- `ocs__toolbar`: a row of `ocs__btn` buttons on a pill above the page (`overlay-panel`).
+  Give it `role="toolbar"` and a name, and give icon-only buttons an `aria-label`
+- `ocs__float-host`: what floating parts belong to; it becomes their positioning box
+- `ocs__float`: takes no room in the host's layout and shows only while the host is
+  hovered, holds the keyboard or has `is-active`
+- `ocs__float--end`, `ocs__float--center`: on the host's top right corner, or centred on
+  its top edge
+
+See [`elements/toolbars`](elements/toolbars). The UI Builder's canvas uses it for each
+section's toolbar and Add section pill; Messages' edit and delete buttons on a message are
+the same pattern.
 
 ### Nav cards
 

@@ -146,6 +146,8 @@ are unchanged.
 - **Editing on the page.** The canvas puts an Add section pill above each section (and one after
   the last) and a toolbar on each section (Edit, Move up, Move down, Duplicate, Remove), shown on
   hover, selection or focus, and only while the page can be edited (`render(spec, {editable})`).
+  They are grammar markup: each section is an `ocs__float-host` with an `ocs__toolbar` and a pill
+  in `ocs__float` (`_sass/open-coding/elements/toolbars`), and a chosen section gets `is-active`.
   They only report: `onAddSection({index})` and `onSectionAction({sectionId, action})` through
   `canvas-bridge.js`, which drops anything but the five actions.
 

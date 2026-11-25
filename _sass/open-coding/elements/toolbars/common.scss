@@ -1,0 +1,32 @@
+// A row of buttons (ocs__btn) on a pill above the page. Give it role="toolbar" and a name.
+.ocs__toolbar {
+  @include overlay-panel;
+  display: inline-flex;
+  align-items: center;
+  gap: map-get($toolbar-box, gap);
+  padding: map-get($toolbar-box, padding);
+  border-radius: $radius-pill;
+}
+
+// What a floating part belongs to: a section, a message, a card.
+.ocs__float-host {
+  position: relative;
+}
+
+.ocs__float {
+  @include float-tucked;
+  position: absolute;
+  z-index: $float-z;
+}
+
+@each $name, $place in $float-places {
+  .ocs__float--#{$name} {
+    @include float-place($place);
+  }
+}
+
+@each $state in $float-show-states {
+  .ocs__float-host#{$state} > .ocs__float {
+    @include float-shown;
+  }
+}

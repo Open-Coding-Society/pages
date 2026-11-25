@@ -1,0 +1,10 @@
+// Toolbar element: a small row of buttons on a pill, and parts that float on the edge of what
+// they act on. The UI Builder's canvas gives each section a toolbar (Edit, Move up, Move down,
+// Duplicate, Remove) on its top corner and an Add section pill centred on its top edge. Messages'
+// edit and delete buttons on a message are the same pattern.
+//
+// The pill is an overlay-panel (mixins/_panel.scss) with round ends ($radius-pill), so it reads
+// as above the page in every preset theme. A floating part takes no room in its holder's layout
+// and shows only while the holder is under the pointer, holds the keyboard or is chosen.
+@import "tokens";
+@import "common";

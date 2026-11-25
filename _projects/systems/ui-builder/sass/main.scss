@@ -3,12 +3,18 @@
 // Published pages and the gallery use only the shared ocs__ grammar; the two rules below for them
 // undo a site-wide leak and fit the grammar's badge into the viewer's one-line bar.
 //
-// The grammar draws every control, card, field, modal and pill the editor uses; these partials
-// only add what an editing app needs and a document page doesn't: the three-pane layout, the
-// scaled canvas frame, the flat outline tree, the menu, the canvas's selection outlines, section
-// toolbars and Add section pills, and the code view's scrolling pane.
-// Each rule says why the grammar can't do it. Colours come from theme tokens only.
+// The grammar draws every control, card, field, modal and pill the editor uses, and the canvas's
+// section toolbars and Add section pills (elements/toolbars); these partials only add what an
+// editing app needs and a document page doesn't: the three-pane layout, the scaled canvas frame,
+// the flat outline tree, the menu, the canvas's selection outlines, and the code view's
+// scrolling pane. Each rule says why the grammar can't do it. Colours come from theme tokens only.
 // Ruby Sass 3.7: no min()/max() (Sass would try to compute them), no / division.
+
+// The generated entry point (assets/css/projects/ui-builder/main.scss) compiles this on its own,
+// without the site stylesheet's preamble, so the shared scale and the panel mixins (surface)
+// are imported here, as Messages does. They hold variables and mixins only, no rules.
+@import "open-coding/mixins/variables";
+@import "open-coding/mixins/panel";
 
 $uib-wide: 1440px;
 $uib-phone: 767px;

@@ -166,6 +166,13 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
     return element || null;
   }
 
+  // The chosen part is outlined; a chosen section also shows its toolbar and pill (is-active on
+  // its ocs__float-host).
+  function showSelection() {
+    const element = mark('data-ui-selected', selectedId);
+    for (const section of root.querySelectorAll('[data-ui-kind="section"]')) section.classList.toggle('is-active', section === element);
+  }
+
   function addButton(sectionId, cellIndex) {
     const button = doc.createElement('button');
     button.type = 'button';
@@ -201,7 +208,10 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
   // An Add section pill: above a section (index = its place), or after the last one.
   function addSectionPill(index, { end = false } = {}) {
     const holder = doc.createElement('div');
-    holder.className = end ? 'ui-builder-canvas-add ui-builder-canvas-add--end' : 'ui-builder-canvas-add';
+    // Grammar toolbars (elements/toolbars): floating on the section's top edge, or at the end in a
+    // row of its own under the last section.
+    holder.className = end ? 'ocs__links' : 'ocs__float ocs__float--center';
+    if (end) holder.setAttribute('data-ui-add-end', '');
     holder.setAttribute('data-ui-chrome', '');
     holder.append(chromeButton({ iconName: 'fa-plus', label: say('canvas_add_section'), words: true, className: 'ocs__btn ocs__btn--icon small accent fill', attrs: { 'data-ui-add-section-at': String(index) } }));
     return holder;
@@ -210,7 +220,7 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
   // The section's hover toolbar. Its buttons only report; the editor runs the action.
   function sectionTools(sectionId, index, count) {
     const bar = doc.createElement('div');
-    bar.className = 'ocs__links ui-builder-canvas-tools';
+    bar.className = 'ocs__toolbar ocs__float ocs__float--end';
     bar.setAttribute('role', 'toolbar');
     bar.setAttribute('aria-label', say('canvas_section_tools', { n: index + 1 }));
     bar.setAttribute('data-ui-chrome', '');
@@ -231,6 +241,7 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
     if (editable) sections.forEach((section, index) => {
       const sectionId = section.getAttribute('data-ui-node');
       if (!sectionId) return;
+      section.classList.add('ocs__float-host');
       section.prepend(addSectionPill(index), sectionTools(sectionId, index, sections.length));
     });
     const article = root.querySelector('[data-ui-page]');
@@ -245,7 +256,7 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
       });
     }
     for (const hidden of root.querySelectorAll('[data-ui-hidden]')) hidden.setAttribute('data-ui-hidden-label', say('canvas_hidden'));
-    mark('data-ui-selected', selectedId);
+    showSelection();
     mark('data-ui-hover', hoverId);
   }
 
@@ -410,7 +421,7 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
     render,
     select(id) {
       selectedId = typeof id === 'string' && id ? id : null;
-      mark('data-ui-selected', selectedId);
+      showSelection();
     },
     scrollTo(id) {
       const element = typeof id === 'string' ? [...root.querySelectorAll('[data-ui-node]')].find((node) => node.getAttribute('data-ui-node') === id) : null;

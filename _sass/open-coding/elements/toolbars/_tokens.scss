@@ -1,0 +1,60 @@
+// Design tokens for toolbars. Sizes and timings come from the shared scale in
+// mixins/_variables.scss. Colors come only through overlay-panel (theme variables), so a saved
+// preference theme recolors every toolbar.
+
+// ── The pill ────────────────────────────────────────────────────────────
+
+$toolbar-box: (
+  gap: 4px,
+  padding: 3px,
+);
+
+// ── Floating parts ──────────────────────────────────────────────────────
+
+// Each place on the holder's top edge: how far the part rises above the edge, which side it
+// keeps to, and how far it shifts along the edge (-50% centres it).
+$float-places: (
+  end: (top: -1.15rem, right: $spacing-xxs),
+  center: (top: -1.6rem, left: 50%, shift: -50%),
+);
+
+// What shows a holder's floating parts: under the pointer, holding the keyboard, or chosen.
+$float-show-states: (':hover', ':focus-within', '.is-active');
+
+$float-fade: $transition-fast;
+
+// Above the holder's own content (an image, an embed), below menus and modals.
+$float-z: $z-base + 2;
+
+// ── Mixins ──────────────────────────────────────────────────────────────
+
+// Out of sight and out of the pointer's way until its holder shows it.
+@mixin float-tucked {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $float-fade ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+@mixin float-shown {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+// A place from $float-places.
+@mixin float-place($place) {
+  top: map-get($place, top);
+
+  @each $side in (left, right) {
+    @if map-has-key($place, $side) {
+      #{$side}: map-get($place, $side);
+    }
+  }
+
+  @if map-has-key($place, shift) {
+    transform: translateX(map-get($place, shift));
+  }
+}

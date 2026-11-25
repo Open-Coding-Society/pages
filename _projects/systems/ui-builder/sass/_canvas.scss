@@ -1,140 +1,113 @@
 // The canvas page's chrome (/ui-builder/canvas/, inside the editor's iframe): selection and hover
-// outlines, hidden and broken parts, and the add buttons in empty cells. The page itself is
-// plain ocs__ grammar; these rules only mark it up for editing.
+// outlines, hidden and broken parts, and room for the section toolbars. The page itself is plain
+// ocs__ grammar, and so is the chrome the canvas adds: each section is an ocs__float-host with an
+// ocs__toolbar and an Add section pill (elements/toolbars), and the label on a hidden part is a
+// surface (mixins/_panel.scss). These rules only mark the page up for editing.
+
+// ── Tokens ──────────────────────────────────────────────────────────────
+
+// How the canvas marks a part: its outline's width and style. A block that failed to draw, or
+// has an unknown type, is dashed so it reads as something to fix. The error mark comes last, so
+// it wins over the selection on the same part.
+$uib-marks: (
+  '[data-ui-hover]': (width: 1px, style: dashed),
+  '[data-ui-selected]': (width: 2px, style: solid),
+  '[data-ui-error]': (width: 2px, style: dashed),
+);
+
+$uib-mark-gap: 3px;
+// A section's outline sits further out, so a selected block and its section don't overlap.
+$uib-section-mark-gap: 8px;
+// While editing, sections get more room between them than when published, so an Add section
+// pill on a section's top edge never covers the content above it.
+$uib-section-room: 2rem;
+
+// Hidden parts stay visible while editing, striped and labelled.
+$uib-stripe: (angle: 135deg, width: 6px, amount: 7%);
+// Only the blocks' own content fades: faded, the "Hidden" label and the add buttons would fall
+// below 4.5:1 contrast.
+$uib-hidden-fade: 0.6;
+
+// ── Functions and mixins ────────────────────────────────────────────────
+
+@function uib-stripes($stripe) {
+  $width: map-get($stripe, width);
+  $ink: unquote("color-mix(in srgb, var(--pref-text-color) #{map-get($stripe, amount)}, transparent)");
+  @return repeating-linear-gradient(map-get($stripe, angle), $ink 0 $width, transparent $width ($width * 2));
+}
+
+@mixin uib-mark($mark, $gap: $uib-mark-gap) {
+  outline: map-get($mark, width) map-get($mark, style) var(--pref-accent-color);
+  outline-offset: $gap;
+}
+
+// ── Rules ───────────────────────────────────────────────────────────────
 
 // The whole frame is clickable: a click on empty space selects nothing (Page settings).
 .ui-builder-canvas {
   min-height: 100vh;
-}
 
-.ui-builder-canvas [data-ui-node] {
-  position: relative;
-  cursor: pointer;
-}
+  [data-ui-node] {
+    position: relative;
+    cursor: pointer;
+  }
 
-.ui-builder-canvas [data-ui-hover] {
-  outline: 1px dashed var(--pref-accent-color);
-  outline-offset: 3px;
-}
+  @each $part, $mark in $uib-marks {
+    #{$part} {
+      @include uib-mark($mark);
+    }
+  }
 
-.ui-builder-canvas [data-ui-selected] {
-  outline: 2px solid var(--pref-accent-color);
-  outline-offset: 3px;
-}
+  [data-ui-kind="section"][data-ui-hover],
+  [data-ui-kind="section"][data-ui-selected] {
+    outline-offset: $uib-section-mark-gap;
+  }
 
-// A section's outline sits further out, so a selected block and its section don't overlap.
-.ui-builder-canvas [data-ui-kind="section"][data-ui-hover],
-.ui-builder-canvas [data-ui-kind="section"][data-ui-selected] {
-  outline-offset: 8px;
-}
+  [data-ui-hidden] {
+    background-image: uib-stripes($uib-stripe);
+  }
 
-// Hidden parts stay visible while editing, striped and labelled.
-.ui-builder-canvas [data-ui-hidden] {
-  background-image: repeating-linear-gradient(135deg, color-mix(in srgb, var(--pref-text-color) 7%, transparent) 0 6px, transparent 6px 12px);
-}
+  // A block in a hidden section fades as well.
+  [data-ui-hidden] [data-ui-kind="block"] > *,
+  [data-ui-kind="block"][data-ui-hidden] > * {
+    opacity: $uib-hidden-fade;
+  }
 
-// Only the blocks' own content fades: faded, the "Hidden" label and the add buttons would fall
-// below 4.5:1 contrast. A block in a hidden section fades as well.
-.ui-builder-canvas [data-ui-hidden] [data-ui-kind="block"] > *,
-.ui-builder-canvas [data-ui-kind="block"][data-ui-hidden] > * {
-  opacity: 0.6;
-}
-
-.ui-builder-canvas [data-ui-hidden]::before {
-  content: attr(data-ui-hidden-label);
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  z-index: 1;
-  padding: 0.1rem 0.5rem;
-  border: 1px solid var(--ui-border);
-  border-radius: 999px;
-  background: var(--panel);
   // The text color, not the muted one: some presets' muted text is under 4.5:1 on the panel.
-  color: var(--pref-text-color);
-  font-size: 0.7rem;
-}
-
-// A block that failed to draw, or an unknown type: dashed so it reads as something to fix.
-.ui-builder-canvas [data-ui-error] {
-  outline: 2px dashed var(--pref-accent-color);
-  outline-offset: 3px;
-}
-
-// A block with nothing to show yet keeps a visible, selectable box.
-.ui-builder-canvas [data-ui-empty] {
-  padding: 0.75rem;
-  border: 1px dashed var(--ui-border);
-  border-radius: 0.5rem;
-  color: var(--text-muted);
-}
-
-// An empty column keeps its height and shows where its add button is.
-.ui-builder-canvas [data-ui-cell] {
-  min-height: 3rem;
-}
-
-.ui-builder-canvas [data-ui-add] {
-  align-self: flex-start;
-  border-style: dashed;
-}
-
-// ---- Studio chrome: each section's toolbar (top right) and its Add section pill (centred on its
-// top edge), shown while the section is hovered, picked or has the keyboard. Both are absolute,
-// so they take no place in the section's own stack or column grid. The page's sections get a
-// little more room between them here than when published, so a pill never covers content.
-$uib-chrome-fade: 0.12s;
-
-.ui-builder-canvas [data-ui-page] {
-  gap: 2rem;
-}
-
-%uib-canvas-chrome {
-  position: absolute;
-  z-index: 3;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity $uib-chrome-fade ease;
-
-  @media (prefers-reduced-motion: reduce) {
-    transition: none;
+  [data-ui-hidden]::before {
+    @include surface($radius-pill, 0.1rem 0.5rem);
+    content: attr(data-ui-hidden-label);
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    z-index: 1;
+    font-size: 0.7rem;
   }
-}
 
-.ui-builder-canvas .ui-builder-canvas-tools {
-  @extend %uib-canvas-chrome;
-  top: -1.15rem;
-  right: 0.5rem;
-  gap: 0.25rem;
-  padding: 0.2rem;
-  border: 1px solid var(--ui-border);
-  border-radius: 999px;
-  background: var(--panel);
-  box-shadow: 0 0.35rem 1rem color-mix(in srgb, var(--pref-text-color) 18%, transparent);
-}
-
-.ui-builder-canvas .ui-builder-canvas-add {
-  @extend %uib-canvas-chrome;
-  top: -1.6rem;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-@each $state in ':hover', '[data-ui-selected]', ':focus-within' {
-  .ui-builder-canvas [data-ui-kind="section"]#{$state} > .ui-builder-canvas-tools,
-  .ui-builder-canvas [data-ui-kind="section"]#{$state} > .ui-builder-canvas-add {
-    opacity: 1;
-    pointer-events: auto;
+  // A block with nothing to show yet keeps a visible, selectable box.
+  [data-ui-empty] {
+    @include surface($radius-sm, 0.75rem, $background: transparent, $color: var(--text-muted));
+    border-style: dashed;
   }
-}
 
-// The last pill, after every section, is always there: it is how an empty page starts.
-.ui-builder-canvas .ui-builder-canvas-add--end {
-  position: static;
-  display: flex;
-  justify-content: center;
-  padding: 0.5rem 0 2rem;
-  opacity: 1;
-  pointer-events: auto;
-  transform: none;
+  // An empty column keeps its height and shows where its add button is.
+  [data-ui-cell] {
+    min-height: 3rem;
+  }
+
+  [data-ui-add] {
+    align-self: flex-start;
+    border-style: dashed;
+  }
+
+  [data-ui-page] {
+    gap: $uib-section-room;
+  }
+
+  // The last Add section pill, after every section, is always there: it is how an empty page
+  // starts. It sits in an ocs__links row, centred under the page.
+  [data-ui-add-end] {
+    justify-content: center;
+    padding: 0.5rem 0 2rem;
+  }
 }

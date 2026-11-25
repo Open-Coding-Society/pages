@@ -182,7 +182,8 @@ class UiBuilderPagesTest < Minitest::Test
   # its pages' titles again, and the gallery's: gallery.js draws it as an h1 under [data-ui-gallery].
   def test_page_and_gallery_titles_show_despite_the_site_wide_h1_rule
     sass = File.join(PROJECT, "sass")
-    css = Sass::Engine.new(File.read(File.join(sass, "main.scss")), syntax: :scss, load_paths: [sass]).render
+    # _sass too: the builder's sass imports the shared mixins (open-coding/mixins/panel).
+    css = Sass::Engine.new(File.read(File.join(sass, "main.scss")), syntax: :scss, load_paths: [sass, File.join(ROOT, "_sass")]).render
     %w[[data-ui-page] [data-ui-gallery]].each do |root|
       rule = css.scan(/([^{}]+)\{([^{}]*)\}/).find { |selectors, _| selectors.split(",").map(&:strip).include?("#{root} h1") }
       assert rule, "#{root} h1 has a rule"
