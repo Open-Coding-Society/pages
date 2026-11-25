@@ -78,3 +78,63 @@
   align-self: flex-start;
   border-style: dashed;
 }
+
+// ---- Studio chrome: each section's toolbar (top right) and its Add section pill (centred on its
+// top edge), shown while the section is hovered, picked or has the keyboard. Both are absolute,
+// so they take no place in the section's own stack or column grid. The page's sections get a
+// little more room between them here than when published, so a pill never covers content.
+$uib-chrome-fade: 0.12s;
+
+.ui-builder-canvas [data-ui-page] {
+  gap: 2rem;
+}
+
+%uib-canvas-chrome {
+  position: absolute;
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $uib-chrome-fade ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.ui-builder-canvas .ui-builder-canvas-tools {
+  @extend %uib-canvas-chrome;
+  top: -1.15rem;
+  right: 0.5rem;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  background: var(--panel);
+  box-shadow: 0 0.35rem 1rem color-mix(in srgb, var(--pref-text-color) 18%, transparent);
+}
+
+.ui-builder-canvas .ui-builder-canvas-add {
+  @extend %uib-canvas-chrome;
+  top: -1.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@each $state in ':hover', '[data-ui-selected]', ':focus-within' {
+  .ui-builder-canvas [data-ui-kind="section"]#{$state} > .ui-builder-canvas-tools,
+  .ui-builder-canvas [data-ui-kind="section"]#{$state} > .ui-builder-canvas-add {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+// The last pill, after every section, is always there: it is how an empty page starts.
+.ui-builder-canvas .ui-builder-canvas-add--end {
+  position: static;
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0 2rem;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}

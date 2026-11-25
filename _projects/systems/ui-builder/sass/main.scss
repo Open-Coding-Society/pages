@@ -5,8 +5,8 @@
 //
 // The grammar draws every control, card, field, modal and pill the editor uses; these partials
 // only add what an editing app needs and a document page doesn't: the three-pane layout, the
-// scaled canvas frame, the flat outline tree, the menu, the canvas's selection outlines and the
-// code view's scrolling pane.
+// scaled canvas frame, the flat outline tree, the menu, the canvas's selection outlines, section
+// toolbars and Add section pills, and the code view's scrolling pane.
 // Each rule says why the grammar can't do it. Colours come from theme tokens only.
 // Ruby Sass 3.7: no min()/max() (Sass would try to compute them), no / division.
 

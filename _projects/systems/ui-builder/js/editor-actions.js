@@ -122,6 +122,7 @@ export const pageActions = {
       else this.notify(this.say('lease_banner', { name: holderName || this.say('someone') }));
       this.leaseHeld = false;
       this.refreshPanels();
+      this.drawCanvas(); // the canvas drops its edit toolbars while read only
       return;
     }
     this.leaseHeld = true;
@@ -131,6 +132,7 @@ export const pageActions = {
       this.lease.hide();
       this.notify(this.say('lease_taken'));
       this.refreshPanels();
+      this.drawCanvas();
     };
     if (this.session.status().pending) {
       this.session.resume();

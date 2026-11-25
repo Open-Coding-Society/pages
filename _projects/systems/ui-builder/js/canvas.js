@@ -1,6 +1,8 @@
 // The canvas (DESIGN §7.4): runs inside the editor's same-origin iframe at /ui-builder/canvas/ and
 // draws the page the editor sends it. window.OCSUiCanvas = {nonce, render, select, scrollTo,
-// onSelect, onHover, onAddRequest, onKey}. It keeps no state the editor can't resend: every
+// onSelect, onHover, onAddRequest, onSectionAction, onAddSection, onKey}. Each section gets the
+// Studio's hover toolbar (Edit, Move up, Move down, Duplicate, Remove) and an Add section pill
+// above it, with one more after the last section. It keeps no state the editor can't resend: every
 // render gets the whole page as a JSON string, parsed here in this window's own realm. Blocks
 // whose JSON didn't change keep their DOM (no image flicker, scroll stays). Live blocks show
 // design samples; only "Data from your API" reads anything, and only with "Real data while
@@ -108,11 +110,12 @@ function closestNode(target) {
 }
 
 // The part of the page a key was pressed in, sent with the key so Delete or a move acts on what
-// has focus: the id of the block or section around the focused element, '' on an add button
+// has focus: the id of the block or section around the focused element, '' on an add button or
+// an Add section pill
 // (no part to act on) and null when nothing in the page has focus (the editor's selection then).
 export function keyPartOf(target) {
   if (!target || target.nodeType !== 1) return null;
-  if (target.closest('[data-ui-add]')) return '';
+  if (target.closest('[data-ui-add], [data-ui-add-section-at]')) return '';
   const node = target.closest('[data-ui-node]');
   return node ? node.getAttribute('data-ui-node') : null;
 }
@@ -140,7 +143,7 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
   const limits = registry.limits || {};
   const hooks = createRichHooks({ richText, baseurl, pageOrigin, doc });
   const ctx = { registry, mode: 'canvas', baseurl, pageOrigin, renderers: contentRenderers };
-  const handlers = { select: null, hover: null, add: null, key: null };
+  const handlers = { select: null, hover: null, add: null, key: null, sectionAction: null, addSection: null };
   const emit = (name, value) => {
     const fn = handlers[name];
     if (typeof fn !== 'function') return;
@@ -178,9 +181,61 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
     return button;
   }
 
-  // Canvas chrome around the page: add buttons in empty cells and a label on hidden parts.
-  function decorate() {
-    for (const section of root.querySelectorAll('[data-ui-kind="section"]')) {
+  function chromeButton({ iconName, label, attrs, words = false, className = 'ocs__btn ocs__btn--icon small' }) {
+    const button = doc.createElement('button');
+    button.type = 'button';
+    button.className = className;
+    for (const [name, value] of Object.entries(attrs)) button.setAttribute(name, value);
+    const glyph = doc.createElement('i');
+    glyph.className = `fa-solid ${iconName}`;
+    glyph.setAttribute('aria-hidden', 'true');
+    button.append(glyph);
+    if (words) button.append(doc.createTextNode(label));
+    else {
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    }
+    return button;
+  }
+
+  // An Add section pill: above a section (index = its place), or after the last one.
+  function addSectionPill(index, { end = false } = {}) {
+    const holder = doc.createElement('div');
+    holder.className = end ? 'ui-builder-canvas-add ui-builder-canvas-add--end' : 'ui-builder-canvas-add';
+    holder.setAttribute('data-ui-chrome', '');
+    holder.append(chromeButton({ iconName: 'fa-plus', label: say('canvas_add_section'), words: true, className: 'ocs__btn ocs__btn--icon small accent fill', attrs: { 'data-ui-add-section-at': String(index) } }));
+    return holder;
+  }
+
+  // The section's hover toolbar. Its buttons only report; the editor runs the action.
+  function sectionTools(sectionId, index, count) {
+    const bar = doc.createElement('div');
+    bar.className = 'ocs__links ui-builder-canvas-tools';
+    bar.setAttribute('role', 'toolbar');
+    bar.setAttribute('aria-label', say('canvas_section_tools', { n: index + 1 }));
+    bar.setAttribute('data-ui-chrome', '');
+    const tool = (action, iconName, label, extra = {}) => chromeButton({ iconName, label, attrs: { 'data-ui-section-act': action, 'data-ui-section': sectionId, ...extra } });
+    const edit = chromeButton({ iconName: 'fa-pen', label: say('canvas_edit_section'), words: true, className: 'ocs__btn ocs__btn--icon small accent fill', attrs: { 'data-ui-section-act': 'edit', 'data-ui-section': sectionId } });
+    const up = tool('move_up', 'fa-arrow-up', say('move_up'));
+    const down = tool('move_down', 'fa-arrow-down', say('move_down'));
+    up.disabled = index === 0;
+    down.disabled = index === count - 1;
+    bar.append(edit, up, down, tool('duplicate', 'fa-clone', say('duplicate')), tool('remove', 'fa-trash-can', say('remove')));
+    return bar;
+  }
+
+  // Canvas chrome around the page: the Studio's section toolbars and Add section pills, add
+  // buttons in empty cells (only while the page can be edited) and a label on hidden parts.
+  function decorate({ editable = true } = {}) {
+    const sections = [...root.querySelectorAll('[data-ui-kind="section"]')];
+    if (editable) sections.forEach((section, index) => {
+      const sectionId = section.getAttribute('data-ui-node');
+      if (!sectionId) return;
+      section.prepend(addSectionPill(index), sectionTools(sectionId, index, sections.length));
+    });
+    const article = root.querySelector('[data-ui-page]');
+    if (article && editable) article.append(addSectionPill(sections.length, { end: true }));
+    for (const section of editable ? sections : []) {
       const sectionId = section.getAttribute('data-ui-node');
       if (!sectionId || section.hasAttribute('data-ui-error')) continue;
       const cells = [...section.children].filter((child) => child.hasAttribute('data-ui-cell'));
@@ -292,7 +347,8 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
       if (id && !blocks.has(id)) blocks.set(id, element);
     }
     state = { key, hashes, blocks, page, realData };
-    decorate();
+    // Read only (someone else holds the page): no toolbars or add buttons that would do nothing.
+    decorate({ editable: own(options, 'editable') !== false });
     if (realData) paintRealData();
     return Promise.resolve();
   }
@@ -301,6 +357,16 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
     event.preventDefault();
     event.stopPropagation();
     const target = event.target && event.target.nodeType === 1 ? event.target : event.target && event.target.parentElement;
+    const sectionAct = target && target.closest('[data-ui-section-act]');
+    if (sectionAct) {
+      if (!sectionAct.disabled) emit('sectionAction', { sectionId: sectionAct.getAttribute('data-ui-section'), action: sectionAct.getAttribute('data-ui-section-act') });
+      return;
+    }
+    const addAt = target && target.closest('[data-ui-add-section-at]');
+    if (addAt) {
+      emit('addSection', { index: Number(addAt.getAttribute('data-ui-add-section-at')) });
+      return;
+    }
     const add = target && target.closest('[data-ui-add]');
     if (add) {
       emit('add', { sectionId: add.getAttribute('data-ui-add-section'), cellIndex: Number(add.getAttribute('data-ui-add-cell')) || 0 });
@@ -353,6 +419,8 @@ export function startCanvas({ root, richText, baseurl = '', win = globalThis.win
     onSelect(fn) { handlers.select = fn; },
     onHover(fn) { handlers.hover = fn; },
     onAddRequest(fn) { handlers.add = fn; },
+    onSectionAction(fn) { handlers.sectionAction = fn; },
+    onAddSection(fn) { handlers.addSection = fn; },
     onKey(fn) { handlers.key = fn; },
   });
   win.OCSUiCanvas = api;

@@ -78,7 +78,7 @@ test('the bridge handshakes on every load and re-sends the last render and selec
   const first = fakeCanvas();
   iframe.contentWindow.OCSUiCanvas = first.canvas;
   await listeners.load();
-  assert.deepEqual(first.calls[0], ['render', { v: 1 }, { realData: true, selectedId: 'b-000001' }]);
+  assert.deepEqual(first.calls[0], ['render', { v: 1 }, { realData: true, editable: true, selectedId: 'b-000001' }]);
   first.canvas.selectFn('b-000002');
   first.canvas.selectFn(42);
   first.canvas.addFn({ sectionId: 's-000001', cellIndex: 'x' });
@@ -87,9 +87,43 @@ test('the bridge handshakes on every load and re-sends the last render and selec
   const second = fakeCanvas();
   iframe.contentWindow = { OCSUiCanvas: second.canvas };
   await listeners.load();
-  assert.deepEqual(second.calls[0], ['render', { v: 1 }, { realData: true, selectedId: 'b-000001' }]);
+  assert.deepEqual(second.calls[0], ['render', { v: 1 }, { realData: true, editable: true, selectedId: 'b-000001' }]);
+  // Read only: the canvas is told to leave out its edit toolbars.
+  await bridge.render({ v: 2 }, { editable: false });
+  assert.deepEqual(second.calls.at(-1), ['render', { v: 2 }, { realData: false, editable: false, selectedId: 'b-000001' }]);
   assert.deepEqual(statuses, ['loading', 'ready', 'loading', 'ready']);
   bridge.destroy();
   second.canvas.selectFn('b-000003');
   assert.equal(selected.length, 2, 'nothing reaches the editor after destroy');
+});
+
+test('section toolbar actions and Add section pills reach the editor only when well formed', async () => {
+  const win = fakeWindow();
+  const listeners = {};
+  const iframe = { contentWindow: {}, addEventListener: (type, fn) => { listeners[type] = fn; }, removeEventListener: () => {}, src: '' };
+  const actions = [];
+  const adds = [];
+  const bridge = createCanvasBridge({ iframe, win, nonceOf: () => NONCE, onSectionAction: (request) => actions.push(request), onAddSection: (request) => adds.push(request) });
+  const { canvas } = fakeCanvas();
+  canvas.onSectionAction = (fn) => { canvas.sectionFn = fn; };
+  canvas.onAddSection = (fn) => { canvas.addSectionFn = fn; };
+  iframe.contentWindow.OCSUiCanvas = canvas;
+  await listeners.load();
+  canvas.sectionFn({ sectionId: 's-000001', action: 'move_up' });
+  canvas.sectionFn({ sectionId: 's-000001', action: 'publish' });
+  canvas.sectionFn({ sectionId: 7, action: 'remove' });
+  canvas.sectionFn(null);
+  canvas.addSectionFn({ index: 2 });
+  canvas.addSectionFn({ index: -1 });
+  canvas.addSectionFn({ index: '3' });
+  assert.deepEqual(actions, [{ sectionId: 's-000001', action: 'move_up' }]);
+  assert.deepEqual(adds, [{ index: 2 }]);
+  // A canvas from before the Studio, without the two hooks, still connects.
+  const old = fakeCanvas();
+  iframe.contentWindow = { OCSUiCanvas: old.canvas };
+  await listeners.load();
+  assert.equal(old.calls.length, 0, 'no render was ever asked for, and nothing threw');
+  bridge.destroy();
+  canvas.sectionFn({ sectionId: 's-000001', action: 'edit' });
+  assert.equal(actions.length, 1, 'nothing after destroy');
 });

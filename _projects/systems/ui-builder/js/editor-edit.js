@@ -110,6 +110,8 @@ export class EditSession {
     this.bridge = createCanvasBridge({
       iframe: shell.iframe, baseurl: this.app.baseurl, win: this.win,
       onSelect: (id) => this.select(id, { from: 'canvas' }), onAddRequest: (target) => this.openPalette(target),
+      onSectionAction: ({ sectionId, action }) => (action === 'edit' ? this.editNode(sectionId) : this.nodeAction(action, sectionId)),
+      onAddSection: ({ index }) => this.openSections(index),
       onKey: (event) => this.shortcuts.handle(event, { fromCanvas: true }),
       onStatus: (status) => {
         shell.failed.hidden = status !== 'failed';
@@ -244,7 +246,7 @@ export class EditSession {
     this.drawQueued = true;
     this.win.requestAnimationFrame(() => {
       this.drawQueued = false;
-      if (!this.closed) this.bridge.render(this.page, { realData: this.state.realData });
+      if (!this.closed) this.bridge.render(this.page, { realData: this.state.realData, editable: !this.state.readOnly });
     });
   }
 
@@ -359,6 +361,12 @@ export class EditSession {
   focusInspector() {
     if (!this.shell.paneOpen('inspector')) this.shell.setPane('inspector', true);
     this.inspector.focusFirst();
+  }
+
+  // A section toolbar's Edit: that section in the settings panel, its first field focused.
+  editNode(id) {
+    this.select(id);
+    if (this.state.selectedId) this.focusInspector();
   }
 
   commit(next, { coalesceKey = null, selectedId = this.state.selectedId, announce = '' } = {}) {
@@ -509,14 +517,17 @@ export class EditSession {
     this.palette.openBlocks({ capabilities: { spring: this.caps.cloud === true, flask: true }, liveCount: countLive(this.page, this.registry), onPick: (item) => this.addBlockAt(item.type, target) });
   }
 
-  openSections() {
+  // Add section (the section chooser) at `index`: a canvas pill's place, else after the selected
+  // section, else at the end.
+  openSections(index) {
     if (this.state.readOnly) return;
     if (this.page.sections.length >= this.limits.sections) { this.notify(this.text('errors.too_many_sections', { max: this.limits.sections }), { error: true }); return; }
     this.palette.openSections({ onPick: ({ type, layout }) => {
       const loc = findNode(this.page, this.state.selectedId);
+      const at = Number.isInteger(index) ? index : (loc ? loc.sectionIndex + 1 : this.page.sections.length);
       const newId = this.app.ids('s');
-      const next = addSection(this.page, this.registry, { type, layout, index: loc ? loc.sectionIndex + 1 : this.page.sections.length, newId });
-      this.commit(next, { selectedId: newId, announce: this.say('added', { label: nodeLabel(this.registry, next, newId) || type }) });
+      const next = addSection(this.page, this.registry, { type, layout, index: at, newId });
+      if (this.commit(next, { selectedId: newId, announce: this.say('added', { label: nodeLabel(this.registry, next, newId) || type }) })) this.bridge.scrollTo(newId);
     } });
   }
 }
