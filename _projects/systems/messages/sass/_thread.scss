@@ -505,6 +505,26 @@
   @include dm-focus-ring(-1px);
 }
 
+// ── Reactions (js/reactions.js, js/message-log.js) ─────────────────────────────────────
+// The chips under a message are the grammar's small pill buttons (yours filled with the
+// accent), in a row that wraps, no wider than the message's text.
+.dm .chat-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dm-space-xs);
+  max-width: min(100%, var(--dm-measure));
+  margin-top: var(--dm-space-xs);
+}
+
+// The React button's menu opens under the action bar, anchored to its right edge so it
+// stays on a phone's screen, and over the messages below it.
+.dm .chat-msg-actions .ocs__menu {
+  position: absolute;
+  top: calc(100% + var(--dm-space-xs));
+  right: 0;
+  z-index: 7;
+}
+
 // A reply's quote of the message it answers (chat-reply.js's renderReplyQuote): a
 // slim accent-ruled block above the reply's text. It is a button, so clicking it
 // scrolls to the original and marks it (.is-found).

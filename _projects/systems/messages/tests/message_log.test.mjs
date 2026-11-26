@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { fakeEvent, installFakeDom } from './fake-dom.mjs';
+import { fakeEvent, installFakeDom, settle } from './fake-dom.mjs';
 
 installFakeDom();
 
@@ -382,4 +382,144 @@ test('a message edited into a pin marker shows as text and pins nothing, now and
   assert.equal(reloaded.log.isPinned('m1'), false);
   assert.equal(reloaded.element.querySelector('.chat-pin-note'), null);
   assert.match(bodyOf(reloaded.element, 'm2').textContent, /\[\[pin:m1\]\]/);
+});
+
+// ── Reactions ───────────────────────────────────────────────────────────────────────────
+const rowOf = (element, key) => element.querySelector(`[data-key="${key}"]`);
+const reactButtonOf = (element, key) => rowOf(element, key).querySelector('[data-action="react"]');
+const chipsOf = (element, key) => rowOf(element, key).querySelector('.chat-reactions');
+const chipButtons = (element, key) => chipsOf(element, key).querySelectorAll('button');
+// Each part of a message by its chat-* class (a grammar class, such as ocs__file-list, can come first).
+const order = (element, key) => mainOf(element, key).children
+  .map(child => child.className.split(' ').find(name => name.startsWith('chat-')) ?? child.className);
+const likedBy = (...people) => [{ reaction: 'like', people: people.map(([uid, name]) => ({ uid, name })) }];
+
+// Opens a message's reaction picker and picks one by its label.
+function pick(element, key, label) {
+  reactButtonOf(element, key).dispatchEvent(fakeEvent('click'));
+  const item = rowOf(element, key).querySelectorAll('.ocs__menu-item')
+    .find(choice => choice.querySelector('.ocs__menu-name').textContent === label);
+  item.dispatchEvent(fakeEvent('click'));
+}
+
+test('the React button comes first, only where reactions can go', () => {
+  const onReact = async () => ({});
+  const { element, log } = makeLog({ onReact, onReply() {} });
+  log.append(message('1', 'hi'), false);
+  log.append(message('2', 'gone', { deleted: true }), false);
+  log.append(message(null, 'from before ids', { key: 'Grace|old' }), false);
+
+  const actions = rowOf(element, '1').querySelector('.chat-msg-actions');
+  assert.equal(actions.children[0], reactButtonOf(element, '1'), 'React is the first button');
+  assert.equal(reactButtonOf(element, '1').getAttribute('aria-label'), 'Add reaction');
+  assert.equal(reactButtonOf(element, '1').querySelector('i').className, 'fas fa-face-smile');
+  assert.equal(reactButtonOf(element, '2'), null, 'not on a deleted message');
+  assert.equal(reactButtonOf(element, 'Grace|old'), null, 'not on a message without an id');
+
+  const readOnly = makeLog({ onReact, readOnly: true });
+  readOnly.log.append(message('1', 'hi'), false);
+  assert.equal(reactButtonOf(readOnly.element, '1'), null, 'not in a read-only log');
+
+  const without = makeLog({ onReply() {} });
+  without.log.append(message('1', 'hi'), false);
+  assert.equal(reactButtonOf(without.element, '1'), null, 'not when the host takes no reactions');
+});
+
+test('picking a reaction asks to add it, and picking yours asks to remove it', async () => {
+  const calls = [];
+  const { element, log } = makeLog({ onReact: async (picked, reaction, on) => { calls.push([picked.key, reaction, on]); } });
+  log.append(message('1', 'hi'), false);
+  log.setReactions('1', likedBy(['grace', 'Grace Hopper']));
+
+  pick(element, '1', 'Like');
+  await settle();
+  log.setReactions('1', likedBy(['grace', 'Grace Hopper'], ['ada', 'Ada Lovelace']));
+  pick(element, '1', 'Like');
+  await settle();
+  // Your own chip takes yours back too.
+  chipButtons(element, '1')[0].dispatchEvent(fakeEvent('click'));
+  await settle();
+
+  assert.deepEqual(calls, [['1', 'like', true], ['1', 'like', false], ['1', 'like', false]]);
+});
+
+test('setReactions draws chips before the action bar, and markDeleted removes them', () => {
+  const { element, log } = makeLog({ onReact: async () => {} });
+  log.append(message('1', 'hi'), false);
+  log.setReactions('1', likedBy(['grace', 'Grace Hopper']));
+
+  assert.deepEqual(order(element, '1'), ['chat-msg-meta', 'chat-msg-body', 'chat-reactions', 'chat-msg-actions']);
+  assert.equal(chipButtons(element, '1')[0].textContent, '👍 1');
+
+  log.markDeleted('1');
+  assert.equal(chipsOf(element, '1'), null);
+  log.setReactions('1', likedBy(['grace', 'Grace Hopper']));
+  assert.equal(chipsOf(element, '1'), null, 'a deleted message takes no chips');
+});
+
+test('editing a message keeps its chips', () => {
+  const linkCards = html => {
+    if (!/github/.test(html)) return null;
+    const box = document.createElement('div');
+    box.textContent = 'card';
+    return box;
+  };
+  const { element, log } = makeLog({ onReact: async () => {}, linkCards });
+  log.append(message('1', '[[files:f~notes.md~10]] see https://github.com/o/r'), true);
+  log.setReactions('1', likedBy(['grace', 'Grace Hopper']));
+  const row = rowOf(element, '1');
+
+  log.updateBody('1', '[[files:f~notes.md~10]] see https://github.com/o/r now');
+
+  assert.equal(rowOf(element, '1'), row, 'the row stays in place');
+  assert.deepEqual(order(element, '1'),
+    ['chat-msg-meta', 'chat-msg-body', 'chat-files', 'chat-cards', 'chat-reactions', 'chat-msg-actions']);
+  assert.equal(chipButtons(element, '1')[0].textContent, '👍 1');
+});
+
+test('a message without an id has no reactions', () => {
+  const { element, log } = makeLog({ onReact: async () => {} });
+  log.append(message(null, 'from before ids', { key: 'Grace|old' }), false);
+  log.setReactions('Grace|old', likedBy(['grace', 'Grace Hopper']));
+  assert.equal(chipsOf(element, 'Grace|old'), null);
+});
+
+test('while a reaction is saving, that message’s controls are disabled', async () => {
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  const calls = [];
+  const { element, log } = makeLog({ onReact: (picked, reaction) => { calls.push(reaction); return held; } });
+  log.append(message('1', 'hi'), false);
+  log.setReactions('1', likedBy(['grace', 'Grace Hopper']));
+
+  pick(element, '1', 'Love');
+  assert.equal(reactButtonOf(element, '1').disabled, true);
+  assert.ok(chipButtons(element, '1').every(chip => chip.disabled));
+  // A second change on the same message waits for the first.
+  chipButtons(element, '1')[0].dispatchEvent(fakeEvent('click'));
+  // Chips drawn again while it saves (a frame from someone else) stay disabled.
+  log.setReactions('1', likedBy(['grace', 'Grace Hopper'], ['alan', 'Alan Turing']));
+  assert.ok(chipButtons(element, '1').every(chip => chip.disabled));
+
+  release({});
+  await settle();
+  assert.equal(reactButtonOf(element, '1').disabled, false);
+  assert.ok(chipButtons(element, '1').every(chip => !chip.disabled));
+  assert.deepEqual(calls, ['love']);
+});
+
+test('clearing the log or deleting the message closes an open reaction picker', () => {
+  const { element, log } = makeLog({ onReact: async () => {} });
+  log.append(message('1', 'hi'), false);
+  log.append(message('2', 'there'), false);
+  const before = document.listenerCount('click');
+
+  reactButtonOf(element, '2').dispatchEvent(fakeEvent('click'));
+  assert.equal(document.listenerCount('click'), before + 1, 'an open picker listens for a click elsewhere');
+  log.markDeleted('2');
+  assert.equal(document.listenerCount('click'), before);
+
+  reactButtonOf(element, '1').dispatchEvent(fakeEvent('click'));
+  log.clear();
+  assert.equal(document.listenerCount('click'), before);
 });
