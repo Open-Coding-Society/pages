@@ -9,7 +9,10 @@ export function createDialog(modal, { onClose } = {}) {
   function open(opener) {
     returnFocus = opener || document.activeElement;
     modal.classList.remove('hidden');
-    modal.querySelector('[data-focus]')?.focus();
+    // The first field marked data-focus that is showing; Close when every one is hidden, so focus never stays
+    // behind the modal.
+    const field = [...modal.querySelectorAll('[data-focus]')].find(element => !element.closest('.hidden'));
+    (field || modal.querySelector('[data-close]'))?.focus();
   }
 
   function close() {

@@ -153,7 +153,10 @@ function hasRole(person, roleName) {
 
 export const isAdmin = person => hasRole(person, 'ROLE_ADMIN');
 
-export const canFormGroups = person => isAdmin(person) || hasRole(person, 'ROLE_TEACHER');
+// Teachers and admins, the people Spring's GroupsApiController counts as staff.
+const isStaff = person => isAdmin(person) || hasRole(person, 'ROLE_TEACHER');
+
+export const canFormGroups = isStaff;
 
 export const isGroupMember = (group, personId) => (group.members || []).some(member => member.id === personId);
 
@@ -166,10 +169,15 @@ export const isCourseChannel = group => /^(lessons|[a-z]+-announcements|[a-z]+-w
 // (PUT /api/groups/class-memberships), and the calendar reads them, so they aren't left here.
 const CLASS_GROUPS = ['CSSE', 'CSP', 'CSA', 'CSH'];
 
-export const isClassGroup = group => CLASS_GROUPS.includes(String(group.name || '').toUpperCase());
+// Spring reads the name trimmed and in capitals (ClassGroupMembershipService), so this does too.
+export const isClassGroup = group => CLASS_GROUPS.includes(String(group.name || '').trim().toUpperCase());
 
 // Only site admins delete groups, and never a class group, for the same reason it has no Leave.
 export const canDeleteGroup = (person, group) => isAdmin(person) && !isClassGroup(group);
+
+// Members' Add and Remove. A class group's members come from each student's Profile, so
+// Spring lets only staff change them by hand (spring#309); any other group's members can.
+export const canChangeMembers = (person, group) => isStaff(person) || !isClassGroup(group);
 
 // A page shows a run of spaces as one, so a name typed as it looks still matches.
 const collapseSpaces = text => String(text ?? '').trim().replace(/\s+/g, ' ');
