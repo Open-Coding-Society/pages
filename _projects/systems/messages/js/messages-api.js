@@ -7,13 +7,33 @@
 export function createMessagesApi({
   javaURI, pythonURI, fetchOptions, createRequest = () => new XMLHttpRequest(),
 }) {
-  const failure = (method, path, status) => Object.assign(new Error(`${method} ${path} answered HTTP ${status}`), { status });
+  // reason is the refusal code Spring answers with (MentorRules: {error, reason}), or '' when there is none.
+  const failure = (method, path, status, reason = '') =>
+    Object.assign(new Error(`${method} ${path} answered HTTP ${status}`), { status, reason });
+
+  function reasonIn(text) {
+    try {
+      const body = JSON.parse(text);
+      return typeof body?.reason === 'string' ? body.reason : '';
+    } catch {
+      return '';
+    }
+  }
+
+  // A body that can't be read gives no reason; the failure keeps its status either way.
+  async function reasonFrom(response) {
+    try {
+      return reasonIn(await response.text());
+    } catch {
+      return '';
+    }
+  }
 
   async function send(base, path, method = 'GET', body) {
     const options = { ...fetchOptions, method };
     if (body !== undefined) options.body = JSON.stringify(body);
     const response = await fetch(`${base}${path}`, options);
-    if (!response.ok) throw failure(method, path, response.status);
+    if (!response.ok) throw failure(method, path, response.status, await reasonFrom(response));
     return response;
   }
 
@@ -42,7 +62,7 @@ export function createMessagesApi({
       };
       xhr.onload = () => {
         if (xhr.status < 200 || xhr.status >= 300) {
-          reject(failure('POST', path, xhr.status));
+          reject(failure('POST', path, xhr.status, reasonIn(xhr.responseText)));
           return;
         }
         try {

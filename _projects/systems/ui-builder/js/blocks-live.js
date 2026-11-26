@@ -136,6 +136,7 @@ function courseLabel(c, code) {
 
 function messageError(c, error) {
   if (error && error.error === 'own_page') return { text: c.say('blocks.sample_message_me') };
+  if (error && error.error === 'mentor_no_direct_messages') return { text: c.say('live.message_me_mentor') };
   if (error && error.name === 'OfflineError' && browserOffline()) return { text: c.say('live.offline') };
   if (error && error.status === 401) return failure(c, error);
   return { text: c.say('live.message_me_failed') };

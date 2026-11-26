@@ -236,7 +236,7 @@ are unchanged.
 |---|---|---|
 | Group chat | Messages `conversation-embed.js` `mountGroupChat` | Spring group chat: REST to send, STOMP to receive |
 | Class announcements | the same, read-only, on `<course>-announcements`, with Courses' `calendar-model.js` `extractEventMarkers` | Spring group chat |
-| Message us | `SpringPageStore.messageOwner(slug)` → `/dm?dm=<id>` | Spring DMs, owner resolved on the server |
+| Message us | `SpringPageStore.messageOwner(slug)` → `/dm?dm=<id>` | Spring DMs, owner resolved on the server; refused (`mentor_no_direct_messages`) when the owner or the visitor is a mentor |
 | Team members | `SpringPageStore.members(slug, blockId)` | names only, from the published page's group |
 | Class calendar | Courses `calendar-card.js` `createCalendarCardSection` + `mountCalendarCard` | Spring calendar; the school week when signed out |
 | Kanban board | `assets/js/kanban-board.js` `createKanbanSection` + `mountKanbanBoard` | GitHub (60 requests an hour per network, so it loads on click) |

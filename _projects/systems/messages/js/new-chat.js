@@ -2,7 +2,17 @@
 // Spring returns the existing conversation when there already is one.
 import { button, createDialog } from './dialogs.js';
 
-export function initNewChat({ elements, api, me, onStarted }) {
+// What the dialog says when everyone a search found is someone Spring won't let anyone message.
+const NO_ONE_TO_MESSAGE = 'Everyone who matches talks in group chats only.';
+
+// Which words a start Spring refuses shows, by the reason Spring gives. Any other failure says to try again.
+const START_REFUSALS = Object.freeze({
+  mentor_no_direct_messages: 'This chat would include a mentor, and mentors don’t use direct messages. Talk in your team’s group instead.',
+});
+
+// canMessage comes from the page's Allowances: Spring refuses any direct message that includes an account
+// without direct messages, so those people aren't offered.
+export function initNewChat({ elements, api, me, onStarted, canMessage = () => true }) {
   const selected = new Map(); // person id -> person
   let searchTimer = null;
   let searchCount = 0;
@@ -14,7 +24,8 @@ export function initNewChat({ elements, api, me, onStarted }) {
   }
 
   function renderResults(people) {
-    const others = people.filter(person => person.uid !== me.uid);
+    const matches = people.filter(person => person.uid !== me.uid);
+    const others = matches.filter(canMessage);
     elements.results.replaceChildren(...others.map(person => {
       const isSelected = selected.has(person.id);
       const choice = button(`${person.name} (@${person.uid})`, isSelected ? 'ocs__btn small pill accent fill' : 'ocs__btn small pill', () => {
@@ -26,7 +37,7 @@ export function initNewChat({ elements, api, me, onStarted }) {
       choice.setAttribute('aria-pressed', String(isSelected));
       return choice;
     }));
-    elements.status.textContent = others.length ? '' : 'No one matches that search.';
+    elements.status.textContent = others.length ? '' : (matches.length ? NO_ONE_TO_MESSAGE : 'No one matches that search.');
   }
 
   async function search(query) {
@@ -75,7 +86,7 @@ export function initNewChat({ elements, api, me, onStarted }) {
       onStarted(conversation);
     } catch (error) {
       console.warn('Messages: could not start the conversation', error);
-      elements.status.textContent = 'Could not start the chat. Try again.';
+      elements.status.textContent = START_REFUSALS[error?.reason] || 'Could not start the chat. Try again.';
       elements.start.disabled = false;
     }
   });

@@ -2,7 +2,7 @@
 // null, and whatever needed that element quietly does nothing, so these check the page
 // and the script against each other.
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
 const read = path => readFileSync(new URL(path, import.meta.url), 'utf8');
@@ -38,4 +38,24 @@ test('the gist command’s Profile link sits beside /dm, so a site under a base 
   has(script, /profileUrl: new URL\('profile', window\.location\.href\)\.pathname/, 'the page finds Profile beside itself');
   assert.equal(new URL('profile', 'https://student.github.io/pages/dm?group=12').pathname, '/pages/profile');
   assert.equal(new URL('profile', 'https://pages.opencodingsociety.com/dm').pathname, '/profile');
+});
+
+test('the page asks Allowances what to offer, and no shared Messages file names a role', () => {
+  has(script, /Allowances\.for\(me\)/, 'messages-page.js asks Allowances.for(me) what to offer');
+  has(script, /if \(allowed\.directMessages\) initNewChat\(/, 'New chat is wired only when direct messages are allowed');
+  has(script, /if \(allowed\.findGroups\) initFindGroup\(/, 'Find or make is wired only when finding groups is allowed');
+  has(script, /Allowances\.offer\(byId\('messagesNewChat'\), allowed\.directMessages\)/, 'New chat shows only when allowed');
+  has(script, /Allowances\.offer\(byId\('messagesFindGroup'\), allowed\.findGroups\)/, 'Find or make shows only when allowed');
+  has(script, /texts: \{ \.\.\.Allowances\.threadTexts\(allowed\), placeholder: /, 'the thread gets its words from Allowances, with the commands placeholder');
+  assert.equal((script.match(/^\s+texts:/gm) || []).length, 1, 'the thread gets one texts object (a second one would replace the first)');
+  has(script, /Allowances\.rejoinNote\(allowed\)/, 'Leave says how to come back from Allowances');
+  has(script, /canManage: allowed\.manageMembers/, 'Members gets canManage from Allowances');
+  has(script, /canMessage: person => Allowances\.for\(person\)\.directMessages/, 'New chat offers only people who use direct messages');
+  has(script, /emptyDmText: Allowances\.emptyDirectMessagesText\(allowed\)/, 'the Direct messages list says why it is empty');
+  const modules = readdirSync(new URL('../js/', import.meta.url)).filter(name => name.endsWith('.js') && name !== 'allowances.js');
+  assert.ok(modules.length > 30, 'every Messages module is checked');
+  for (const name of modules) {
+    const source = read(`../js/${name}`);
+    assert.ok(!/ROLE_MENTOR|isMentor|\.mentor\b/.test(source), `${name} checks for a mentor; ask Allowances instead`);
+  }
 });

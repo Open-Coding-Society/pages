@@ -96,3 +96,14 @@ test('render does not reorder the array it was handed', () => {
 
   assert.deepEqual(conversations.map(conversation => conversation.id), before);
 });
+
+test('an empty direct messages list says what the page passes, or that there are none yet', () => {
+  const dmList = collector();
+  createSidebar({ groupList: collector(), dmList, onOpen() {} }).render({ groups: [], conversations: [], active: null });
+  assert.equal(dmList.rows[0].textContent, 'No direct messages yet.');
+
+  const noDirectMessages = collector();
+  createSidebar({ groupList: collector(), dmList: noDirectMessages, onOpen() {}, emptyDmText: 'Direct messages are off for your account.' })
+    .render({ groups: [], conversations: [], active: null });
+  assert.equal(noDirectMessages.rows[0].textContent, 'Direct messages are off for your account.');
+});

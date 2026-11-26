@@ -31,7 +31,8 @@ same way they reach a direct message.
 | `js/delete-group.js` | The Delete group dialog: says what deleting takes away, and waits for the group's name. |
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
-| `js/messages-api.js` | Every Spring and Flask request. |
+| `js/messages-api.js` | Every Spring and Flask request. A refusal carries Spring's `reason` with its status. |
+| `js/allowances.js` | What the page offers the signed-in account (`Allowances.for(me)`), mirroring Spring's rules. See [What an account is offered](#what-an-account-is-offered). |
 | `js/github-links.js` | `GitHubLinks`, static: reads a GitHub link (issue, pull request, commit, repository, gist), finds the first three different ones in a message, and builds the link `/issue`, `/pr`, `/commit` and `/repo` post. |
 | `js/github-source.js` | `GitHubSource`: asks api.github.com from the browser and keeps each answer 10 minutes (in memory and in localStorage under `ocs-github:`). Keeping one first removes copies older than that, because the rest of the site shares localStorage. After GitHub's rate limit it asks nothing until GitHub's reset time, or its `Retry-After`. Gists come through Spring. |
 | `js/github-cards.js` | `GitHubCards`: a card (a compact `ocs__nav-card`) under a message for each GitHub link, drawn from the link at once and filled in when it scrolls near the screen. |
@@ -255,6 +256,7 @@ back the listeners the pane and its composer put on `document` and `window`, and
 | `offline` | Live updates are off. Reload the page to see new messages. |
 | `placeholder`, `send`, `save`, `cancel` | Type a message…; Send; Save; Cancel |
 | `sendFailed` | Could not send the message. Try again. |
+| `refusedNoDirectMessages` | This conversation includes a mentor, and mentors don’t use direct messages. Talk in your team’s group instead. (When Spring refuses a send with `mentor_no_direct_messages`.) |
 | `editFailed` | Could not save your edit. Try again. |
 | `editOfDeleted` | That message was deleted, so your edit was not saved. |
 | `deleteFailed` | Could not delete the message. Try again. |
@@ -331,6 +333,26 @@ Flask: `POST /run/python` and `POST /run/javascript` (`{code}`, answers `{output
 Form groups `POST /api/persona/evaluate-group`, `POST /api/persona/form-groups`.
 
 GitHub: `api.github.com`, from the browser, signed out, for the cards.
+
+## What an account is offered
+
+Spring decides what each account may do. `Allowances` (`js/allowances.js`) mirrors its rules, so the page never offers
+what Spring would refuse, and holds the words the page shows about it (`Allowances.TEXTS`). Every other Messages
+module (the sidebar, the dialogs, the thread and the rest) gets its answers from the page and never checks the mentor
+role; `page_wiring.test.mjs` reads each one and fails if it does.
+
+- Spring's `MentorRules` keep an account with `ROLE_MENTOR` and no teacher or admin role to its team's groups, and
+  Spring lists only the groups it may use. For that account the page hides New chat and Find or make, the empty
+  thread pane says to pick a group, Leave says a member can add them back, and Members lists the group with no Remove
+  or add search (its Close button gets focus). An empty Direct messages list says direct messages are off. Older
+  direct messages still open, and a send there says a mentor is in the chat.
+- Spring marks each member who is a mentor (`"mentor": true` in a group's members), and Members shows "(mentor)"
+  for everyone (`Allowances.memberTag`).
+- Spring refuses any direct message that includes an account without direct messages, so New chat leaves those
+  people out of its results (`canMessage`), and says so when everyone a search found is one of them.
+- A refusal carries Spring's `reason` (`messages-api.js`, uploads too). A send refused with `mentor_no_direct_messages`
+  shows `refusedNoDirectMessages`, a refused New chat start and a refused member change say why, and any other
+  failure still asks to try again.
 
 ## Groups the page leaves alone
 
