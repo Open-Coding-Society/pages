@@ -27,7 +27,7 @@ mentors:
   removed: "{name} was taken out of the team chat."
   # Spring's reason when it refuses a change (MentorRules in Spring).
   reasons:
-    mentor_team_too_small: "Add at least 2 team members to the group in Messages before adding a mentor."
+    mentor_team_too_small: "The group needs at least 2 members who aren't mentors before it can have a mentor. Add your teammates in Messages first."
     team_manages_mentors: "Only the group's members or a teacher can add or remove its mentor."
     mentor_class_group: "Mentors can't be in class groups."
     mentor_cannot_manage: "Mentors can't add or remove people."
