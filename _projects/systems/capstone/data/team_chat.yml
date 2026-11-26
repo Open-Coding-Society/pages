@@ -1,0 +1,15 @@
+# The words of a capstone page's team chat (_includes/capstone-team-chat.html, js/team-chat.js,
+# js/team-mentors.js). {group} is the team group's name. The code has no visible text of its own.
+title: Team chat
+lead: The team and its mentors talk here. It's the same group the team has in Messages.
+loading: Loading the team chat…
+signIn: Sign in to see the team chat.
+unavailable: The team chat isn't available right now.
+notMember: "This chat is for {group}'s members and mentors. A member can add you in Messages."
+mentorWaiting: "You'll see this chat once a member of {group} adds you and the group has at least 2 members who aren't mentors."
+notFound: "There's no group named {group} in Messages yet. Make it in Messages, then add the team."
+openInMessages: Open in Messages
+# Words for the chat itself (Messages' embed); any key from the Messages README's embed table.
+embed:
+  emptyHint: Say hi to your team.
+  placeholder: Message the team…
