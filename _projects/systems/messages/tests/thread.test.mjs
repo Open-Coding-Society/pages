@@ -8,7 +8,7 @@ import { fakeEvent, installFakeDom, settle } from './fake-dom.mjs';
 
 const { document } = installFakeDom();
 
-const { createThread } = await import('../js/thread.js');
+const { createThread, THREAD_TEXTS } = await import('../js/thread.js');
 
 const me = { id: 1, uid: 'ada', name: 'Ada Lovelace', pfp: null };
 
@@ -265,4 +265,34 @@ test('a GitHub link in a DM shows its card under the message', async () => {
 
   assert.equal(elements.messages.querySelectorAll('.chat-cards').length, 1);
   assert.match(asked[0], /pages\/pull\/2066/);
+});
+
+test('a direct message Spring refuses for a reason it names says that reason, not try again', async () => {
+  const api = stubApi();
+  api.sendDm = async () => {
+    throw Object.assign(new Error('POST /api/dm/conversations/4/messages answered HTTP 403'),
+      { status: 403, reason: 'mentor_no_direct_messages' });
+  };
+  const { thread, elements, richText } = makeThread({ api });
+  thread.open('dm', 4, { title: '', subtitle: '' });
+  await settle();
+  richText.composers[0].setHTML('hi');
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  assert.equal(elements.formStatus.textContent, THREAD_TEXTS.refusedNoDirectMessages);
+});
+
+test('a refusal with no reason the page knows still says to try again', async () => {
+  const api = stubApi();
+  api.sendDm = async () => { throw Object.assign(new Error('POST answered HTTP 403'), { status: 403, reason: '' }); };
+  api.sendGroupMessage = async () => { throw Object.assign(new Error('POST answered HTTP 500'), { status: 500, reason: '' }); };
+  for (const [kind, id] of [['dm', 4], ['group', 7]]) {
+    const { thread, elements, richText } = makeThread({ api });
+    thread.open(kind, id, { title: '', subtitle: '' });
+    await settle();
+    richText.composers[0].setHTML('hi');
+    elements.form.dispatchEvent(fakeEvent('submit'));
+    await settle();
+    assert.equal(elements.formStatus.textContent, THREAD_TEXTS.sendFailed, kind);
+  }
 });

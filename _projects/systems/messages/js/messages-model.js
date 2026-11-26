@@ -147,7 +147,7 @@ export function groupSubtitle(group) {
   ].filter(Boolean).join(' · ');
 }
 
-function hasRole(person, roleName) {
+export function hasRole(person, roleName) {
   return (person?.roles || []).some(role => (typeof role === 'string' ? role : role?.name) === roleName);
 }
 

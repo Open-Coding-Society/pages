@@ -22,6 +22,10 @@ import { createMessageLog, withTexts } from './message-log.js';
 
 // What the pane says, worded for /dm. A host passes its own wording for any of these in
 // `texts`.
+// Which of the texts below a refusal from Spring shows, by the reason Spring gives. Any other failure says
+// to try again.
+const REFUSAL_TEXTS = Object.freeze({ mentor_no_direct_messages: 'refusedNoDirectMessages' });
+
 export const THREAD_TEXTS = Object.freeze({
   idleTitle: 'Pick a conversation',
   idleHint: 'Or start a new chat, or find a group to join.',
@@ -32,6 +36,7 @@ export const THREAD_TEXTS = Object.freeze({
   send: 'Send',
   save: 'Save',
   sendFailed: 'Could not send the message. Try again.',
+  refusedNoDirectMessages: 'This conversation includes a mentor, and mentors don’t use direct messages. Talk in your team’s group instead.',
   editFailed: 'Could not save your edit. Try again.',
   editOfDeleted: 'That message was deleted, so your edit was not saved.',
   deleteFailed: 'Could not delete the message. Try again.',
@@ -421,7 +426,8 @@ export function createThread({
         showFormMessage(text.sharedButNotSent);
       } else {
         refreshComposer();
-        showFormMessage(target ? text.editFailed : text.sendFailed);
+        const refusal = REFUSAL_TEXTS[error?.reason];
+        showFormMessage(refusal ? text[refusal] : (target ? text.editFailed : text.sendFailed));
       }
       return;
     }

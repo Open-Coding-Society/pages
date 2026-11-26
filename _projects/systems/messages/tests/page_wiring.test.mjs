@@ -39,3 +39,20 @@ test('the gist command’s Profile link sits beside /dm, so a site under a base 
   assert.equal(new URL('profile', 'https://student.github.io/pages/dm?group=12').pathname, '/pages/profile');
   assert.equal(new URL('profile', 'https://pages.opencodingsociety.com/dm').pathname, '/profile');
 });
+
+test('the page asks Allowances what to offer, and no shared Messages file names a role', () => {
+  has(script, /Allowances\.for\(me\)/, 'messages-page.js asks Allowances.for(me) what to offer');
+  has(script, /if \(allowed\.directMessages\) initNewChat\(/, 'New chat is wired only when direct messages are allowed');
+  has(script, /if \(allowed\.findGroups\) initFindGroup\(/, 'Find or make is wired only when finding groups is allowed');
+  has(script, /Allowances\.offer\(byId\('messagesNewChat'\), allowed\.directMessages\)/, 'New chat shows only when allowed');
+  has(script, /Allowances\.offer\(byId\('messagesFindGroup'\), allowed\.findGroups\)/, 'Find or make shows only when allowed');
+  has(script, /texts: Allowances\.threadTexts\(allowed\)/, 'the thread gets its words from Allowances');
+  has(script, /Allowances\.rejoinNote\(allowed\)/, 'Leave says how to come back from Allowances');
+  has(script, /canManage: allowed\.manageMembers/, 'Members gets canManage from Allowances');
+  has(script, /canMessage: person => Allowances\.for\(person\)\.directMessages/, 'New chat offers only people who use direct messages');
+  has(script, /emptyDmText: Allowances\.emptyDirectMessagesText\(allowed\)/, 'the Direct messages list says why it is empty');
+  for (const name of ['messages-page.js', 'sidebar.js', 'group-dialogs.js', 'thread.js', 'new-chat.js']) {
+    const source = read(`../js/${name}`);
+    assert.ok(!/ROLE_MENTOR|isMentor|\.mentor\b/.test(source), `${name} checks for a mentor; ask Allowances instead`);
+  }
+});

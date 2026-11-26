@@ -2,6 +2,7 @@
 // one sidebar, the open conversation beside them, and the group dialogs. The page hands
 // in config.js and rich-text.js, which it imports with {{ site.baseurl }}, so the modules
 // here only import each other, with ./ paths.
+import { Allowances } from './allowances.js';
 import { createChatSocket } from './chat-socket.js';
 import { ConversationPanel } from './conversation-panel.js';
 import { initDeleteGroup } from './delete-group.js';
@@ -63,6 +64,8 @@ export async function startMessagesPage({ config, richText, push }) {
 
   const me = await signedInPerson(api, setStatus);
   if (!me) return;
+  // What Spring lets this account do here (Allowances mirrors its rules): the page offers nothing else.
+  const allowed = Allowances.for(me);
   const state = { groups: [], conversations: [], active: null, query: '' };
   let messageSearch = null; // set once the search box is wired up, below
   // The search box in the chat header searches the open direct message, so it is told which.
@@ -76,6 +79,7 @@ export async function startMessagesPage({ config, richText, push }) {
     groupList: byId('messagesGroupList'),
     dmList: byId('messagesDmList'),
     onOpen: (kind, id) => openConversation(kind, id),
+    emptyDmText: Allowances.emptyDirectMessagesText(allowed),
   });
   const render = () => sidebar.render(state);
   // "Find a conversation" narrows both lists as you type; Enter opens the first one left,
@@ -122,6 +126,7 @@ export async function startMessagesPage({ config, richText, push }) {
   let scheduleDialog = null; // wired up below, once the thread exists
   const thread = createThread({
     api,
+    texts: Allowances.threadTexts(allowed),
     onSchedule: (message, opener) => scheduleDialog?.open(message, opener),
     socket,
     richText,
@@ -363,6 +368,7 @@ export async function startMessagesPage({ config, richText, push }) {
     onChanged: groupChanged,
     // Cancel returns focus to the header's Members button, where this started.
     onDelete: group => deleteGroup.open(group, byId('messagesMembers')),
+    canManage: allowed.manageMembers,
     elements: {
       dialog: byId('membersDialog'), title: byId('membersTitle'), list: byId('membersList'),
       search: byId('membersSearch'), searchField: byId('membersAddField'), results: byId('membersResults'), status: byId('membersStatus'),
@@ -377,7 +383,7 @@ export async function startMessagesPage({ config, richText, push }) {
   byId('messagesSharedButton').addEventListener('click', event => openPanel({}, event.currentTarget));
   byId('messagesLeaveGroup').addEventListener('click', async () => {
     const group = openGroup();
-    if (!group || !window.confirm(`Leave ${group.name}? You can join it again from Find a group.`)) return;
+    if (!group || !window.confirm(`Leave ${group.name}? ${Allowances.rejoinNote(allowed)}`)) return;
     try {
       await api.removeMember(group.id, me.id);
       groupGone(group.id);
@@ -387,7 +393,7 @@ export async function startMessagesPage({ config, richText, push }) {
       notice.textContent = `Could not leave ${group.name}. Try again.`;
     }
   });
-  initFindGroup({
+  if (allowed.findGroups) initFindGroup({
     api,
     me,
     onJoined: async group => {
@@ -402,9 +408,11 @@ export async function startMessagesPage({ config, richText, push }) {
       course: byId('createGroupCourse'), create: byId('createGroupSubmit'), createStatus: byId('createGroupStatus'),
     },
   });
-  initNewChat({
+  if (allowed.directMessages) initNewChat({
     api,
     me,
+    // Spring refuses any direct message that includes someone without direct messages, so they aren't offered.
+    canMessage: person => Allowances.for(person).directMessages,
     onStarted: async conversation => {
       await loadConversations();
       openConversation('dm', conversation.id);
@@ -454,8 +462,8 @@ export async function startMessagesPage({ config, richText, push }) {
     });
     byId('messagesFormGroups').classList.remove('hidden');
   }
-  byId('messagesFindGroup').disabled = false;
-  byId('messagesNewChat').disabled = false;
+  Allowances.offer(byId('messagesFindGroup'), allowed.findGroups);
+  Allowances.offer(byId('messagesNewChat'), allowed.directMessages);
   initNotifyButton({ push, button: byId('messagesNotify'), notice });
   if (conversationSearch) conversationSearch.disabled = false;
   startShortcuts();

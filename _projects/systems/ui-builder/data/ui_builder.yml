@@ -821,6 +821,7 @@ text:
     save: Save
     cancel: Cancel
     sendFailed: Could not send the message. Try again.
+    refusedNoDirectMessages: "This conversation includes a mentor, and mentors don’t use direct messages. Talk in your team’s group instead."
     editFailed: Could not save your edit. Try again.
     editOfDeleted: That message was deleted, so your edit was not saved.
     deleteFailed: Could not delete the message. Try again.

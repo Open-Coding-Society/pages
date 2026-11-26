@@ -6,7 +6,8 @@ import { conversationLabel, groupSubtitle, initialsFor, matchesConversationSearc
 
 export const conversationHref = (kind, id) => `?${kind}=${encodeURIComponent(id)}`;
 
-export function createSidebar({ groupList, dmList, onOpen }) {
+// emptyDmText is what an empty Direct messages list says, for a page that says why it is empty.
+export function createSidebar({ groupList, dmList, onOpen, emptyDmText = 'No direct messages yet.' }) {
   function row(kind, id, title, detail, note, active) {
     const link = document.createElement('a');
     link.className = 'ocs__nav-card';
@@ -79,7 +80,7 @@ export function createSidebar({ groupList, dmList, onOpen }) {
     dmList.replaceChildren(...(shownConversations.length
       ? unreadFirst(shownConversations).map(conversation => row('dm', conversation.id, conversationLabel(conversation), '',
         unreadNote(conversation.unreadCount), active))
-      : [emptyLine(query ? 'No direct messages match your search.' : 'No direct messages yet.')]));
+      : [emptyLine(query ? 'No direct messages match your search.' : emptyDmText)]));
   }
 
   return { render };
