@@ -190,7 +190,7 @@ class TopicsTest < Minitest::Test
   end
 
   def test_registered_system_architectures_are_published_and_indexed
-    names = %w[blogs calendar capstone courses grades login profile topics ui-builder]
+    names = %w[blogs calendar capstone courses events grades login profile topics ui-builder]
     Dir.mktmpdir("system-topics-") do |source|
       FileUtils.mkdir_p(File.join(source, "_projects/_template"))
       FileUtils.cp(File.join(ROOT, "Makefile"), source)
