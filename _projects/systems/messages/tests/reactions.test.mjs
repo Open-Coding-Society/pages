@@ -126,3 +126,19 @@ test('setDisabled turns every chip in the row off and back on', () => {
   chips.setDisabled(main, false);
   assert.deepEqual(buttons.map(chip => chip.disabled), [false, false]);
 });
+
+test('a chip that had focus keeps it when the row is redrawn', () => {
+  const { main, chips } = drawChips([like(person('ada')), { reaction: 'wow', people: [person('alan')] }]);
+  document.body.appendChild(main);
+  chipsIn(main)[1].focus();
+
+  chips.render(main, null, [like(person('ada'), person('grace')), { reaction: 'wow', people: [person('alan'), person('ada')] }]);
+
+  assert.equal(document.activeElement, chipsIn(main)[1], 'the Wow chip in the new row has focus');
+  assert.equal(document.activeElement.dataset.reaction, 'wow');
+});
+
+test('the chip row is not read out by the log as it changes', () => {
+  const { main } = drawChips([like(person('ada'))]);
+  assert.equal(main.querySelector('.chat-reactions').getAttribute('aria-live'), 'off');
+});

@@ -103,13 +103,20 @@ export class ReactionChips {
    * @param {Array} list the message's reactions, from Reactions.normalize; empty removes the row
    */
   render(main, before, list) {
-    main.querySelector('.chat-reactions')?.remove();
+    const old = main.querySelector('.chat-reactions');
+    // A chip that had focus (toggled from the keyboard, or sat on while someone's change came
+    // in) keeps it in the new row.
+    const focused = old && old.contains(document.activeElement) ? document.activeElement.dataset.reaction : null;
+    old?.remove();
     if (!list?.length) return;
     const row = document.createElement('div');
     row.className = 'chat-reactions';
+    // The log is a live region, and the chips change too often to be read out each time.
+    row.setAttribute('aria-live', 'off');
     list.forEach(entry => row.appendChild(this.#chip(entry)));
     if (before && before.parentNode === main) main.insertBefore(row, before);
     else main.appendChild(row);
+    if (focused) row.querySelector(`[data-reaction="${focused}"]`)?.focus();
   }
 
   /**
@@ -128,6 +135,7 @@ export class ReactionChips {
     const names = this.#names.format(this.#namesFor(entry, mine));
     const chip = document.createElement('button');
     chip.type = 'button';
+    chip.dataset.reaction = entry.reaction;
     chip.className = mine ? 'ocs__btn small pill accent fill' : 'ocs__btn small pill';
     chip.setAttribute('aria-pressed', String(mine));
     chip.title = fill(this.#text.reactionPeople, { reaction, names });

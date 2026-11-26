@@ -541,3 +541,31 @@ test('a reaction picker near the foot of the log opens upward', () => {
   reactButtonOf(element, '1').dispatchEvent(fakeEvent('keydown', { key: 'ArrowDown' }));
   assert.equal(actions.classList.contains('is-menu-above'), false, 'room below again, opened from the keyboard');
 });
+
+test('after a reaction saves, focus that fell off the page goes back to the React button', async () => {
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  const { element, log } = makeLog({ onReact: () => held });
+  document.body.appendChild(element);
+  log.append(message('1', 'hi'), false);
+
+  pick(element, '1', 'Like');
+  document.activeElement = document.body; // the picked item went away, and the button is disabled
+  release({});
+  await settle();
+
+  assert.equal(document.activeElement, reactButtonOf(element, '1'));
+});
+
+test('the reaction menu marks the reactions that are yours', () => {
+  const { element, log } = makeLog({ onReact: async () => {} });
+  log.append(message('1', 'hi'), false);
+  log.setReactions('1', [{ reaction: 'love', people: [{ uid: 'ada', name: 'Ada Lovelace' }] }]);
+
+  reactButtonOf(element, '1').dispatchEvent(fakeEvent('click'));
+  const items = rowOf(element, '1').querySelectorAll('.ocs__menu-item');
+  const checked = items.filter(item => item.getAttribute('aria-checked') === 'true')
+    .map(item => item.querySelector('.ocs__menu-name').textContent);
+  assert.deepEqual(checked, ['Love']);
+  assert.equal(rowOf(element, '1').querySelector('.ocs__menu').getAttribute('aria-orientation'), 'horizontal');
+});

@@ -363,14 +363,14 @@ export function createMessageLog(element, {
 
   function chipsFor(key) {
     if (!chipRows.has(key)) {
-      chipRows.set(key, new ReactionChips({ text, me, onToggle: (reaction, on) => react(key, reaction, on) }));
+      chipRows.set(key, new ReactionChips({ text, me, onToggle: (reaction, on) => react(key, reaction, on, 'chip') }));
     }
     return chipRows.get(key);
   }
 
   // One change at a time on each message: its chips and React button are disabled until
   // onReact settles, and anything picked meanwhile is ignored.
-  function react(key, reaction, on) {
+  function react(key, reaction, on, from) {
     const stored = messages.get(key);
     if (!canReact(stored) || reacting.has(key)) return;
     reacting.add(key);
@@ -386,7 +386,18 @@ export function createMessageLog(element, {
       .finally(() => {
         reacting.delete(key);
         showReacting(key, false);
+        refocus(key, reaction, from);
       });
+  }
+
+  // The picked menu item went away, and a chip or the button was disabled while it saved, so
+  // focus may have fallen off the page: put it back on that chip or on the React button.
+  function refocus(key, reaction, from) {
+    if (document.activeElement && document.activeElement !== document.body) return;
+    const main = rowFor(key)?.querySelector('.chat-msg-main');
+    if (!main) return;
+    const chip = from === 'chip' ? main.querySelector('.chat-reactions')?.querySelector(`[data-reaction="${reaction}"]`) : null;
+    (chip || main.querySelector('[data-action="react"]'))?.focus();
   }
 
   function showReacting(key, busy) {
@@ -399,14 +410,17 @@ export function createMessageLog(element, {
 
   // The React button's menu: the six reactions, drawn like the composer's Attach menu.
   function reactionPicker(key, button, container) {
+    // Built as it opens, so each item says whether that reaction is yours (picking it takes yours back).
     const picker = new PopupMenu({
       button,
       container,
       label: text.addReaction,
-      items: Reactions.KINDS.map(kind => ({
+      orientation: 'horizontal',
+      items: () => Reactions.KINDS.map(kind => ({
         glyph: kind.emoji,
         label: text[kind.textKey],
-        onPick: () => react(key, kind.key, !isMine(key, kind.key)),
+        checked: isMine(key, kind.key),
+        onPick: () => react(key, kind.key, !isMine(key, kind.key), 'menu'),
       })),
     });
     // PopupMenu's own listeners come first, so the menu is open by the time these measure it.

@@ -21,11 +21,13 @@ export class PopupMenu {
    * @param {HTMLElement} options.container where the menu goes
    * @param {string} options.label its name for assistive technology
    * @param {Array|Function} options.items [{ icon, label, hint, onPick(button), disabled }], where
-   *   an item may give glyph (text, such as an emoji) in place of icon,
-   *   or a function that gives them as it opens, so a menu can offer different things in
-   *   different conversations
+   *   an item may give glyph (text, such as an emoji) in place of icon, and checked (true or
+   *   false) to be a checkbox item; or a function that gives them as it opens, so a menu can
+   *   offer different things in different conversations
+   * @param {string} [options.orientation] 'horizontal' for a menu drawn as a row: Left and Right
+   *   step through it as well as Up and Down
    */
-  constructor({ button, container, label, items }) {
+  constructor({ button, container, label, items, orientation = 'vertical' }) {
     this.#button = button;
     this.#items = items;
     PopupMenu.#count += 1;
@@ -35,6 +37,8 @@ export class PopupMenu {
     menu.id = id;
     menu.setAttribute('role', 'menu');
     menu.setAttribute('aria-label', label);
+    const horizontal = orientation === 'horizontal';
+    if (horizontal) menu.setAttribute('aria-orientation', 'horizontal');
     menu.hidden = true;
     container.appendChild(menu);
     this.#menu = menu;
@@ -47,8 +51,8 @@ export class PopupMenu {
     menu.addEventListener('keydown', event => {
       // Counted among the enabled items, the ones #focusItem steps through.
       const at = this.#enabled().indexOf(document.activeElement);
-      if (event.key === 'ArrowDown') this.#focusItem(at + 1);
-      else if (event.key === 'ArrowUp') this.#focusItem(at - 1);
+      if (event.key === 'ArrowDown' || (horizontal && event.key === 'ArrowRight')) this.#focusItem(at + 1);
+      else if (event.key === 'ArrowUp' || (horizontal && event.key === 'ArrowLeft')) this.#focusItem(at - 1);
       else if (event.key === 'Home') this.#focusItem(0);
       else if (event.key === 'End') this.#focusItem(-1);
       else if (event.key === 'Escape') this.close();
@@ -109,8 +113,10 @@ export class PopupMenu {
     enabled[(index + enabled.length) % enabled.length].focus();
   }
 
+  // A click somewhere else closes the menu and leaves focus where that click put it; taking it
+  // back to the button would also scroll a log back up to wherever the button is.
   #onDocumentClick = event => {
-    if (!this.#menu.contains(event.target) && !this.#button.contains(event.target)) this.close();
+    if (!this.#menu.contains(event.target) && !this.#button.contains(event.target)) this.close({ refocus: false });
   };
 
   #build() {
@@ -119,7 +125,12 @@ export class PopupMenu {
       const choice = document.createElement('button');
       choice.type = 'button';
       choice.className = 'ocs__menu-item';
-      choice.setAttribute('role', 'menuitem');
+      if ('checked' in item) {
+        choice.setAttribute('role', 'menuitemcheckbox');
+        choice.setAttribute('aria-checked', String(Boolean(item.checked)));
+      } else {
+        choice.setAttribute('role', 'menuitem');
+      }
       choice.disabled = Boolean(item.disabled);
       // An emoji (glyph) sits in the same slot as a Font Awesome icon.
       const icon = document.createElement('i');
