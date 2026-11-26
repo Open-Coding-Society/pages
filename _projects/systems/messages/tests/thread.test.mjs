@@ -270,12 +270,12 @@ test('a GitHub link in a DM shows its card under the message', async () => {
 // ── Reactions ───────────────────────────────────────────────────────────────────────────
 // The stub API with the four reaction calls. `reactions` is what a GET answers (a map of
 // message id → list), or a function (kind, id) that gives it or a Promise of it; each PUT
-// or DELETE answers with `answer(messageId, reaction, on)`, or fails when `fail` is set.
+// or DELETE answers with `answer(messageId, reaction, on)`, or fails when `fail` is (or returns) true.
 function withReactions(api, { reactions = {}, answer = () => ({ reactions: [] }), fail = false } = {}) {
   const read = (kind, id) => Promise.resolve(typeof reactions === 'function' ? reactions(kind, id) : reactions);
   const write = name => async (id, messageId, reaction, on) => {
     api.calls.push([name, id, messageId, reaction, on]);
-    if (fail) throw new Error('the reaction did not save');
+    if (typeof fail === 'function' ? fail() : fail) throw new Error('the reaction did not save');
     return answer(messageId, reaction, on);
   };
   return Object.assign(api, {
@@ -429,4 +429,88 @@ test('after the socket reconnects, reactions are fetched again', async () => {
   thread.resume();
   await settle();
   assert.equal(chipsIn(elements, 'm1'), null, 'and one taken back while offline goes');
+});
+
+test('an older reactions load can’t undo a newer frame, across a reconnect and a switch', async () => {
+  let releaseCatchUp;
+  let releaseBulk;
+  const catchUp = new Promise(resolve => { releaseCatchUp = resolve; });
+  const bulk = new Promise(resolve => { releaseBulk = resolve; });
+  const api = withReactions(stubApi(), { reactions: (kind, id) => (id === 8 ? bulk : {}) });
+  let group7Loads = 0;
+  api.groupMessages = async id => {
+    api.calls.push(['groupMessages', id]);
+    if (id === 7 && ++group7Loads === 2) return catchUp; // group 7's catch-up after the reconnect
+    return [groupRow('m1')];
+  };
+  const { thread, elements, socket } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  thread.resume();
+  await settle();
+  thread.open('group', 8, { title: 'Team Hopper', subtitle: '' });
+  await settle();
+
+  socket.handler(reactionsFrame('m1', liked('grace', 'alan')));
+  releaseCatchUp([groupRow('m1')]);
+  await settle();
+  releaseBulk({ m1: liked('grace') });
+  await settle();
+
+  assert.equal(chipText(elements, 'm1'), '👍 2', 'group 8’s older answer leaves the newer frame');
+  assert.equal(api.calls.filter(call => call[0] === 'groupReactions' && call[1] === 7).length, 1,
+    'group 7, left behind, asks for no more reactions');
+});
+
+test('your own reaction’s answer doesn’t undo a newer frame', async () => {
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { answer: () => held });
+  const { thread, elements, socket } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+
+  pickIn(elements, 'm1', 'Like');
+  socket.handler(reactionsFrame('m1', liked('ada')));
+  socket.handler(reactionsFrame('m1', liked('ada', 'alan')));
+  release({ messageId: 'm1', reactions: liked('ada') });
+  await settle();
+
+  assert.equal(chipText(elements, 'm1'), '👍 2');
+});
+
+test('a read-only thread ignores reactions frames', async () => {
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }));
+  const { thread, elements, socket } = makeThread({ api, readOnly: true });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+
+  socket.handler(reactionsFrame('m1', liked('grace')));
+
+  assert.equal(chipsIn(elements, 'm1'), null);
+});
+
+test('saving a reaction clears only its own failure notice', async () => {
+  let attempts = 0;
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { answer: answerAsAda, fail: () => ++attempts === 1 });
+  const { thread, elements } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  const warn = console.warn;
+  console.warn = () => {};
+  try {
+    pickIn(elements, 'm1', 'Like');
+    await settle();
+  } finally {
+    console.warn = warn;
+  }
+  assert.equal(elements.formStatus.textContent, 'Could not save your reaction. Try again.');
+  pickIn(elements, 'm1', 'Like');
+  await settle();
+  assert.equal(elements.formStatus.textContent, '', 'trying again clears it');
+
+  elements.formStatus.textContent = 'Your files are shared, but the message didn’t send. Press Send to try again.';
+  pickIn(elements, 'm1', 'Love');
+  await settle();
+  assert.match(elements.formStatus.textContent, /Your files are shared/, 'another notice stays');
 });

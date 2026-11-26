@@ -105,9 +105,13 @@ export function createThread({
   // read-only pane, shows none.
   const reactionsOn = !readOnly
     && ['dmReactions', 'setDmReaction', 'groupReactions', 'setGroupReaction'].every(name => typeof api[name] === 'function');
-  // Messages whose reactions a frame or your own change drew since the last reactions load
-  // began: that load's answer may be older, so it leaves them as they are.
-  let framedSince = new Set();
+  // Every reactions frame, and the answer to your own change, counts one change and marks its
+  // message. A reactions load or an answer that started before a message's last change is older
+  // than what that message shows, so it leaves the message as it is.
+  let reactionChanges = 0;
+  const reactionChangedAt = new Map(); // a message's key → reactionChanges at its last change
+  const markReactionChange = key => reactionChangedAt.set(key, ++reactionChanges);
+  const changedSince = (key, mark) => (reactionChangedAt.get(key) || 0) > mark;
 
   let current = null; // { kind, id, loaded, catchUp } for the open conversation
   let openCount = 0; // a newer open makes an older one that is still loading stop
@@ -347,11 +351,12 @@ export function createThread({
   }
 
   // Every message's reactions, once the history is drawn and again after a reconnect.
-  // A message whose reactions changed since this began (framedSince) keeps the newer ones,
-  // and one whose reactions were all taken back meanwhile loses its chips.
+  // A message whose reactions changed since this began keeps the newer ones, and one whose
+  // reactions were all taken back meanwhile loses its chips. A load for a chat that's no longer
+  // open (a catch-up that finished after you moved on) asks for nothing.
   async function loadReactions(kind, id, ticket) {
-    if (!reactionsOn) return;
-    framedSince = new Set();
+    if (!reactionsOn || destroyed || ticket !== openCount || !isOpen(kind, id)) return;
+    const startedAt = reactionChanges;
     let map;
     try {
       map = await kinds[kind].reactions(id);
@@ -362,7 +367,7 @@ export function createThread({
     if (destroyed || ticket !== openCount || !isOpen(kind, id)) return;
     const found = Reactions.normalizeMap(map);
     log.list().forEach(message => {
-      if (!message.id || framedSince.has(message.key)) return;
+      if (!message.id || changedSince(message.key, startedAt)) return;
       const list = found.get(String(message.id)) || [];
       if (list.length || message.reactions?.length) log.setReactions(message.key, list);
     });
@@ -534,11 +539,14 @@ export function createThread({
   async function react(message, reaction, on) {
     if (!current?.loaded || !message?.id) return;
     const { kind, id } = current;
-    showFormMessage('');
+    const startedAt = reactionChanges;
+    if (elements.formStatus.textContent === text.reactFailed) showFormMessage('');
     try {
       const saved = await kinds[kind].react(id, message.id, reaction, on);
       if (destroyed || !isOpen(kind, id)) return;
-      framedSince.add(message.key);
+      // A frame that came while this saved is at least as new: your own change sends one too.
+      if (changedSince(message.key, startedAt)) return;
+      markReactionChange(message.key);
       log.setReactions(message.key, saved?.reactions ?? []);
     } catch (error) {
       console.warn('Messages: could not save the reaction', error);
@@ -606,7 +614,8 @@ export function createThread({
         break;
       // Someone's reaction (or yours, from another tab) changed a message's chips.
       case 'reactions':
-        framedSince.add(change.id);
+        if (!reactionsOn) break;
+        markReactionChange(change.id);
         log.setReactions(change.id, change.reactions);
         break;
       // A file went up. The message that shares it lists it, so the log adds nothing; the
