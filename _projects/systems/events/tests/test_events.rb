@@ -527,7 +527,10 @@ class EventsBuildTest < Minitest::Test
     join = catalog.at_css("div.ocs__links > a.ocs__btn.pill.accent.fill.large")
     assert_equal "/preview/signup", join["href"]
     assert_equal "Join Us", join.text.strip
-    assert_equal %w[community technology workshop], catalog.css("button[data-event-category]").map { |button| button["data-event-category"] }.reject(&:empty?)
+    buttons = catalog.css("button[data-event-category]")
+    assert_equal %w[community technology workshop], buttons.map { |button| button["data-event-category"] }.reject(&:empty?)
+    # The grammar's default size (44 px), not small (28 px), so each is a full touch target on a phone.
+    assert buttons.all? { |button| button["class"].split == (button["data-event-category"].empty? ? %w[ocs__btn accent fill] : %w[ocs__btn accent]) }
     assert_includes page("events"), "/preview/assets/js/projects/events/event-catalog.js"
   end
 

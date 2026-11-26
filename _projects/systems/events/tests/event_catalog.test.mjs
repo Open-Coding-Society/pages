@@ -43,7 +43,7 @@ function pager(document, name, texts) {
 // The catalog the way _includes/events-catalog.html writes it.
 function catalog(document, texts, cards, categories = []) {
   const buttons = [['', texts.all], ...categories].map(([key, label]) => el(document, 'button', {
-    class: `ocs__btn small accent${key ? '' : ' fill'}`, type: 'button', 'data-event-category': key, 'aria-pressed': String(!key),
+    class: `ocs__btn accent${key ? '' : ' fill'}`, type: 'button', 'data-event-category': key, 'aria-pressed': String(!key),
   }, label));
   const root = el(document, 'section', { class: 'ocs__stack ocs__band ocs__band--tint', 'data-event-catalog': '', 'data-page-size': '6' },
     el(document, 'div', { class: 'ocs__links', role: 'group' }, ...buttons),

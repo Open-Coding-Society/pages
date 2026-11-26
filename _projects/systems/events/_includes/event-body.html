@@ -44,7 +44,7 @@
     {%- when "description" %}
     {{ content }}
     {%- if event.presentation %}
-    <div class="ocs__links"><a class="ocs__btn small accent" href="{{ event.presentation | relative_url | escape }}">{{ words.presentation | escape }}</a></div>
+    <div class="ocs__links"><a class="ocs__btn accent" href="{{ event.presentation | relative_url | escape }}">{{ words.presentation | escape }}</a></div>
     {%- endif %}
     {%- when "schedule" %}
     <p><time class="ocs__text" datetime="{{ event.datetime }}">{{ event.when | escape }}</time></p>

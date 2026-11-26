@@ -18,9 +18,9 @@
     {%- endif %}
     {%- if site.data.events_categories.size > 0 %}
     <div class="ocs__links" role="group" aria-label="{{ catalog_words.filter_label | escape }}">
-      <button class="ocs__btn small accent fill" type="button" data-event-category="" aria-pressed="true">{{ catalog_words.all | escape }}</button>
+      <button class="ocs__btn accent fill" type="button" data-event-category="" aria-pressed="true">{{ catalog_words.all | escape }}</button>
       {%- for category in site.data.events_categories %}
-      <button class="ocs__btn small accent" type="button" data-event-category="{{ category[0] | escape }}" aria-pressed="false">{{ category[1] | escape }}</button>
+      <button class="ocs__btn accent" type="button" data-event-category="{{ category[0] | escape }}" aria-pressed="false">{{ category[1] | escape }}</button>
       {%- endfor %}
     </div>
     {%- endif %}
