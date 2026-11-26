@@ -14,8 +14,8 @@ class CallsPageTest < Minitest::Test
   PROJECT = File.expand_path("..", __dir__)
   PAGE = File.join(PROJECT, "pages/calls.md")
   DM = "_projects/systems/messages/navigation/dm.md".freeze
-  # Upstream main before calls' hook in /dm.
-  BEFORE = "5b811b01b440a231f811ac073bc7f9285367e7c9".freeze
+  # /dm just before calls' hook was merged in: the merge of #2081 in the combined Messages and calls branch.
+  BEFORE = "e78b2063234a397352a20a88ab9d1e038c710ddc".freeze
   STRINGS = SafeYAML.load_file(File.join(PROJECT, "data/calls.yml"))
   SCRIPTS = %w[
     /preview/assets/js/api/config.js
