@@ -524,7 +524,8 @@ class EventsBuildTest < Minitest::Test
     assert_equal %w[Published Sample], sample_card.css("b.ocs__status-pill").map(&:text)
     assert_equal "March 15", sample_card.at_css("time.ocs__badge").text
     assert_equal '["community","technology","workshop"]', sample_card["data-event-categories"]
-    join = catalog.at_css("div.ocs__links > a.ocs__btn.pill.accent.fill.large")
+    # ocs__btn--icon spaces the icon from the words, as on Mort's Submit buttons.
+    join = catalog.at_css("div.ocs__links > a.ocs__btn.ocs__btn--icon.pill.accent.fill.large")
     assert_equal "/preview/signup", join["href"]
     assert_equal "Join Us", join.text.strip
     buttons = catalog.css("button[data-event-category]")
@@ -546,6 +547,9 @@ class EventsBuildTest < Minitest::Test
     assert_equal "March 15, 2027 · 10:00 AM – 1:00 PM", sample.at_css("article[data-event-page] > p > time.ocs__text").text
     assert_equal "Community Center, Poway, California", sample.at_css(".ocs__keypoints .ocs__keypoint").text.strip
     assert_equal "OC", sample.at_css("#event-presenters abbr.ocs__avatar").text
+    ask = sample.at_css("#event-discussion [data-event-discuss][hidden] > button.ocs__btn.ocs__btn--icon.accent.fill")
+    assert_equal "Ask a question", ask.text.strip
+    assert ask.at_css("i.fas.fa-comments"), "the icon sits straight in the button, no span"
     assert_includes sample.at_css("#event-description").text, "An introduction to practical AI, programming, and community technology projects."
     assert_nil sample.at_css("figure"), "the sample has no photo"
     assert_includes page("events/community-technology-workshop"), "/preview/assets/js/projects/events/event-page.js"

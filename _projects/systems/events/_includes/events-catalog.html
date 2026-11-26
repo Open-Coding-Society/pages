@@ -13,7 +13,7 @@
     <p class="ocs__text ocs__lead">{{ catalog_words.intro | escape }}</p>
     {%- if events_settings.join_url %}
     <div class="ocs__links">
-      <a class="ocs__btn pill accent fill large" href="{{ events_settings.join_url | relative_url | escape }}">{{ catalog_words.join | escape }} <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+      <a class="ocs__btn ocs__btn--icon pill accent fill large" href="{{ events_settings.join_url | relative_url | escape }}">{{ catalog_words.join | escape }} <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
     </div>
     {%- endif %}
     {%- if site.data.events_categories.size > 0 %}
