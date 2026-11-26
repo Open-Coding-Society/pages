@@ -99,6 +99,12 @@ export function createMessagesApi({
     editDm: (id, messageId, body) => spring(`/api/dm/conversations/${part(id)}/messages/${part(messageId)}`, 'PATCH', { body }),
     deleteDm: (id, messageId) => spring(`/api/dm/conversations/${part(id)}/messages/${part(messageId)}`, 'DELETE'),
     markDmRead: id => spring(`/api/dm/conversations/${part(id)}/read`, 'POST'),
+    // A conversation's reactions by message id, and adding (on) or removing yours, which
+    // answers with that message's reactions.
+    dmReactions: id => spring(`/api/dm/conversations/${part(id)}/reactions`),
+    setDmReaction: (id, messageId, reaction, on) => spring(
+      `/api/dm/conversations/${part(id)}/messages/${part(messageId)}/reactions/${part(reaction)}`, on ? 'PUT' : 'DELETE',
+    ),
     // Messages in your own conversations whose text contains the query, newest first.
     // With a conversation id, only that conversation is searched.
     searchDms: (query, conversationId) => spring(
@@ -140,6 +146,10 @@ export function createMessagesApi({
     sendGroupMessage: (groupId, message, image = null) => spring(`/api/groups/chat/${part(groupId)}/messages`, 'POST', { message, image }),
     editGroupMessage: (groupId, messageId, message) => spring(`/api/groups/chat/${part(groupId)}/messages/${part(messageId)}`, 'PATCH', { message }),
     deleteGroupMessage: (groupId, messageId) => spring(`/api/groups/chat/${part(groupId)}/messages/${part(messageId)}`, 'DELETE'),
+    groupReactions: groupId => spring(`/api/groups/chat/${part(groupId)}/reactions`),
+    setGroupReaction: (groupId, messageId, reaction, on) => spring(
+      `/api/groups/chat/${part(groupId)}/messages/${part(messageId)}/reactions/${part(reaction)}`, on ? 'PUT' : 'DELETE',
+    ),
     // Unread counts for group chat, the group-side twin of /api/dm/unread. Groups with
     // nothing unread are absent from unreadByGroup rather than present as zero.
     groupUnread: () => spring('/api/groups/chat/unread'),

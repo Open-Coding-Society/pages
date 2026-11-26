@@ -116,7 +116,9 @@
   gap: 0.75rem;
   padding: 0.5rem var(--dm-gutter);
   transition: background-color $transition-fast ease;
-  animation: dm-fade $transition-slow ease both;
+  // backwards, not both: a fade kept in effect after it ends leaves each row its own stacking
+  // context, and the next row would then cover this row's reaction menu and take its clicks.
+  animation: dm-fade $transition-slow ease backwards;
 
   &:hover,
   &:focus-within {
@@ -503,6 +505,73 @@
   }
 
   @include dm-focus-ring(-1px);
+}
+
+// ── Reactions (js/reactions.js, js/message-log.js) ─────────────────────────────────────
+// The chips under a message are the grammar's small pill buttons (yours filled with the
+// accent), in a row that wraps, no wider than the message's text.
+.dm .chat-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dm-space-xs);
+  max-width: min(100%, var(--dm-measure));
+  margin-top: var(--dm-space-xs);
+}
+
+// The React button's menu (the grammar's ocs__menu) is one row of the six emoji, small
+// enough to open beside any message on a phone. It opens under the action bar, anchored to
+// its right edge so it stays on the screen, and over the messages below it.
+.dm .chat-msg-actions .ocs__menu {
+  position: absolute;
+  top: calc(100% + var(--dm-space-xs));
+  right: 0;
+  z-index: 7;
+  flex-direction: row;
+  min-width: 0;
+  max-height: none;
+  overflow: visible;
+}
+
+.dm .chat-msg-actions .ocs__menu-item {
+  grid-template-columns: auto;
+  width: auto;
+  padding: var(--dm-space-xs);
+}
+
+.dm .chat-msg-actions .ocs__menu-icon {
+  grid-row: auto;
+  font-size: $text-xl;
+  font-style: normal; // the glyph sits in an <i>, which Chrome would slant
+  line-height: 1;
+}
+
+// Your own reactions in the open menu wear the grammar's hover tint, so picking one again reads
+// as taking it back.
+.dm .chat-msg-actions .ocs__menu-item[aria-checked="true"] {
+  @include accent-tint(16%, null);
+}
+
+// Each reaction's name stays as its button's name for a screen reader, but isn't drawn.
+.dm .chat-msg-actions .ocs__menu-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// The row holding an open menu (focus is in it) sits above the rows after it. The bar fades
+// in and out, and while its opacity is under 1 it is a layer of its own, so without this the
+// next message would cover the menu and take its clicks.
+.dm .chat-msg:focus-within {
+  z-index: 1;
+}
+
+// Near the foot of the log there's no room under the bar, so message-log.js opens it above.
+.dm .chat-msg-actions.is-menu-above .ocs__menu {
+  top: auto;
+  bottom: calc(100% + var(--dm-space-xs));
 }
 
 // A reply's quote of the message it answers (chat-reply.js's renderReplyQuote): a

@@ -876,5 +876,15 @@ text:
     unpinnedNote: "{name} unpinned a message:"
     aMessage: a message
     pinFailed: Could not change the pin. Try again.
+    addReaction: Add reaction
+    reactionLike: Like
+    reactionLove: Love
+    reactionHaha: Haha
+    reactionWow: Wow
+    reactionSad: Sad
+    reactionCelebrate: Celebrate
+    reactionPeople: "{reaction}: {names}"
+    reactionCount: "{reaction}, {count}: {names}"
+    reactFailed: Could not save your reaction. Try again.
     idleTitle: Pick a conversation
     idleHint: Or start a new chat, or find a group to join.

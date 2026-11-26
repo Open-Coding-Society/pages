@@ -459,7 +459,7 @@ test('destroy disconnects, takes back every document and window listener, and em
 
 test('destroy while the socket is still connecting closes it without reporting a failed connection', async t => {
   const warn = t.mock.method(console, 'warn', () => {});
-  fakeSpring({ 'GET /api/groups/chat/7/messages': { body: [] } });
+  fakeSpring({ 'GET /api/groups/chat/7/messages': { body: [] }, 'GET /api/groups/chat/7/reactions': { body: {} } });
   const server = fakeStomp({ holdConnect: true });
   const root = newRoot();
   const chat = await mountGroupChat(root, { groupId: 7, config, richText: stubRichText() });
