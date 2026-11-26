@@ -1,0 +1,7 @@
+{
+  "files": [
+    { "source": "pages", "destination": "navigation/projects/community" },
+    { "source": "data", "destination": "_data/projects/community" },
+    { "source": "js", "destination": "assets/js/projects/community" }
+  ]
+}

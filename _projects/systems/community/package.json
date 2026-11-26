@@ -1,0 +1,9 @@
+{
+  "name": "ocs-community",
+  "private": true,
+  "type": "module",
+  "description": "Marks this project's .js files as ES modules so `node --test tests/*.test.mjs` can import them. Not published, not bundled, not copied into the site build.",
+  "scripts": {
+    "test": "node --test tests/"
+  }
+}

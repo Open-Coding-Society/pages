@@ -1,0 +1,181 @@
+# The setup for the Community demo (/community/demo/): a made-up investment group whose
+# members (LPs) invest deal by deal through "series".
+#
+# Everything below is made up for the demo and reads that way: the organization ("Demo Org"),
+# its colors, and every person, series, company, message, file, poll and report ("Demo LP 1",
+# "Demo Series 1", "Demo Company A"). There are no money amounts.
+#
+# Times are offsets from when the page opens (minutes_ago, days_from_today), so the demo
+# always looks current. js/demo-store.js turns them into dates.
+
+org:
+  name: Demo Org
+  short: Demo Org
+  tagline: A made-up investment group
+
+# Applied through the OCS theme engine (assets/js/user-preferences.js) with
+# SitePreferences.preview, so every ocs__ element takes these colors. Text and the accent
+# keep the 4.5:1 OCS asks for, on the page and on panels (tests/brand.test.mjs).
+brand:
+  bg: "#ffffff"
+  text: "#1d2b24"
+  accent: "#1e6b52"
+  font: "'Avenir Next', Avenir, 'Segoe UI', system-ui, sans-serif"
+  size: 16
+
+# LPs message staff, not each other. 'co-investors' would allow two LPs who share a series
+# and have both turned it on.
+dm_policy: staff-only
+
+series:
+  - id: s1
+    title: Demo Series 1
+    company: Demo Company A
+  - id: s2
+    title: Demo Series 2
+    company: Demo Company B
+  - id: s3
+    title: Demo Series 3
+    company: Demo Company C
+
+# Roles are Spring's role names, kept in a person's roles list (Person.roles). Staff and
+# moderators are in every series, so only LPs list theirs.
+people:
+  - { id: 1, uid: demo-staff-1, name: Demo Staff 1, roles: [ROLE_STAFF] }
+  - { id: 2, uid: demo-staff-2, name: Demo Staff 2, roles: [ROLE_STAFF] }
+  - { id: 3, uid: demo-moderator, name: Demo Moderator, roles: [ROLE_MODERATOR] }
+  - { id: 11, uid: demo-lp-1, name: Demo LP 1, roles: [ROLE_LP], series: [s1, s2] }
+  - { id: 12, uid: demo-lp-2, name: Demo LP 2, roles: [ROLE_LP], series: [s1] }
+  - { id: 13, uid: demo-lp-3, name: Demo LP 3, roles: [ROLE_LP], series: [s1, s3] }
+  - { id: 14, uid: demo-lp-4, name: Demo LP 4, roles: [ROLE_LP], series: [s2] }
+  - { id: 15, uid: demo-lp-5, name: Demo LP 5, roles: [ROLE_LP], series: [s2, s3] }
+  - { id: 16, uid: demo-lp-6, name: Demo LP 6, roles: [ROLE_LP], series: [s3] }
+  - { id: 19, uid: demo-lp-9, name: Demo LP 9, roles: [ROLE_LP], series: [s1] }
+
+# Who the "Viewing as" menu offers, first one first.
+personas: [11, 19, 3, 1, 2]
+
+# Group chats, named the way Spring names groups. "updates" channels are read-only for
+# LPs, like a course's announcement channel; "series" channels are each series' group.
+channels:
+  - { id: 100, name: demo-updates, title: All members, kind: updates, series: null }
+  - { id: 101, name: demo-series-1-updates, title: Demo Series 1 updates, kind: updates, series: s1 }
+  - { id: 102, name: demo-series-2-updates, title: Demo Series 2 updates, kind: updates, series: s2 }
+  - { id: 103, name: demo-series-3-updates, title: Demo Series 3 updates, kind: updates, series: s3 }
+  - { id: 201, name: demo-series-1, title: Demo Series 1, kind: series, series: s1 }
+  - { id: 202, name: demo-series-2, title: Demo Series 2, kind: series, series: s2 }
+  - { id: 203, name: demo-series-3, title: Demo Series 3, kind: series, series: s3 }
+
+# An event becomes a Courses [[event:...]] marker on the message, so it reaches the calendar.
+messages:
+  - channel: 100
+    by: 1
+    minutes_ago: 4320
+    text: Welcome to the member app demo. Updates for everyone show here, and each series also has its own updates and its own group.
+  - channel: 100
+    by: 2
+    minutes_ago: 1500
+    text: Demo LP call next week, made up for this demo. Use Add to calendar to put it on yours, and pick a time in the poll.
+    event: { days_from_today: 7, title: Demo LP call }
+  - channel: 101
+    by: 1
+    minutes_ago: 2900
+    text: Demo Company A sent its quarterly update to Demo Series 1 (made up). The one-pager is in the series documents, and staff take questions on a short call.
+    event: { days_from_today: 1, title: Demo Series 1 Q&A call }
+  - channel: 102
+    by: 2
+    minutes_ago: 700
+    text: Demo Series 2 closing date, made up for this demo. Questions about the paperwork go to staff in your inbox.
+    event: { days_from_today: 14, title: Demo Series 2 closing date }
+  - channel: 201
+    by: 12
+    minutes_ago: 2600
+    text: Did anyone else read the Demo Company A one-pager? The hiring plan part was new to me.
+  - channel: 201
+    by: 13
+    minutes_ago: 2550
+    text: Same. I'd like to hear more about it on the LP call.
+  - channel: 201
+    key: side-deal
+    by: 19
+    minutes_ago: 180
+    text: Anyone want in on a side deal for more Demo Company A shares? DM me, guaranteed returns.
+  - channel: 201
+    by: 12
+    minutes_ago: 150
+    text: That doesn't sound right. Isn't that what the series process is for?
+  - channel: 201
+    by: 11
+    minutes_ago: 60
+    text: Looking forward to the call next week.
+  - channel: 202
+    by: 14
+    minutes_ago: 1200
+    text: Hi all, I just joined Demo Series 2.
+  - channel: 202
+    by: 11
+    minutes_ago: 1100
+    text: Welcome! The closing date is in Updates.
+  - channel: 202
+    by: 15
+    minutes_ago: 300
+    text: Is the subscription form the same one as last time?
+  - channel: 203
+    by: 16
+    minutes_ago: 2000
+    text: Quiet in here so far.
+  - channel: 203
+    by: 13
+    minutes_ago: 1900
+    text: Waiting on the next update.
+
+# Deal documents, shared by staff in a series group. Plain text files, so nothing pretends
+# to be a real document.
+files:
+  - channel: 201
+    by: 1
+    minutes_ago: 2880
+    name: Demo Company A one-pager (made up).txt
+    text: Demo Company A one-pager. Every detail in this file is made up for the OCS demo. It stands in for the documents staff share with a series.
+  - channel: 202
+    by: 2
+    minutes_ago: 800
+    name: Demo Series 2 subscription steps (made up).txt
+    text: "Made-up steps for the demo. 1. Read the series documents. 2. Ask staff any questions in your inbox. 3. Sign when staff send the forms."
+
+# Polls are microblog surveys: votes are [[microblog:vote]] replies, one per person.
+polls:
+  - channel: 100
+    by: 2
+    minutes_ago: 1490
+    question: Which time works for the demo LP call next week?
+    options: [Thursday afternoon, Friday at noon, Either works]
+    votes:
+      - { by: 12, choice: 0 }
+      - { by: 13, choice: 2 }
+      - { by: 14, choice: 0 }
+      - { by: 15, choice: 1 }
+
+reports:
+  - message: side-deal
+    by: 13
+    minutes_ago: 170
+    reason: selling
+    note: Asking people to message them for a side deal outside the series.
+
+dms:
+  - between: [11, 1]
+    messages:
+      - { by: 1, minutes_ago: 2000, text: "Hi, this is Demo Staff 1. You can reach the Demo Org team here any time." }
+      - { by: 11, minutes_ago: 1900, text: Thanks. Where do I find the Demo Series 2 forms? }
+      - { by: 1, minutes_ago: 1850, text: They're in the Demo Series 2 group's documents. }
+  - between: [14, 2]
+    messages:
+      - { by: 14, minutes_ago: 600, text: Is the closing date firm? }
+
+# An update one staff member wrote and another has to approve before LPs see it.
+pending_updates:
+  - channel: 103
+    by: 1
+    minutes_ago: 25
+    text: Demo Series 3, what to expect over the next month (made up). The company's update goes here when it arrives.
