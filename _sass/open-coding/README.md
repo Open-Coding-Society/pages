@@ -371,6 +371,23 @@ rows and the phone menu use both classes. The sidebar's week titles use
 - `ocs__tabs-btn`: an individual tab; add `active` for the selected one
 - `ocs__tabs-underline`: optional sliding indicator under the active tab
 - `ocs__tabs-panels`, `ocs__tabs-panel`: the swapped content area
+- `ocs__tabs--fit`: on `ocs__tabs`, for an app's main tabs. At 768px and narrower, each
+  tab takes an equal share of the row with its icon above its words, like a phone app's
+  tab bar, so four or five tabs fit on one line instead of wrapping. Put the icon straight
+  inside the tab. A long label wraps inside its own tab.
+
+For an app's main tabs on a phone:
+
+```html
+<div class="ocs__tabs ocs__tabs--fit">
+  <ul class="ocs__tabs-list">
+    <li><a class="ocs__tabs-btn active text-blue-500 border-blue-500" href="#"><i class="fas fa-bullhorn"></i> Updates</a></li>
+    <li><a class="ocs__tabs-btn" href="#"><i class="fas fa-users"></i> Groups</a></li>
+    <li><a class="ocs__tabs-btn" href="#"><i class="fas fa-inbox"></i> Inbox</a></li>
+    <li><a class="ocs__tabs-btn" href="#"><i class="fas fa-calendar"></i> Calendar</a></li>
+  </ul>
+</div>
+```
 
 See [`elements/tabs`](elements/tabs). The Dashboard uses this for its tab bar.
 
