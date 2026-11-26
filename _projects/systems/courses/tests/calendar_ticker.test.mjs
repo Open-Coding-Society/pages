@@ -131,6 +131,19 @@ test('a typed title that only looks a little like code stays exactly as typed', 
   assert.equal(TickerItems.plainTitle(' Live   Reviews '), 'Live Reviews');
 });
 
+test('a "<" that isn\'t part of a tag stays in a title saved as HTML', () => {
+  assert.equal(TickerItems.plainTitle('x < y <b>bold</b>'), 'x < y bold');
+});
+
+test('a title with a long run of "<" and no ">" is cleaned fast', () => {
+  // Any signed-in account can write a title, and every signed-in visitor's ticker cleans it.
+  // Main's tag pattern scanned to the end from every "<": this took over a second.
+  const title = '</b>' + '<'.repeat(40000);
+  const started = performance.now();
+  assert.equal(TickerItems.plainTitle(title), '<'.repeat(40000));
+  assert.ok(performance.now() - started < 200, `took ${Math.round(performance.now() - started)} ms`);
+});
+
 /* ── Where each one links ───────────────────────────────────────────────── */
 
 test('an event with a linked doc on this site opens the doc', () => {

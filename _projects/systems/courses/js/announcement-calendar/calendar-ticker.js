@@ -17,7 +17,10 @@ import {
 // The same rule the week strip uses (calendar-feed.js): a closing tag or an entity means the title
 // was saved as HTML. A typed title such as "ArrayList<Integer> practice" has neither.
 const LOOKS_LIKE_MARKUP = /<\/[a-z][\w-]*\s*>|&(#\d+|#x[\da-f]+|[a-z]+\d*);/i;
-const TAG = /<[^>]*>/g;
+// A tag ends at its ">", and stopping at the next "<" too keeps a long run of "<" with no ">"
+// fast: a pattern that runs on past it reads to the end of the title again from every "<". A
+// tag with a "<" inside it (rare in a title) is left partly in place, as text.
+const TAG = /<[^<>]*>/g;
 const NAMED_ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
 const URGENT = PRIORITIES[0]; // P0, labeled Urgent
 const PRIORITY_ORDER = PRIORITIES.map((priority) => priority.value);
