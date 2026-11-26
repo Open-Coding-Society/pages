@@ -33,3 +33,9 @@ test('an upload Spring refuses carries its reason too', async () => {
   await assert.rejects(api.uploadGroupFileWithProgress(7, 'notes.txt', 'aGk='),
     error => error.status === 403 && error.reason === 'mentor_not_in_group');
 });
+
+test('a failure whose body can\'t be read still carries its status', async () => {
+  globalThis.fetch = async () => ({ ok: false, status: 502, text: async () => { throw new Error('the body stream broke'); } });
+  const api = createMessagesApi({ javaURI: 'http://spring', pythonURI: 'http://flask', fetchOptions: {} });
+  await assert.rejects(api.sendDm(4, 'hi'), error => error.status === 502 && error.reason === '');
+});

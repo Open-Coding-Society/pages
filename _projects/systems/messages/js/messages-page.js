@@ -126,7 +126,6 @@ export async function startMessagesPage({ config, richText, push }) {
   let scheduleDialog = null; // wired up below, once the thread exists
   const thread = createThread({
     api,
-    texts: Allowances.threadTexts(allowed),
     onSchedule: (message, opener) => scheduleDialog?.open(message, opener),
     socket,
     richText,
@@ -146,8 +145,8 @@ export async function startMessagesPage({ config, richText, push }) {
       else if (name === 'search') byId('messagesSearch').focus();
       else if (name === 'help') help.open(byId('messagesForm'));
     },
-    // Where the slash commands are, said where people type.
-    texts: { placeholder: 'Write a message, or type / for commands' },
+    // Where the slash commands are, said where people type, plus Allowances' words for this account.
+    texts: { ...Allowances.threadTexts(allowed), placeholder: 'Write a message, or type / for commands' },
     // A folder's Open button in the chat opens it in the Shared panel's Files tab.
     onOpenFolder: (groupId, path) => {
       const group = findItem('group', groupId);

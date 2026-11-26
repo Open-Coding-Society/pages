@@ -46,7 +46,8 @@ test('the page asks Allowances what to offer, and no shared Messages file names 
   has(script, /if \(allowed\.findGroups\) initFindGroup\(/, 'Find or make is wired only when finding groups is allowed');
   has(script, /Allowances\.offer\(byId\('messagesNewChat'\), allowed\.directMessages\)/, 'New chat shows only when allowed');
   has(script, /Allowances\.offer\(byId\('messagesFindGroup'\), allowed\.findGroups\)/, 'Find or make shows only when allowed');
-  has(script, /texts: Allowances\.threadTexts\(allowed\)/, 'the thread gets its words from Allowances');
+  has(script, /texts: \{ \.\.\.Allowances\.threadTexts\(allowed\), placeholder: /, 'the thread gets its words from Allowances, with the commands placeholder');
+  assert.equal((script.match(/^\s+texts:/gm) || []).length, 1, 'the thread gets one texts object (a second one would replace the first)');
   has(script, /Allowances\.rejoinNote\(allowed\)/, 'Leave says how to come back from Allowances');
   has(script, /canManage: allowed\.manageMembers/, 'Members gets canManage from Allowances');
   has(script, /canMessage: person => Allowances\.for\(person\)\.directMessages/, 'New chat offers only people who use direct messages');

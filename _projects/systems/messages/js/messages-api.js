@@ -20,8 +20,13 @@ export function createMessagesApi({
     }
   }
 
+  // A body that can't be read gives no reason; the failure keeps its status either way.
   async function reasonFrom(response) {
-    return reasonIn(await response.text());
+    try {
+      return reasonIn(await response.text());
+    } catch {
+      return '';
+    }
   }
 
   async function send(base, path, method = 'GET', body) {
