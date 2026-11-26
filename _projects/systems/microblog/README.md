@@ -14,6 +14,11 @@ Edit the sources here, not the generated copies in the project directories.
 - `js/` publishes to `assets/js/projects/microblog/`, including the
   Jekyll-generated notification index. The modules use the shared API
   configuration and Login's published password helpers.
+- `js/microblog-topic.js` (`MicroblogTopic`, no imports) is the one copy of
+  Flask's page key (`Topic._generate_page_key`) and reads a page topic's newest
+  posts from Flask's public `GET /api/microblog/page/<key>`, where a 404 means
+  nobody has posted yet. The UI Builder's feedback block and the Events pages
+  use it, so they read the topic the panel posts to.
 - `sass/` publishes to `_sass/projects/microblog/`; the site stylesheet imports
   both files. `pages/review.md` publishes under `navigation/projects/microblog/`
   and keeps its `/review` permalink and QR guest flow.
