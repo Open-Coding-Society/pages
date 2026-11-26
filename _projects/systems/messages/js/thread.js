@@ -19,6 +19,7 @@ import { FileActions } from './file-actions.js';
 import { FileViewer } from './file-viewer.js';
 import { FilesMarker } from './files-model.js';
 import { createMessageLog, withTexts } from './message-log.js';
+import { Reactions } from './reactions.js';
 
 // What the pane says, worded for /dm. A host passes its own wording for any of these in
 // `texts`.
@@ -37,6 +38,7 @@ export const THREAD_TEXTS = Object.freeze({
   deleteFailed: 'Could not delete the message. Try again.',
   waitForSave: 'Wait for your message to finish saving first.',
   pinFailed: 'Could not change the pin. Try again.',
+  reactFailed: 'Could not save your reaction. Try again.',
   imageUnreadable: 'Could not read that image. Try a different file.',
   imageOnly: 'Drop an image or screenshot here.',
   imageWhileEditing: 'Images can’t be added while you edit a message.',
@@ -82,6 +84,8 @@ export function createThread({
       supportsImages: true,
       edit: (id, messageId, html) => api.editDm(id, messageId, html),
       remove: (id, messageId) => api.deleteDm(id, messageId),
+      reactions: id => api.dmReactions(id),
+      react: (id, messageId, reaction, on) => api.setDmReaction(id, messageId, reaction, on),
       topic: id => `/topic/dm/${id}`,
       selfKey: me.uid,
     },
@@ -91,10 +95,19 @@ export function createThread({
       supportsImages: true,
       edit: (id, messageId, html) => api.editGroupMessage(id, messageId, html),
       remove: (id, messageId) => api.deleteGroupMessage(id, messageId),
+      reactions: id => api.groupReactions(id),
+      react: (id, messageId, reaction, on) => api.setGroupReaction(id, messageId, reaction, on),
       topic: id => `/topic/group/${id}`,
       selfKey: me.name,
     },
   };
+  // Reactions need Spring's four reaction calls; a host whose API predates them, or a
+  // read-only pane, shows none.
+  const reactionsOn = !readOnly
+    && ['dmReactions', 'setDmReaction', 'groupReactions', 'setGroupReaction'].every(name => typeof api[name] === 'function');
+  // Messages whose reactions a frame or your own change drew since the last reactions load
+  // began: that load's answer may be older, so it leaves them as they are.
+  let framedSince = new Set();
 
   let current = null; // { kind, id, loaded, catchUp } for the open conversation
   let openCount = 0; // a newer open makes an older one that is still loading stop
@@ -130,6 +143,7 @@ export function createThread({
     richText, me, onEdit: beginEdit, onDelete: deleteMessage, onReply: canReply ? beginReply : null,
     onSchedule, readOnly, texts, formatBody, linkCards, runCode,
     onPin: readOnly ? null : (message, pinned) => togglePin(message, pinned),
+    onReact: reactionsOn ? (message, reaction, on) => react(message, reaction, on) : null,
     onChange: () => noteChange(),
     // Any code block in the chat can be saved to your own gists (commands is made below).
     saveGist: readOnly || !api.createGist ? null
@@ -332,6 +346,28 @@ export function createThread({
     }
   }
 
+  // Every message's reactions, once the history is drawn and again after a reconnect.
+  // A message whose reactions changed since this began (framedSince) keeps the newer ones,
+  // and one whose reactions were all taken back meanwhile loses its chips.
+  async function loadReactions(kind, id, ticket) {
+    if (!reactionsOn) return;
+    framedSince = new Set();
+    let map;
+    try {
+      map = await kinds[kind].reactions(id);
+    } catch (error) {
+      if (!destroyed && ticket === openCount) console.warn('Messages: could not load reactions', error);
+      return;
+    }
+    if (destroyed || ticket !== openCount || !isOpen(kind, id)) return;
+    const found = Reactions.normalizeMap(map);
+    log.list().forEach(message => {
+      if (!message.id || framedSince.has(message.key)) return;
+      const list = found.get(String(message.id)) || [];
+      if (list.length || message.reactions?.length) log.setReactions(message.key, list);
+    });
+  }
+
   // Shares what waits in the tray before the message goes. Resolves the items for its
   // [[files:…]] marker, [] when nothing waits, or null when the message should stay unsent.
   async function shareFirst() {
@@ -493,6 +529,23 @@ export function createThread({
     }
   }
 
+  // Adds (on) or takes back your reaction. Spring answers with the message's reactions,
+  // which are newer than any reactions load still on its way.
+  async function react(message, reaction, on) {
+    if (!current?.loaded || !message?.id) return;
+    const { kind, id } = current;
+    showFormMessage('');
+    try {
+      const saved = await kinds[kind].react(id, message.id, reaction, on);
+      if (destroyed || !isOpen(kind, id)) return;
+      framedSince.add(message.key);
+      log.setReactions(message.key, saved?.reactions ?? []);
+    } catch (error) {
+      console.warn('Messages: could not save the reaction', error);
+      if (!destroyed && isOpen(kind, id)) showFormMessage(text.reactFailed);
+    }
+  }
+
   function showSaved(kind, id, saved) {
     if (kind === 'group' && Array.isArray(saved)) {
       saved.map(groupMessage).forEach(message => log.append(message, isMine(kind, message)));
@@ -560,6 +613,11 @@ export function createThread({
       case 'error':
         showFormMessage(change.text);
         break;
+      // Someone's reaction (or yours, from another tab) changed a message's chips.
+      case 'reactions':
+        framedSince.add(change.id);
+        log.setReactions(change.id, change.reactions);
+        break;
       default:
         break;
     }
@@ -578,8 +636,14 @@ export function createThread({
   function resume() {
     if (!current) return;
     follow();
-    if (current.loaded) loadNew(current.kind, current.id);
-    else current.catchUp = true;
+    if (current.loaded) {
+      // Reactions left or taken back while offline come after the messages that were missed.
+      const { kind, id } = current;
+      const ticket = openCount;
+      loadNew(kind, id).then(() => loadReactions(kind, id, ticket));
+    } else {
+      current.catchUp = true;
+    }
   }
 
   function setHeading(title, subtitle) {
@@ -636,7 +700,8 @@ export function createThread({
     early = [];
     waiting.forEach(event => handleEvent(kind, id, event));
     refreshComposer();
-    if (current.catchUp) loadNew(kind, id);
+    if (current.catchUp) loadNew(kind, id).then(() => loadReactions(kind, id, ticket));
+    else loadReactions(kind, id, ticket);
     if (kind === 'dm') markRead(id);
     if (current.reveal) log.reveal(current.reveal);
   }

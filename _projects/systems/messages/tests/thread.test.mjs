@@ -266,3 +266,167 @@ test('a GitHub link in a DM shows its card under the message', async () => {
   assert.equal(elements.messages.querySelectorAll('.chat-cards').length, 1);
   assert.match(asked[0], /pages\/pull\/2066/);
 });
+
+// ── Reactions ───────────────────────────────────────────────────────────────────────────
+// The stub API with the four reaction calls. `reactions` is what a GET answers (a map of
+// message id → list), or a function (kind, id) that gives it or a Promise of it; each PUT
+// or DELETE answers with `answer(messageId, reaction, on)`, or fails when `fail` is set.
+function withReactions(api, { reactions = {}, answer = () => ({ reactions: [] }), fail = false } = {}) {
+  const read = (kind, id) => Promise.resolve(typeof reactions === 'function' ? reactions(kind, id) : reactions);
+  const write = name => async (id, messageId, reaction, on) => {
+    api.calls.push([name, id, messageId, reaction, on]);
+    if (fail) throw new Error('the reaction did not save');
+    return answer(messageId, reaction, on);
+  };
+  return Object.assign(api, {
+    groupReactions: id => { api.calls.push(['groupReactions', id]); return read('group', id); },
+    dmReactions: id => { api.calls.push(['dmReactions', id]); return read('dm', id); },
+    setGroupReaction: write('setGroupReaction'),
+    setDmReaction: write('setDmReaction'),
+  });
+}
+
+const groupRow = (id, message = 'hi') => ({ id, author: 'Grace Hopper', author_uid: 'grace', message, date: '2026-10-20T10:00:00Z' });
+const liked = (...uids) => [{ reaction: 'like', people: uids.map(uid => ({ uid, name: uid })) }];
+const reactionsFrame = (messageId, reactions) => ({ context: 'reactionsServer', messageId, reactions });
+const rowIn = (elements, key) => elements.messages.querySelector(`[data-key="${key}"]`);
+const chipsIn = (elements, key) => rowIn(elements, key)?.querySelector('.chat-reactions') ?? null;
+const chipText = (elements, key) => chipsIn(elements, key)?.textContent ?? '';
+const answerAsAda = (messageId, reaction, on) => ({ messageId, reactions: on ? [{ reaction, people: [{ uid: 'ada', name: 'Ada Lovelace' }] }] : [] });
+
+// Opens a message's reaction picker and picks one by its label.
+function pickIn(elements, key, label) {
+  rowIn(elements, key).querySelector('[data-action="react"]').dispatchEvent(fakeEvent('click'));
+  rowIn(elements, key).querySelectorAll('.ocs__menu-item')
+    .find(choice => choice.querySelector('.ocs__menu-name').textContent === label)
+    .dispatchEvent(fakeEvent('click'));
+}
+
+test('reactions load after the history and draw on their messages', async () => {
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { reactions: { m1: liked('grace') } });
+  const group = makeThread({ api });
+  group.thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  assert.deepEqual(api.calls.slice(0, 2), [['groupMessages', 7], ['groupReactions', 7]]);
+  assert.equal(chipText(group.elements, 'm1'), '👍 1');
+
+  const dmApi = withReactions(stubApi({ dmMessages: [dmRow(1, 'hi')] }), { reactions: { 1: liked('grace', 'ada') } });
+  const dm = makeThread({ api: dmApi });
+  dm.thread.open('dm', 4, { title: 'Grace', subtitle: '' });
+  await settle();
+  assert.equal(chipText(dm.elements, '1'), '👍 2');
+});
+
+test('a reactions frame redraws a message’s chips', async () => {
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }));
+  const { thread, elements, socket } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  assert.equal(chipsIn(elements, 'm1'), null);
+
+  socket.handler(reactionsFrame('m1', liked('grace')));
+  assert.equal(chipText(elements, 'm1'), '👍 1');
+  socket.handler(reactionsFrame('m1', []));
+  assert.equal(chipsIn(elements, 'm1'), null, 'the last reaction taken back takes the row with it');
+});
+
+test('a frame newer than the bulk load wins', async () => {
+  let answer;
+  const held = new Promise(resolve => { answer = resolve; });
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { reactions: () => held });
+  const { thread, elements, socket } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+
+  socket.handler(reactionsFrame('m1', liked('grace', 'alan')));
+  answer({ m1: liked('grace') });
+  await settle();
+  assert.equal(chipText(elements, 'm1'), '👍 2');
+});
+
+test('a reactions answer for a chat you left is dropped', async () => {
+  let answer;
+  const held = new Promise(resolve => { answer = resolve; });
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { reactions: (kind, id) => (id === 7 ? held : {}) });
+  const { thread, elements } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  thread.open('group', 8, { title: 'Team Hopper', subtitle: '' });
+  await settle();
+
+  answer({ m1: liked('grace') });
+  await settle();
+  assert.equal(chipsIn(elements, 'm1'), null, 'group 7’s reactions don’t land on group 8’s m1');
+});
+
+test('picking a reaction sends PUT, and picking it again sends DELETE', async () => {
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { answer: answerAsAda });
+  const { thread, elements } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+
+  pickIn(elements, 'm1', 'Like');
+  await settle();
+  assert.equal(chipText(elements, 'm1'), '👍 1');
+  pickIn(elements, 'm1', 'Like');
+  await settle();
+  assert.equal(chipsIn(elements, 'm1'), null);
+  assert.deepEqual(api.calls.filter(call => call[0] === 'setGroupReaction'),
+    [['setGroupReaction', 7, 'm1', 'like', true], ['setGroupReaction', 7, 'm1', 'like', false]]);
+});
+
+test('a failed reaction shows the reactFailed text', async () => {
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { fail: true });
+  const { thread, elements } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  const warn = console.warn;
+  console.warn = () => {};
+  try {
+    pickIn(elements, 'm1', 'Like');
+    await settle();
+  } finally {
+    console.warn = warn;
+  }
+  assert.equal(elements.formStatus.textContent, 'Could not save your reaction. Try again.');
+  assert.equal(rowIn(elements, 'm1').querySelector('[data-action="react"]').disabled, false, 'you can try again');
+});
+
+test('a read-only thread never asks for reactions', async () => {
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { reactions: { m1: liked('grace') } });
+  const { thread, elements } = makeThread({ api, readOnly: true });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  assert.equal(api.calls.some(call => call[0] === 'groupReactions'), false);
+  assert.equal(elements.messages.querySelector('[data-action="react"]'), null);
+});
+
+test('a message that arrived live can be reacted to', async () => {
+  const api = withReactions(stubApi({ groupMessages: [] }), { answer: answerAsAda });
+  const { thread, elements, socket } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+
+  socket.handler(groupFrame('m9', 'Grace Hopper', 'just now'));
+  socket.handler(reactionsFrame('m9', liked('grace')));
+  assert.equal(chipText(elements, 'm9'), '👍 1');
+  pickIn(elements, 'm9', 'Love');
+  await settle();
+  assert.deepEqual(api.calls.filter(call => call[0] === 'setGroupReaction'), [['setGroupReaction', 7, 'm9', 'love', true]]);
+});
+
+test('after the socket reconnects, reactions are fetched again', async () => {
+  const answers = [{}, { m1: liked('grace') }, {}];
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { reactions: () => answers.shift() });
+  const { thread, elements } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  assert.equal(chipsIn(elements, 'm1'), null);
+
+  thread.resume();
+  await settle();
+  assert.equal(chipText(elements, 'm1'), '👍 1', 'a reaction left while offline shows up');
+  thread.resume();
+  await settle();
+  assert.equal(chipsIn(elements, 'm1'), null, 'and one taken back while offline goes');
+});
