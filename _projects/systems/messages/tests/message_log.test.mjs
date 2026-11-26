@@ -523,3 +523,21 @@ test('clearing the log or deleting the message closes an open reaction picker', 
   log.clear();
   assert.equal(document.listenerCount('click'), before);
 });
+
+test('a reaction picker near the foot of the log opens upward', () => {
+  const { element, log } = makeLog({ onReact: async () => {} });
+  log.append(message('1', 'hi'), false);
+  const actions = rowOf(element, '1').querySelector('.chat-msg-actions');
+  const menu = rowOf(element, '1').querySelector('.ocs__menu');
+  element.getBoundingClientRect = () => ({ top: 0, bottom: 300 });
+  menu.getBoundingClientRect = () => ({ height: 240 });
+
+  actions.getBoundingClientRect = () => ({ top: 270, bottom: 296 });
+  reactButtonOf(element, '1').dispatchEvent(fakeEvent('click'));
+  assert.equal(actions.classList.contains('is-menu-above'), true, 'no room below, so it opens upward');
+  reactButtonOf(element, '1').dispatchEvent(fakeEvent('click')); // closes it
+
+  actions.getBoundingClientRect = () => ({ top: 10, bottom: 36 });
+  reactButtonOf(element, '1').dispatchEvent(fakeEvent('keydown', { key: 'ArrowDown' }));
+  assert.equal(actions.classList.contains('is-menu-above'), false, 'room below again, opened from the keyboard');
+});

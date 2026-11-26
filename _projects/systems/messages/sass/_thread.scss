@@ -516,13 +516,46 @@
   margin-top: var(--dm-space-xs);
 }
 
-// The React button's menu opens under the action bar, anchored to its right edge so it
-// stays on a phone's screen, and over the messages below it.
+// The React button's menu (the grammar's ocs__menu) is one row of the six emoji, small
+// enough to open beside any message on a phone. It opens under the action bar, anchored to
+// its right edge so it stays on the screen, and over the messages below it.
 .dm .chat-msg-actions .ocs__menu {
   position: absolute;
   top: calc(100% + var(--dm-space-xs));
   right: 0;
   z-index: 7;
+  flex-direction: row;
+  min-width: 0;
+  max-height: none;
+  overflow: visible;
+}
+
+.dm .chat-msg-actions .ocs__menu-item {
+  grid-template-columns: auto;
+  width: auto;
+  padding: var(--dm-space-xs);
+}
+
+.dm .chat-msg-actions .ocs__menu-icon {
+  grid-row: auto;
+  font-size: $text-xl;
+  line-height: 1;
+}
+
+// Each reaction's name stays as its button's name for a screen reader, but isn't drawn.
+.dm .chat-msg-actions .ocs__menu-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// Near the foot of the log there's no room under the bar, so message-log.js opens it above.
+.dm .chat-msg-actions.is-menu-above .ocs__menu {
+  top: auto;
+  bottom: calc(100% + var(--dm-space-xs));
 }
 
 // A reply's quote of the message it answers (chat-reply.js's renderReplyQuote): a

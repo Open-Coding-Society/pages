@@ -399,7 +399,7 @@ export function createMessageLog(element, {
 
   // The React button's menu: the six reactions, drawn like the composer's Attach menu.
   function reactionPicker(key, button, container) {
-    return new PopupMenu({
+    const picker = new PopupMenu({
       button,
       container,
       label: text.addReaction,
@@ -409,6 +409,21 @@ export function createMessageLog(element, {
         onPick: () => react(key, kind.key, !isMine(key, kind.key)),
       })),
     });
+    // PopupMenu's own listeners come first, so the menu is open by the time these measure it.
+    button.addEventListener('click', () => placePicker(picker, container));
+    button.addEventListener('keydown', () => placePicker(picker, container));
+    return picker;
+  }
+
+  // The menu opens under the action bar, but near the foot of the log it would be cut off
+  // there (a phone shows only a few messages), so it opens above when that has more room.
+  function placePicker(picker, actions) {
+    if (!picker.isOpen()) return;
+    const room = element.getBoundingClientRect();
+    const bar = actions.getBoundingClientRect();
+    const below = room.bottom - bar.bottom;
+    const above = bar.top - room.top;
+    actions.classList.toggle('is-menu-above', below < picker.element.getBoundingClientRect().height && above > below);
   }
 
   // Draws a message's reactions from Spring's list (Reactions.normalize reads it), after
