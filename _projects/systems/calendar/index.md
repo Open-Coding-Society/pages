@@ -2857,7 +2857,9 @@ active_tab: calendar
         const inlineCodes = [];
         processed = processed.replace(/`([^`]+)`/g, (m, c) => { inlineCodes.push(c); return `%%IC${inlineCodes.length-1}%%`; });
         const links = [];
-        processed = processed.replace(/<((https?|ftp|mailto):[^|>]+)(?:\|([^>]+))?>/g, (m, url, p, t) => { links.push({url, linkText: t || url}); return `%%LK${links.length-1}%%`; });
+        // A link stops at its first "<" as well as its ">": without that, a description full of links
+        // that never close is read to the end again from every "<http:".
+        processed = processed.replace(/<((https?|ftp|mailto):[^|<>]+)(?:\|([^<>]+))?>/g, (m, url, p, t) => { links.push({url, linkText: t || url}); return `%%LK${links.length-1}%%`; });
         processed = processed.replace(/(\*)([^*]+)\1/g, '<strong>$2</strong>').replace(/(_)([^_]+)\1/g, '<em>$2</em>').replace(/(~)([^~]+)\1/g, '<del>$2</del>');
         processed = processed.replace(/%%CB(\d+)%%/g, (m, i) => `<pre><code>${escapeHtml(codeBlocks[i])}</code></pre>`);
         processed = processed.replace(/%%IC(\d+)%%/g, (m, i) => `<code>${escapeHtml(inlineCodes[i])}</code>`);
