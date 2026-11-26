@@ -11,6 +11,7 @@ const { initMembers } = await import('../js/group-dialogs.js');
 const roles = (...names) => names.map(name => ({ name }));
 const ana = { id: 1, uid: 'ana', name: 'Ana Student', roles: roles('ROLE_USER') };
 const pat = { id: 3, uid: 'pat', name: 'Pat Mentor', roles: roles('ROLE_USER', 'ROLE_MENTOR') };
+const tess = { id: 8, uid: 'tess', name: 'Tess Teacher', roles: roles('ROLE_USER', 'ROLE_TEACHER') };
 const group = {
   id: 7, name: 'Team Rocket',
   members: [
@@ -25,6 +26,7 @@ function open(me, options = {}, shown = group) {
   const elements = {
     dialog: make('div'), title: make('h3'), list: make('tbody'), results: make('div'), status: make('p'),
     search: make('input'), searchField: make('div'), deleteSection: make('div'), deleteWarning: make('p'), deleteOpen: make('button'),
+    actionHeader: make('th'),
   };
   const close = make('button');
   close.setAttribute('data-close', '');
@@ -64,12 +66,13 @@ test('the dialog focuses the add search, or Close when the account may not add a
 });
 
 test('an add Spring refuses for a reason it names says that reason', async () => {
+  // Only a teacher or an admin gets Add in a class group, so it's a teacher who hears this refusal.
   const csa = { id: 9, name: 'CSA', members: [{ id: 1, uid: 'ana', name: 'Ana Student', mentor: false }] };
   const api = {
     searchPeople: async () => [{ id: 3, uid: 'pat', name: 'Pat Mentor' }],
     addMember: async () => { throw Object.assign(new Error('POST answered HTTP 403'), { status: 403, reason: 'mentor_class_group' }); },
   };
-  const elements = open(ana, { api }, csa);
+  const elements = open(tess, { api }, csa);
   elements.search.value = 'Pat';
   elements.search.dispatchEvent(fakeEvent('input'));
   await new Promise(resolve => setTimeout(resolve, 300));
