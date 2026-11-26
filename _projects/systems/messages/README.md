@@ -27,6 +27,7 @@ same way they reach a direct message.
 | `js/file-actions.js`, `js/file-viewer.js` | `FileActions` and `FileViewer`: what a shared file's buttons do (download, preview, open a folder, .zip), and the preview: an image, video, sound, PDF or the start of a text file. |
 | `js/zip-store.js` | `ZipStore`, static: a stored (uncompressed) ZIP writer, so a shared folder downloads as one file. |
 | `js/popup-menu.js` | `PopupMenu`: a menu a button opens (`ocs__menu`), with the arrow keys, Escape and click-away. |
+| `js/reactions.js` | `Reactions` (the six reaction kinds, in the order Spring's `Reaction` enum lists them, and the readers for Spring's reaction lists) and `ReactionChips` (the chips under a message). |
 | `js/file-rows.js` | `FileRows`: the files a message shares, as `ocs__file` rows with their buttons, and small previews for a few images. |
 | `js/delete-group.js` | The Delete group dialog: says what deleting takes away, and waits for the group's name. |
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
@@ -151,6 +152,24 @@ direct message only an image can be attached: Spring stores shared files for gro
   and the message's words as a link to it) and marks the message Pinned. Pinning again
   keeps the first pin; deleting the pin message, or the pinned message, takes the pin away.
   An embed shows the pins too, but the Shared panel is `/dm`'s.
+
+## Reactions
+
+- Each message in a DM or a group has React, first in its action bar. It opens a menu of six
+  reactions: 👍 Like, ❤️ Love, 😂 Haha, 😮 Wow, 😢 Sad and 🎉 Celebrate. The message then shows a
+  chip for each reaction it has, with the emoji, how many people left it and their names in
+  the chip's title. Your own chips are filled; clicking one, or picking that reaction again,
+  takes yours back. While a change is saving, that message's chips and React button wait.
+- Spring keeps them (spring#302). The page reads a conversation's reactions after its
+  history, and again after the socket reconnects. A reactions frame on the conversation's
+  topic redraws one message's chips, and a message that a frame or your own change redrew
+  since the load began keeps that newer state.
+- Spring stores the key (`like`, `love`, `haha`, `wow`, `sad`, `celebrate`), never the emoji.
+  `Reactions.KINDS` in `js/reactions.js` and Spring's `Reaction` enum list the same keys in the
+  same order, so change them together.
+- Whether a chip is yours is decided by uid, since two people in a group can share a name. A
+  message saved before ids and a deleted message take no reactions, and a read-only pane, or
+  a host whose API has no reaction calls, asks for none.
 
 ## GitHub cards, slash commands and code
 
@@ -322,6 +341,11 @@ Spring:
   with `Retry-After` when Spring can't check S3 for the path, from spring#281), `GET /api/groups/chat/{id}/files/index` (paths,
   sizes and who shared them, no bytes) and `GET /api/groups/chat/{id}/files/content?path=`
   (one file's bytes)
+- Reactions (spring#302): `GET /api/dm/conversations/{id}/reactions` and
+  `GET /api/groups/chat/{id}/reactions` (each message id with `[{reaction, people: [{uid, name}]}]`), and
+  `PUT` or `DELETE` `…/messages/{messageId}/reactions/{reaction}` to add or take back yours, which
+  answers `{messageId, reactions}`. Live, a group's topic sends `reactionsServer` frames and a DM's
+  sends `type: "reactions"` frames, each with the message's reactions after the change.
 - STOMP over SockJS at `/ws-chat` (port 8589 on localhost)
 - Gists: `GET /api/grades/read-gist/{id}` (a gist's card) and `POST /api/grades/create-gist`
   (`{files, description}`, saved with the sender's GitHub Gist connection)
