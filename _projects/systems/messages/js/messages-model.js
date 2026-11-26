@@ -51,8 +51,21 @@ export function groupMessage(raw) {
 
 // A frame from /topic/group/{id}. Presence, typing and heartbeat frames are 'other':
 // this page doesn't show who is online.
+// Spring's {"context":"callServer","callId","state","count"} on a group or DM topic: a call there
+// started, changed or ended. The calls system's CallEntry confirms it over REST before /dm shows it.
+function callChange(event) {
+  return {
+    type: 'call',
+    callId: event.callId,
+    state: typeof event.state === 'string' ? event.state : '',
+    count: Number.isSafeInteger(event.count) && event.count >= 0 ? event.count : 0,
+  };
+}
+
 export function classifyGroupEvent(event) {
   switch (event?.context) {
+    case 'callServer':
+      return callChange(event);
     case 'sendMessageServer':
       return {
         type: 'message',
@@ -79,6 +92,8 @@ export function classifyGroupEvent(event) {
 // ways over time, so this accepts each of them. Spring now types every frame ("message"
 // or "edited"); only an untyped frame for a message already shown counts as an edit.
 export function classifyDmEvent(event, activeConversationId, isKnown) {
+  // A DM's call frame names no conversation: it arrives only on the open one's topic.
+  if (event?.context === 'callServer') return callChange(event);
   if (!event || event.conversationId !== activeConversationId) return { type: 'other' };
   const id = asId(event.id);
   const type = String(event.type || '').toLowerCase();

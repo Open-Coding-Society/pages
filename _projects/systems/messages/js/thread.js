@@ -71,7 +71,7 @@ export const EMPTY_STATES = Object.freeze({
 // folders. onOpenFolder(groupId, path) opens a shared folder in the Shared panel's Files tab.
 export function createThread({
   elements, api, socket, richText, me,
-  onDmRead = () => {}, onGroupRead = () => {}, onFileShared = () => {},
+  onDmRead = () => {}, onGroupRead = () => {}, onFileShared = () => {}, onCall = () => {},
   readOnly = false, onSchedule = null, emptyState = null, texts = {}, formatBody = null,
   groupFiles = null, onOpenFolder = null, viewer: sharedViewer = null, linkCards = null,
   runCode = null, onCommand = () => {}, profileUrl = '/profile', onChanged = () => {},
@@ -632,6 +632,10 @@ export function createThread({
         break;
       case 'error':
         showFormMessage(change.text);
+        break;
+      // A call in this conversation started, changed or ended: /dm's CallEntry, when calls are on.
+      case 'call':
+        onCall(kind, id, change);
         break;
       default:
         break;

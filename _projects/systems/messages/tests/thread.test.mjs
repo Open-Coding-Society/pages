@@ -113,6 +113,29 @@ test('a pane needs no onDmRead, onGroupRead or onFileShared', async () => {
   assert.match(elements.messages.textContent, /new here/);
 });
 
+test('a call frame goes to onCall with the open conversation, and adds no line to the log', async () => {
+  const seen = [];
+  const { thread, socket, elements } = makeThread({ onCall: (kind, id, change) => seen.push([kind, id, change]) });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  socket.handler({ context: 'callServer', callId: 5, state: 'live', count: 2 });
+  assert.deepEqual(seen, [['group', 7, { type: 'call', callId: 5, state: 'live', count: 2 }]]);
+  assert.doesNotMatch(elements.messages.textContent, /callServer|Unknown/);
+
+  thread.open('dm', 34, { title: 'Grace', subtitle: 'Direct message' });
+  await settle();
+  socket.handler({ context: 'callServer', callId: 6, state: 'idle', count: 0 });
+  assert.deepEqual(seen.at(-1), ['dm', 34, { type: 'call', callId: 6, state: 'idle', count: 0 }]);
+});
+
+test('a pane needs no onCall', async () => {
+  const { thread, socket, elements } = makeThread();
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  socket.handler({ context: 'callServer', callId: 5, state: 'live', count: 2 });
+  assert.doesNotMatch(elements.messages.textContent, /callServer/);
+});
+
 test('emptyState says what an open conversation with no messages shows', async () => {
   const { thread, elements } = makeThread({ emptyState: { title: 'Nothing yet', hint: 'Start the team chat.' } });
   thread.open('group', 7, { title: '', subtitle: '' });

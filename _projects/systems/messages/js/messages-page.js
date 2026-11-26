@@ -56,7 +56,8 @@ async function signedInPerson(api, setStatus) {
   return null;
 }
 
-export async function startMessagesPage({ config, richText, push }) {
+// calls is the calls system's CallEntry when calls are on (dm.md makes it), or null.
+export async function startMessagesPage({ config, richText, push, calls = null }) {
   const api = createMessagesApi(config);
   const setStatus = createStatus();
   const notice = byId('messagesNotice');
@@ -171,7 +172,9 @@ export async function startMessagesPage({ config, richText, push }) {
     },
     onGroupRead: id => markGroupRead(findItem('group', id)),
     onFileShared: id => files.refreshIfShowing(id),
+    onCall: (kind, id, change) => calls?.frame(kind, id, change),
   });
+  calls?.attach({ link: byId('messagesCall'), notice: byId('messagesCallNotice') });
 
   const groupActions = byId('messagesGroupActions');
   const openGroup = () => (state.active?.kind === 'group' ? findItem('group', state.active.id) : null);
@@ -242,6 +245,7 @@ export async function startMessagesPage({ config, richText, push }) {
     render();
     syncSearchScope();
     showGroupActions(kind === 'group' ? item : null);
+    calls?.open(kind, id);
     history.replaceState(null, '', conversationHref(kind, id));
     // Nothing to scroll to on a phone: the page shows one pane at a time there (dm.md's
     // inline script swaps the list for the conversation), and the pane fills the window.
@@ -281,6 +285,7 @@ export async function startMessagesPage({ config, richText, push }) {
     state.active = null;
     syncSearchScope();
     showGroupActions(null);
+    calls?.close();
     history.replaceState(null, '', window.location.pathname);
   }
 

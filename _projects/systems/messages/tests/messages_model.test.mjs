@@ -68,6 +68,14 @@ test('classifyGroupEvent turns a broadcast message into a message with its saved
   assert.equal(event.message.body, 'hi');
 });
 
+test('a call frame on a group or DM topic is a call, never a message', () => {
+  const frame = { context: 'callServer', callId: 5, state: 'live', count: 2 };
+  assert.deepEqual(classifyGroupEvent(frame), { type: 'call', callId: 5, state: 'live', count: 2 });
+  // Spring's DM call frame has no conversationId; the topic says which conversation it is.
+  assert.deepEqual(classifyDmEvent(frame, 34, () => false), { type: 'call', callId: 5, state: 'live', count: 2 });
+  assert.deepEqual(classifyDmEvent({ ...frame, count: 'x', state: 7 }, 34, () => false), { type: 'call', callId: 5, state: '', count: 0 });
+});
+
 test('classifyGroupEvent reads edits, deletes, shared files and errors', () => {
   assert.deepEqual(classifyGroupEvent({ context: 'editMessageServer', messageId: 'm1', message: 'new' }),
     { type: 'edit', id: 'm1', body: 'new' });

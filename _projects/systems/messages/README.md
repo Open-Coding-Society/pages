@@ -92,6 +92,16 @@ import them by name, like the UI Builder's chat block with `mountGroupChat`.
   sidebar's DM counts current. Groups have their own counts
   (`GET /api/groups/chat/unread`): opening a group, or a message arriving while it is
   open, posts `/api/groups/chat/{id}/read` and fires `dm:group-read` for the bell.
+- **Calls**, when the site runs Spring and `_config.yml` has `enabled: true` under `calls:`: dm.md
+  adds a Call link to the thread header and a line under it, and hands
+  `startMessagesPage` the calls system's `CallEntry` as `calls`. Opening a group or DM
+  points the link at its call (`/calls/?group=<id>` or `?dm=<id>`). Spring's
+  `{"context":"callServer","callId","state","count"}` frame on the open topic becomes a
+  `call` change (`messages-model.js`), which thread.js passes to `onCall`. CallEntry shows
+  "A call is on with N in it" and a Join link, but only after `GET /api/calls/{id}`
+  confirms a live call in that same conversation. A call frame never becomes a message.
+  With calls off, none of this is on the page and nothing is asked of Spring. See
+  [the calls system](../calls/README.md).
 - **The bell** counts conversations waiting: each person with unread DMs, plus each
   group with unread messages. Spring counts a group by reading its whole chat file, so
   the bell asks about groups when a page loads, when the tab comes back to the front
