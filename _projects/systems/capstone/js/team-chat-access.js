@@ -7,9 +7,6 @@ export class TeamChatAccess {
   /** The role Spring gives a verified mentor. */
   static MENTOR = 'ROLE_MENTOR';
 
-  /** The fewest members who aren't mentors that a group needs before its mentor can use it. */
-  static MIN_TEAM_SIZE = 2;
-
   /** A person's role names; Spring sends each role as { name } (older answers send plain names). */
   static roleNames(person) {
     return (person?.roles ?? []).map(role => (typeof role === 'string' ? role : role?.name));
@@ -31,27 +28,20 @@ export class TeamChatAccess {
     return (Array.isArray(groups) ? groups : []).find(group => group?.name === name) ?? null;
   }
 
-  /** How many of the group's members aren't mentors; Spring marks each member's mentor flag. */
-  static teamSize(group) {
-    return (group?.members ?? []).filter(member => !member.mentor).length;
-  }
-
   /** Whether the person is one of the group's members, compared by id. */
   static isMember(person, group) {
     return person?.id != null && (group?.members ?? []).some(member => member.id === person.id);
   }
 
   /**
-   * What the person sees: 'chat'; 'not-member'; 'team-too-small' for a mentor whose team is below
-   * MIN_TEAM_SIZE; or 'not-found' for a teacher when the group doesn't exist. A person who isn't
-   * staff only ever sees their own groups, so to them a missing group is 'not-member'.
+   * What the person sees: 'chat'; 'not-found' for a teacher when the group doesn't exist;
+   * 'mentor-waiting' for a mentor whose own groups leave it out; or 'not-member'. A person who isn't
+   * staff only ever sees their own groups, and Spring lists a group to its mentor only once they're in
+   * it and it has 2 members who aren't mentors, so the page can't tell which step is missing.
    */
   static viewFor(person, group) {
     if (TeamChatAccess.isStaff(person)) return group ? 'chat' : 'not-found';
-    if (!TeamChatAccess.isMember(person, group)) return 'not-member';
-    if (TeamChatAccess.isMentor(person) && TeamChatAccess.teamSize(group) < TeamChatAccess.MIN_TEAM_SIZE) {
-      return 'team-too-small';
-    }
-    return 'chat';
+    if (TeamChatAccess.isMember(person, group)) return 'chat';
+    return TeamChatAccess.isMentor(person) ? 'mentor-waiting' : 'not-member';
   }
 }

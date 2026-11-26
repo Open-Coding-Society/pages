@@ -122,8 +122,10 @@ capstone_project:
   (from `assets/js/projects/messages/conversation-embed.js`, loaded only when
   the chat shows) with a link to the group in Messages, or shows a note.
 - A member sees the chat. So does a mentor in the group, once the group has at
-  least 2 members who aren't mentors. A teacher or admin sees it whether or not
-  they're a member. Anyone else gets a note saying the chat is for the team.
+  least 2 members who aren't mentors: only then does Spring list the group among
+  the mentor's own, so a mentor who doesn't see it gets a note naming both steps.
+  A teacher or admin sees it whether or not they're a member. Anyone else gets a
+  note saying the chat is for the team.
 - Everyone looks for the group among their own groups
   (`GET /api/groups/person/{id}`) first; only a teacher or admin who isn't a
   member searches by name. So a mentor's browser never calls a route Spring

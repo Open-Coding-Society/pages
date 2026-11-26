@@ -62,5 +62,6 @@ capstone-team-chat.html (only with team_group, only with spring)
 
 Spring decides who may read and post (`MentorRules`): a mentor uses only a
 group they were added to, with at least 2 members who aren't mentors, and never
-a direct message. `TeamChatAccess` applies the same rules to choose a view, so
+a direct message. `TeamChatAccess` chooses a view from what Spring answers: a
+mentor's own group list already leaves out a group Spring would refuse them, so
 the browser asks only for what Spring would allow.

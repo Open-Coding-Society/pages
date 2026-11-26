@@ -6,7 +6,7 @@ loading: Loading the team chat…
 signIn: Sign in to see the team chat.
 unavailable: The team chat isn't available right now.
 notMember: "This chat is for {group}'s members and mentors. A member can add you in Messages."
-teamTooSmall: "{group} needs at least 2 members who aren't mentors before its mentor can use this chat."
+mentorWaiting: "You'll see this chat once a member of {group} adds you and the group has at least 2 members who aren't mentors."
 notFound: "There's no group named {group} in Messages yet. Make it in Messages, then add the team."
 openInMessages: Open in Messages
 # Words for the chat itself (Messages' embed); any key from the Messages README's embed table.

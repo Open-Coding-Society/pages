@@ -24,7 +24,7 @@ const TEXTS = {
   signIn: 'Sign in to see the team chat.',
   unavailable: "The team chat isn't available right now.",
   notMember: "This chat is for {group}'s members and mentors.",
-  teamTooSmall: '{group} needs at least 2 members who aren’t mentors.',
+  mentorWaiting: 'You’ll see this chat once a member of {group} adds you.',
   notFound: "There's no group named {group} in Messages yet.",
   openInMessages: 'Open in Messages',
   embed: { placeholder: 'Message the team…' },
@@ -43,12 +43,6 @@ test('a mentor has ROLE_MENTOR and no teacher or admin role, with roles as names
   assert.equal(TeamChatAccess.isStaff(mentor), false);
 });
 
-test('the team size counts members Spring did not mark as mentors', () => {
-  assert.equal(TeamChatAccess.teamSize(team), 2);
-  assert.equal(TeamChatAccess.teamSize(pair), 1);
-  assert.equal(TeamChatAccess.teamSize({ members: [] }), 0);
-});
-
 test('the group is found by its exact name only', () => {
   const groups = [{ id: 1, name: `${NAME} 2` }, { id: 2, name: NAME.toLowerCase() }, team];
   assert.equal(TeamChatAccess.findGroup(groups, NAME), team);
@@ -65,7 +59,7 @@ test('membership is by id', () => {
 test('what each viewer sees', () => {
   assert.equal(TeamChatAccess.viewFor(student, team), 'chat');
   assert.equal(TeamChatAccess.viewFor(mentor, team), 'chat');
-  assert.equal(TeamChatAccess.viewFor(mentor, pair), 'team-too-small');
+  assert.equal(TeamChatAccess.viewFor(mentor, null), 'mentor-waiting');
   assert.equal(TeamChatAccess.viewFor(student, pair), 'chat');
   assert.equal(TeamChatAccess.viewFor(outsider, team), 'not-member');
   assert.equal(TeamChatAccess.viewFor(outsider, null), 'not-member');
@@ -204,11 +198,12 @@ test('a mentor is looked up through their own groups only', async () => {
   assert.deepEqual(api.calls, ['me', 'groupsOf 3']);
 });
 
-test('a mentor whose team is too small gets a note and no chat', async () => {
-  const { root, embed, chat } = setUp({ api: fakeApi({ me: mentor, myGroups: [pair] }) });
-  assert.equal(await chat.start(), 'team-too-small');
+test('a mentor whose own groups leave the team out gets a note on how they get in, and no chat', async () => {
+  // Spring lists a group to its mentor only once they're in it and it has 2 members who aren't mentors.
+  const { root, embed, chat } = setUp({ api: fakeApi({ me: mentor, myGroups: [] }) });
+  assert.equal(await chat.start(), 'mentor-waiting');
   assert.equal(embed.mounts.length, 0);
-  assert.equal(root.textContent, `${NAME} needs at least 2 members who aren’t mentors.`);
+  assert.equal(root.textContent, `You’ll see this chat once a member of ${NAME} adds you.`);
 });
 
 test('someone outside the team gets a note and no chat', async () => {

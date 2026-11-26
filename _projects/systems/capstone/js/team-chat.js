@@ -11,7 +11,7 @@ export class CapstoneTeamChat {
    * @param {object} options
    * @param {string} options.groupName The team group's exact name, from capstone_project.team_group.
    * @param {object} options.config config.js: springEnabled, baseurl, javaURI, javaWebSocketURI, fetchOptions.
-   * @param {object} options.texts The page's words: loading, signIn, unavailable, notMember, teamTooSmall,
+   * @param {object} options.texts The page's words: loading, signIn, unavailable, notMember, mentorWaiting,
    *   notFound, openInMessages, and embed (passed to the chat as its texts).
    * @param {object} options.api A TeamGroupApi.
    * @param {object} options.load embed() and richText() load Messages' embed and the composer when needed.
@@ -34,7 +34,7 @@ export class CapstoneTeamChat {
 
   /**
    * Shows what the signed-in person may see and answers which view that was: 'chat', 'not-member',
-   * 'team-too-small', 'not-found', 'signed-out' or 'unavailable'.
+   * 'mentor-waiting', 'not-found', 'signed-out' or 'unavailable'.
    */
   async start() {
     // A Flask-only site (spring: false) never calls Spring. The include isn't rendered there either.
@@ -133,7 +133,7 @@ export class CapstoneTeamChat {
   }
 
   noteFor(view) {
-    return { 'not-member': this.texts.notMember, 'team-too-small': this.texts.teamTooSmall, 'not-found': this.texts.notFound }[view];
+    return { 'not-member': this.texts.notMember, 'mentor-waiting': this.texts.mentorWaiting, 'not-found': this.texts.notFound }[view];
   }
 
   showNote(message) {
