@@ -1,0 +1,24 @@
+# Words and choices for the Events system. Published to _data/projects/events/event_registry.yml.
+# An organization renames a label here; no template or script spells one.
+lifecycle:            # Mort's order (img1). listed: shown in the /events/ catalog
+  - {key: draft,        label: Draft,             description: Being written,        tone: neutral, listed: false}
+  - {key: published,    label: Published,         description: Details are out,      tone: good,    listed: true}
+  - {key: registration, label: Registration Open, description: Taking RSVPs,         tone: good,    listed: true}
+  - {key: active,       label: Active,            description: Happening now,        tone: good,    listed: true}
+  - {key: completed,    label: Completed,         description: Over; files and photos stay, tone: neutral, listed: true}
+  - {key: archived,     label: Archived,          description: Kept but not listed,  tone: neutral, listed: false}
+event_types: {workshop: Workshop, showcase: Showcase, fundraiser: Fundraiser, outreach: Outreach, meeting: Meeting}
+attachment_types: {gallery: Gallery, document: Document}
+features: [microblog, registration, attendance, gallery]
+sections:             # img2's cards, in order; a card shows only when its section has content
+  - {key: description, label: Description, icon: fa-file-lines}
+  - {key: schedule,    label: Schedule,    icon: fa-calendar}
+  - {key: presenters,  label: Presenters,  icon: fa-users}
+  - {key: gallery,     label: Gallery,     icon: fa-images}   # filled by PR 3 when photos exist
+formats: {date: "%B %-d, %Y", card_date: "%B %-d", time: "%-l:%M %p", between: " – ", separator: " · "}
+viewer: {label: Events, item: event}
+discussion: {shown: 5}  # how many of the topic's latest posts the page lists
+texts:
+  catalog: {title: Upcoming Events, intro: "Workshops, showcases and community events. Open one for its schedule, presenters and discussion.", join: Join Us, all: All, filter_label: Filter events by category, past_title: Past Events, empty: No upcoming events yet., showing: "Showing {count} upcoming events.", showing_one: "Showing 1 upcoming event.", showing_in: "Showing {count} upcoming events in {category}.", showing_one_in: "Showing 1 upcoming event in {category}.", none_in: "No upcoming events in {category}.", sample: Sample, pages_label: Event pages, earlier: "← Earlier events", later: "Later events →", page_of: "Page {page} of {pages}"}
+  page: {sections_title: Event Sections, organizer: Organizer, sample_note: "This is a sample event that shows how an event page looks. Nothing is happening here.", schedule_time: Time, schedule_item: Session, schedule_detail: Details, presentation: Open the presentation, discussion_title: Questions and Discussion, discussion_kicker: Event Microblog, discussion_text: Ask the organizers a question or participate in the discussion., discussion_button: Ask a question, discussion_none: "No questions yet. Ask the first one.", discussion_failed: "Questions couldn't load. Refresh to try again.", discussion_someone: Someone}
+  viewer: {unavailable: "Previous and next events are unavailable. Return to Events to restore them.", previous: "Previous event: {title}", next: "Next event: {title}"}
