@@ -756,6 +756,7 @@ text:
     api_saved_copy: Saved copy
     message_me_opening: Opening Messages…
     message_me_failed: "Couldn't start a message. Try again."
+    message_me_mentor: "This message would include a mentor, and mentors don't use direct messages."
     message_me_unpublished: The button works once this page is published.
     members_unpublished: Team members show once this page is published.
     members_unavailable: "This group's members can't be shown."

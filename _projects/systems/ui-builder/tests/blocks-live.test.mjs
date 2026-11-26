@@ -194,6 +194,11 @@ test('Message us opens a DM with the owner; the owner sees what it is for instea
   own.mount(0).querySelector('button').click();
   await settle();
   assert.equal(text(own.status(0)), say(registry, 'blocks.sample_message_me'));
+
+  const withMentor = await live(registry, [['message_me', {}]], { store: { messageOwner: async () => { throw Object.assign(new Error('x'), { name: 'ApiError', error: 'mentor_no_direct_messages', status: 403 }); } } });
+  withMentor.mount(0).querySelector('button').click();
+  await settle();
+  assert.equal(text(withMentor.status(0)), say(registry, 'live.message_me_mentor'), 'Spring refused because a mentor would be in it');
 });
 
 test('announcements find the course channel by exact name and show it read-only, markers as text', needsRuby, async (t) => {
