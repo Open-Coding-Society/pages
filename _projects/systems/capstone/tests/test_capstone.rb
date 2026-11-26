@@ -65,6 +65,17 @@ class CapstoneTest < Minitest::Test
     end
   end
 
+  # Spring's members routes refuse with these reasons (MentorRules); the panel needs words for each.
+  def test_team_chat_texts_cover_every_reason_the_members_routes_send
+    texts = YAML.load_file(File.expand_path("../data/team_chat.yml", __dir__))
+    %w[mentor_team_too_small team_manages_mentors mentor_class_group mentor_cannot_manage failed].each do |reason|
+      assert texts.dig("mentors", "reasons", reason).to_s.strip != "", "team_chat.yml mentors.reasons.#{reason}"
+    end
+    %w[title lead loading signIn unavailable notMember mentorWaiting notFound openInMessages].each do |key|
+      assert texts[key].to_s.strip != "", "team_chat.yml #{key}"
+    end
+  end
+
   def test_duplicate_urls_are_rejected
     projects = [
       document("First", "/same/", { "course" => "CSA" }),

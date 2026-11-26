@@ -133,6 +133,12 @@ capstone_project:
 - Spring enforces the rules (`MentorRules` in Spring's `mvc/groups`); the page
   only picks what to show. `js/team-group-api.js` (`TeamGroupApi`) makes the
   requests and keeps Spring's refusal `reason`.
+- Under the chat, `js/team-mentors.js` (`TeamMentorsPanel`) lists the team's
+  mentors (members Spring marks `mentor: true`). A member who isn't a mentor,
+  or a teacher, can also search for verified mentors (`/api/people/search`,
+  narrowed to `ROLE_MENTOR` accounts not in the group yet) and Add or Remove
+  them through the group's members routes. A mentor sees the list only. When
+  Spring refuses, the panel shows the words for Spring's `reason`.
 - The words are in `data/team_chat.yml` (published to
   `_data/projects/capstone/`); its `embed` keys go to the chat itself.
 - The tests reuse Messages' fake DOM (`../../messages/tests/fake-dom.mjs`),

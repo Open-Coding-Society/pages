@@ -28,6 +28,11 @@ const TEXTS = {
   notFound: "There's no group named {group} in Messages yet.",
   openInMessages: 'Open in Messages',
   embed: { placeholder: 'Message the team…' },
+  mentors: {
+    title: 'Mentors', none: 'No mentors yet.', findLabel: 'Find a mentor', findHint: 'Verified mentors only.',
+    search: 'Search', noResults: 'No mentors match.', add: 'Add', remove: 'Remove',
+    added: '{name} added.', removed: '{name} removed.', reasons: { failed: 'Try again.' },
+  },
 };
 
 // --- TeamChatAccess: pure ---
@@ -113,6 +118,31 @@ test('findByName answers only the group with that exact name, and encodes it', a
   assert.equal((await api.findByName(NAME)).data, team);
 });
 
+test('adding a member posts to the members route and returns the group', async () => {
+  const { fetch, calls } = fakeFetch({ [`POST ${SPRING}/api/groups/7/members/3`]: { status: 200, body: team } });
+  const api = new TeamGroupApi({ javaURI: SPRING, fetchOptions, fetch });
+  assert.deepEqual(await api.addMember(7, 3), { ok: true, status: 200, data: team, reason: '' });
+  assert.equal(calls[0].method, 'POST');
+});
+
+test('a refusal keeps Spring\'s reason', async () => {
+  const body = { error: 'too small', reason: 'mentor_team_too_small' };
+  const { fetch } = fakeFetch({ [`POST ${SPRING}/api/groups/9/members/3`]: { status: 403, body } });
+  const api = new TeamGroupApi({ javaURI: SPRING, fetchOptions, fetch });
+  assert.deepEqual(await api.addMember(9, 3), { ok: false, status: 403, data: body, reason: 'mentor_team_too_small' });
+});
+
+test('people search and removing a member use their routes', async () => {
+  const { fetch, calls } = fakeFetch({
+    [`GET ${SPRING}/api/people/search?query=p%26t`]: { status: 200, body: [mentor] },
+    [`DELETE ${SPRING}/api/groups/7/members/3`]: { status: 200, body: team },
+  });
+  const api = new TeamGroupApi({ javaURI: SPRING, fetchOptions, fetch });
+  assert.deepEqual((await api.searchPeople('p&t')).data, [mentor]);
+  assert.equal((await api.removeMember(7, 3)).ok, true);
+  assert.deepEqual(calls.map(call => call.method), ['GET', 'DELETE']);
+});
+
 test('a success whose body is not JSON is a failure, not an empty answer', async () => {
   const fetch = async () => ({ ok: true, status: 200, json: async () => { throw new SyntaxError('Unexpected token <'); } });
   const warnings = [];
@@ -189,6 +219,21 @@ test('a member gets the chat, with a link to the group in Messages', async () =>
   assert.deepEqual(embed.mounts[0].options.texts, TEXTS.embed);
   assert.equal(root.querySelector('a.ocs__btn').getAttribute('href'), '/dm?group=7');
   assert.deepEqual(api.calls, ['me', 'groupsOf 1']);
+});
+
+test('the chat shows the team\'s mentors under it, with the search for a member', async () => {
+  const { root, chat } = setUp({ api: fakeApi({ me: student, myGroups: [team] }) });
+  await chat.start();
+  assert.equal(root.querySelector('h3').textContent, 'Mentors');
+  assert.match(root.querySelector('li').textContent, /Pat Mentor/);
+  assert.ok(root.querySelector('form'));
+});
+
+test('a mentor in the chat sees the team\'s mentors without the search', async () => {
+  const { root, chat } = setUp({ api: fakeApi({ me: mentor, myGroups: [team] }) });
+  await chat.start();
+  assert.match(root.querySelector('li').textContent, /Pat Mentor/);
+  assert.equal(root.querySelector('form'), null);
 });
 
 test('a mentor is looked up through their own groups only', async () => {

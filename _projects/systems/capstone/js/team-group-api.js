@@ -39,6 +39,21 @@ export class TeamGroupApi {
     return { ...answer, data: match ?? null };
   }
 
+  /** People whose name or email holds the query: GET /api/people/search. */
+  searchPeople(query) {
+    return this.request('GET', `/api/people/search?query=${encodeURIComponent(query)}`);
+  }
+
+  /** Adds a person to a group; data is the group afterwards. */
+  addMember(groupId, personId) {
+    return this.request('POST', `/api/groups/${encodeURIComponent(groupId)}/members/${encodeURIComponent(personId)}`);
+  }
+
+  /** Takes a person out of a group; data is the group afterwards. */
+  removeMember(groupId, personId) {
+    return this.request('DELETE', `/api/groups/${encodeURIComponent(groupId)}/members/${encodeURIComponent(personId)}`);
+  }
+
   /** Sends one request and reads its JSON, whatever the status. */
   async request(method, path) {
     let response;
