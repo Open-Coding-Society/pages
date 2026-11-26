@@ -2861,9 +2861,11 @@ active_tab: calendar
         // that never close is read to the end again from every "<http:".
         processed = processed.replace(/<((https?|ftp|mailto):[^|<>]+)(?:\|([^<>]+))?>/g, (m, url, p, t) => { links.push({url, linkText: t || url}); return `%%LK${links.length-1}%%`; });
         processed = processed.replace(/(\*)([^*]+)\1/g, '<strong>$2</strong>').replace(/(_)([^_]+)\1/g, '<em>$2</em>').replace(/(~)([^~]+)\1/g, '<del>$2</del>');
-        processed = processed.replace(/%%CB(\d+)%%/g, (m, i) => `<pre><code>${escapeHtml(codeBlocks[i])}</code></pre>`);
-        processed = processed.replace(/%%IC(\d+)%%/g, (m, i) => `<code>${escapeHtml(inlineCodes[i])}</code>`);
-        processed = processed.replace(/%%LK(\d+)%%/g, (m, i) => { const l = links[i]; return `<a href="${escapeHtml(l.url)}" target="_blank" rel="noopener">${escapeHtml(l.linkText)}</a>`; });
+        // A description can say "%%LK0%%" itself. A placeholder with no code or link behind it stays as
+        // typed: looking up a link that isn't there used to throw, so the event's window never opened.
+        processed = processed.replace(/%%CB(\d+)%%/g, (m, i) => codeBlocks[i] === undefined ? m : `<pre><code>${escapeHtml(codeBlocks[i])}</code></pre>`);
+        processed = processed.replace(/%%IC(\d+)%%/g, (m, i) => inlineCodes[i] === undefined ? m : `<code>${escapeHtml(inlineCodes[i])}</code>`);
+        processed = processed.replace(/%%LK(\d+)%%/g, (m, i) => { const l = links[i]; if (!l) return m; return `<a href="${escapeHtml(l.url)}" target="_blank" rel="noopener">${escapeHtml(l.linkText)}</a>`; });
         return processed.replace(/\n/g, '<br>');
     }
     function escapeHtml(s) { return s ? s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;") : ''; }

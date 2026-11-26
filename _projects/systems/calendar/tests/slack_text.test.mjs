@@ -45,6 +45,14 @@ test('a link that never closes ends at the next "<"', () => {
   assert.equal(slackToHtml('<http:a <https://b.c|x>'), `<http:a ${link('https://b.c', 'x')}`);
 });
 
+test('text that looks like the page\'s own placeholders stays as typed', () => {
+  // slackToHtml swaps code and links for placeholders while it formats the rest. A description
+  // with "%%LK0%%" in it used to make it look up a link that wasn't there and throw, so the
+  // event's window never opened.
+  assert.equal(slackToHtml('Room %%LK0%% today'), 'Room %%LK0%% today');
+  assert.equal(slackToHtml('Use %%CB3%% and %%IC0%% here'), 'Use %%CB3%% and %%IC0%% here');
+});
+
 test('a description with many links that never close is read fast', () => {
   // Any signed-in account can write a description, and the page turns it into HTML when you
   // open the event. Main's link pattern scanned to the end from every "<http:": this took
