@@ -46,6 +46,7 @@ are asked not to index them.
       calendarCard: '{{ site.baseurl }}/assets/js/chat/calendar/calendar-card.js',
       calendarModel: '{{ site.baseurl }}/assets/js/chat/calendar/calendar-model.js',
       microblog: '{{ site.baseurl }}/assets/js/projects/microblog/microblog.js',
+      microblogTopic: '{{ site.baseurl }}/assets/js/projects/microblog/microblog-topic.js',
     },
   });
 </script>

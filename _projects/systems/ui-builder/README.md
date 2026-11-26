@@ -74,7 +74,7 @@ Edit the sources here, never the published copies. The modules import each other
 | Messages | `conversation-embed.js` `mountGroupChat` (group chat, and class announcements read-only); `messages-model.js` `isClassGroup` / `isCourseChannel` |
 | Courses | `calendar-card.js` `createCalendarCardSection` / `mountCalendarCard`, `ocs_calendar_card.html template=true`, `ocs_calendar_card_data.html`; `calendar-model.js` `extractEventMarkers` (events in announcements) |
 | Kanban (root) | `kanban-board.js` `createKanbanSection` / `mountKanbanBoard` / `parseBoardUrl`, `ocs_kanban_board.html template=true`, `ocs_kanban_board_data.html` |
-| Flask microblog | `microblog.js` `createPost` to post feedback; Flask's public `GET /api/microblog/page/<key>` to read it |
+| Flask microblog | `microblog.js` `createPost` to post feedback; Flask's public `GET /api/microblog/page/<key>` to read it, with `<key>` from `microblog-topic.js` `MicroblogTopic.pageKey` |
 | Chat rich text | `rich-text.js` `createRichComposer({enterKey: 'newline'})`, `renderRichMessage` |
 | Grammar | `ocs__split--aside-end`, `ocs__embed` and `ocs__band` (added for this system) |
 

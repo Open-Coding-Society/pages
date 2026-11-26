@@ -4,7 +4,8 @@ import * as messagesModel from '../../messages/js/messages-model.js';
 import { embedTexts } from '../../messages/js/conversation-embed.js';
 import * as calendarModel from '../../courses/js/announcement-calendar/calendar-model.js';
 import { textOf } from '../js/registry.js';
-import { announcementText, createLiveMounts, microblogPageKey, mountLiveBlocks } from '../js/blocks-live.js';
+import { announcementText, createLiveMounts, mountLiveBlocks } from '../js/blocks-live.js';
+import { MicroblogTopic } from '../../microblog/js/microblog-topic.js';
 import { escapeHTML } from '../js/vnode.js';
 import { createDocument, createEvent, settle, text } from './fixtures/live/dom.mjs';
 import {
@@ -41,7 +42,8 @@ async function live(registry, blocks, options = {}) {
   const doc = createDocument();
   const root = drawPage(doc, page, registry);
   const fakes = {
-    conversationEmbed: fakeConversationEmbed(), kanban: fakeKanban(), calendarCard: fakeCalendarCard(), calendarModel, microblog: fakeMicroblog(), ...options.fakes,
+    conversationEmbed: fakeConversationEmbed(), kanban: fakeKanban(), calendarCard: fakeCalendarCard(), calendarModel, microblog: fakeMicroblog(),
+    microblogTopic: { MicroblogTopic }, ...options.fakes,
   };
   const loader = moduleLoader(fakes);
   const router = fetchRouter(options.routes || {});
@@ -279,7 +281,7 @@ test('a board waits for "Show our board" unless the viewer can edit the page', n
 
 test('feedback reads the page\'s microblog topic and posts to it, first names only', needsRuby, async () => {
   const registry = loadRegistry();
-  const key = microblogPageKey('/ui-builder/view/?page=flood-watch');
+  const key = MicroblogTopic.pageKey('/ui-builder/view/?page=flood-watch');
   assert.equal(key, 'ui-builder_view_page_flood-watch', 'the key Flask makes from that path');
   const read = `${PYTHON}/api/microblog/page/${key}?limit=20`;
   let posts = [{ userName: 'Ada Lovelace', content: '<b>Great</b> map', timestamp: '2026-10-28T17:00:00.123456', userUid: 'ada' }];
@@ -329,7 +331,7 @@ test('feedback reads the page\'s microblog topic and posts to it, first names on
 
 test('feedback without Flask sign-in shows the posts and a sign-in link; unpublished pages wait', needsRuby, async () => {
   const registry = loadRegistry();
-  const key = microblogPageKey('/ui-builder/view/?page=flood-watch');
+  const key = MicroblogTopic.pageKey('/ui-builder/view/?page=flood-watch');
   const run = await live(registry, [['feedback', {}]], {
     viewer: { springSignedIn: false, flaskSignedIn: false }, routes: { [`${PYTHON}/api/microblog/page/${key}`]: json({ message: 'Page topic not found' }, 404) },
   });

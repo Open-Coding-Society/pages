@@ -5,8 +5,8 @@
 // its [data-ui-live-mount], reporting progress and refusals in its [data-ui-live-status]. A card
 // that fails says so in its own status and never stops the others. Other systems' modules
 // (Messages' conversation-embed.js, kanban-board.js, Courses' calendar-card.js and
-// calendar-model.js, microblog.js) are loaded by URL from ctx.services.modules, so nothing here
-// imports across systems.
+// calendar-model.js, microblog.js and microblog-topic.js) are loaded by URL from
+// ctx.services.modules, so nothing here imports across systems.
 //
 // ctx: {registry, baseurl, pageOrigin, pageProtocol, slug, pageKey, doc, fetchImpl, storage, now,
 //   loadModule?(url), navigate?(url), services: {config, richText, messagesModel, modules, store,
@@ -355,11 +355,6 @@ async function mountKanban(card, block, c, { status, mount }) {
 
 /* ---------- visitor feedback (the Flask microblog) ---------- */
 
-// The Flask microblog's Topic._generate_page_key, so the public read finds the topic a post made.
-export function microblogPageKey(topicPath) {
-  return String(topicPath).replace(/^\/+|\/+$/g, '').replace(/[^a-zA-Z0-9_-]/g, '_').replace(/_+/g, '_').slice(0, 100).replace(/^_+|_+$/g, '');
-}
-
 // Flask writes UTC times without a zone; without the Z, Date would read them as local time.
 function postTime(value) {
   if (typeof value !== 'string' || !value) return null;
@@ -424,12 +419,14 @@ async function mountFeedback(card, block, c, { status, mount }) {
   if (stop) return refuse(status, stop);
   if (!c.slug) return refuse(status, { text: c.say('live.feedback_unpublished') });
   const topicPath = `/ui-builder/view/?page=${c.slug}`;
+  // The Microblog's copy of Flask's page key, so the public read finds the topic a post made.
+  const { MicroblogTopic } = await c.load('microblogTopic');
   const pythonURI = String(c.config.pythonURI || '').replace(/\/+$/, '');
   const list = element(c.doc, 'div');
   let alive = true;
 
   const load = async () => {
-    const answer = await getJson(c, `${pythonURI}/api/microblog/page/${microblogPageKey(topicPath)}?limit=${FEEDBACK_SHOWN}`);
+    const answer = await getJson(c, `${pythonURI}/api/microblog/page/${MicroblogTopic.pageKey(topicPath)}?limit=${FEEDBACK_SHOWN}`);
     if (!alive) return;
     // 404: nobody has posted yet, so Flask has no topic for this page.
     const posts = answer.ok && isObject(answer.json) && Array.isArray(answer.json.microblogs) ? answer.json.microblogs.filter(isObject) : [];
