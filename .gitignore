@@ -170,6 +170,9 @@ _layouts/projects/
 /_sass/open-coding/submissions.scss
 /_sass/open-coding/submissions-v2.scss
 
+# Events system distributions (authoritative sources in _projects/systems/events)
+/_layouts/event.html
+
 # Auto-generated project Makefiles (copied from _template at build time)
 _projects/*/Makefile
 _projects/*/*/Makefile

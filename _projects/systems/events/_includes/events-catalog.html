@@ -1,0 +1,70 @@
+{%- comment -%}
+  The Upcoming Events catalog on /events/ (img3): a tinted band with the heading, the intro and Join
+  Us, the category buttons, the upcoming cards with Earlier and Later under them, and Past Events.
+  plugins/events.rb lists every listed event in date order; js/event-catalog.js moves the ones
+  that have ended under Past Events, filters by ?category= and shows a page of each grid at a time.
+  Parts that hide are plain wrappers, because an ocs__ element's display beats [hidden].
+{%- endcomment -%}
+{%- assign catalog_words = site.data.projects.events.event_registry.texts.catalog -%}
+{%- assign events_settings = site.data.events_settings -%}
+<div class="ocs__container">
+  <section class="ocs__stack ocs__band ocs__band--tint" aria-labelledby="events-title" data-event-catalog data-page-size="{{ events_settings.page_size }}">
+    <h2 id="events-title">{{ catalog_words.title | escape }}</h2>
+    <p class="ocs__text ocs__lead">{{ catalog_words.intro | escape }}</p>
+    {%- if events_settings.join_url %}
+    <div class="ocs__links">
+      <a class="ocs__btn pill accent fill large" href="{{ events_settings.join_url | relative_url | escape }}">{{ catalog_words.join | escape }} <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+    </div>
+    {%- endif %}
+    {%- if site.data.events_categories.size > 0 %}
+    <div class="ocs__links" role="group" aria-label="{{ catalog_words.filter_label | escape }}">
+      <button class="ocs__btn small accent fill" type="button" data-event-category="" aria-pressed="true">{{ catalog_words.all | escape }}</button>
+      {%- for category in site.data.events_categories %}
+      <button class="ocs__btn small accent" type="button" data-event-category="{{ category[0] | escape }}" aria-pressed="false">{{ category[1] | escape }}</button>
+      {%- endfor %}
+    </div>
+    {%- endif %}
+    <p class="ocs__text" role="status" data-event-status></p>
+    <div class="ocs__grid ocs__grid--card cols-3" data-event-grid="upcoming">
+      {%- for event in site.data.events_catalog %}
+      {% include projects/events/event-card.html event=event %}
+      {%- endfor %}
+    </div>
+    <div data-event-pager="upcoming" hidden>
+      <nav class="ocs__pager" aria-label="{{ catalog_words.pages_label | escape }}">
+        <a class="ocs__pager-link" data-event-earlier>{{ catalog_words.earlier | escape }}</a>
+        <a class="ocs__pager-link next" data-event-later>{{ catalog_words.later | escape }}</a>
+      </nav>
+    </div>
+    <div data-event-empty hidden>
+      <p class="ocs__callout">{{ catalog_words.empty | escape }}</p>
+    </div>
+    <div data-event-past hidden>
+      <h2 class="ocs__section-title">{{ catalog_words.past_title | escape }}</h2>
+      <div class="ocs__grid ocs__grid--card cols-3" data-event-grid="past"></div>
+      <div data-event-pager="past" hidden>
+        <nav class="ocs__pager" aria-label="{{ catalog_words.pages_label | escape }}">
+          <a class="ocs__pager-link" data-event-earlier>{{ catalog_words.earlier | escape }}</a>
+          <a class="ocs__pager-link next" data-event-later>{{ catalog_words.later | escape }}</a>
+        </nav>
+      </div>
+    </div>
+  </section>
+</div>
+{% include projects/events/event-texts-json.html %}
+<script type="module">
+  import { EventCatalog } from '{{ site.baseurl }}/assets/js/projects/events/event-catalog.js';
+  import { EventTexts } from '{{ site.baseurl }}/assets/js/projects/events/event-texts.js';
+
+  const root = document.querySelector('[data-event-catalog]');
+  let storage = null;
+  try {
+    storage = window.sessionStorage;
+  } catch (error) {
+    console.warn('Events: sessionStorage is unavailable, so previous and next are too', error);
+  }
+  new EventCatalog(root, {
+    texts: EventTexts.read(document), pageSize: Number(root.dataset.pageSize), location: window.location,
+    history: window.history, storage, window,
+  }).start();
+</script>

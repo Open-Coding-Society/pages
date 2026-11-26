@@ -1,0 +1,101 @@
+{%- comment -%}
+  The Event Viewer (img2): the body of every `layout: event` page, from page.event_entry, which
+  plugins/events.rb checks and builds. A section card shows only when its section has content, and
+  the discussion part only when the event's features.microblog is on. js/event-page.js keeps the
+  stage pill current by the clock and lists the latest questions from the event's Microblog topic.
+{%- endcomment -%}
+{%- assign event = page.event_entry -%}
+{%- assign words = event.words -%}
+{%- assign catalog_words = site.data.projects.events.event_registry.texts.catalog -%}
+<article class="ocs__container" data-event-page data-event-day="{{ event.day }}" data-event-start="{{ event.start_time }}" data-event-end="{{ event.end_time }}" data-event-zone="{{ event.timezone | escape }}" data-event-stage="{{ event.stage }}">
+  {%- if event.sample %}
+  <div class="ocs__callout">{{ words.sample_note | escape }}</div>
+  {%- endif %}
+  {%- if event.image %}
+  <figure>
+    <img class="ocs__image-frame ocs__image-frame--cover" src="{{ event.image | relative_url | escape }}" alt="{{ event.image_alt | escape }}">
+    {%- if event.image_credit %}
+    <figcaption>{% if event.image_credit.url %}<a class="ocs__status" href="{{ event.image_credit.url | relative_url | escape }}">{{ event.image_credit.name | escape }}</a>{% else %}<b class="ocs__status">{{ event.image_credit.name | escape }}</b>{% endif %}</figcaption>
+    {%- endif %}
+  </figure>
+  {%- endif %}
+  <div><b class="ocs__status-pill ocs__status-pill--{{ event.pill.tone }}" data-event-pill>{{ event.pill.label | escape }}</b>{% if event.sample %} <b class="ocs__status-pill ocs__status-pill--neutral">{{ catalog_words.sample | escape }}</b>{% endif %}</div>
+  <h2>{{ event.title | escape }}</h2>
+  <p><time class="ocs__text" datetime="{{ event.datetime }}">{{ event.when | escape }}</time></p>
+  {%- if event.description %}
+  <p class="ocs__text ocs__lead">{{ event.description | escape }}</p>
+  {%- endif %}
+  {%- if event.place %}
+  <div class="ocs__keypoints">
+    <p class="ocs__keypoint"><i class="fas fa-location-dot" aria-hidden="true"></i> {% if event.place_url %}<a href="{{ event.place_url | escape }}" rel="noopener">{{ event.place | escape }}</a>{% else %}{{ event.place | escape }}{% endif %}</p>
+  </div>
+  {%- endif %}
+  <hr>
+  <h2 class="ocs__section-title">{{ words.sections_title | escape }}</h2>
+  <nav class="ocs__nav-grid ocs__nav-grid--in-card" aria-label="{{ words.sections_title | escape }}">
+    {%- for section in event.sections %}
+    <a class="ocs__nav-card" href="#event-{{ section.key }}"><span class="ocs__nav-card-kicker"><i class="fas {{ section.icon }}" aria-hidden="true"></i></span><span class="ocs__nav-card-title">{{ section.label | escape }}</span></a>
+    {%- endfor %}
+  </nav>
+  {%- for section in event.sections %}
+  <section class="ocs__card" id="event-{{ section.key }}">
+    <h2 class="ocs__section-title">{{ section.label | escape }}</h2>
+    {%- case section.key %}
+    {%- when "description" %}
+    {{ content }}
+    {%- if event.presentation %}
+    <div class="ocs__links"><a class="ocs__btn small accent" href="{{ event.presentation | relative_url | escape }}">{{ words.presentation | escape }}</a></div>
+    {%- endif %}
+    {%- when "schedule" %}
+    <p><time class="ocs__text" datetime="{{ event.datetime }}">{{ event.when | escape }}</time></p>
+    {%- if event.schedule.size > 0 %}
+    <div class="ocs__table-wrap">
+      <table class="ocs__table ocs__table--list">
+        <thead><tr><th scope="col">{{ words.schedule_time | escape }}</th><th scope="col">{{ words.schedule_item | escape }}</th><th scope="col">{{ words.schedule_detail | escape }}</th></tr></thead>
+        <tbody>
+          {%- for row in event.schedule %}
+          <tr><td><time datetime="{{ event.day }}T{{ row.time }}">{{ row.time_label | escape }}</time></td><td>{{ row.title | escape }}</td><td>{{ row.detail | escape }}</td></tr>
+          {%- endfor %}
+        </tbody>
+      </table>
+    </div>
+    {%- endif %}
+    {%- when "presenters" %}
+    <ul class="ocs__entity-list">
+      {%- for person in event.presenters %}
+      <li><abbr class="ocs__avatar" title="{{ person.name | escape }}">{{ person.initials | escape }}</abbr> <strong>{{ person.name | escape }}</strong>{% if person.role %} <em>{{ person.role | escape }}</em>{% endif %}</li>
+      {%- endfor %}
+    </ul>
+    {%- endcase %}
+  </section>
+  {%- endfor %}
+  {%- if event.features.microblog %}
+  <section class="ocs__card" id="event-discussion">
+    <div class="ocs__card-header">
+      <h2 class="ocs__section-title">{{ words.discussion_title | escape }}</h2>
+      <div data-event-discuss hidden><button class="ocs__btn accent fill" type="button"><i class="fas fa-comments" aria-hidden="true"></i> {{ words.discussion_button | escape }}</button></div>
+    </div>
+    <p><em class="ocs__text">{{ words.discussion_kicker | escape }}</em></p>
+    <p>{{ words.discussion_text | escape }}</p>
+    <div data-event-discussion-list data-event-topic="{{ page.permalink | escape }}"></div>
+  </section>
+  {%- endif %}
+</article>
+{%- if event.json_ld %}
+<script type="application/ld+json">{{ event.json_ld }}</script>
+{%- endif %}
+{%- if event.features.microblog %}
+{% include projects/events/event-texts-json.html words=event.words %}
+{%- else %}
+{% include projects/events/event-texts-json.html %}
+{%- endif %}
+<script type="module">
+  import { fetchOptions, pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { MicroblogTopic } from '{{ site.baseurl }}/assets/js/projects/microblog/microblog-topic.js';
+  import { EventPage } from '{{ site.baseurl }}/assets/js/projects/events/event-page.js';
+  import { EventTexts } from '{{ site.baseurl }}/assets/js/projects/events/event-texts.js';
+
+  new EventPage(document.querySelector('[data-event-page]'), {
+    texts: EventTexts.read(document), topic: MicroblogTopic, pythonURI, fetchOptions,
+  }).start();
+</script>
