@@ -78,3 +78,19 @@ test('an add Spring refuses for a reason it names says that reason', async () =>
   await settle();
   assert.equal(elements.status.textContent, 'Mentors can’t be in class groups.');
 });
+
+test('a mentor added to a group too small for one hears what the group needs, however many it has', async () => {
+  const pair = { id: 8, name: 'Pair', members: [{ id: 1, uid: 'ana', name: 'Ana Student', mentor: false }] };
+  const api = {
+    searchPeople: async () => [{ id: 3, uid: 'pat', name: 'Pat Mentor' }],
+    addMember: async () => { throw Object.assign(new Error('POST answered HTTP 403'), { status: 403, reason: 'mentor_team_too_small' }); },
+  };
+  const elements = open(ana, { api }, pair);
+  elements.search.value = 'Pat';
+  elements.search.dispatchEvent(fakeEvent('input'));
+  await new Promise(resolve => setTimeout(resolve, 300));
+  await settle();
+  elements.results.querySelectorAll('button')[0].click();
+  await settle();
+  assert.equal(elements.status.textContent, 'A group needs at least 2 members who aren’t mentors before it can have a mentor.');
+});

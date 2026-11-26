@@ -2,7 +2,7 @@
 // null, and whatever needed that element quietly does nothing, so these check the page
 // and the script against each other.
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
 const read = path => readFileSync(new URL(path, import.meta.url), 'utf8');
@@ -52,7 +52,9 @@ test('the page asks Allowances what to offer, and no shared Messages file names 
   has(script, /canManage: allowed\.manageMembers/, 'Members gets canManage from Allowances');
   has(script, /canMessage: person => Allowances\.for\(person\)\.directMessages/, 'New chat offers only people who use direct messages');
   has(script, /emptyDmText: Allowances\.emptyDirectMessagesText\(allowed\)/, 'the Direct messages list says why it is empty');
-  for (const name of ['messages-page.js', 'sidebar.js', 'group-dialogs.js', 'thread.js', 'new-chat.js']) {
+  const modules = readdirSync(new URL('../js/', import.meta.url)).filter(name => name.endsWith('.js') && name !== 'allowances.js');
+  assert.ok(modules.length > 30, 'every Messages module is checked');
+  for (const name of modules) {
     const source = read(`../js/${name}`);
     assert.ok(!/ROLE_MENTOR|isMentor|\.mentor\b/.test(source), `${name} checks for a mentor; ask Allowances instead`);
   }

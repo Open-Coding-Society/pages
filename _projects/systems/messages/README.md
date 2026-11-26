@@ -337,9 +337,9 @@ GitHub: `api.github.com`, from the browser, signed out, for the cards.
 ## What an account is offered
 
 Spring decides what each account may do. `Allowances` (`js/allowances.js`) mirrors its rules, so the page never offers
-what Spring would refuse, and holds the words the page shows about it (`Allowances.TEXTS`). The shared parts of the
-page (the sidebar, the dialogs, the thread) get its answers from the page and never check the mentor role;
-`page_wiring.test.mjs` fails if one of them does.
+what Spring would refuse, and holds the words the page shows about it (`Allowances.TEXTS`). Every other Messages
+module (the sidebar, the dialogs, the thread and the rest) gets its answers from the page and never checks the mentor
+role; `page_wiring.test.mjs` reads each one and fails if it does.
 
 - Spring's `MentorRules` keep an account with `ROLE_MENTOR` and no teacher or admin role to its team's groups, and
   Spring lists only the groups it may use. For that account the page hides New chat and Find or make, the empty

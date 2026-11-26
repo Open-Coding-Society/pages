@@ -140,7 +140,7 @@ export function initFindGroup({ elements, api, me, onJoined }) {
 // Which words a member change Spring refuses shows, by the reason Spring gives (MentorRules). Any other
 // failure says to try again.
 const MEMBER_REFUSALS = Object.freeze({
-  mentor_team_too_small: 'Add at least 2 people who aren’t mentors to the group before adding a mentor.',
+  mentor_team_too_small: 'A group needs at least 2 members who aren’t mentors before it can have a mentor.',
   mentor_class_group: 'Mentors can’t be in class groups.',
   team_manages_mentors: 'Only the group’s members or a teacher can add or remove its mentor.',
   mentor_cannot_manage: 'Mentors can’t add or remove people.',
