@@ -604,6 +604,11 @@ export function createThread({
         // Someone else deleting a message can change your unread count.
         if (kind === 'dm' && change.senderUid !== me.uid) window.dispatchEvent(new Event('dm:refresh-unread'));
         break;
+      // Someone's reaction (or yours, from another tab) changed a message's chips.
+      case 'reactions':
+        framedSince.add(change.id);
+        log.setReactions(change.id, change.reactions);
+        break;
       // A file went up. The message that shares it lists it, so the log adds nothing; the
       // group's file list is just out of date.
       case 'file':
@@ -612,11 +617,6 @@ export function createThread({
         break;
       case 'error':
         showFormMessage(change.text);
-        break;
-      // Someone's reaction (or yours, from another tab) changed a message's chips.
-      case 'reactions':
-        framedSince.add(change.id);
-        log.setReactions(change.id, change.reactions);
         break;
       default:
         break;
