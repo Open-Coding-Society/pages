@@ -63,6 +63,7 @@ systems/auto-generator-ui
 systems/scraper
 systems/messages:dev
 systems/ui-builder
+systems/community
 systems/lesson-feedback:dev
 systems/test-project
 
