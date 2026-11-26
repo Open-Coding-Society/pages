@@ -199,6 +199,11 @@ const layout = { top: new Map(), listWidth: 0 };
 // Every innerHTML write. The fake DOM keeps innerHTML as text without reading it, so this is how
 // a test sees whether the ticker ever hands event text to the HTML parser.
 const htmlWrites = [];
+// Animation frames the test runs: the bar checks a new width on the next frame (WidthWatcher).
+let frames = [];
+globalThis.requestAnimationFrame = (callback) => frames.push(callback);
+globalThis.cancelAnimationFrame = () => {};
+const runFrames = () => frames.splice(0).forEach((callback) => callback());
 const observers = [];
 class FakeResizeObserver {
   constructor(callback) {
@@ -403,18 +408,26 @@ test('it moves only when its items don\'t fit on one row, at one speed for any l
   assert.equal(section.style['--ocs-ticker-duration'], '30s', '1500px at 50px a second');
 });
 
-test('a change in the bar\'s width checks again whether it fits', async () => {
+test('a change in the bar\'s width checks again whether it fits, on the next frame', async () => {
   const { section, mount } = setUp();
   mount();
   await settle();
   const [observer] = observers;
   assert.ok(observer.targets.length, 'it watches the viewport');
+  // Starting or stopping the bar changes the viewport's size, so doing it inside the observer's
+  // callback made browsers fire "ResizeObserver loop completed with undelivered notifications".
+  const viewport = section.querySelector('.ocs__ticker-viewport');
   layout.top.set('Today: Live Reviews', 24);
   layout.listWidth = 800;
+  viewport.clientWidth = 600;
   observer.resize(600);
+  assert.equal(section.classList.contains('ocs__ticker--moving'), false, 'nothing changes inside the callback');
+  runFrames();
   assert.equal(section.classList.contains('ocs__ticker--moving'), true);
   layout.top.clear();
+  viewport.clientWidth = 1400;
   observer.resize(1400);
+  runFrames();
   assert.equal(section.classList.contains('ocs__ticker--moving'), false);
 });
 

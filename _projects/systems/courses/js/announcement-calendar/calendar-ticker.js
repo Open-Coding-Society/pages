@@ -13,6 +13,7 @@ import { createLiveCalendarStore } from './calendar-data.js';
 import {
   addDays, formatShortDate, nextSchoolDay, parseSchoolCalendar, PRIORITIES, todayIso,
 } from './calendar-model.js';
+import { WidthWatcher } from './width-watcher.js';
 
 // The same rule the week strip uses (calendar-feed.js): a closing tag or an entity means the title
 // was saved as HTML. A typed title such as "ArrayList<Integer> practice" has neither.
@@ -254,7 +255,7 @@ export class CalendarTicker {
     this.links = { splitLinkedDoc, origin, pageUrl, calendarUrl };
     this.today = today;
     this.stopped = false;
-    this.observer = null;
+    this.widthWatcher = null;
     this.onVisible = () => {
       if (document.visibilityState === 'visible') this.refresh();
     };
@@ -262,20 +263,13 @@ export class CalendarTicker {
 
   /**
    * Load the events, then keep the bar current: reload when the visitor comes back to the tab,
-   * and check again whether it fits when its width changes or the page's fonts arrive.
+   * and check again whether it fits when its width changes (on the next frame, see WidthWatcher)
+   * or the page's fonts arrive.
    * @returns {Promise<void>} the first load
    */
   start() {
     document.addEventListener('visibilitychange', this.onVisible);
-    if (typeof ResizeObserver === 'function') {
-      let width = null;
-      this.observer = new ResizeObserver(([entry]) => {
-        if (entry.contentRect.width === width) return;
-        width = entry.contentRect.width;
-        this.fit();
-      });
-      this.observer.observe(this.viewport);
-    }
+    this.widthWatcher = new WidthWatcher(this.viewport, () => this.fit());
     document.fonts?.ready.then(() => this.fit());
     return this.refresh();
   }
@@ -339,7 +333,7 @@ export class CalendarTicker {
   unmount() {
     this.stopped = true;
     document.removeEventListener('visibilitychange', this.onVisible);
-    this.observer?.disconnect();
+    this.widthWatcher?.stop();
     this.track.replaceChildren();
     this.wrapper.hidden = true;
     this.section.classList.remove('ocs__ticker--moving');
