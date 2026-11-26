@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  canDeleteGroup, canFormGroups, classifyDmEvent, classifyGroupEvent, confirmsGroupName, conversationLabel, dayLabel,
+  canChangeMembers, canDeleteGroup, canFormGroups, classifyDmEvent, classifyGroupEvent, confirmsGroupName, conversationLabel, dayLabel,
   deleteGroupWarning, dmMessage, downloadName, groupMessage, groupSubtitle, highlightParts, initialsFor, isAdmin,
   isClassGroup, isCourseChannel, isGroupMember, isImageFile, pfpSrc, sortGroups, tintFor,
 } from '../js/messages-model.js';
@@ -164,6 +164,11 @@ test('isClassGroup spots the class groups that profile classes keep in step', ()
   assert.equal(isClassGroup({ name: 'CSA Study Group' }), false);
 });
 
+test('isClassGroup ignores spaces around the name, as Spring does', () => {
+  assert.equal(isClassGroup({ name: ' CSA ' }), true);
+  assert.equal(canChangeMembers({ roles: [{ name: 'ROLE_STUDENT' }] }, { name: 'CSA ' }), false);
+});
+
 test('canDeleteGroup offers Delete to site admins only', () => {
   const team = { name: 'Fruit Empire' };
   assert.equal(canDeleteGroup({ roles: [{ name: 'ROLE_USER' }, { name: 'ROLE_ADMIN' }] }, team), true);
@@ -178,6 +183,25 @@ test('canDeleteGroup never offers Delete on a class group, the same rule as Leav
     assert.equal(canDeleteGroup(admin, { name }), false, name);
   }
   assert.equal(canDeleteGroup(admin, { name: 'CSA Study Group' }), true);
+});
+
+test('canChangeMembers lets only teachers and admins add or remove people in a class group', () => {
+  const student = { roles: [{ name: 'ROLE_USER' }, { name: 'ROLE_STUDENT' }] };
+  const teacher = { roles: [{ name: 'ROLE_USER' }, { name: 'ROLE_TEACHER' }] };
+  const admin = { roles: ['ROLE_ADMIN'] };
+  for (const name of ['CSA', 'csse', 'CSP', 'CSH']) {
+    assert.equal(canChangeMembers(student, { name }), false, name);
+    assert.equal(canChangeMembers(teacher, { name }), true, name);
+    assert.equal(canChangeMembers(admin, { name }), true, name);
+    assert.equal(canChangeMembers(null, { name }), false, name);
+  }
+});
+
+test('canChangeMembers leaves any other group to its members, as before', () => {
+  const student = { roles: [{ name: 'ROLE_STUDENT' }] };
+  for (const name of ['Team Turing', 'CSA Study Group']) {
+    assert.equal(canChangeMembers(student, { name }), true, name);
+  }
 });
 
 test('confirmsGroupName needs the whole name typed, with the same capitals', () => {

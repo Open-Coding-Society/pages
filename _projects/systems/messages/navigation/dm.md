@@ -278,11 +278,11 @@ the open conversation each start with a bar of the same height.
       </div>
       <div class="ocs__table-wrap">
         <table class="ocs__table">
-          <thead><tr><th>Name</th><th>User ID</th><th>Action</th></tr></thead>
+          <thead><tr><th>Name</th><th>User ID</th><th id="membersActionHeader">Action</th></tr></thead>
           <tbody id="membersList"></tbody>
         </table>
       </div>
-      <div class="ocs__field">
+      <div class="ocs__field" id="membersAddField">
         <label class="ocs__label" for="membersSearch">Add a classmate</label>
         <input class="ocs__input" id="membersSearch" type="search" autocomplete="off" placeholder="Name or email" data-focus>
       </div>

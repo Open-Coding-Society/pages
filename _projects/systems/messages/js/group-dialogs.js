@@ -4,7 +4,8 @@
 // delete-group.js. Shared files are the Shared panel's (conversation-panel.js).
 import { button, cell, createDialog } from './dialogs.js';
 import {
-  canDeleteGroup, deleteGroupWarning, groupSubtitle, isClassGroup, isCourseChannel, isGroupMember, sortGroups,
+  canChangeMembers, canDeleteGroup, deleteGroupWarning, groupSubtitle, isClassGroup, isCourseChannel, isGroupMember,
+  sortGroups,
 } from './messages-model.js';
 
 const byName = (a, b) => String(a.name).localeCompare(String(b.name));
@@ -145,10 +146,10 @@ export function initMembers({ elements, api, me, onChanged, onDelete }) {
     onChanged(updated);
   }
 
-  function memberRow(member) {
+  function memberRow(member, changeable) {
     const row = document.createElement('tr');
     const action = document.createElement('td');
-    if (member.id !== me.id) {
+    if (changeable && member.id !== me.id) {
       action.appendChild(button('Remove', 'ocs__btn small alert-red', async control => {
         if (!window.confirm(`Remove ${member.name} from ${group.name}?`)) return;
         control.disabled = true;
@@ -161,13 +162,18 @@ export function initMembers({ elements, api, me, onChanged, onDelete }) {
         }
       }));
     }
-    row.append(cell(member.id === me.id ? `${member.name} (you)` : member.name), cell(`@${member.uid}`), action);
+    row.append(cell(member.id === me.id ? `${member.name} (you)` : member.name), cell(`@${member.uid}`));
+    if (changeable) row.appendChild(action);
     return row;
   }
 
   function render() {
     elements.title.textContent = `Members of ${group.name}`;
-    elements.list.replaceChildren(...[...(group.members || [])].sort(byName).map(memberRow));
+    // With no Add or Remove, the search and the Action column go too.
+    const changeable = canChangeMembers(me, group);
+    elements.searchField.classList.toggle('hidden', !changeable);
+    elements.actionHeader.classList.toggle('hidden', !changeable);
+    elements.list.replaceChildren(...[...(group.members || [])].sort(byName).map(member => memberRow(member, changeable)));
     const deletable = canDeleteGroup(me, group);
     elements.deleteSection.classList.toggle('hidden', !deletable);
     if (deletable) elements.deleteWarning.textContent = deleteGroupWarning(group);

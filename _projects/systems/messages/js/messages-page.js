@@ -365,8 +365,9 @@ export async function startMessagesPage({ config, richText, push }) {
     onDelete: group => deleteGroup.open(group, byId('messagesMembers')),
     elements: {
       dialog: byId('membersDialog'), title: byId('membersTitle'), list: byId('membersList'),
-      search: byId('membersSearch'), results: byId('membersResults'), status: byId('membersStatus'),
+      search: byId('membersSearch'), searchField: byId('membersAddField'), results: byId('membersResults'), status: byId('membersStatus'),
       deleteSection: byId('membersDeleteSection'), deleteWarning: byId('membersDeleteWarning'), deleteOpen: byId('membersDelete'),
+      actionHeader: byId('membersActionHeader'),
     },
   });
   byId('messagesMembers').addEventListener('click', event => {

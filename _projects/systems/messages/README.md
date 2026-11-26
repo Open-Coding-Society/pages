@@ -16,7 +16,7 @@ same way they reach a direct message.
 | `js/message-log.js` | Draws the messages: day dividers, avatars, edit and delete buttons, and the image viewer; the files a message shares come from `file-rows.js`. Also the small text helpers the pane and the embed share. |
 | `js/sidebar.js` | The Groups and Direct messages lists, as `ocs__nav-card` links, each starting with an `ocs__avatar` of the name's initials. |
 | `js/new-chat.js` | The New chat dialog. |
-| `js/group-dialogs.js` | Find a group (search, join, make a group), and Members (with Delete group at the bottom, for admins). |
+| `js/group-dialogs.js` | Find a group (search, join, make a group), and Members (Add and Remove, which a class group shows only to teachers and admins, and Delete group at the bottom, for admins). |
 | `js/files-model.js` | `SharedFiles` and `FilesMarker`, static: planning a share (folders keep their paths, clutter is skipped, taken names become "name (2)"), sizes, icons and the folder tree, and the `[[files:…]]` marker. |
 | `js/group-files.js` | `GroupFiles`: one group's shared files. The list without bytes, one file's bytes, a folder's files for a .zip, and uploads with progress, three at a time. |
 | `js/composer-files.js` | `ComposerFiles`: the composer's Attach menu, the Files and Folder pickers, dropping files or folders on the conversation, and sharing them before the message sends. |
@@ -49,7 +49,7 @@ same way they reach a direct message.
 | `js/messages-model.js` | Pure functions: one message shape for DMs and groups, labels, roles. |
 | `js/formation-model.js` | Pure functions: the steps of forming groups. |
 | `sass/` | The `/dm` skin, scoped under `.dm`. File rows, menus and progress bars are the shared grammar (`ocs__file`, `ocs__menu`, `ocs__progress` in `_sass/open-coding/elements/`); `sass/` only places them; `.dm--embed` in `_layout.scss` fits an embed into its host's column. It has no palette or scale of its own: `_tokens.scss` aliases the site's theme tokens and the shared scale in `_sass/open-coding/mixins/_variables.scss`, and no partial holds a literal colour. See [Styling under a user theme](#styling-under-a-user-theme). |
-| `tests/*.test.mjs` | Node tests: the models, the sidebar, the message log, the pane, the embed, the Shared panel and pins, sharing files, GitHub links and cards, the commands and code blocks, the shared composer's `enterKey` and `destroy()`, `page_wiring.test.mjs` (every id the page script looks up is in `dm.md`), and `module_classes.test.mjs`, which fails if a newer module exports anything but classes. |
+| `tests/*.test.mjs` | Node tests: the models, the sidebar, the message log, the pane, the embed, the Shared panel and pins, sharing files, GitHub links and cards, the commands and code blocks, the Members dialog, the shared composer's `enterKey` and `destroy()`, `page_wiring.test.mjs` (every id the page script looks up is in `dm.md`), and `module_classes.test.mjs`, which fails if a newer module exports anything but classes. |
 | `tests/fake-dom.mjs` | A small stand-in for the browser DOM that the pane, log, embed and composer tests run on. |
 
 The modules import each other with `./` paths only. The page imports `config.js` and
@@ -339,7 +339,9 @@ GitHub: `api.github.com`, from the browser, signed out, for the cards.
 - **Class groups** (`CSSE`, `CSP`, `CSA`, `CSH`, Spring's `courses.class-groups`) follow
   the classes on a student's Profile, and the calendar reads them. They show under
   Groups, but have no Leave or Delete, and Find a group points to the Profile instead
-  of offering Join.
+  of offering Join. In Members, only teachers and admins get Add and Remove there
+  (`canChangeMembers`), the rule spring#309 adds to `POST` and
+  `DELETE /api/groups/{id}/members/{personId}`. Everyone else sees who is in the class.
 
 ## Deleting a group
 
@@ -355,7 +357,8 @@ GitHub: `api.github.com`, from the browser, signed out, for the cards.
 ## Things to know
 
 - Spring lets any signed-in user delete a group or change its members. The page offers
-  Delete only to admins, but the API doesn't check.
+  Delete only to admins, and Add and Remove in a class group only to teachers and admins,
+  but the API doesn't check until spring#309.
 - Deleting a group deletes its Spring record: its member list, its grades and, by
   cascade, any assignments submitted as the group. Its chat and files stay in S3 under
   the group's name, where this page can't open them, since it looks groups up by id. A
