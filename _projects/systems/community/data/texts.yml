@@ -1,0 +1,203 @@
+# Every word the Community system shows. js/*.js reads them with Texts.say("section.key"),
+# and the page renders some with Liquid. An organization's own words (its name, its channel
+# and series titles) are in its setup file, such as data/demo.yml. {org} is the setup's
+# short name; other {slots} are filled in by the code.
+
+app:
+  title: Member app
+  demo: Demo
+  made_up: "Everything here is made up: the organization, its members, series, messages, documents and polls. Nothing you post is saved or sent anywhere. It stays in this browser until you reload."
+  built_from: "Built by Open Coding Society students from OCS systems: Messages, the course announcements and calendar, the microblog's polls and the theme engine."
+  controls: Demo controls
+  viewing_as: Viewing as
+  look: Look
+  look_brand: "{org} colors"
+  look_preset: "OCS {name}"
+  person_option: "{name} ({role})"
+  sections: Sections
+
+roles:
+  lp: LP
+  moderator: Moderator
+  staff: Staff
+  none: Visitor
+
+tabs:
+  updates: Updates
+  groups: Groups
+  inbox: Inbox
+  calendar: Calendar
+  review: Review
+  review_count: "Review ({count})"
+
+updates:
+  channels: Update channels
+  hint_lp: "Only {org} staff post here. To talk about an update, reply in your series group."
+  hint_staff: "Members read these. What you write waits for a second staff member to approve it."
+  empty_title: No updates yet
+  empty_hint: "Updates from {org} show here."
+  event_line: "Event: {title}, {date}"
+  reply: Reply in your group
+  write: Write an update
+  send_for_approval: Send for approval
+  sent_for_approval: Sent. It goes out when another staff member approves it.
+  send_failed: Could not send the update. Try again.
+  votes: "{count} votes"
+  vote_one: 1 vote
+  your_vote: Your vote
+  share: "{votes} · {percent}%"
+  vote_failed: Could not save your vote. Try again.
+  new_poll: Start a poll
+  poll_question: Question
+  poll_choices: Choices, one per line (2 to 6)
+  poll_post: Post poll
+  poll_posted: Poll posted.
+
+schedule:
+  title: Add to calendar
+  close: Close
+  name: Title
+  day: Day
+  time: Time (optional)
+  cancel: Cancel
+  save: Add event
+
+reply:
+  title: Reply in your group
+  hint: "Your reply goes to your series group with the update quoted, so it reaches the people in that series, not every member."
+  group: Group
+  placeholder: Write your reply…
+  send: Post reply
+  cancel: Cancel
+  sent: "Posted in {group}."
+  failed: Could not post the reply. Try again.
+  no_group: "You aren't in a series group yet, so there's nowhere to reply. Message {org} staff from your inbox instead."
+  empty: Write a reply first.
+
+groups:
+  list: Your series groups
+  none: "You aren't in any series groups yet."
+  documents: Documents
+  no_documents: No documents shared yet.
+  download: Download
+  shared_by: "Shared by {name}, {date}"
+  share: Share a document
+  share_hint: Only staff share documents in a series.
+  shared: "Shared {name}."
+  share_failed: Could not share that file. Try again.
+  report: Report a message
+  send: Send
+  cancel_edit: Cancel
+  muted: "A moderator muted you in {group} until {until}. You can still read, and you can post again after that."
+  placeholder: "Message {group}…"
+  deleted: Message removed.
+  empty_title: No messages yet
+  empty_hint: Say hi to your series.
+
+report:
+  title: Report a message
+  pick: Which message?
+  none: There are no messages from other members to report here.
+  reason: Reason
+  reasons:
+    spam: Spam
+    selling: Selling to members
+    private-info: Shares private deal information
+    harassment: Harassment
+    other: Something else
+  note: What happened (optional)
+  send: Send report
+  cancel: Cancel
+  sent: "Thanks. A moderator will look at it. The member you reported doesn't see who reported it."
+  failed: Could not send the report. Try again.
+
+inbox:
+  list: Conversations
+  none: No conversations yet.
+  new: New message
+  to: To
+  start: Start
+  cancel: Cancel
+  rule_lp: "You can message {org} staff here. Members talk with each other in their series groups."
+  rule_staff: Staff can message any member.
+  empty_title: No messages yet
+  empty_hint: Say hi.
+  start_failed: Could not start the conversation. Try again.
+  placeholder: "Message {name}…"
+
+calendar:
+  hint: "Events from {org} updates, and anything you put on your calendar with Add to calendar."
+  coming_up: Coming up
+  nothing: Nothing coming up.
+  from: "From {channel}"
+  yours: On your calendar
+
+review:
+  reports: Reports
+  no_reports: No open reports.
+  reported: "{reporter} reported {author}'s message in {channel}, {when}."
+  reason: "Reason: {reason}"
+  reporter_note: "Their note: {note}"
+  versions: Every version
+  note: Note for the log (optional)
+  hide: Hide message
+  mute_24: Hide and mute 24 hours
+  mute_168: Hide and mute 7 days
+  remove: Hide and remove from group
+  dismiss: Dismiss
+  failed: Could not do that. Try again.
+  approvals: Waiting for approval
+  no_approvals: Nothing waiting.
+  wrote: "{author} wrote this for {channel}, {when}."
+  approve: Approve and send
+  own: You wrote this, so another staff member approves it.
+  push: "Phone notification: {text}"
+  log: Moderation log
+  no_log: Nothing yet.
+  log_when: When
+  log_who: Who
+  log_what: What
+  export: Export records
+  export_hint: Every message, every edit and every moderator action, for the person and dates you pick.
+  export_person: Person
+  export_everyone: Everyone
+  export_from: From
+  export_to: To
+  export_download: Download CSV
+  exported: "Downloaded {count} rows."
+
+log:
+  hide: "Hid {author}'s message in {channel}"
+  mute: "Hid {author}'s message and muted them in {channel} until {until}"
+  remove: "Hid {author}'s message and removed them from {channel}"
+  dismiss: "Dismissed a report about {author}'s message"
+  approve: "Approved an update for {channel}"
+
+records:
+  message: message
+  edit: edit
+  delete: deleted by sender
+  pin: pinned a message
+  unpin: unpinned a message
+  hide: hidden by a moderator
+  action: moderator action
+  dm: Direct message
+
+push:
+  update_series: "New update for {series}"
+  update_all: "New update from {org}"
+
+errors:
+  staff-only: Only staff post here.
+  not-member: You aren't in this group.
+  muted: You're muted here for now.
+  lp-to-lp: "Members message {org} staff, not each other."
+  own-update: Another staff member has to approve your update.
+  needs-approval: Updates go out after a second staff member approves them.
+  self: You can't do that to your own message.
+  protected: Staff and moderators can't be muted or removed.
+  not-found: That's no longer here.
+  not-author: You can only change your own messages.
+  moderators-only: Only moderators and staff can do that.
+  bad-request: That didn't work. Check what you typed.
+  generic: Something went wrong. Try again.
