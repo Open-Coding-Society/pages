@@ -123,7 +123,7 @@ module Events
   def self.entry(document, registry, settings)
     data = document.data
     source = document.relative_path
-    day = check_required(source, data)
+    event_day = check_required(source, data)
     status = data["status"]
     start_time, end_time = times(source, data)
     page_words = words(source, data["labels"], registry)
@@ -147,9 +147,9 @@ module Events
       "url" => document.url, "path" => source, "sample" => data["sample"] == true,
       "status" => status, "stage" => stage, "pill" => { "label" => pill["label"], "tone" => pill["tone"] },
       "listed" => registry["lifecycle"].find { |each| each["key"] == status }["listed"] == true,
-      "day" => day, "start_time" => start_time, "end_time" => end_time, "timezone" => timezone(source, data, settings),
-      "when" => when_line(day, start_time, end_time, formats), "datetime" => start_time ? "#{day}T#{start_time}" : day,
-      "card_date" => Date.strptime(day, "%Y-%m-%d").strftime(formats["card_date"]),
+      "day" => event_day, "start_time" => start_time, "end_time" => end_time, "timezone" => timezone(source, data, settings),
+      "when" => when_line(event_day, start_time, end_time, formats), "datetime" => start_time ? "#{event_day}T#{start_time}" : event_day,
+      "card_date" => Date.strptime(event_day, "%Y-%m-%d").strftime(formats["card_date"]),
       "categories" => event_categories, "category_keys" => event_categories.map(&:downcase),
       "event_type" => event_type, "event_type_label" => event_type && registry["event_types"][event_type],
       "location" => place_details, "place" => place(place_details), "place_url" => place_details["url"],
@@ -165,7 +165,7 @@ module Events
   # @return [String] the event's "YYYY-MM-DD" day
   def self.check_required(source, data)
     fail!(source, "title must be text that isn't blank") unless text?(data["title"])
-    day = day(data["date"]) || fail!(source, "date must be a YYYY-MM-DD day")
+    event_day = day(data["date"]) || fail!(source, "date must be a YYYY-MM-DD day")
     fail!(source, "status must be one of #{LIFECYCLE.join(', ')}") unless LIFECYCLE.include?(data["status"])
     fail!(source, "permalink is needed, like /events/<slug>/") if data["permalink"].nil?
     unless data["permalink"].is_a?(String) && data["permalink"].match?(PERMALINK)
@@ -173,7 +173,7 @@ module Events
     end
     fail!(source, "description must be text") unless data["description"].nil? || data["description"].is_a?(String)
     fail!(source, "sample must be true or false") unless [nil, true, false].include?(data["sample"])
-    day
+    event_day
   end
 
   # A "YYYY-MM-DD" day from front matter: Jekyll gives a post's date as a Time at midnight and a
