@@ -292,7 +292,12 @@ This is a reusable frontend kit, not a standalone backend or complete theme:
   with `end` at the far right (the row wraps on a phone). The chat finds them
   once in `[data-hook="calendar-tools"]`; each new week view (live, then preview
   if the connection fails) moves them into its row. Without `tools` the week view
-  is unchanged (the calendar card). Tests: `node --test tests/week_row_tools.test.mjs`,
+  is unchanged (the calendar card). The week view, and the ticker's check of whether
+  it fits, run for a new width on the next animation frame (`WidthWatcher` in
+  `js/announcement-calendar/width-watcher.js`): a redraw inside the ResizeObserver
+  callback changes the element's own size while the observer is still reporting, and the browser then fires the error "ResizeObserver
+  loop completed with undelivered notifications" (Safari shows it in its console).
+  Tests: `node --test tests/week_row_tools.test.mjs tests/width_watcher.test.mjs tests/calendar_ticker.test.mjs`,
   `bundle exec ruby scripts/test_course_landing_pages.rb`.
 - Above the announcements, a calendar ticker (`ocs_calendar_ticker.html`,
   `CalendarTicker` in `js/announcement-calendar/calendar-ticker.js`) shows the

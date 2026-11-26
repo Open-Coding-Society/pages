@@ -9,6 +9,7 @@ import {
   eventMatchesPeriod, extractEventMarkers, findSchoolWeek, formatPeriods,
   formatShortDate, fromIsoDate, neighborWeek, PRIORITY_LABELS, schoolWeekDays, todayIso, TYPE_LABELS,
 } from './calendar-model.js';
+import { WidthWatcher } from './width-watcher.js';
 
 /* ── Announcement log ────────────────────────────────────────────────── */
 
@@ -551,15 +552,12 @@ export function mountWeekView({
 
   // Switch between the wide and narrow table when the strip's own width
   // crosses NARROW_WIDTH, and refit the pills whenever the width changes.
+  // The redraw waits for the next frame (see WidthWatcher).
   const isNarrow = () => body.clientWidth > 0 && body.clientWidth < NARROW_WIDTH;
   narrow = isNarrow();
-  let lastWidth = body.clientWidth;
-  const resize = 'ResizeObserver' in window ? new ResizeObserver(() => {
-    if (body.clientWidth === lastWidth) return;
-    lastWidth = body.clientWidth;
+  const widthWatcher = new WidthWatcher(body, () => {
     if (isNarrow() !== narrow) { narrow = !narrow; render(); } else fitPills();
-  }) : null;
-  resize?.observe(body);
+  });
   // The pills are measured in the page's web font; measure again once it has loaded.
   document.fonts?.ready.then(fitPills);
 
@@ -572,7 +570,7 @@ export function mountWeekView({
     unmount() {
       unsubscribe();
       unlisten();
-      resize?.disconnect();
+      widthWatcher.stop();
       if (host) body.remove(); else root.remove();
     },
   };
