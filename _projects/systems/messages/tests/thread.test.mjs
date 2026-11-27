@@ -8,7 +8,7 @@ import { fakeEvent, installFakeDom, settle } from './fake-dom.mjs';
 
 const { document } = installFakeDom();
 
-const { createThread } = await import('../js/thread.js');
+const { createThread, THREAD_TEXTS } = await import('../js/thread.js');
 
 const me = { id: 1, uid: 'ada', name: 'Ada Lovelace', pfp: null };
 
@@ -111,6 +111,29 @@ test('a pane needs no onDmRead, onGroupRead or onFileShared', async () => {
   // The message that shares a file lists it; the socket's file frame adds no line of its own.
   assert.doesNotMatch(elements.messages.textContent, /plan\.pdf/);
   assert.match(elements.messages.textContent, /new here/);
+});
+
+test('a call frame goes to onCall with the open conversation, and adds no line to the log', async () => {
+  const seen = [];
+  const { thread, socket, elements } = makeThread({ onCall: (kind, id, change) => seen.push([kind, id, change]) });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  socket.handler({ context: 'callServer', callId: 5, state: 'live', count: 2 });
+  assert.deepEqual(seen, [['group', 7, { type: 'call', callId: 5, state: 'live', count: 2 }]]);
+  assert.doesNotMatch(elements.messages.textContent, /callServer|Unknown/);
+
+  thread.open('dm', 34, { title: 'Grace', subtitle: 'Direct message' });
+  await settle();
+  socket.handler({ context: 'callServer', callId: 6, state: 'idle', count: 0 });
+  assert.deepEqual(seen.at(-1), ['dm', 34, { type: 'call', callId: 6, state: 'idle', count: 0 }]);
+});
+
+test('a pane needs no onCall', async () => {
+  const { thread, socket, elements } = makeThread();
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  socket.handler({ context: 'callServer', callId: 5, state: 'live', count: 2 });
+  assert.doesNotMatch(elements.messages.textContent, /callServer/);
 });
 
 test('emptyState says what an open conversation with no messages shows', async () => {
@@ -265,4 +288,282 @@ test('a GitHub link in a DM shows its card under the message', async () => {
 
   assert.equal(elements.messages.querySelectorAll('.chat-cards').length, 1);
   assert.match(asked[0], /pages\/pull\/2066/);
+});
+
+test('a direct message Spring refuses for a reason it names says that reason, not try again', async () => {
+  const api = stubApi();
+  api.sendDm = async () => {
+    throw Object.assign(new Error('POST /api/dm/conversations/4/messages answered HTTP 403'),
+      { status: 403, reason: 'mentor_no_direct_messages' });
+  };
+  const { thread, elements, richText } = makeThread({ api });
+  thread.open('dm', 4, { title: '', subtitle: '' });
+  await settle();
+  richText.composers[0].setHTML('hi');
+  elements.form.dispatchEvent(fakeEvent('submit'));
+  await settle();
+  assert.equal(elements.formStatus.textContent, THREAD_TEXTS.refusedNoDirectMessages);
+});
+
+test('a refusal with no reason the page knows still says to try again', async () => {
+  const api = stubApi();
+  api.sendDm = async () => { throw Object.assign(new Error('POST answered HTTP 403'), { status: 403, reason: '' }); };
+  api.sendGroupMessage = async () => { throw Object.assign(new Error('POST answered HTTP 500'), { status: 500, reason: '' }); };
+  for (const [kind, id] of [['dm', 4], ['group', 7]]) {
+    const { thread, elements, richText } = makeThread({ api });
+    thread.open(kind, id, { title: '', subtitle: '' });
+    await settle();
+    richText.composers[0].setHTML('hi');
+    elements.form.dispatchEvent(fakeEvent('submit'));
+    await settle();
+    assert.equal(elements.formStatus.textContent, THREAD_TEXTS.sendFailed, kind);
+  }
+});
+
+// ── Reactions ───────────────────────────────────────────────────────────────────────────
+// The stub API with the four reaction calls. `reactions` is what a GET answers (a map of
+// message id → list), or a function (kind, id) that gives it or a Promise of it; each PUT
+// or DELETE answers with `answer(messageId, reaction, on)`, or fails when `fail` is (or returns) true.
+function withReactions(api, { reactions = {}, answer = () => ({ reactions: [] }), fail = false } = {}) {
+  const read = (kind, id) => Promise.resolve(typeof reactions === 'function' ? reactions(kind, id) : reactions);
+  const write = name => async (id, messageId, reaction, on) => {
+    api.calls.push([name, id, messageId, reaction, on]);
+    if (typeof fail === 'function' ? fail() : fail) throw new Error('the reaction did not save');
+    return answer(messageId, reaction, on);
+  };
+  return Object.assign(api, {
+    groupReactions: id => { api.calls.push(['groupReactions', id]); return read('group', id); },
+    dmReactions: id => { api.calls.push(['dmReactions', id]); return read('dm', id); },
+    setGroupReaction: write('setGroupReaction'),
+    setDmReaction: write('setDmReaction'),
+  });
+}
+
+const groupRow = (id, message = 'hi') => ({ id, author: 'Grace Hopper', author_uid: 'grace', message, date: '2026-10-20T10:00:00Z' });
+const liked = (...uids) => [{ reaction: 'like', people: uids.map(uid => ({ uid, name: uid })) }];
+const reactionsFrame = (messageId, reactions) => ({ context: 'reactionsServer', messageId, reactions });
+const rowIn = (elements, key) => elements.messages.querySelector(`[data-key="${key}"]`);
+const chipsIn = (elements, key) => rowIn(elements, key)?.querySelector('.chat-reactions') ?? null;
+const chipText = (elements, key) => chipsIn(elements, key)?.textContent ?? '';
+const answerAsAda = (messageId, reaction, on) => ({ messageId, reactions: on ? [{ reaction, people: [{ uid: 'ada', name: 'Ada Lovelace' }] }] : [] });
+
+// Opens a message's reaction picker and picks one by its label.
+function pickIn(elements, key, label) {
+  rowIn(elements, key).querySelector('[data-action="react"]').dispatchEvent(fakeEvent('click'));
+  rowIn(elements, key).querySelectorAll('.ocs__menu-item')
+    .find(choice => choice.querySelector('.ocs__menu-name').textContent === label)
+    .dispatchEvent(fakeEvent('click'));
+}
+
+test('reactions load after the history and draw on their messages', async () => {
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { reactions: { m1: liked('grace') } });
+  const group = makeThread({ api });
+  group.thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  assert.deepEqual(api.calls.slice(0, 2), [['groupMessages', 7], ['groupReactions', 7]]);
+  assert.equal(chipText(group.elements, 'm1'), '👍 1');
+
+  const dmApi = withReactions(stubApi({ dmMessages: [dmRow(1, 'hi')] }), { reactions: { 1: liked('grace', 'ada') } });
+  const dm = makeThread({ api: dmApi });
+  dm.thread.open('dm', 4, { title: 'Grace', subtitle: '' });
+  await settle();
+  assert.equal(chipText(dm.elements, '1'), '👍 2');
+});
+
+test('a reactions frame redraws a message’s chips', async () => {
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }));
+  const { thread, elements, socket } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  assert.equal(chipsIn(elements, 'm1'), null);
+
+  socket.handler(reactionsFrame('m1', liked('grace')));
+  assert.equal(chipText(elements, 'm1'), '👍 1');
+  socket.handler(reactionsFrame('m1', []));
+  assert.equal(chipsIn(elements, 'm1'), null, 'the last reaction taken back takes the row with it');
+});
+
+test('a frame newer than the bulk load wins', async () => {
+  let answer;
+  const held = new Promise(resolve => { answer = resolve; });
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { reactions: () => held });
+  const { thread, elements, socket } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+
+  socket.handler(reactionsFrame('m1', liked('grace', 'alan')));
+  answer({ m1: liked('grace') });
+  await settle();
+  assert.equal(chipText(elements, 'm1'), '👍 2');
+});
+
+test('a reactions answer for a chat you left is dropped', async () => {
+  let answer;
+  const held = new Promise(resolve => { answer = resolve; });
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { reactions: (kind, id) => (id === 7 ? held : {}) });
+  const { thread, elements } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  thread.open('group', 8, { title: 'Team Hopper', subtitle: '' });
+  await settle();
+
+  answer({ m1: liked('grace') });
+  await settle();
+  assert.equal(chipsIn(elements, 'm1'), null, 'group 7’s reactions don’t land on group 8’s m1');
+});
+
+test('picking a reaction sends PUT, and picking it again sends DELETE', async () => {
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { answer: answerAsAda });
+  const { thread, elements } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+
+  pickIn(elements, 'm1', 'Like');
+  await settle();
+  assert.equal(chipText(elements, 'm1'), '👍 1');
+  pickIn(elements, 'm1', 'Like');
+  await settle();
+  assert.equal(chipsIn(elements, 'm1'), null);
+  assert.deepEqual(api.calls.filter(call => call[0] === 'setGroupReaction'),
+    [['setGroupReaction', 7, 'm1', 'like', true], ['setGroupReaction', 7, 'm1', 'like', false]]);
+});
+
+test('a failed reaction shows the reactFailed text', async () => {
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { fail: true });
+  const { thread, elements } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  const warn = console.warn;
+  console.warn = () => {};
+  try {
+    pickIn(elements, 'm1', 'Like');
+    await settle();
+  } finally {
+    console.warn = warn;
+  }
+  assert.equal(elements.formStatus.textContent, 'Could not save your reaction. Try again.');
+  assert.equal(rowIn(elements, 'm1').querySelector('[data-action="react"]').disabled, false, 'you can try again');
+});
+
+test('a read-only thread never asks for reactions', async () => {
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { reactions: { m1: liked('grace') } });
+  const { thread, elements } = makeThread({ api, readOnly: true });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  assert.equal(api.calls.some(call => call[0] === 'groupReactions'), false);
+  assert.equal(elements.messages.querySelector('[data-action="react"]'), null);
+});
+
+test('a message that arrived live can be reacted to', async () => {
+  const api = withReactions(stubApi({ groupMessages: [] }), { answer: answerAsAda });
+  const { thread, elements, socket } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+
+  socket.handler(groupFrame('m9', 'Grace Hopper', 'just now'));
+  socket.handler(reactionsFrame('m9', liked('grace')));
+  assert.equal(chipText(elements, 'm9'), '👍 1');
+  pickIn(elements, 'm9', 'Love');
+  await settle();
+  assert.deepEqual(api.calls.filter(call => call[0] === 'setGroupReaction'), [['setGroupReaction', 7, 'm9', 'love', true]]);
+});
+
+test('after the socket reconnects, reactions are fetched again', async () => {
+  const answers = [{}, { m1: liked('grace') }, {}];
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { reactions: () => answers.shift() });
+  const { thread, elements } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  assert.equal(chipsIn(elements, 'm1'), null);
+
+  thread.resume();
+  await settle();
+  assert.equal(chipText(elements, 'm1'), '👍 1', 'a reaction left while offline shows up');
+  thread.resume();
+  await settle();
+  assert.equal(chipsIn(elements, 'm1'), null, 'and one taken back while offline goes');
+});
+
+test('an older reactions load can’t undo a newer frame, across a reconnect and a switch', async () => {
+  let releaseCatchUp;
+  let releaseBulk;
+  const catchUp = new Promise(resolve => { releaseCatchUp = resolve; });
+  const bulk = new Promise(resolve => { releaseBulk = resolve; });
+  const api = withReactions(stubApi(), { reactions: (kind, id) => (id === 8 ? bulk : {}) });
+  let group7Loads = 0;
+  api.groupMessages = async id => {
+    api.calls.push(['groupMessages', id]);
+    if (id === 7 && ++group7Loads === 2) return catchUp; // group 7's catch-up after the reconnect
+    return [groupRow('m1')];
+  };
+  const { thread, elements, socket } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  thread.resume();
+  await settle();
+  thread.open('group', 8, { title: 'Team Hopper', subtitle: '' });
+  await settle();
+
+  socket.handler(reactionsFrame('m1', liked('grace', 'alan')));
+  releaseCatchUp([groupRow('m1')]);
+  await settle();
+  releaseBulk({ m1: liked('grace') });
+  await settle();
+
+  assert.equal(chipText(elements, 'm1'), '👍 2', 'group 8’s older answer leaves the newer frame');
+  assert.equal(api.calls.filter(call => call[0] === 'groupReactions' && call[1] === 7).length, 1,
+    'group 7, left behind, asks for no more reactions');
+});
+
+test('your own reaction’s answer doesn’t undo a newer frame', async () => {
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { answer: () => held });
+  const { thread, elements, socket } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+
+  pickIn(elements, 'm1', 'Like');
+  socket.handler(reactionsFrame('m1', liked('ada')));
+  socket.handler(reactionsFrame('m1', liked('ada', 'alan')));
+  release({ messageId: 'm1', reactions: liked('ada') });
+  await settle();
+
+  assert.equal(chipText(elements, 'm1'), '👍 2');
+});
+
+test('a read-only thread ignores reactions frames', async () => {
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }));
+  const { thread, elements, socket } = makeThread({ api, readOnly: true });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+
+  socket.handler(reactionsFrame('m1', liked('grace')));
+
+  assert.equal(chipsIn(elements, 'm1'), null);
+});
+
+test('saving a reaction clears only its own failure notice', async () => {
+  let attempts = 0;
+  const api = withReactions(stubApi({ groupMessages: [groupRow('m1')] }), { answer: answerAsAda, fail: () => ++attempts === 1 });
+  const { thread, elements } = makeThread({ api });
+  thread.open('group', 7, { title: 'Team Turing', subtitle: '' });
+  await settle();
+  const warn = console.warn;
+  console.warn = () => {};
+  try {
+    pickIn(elements, 'm1', 'Like');
+    await settle();
+  } finally {
+    console.warn = warn;
+  }
+  assert.equal(elements.formStatus.textContent, 'Could not save your reaction. Try again.');
+  pickIn(elements, 'm1', 'Like');
+  await settle();
+  assert.equal(elements.formStatus.textContent, '', 'trying again clears it');
+
+  elements.formStatus.textContent = 'Your files are shared, but the message didn’t send. Press Send to try again.';
+  pickIn(elements, 'm1', 'Love');
+  await settle();
+  assert.match(elements.formStatus.textContent, /Your files are shared/, 'another notice stays');
 });

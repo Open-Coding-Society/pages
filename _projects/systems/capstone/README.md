@@ -94,6 +94,56 @@ rules are required. The landing page remains a Jekyll page at `/capstone/`,
 not a blog post. Publishing removes old root-level outputs using the previous
 distribution cache, which must be kept during migration.
 
+## Team chat
+
+A project post can show its team's group chat, where the team and its mentors
+talk. It is the same group the team has in Messages (`/dm`), so the mentor gets
+its alerts there too. Place the include where the chat should go, and name the
+group exactly as Messages shows it:
+
+```yaml
+capstone_project:
+  course: CSP
+  team_group: "OCS Communication Systems"
+```
+
+```liquid
+{% include projects/capstone/capstone-team-chat.html %}
+```
+
+- Without `team_group`, or on a Flask-only site (`spring: false`), the include
+  renders nothing. The generator stops the build if `team_group` isn't a name.
+- Place the include outside a `*-infograph` wrapper. `_sass/capstone/infograph.scss`
+  styles everything inside one by the end of its class name (every `*-title` is
+  2.75rem), so the chat's own parts, such as `chat-empty-title`, would grow.
+- `js/team-chat-access.js` (`TeamChatAccess`) holds the rules as static
+  methods, with no requests. `js/team-chat.js` (`CapstoneTeamChat`) loads the
+  person and their groups once, then mounts Messages' `mountGroupChat`
+  (from `assets/js/projects/messages/conversation-embed.js`, loaded only when
+  the chat shows) with a link to the group in Messages, or shows a note.
+- A member sees the chat. So does a mentor in the group, once the group has at
+  least 2 members who aren't mentors: only then does Spring list the group among
+  the mentor's own, so a mentor who doesn't see it gets a note naming both steps.
+  A teacher or admin sees it whether or not they're a member. Anyone else gets a
+  note saying the chat is for the team.
+- Everyone looks for the group among their own groups
+  (`GET /api/groups/person/{id}`) first; only a teacher or admin who isn't a
+  member searches by name. So a mentor's browser never calls a route Spring
+  refuses mentors.
+- Spring enforces the rules (`MentorRules` in Spring's `mvc/groups`); the page
+  only picks what to show. `js/team-group-api.js` (`TeamGroupApi`) makes the
+  requests and keeps Spring's refusal `reason`.
+- Under the chat, `js/team-mentors.js` (`TeamMentorsPanel`) lists the team's
+  mentors (members Spring marks `mentor: true`). A member who isn't a mentor,
+  or a teacher, can also search for verified mentors (`/api/people/search`,
+  narrowed to `ROLE_MENTOR` accounts not in the group yet) and Add or Remove
+  them through the group's members routes. A mentor sees the list only. When
+  Spring refuses, the panel shows the words for Spring's `reason`.
+- The words are in `data/team_chat.yml` (published to
+  `_data/projects/capstone/`); its `embed` keys go to the chat itself.
+- The tests reuse Messages' fake DOM (`../../messages/tests/fake-dom.mjs`),
+  since the chat is Messages' embed.
+
 ## Validation
 
 ```sh
@@ -101,4 +151,5 @@ bundle exec ruby scripts/test_capstone.rb
 bundle exec ruby scripts/test_capstone_posts.rb
 bundle exec ruby scripts/test_system_project_distribution.rb
 node --test tests/capstone.test.mjs tests/capstone_title_hover.test.mjs
+node --test _projects/systems/capstone/tests/*.test.mjs
 ```

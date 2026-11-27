@@ -7,13 +7,33 @@
 export function createMessagesApi({
   javaURI, pythonURI, fetchOptions, createRequest = () => new XMLHttpRequest(),
 }) {
-  const failure = (method, path, status) => Object.assign(new Error(`${method} ${path} answered HTTP ${status}`), { status });
+  // reason is the refusal code Spring answers with (MentorRules: {error, reason}), or '' when there is none.
+  const failure = (method, path, status, reason = '') =>
+    Object.assign(new Error(`${method} ${path} answered HTTP ${status}`), { status, reason });
+
+  function reasonIn(text) {
+    try {
+      const body = JSON.parse(text);
+      return typeof body?.reason === 'string' ? body.reason : '';
+    } catch {
+      return '';
+    }
+  }
+
+  // A body that can't be read gives no reason; the failure keeps its status either way.
+  async function reasonFrom(response) {
+    try {
+      return reasonIn(await response.text());
+    } catch {
+      return '';
+    }
+  }
 
   async function send(base, path, method = 'GET', body) {
     const options = { ...fetchOptions, method };
     if (body !== undefined) options.body = JSON.stringify(body);
     const response = await fetch(`${base}${path}`, options);
-    if (!response.ok) throw failure(method, path, response.status);
+    if (!response.ok) throw failure(method, path, response.status, await reasonFrom(response));
     return response;
   }
 
@@ -42,7 +62,7 @@ export function createMessagesApi({
       };
       xhr.onload = () => {
         if (xhr.status < 200 || xhr.status >= 300) {
-          reject(failure('POST', path, xhr.status));
+          reject(failure('POST', path, xhr.status, reasonIn(xhr.responseText)));
           return;
         }
         try {
@@ -79,6 +99,12 @@ export function createMessagesApi({
     editDm: (id, messageId, body) => spring(`/api/dm/conversations/${part(id)}/messages/${part(messageId)}`, 'PATCH', { body }),
     deleteDm: (id, messageId) => spring(`/api/dm/conversations/${part(id)}/messages/${part(messageId)}`, 'DELETE'),
     markDmRead: id => spring(`/api/dm/conversations/${part(id)}/read`, 'POST'),
+    // A conversation's reactions by message id, and adding (on) or removing yours, which
+    // answers with that message's reactions.
+    dmReactions: id => spring(`/api/dm/conversations/${part(id)}/reactions`),
+    setDmReaction: (id, messageId, reaction, on) => spring(
+      `/api/dm/conversations/${part(id)}/messages/${part(messageId)}/reactions/${part(reaction)}`, on ? 'PUT' : 'DELETE',
+    ),
     // Messages in your own conversations whose text contains the query, newest first.
     // With a conversation id, only that conversation is searched.
     searchDms: (query, conversationId) => spring(
@@ -120,6 +146,10 @@ export function createMessagesApi({
     sendGroupMessage: (groupId, message, image = null) => spring(`/api/groups/chat/${part(groupId)}/messages`, 'POST', { message, image }),
     editGroupMessage: (groupId, messageId, message) => spring(`/api/groups/chat/${part(groupId)}/messages/${part(messageId)}`, 'PATCH', { message }),
     deleteGroupMessage: (groupId, messageId) => spring(`/api/groups/chat/${part(groupId)}/messages/${part(messageId)}`, 'DELETE'),
+    groupReactions: groupId => spring(`/api/groups/chat/${part(groupId)}/reactions`),
+    setGroupReaction: (groupId, messageId, reaction, on) => spring(
+      `/api/groups/chat/${part(groupId)}/messages/${part(messageId)}/reactions/${part(reaction)}`, on ? 'PUT' : 'DELETE',
+    ),
     // Unread counts for group chat, the group-side twin of /api/dm/unread. Groups with
     // nothing unread are absent from unreadByGroup rather than present as zero.
     groupUnread: () => spring('/api/groups/chat/unread'),

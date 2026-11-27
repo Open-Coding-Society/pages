@@ -253,7 +253,9 @@ and [`grids.md`](../../_projects/lessons/sass/navigation/grids.md).
 
 Give each iframe a `title` that says what it shows: screen readers announce it.
 See [`elements/embeds`](elements/embeds). The UI Builder's Embed your app and
-Video blocks load their pages in this frame.
+Video blocks load their pages in this frame. The call page (`/calls/`) puts each camera
+and shared screen in `ocs__embed ocs__embed--video` on a `<video playsinline>`, with an
+`aria-label` in place of the title.
 
 ### Form fields
 
@@ -287,7 +289,8 @@ See [`elements/forms/fields`](elements/forms/fields). The Profile page
 `ocs__avatar`: a round avatar with a person's initials in the accent color.
 Write it as an `<abbr>` with the full name in `title`, not a `<span>` or
 `<div>`: preset themes recolor every span and div to the text color. See
-[`elements/avatars`](elements/avatars).
+[`elements/avatars`](elements/avatars). The call page shows one in place of the
+video of someone whose camera is off.
 
 ### Tables
 

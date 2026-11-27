@@ -16,7 +16,7 @@ same way they reach a direct message.
 | `js/message-log.js` | Draws the messages: day dividers, avatars, edit and delete buttons, and the image viewer; the files a message shares come from `file-rows.js`. Also the small text helpers the pane and the embed share. |
 | `js/sidebar.js` | The Groups and Direct messages lists, as `ocs__nav-card` links, each starting with an `ocs__avatar` of the name's initials. |
 | `js/new-chat.js` | The New chat dialog. |
-| `js/group-dialogs.js` | Find a group (search, join, make a group), and Members (with Delete group at the bottom, for admins). |
+| `js/group-dialogs.js` | Find a group (search, join, make a group), and Members (Add and Remove, which a class group shows only to teachers and admins, and Delete group at the bottom, for admins). |
 | `js/files-model.js` | `SharedFiles` and `FilesMarker`, static: planning a share (folders keep their paths, clutter is skipped, taken names become "name (2)"), sizes, icons and the folder tree, and the `[[files:…]]` marker. |
 | `js/group-files.js` | `GroupFiles`: one group's shared files. The list without bytes, one file's bytes, a folder's files for a .zip, and uploads with progress, three at a time. |
 | `js/composer-files.js` | `ComposerFiles`: the composer's Attach menu, the Files and Folder pickers, dropping files or folders on the conversation, and sharing them before the message sends. |
@@ -27,11 +27,13 @@ same way they reach a direct message.
 | `js/file-actions.js`, `js/file-viewer.js` | `FileActions` and `FileViewer`: what a shared file's buttons do (download, preview, open a folder, .zip), and the preview: an image, video, sound, PDF or the start of a text file. |
 | `js/zip-store.js` | `ZipStore`, static: a stored (uncompressed) ZIP writer, so a shared folder downloads as one file. |
 | `js/popup-menu.js` | `PopupMenu`: a menu a button opens (`ocs__menu`), with the arrow keys, Escape and click-away. |
+| `js/reactions.js` | `Reactions` (the six reaction kinds, in the order Spring's `Reaction` enum lists them, and the readers for Spring's reaction lists) and `ReactionChips` (the chips under a message). |
 | `js/file-rows.js` | `FileRows`: the files a message shares, as `ocs__file` rows with their buttons, and small previews for a few images. |
 | `js/delete-group.js` | The Delete group dialog: says what deleting takes away, and waits for the group's name. |
 | `js/group-formation.js` | Form groups for a class: teachers and admins only. |
 | `js/dialogs.js` | Opens and closes an `ocs__modal`; small table and button builders. |
-| `js/messages-api.js` | Every Spring and Flask request. |
+| `js/messages-api.js` | Every Spring and Flask request. A refusal carries Spring's `reason` with its status. |
+| `js/allowances.js` | What the page offers the signed-in account (`Allowances.for(me)`), mirroring Spring's rules. See [What an account is offered](#what-an-account-is-offered). |
 | `js/github-links.js` | `GitHubLinks`, static: reads a GitHub link (issue, pull request, commit, repository, gist), finds the first three different ones in a message, and builds the link `/issue`, `/pr`, `/commit` and `/repo` post. |
 | `js/github-source.js` | `GitHubSource`: asks api.github.com from the browser and keeps each answer 10 minutes (in memory and in localStorage under `ocs-github:`). Keeping one first removes copies older than that, because the rest of the site shares localStorage. After GitHub's rate limit it asks nothing until GitHub's reset time, or its `Retry-After`. Gists come through Spring. |
 | `js/github-cards.js` | `GitHubCards`: a card (a compact `ocs__nav-card`) under a message for each GitHub link, drawn from the link at once and filled in when it scrolls near the screen. |
@@ -49,7 +51,7 @@ same way they reach a direct message.
 | `js/messages-model.js` | Pure functions: one message shape for DMs and groups, labels, roles. |
 | `js/formation-model.js` | Pure functions: the steps of forming groups. |
 | `sass/` | The `/dm` skin, scoped under `.dm`. File rows, menus and progress bars are the shared grammar (`ocs__file`, `ocs__menu`, `ocs__progress` in `_sass/open-coding/elements/`); `sass/` only places them; `.dm--embed` in `_layout.scss` fits an embed into its host's column. It has no palette or scale of its own: `_tokens.scss` aliases the site's theme tokens and the shared scale in `_sass/open-coding/mixins/_variables.scss`, and no partial holds a literal colour. See [Styling under a user theme](#styling-under-a-user-theme). |
-| `tests/*.test.mjs` | Node tests: the models, the sidebar, the message log, the pane, the embed, the Shared panel and pins, sharing files, GitHub links and cards, the commands and code blocks, the shared composer's `enterKey` and `destroy()`, `page_wiring.test.mjs` (every id the page script looks up is in `dm.md`), and `module_classes.test.mjs`, which fails if a newer module exports anything but classes. |
+| `tests/*.test.mjs` | Node tests: the models, the sidebar, the message log, the pane, the embed, the Shared panel and pins, sharing files, GitHub links and cards, the commands and code blocks, the Members dialog, the shared composer's `enterKey` and `destroy()`, `page_wiring.test.mjs` (every id the page script looks up is in `dm.md`), and `module_classes.test.mjs`, which fails if a newer module exports anything but classes. |
 | `tests/fake-dom.mjs` | A small stand-in for the browser DOM that the pane, log, embed and composer tests run on. |
 
 The modules import each other with `./` paths only. The page imports `config.js` and
@@ -90,6 +92,16 @@ import them by name, like the UI Builder's chat block with `mountGroupChat`.
   sidebar's DM counts current. Groups have their own counts
   (`GET /api/groups/chat/unread`): opening a group, or a message arriving while it is
   open, posts `/api/groups/chat/{id}/read` and fires `dm:group-read` for the bell.
+- **Calls**, when the site runs Spring and `_config.yml` has `enabled: true` under `calls:`: dm.md
+  adds a Call link to the thread header and a line under it, and hands
+  `startMessagesPage` the calls system's `CallEntry` as `calls`. Opening a group or DM
+  points the link at its call (`/calls/?group=<id>` or `?dm=<id>`). Spring's
+  `{"context":"callServer","callId","state","count"}` frame on the open topic becomes a
+  `call` change (`messages-model.js`), which thread.js passes to `onCall`. CallEntry shows
+  "A call is on with N in it" and a Join link, but only after `GET /api/calls/{id}`
+  confirms a live call in that same conversation. A call frame never becomes a message.
+  With calls off, none of this is on the page and nothing is asked of Spring. See
+  [the calls system](../calls/README.md).
 - **The bell** counts conversations waiting: each person with unread DMs, plus each
   group with unread messages. Spring counts a group by reading its whole chat file, so
   the bell asks about groups when a page loads, when the tab comes back to the front
@@ -151,6 +163,24 @@ direct message only an image can be attached: Spring stores shared files for gro
   and the message's words as a link to it) and marks the message Pinned. Pinning again
   keeps the first pin; deleting the pin message, or the pinned message, takes the pin away.
   An embed shows the pins too, but the Shared panel is `/dm`'s.
+
+## Reactions
+
+- Each message in a DM or a group has React, first in its action bar. It opens a menu of six
+  reactions: 👍 Like, ❤️ Love, 😂 Haha, 😮 Wow, 😢 Sad and 🎉 Celebrate. The message then shows a
+  chip for each reaction it has, with the emoji, how many people left it and their names in
+  the chip's title. Your own chips are filled; clicking one, or picking that reaction again,
+  takes yours back. While a change is saving, that message's chips and React button wait.
+- Spring keeps them (spring#302). The page reads a conversation's reactions after its
+  history, and again after the socket reconnects. A reactions frame on the conversation's
+  topic redraws one message's chips, and a message that a frame or your own change redrew
+  since the load began keeps that newer state.
+- Spring stores the key (`like`, `love`, `haha`, `wow`, `sad`, `celebrate`), never the emoji.
+  `Reactions.KINDS` in `js/reactions.js` and Spring's `Reaction` enum list the same keys in the
+  same order, so change them together.
+- Whether a chip is yours is decided by uid, since two people in a group can share a name. A
+  message saved before ids and a deleted message take no reactions, and a read-only pane, or
+  a host whose API has no reaction calls, asks for none.
 
 ## GitHub cards, slash commands and code
 
@@ -255,6 +285,7 @@ back the listeners the pane and its composer put on `document` and `window`, and
 | `offline` | Live updates are off. Reload the page to see new messages. |
 | `placeholder`, `send`, `save`, `cancel` | Type a message…; Send; Save; Cancel |
 | `sendFailed` | Could not send the message. Try again. |
+| `refusedNoDirectMessages` | This conversation includes a mentor, and mentors don’t use direct messages. Talk in your team’s group instead. (When Spring refuses a send with `mentor_no_direct_messages`.) |
 | `editFailed` | Could not save your edit. Try again. |
 | `editOfDeleted` | That message was deleted, so your edit was not saved. |
 | `deleteFailed` | Could not delete the message. Try again. |
@@ -322,6 +353,11 @@ Spring:
   with `Retry-After` when Spring can't check S3 for the path, from spring#281), `GET /api/groups/chat/{id}/files/index` (paths,
   sizes and who shared them, no bytes) and `GET /api/groups/chat/{id}/files/content?path=`
   (one file's bytes)
+- Reactions (spring#302): `GET /api/dm/conversations/{id}/reactions` and
+  `GET /api/groups/chat/{id}/reactions` (each message id with `[{reaction, people: [{uid, name}]}]`), and
+  `PUT` or `DELETE` `…/messages/{messageId}/reactions/{reaction}` to add or take back yours, which
+  answers `{messageId, reactions}`. Live, a group's topic sends `reactionsServer` frames and a DM's
+  sends `type: "reactions"` frames, each with the message's reactions after the change.
 - STOMP over SockJS at `/ws-chat` (port 8589 on localhost)
 - Gists: `GET /api/grades/read-gist/{id}` (a gist's card) and `POST /api/grades/create-gist`
   (`{files, description}`, saved with the sender's GitHub Gist connection)
@@ -332,6 +368,26 @@ Form groups `POST /api/persona/evaluate-group`, `POST /api/persona/form-groups`.
 
 GitHub: `api.github.com`, from the browser, signed out, for the cards.
 
+## What an account is offered
+
+Spring decides what each account may do. `Allowances` (`js/allowances.js`) mirrors its rules, so the page never offers
+what Spring would refuse, and holds the words the page shows about it (`Allowances.TEXTS`). Every other Messages
+module (the sidebar, the dialogs, the thread and the rest) gets its answers from the page and never checks the mentor
+role; `page_wiring.test.mjs` reads each one and fails if it does.
+
+- Spring's `MentorRules` keep an account with `ROLE_MENTOR` and no teacher or admin role to its team's groups, and
+  Spring lists only the groups it may use. For that account the page hides New chat and Find or make, the empty
+  thread pane says to pick a group, Leave says a member can add them back, and Members lists the group with no Remove
+  or add search (its Close button gets focus). An empty Direct messages list says direct messages are off. Older
+  direct messages still open, and a send there says a mentor is in the chat.
+- Spring marks each member who is a mentor (`"mentor": true` in a group's members), and Members shows "(mentor)"
+  for everyone (`Allowances.memberTag`).
+- Spring refuses any direct message that includes an account without direct messages, so New chat leaves those
+  people out of its results (`canMessage`), and says so when everyone a search found is one of them.
+- A refusal carries Spring's `reason` (`messages-api.js`, uploads too). A send refused with `mentor_no_direct_messages`
+  shows `refusedNoDirectMessages`, a refused New chat start and a refused member change say why, and any other
+  failure still asks to try again.
+
 ## Groups the page leaves alone
 
 - **Course chat channels** (`lessons`, `<course>-announcements`, `<course>-week-<n>`) are
@@ -339,7 +395,9 @@ GitHub: `api.github.com`, from the browser, signed out, for the cards.
 - **Class groups** (`CSSE`, `CSP`, `CSA`, `CSH`, Spring's `courses.class-groups`) follow
   the classes on a student's Profile, and the calendar reads them. They show under
   Groups, but have no Leave or Delete, and Find a group points to the Profile instead
-  of offering Join.
+  of offering Join. In Members, only teachers and admins get Add and Remove there
+  (`canChangeMembers`), the rule spring#309 adds to `POST` and
+  `DELETE /api/groups/{id}/members/{personId}`. Everyone else sees who is in the class.
 
 ## Deleting a group
 
@@ -355,7 +413,8 @@ GitHub: `api.github.com`, from the browser, signed out, for the cards.
 ## Things to know
 
 - Spring lets any signed-in user delete a group or change its members. The page offers
-  Delete only to admins, but the API doesn't check.
+  Delete only to admins, and Add and Remove in a class group only to teachers and admins,
+  but the API doesn't check until spring#309.
 - Deleting a group deletes its Spring record: its member list, its grades and, by
   cascade, any assignments submitted as the group. Its chat and files stay in S3 under
   the group's name, where this page can't open them, since it looks groups up by id. A

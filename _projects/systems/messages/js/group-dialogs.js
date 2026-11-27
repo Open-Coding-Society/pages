@@ -2,9 +2,11 @@
 // members. Leaving a group is a button in the conversation header (messages-page.js).
 // Deleting one starts at the bottom of Members, for site admins only, and is confirmed in
 // delete-group.js. Shared files are the Shared panel's (conversation-panel.js).
+import { Allowances } from './allowances.js';
 import { button, cell, createDialog } from './dialogs.js';
 import {
-  canDeleteGroup, deleteGroupWarning, groupSubtitle, isClassGroup, isCourseChannel, isGroupMember, sortGroups,
+  canChangeMembers, canDeleteGroup, deleteGroupWarning, groupSubtitle, isClassGroup, isCourseChannel, isGroupMember,
+  sortGroups,
 } from './messages-model.js';
 
 const byName = (a, b) => String(a.name).localeCompare(String(b.name));
@@ -133,7 +135,18 @@ export function initFindGroup({ elements, api, me, onJoined }) {
   });
 }
 
-export function initMembers({ elements, api, me, onChanged, onDelete }) {
+// canManage comes from the page's Allowances: without it the dialog lists the members with no Remove and
+// no add search, because Spring would refuse both.
+// Which words a member change Spring refuses shows, by the reason Spring gives (MentorRules). Any other
+// failure says to try again.
+const MEMBER_REFUSALS = Object.freeze({
+  mentor_team_too_small: 'A group needs at least 2 members who aren’t mentors before it can have a mentor.',
+  mentor_class_group: 'Mentors can’t be in class groups.',
+  team_manages_mentors: 'Only the group’s members or a teacher can add or remove its mentor.',
+  mentor_cannot_manage: 'Mentors can’t add or remove people.',
+});
+
+export function initMembers({ elements, api, me, onChanged, onDelete, canManage = true }) {
   let group = null;
   let lastResults = [];
   let searchCount = 0;
@@ -145,10 +158,10 @@ export function initMembers({ elements, api, me, onChanged, onDelete }) {
     onChanged(updated);
   }
 
-  function memberRow(member) {
+  function memberRow(member, changeable) {
     const row = document.createElement('tr');
     const action = document.createElement('td');
-    if (member.id !== me.id) {
+    if (changeable && member.id !== me.id) {
       action.appendChild(button('Remove', 'ocs__btn small alert-red', async control => {
         if (!window.confirm(`Remove ${member.name} from ${group.name}?`)) return;
         control.disabled = true;
@@ -157,17 +170,29 @@ export function initMembers({ elements, api, me, onChanged, onDelete }) {
         } catch (error) {
           console.warn('Messages: could not remove the member', error);
           control.disabled = false;
-          elements.status.textContent = `Could not remove ${member.name}. Try again.`;
+          elements.status.textContent = MEMBER_REFUSALS[error?.reason] || `Could not remove ${member.name}. Try again.`;
         }
       }));
     }
-    row.append(cell(member.id === me.id ? `${member.name} (you)` : member.name), cell(`@${member.uid}`), action);
+    row.append(cell(memberLabel(member)), cell(`@${member.uid}`));
+    if (changeable) row.appendChild(action);
     return row;
+  }
+
+  // Spring marks each member who is a mentor, so everyone in the group can see who is.
+  function memberLabel(member) {
+    if (member.id === me.id) return `${member.name} (you)`;
+    const tag = Allowances.memberTag(member);
+    return tag ? `${member.name} (${tag})` : member.name;
   }
 
   function render() {
     elements.title.textContent = `Members of ${group.name}`;
-    elements.list.replaceChildren(...[...(group.members || [])].sort(byName).map(memberRow));
+    // With no Add or Remove, the search and the Action column go too.
+    const changeable = canManage && canChangeMembers(me, group);
+    elements.searchField.classList.toggle('hidden', !changeable);
+    elements.actionHeader.classList.toggle('hidden', !changeable);
+    elements.list.replaceChildren(...[...(group.members || [])].sort(byName).map(member => memberRow(member, changeable)));
     const deletable = canDeleteGroup(me, group);
     elements.deleteSection.classList.toggle('hidden', !deletable);
     if (deletable) elements.deleteWarning.textContent = deleteGroupWarning(group);
@@ -183,7 +208,7 @@ export function initMembers({ elements, api, me, onChanged, onDelete }) {
       } catch (error) {
         console.warn('Messages: could not add the member', error);
         control.disabled = false;
-        elements.status.textContent = `Could not add ${person.name}. Try again.`;
+        elements.status.textContent = MEMBER_REFUSALS[error?.reason] || `Could not add ${person.name}. Try again.`;
       }
     })));
     if (people.length && !addable.length) elements.status.textContent = 'Everyone who matches is already in the group.';

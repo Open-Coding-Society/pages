@@ -71,6 +71,17 @@ module Capstone
       unless image.nil? || image_path || image_url
         raise Jekyll::Errors::FatalException, "#{document.relative_path}: capstone project image must be a site path or HTTP(S) URL"
       end
+      # The team chat include looks the group up by this exact name (capstone-team-chat.html). A class
+      # group (named for a course) is the whole class, and Spring never lets a mentor into one.
+      team_group = project["team_group"]
+      unless team_group.nil? || (team_group.is_a?(String) && !team_group.strip.empty?)
+        raise Jekyll::Errors::FatalException,
+              "#{document.relative_path}: capstone_project.team_group must be the team group's name in Messages"
+      end
+      if team_group.is_a?(String) && COURSES.include?(team_group.strip.upcase)
+        raise Jekyll::Errors::FatalException,
+              "#{document.relative_path}: capstone_project.team_group must be the team's own group, not the class group #{team_group.strip}"
+      end
 
       {
         "title" => title.to_s.strip,

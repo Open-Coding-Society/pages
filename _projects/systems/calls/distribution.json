@@ -1,0 +1,7 @@
+{
+  "files": [
+    { "source": "pages", "destination": "navigation/projects/calls" },
+    { "source": "data", "destination": "_data/projects/calls" },
+    { "source": "js", "destination": "assets/js/projects/calls" }
+  ]
+}

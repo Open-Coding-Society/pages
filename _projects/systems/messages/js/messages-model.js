@@ -51,8 +51,21 @@ export function groupMessage(raw) {
 
 // A frame from /topic/group/{id}. Presence, typing and heartbeat frames are 'other':
 // this page doesn't show who is online.
+// Spring's {"context":"callServer","callId","state","count"} on a group or DM topic: a call there
+// started, changed or ended. The calls system's CallEntry confirms it over REST before /dm shows it.
+function callChange(event) {
+  return {
+    type: 'call',
+    callId: event.callId,
+    state: typeof event.state === 'string' ? event.state : '',
+    count: Number.isSafeInteger(event.count) && event.count >= 0 ? event.count : 0,
+  };
+}
+
 export function classifyGroupEvent(event) {
   switch (event?.context) {
+    case 'callServer':
+      return callChange(event);
     case 'sendMessageServer':
       return {
         type: 'message',
@@ -66,6 +79,8 @@ export function classifyGroupEvent(event) {
       return { type: 'delete', id: asId(event.messageId) };
     case 'sendFileServer':
       return { type: 'file', sender: event.sender || '', filename: event.filename || '' };
+    case 'reactionsServer':
+      return { type: 'reactions', id: asId(event.messageId), reactions: event.reactions || [] };
     case 'errorServer':
       return { type: 'error', text: event.error || 'The chat server reported an error.' };
     default:
@@ -77,9 +92,13 @@ export function classifyGroupEvent(event) {
 // ways over time, so this accepts each of them. Spring now types every frame ("message"
 // or "edited"); only an untyped frame for a message already shown counts as an edit.
 export function classifyDmEvent(event, activeConversationId, isKnown) {
+  // A DM's call frame names no conversation: it arrives only on the open one's topic.
+  if (event?.context === 'callServer') return callChange(event);
   if (!event || event.conversationId !== activeConversationId) return { type: 'other' };
   const id = asId(event.id);
   const type = String(event.type || '').toLowerCase();
+  // A reaction changes no message, so it is read before the rules below could take it for one.
+  if (type === 'reactions') return { type: 'reactions', id, reactions: event.reactions || [] };
   if (event.deleted === true || ['deleted', 'message-deleted', 'message_deleted'].includes(type)) {
     return { type: 'delete', id, senderUid: event.senderUid || '' };
   }
@@ -147,13 +166,16 @@ export function groupSubtitle(group) {
   ].filter(Boolean).join(' · ');
 }
 
-function hasRole(person, roleName) {
+export function hasRole(person, roleName) {
   return (person?.roles || []).some(role => (typeof role === 'string' ? role : role?.name) === roleName);
 }
 
 export const isAdmin = person => hasRole(person, 'ROLE_ADMIN');
 
-export const canFormGroups = person => isAdmin(person) || hasRole(person, 'ROLE_TEACHER');
+// Teachers and admins, the people Spring's GroupsApiController counts as staff.
+const isStaff = person => isAdmin(person) || hasRole(person, 'ROLE_TEACHER');
+
+export const canFormGroups = isStaff;
 
 export const isGroupMember = (group, personId) => (group.members || []).some(member => member.id === personId);
 
@@ -166,10 +188,15 @@ export const isCourseChannel = group => /^(lessons|[a-z]+-announcements|[a-z]+-w
 // (PUT /api/groups/class-memberships), and the calendar reads them, so they aren't left here.
 const CLASS_GROUPS = ['CSSE', 'CSP', 'CSA', 'CSH'];
 
-export const isClassGroup = group => CLASS_GROUPS.includes(String(group.name || '').toUpperCase());
+// Spring reads the name trimmed and in capitals (ClassGroupMembershipService), so this does too.
+export const isClassGroup = group => CLASS_GROUPS.includes(String(group.name || '').trim().toUpperCase());
 
 // Only site admins delete groups, and never a class group, for the same reason it has no Leave.
 export const canDeleteGroup = (person, group) => isAdmin(person) && !isClassGroup(group);
+
+// Members' Add and Remove. A class group's members come from each student's Profile, so
+// Spring lets only staff change them by hand (spring#309); any other group's members can.
+export const canChangeMembers = (person, group) => isStaff(person) || !isClassGroup(group);
 
 // A page shows a run of spaces as one, so a name typed as it looks still matches.
 const collapseSpaces = text => String(text ?? '').trim().replace(/\s+/g, ' ');

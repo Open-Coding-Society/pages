@@ -3,12 +3,15 @@
 // with its avatar, sender and time, a Reply button, and edit and delete buttons on your
 // own messages (none in a read-only log). A reply shows a quote of the message it
 // answers, from the [[reply:...]] marker at the start of its body (assets/js/chat/chat-reply.js).
+// Reactions (reactions.js) are chips under a message and a React button that opens a menu.
 import { CodeBlock } from './code-block.js';
 import { CodeBlocks } from './code-model.js';
 import { Conversation } from './conversation-model.js';
 import { FileRows } from './file-rows.js';
 import { FilesMarker } from './files-model.js';
 import { dayKey, dayLabel, initialsFor, pfpSrc, tintFor } from './messages-model.js';
+import { PopupMenu } from './popup-menu.js';
+import { ReactionChips, Reactions } from './reactions.js';
 
 // What the log says, worded for /dm. A host passes its own wording for any of these in
 // `texts`; {name} is filled in.
@@ -47,6 +50,15 @@ export const LOG_TEXTS = Object.freeze({
   pinnedNote: '{name} pinned a message:',
   unpinnedNote: '{name} unpinned a message:',
   aMessage: 'a message',
+  addReaction: 'Add reaction',
+  reactionLike: 'Like',
+  reactionLove: 'Love',
+  reactionHaha: 'Haha',
+  reactionWow: 'Wow',
+  reactionSad: 'Sad',
+  reactionCelebrate: 'Celebrate',
+  reactionPeople: '{reaction}: {names}',
+  reactionCount: '{reaction}, {count}: {names}',
 });
 
 // Fills a text's {slot}s, the way the UI Builder's registry text marks them. A slot with
@@ -97,10 +109,14 @@ function splitReply(richText, body) {
 // code) resolves the URL of a secret gist made from it. onPin(message, isPinned), when
 // given, adds Pin/Unpin to each message; which messages are pinned comes from the
 // [[pin:…]] messages the log holds (conversation-model.js), each drawn as a one-line note.
+// onReact(message, reactionKey, on), when given, adds a React button to each message and
+// makes its chips clickable; it returns a Promise, and the message's reaction controls wait
+// for it. setReactions(key, list) draws a message's chips from Spring's list.
 // onChange() is called after each append, edit and delete (the Shared panel redraws).
 export function createMessageLog(element, {
   richText, me, onEdit, onDelete, onReply = null, onSchedule = null, readOnly = false, texts = {}, formatBody = null,
-  onFile = null, thumbnail = null, linkCards = null, runCode = null, saveGist = null, onPin = null, onChange = () => {},
+  onFile = null, thumbnail = null, linkCards = null, runCode = null, saveGist = null, onPin = null, onReact = null,
+  onChange = () => {},
 }) {
   if (formatBody !== null && typeof formatBody !== 'function') {
     throw new TypeError('createMessageLog: formatBody must be a function or null');
@@ -111,11 +127,22 @@ export function createMessageLog(element, {
   let pinnedIds = new Set();
   let lastDay = null;
   const fileRows = new FileRows({ onFile, thumbnail, text });
+  const pickers = new Map(); // a message's key → its React button's menu
+  const chipRows = new Map(); // a message's key → its ReactionChips
+  const reacting = new Set(); // keys of messages whose reaction is saving
 
   const rowFor = key => element.querySelector(`[data-key="${CSS.escape(key)}"]`);
   const isNearBottom = () => element.scrollHeight - element.scrollTop - element.clientHeight < 40;
 
+  function destroyPickers() {
+    pickers.forEach(picker => picker.destroy());
+    pickers.clear();
+    chipRows.clear();
+    reacting.clear();
+  }
+
   function clear() {
+    destroyPickers();
     element.replaceChildren();
     messages.clear();
     keyById.clear();
@@ -200,6 +227,7 @@ export function createMessageLog(element, {
   // Takes the viewer off the page with its listener. thread.js calls this from its own
   // destroy(), so an embed that is torn down while an image is open leaves nothing behind.
   function destroy() {
+    destroyPickers();
     closeViewer();
     viewer?.remove();
     viewer = null;
@@ -314,16 +342,116 @@ export function createMessageLog(element, {
     return shown;
   }
 
-  // Previews of the links in the message's own text, last before the action bar, so a link
-  // only inside a reply's quote makes none.
+  // Previews of the links in the message's own text, after everything else it shows and
+  // before its reactions and action bar, so a link only inside a reply's quote makes none.
   function renderCards(main, html) {
     main.querySelector('.chat-cards')?.remove();
     const cards = linkCards ? linkCards(html) : null;
     if (!cards) return;
     cards.classList.add('chat-cards');
-    const actions = main.querySelector('.chat-msg-actions');
-    if (actions) main.insertBefore(cards, actions);
+    const next = main.querySelector('.chat-reactions') || main.querySelector('.chat-msg-actions');
+    if (next) main.insertBefore(cards, next);
     else main.appendChild(cards);
+  }
+
+  // ── Reactions ──────────────────────────────────────────────────────────────────────────
+  // A message can take reactions once it is saved (it has an id), until it is deleted.
+  const canReact = stored => Boolean(onReact) && !readOnly && Boolean(stored?.id) && !stored.deleted && !stored.pinNote;
+  const isMine = (key, reaction) => Reactions.isMine(
+    messages.get(key)?.reactions?.find(entry => entry.reaction === reaction), me?.uid,
+  );
+
+  function chipsFor(key) {
+    if (!chipRows.has(key)) {
+      chipRows.set(key, new ReactionChips({ text, me, onToggle: (reaction, on) => react(key, reaction, on, 'chip') }));
+    }
+    return chipRows.get(key);
+  }
+
+  // One change at a time on each message: its chips and React button are disabled until
+  // onReact settles, and anything picked meanwhile is ignored.
+  function react(key, reaction, on, from) {
+    const stored = messages.get(key);
+    if (!canReact(stored) || reacting.has(key)) return;
+    reacting.add(key);
+    showReacting(key, true);
+    let saving;
+    try {
+      saving = Promise.resolve(onReact(stored, reaction, on));
+    } catch (error) {
+      saving = Promise.reject(error);
+    }
+    saving
+      .catch(error => console.warn('Messages: a reaction was not saved', error))
+      .finally(() => {
+        reacting.delete(key);
+        showReacting(key, false);
+        refocus(key, reaction, from);
+      });
+  }
+
+  // The picked menu item went away, and a chip or the button was disabled while it saved, so
+  // focus may have fallen off the page: put it back on that chip or on the React button.
+  function refocus(key, reaction, from) {
+    if (document.activeElement && document.activeElement !== document.body) return;
+    const main = rowFor(key)?.querySelector('.chat-msg-main');
+    if (!main) return;
+    const chip = from === 'chip' ? main.querySelector('.chat-reactions')?.querySelector(`[data-reaction="${reaction}"]`) : null;
+    (chip || main.querySelector('[data-action="react"]'))?.focus();
+  }
+
+  function showReacting(key, busy) {
+    const main = rowFor(key)?.querySelector('.chat-msg-main');
+    if (!main) return;
+    const button = main.querySelector('[data-action="react"]');
+    if (button) button.disabled = busy;
+    chipRows.get(key)?.setDisabled(main, busy);
+  }
+
+  // The React button's menu: the six reactions, drawn like the composer's Attach menu.
+  function reactionPicker(key, button, container) {
+    // Built as it opens, so each item says whether that reaction is yours (picking it takes yours back).
+    const picker = new PopupMenu({
+      button,
+      container,
+      label: text.addReaction,
+      orientation: 'horizontal',
+      items: () => Reactions.KINDS.map(kind => ({
+        glyph: kind.emoji,
+        label: text[kind.textKey],
+        checked: isMine(key, kind.key),
+        onPick: () => react(key, kind.key, !isMine(key, kind.key), 'menu'),
+      })),
+    });
+    // PopupMenu's own listeners come first, so the menu is open by the time these measure it.
+    button.addEventListener('click', () => placePicker(picker, container));
+    button.addEventListener('keydown', () => placePicker(picker, container));
+    return picker;
+  }
+
+  // The menu opens under the action bar, but near the foot of the log it would be cut off
+  // there (a phone shows only a few messages), so it opens above when that has more room.
+  function placePicker(picker, actions) {
+    if (!picker.isOpen()) return;
+    const room = element.getBoundingClientRect();
+    const bar = actions.getBoundingClientRect();
+    const below = room.bottom - bar.bottom;
+    const above = bar.top - room.top;
+    actions.classList.toggle('is-menu-above', below < picker.element.getBoundingClientRect().height && above > below);
+  }
+
+  // Draws a message's reactions from Spring's list (Reactions.normalize reads it), after
+  // what the message shows and before its action bar. A message that can't take reactions
+  // (no id, deleted, a pin note) draws none; where you can't react, the chips only show.
+  function setReactions(key, list) {
+    const stored = messages.get(key);
+    if (!stored?.id || stored.deleted || stored.pinNote) return;
+    stored.reactions = Reactions.normalize(list);
+    const main = rowFor(key)?.querySelector('.chat-msg-main');
+    if (!main) return;
+    const chips = chipsFor(key);
+    chips.render(main, main.querySelector('.chat-msg-actions'), stored.reactions);
+    if (reacting.has(key) || !canReact(stored)) chips.setDisabled(main, true);
   }
 
   function actionButton(icon, label, handler) {
@@ -336,7 +464,7 @@ export function createMessageLog(element, {
     glyph.className = `fas ${icon}`;
     glyph.setAttribute('aria-hidden', 'true');
     button.appendChild(glyph);
-    button.addEventListener('click', () => handler(button));
+    if (handler) button.addEventListener('click', () => handler(button));
     return button;
   }
 
@@ -506,6 +634,12 @@ export function createMessageLog(element, {
     // message can go on your calendar, so that button is not limited to your own.
     if (!readOnly && message.id && !message.deleted) {
       const buttons = [];
+      // React comes first; its menu (a PopupMenu) opens it, so it has no handler of its own.
+      const reactButton = onReact ? actionButton('fa-face-smile', text.addReaction, null) : null;
+      if (reactButton) {
+        reactButton.dataset.action = 'react';
+        buttons.push(reactButton);
+      }
       if (onReply) buttons.push(actionButton('fa-reply', text.replyMessage, () => onReply(messages.get(message.key))));
       if (onPin) {
         const pinButton = actionButton('fa-thumbtack', text.pinMessage, () => onPin(messages.get(message.key), pinnedIds.has(String(message.id))));
@@ -525,6 +659,7 @@ export function createMessageLog(element, {
         actions.className = 'chat-msg-actions';
         actions.append(...buttons);
         main.appendChild(actions);
+        if (reactButton) pickers.set(message.key, reactionPicker(message.key, reactButton, actions));
       }
     }
 
@@ -565,11 +700,17 @@ export function createMessageLog(element, {
     if (stored) {
       stored.deleted = true;
       stored.body = '';
+      stored.reactions = [];
     }
+    // A deleted message takes no reactions: its menu goes (and stops listening), its chips too.
+    pickers.get(key)?.destroy();
+    pickers.delete(key);
+    chipRows.delete(key);
     refreshPins(); // a deleted message is no longer pinned
     const row = rowFor(key);
     if (!row) return;
     showDeleted(row.querySelector('.chat-msg-body'));
+    row.querySelector('.chat-reactions')?.remove();
     row.querySelector('.chat-reply-quote')?.remove();
     row.querySelector('.chat-code')?.remove();
     row.querySelector('.chat-files')?.remove();
@@ -605,7 +746,7 @@ export function createMessageLog(element, {
   }
 
   return {
-    clear, showEmpty, append, updateBody, markDeleted, note, reveal, destroy,
+    clear, showEmpty, append, updateBody, markDeleted, note, reveal, destroy, setReactions,
     has: key => messages.has(key),
     get: key => messages.get(key),
     // The messages as loaded, oldest first, pin notes included (the Shared panel reads them).

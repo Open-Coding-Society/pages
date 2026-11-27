@@ -52,6 +52,30 @@ class CapstoneTest < Minitest::Test
     assert_includes error.message, "capstone_project.course"
   end
 
+  def test_team_group_must_be_a_group_name
+    named = document("Named", "/named/", { "course" => "CSP", "team_group" => "OCS Communication Systems" })
+    assert_equal ["/named/"], Capstone.catalog(Site.new(posts: Posts.new([named]), pages: [], data: {})).map { |p| p["url"] }
+
+    [["Team A", "Team B"], "   ", 42, "CSP", " csa "].each do |value|
+      bad = document("Bad", "/bad/", { "course" => "CSP", "team_group" => value })
+      error = assert_raises(Jekyll::Errors::FatalException) do
+        Capstone.catalog(Site.new(posts: Posts.new([bad]), pages: [], data: {}))
+      end
+      assert_includes error.message, "capstone_project.team_group"
+    end
+  end
+
+  # Spring's members routes refuse with these reasons (MentorRules); the panel needs words for each.
+  def test_team_chat_texts_cover_every_reason_the_members_routes_send
+    texts = YAML.load_file(File.expand_path("../data/team_chat.yml", __dir__))
+    %w[mentor_team_too_small team_manages_mentors mentor_class_group mentor_cannot_manage failed].each do |reason|
+      assert texts.dig("mentors", "reasons", reason).to_s.strip != "", "team_chat.yml mentors.reasons.#{reason}"
+    end
+    %w[title lead loading signIn unavailable notMember mentorWaiting notFound openInMessages].each do |key|
+      assert texts[key].to_s.strip != "", "team_chat.yml #{key}"
+    end
+  end
+
   def test_duplicate_urls_are_rejected
     projects = [
       document("First", "/same/", { "course" => "CSA" }),
