@@ -15,7 +15,7 @@ const FETCH_OPTIONS = { method: 'GET', mode: 'cors', credentials: 'include', hea
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
-async function show(answer) {
+async function show(answer, topic = MicroblogTopic) {
   const { document } = installFakeDom();
   const registry = readRegistry();
   const words = pageWords(registry);
@@ -27,7 +27,7 @@ async function show(answer) {
   const warnings = [];
   const fetch = async (url, init) => { calls.push({ url, init }); return answer; };
   await new EventDiscussion(list, {
-    topic: MicroblogTopic, pythonURI: PYTHON, fetchOptions: FETCH_OPTIONS, texts: words, shown: registry.discussion.shown,
+    topic, pythonURI: PYTHON, fetchOptions: FETCH_OPTIONS, texts: words, shown: registry.discussion.shown,
     fetch, console: { warn: (...args) => warnings.push(args) },
   }).start();
   await settle();
@@ -70,4 +70,14 @@ test('a post is text, never markup, and a post without a name says someone', nee
   assert.equal(item.querySelector('p').textContent, '<img src=x onerror=alert(1)>');
   assert.equal(list.querySelectorAll('img').length, 0);
   assert.equal(item.querySelector('strong').textContent, words.discussion_someone);
+});
+
+test('names and times follow the Microblog\'s own rules, handed in with its topic', needsRuby, async () => {
+  class OtherRules extends MicroblogTopic {
+    static firstName() { return 'First'; }
+    static timeLabel() { return 'when'; }
+  }
+  const { list } = await show(json({ microblogs: [post('Ada Lovelace', 'Hi')] }), OtherRules);
+  assert.equal(list.querySelector('strong').textContent, 'First');
+  assert.equal(list.querySelector('time').textContent, 'when');
 });

@@ -3,6 +3,7 @@
 // /api/microblog/page/<key> answers 404 "Page topic not found" until the first post makes the
 // topic, so a 404 means "no posts yet", not a failure.
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { MicroblogTopic } from '../_projects/systems/microblog/js/microblog-topic.js';
 
@@ -60,4 +61,37 @@ test('any other answer, or no answer, is an error the page reports', async () =>
 test('a 200 without a list of posts counts as no posts', async () => {
   const odd = recorder(json({ topic: {} }));
   assert.deepEqual(await MicroblogTopic.latest({ pythonURI: PYTHON, path: '/events/x/', limit: 5, fetch: odd.fetch }), { posts: [], missing: false });
+});
+
+test('latest gives up when Flask doesn\'t answer in time', async () => {
+  // A fetch that waits until its request is cancelled, the way a hung server looks.
+  const hung = (_url, init) => new Promise((_resolve, reject) => init.signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError'))));
+  await assert.rejects(MicroblogTopic.latest({ pythonURI: PYTHON, path: '/events/x/', limit: 5, fetch: hung, timeoutMs: 10 }), { name: 'AbortError' });
+  assert.equal(MicroblogTopic.TIMEOUT_MS, 15000, 'the UI Builder\'s request timeout');
+});
+
+test('a post\'s time: Flask writes UTC without a zone, so one is added; a written zone is kept', () => {
+  assert.equal(MicroblogTopic.timeOf('2027-03-01T17:00:00').toISOString(), '2027-03-01T17:00:00.000Z');
+  assert.equal(MicroblogTopic.timeOf('2026-10-28T17:00:00.123456').toISOString(), '2026-10-28T17:00:00.123Z');
+  assert.equal(MicroblogTopic.timeOf('2027-03-01T17:00:00Z').toISOString(), '2027-03-01T17:00:00.000Z');
+  assert.equal(MicroblogTopic.timeOf('2027-03-01T10:00:00-07:00').toISOString(), '2027-03-01T17:00:00.000Z');
+  for (const odd of ['', 'soon', null, undefined, 1700000000]) assert.equal(MicroblogTopic.timeOf(odd), null, String(odd));
+});
+
+test('a post shows its writer\'s first name only, and its time in the visitor\'s own words', () => {
+  assert.equal(MicroblogTopic.firstName('  Ada  Lovelace '), 'Ada');
+  assert.equal(MicroblogTopic.firstName('Grace'), 'Grace');
+  for (const odd of ['', '   ', null, undefined, 42]) assert.equal(MicroblogTopic.firstName(odd), '', String(odd));
+  const when = new Date('2027-03-01T17:00:00Z');
+  assert.equal(MicroblogTopic.timeLabel(when), when.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }));
+});
+
+test('the Events page and the UI Builder\'s feedback read posts only through MicroblogTopic', () => {
+  for (const file of ['_projects/systems/events/js/event-discussion.js', '_projects/systems/ui-builder/js/blocks-live.js']) {
+    const source = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
+    assert.ok(!source.includes('toLocaleString'), `${file} writes post times with MicroblogTopic.timeLabel`);
+    assert.ok(!source.includes('[zZ]'), `${file} reads post times with MicroblogTopic.timeOf`);
+    assert.ok(!/userName[^\n]*split/.test(source), `${file} shortens names with MicroblogTopic.firstName`);
+    assert.ok(!source.includes('/api/microblog/page/'), `${file} reads the topic with MicroblogTopic.latest`);
+  }
 });

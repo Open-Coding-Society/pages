@@ -240,7 +240,7 @@ are unchanged.
 | Team members | `SpringPageStore.members(slug, blockId)` | names only, from the published page's group |
 | Class calendar | Courses `calendar-card.js` `createCalendarCardSection` + `mountCalendarCard` | Spring calendar; the school week when signed out |
 | Kanban board | `assets/js/kanban-board.js` `createKanbanSection` + `mountKanbanBoard` | GitHub (60 requests an hour per network, so it loads on click) |
-| Visitor feedback | `assets/js/projects/microblog/microblog.js` `createPost`, and Flask's public `GET /api/microblog/page/<key>` with `<key>` from `microblog-topic.js` `MicroblogTopic.pageKey` | Flask microblog, filed under the published address |
+| Visitor feedback | `assets/js/projects/microblog/microblog.js` `createPost`, and Flask's public `GET /api/microblog/page/<key>` through `microblog-topic.js` `MicroblogTopic.latest` | Flask microblog, filed under the published address |
 | Data from your API | `api-data.js` `fetchJson` | the student's own API, without cookies |
 
 Other systems' modules load by address, and only when a page has their block: the viewer passes
@@ -256,10 +256,11 @@ the addresses in (`conversationEmbed`, `kanban`, `calendarCard`, `calendarModel`
   `extractEventMarkers` takes the calendar's event markers out of each message and adds one short
   line per event. An empty channel has its own words, since visitors can't post there.
 - **Visitor feedback** reads Flask's public `GET /api/microblog/page/<key>` for the topic
-  `/ui-builder/view/?page=<slug>` (`<key>` is that path turned into a key the way Flask's
-  microblog does it, by the Microblog's `MicroblogTopic.pageKey`) and posts with `microblog.js`
+  `/ui-builder/view/?page=<slug>` through the Microblog's `MicroblogTopic.latest` (`<key>` is that
+  path turned into a key the way Flask's microblog does it) and posts with `microblog.js`
   `createPost`. Anyone signed in to Flask can post, showcase guests included; posts show first
-  names only.
+  names only, by `MicroblogTopic.firstName`, with times by `timeOf` and `timeLabel`. The list
+  loads `microblog-topic.js` itself, so if that fails only the list says so and the form works.
 - **Data from your API** reads the API once per block per view and reuses the answer from
   sessionStorage for five minutes. The viewer never reads an API on the team's own computer, even
   when the site itself runs on localhost: its saved copy shows instead. Any other API that doesn't

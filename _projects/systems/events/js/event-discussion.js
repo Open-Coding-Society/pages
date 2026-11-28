@@ -9,7 +9,8 @@ export class EventDiscussion {
    * @param {HTMLElement} root - the div[data-event-discussion-list], whose data-event-topic is the page's permalink
    * @param {{topic: Function, pythonURI: string, fetchOptions: object, texts: object, shown: number,
    *   fetch?: Function, console?: Console}} options
-   *   topic is the Microblog's MicroblogTopic class; texts are the page's words; shown is how many posts to list
+   *   topic is the Microblog's MicroblogTopic class, which reads the topic and holds the rules for
+   *   showing a post; texts are the page's words; shown is how many posts to list
    */
   constructor(root, { topic, pythonURI, fetchOptions, texts, shown, fetch, console: log = globalThis.console }) {
     this.root = root;
@@ -49,7 +50,7 @@ export class EventDiscussion {
   }
 
   /**
-   * One post as text only: its writer's first name, its time and its words.
+   * One post as text only: its writer's first name, its time and its words, by the Microblog's rules.
    * @param {{userName?: string, content?: string, timestamp?: string}} post - as Flask sends it
    * @returns {HTMLLIElement}
    */
@@ -57,14 +58,14 @@ export class EventDiscussion {
     const doc = this.root.ownerDocument;
     const item = doc.createElement('li');
     const name = doc.createElement('strong');
-    name.textContent = (typeof post.userName === 'string' ? post.userName.trim().split(/\s+/)[0] : '') || this.texts.discussion_someone;
+    name.textContent = this.topic.firstName(post.userName) || this.texts.discussion_someone;
     item.append(name);
-    const when = EventDiscussion.timeOf(post.timestamp);
+    const when = this.topic.timeOf(post.timestamp);
     if (when) {
       const time = doc.createElement('time');
       time.className = 'ocs__text';
       time.setAttribute('datetime', when.toISOString());
-      time.textContent = when.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+      time.textContent = this.topic.timeLabel(when);
       item.append(' ', time);
     }
     const words = doc.createElement('p');
@@ -82,16 +83,5 @@ export class EventDiscussion {
     line.className = 'ocs__text';
     line.textContent = text;
     this.root.replaceChildren(line);
-  }
-
-  /**
-   * A post's time. Flask writes UTC without a zone; without the Z, Date would read it as local time.
-   * @param {string} value
-   * @returns {Date|null}
-   */
-  static timeOf(value) {
-    if (typeof value !== 'string' || !value) return null;
-    const date = new Date(/(?:[zZ]|[+-]\d\d:?\d\d)$/.test(value) ? value : `${value}Z`);
-    return Number.isNaN(date.getTime()) ? null : date;
   }
 }
