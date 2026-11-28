@@ -218,8 +218,24 @@ class EventsGeneratorTest < Minitest::Test
     assert_equal "https://schema.org/OfflineEventAttendanceMode", data["eventAttendanceMode"]
     assert_equal({ "@type" => "Place", "name" => "Community Center", "address" => "Poway, California" }, data["location"])
     assert_equal({ "@type" => "Organization", "name" => "Open Coding Society" }, data["organizer"])
-    assert_equal ["/images/OCS-Kit-Capstone.png"], data["image"]
-    assert_equal "/events/real-event/", data["url"]
+    # This site's _config.yml has no url, and a relative address means nothing to a search engine.
+    refute data.key?("url"), "no url without the site's url"
+    refute data.key?("image"), "no site-path image without the site's url"
+  end
+
+  # Plan test 10: addresses in the JSON-LD are absolute, or left out.
+  def test_json_ld_addresses_are_absolute_when_the_site_has_a_url
+    real = event({}, name: "real-event")
+    generate(site([real], config: { "url" => "https://pages.example.org/", "baseurl" => "/kit" }))
+    data = JSON.parse(real.data.dig("event_entry", "json_ld"))
+    assert_equal "https://pages.example.org/kit/events/real-event/", data["url"]
+    assert_equal ["https://pages.example.org/kit/images/OCS-Kit-Capstone.png"], data["image"]
+
+    linked = event({ "image" => "https://images.example.org/workshop.png" }, name: "linked")
+    generate(site([linked], config: { "url" => "  " }))
+    data = JSON.parse(linked.data.dig("event_entry", "json_ld"))
+    assert_equal ["https://images.example.org/workshop.png"], data["image"], "an https image is kept without the site's url"
+    refute data.key?("url")
   end
 
   # Plan test 11 (the texts JSON half is in the build test below).
@@ -658,8 +674,9 @@ class EventsBuildTest < Minitest::Test
     fixture = json_ld("events/community-technology-workshop-fixture")
     assert_equal 1, fixture.size
     assert_equal "Event", fixture.first["@type"]
-    assert_equal "/preview/events/community-technology-workshop-fixture/", fixture.first["url"]
-    assert_equal ["/preview/images/OCS-Kit-Capstone.png"], fixture.first["image"]
+    # The temporary site, like this one, has no url: the JSON-LD leaves out what it can't give in full.
+    refute fixture.first.key?("url")
+    refute fixture.first.key?("image")
   end
 
   # Plan test 18.

@@ -22,7 +22,9 @@ the build uses `--unpublished`.
 People find events on `/events/` and its category filter, not in site search: `/search/` only
 redirects to `/topics/`, and Topics leaves out documents with `hide: true`, which every event
 gets. Search engines find each event through its page, its title and description tags and its
-schema.org Event data.
+schema.org Event data. That data's addresses must be absolute, so it names the page and a
+site-path photo only when `_config.yml` sets the site's `url` (this site doesn't); an https photo
+is always named.
 
 | Field | Needed | What it is |
 |---|---|---|

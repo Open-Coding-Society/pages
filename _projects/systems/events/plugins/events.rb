@@ -416,14 +416,16 @@ module Events
   end
 
   # A schema.org Event for search engines. Times carry no UTC offset: the site declares no time
-  # zone library, so the times are written as the event's own wall clock.
+  # zone library, so the times are written as the event's own wall clock. Addresses are absolute:
+  # without the site's url in _config.yml, the page's url and a site-path image are left out,
+  # since a relative address tells a search engine nothing; an http(s) image is kept.
   #
   # @param entry [Hash] from Events.entry
   # @param site [Jekyll::Site] for its url and baseurl
   # @return [String] JSON
   def self.json_ld(entry, site)
-    base = "#{site.config['url']}#{site.config['baseurl']}"
-    address = ->(link) { link.match?(SITE_PATH) ? "#{base}#{link}" : link }
+    root = site.config["url"].to_s.strip.chomp("/")
+    address = ->(link) { link.match?(SITE_PATH) ? ("#{root}#{site.config['baseurl']}#{link}" unless root.empty?) : link }
     data = { "@context" => "https://schema.org", "@type" => "Event", "name" => entry["title"], "description" => entry["description"] }
     data["startDate"] = entry["datetime"]
     data["endDate"] = entry["end_time"] ? "#{entry['day']}T#{entry['end_time']}" : (entry["day"] unless entry["start_time"])
@@ -433,7 +435,8 @@ module Events
       data["location"] = { "@type" => "Place", "name" => entry.dig("location", "name"), "address" => entry.dig("location", "address") }.compact
     end
     data["organizer"] = { "@type" => "Organization", "name" => entry.dig("organizer", "name") } if text?(entry.dig("organizer", "name"))
-    data["image"] = [address.call(entry["image"])] if entry["image"]
+    image = entry["image"] && address.call(entry["image"])
+    data["image"] = [image] if image
     data["url"] = address.call(entry["url"])
     script_json(data.compact)
   end
