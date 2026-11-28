@@ -1,0 +1,18 @@
+{%- comment -%}
+  One card on /events/: the date band, the photo, the title, a short blurb and the stage
+  pill (its word, with its description as the title), plus the Sample pill on a sample. The data-* values are what js/event-catalog.js reads; it
+  keeps the pill current by the clock and adds the viewer's context to the link.
+{%- endcomment -%}
+{%- assign event = include.event -%}
+{%- assign catalog_words = site.data.projects.events.event_registry.texts.catalog -%}
+<article class="ocs__grid-cell" data-event-card data-event-url="{{ event.url | relative_url | escape }}" data-event-day="{{ event.day }}" data-event-start="{{ event.start_time }}" data-event-end="{{ event.end_time }}" data-event-zone="{{ event.timezone | escape }}" data-event-stage="{{ event.stage }}" data-event-categories="{{ event.category_keys | jsonify | escape }}">
+  <time class="ocs__badge" datetime="{{ event.day }}">{{ event.card_date | escape }}</time>
+  {%- if event.image %}
+  <img class="ocs__image-frame ocs__image-frame--cover" src="{{ event.image | relative_url | escape }}" alt="{{ event.image_alt | escape }}" loading="lazy">
+  {%- endif %}
+  <h3><a href="{{ event.url | relative_url | escape }}" data-event-link>{{ event.title | escape }}</a></h3>
+  {%- if event.description %}
+  <p class="ocs__card-description">{{ event.description | escape }}</p>
+  {%- endif %}
+  <div><b class="ocs__status-pill ocs__status-pill--{{ event.pill.tone }}" title="{{ event.pill.description | escape }}" data-event-pill>{{ event.pill.label | escape }}</b>{% if event.sample %} <b class="ocs__status-pill ocs__status-pill--neutral">{{ catalog_words.sample | escape }}</b>{% endif %}</div>
+</article>

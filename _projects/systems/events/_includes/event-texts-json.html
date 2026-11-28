@@ -1,0 +1,7 @@
+{%- comment -%}
+  The registry's words for the browser scripts, as one JSON block that js/event-texts.js reads.
+  include.json is built by plugins/events.rb (Events.texts_json), which writes "</" as "<\/" and
+  "<!--" as "<!--" in every part, so no word can close this script element: the catalog passes
+  site.data.events_texts_json, and an event page its page.event_entry.texts_json.
+{%- endcomment -%}
+<script type="application/json" data-event-texts>{{ include.json }}</script>

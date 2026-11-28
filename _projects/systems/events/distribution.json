@@ -1,0 +1,8 @@
+{
+  "standard": true,
+  "files": [
+    { "source": "index.md", "destination": "navigation/projects/events/index.md" },
+    { "source": "layouts/event.html", "destination": "_layouts/event.html" },
+    { "source": "plugins", "destination": "_plugins/projects/events" }
+  ]
+}

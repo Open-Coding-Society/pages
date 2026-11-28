@@ -5,8 +5,8 @@
 // its [data-ui-live-mount], reporting progress and refusals in its [data-ui-live-status]. A card
 // that fails says so in its own status and never stops the others. Other systems' modules
 // (Messages' conversation-embed.js, kanban-board.js, Courses' calendar-card.js and
-// calendar-model.js, microblog.js) are loaded by URL from ctx.services.modules, so nothing here
-// imports across systems.
+// calendar-model.js, microblog.js and microblog-topic.js) are loaded by URL from
+// ctx.services.modules, so nothing here imports across systems.
 //
 // ctx: {registry, baseurl, pageOrigin, pageProtocol, slug, pageKey, doc, fetchImpl, storage, now,
 //   loadModule?(url), navigate?(url), services: {config, richText, messagesModel, modules, store,
@@ -355,27 +355,14 @@ async function mountKanban(card, block, c, { status, mount }) {
 
 /* ---------- visitor feedback (the Flask microblog) ---------- */
 
-// The Flask microblog's Topic._generate_page_key, so the public read finds the topic a post made.
-export function microblogPageKey(topicPath) {
-  return String(topicPath).replace(/^\/+|\/+$/g, '').replace(/[^a-zA-Z0-9_-]/g, '_').replace(/_+/g, '_').slice(0, 100).replace(/^_+|_+$/g, '');
-}
-
-// Flask writes UTC times without a zone; without the Z, Date would read them as local time.
-function postTime(value) {
-  if (typeof value !== 'string' || !value) return null;
-  const date = new Date(/(?:[zZ]|[+-]\d\d:?\d\d)$/.test(value) ? value : `${value}Z`);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-// First names only: visitors on public pages see who wrote, not their full name.
-function postView(post, c) {
-  const name = (typeof post.userName === 'string' ? post.userName.trim().split(/\s+/)[0] : '') || c.say('live.feedback_someone');
-  const when = postTime(post.timestamp);
+// The Microblog's MicroblogTopic shows a post on a public page: first names only, and Flask's
+// UTC times read as UTC.
+function postView(post, c, topic) {
+  const name = topic.firstName(post.userName) || c.say('live.feedback_someone');
+  const when = topic.timeOf(post.timestamp);
   return h('li', null,
     h('strong', null, name),
-    when ? [' ', h('time', { datetime: when.toISOString() }, c.say('live.feedback_time', {
-      time: when.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
-    }))] : null,
+    when ? [' ', h('time', { datetime: when.toISOString() }, c.say('live.feedback_time', { time: topic.timeLabel(when) }))] : null,
     h('br'),
     h('span', null, typeof post.content === 'string' ? post.content : ''));
 }
@@ -424,21 +411,30 @@ async function mountFeedback(card, block, c, { status, mount }) {
   if (stop) return refuse(status, stop);
   if (!c.slug) return refuse(status, { text: c.say('live.feedback_unpublished') });
   const topicPath = `/ui-builder/view/?page=${c.slug}`;
-  const pythonURI = String(c.config.pythonURI || '').replace(/\/+$/, '');
   const list = element(c.doc, 'div');
   let alive = true;
 
+  // The list reads the topic through the Microblog's MicroblogTopic (its copy of Flask's page key,
+  // and the public read, where 404 means nobody has posted yet). The module loads here, so if it
+  // can't (a page cached from before it was published), only the list says so and the form works.
   const load = async () => {
-    const answer = await getJson(c, `${pythonURI}/api/microblog/page/${microblogPageKey(topicPath)}?limit=${FEEDBACK_SHOWN}`);
-    if (!alive) return;
-    // 404: nobody has posted yet, so Flask has no topic for this page.
-    const posts = answer.ok && isObject(answer.json) && Array.isArray(answer.json.microblogs) ? answer.json.microblogs.filter(isObject) : [];
-    if (!answer.ok && answer.status !== 404) {
-      tell(status, { text: c.say(answer.offline ? 'live.offline' : 'live.feedback_load_failed') });
+    let topic;
+    let answer;
+    try {
+      ({ MicroblogTopic: topic } = await c.load('microblogTopic'));
+      answer = await topic.latest({
+        pythonURI: c.config.pythonURI, fetchOptions: isObject(c.config.fetchOptions) ? c.config.fetchOptions : {}, path: topicPath,
+        limit: FEEDBACK_SHOWN, fetch: c.fetchImpl,
+      });
+    } catch (error) {
+      if (!alive) return;
+      console.warn('UI Builder: the feedback could not load', error);
+      tell(status, { text: c.say(browserOffline() ? 'live.offline' : 'live.feedback_load_failed') });
       return;
     }
-    list.replaceChildren(posts.length
-      ? toDOM(h('ul', { class: 'ocs__entity-list' }, posts.slice(0, FEEDBACK_SHOWN).map((post) => postView(post, c))), { doc: c.doc })
+    if (!alive) return;
+    list.replaceChildren(answer.posts.length
+      ? toDOM(h('ul', { class: 'ocs__entity-list' }, answer.posts.slice(0, FEEDBACK_SHOWN).map((post) => postView(post, c, topic))), { doc: c.doc })
       : element(c.doc, 'p', { className: 'ocs__text', text: c.say('live.feedback_none') }));
   };
 

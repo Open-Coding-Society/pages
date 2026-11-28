@@ -4,7 +4,8 @@ import * as messagesModel from '../../messages/js/messages-model.js';
 import { embedTexts } from '../../messages/js/conversation-embed.js';
 import * as calendarModel from '../../courses/js/announcement-calendar/calendar-model.js';
 import { textOf } from '../js/registry.js';
-import { announcementText, createLiveMounts, microblogPageKey, mountLiveBlocks } from '../js/blocks-live.js';
+import { announcementText, createLiveMounts, mountLiveBlocks } from '../js/blocks-live.js';
+import { MicroblogTopic } from '../../microblog/js/microblog-topic.js';
 import { escapeHTML } from '../js/vnode.js';
 import { createDocument, createEvent, settle, text } from './fixtures/live/dom.mjs';
 import {
@@ -41,7 +42,8 @@ async function live(registry, blocks, options = {}) {
   const doc = createDocument();
   const root = drawPage(doc, page, registry);
   const fakes = {
-    conversationEmbed: fakeConversationEmbed(), kanban: fakeKanban(), calendarCard: fakeCalendarCard(), calendarModel, microblog: fakeMicroblog(), ...options.fakes,
+    conversationEmbed: fakeConversationEmbed(), kanban: fakeKanban(), calendarCard: fakeCalendarCard(), calendarModel, microblog: fakeMicroblog(),
+    microblogTopic: { MicroblogTopic }, ...options.fakes,
   };
   const loader = moduleLoader(fakes);
   const router = fetchRouter(options.routes || {});
@@ -279,7 +281,7 @@ test('a board waits for "Show our board" unless the viewer can edit the page', n
 
 test('feedback reads the page\'s microblog topic and posts to it, first names only', needsRuby, async () => {
   const registry = loadRegistry();
-  const key = microblogPageKey('/ui-builder/view/?page=flood-watch');
+  const key = MicroblogTopic.pageKey('/ui-builder/view/?page=flood-watch');
   assert.equal(key, 'ui-builder_view_page_flood-watch', 'the key Flask makes from that path');
   const read = `${PYTHON}/api/microblog/page/${key}?limit=20`;
   let posts = [{ userName: 'Ada Lovelace', content: '<b>Great</b> map', timestamp: '2026-10-28T17:00:00.123456', userUid: 'ada' }];
@@ -329,7 +331,7 @@ test('feedback reads the page\'s microblog topic and posts to it, first names on
 
 test('feedback without Flask sign-in shows the posts and a sign-in link; unpublished pages wait', needsRuby, async () => {
   const registry = loadRegistry();
-  const key = microblogPageKey('/ui-builder/view/?page=flood-watch');
+  const key = MicroblogTopic.pageKey('/ui-builder/view/?page=flood-watch');
   const run = await live(registry, [['feedback', {}]], {
     viewer: { springSignedIn: false, flaskSignedIn: false }, routes: { [`${PYTHON}/api/microblog/page/${key}`]: json({ message: 'Page topic not found' }, 404) },
   });
@@ -339,6 +341,35 @@ test('feedback without Flask sign-in shows the posts and a sign-in link; unpubli
   const draft = await live(registry, [['feedback', {}]], { slug: null, view: null });
   assert.equal(text(draft.status(0)), say(registry, 'live.feedback_unpublished'));
   assert.deepEqual(draft.router.calls, []);
+});
+
+test('feedback reads its posts through the Microblog\'s MicroblogTopic.latest', needsRuby, async () => {
+  const registry = loadRegistry();
+  const reads = [];
+  class WatchedTopic extends MicroblogTopic {
+    static latest(options) {
+      reads.push(options);
+      return super.latest(options);
+    }
+  }
+  const key = MicroblogTopic.pageKey('/ui-builder/view/?page=flood-watch');
+  const run = await live(registry, [['feedback', {}]], {
+    fakes: { microblogTopic: { MicroblogTopic: WatchedTopic } },
+    routes: { [`${PYTHON}/api/microblog/page/${key}`]: json({ microblogs: [{ userName: 'Ada Lovelace', content: 'Hi', timestamp: '2026-10-28T17:00:00' }] }) },
+  });
+  assert.equal(reads.length, 1);
+  assert.deepEqual([reads[0].path, reads[0].limit, reads[0].pythonURI], ['/ui-builder/view/?page=flood-watch', 20, PYTHON]);
+  assert.equal(reads[0].fetchOptions.credentials, 'include', 'the page\'s fetch options from config.js');
+  assert.ok(text(run.mount(0).querySelector('li')).startsWith('Ada · '));
+});
+
+test('feedback whose Microblog module fails to load keeps its form and says the list couldn\'t load', needsRuby, async () => {
+  const registry = loadRegistry();
+  // A page cached from before microblog-topic.js was published: its address answers 404.
+  const run = await live(registry, [['feedback', {}]], { fakes: { microblogTopic: null } });
+  assert.ok(run.mount(0).querySelector('form textarea'), 'the form still works');
+  assert.equal(text(run.status(0)), say(registry, 'live.feedback_load_failed'));
+  assert.equal(run.mount(0).querySelectorAll('li').length, 0);
 });
 
 test('one failing block reports in its own card; mounts that finish late are shut down', needsRuby, async (t) => {
