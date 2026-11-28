@@ -32,7 +32,7 @@
   {%- endif %}
   <hr>
   <h2 class="ocs__section-title">{{ words.sections_title | escape }}</h2>
-  <nav class="ocs__nav-grid ocs__nav-grid--in-card" aria-label="{{ words.sections_title | escape }}">
+  <nav class="ocs__nav-grid" aria-label="{{ words.sections_title | escape }}">
     {%- for section in event.sections %}
     <a class="ocs__nav-card" href="#event-{{ section.key }}"><span class="ocs__nav-card-kicker"><i class="fas {{ section.icon }}" aria-hidden="true"></i></span><span class="ocs__nav-card-title">{{ section.label | escape }}</span></a>
     {%- endfor %}

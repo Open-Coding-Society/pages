@@ -542,7 +542,11 @@ class EventsBuildTest < Minitest::Test
     assert_equal "Published", pill.text
     assert_equal "Sample", sample.at_css("b.ocs__status-pill.ocs__status-pill--neutral").text
     assert_equal REGISTRY.dig("texts", "page", "sample_note"), sample.at_css("article[data-event-page] > div.ocs__callout").text.strip
-    assert_equal 3, sample.css("nav.ocs__nav-grid.ocs__nav-grid--in-card > a.ocs__nav-card").size
+    # The plain grid: its bottom margin and divider set the cards apart from the first section.
+    # (--in-card is for a grid inside a card, which this isn't.)
+    sections_nav = sample.at_css("article[data-event-page] > nav.ocs__nav-grid")
+    assert_equal %w[ocs__nav-grid], sections_nav["class"].split
+    assert_equal 3, sections_nav.css("> a.ocs__nav-card").size
     assert_equal "Community Technology Workshop", sample.at_css("article[data-event-page] > h2").text
     assert_equal "March 15, 2027 · 10:00 AM – 1:00 PM", sample.at_css("article[data-event-page] > p > time.ocs__text").text
     assert_equal "Community Center, Poway, California", sample.at_css(".ocs__keypoints .ocs__keypoint").text.strip
