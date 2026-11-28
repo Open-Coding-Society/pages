@@ -1,0 +1,99 @@
+# Data for the ODIN Diagnostics capstone page.
+# Read by _posts/capstone/2026-2027/2026-11-27-odin-capstone.md. Edit here to change the intro, team,
+# pages, build plan status or API list. The page uses only the shared ocs__ grammar (_sass/open-coding/elements),
+# so there is no page-specific CSS.
+Title: "ODIN Diagnostics"
+TeamName: "ODIN Website Team"
+Tagline: "A website for ODIN Diagnostics, built on the OCS template with its content served by Flask."
+Description: "ODIN Diagnostics makes ODIN, an eye-tracking headset for quick, non-invasive concussion assessments. Our team rebuilt their website on the OCS Pages template. Every word and image comes from our Flask backend, so the frontend only handles layout and the content can be edited in one place."
+Team: ["Aryan M", "Chetan T", "Ryden B", "Aarav N", "Ishaan S"]
+Stack: ["Jekyll", "SASS", "JavaScript", "Flask", "SQLAlchemy"]
+
+# The team's GitHub project board, shown live under the intro (_includes/ocs_kanban_board.html)
+Board:
+  url: "https://github.com/orgs/OCSVR/projects/3/views/1"
+  title: "ODIN Kanban Board"
+
+# Links shown as buttons under the intro
+Links:
+  - label: "Live site"
+    url: "https://open-coding-society.github.io/ODIN_Frontend/"
+  - label: "Frontend repo"
+    url: "https://github.com/Open-Coding-Society/ODIN_Frontend"
+  - label: "Backend repo"
+    url: "https://github.com/Open-Coding-Society/ODIN_Backend"
+
+# The pages of the site, each filled from the backend
+Pages:
+  - name: "Home"
+    goal: "What ODIN is, the concussion numbers and the pitch"
+  - name: "How it works"
+    goal: "Eye tracking and the four product features"
+  - name: "About"
+    goal: "ODIN Diagnostics' mission"
+  - name: "Contact Us"
+    goal: "Phone, email, address and social links"
+  - name: "Not found"
+    goal: "A plain page for a wrong address"
+
+# What the frontend and backend each own
+Split:
+  - title: "Frontend (ODIN_Frontend)"
+    points:
+      - "The ODIN kit in _projects/systems/odin: layout, header, footer and page shells"
+      - "Built from OCS SASS tokens and ocs__ classes, with the site theme's colors and fonts"
+      - "A content loader that shows loading and error states when the backend is slow or down"
+  - title: "Backend (ODIN_Backend)"
+    points:
+      - "Site, page, section and image models, seeded from JSON in model/dataconfigs"
+      - "Read-only endpoints for the public site, since visitors have no account"
+      - "Verify scripts that check every page, section and image is there"
+
+# The build plan. status: done, active or next
+BuildPlan:
+  - step: "1"
+    name: "Content API"
+    detail: "Models and read endpoints for the site, pages and images"
+    status: "done"
+  - step: "2"
+    name: "ODIN kit and layout"
+    detail: "Registered kit, standalone layout from OCS SASS tokens"
+    status: "done"
+  - step: "3"
+    name: "Four pages"
+    detail: "Home, How it works, About and Contact, all loaded from the backend"
+    status: "done"
+  - step: "4"
+    name: "Notice and not found page"
+    detail: "The FDA notice, site icon and a not found page"
+    status: "done"
+  - step: "5"
+    name: "Review fixes"
+    detail: "Plain copy, sourced numbers, more ocs__ classes, template pages restored"
+    status: "active"
+  - step: "6"
+    name: "Sign in and admin console"
+    detail: "Admins edit the content from the site instead of JSON files"
+    status: "next"
+  - step: "7"
+    name: "Contact form"
+    detail: "Messages saved in the backend for ODIN staff"
+    status: "next"
+  - step: "8"
+    name: "Deploy the backend"
+    detail: "Content served live instead of from a local server"
+    status: "next"
+
+# The backend endpoints the site reads
+Api:
+  - route: "GET /api/odin/site"
+    use: "Company name, contact details, logos and the notice every page shows"
+  - route: "GET /api/odin/pages"
+    use: "Every page's title and menu words, in menu order"
+  - route: "GET /api/odin/page?name=home"
+    use: "One page's title, description and sections"
+  - route: "GET /api/odin/image?name=..."
+    use: "One of the site's images"
+
+# The client's required notice, shown on the capstone page as it is on the site
+Notice: "ODIN is an investigational product and has not been cleared or approved by the FDA. It is offered for research use only."
