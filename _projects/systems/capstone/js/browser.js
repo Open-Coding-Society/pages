@@ -46,7 +46,8 @@ if (browser) {
   }
 
   function saveSnapshot() {
-    const projects = cards.filter((card) => !card.hidden).map((card) => {
+    // A skipped project cannot be opened, so the viewer's previous/next leaves it out.
+    const projects = cards.filter((card) => !card.hidden && !card.hasAttribute('data-capstone-skipped')).map((card) => {
       const url = new URL(card.dataset.pageUrl, window.location.href);
       return {
         path: url.pathname.replace(/\/+$/, ''),
@@ -76,7 +77,7 @@ if (browser) {
     const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT);
     const nodes = [];
     while (walker.nextNode()) {
-      if (!walker.currentNode.parentElement.closest('details')) nodes.push(walker.currentNode);
+      if (!walker.currentNode.parentElement.closest('details, [data-capstone-card-footer]')) nodes.push(walker.currentNode);
     }
     nodes.forEach((node) => {
       const text = node.data;
@@ -124,7 +125,7 @@ if (browser) {
     const words = normalizeSearch(query).split(/\s+/).filter(Boolean);
     cards.forEach((card) => {
       const cardCourse = card.dataset.course || ['CSA', 'CSP', 'CSH', 'CSSE'].find((name) => card.classList.contains(name)) || '';
-      const match = matchesProject({
+      const match = !card.hasAttribute('data-capstone-filtered-out') && matchesProject({
         course: cardCourse,
         year: card.dataset.year,
         text: searchText.get(card),
@@ -185,6 +186,7 @@ if (browser) {
   browser.addEventListener('contextmenu', (event) => {
     if (event.target.closest('a[data-capstone-project-link]')) saveSnapshot();
   });
+  browser.addEventListener('capstone:filter', applyFilters);
   selectCourse(course, false);
   window.addEventListener('pageshow', () => {
     query = searchInput?.value || '';

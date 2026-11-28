@@ -1,0 +1,66 @@
+# Every label the Capstone mentor controls show. The states and their actions mirror the
+# rules on Spring's Person; the server still decides what is allowed.
+actions:
+  interested: Interested
+  skip: Skip
+  remove-interest: Remove interest
+  undo-skip: Undo skip
+  apply: Apply now
+  apply-again: Apply again
+  cancel: Cancel request
+
+states:
+  default:
+    actions: [interested, skip, apply]
+  interested:
+    pill: Interested
+    tone: neutral
+    actions: [remove-interest, skip, apply]
+  skipped:
+    pill: Skipped
+    tone: neutral
+    actions: [undo-skip]
+  pending:
+    pill: Pending approval
+    tone: warn
+    actions: [cancel]
+  approved:
+    actions: []
+  denied:
+    pill: Not approved
+    tone: bad
+    actions: [interested, skip, apply-again]
+
+filters:
+  - id: all
+    label: All
+    states: []
+  - id: interested
+    label: Interested
+    states: [interested]
+  - id: applied
+    label: Applied
+    states: [pending, approved, denied]
+  - id: skipped
+    label: Skipped
+    states: [skipped]
+
+summary:
+  interested: Interested
+  pending: Pending
+  approved: Mentoring
+  skipped: Skipped
+
+text:
+  panel_label: Your mentor choices
+  filter_label: Filter by your choices
+  mentors_prefix: "Mentors:"
+  reset: Reset
+  reset_title: Reset your choices?
+  reset_keep: Keep my choices
+  reset_close: Close
+  reset_one: This clears 1 project marked Interested or Skipped. Pending, Mentoring, and Not approved projects stay as they are.
+  reset_many: This clears {count} projects marked Interested or Skipped. Pending, Mentoring, and Not approved projects stay as they are.
+  reset_none: You have no Interested or Skipped projects to clear.
+  error_unreachable: Could not reach the server. Check your connection and try again.
+  error_failed: The server could not complete that.
