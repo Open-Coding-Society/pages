@@ -233,6 +233,38 @@ class EventsGeneratorTest < Minitest::Test
     assert_equal "Bring </script><!--<script>alert(1)</script> & more", JSON.parse(json)["description"]
   end
 
+  # Plan test 11, every block of the words JSON: the generator builds it with the JSON-LD's escape,
+  # so no registry or label text can close the script element, on the catalog or an event page.
+  def test_no_block_of_the_words_json_can_close_its_script
+    closer = "</script><!--<script>"
+    labelled = event({ "labels" => { "discussion_title" => "Ask #{closer}" } })
+    quiet = event({ "features" => { "microblog" => false } }, name: "quiet")
+    built = site([labelled, quiet])
+    registry = built.data["projects"]["events"]["event_registry"]
+    registry["lifecycle"][1]["description"] = "Out #{closer}"
+    registry["texts"]["catalog"]["empty"] = "None #{closer}"
+    registry["texts"]["viewer"]["unavailable"] = "Gone #{closer}"
+    registry["discussion"]["note"] = "Note #{closer}"
+    generate(built)
+    { "the catalog" => [built.data["events_texts_json"], nil],
+      "an event page" => [labelled.data.dig("event_entry", "texts_json"), "Ask #{closer}"] }.each do |where, (json, page_title)|
+      refute_includes json, "</", where
+      refute_includes json, "<!--", where
+      words = JSON.parse(json)
+      assert_equal %w[lifecycle catalog viewer discussion page], words.keys, where
+      assert_equal "Out #{closer}", words["lifecycle"][1]["description"], where
+      assert_equal "None #{closer}", words.dig("catalog", "empty"), where
+      assert_equal "Gone #{closer}", words.dig("viewer", "unavailable"), where
+      assert_equal "Note #{closer}", words.dig("discussion", "note"), where
+      if page_title
+        assert_equal page_title, words.dig("page", "discussion_title"), where
+      else
+        assert_nil words["page"], where
+      end
+    end
+    assert_nil JSON.parse(quiet.data.dig("event_entry", "texts_json"))["page"], "the page's words go out only for its discussion"
+  end
+
   # Plan test 12.
   def test_the_registry_keeps_morts_six_states_in_order
     assert_equal %w[draft published registration active completed archived], REGISTRY["lifecycle"].map { |stage| stage["key"] }
@@ -655,6 +687,11 @@ class EventsBuildTest < Minitest::Test
     end
     assert_equal "Bring </script> & more", JSON.parse(script)["description"]
     assert_equal "Robots & <script>alert(1)</script> <!--", JSON.parse(script)["name"]
+    # The catalog prints the generator's JSON too, with every part and no page words.
+    catalog_texts = JSON.parse(html("events").at_css("script[data-event-texts]").text)
+    assert_equal %w[lifecycle catalog viewer discussion page], catalog_texts.keys
+    assert_nil catalog_texts["page"]
+    assert_equal REGISTRY.dig("texts", "catalog"), catalog_texts["catalog"]
     types = html("events/robots").css("script").map { |script| script["type"] }
     assert_equal %w[module application/ld+json application/json module], types, "the viewer's, then the page's own: nothing from the event's text"
   end

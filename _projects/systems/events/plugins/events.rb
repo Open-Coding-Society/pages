@@ -392,10 +392,31 @@ module Events
     Time.utc(2000, 1, 1, hour, minute).strftime(formats["time"])
   end
 
+  # JSON to print inside a script element. "</" is written "<\/" and "<!--" as "<\u0021--" (the
+  # same text in JSON), so no value can close the element or keep its end tag from closing it.
+  #
+  # @param data [Object]
+  # @return [String] JSON
+  def self.script_json(data)
+    JSON.generate(data).gsub("</", "<\\/").gsub("<!--", "<\\u0021--")
+  end
+
+  # The registry's words for the browser scripts (js/event-texts.js reads them from
+  # event-texts-json.html). page is an event page's words, given only when its discussion is on,
+  # since the scripts use them only there; the catalog has none.
+  #
+  # @param registry [Hash]
+  # @param page [Hash, nil] the page's words (Events.words), or nil
+  # @return [String] JSON for Events.script_json's script element
+  def self.texts_json(registry, page)
+    script_json({
+      "lifecycle" => registry["lifecycle"], "catalog" => registry.dig("texts", "catalog"),
+      "viewer" => registry.dig("texts", "viewer"), "discussion" => registry["discussion"], "page" => page
+    })
+  end
+
   # A schema.org Event for search engines. Times carry no UTC offset: the site declares no time
-  # zone library, so the times are written as the event's own wall clock. "</" is written "<\/"
-  # and "<!--" as "<\u0021--" (the same text in JSON), so no value can close the script element or
-  # keep its end tag from closing it.
+  # zone library, so the times are written as the event's own wall clock.
   #
   # @param entry [Hash] from Events.entry
   # @param site [Jekyll::Site] for its url and baseurl
@@ -414,7 +435,7 @@ module Events
     data["organizer"] = { "@type" => "Organization", "name" => entry.dig("organizer", "name") } if text?(entry.dig("organizer", "name"))
     data["image"] = [address.call(entry["image"])] if entry["image"]
     data["url"] = address.call(entry["url"])
-    JSON.generate(data.compact).gsub("</", "<\\/").gsub("<!--", "<\\u0021--")
+    script_json(data.compact)
   end
 
   # Sets what an event page reads, and the flags that keep it out of other lists.
@@ -427,6 +448,7 @@ module Events
   def self.publish(document, registry, settings, site)
     entry = entry(document, registry, settings)
     entry["json_ld"] = json_ld(entry, site) unless entry["sample"] || entry["status"] == "draft"
+    entry["texts_json"] = texts_json(registry, entry["features"]["microblog"] ? entry["words"] : nil)
     data = document.data
     data["event_entry"] = entry
     data["hide"] = true
@@ -475,7 +497,7 @@ module Events
     #   description, removes `status: draft` events from site.posts.docs and site.pages unless the
     #   build uses --unpublished, and sets
     #   site.data["events_catalog"] (listed events by day, start time, then title),
-    #   ["events_categories"] and ["events_settings"].
+    #   ["events_categories"], ["events_settings"] and ["events_texts_json"] (the catalog's words).
     # @raise [Jekyll::Errors::FatalException] naming the file and field to fix
     def generate(site)
       # Jekyll silently skips future-dated posts unless future is on.
@@ -500,6 +522,7 @@ module Events
       site.data["events_catalog"] = catalog
       site.data["events_categories"] = Events.category_labels(catalog)
       site.data["events_settings"] = settings
+      site.data["events_texts_json"] = Events.texts_json(registry, nil)
     end
   end
 end

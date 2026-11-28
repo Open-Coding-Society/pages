@@ -84,11 +84,7 @@
 {%- if event.json_ld %}
 <script type="application/ld+json">{{ event.json_ld }}</script>
 {%- endif %}
-{%- if event.features.microblog %}
-{% include projects/events/event-texts-json.html words=event.words %}
-{%- else %}
-{% include projects/events/event-texts-json.html %}
-{%- endif %}
+{% include projects/events/event-texts-json.html json=event.texts_json %}
 <script type="module">
   import { fetchOptions, pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
   import { MicroblogTopic } from '{{ site.baseurl }}/assets/js/projects/microblog/microblog-topic.js';

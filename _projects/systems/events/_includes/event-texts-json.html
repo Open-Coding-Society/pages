@@ -1,10 +1,7 @@
 {%- comment -%}
   The registry's words for the browser scripts, as one JSON block that js/event-texts.js reads.
-  include.words is an event page's words (the registry's page texts and section labels, with the
-  event's own labels over them), passed only when the event's Microblog is on, since the scripts
-  use them only for its discussion; the catalog passes none. "</" is written "<\/" and "<!--" as
-  "<\u0021--" (the same text in JSON), so no value can close the script element or keep its end
-  tag from closing it.
+  include.json is built by plugins/events.rb (Events.texts_json), which writes "</" as "<\/" and
+  "<!--" as "<!--" in every part, so no word can close this script element: the catalog passes
+  site.data.events_texts_json, and an event page its page.event_entry.texts_json.
 {%- endcomment -%}
-{%- assign event_registry = site.data.projects.events.event_registry -%}
-<script type="application/json" data-event-texts>{"lifecycle":{{ event_registry.lifecycle | jsonify | replace: "</", "<\/" | replace: "<!--", "<\u0021--" }},"catalog":{{ event_registry.texts.catalog | jsonify | replace: "</", "<\/" | replace: "<!--", "<\u0021--" }},"viewer":{{ event_registry.texts.viewer | jsonify | replace: "</", "<\/" | replace: "<!--", "<\u0021--" }},"discussion":{{ event_registry.discussion | jsonify | replace: "</", "<\/" | replace: "<!--", "<\u0021--" }},"page":{{ include.words | jsonify | replace: "</", "<\/" | replace: "<!--", "<\u0021--" }}}</script>
+<script type="application/json" data-event-texts>{{ include.json }}</script>

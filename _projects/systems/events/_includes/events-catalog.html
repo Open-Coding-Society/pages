@@ -52,7 +52,7 @@
     </div>
   </section>
 </div>
-{% include projects/events/event-texts-json.html %}
+{% include projects/events/event-texts-json.html json=site.data.events_texts_json %}
 <script type="module">
   import { EventCatalog } from '{{ site.baseurl }}/assets/js/projects/events/event-catalog.js';
   import { EventTexts } from '{{ site.baseurl }}/assets/js/projects/events/event-texts.js';

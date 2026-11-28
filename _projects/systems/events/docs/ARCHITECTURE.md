@@ -55,11 +55,13 @@ flowchart TD
   shared `page_viewer` on listed events;
 - builds `page.event_entry`: the checked values, the date line and card date in the registry's
   formats, the place, the presenters with the organizer first, the section cards that have content,
-  the page's words with the event's own `labels` over the registry's, and schema.org Event data for
-  events that aren't samples.
+  the page's words with the event's own `labels` over the registry's, schema.org Event data for
+  events that aren't samples, and the words JSON for the page's scripts.
 
 It writes `site.data["events_catalog"]` (listed events by day, start time, then title),
-`["events_categories"]` (one lowercase key per category) and `["events_settings"]`.
+`["events_categories"]` (one lowercase key per category), `["events_settings"]` and
+`["events_texts_json"]` (the catalog's words JSON). Both JSON-LD and the words JSON go through one
+escape, `Events.script_json`, so no text can close the script element that holds it.
 
 ## The browser
 
