@@ -320,6 +320,33 @@ class EventsGeneratorTest < Minitest::Test
     assert_build_fails(site([], config: { "events" => SETTINGS.merge("join_url" => "javascript:alert(1)") }), "_config.yml", "events.join_url")
   end
 
+  # A misspelled zone builds fine otherwise, and then the browser can't read the event's times, so
+  # it would stay Upcoming forever: the build checks the zone against the tz database.
+  def test_a_time_zone_the_tz_database_doesnt_know_fails_naming_the_file_and_field
+    assert_build_fails(site([event({ "timezone" => "America/Los_Angles" })]),
+                       "_posts/events/2027-03-15-community-technology-workshop.md: timezone America/Los_Angles isn't a time zone")
+    assert_build_fails(site([event], config: { "events" => SETTINGS.merge("timezone" => "America/Los_Angles") }),
+                       "_config.yml: events.timezone America/Los_Angles isn't a time zone")
+    utc = event({ "timezone" => "UTC" })
+    generate(site([utc], config: { "events" => SETTINGS.merge("timezone" => "UTC") }))
+    assert_equal "UTC", utc.data.dig("event_entry", "timezone")
+    %w[UTC America/Los_Angeles Asia/Kathmandu Pacific/Auckland].each { |zone| assert Events.zone_known?(zone), zone }
+    refute Events.zone_known?("Mars/Olympus")
+  end
+
+  # Without tzinfo the build asks the system's zone files; with none to ask it can't tell, so the
+  # zone passes and the browser warns as before.
+  def test_the_zone_files_answer_when_tzinfo_cannot
+    Dir.mktmpdir("zoneinfo") do |folder|
+      FileUtils.mkdir_p(File.join(folder, "America"))
+      File.write(File.join(folder, "America/Los_Angeles"), "TZif")
+      assert Events.zone_file?("America/Los_Angeles", folder)
+      refute Events.zone_file?("America/Los_Angles", folder)
+      refute Events.zone_file?("America", folder), "a folder isn't a zone"
+      assert Events.zone_file?("America/Los_Angles", File.join(folder, "missing")), "no zone files: can't tell"
+    end
+  end
+
   # Plan test 14. Jekyll silently skips future-dated posts when future is off.
   def test_future_false_fails_only_when_there_are_event_files
     Dir.mktmpdir("events-future") do |source|

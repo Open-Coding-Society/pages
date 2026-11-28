@@ -86,8 +86,11 @@ The `events:` block in `_config.yml` holds the site defaults:
   the Microblog is on, since registration, check-in and the gallery need a Flask record and an
   organizer. With no `features` setting, a key an event leaves out is off.
 
-`timezone` and `page_size` are needed once there are events. The build also needs `future: true`,
-or Jekyll would skip every event dated after today without saying so.
+`timezone` and `page_size` are needed once there are events. The build checks `timezone`, and an
+event's own `timezone`, against the tz database (tzinfo, or the system's zone files), so a
+misspelling like `America/Los_Angles` stops the build instead of leaving the event Upcoming
+forever. The build also needs `future: true`, or Jekyll would skip every event dated after today
+without saying so.
 
 ## Discussion
 

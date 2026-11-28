@@ -29,6 +29,8 @@ module Events
   SITE_PATH = %r{\A/(?![/\\])[^\s\\]*\z}.freeze
   HTTPS = %r{\Ahttps://\S+\z}i.freeze
   HTTP_OR_HTTPS = %r{\Ahttps?://\S+\z}i.freeze
+  # The system's time zone files, asked when tzinfo can't be loaded.
+  ZONEINFO = "/usr/share/zoneinfo".freeze
   REGISTRY_FILE = "_data/projects/events/event_registry.yml".freeze
   CONFIG_FILE = "_config.yml".freeze
   # The catalog page's address (index.md's permalink).
@@ -94,6 +96,8 @@ module Events
       fail!(CONFIG_FILE, "events.timezone is needed: an Area/City name like America/Los_Angeles, or UTC") if events_exist
     elsif !(zone.is_a?(String) && zone.match?(ZONE))
       fail!(CONFIG_FILE, "events.timezone must be an Area/City name like America/Los_Angeles, or UTC")
+    elsif !zone_known?(zone)
+      fail!(CONFIG_FILE, "events.timezone #{zone} isn't a time zone the tz database knows; check its spelling, like America/Los_Angeles")
     end
     size = settings["page_size"]
     unless (size.nil? && !events_exist) || (size.is_a?(Integer) && size.between?(1, 48))
@@ -103,6 +107,35 @@ module Events
     fail!(CONFIG_FILE, "events.join_url must be a site path or an https link") unless join.nil? || link?(join, HTTPS)
     features = switches(settings["features"] || {}, registry, CONFIG_FILE, "events.features")
     { "timezone" => zone, "join_url" => join, "page_size" => size, "features" => features }
+  end
+
+  # Whether the tz database knows a time zone, so a misspelled one stops the build instead of
+  # leaving the browser unable to read the event's times (it would stay Upcoming forever). tzinfo
+  # comes with the site's gems (activesupport needs it); without it, or without its data, the
+  # system's zone files answer.
+  #
+  # @param zone [String] an Area/City name, or UTC
+  # @return [Boolean]
+  def self.zone_known?(zone)
+    return true if zone == "UTC"
+
+    require "tzinfo"
+    TZInfo::Timezone.get(zone)
+    true
+  rescue LoadError
+    zone_file?(zone)
+  rescue TZInfo::InvalidTimezoneIdentifier
+    false
+  rescue TZInfo::DataSourceNotFound
+    zone_file?(zone)
+  end
+
+  # @param zone [String] an Area/City name that matches ZONE, so it can't leave the folder
+  # @param folder [String] the system's zone files
+  # @return [Boolean] whether folder has zone's file; true when there is no folder to ask, since the
+  #   build then can't tell (the browser still warns about a zone it doesn't know)
+  def self.zone_file?(zone, folder = ZONEINFO)
+    !File.directory?(folder) || File.file?(File.join(folder, zone))
   end
 
   # Checks a features block: only the registry's keys, each true or false.
@@ -217,9 +250,11 @@ module Events
   # @return [String] the event's own time zone, or the site's
   def self.timezone(source, data, settings)
     return settings["timezone"] unless data.key?("timezone")
-    return data["timezone"] if data["timezone"].is_a?(String) && data["timezone"].match?(ZONE)
 
-    fail!(source, "timezone must be an Area/City name like America/Los_Angeles, or UTC")
+    zone = data["timezone"]
+    fail!(source, "timezone must be an Area/City name like America/Los_Angeles, or UTC") unless zone.is_a?(String) && zone.match?(ZONE)
+    fail!(source, "timezone #{zone} isn't a time zone the tz database knows; check its spelling, like America/Los_Angeles") unless zone_known?(zone)
+    zone
   end
 
   # The page's words: the registry's page texts and section labels, with the event's own labels
