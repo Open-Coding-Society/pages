@@ -55,7 +55,8 @@ A wrong value stops the build with the file and the field, for example
 ## The lifecycle
 
 Mort's six stages, in his order, live in `data/event_registry.yml`, each one word plus a short
-description. An organization renames a label there; no template or script spells one.
+description. The pill shows the word, with the description as its title. An organization renames
+a label there; no template or script spells one.
 
 | Stage | Word | Description | In the catalog |
 |---|---|---|---|

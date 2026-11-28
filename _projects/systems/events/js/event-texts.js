@@ -26,7 +26,8 @@ export class EventTexts {
   }
 
   /**
-   * Shows a lifecycle stage on a status pill: the stage's word, and its tone as the pill's modifier.
+   * Shows a lifecycle stage on a status pill: the stage's word, its description as the pill's
+   * title, and its tone as the pill's modifier.
    * @param {HTMLElement} pill - a b.ocs__status-pill
    * @param {object[]} lifecycle - the registry's lifecycle
    * @param {string} key - the stage
@@ -36,6 +37,7 @@ export class EventTexts {
     const stage = lifecycle.find((entry) => entry.key === key);
     if (!pill || !stage) return false;
     pill.textContent = stage.label;
+    pill.setAttribute('title', stage.description);
     pill.className = `ocs__status-pill ocs__status-pill--${stage.tone}`;
     return true;
   }

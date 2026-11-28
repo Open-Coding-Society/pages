@@ -80,7 +80,7 @@ class EventsGeneratorTest < Minitest::Test
     entry = workshop.data["event_entry"]
     assert_equal "published", entry["status"]
     assert_equal "published", entry["stage"]
-    assert_equal({ "label" => "Published", "tone" => "good" }, entry["pill"])
+    assert_equal({ "label" => "Published", "tone" => "good", "description" => "Details are out" }, entry["pill"])
     assert_equal "March 15, 2027 · 10:00 AM – 1:00 PM", entry["when"]
     assert_equal "March 15", entry["card_date"]
     assert_equal "2027-03-15T10:00", entry["datetime"]
@@ -88,7 +88,8 @@ class EventsGeneratorTest < Minitest::Test
     assert_equal %w[description schedule presenters], entry["sections"].map { |section| section["key"] }, "no gallery card yet"
     assert_equal [{ "name" => "Open Coding Society", "role" => "Organizer", "initials" => "OC" }], entry["presenters"]
     assert_equal %w[community technology workshop], entry["category_keys"]
-    assert_equal "Workshop", entry["event_type_label"]
+    assert_equal "workshop", entry["event_type"]
+    %w[path event_type_label place_url].each { |unused| refute entry.key?(unused), "#{unused} is read by nothing" }
     assert_equal true, workshop.data["hide"]
     assert_equal true, workshop.data["full_width"]
     assert_equal true, workshop.data["microblog"]
@@ -242,6 +243,10 @@ class EventsGeneratorTest < Minitest::Test
     toned = site([event])
     toned.data["projects"]["events"]["event_registry"]["lifecycle"][1]["tone"] = "green"
     assert_build_fails(toned, "_data/projects/events/event_registry.yml", "tone must be one of good, warn, bad, neutral")
+    # Each stage is a word plus a description; the pill shows the description as its title.
+    undescribed = site([event])
+    undescribed.data["projects"]["events"]["event_registry"]["lifecycle"][1].delete("description")
+    assert_build_fails(undescribed, "_data/projects/events/event_registry.yml", "lifecycle published needs a description")
   end
 
   # Plan test 13.
@@ -384,7 +389,7 @@ class EventsGeneratorTest < Minitest::Test
     assert_equal [["10:00", "10:00 AM", "Welcome", nil], ["13:30", "1:30 PM", "Demos", "Bring a laptop"]],
                  entry["schedule"].map { |row| row.values_at("time", "time_label", "title", "detail") }
     assert_equal "/ui-builder/view/?page=workshop", entry["presentation"]
-    assert_equal "https://maps.example.org/poway", entry["place_url"]
+    assert_equal "https://maps.example.org/poway", entry.dig("location", "url")
     assert_build_fails(site([event({ "schedule" => [{ "time" => 9, "title" => "Doors" }] })]), "schedule time must be a quoted 24-hour")
     assert_build_fails(site([event({ "presenters" => [{ "role" => "Host" }] })]), "presenters need a name")
   end
@@ -469,6 +474,10 @@ class EventsBuildTest < Minitest::Test
       presenters:
         - name: Ada Lovelace
           role: Host
+      location:
+        name: Poway Library
+        address: Poway, California
+        url: https://maps.example.org/poway-library
       labels:
         presenters: Speakers
       ---
@@ -522,6 +531,8 @@ class EventsBuildTest < Minitest::Test
     assert File.exist?(File.join(self.class.build[:site], "events/long-gone/index.html")), "an archived event is still built"
     sample_card = catalog.css("article[data-event-card]").find { |card| card["data-event-url"] == "/preview/events/community-technology-workshop/" }
     assert_equal %w[Published Sample], sample_card.css("b.ocs__status-pill").map(&:text)
+    # The stage's word, and its description from the registry as the pill's title.
+    assert_equal "Details are out", sample_card.at_css("b[data-event-pill]")["title"]
     assert_equal "March 15", sample_card.at_css("time.ocs__badge").text
     assert_equal '["community","technology","workshop"]', sample_card["data-event-categories"]
     # ocs__btn--icon spaces the icon from the words, as on Mort's Submit buttons.
@@ -548,6 +559,7 @@ class EventsBuildTest < Minitest::Test
     sample = html("events/community-technology-workshop")
     pill = sample.at_css("b.ocs__status-pill.ocs__status-pill--good[data-event-pill]")
     assert_equal "Published", pill.text
+    assert_equal "Details are out", pill["title"], "the stage's description from the registry"
     assert_equal "Sample", sample.at_css("b.ocs__status-pill.ocs__status-pill--neutral").text
     assert_equal REGISTRY.dig("texts", "page", "sample_note"), sample.at_css("article[data-event-page] > div.ocs__callout").text.strip
     # The plain grid: its bottom margin and divider set the cards apart from the first section.
@@ -647,5 +659,12 @@ class EventsBuildTest < Minitest::Test
     assert_includes speakers.css("a.ocs__nav-card .ocs__nav-card-title").map(&:text), "Speakers"
     assert_equal "Speakers", speakers.at_css("#event-presenters > h2.ocs__section-title").text
     assert_equal "Presenters", html("events/community-technology-workshop").at_css("#event-presenters > h2.ocs__section-title").text
+  end
+
+  def test_the_place_links_to_its_directions_when_the_location_has_a_url
+    place = html("events/speakers-night").at_css(".ocs__keypoints > p.ocs__keypoint > a")
+    assert_equal "https://maps.example.org/poway-library", place["href"]
+    assert_equal "Poway Library, Poway, California", place.text
+    assert_nil html("events/community-technology-workshop").at_css(".ocs__keypoint a"), "no url, no link"
   end
 end

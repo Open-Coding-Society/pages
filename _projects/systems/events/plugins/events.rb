@@ -55,7 +55,8 @@ module Events
     value.is_a?(String) && (value.match?(SITE_PATH) || value.match?(external))
   end
 
-  # Checks the registry: Mort's six lifecycle stages in his order, each with a word and a tone.
+  # Checks the registry: Mort's six lifecycle stages in his order, each with a word, a description
+  # (the pill's title) and a tone.
   #
   # @param site [Jekyll::Site]
   # @return [Hash] the registry
@@ -68,6 +69,7 @@ module Events
     fail!(REGISTRY_FILE, "lifecycle must list #{LIFECYCLE.join(', ')}, in that order") unless keys == LIFECYCLE
     lifecycle.each do |stage|
       fail!(REGISTRY_FILE, "lifecycle #{stage['key']} needs a label") unless text?(stage["label"])
+      fail!(REGISTRY_FILE, "lifecycle #{stage['key']} needs a description") unless text?(stage["description"])
       fail!(REGISTRY_FILE, "lifecycle #{stage['key']} tone must be one of #{TONES.join(', ')}") unless TONES.include?(stage["tone"])
     end
     registry
@@ -144,15 +146,14 @@ module Events
     pill = registry["lifecycle"].find { |each| each["key"] == stage }
     {
       "title" => data["title"].strip, "description" => text?(data["description"]) ? data["description"].strip : nil,
-      "url" => document.url, "path" => source, "sample" => data["sample"] == true,
-      "status" => status, "stage" => stage, "pill" => { "label" => pill["label"], "tone" => pill["tone"] },
+      "url" => document.url, "sample" => data["sample"] == true,
+      "status" => status, "stage" => stage, "pill" => { "label" => pill["label"], "tone" => pill["tone"], "description" => pill["description"] },
       "listed" => registry["lifecycle"].find { |each| each["key"] == status }["listed"] == true,
       "day" => event_day, "start_time" => start_time, "end_time" => end_time, "timezone" => timezone(source, data, settings),
       "when" => when_line(event_day, start_time, end_time, formats), "datetime" => start_time ? "#{event_day}T#{start_time}" : event_day,
       "card_date" => Date.strptime(event_day, "%Y-%m-%d").strftime(formats["card_date"]),
-      "categories" => event_categories, "category_keys" => event_categories.map(&:downcase),
-      "event_type" => event_type, "event_type_label" => event_type && registry["event_types"][event_type],
-      "location" => place_details, "place" => place(place_details), "place_url" => place_details["url"],
+      "categories" => event_categories, "category_keys" => event_categories.map(&:downcase), "event_type" => event_type,
+      "location" => place_details, "place" => place(place_details),
       "organizer" => host, "presenters" => people, "schedule" => schedule(source, data["schedule"], formats),
       "presentation" => presentation, "features" => features(source, data["features"], registry, settings),
       "sections" => sections(document, registry, page_words, people, presentation), "words" => page_words

@@ -19,7 +19,7 @@
     {%- endif %}
   </figure>
   {%- endif %}
-  <div><b class="ocs__status-pill ocs__status-pill--{{ event.pill.tone }}" data-event-pill>{{ event.pill.label | escape }}</b>{% if event.sample %} <b class="ocs__status-pill ocs__status-pill--neutral">{{ catalog_words.sample | escape }}</b>{% endif %}</div>
+  <div><b class="ocs__status-pill ocs__status-pill--{{ event.pill.tone }}" title="{{ event.pill.description | escape }}" data-event-pill>{{ event.pill.label | escape }}</b>{% if event.sample %} <b class="ocs__status-pill ocs__status-pill--neutral">{{ catalog_words.sample | escape }}</b>{% endif %}</div>
   <h2>{{ event.title | escape }}</h2>
   <p><time class="ocs__text" datetime="{{ event.datetime }}">{{ event.when | escape }}</time></p>
   {%- if event.description %}
@@ -27,7 +27,7 @@
   {%- endif %}
   {%- if event.place %}
   <div class="ocs__keypoints">
-    <p class="ocs__keypoint"><i class="fas fa-location-dot" aria-hidden="true"></i> {% if event.place_url %}<a href="{{ event.place_url | escape }}" rel="noopener">{{ event.place | escape }}</a>{% else %}{{ event.place | escape }}{% endif %}</p>
+    <p class="ocs__keypoint"><i class="fas fa-location-dot" aria-hidden="true"></i> {% if event.location.url %}<a href="{{ event.location.url | escape }}" rel="noopener">{{ event.place | escape }}</a>{% else %}{{ event.place | escape }}{% endif %}</p>
   </div>
   {%- endif %}
   <hr>

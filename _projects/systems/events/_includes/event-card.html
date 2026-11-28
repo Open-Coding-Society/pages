@@ -1,6 +1,6 @@
 {%- comment -%}
   One card on /events/ (img3): the date band, the photo, the title, a short blurb and the stage
-  pill, plus the Sample pill on a sample. The data-* values are what js/event-catalog.js reads; it
+  pill (its word, with its description as the title), plus the Sample pill on a sample. The data-* values are what js/event-catalog.js reads; it
   keeps the pill current by the clock and adds the viewer's context to the link.
 {%- endcomment -%}
 {%- assign event = include.event -%}
@@ -14,5 +14,5 @@
   {%- if event.description %}
   <p class="ocs__card-description">{{ event.description | escape }}</p>
   {%- endif %}
-  <div><b class="ocs__status-pill ocs__status-pill--{{ event.pill.tone }}" data-event-pill>{{ event.pill.label | escape }}</b>{% if event.sample %} <b class="ocs__status-pill ocs__status-pill--neutral">{{ catalog_words.sample | escape }}</b>{% endif %}</div>
+  <div><b class="ocs__status-pill ocs__status-pill--{{ event.pill.tone }}" title="{{ event.pill.description | escape }}" data-event-pill>{{ event.pill.label | escape }}</b>{% if event.sample %} <b class="ocs__status-pill ocs__status-pill--neutral">{{ catalog_words.sample | escape }}</b>{% endif %}</div>
 </article>

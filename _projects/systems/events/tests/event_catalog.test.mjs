@@ -139,9 +139,12 @@ test('each card\'s pill follows the clock with the registry\'s words and tones',
   const pills = Object.fromEntries(root.querySelectorAll('[data-event-card]').map((node) => [node.getAttribute('data-event-url'), node.querySelector('[data-event-pill]')]));
   assert.equal(pills['/events/now/'].textContent, words.active.label);
   assert.equal(pills['/events/now/'].className, `ocs__status-pill ocs__status-pill--${words.active.tone}`);
+  assert.equal(pills['/events/now/'].getAttribute('title'), words.active.description, 'the stage\'s description as its title');
   assert.equal(pills['/events/over/'].textContent, words.completed.label);
   assert.equal(pills['/events/over/'].className, `ocs__status-pill ocs__status-pill--${words.completed.tone}`);
+  assert.equal(pills['/events/over/'].getAttribute('title'), words.completed.description);
   assert.equal(pills['/events/soon/'].textContent, words.published.label);
+  assert.equal(pills['/events/soon/'].getAttribute('title'), words.published.description);
 });
 
 test('a card in an unknown time zone keeps its built pill, stays upcoming and warns once', needsRuby, () => {

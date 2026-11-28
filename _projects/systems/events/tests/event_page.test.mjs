@@ -70,6 +70,7 @@ test('the stage pill goes Published, then Active, then Completed by the clock', 
     start(view, new Date(now));
     assert.equal(pill(view.root).textContent, stages[key].label, now);
     assert.equal(pill(view.root).className, `ocs__status-pill ocs__status-pill--${stages[key].tone}`, now);
+    assert.equal(pill(view.root).getAttribute('title'), stages[key].description, `${now}: the stage's description as its title`);
   }
 });
 
@@ -79,6 +80,7 @@ test('the Sample pill never changes', needsRuby, () => {
   const sample = view.root.querySelectorAll('b').find((node) => !node.hasAttribute('data-event-pill'));
   assert.equal(sample.textContent, 'Sample');
   assert.equal(sample.className, 'ocs__status-pill ocs__status-pill--neutral');
+  assert.equal(sample.getAttribute('title'), null);
 });
 
 test('an unknown time zone keeps the built pill and warns once', needsRuby, () => {
