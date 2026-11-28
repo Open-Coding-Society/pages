@@ -29,6 +29,23 @@ test('a wall-clock time in a time zone becomes the right instant, summer or wint
   assert.equal(EventTime.instant('2027-03-15', '', LA).toISOString(), '2027-03-15T07:00:00.000Z', 'no clock means midnight');
 });
 
+test('a clock time a daylight-saving change skips moves forward by the gap, the usual rule', () => {
+  // 2:00 AM became 3:00 AM, so 2:30 AM never happened there: it is read as 3:30 AM daylight time.
+  assert.equal(EventTime.instant('2027-03-14', '02:30', LA).toISOString(), '2027-03-14T10:30:00.000Z', 'Los Angeles: 3:30 AM PDT');
+  // East of Greenwich the same rule: 1:30 AM in London is 2:30 AM BST, and 2:30 AM in Auckland is 3:30 AM NZDT.
+  assert.equal(EventTime.instant('2027-03-28', '01:30', 'Europe/London').toISOString(), '2027-03-28T01:30:00.000Z', 'London: 2:30 AM BST');
+  assert.equal(EventTime.instant('2027-09-26', '02:30', 'Pacific/Auckland').toISOString(), '2027-09-25T14:30:00.000Z', 'Auckland: 3:30 AM NZDT');
+});
+
+test('a clock time that happens twice is the first one, and odd offsets stay exact', () => {
+  // 1:30 AM on November 7, 2027 happens in daylight time (UTC-7) and again in standard time.
+  assert.equal(EventTime.instant('2027-11-07', '01:30', LA).toISOString(), '2027-11-07T08:30:00.000Z', 'fall back: the daylight-time one');
+  assert.equal(EventTime.instant('2027-11-07', '03:00', LA).toISOString(), '2027-11-07T11:00:00.000Z', 'after the change, UTC-8');
+  // Kathmandu is UTC+5:45 all year.
+  assert.equal(EventTime.instant('2027-03-15', '10:00', 'Asia/Kathmandu').toISOString(), '2027-03-15T04:15:00.000Z');
+  assert.equal(EventTime.instant('2027-03-15', '', 'Asia/Kathmandu').toISOString(), '2027-03-14T18:15:00.000Z', 'midnight there');
+});
+
 test('an unknown time zone is a RangeError', () => {
   for (const zone of ['Pacific/Nowhere', 'Pacific', '']) {
     assert.throws(() => EventTime.instant('2027-03-15', '10:00', zone), RangeError, JSON.stringify(zone));

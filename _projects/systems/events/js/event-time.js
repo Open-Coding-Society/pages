@@ -33,7 +33,9 @@ export class EventTime {
   }
 
   /**
-   * The instant a wall-clock day and time happen in a time zone.
+   * The instant a wall-clock day and time happen in a time zone. A time that happens twice (when
+   * the clocks go back) is the first one; a time the clocks skip (when they go forward) moves
+   * forward by the gap, so 2:30 on a 2:00-to-3:00 night is 3:30.
    * @param {string} day - "YYYY-MM-DD"
    * @param {string} [clock] - "HH:MM"; midnight when empty
    * @param {string} timeZone - an IANA name like America/Los_Angeles, or UTC
@@ -47,7 +49,11 @@ export class EventTime {
     // Read the zone's offset twice: around a daylight-saving change, the offset at the wall-clock
     // time read as UTC can differ from the offset at the real instant.
     const first = asUtc - EventTime.offsetMinutes(timeZone, new Date(asUtc)) * 60000;
-    return new Date(asUtc - EventTime.offsetMinutes(timeZone, new Date(first)) * 60000);
+    const second = asUtc - EventTime.offsetMinutes(timeZone, new Date(first)) * 60000;
+    // When the zone's clock doesn't read the asked time at the second reading, that time was
+    // skipped; of the two readings (one with each side's offset), the later one is the shift forward.
+    const wallClock = second + EventTime.offsetMinutes(timeZone, new Date(second)) * 60000;
+    return new Date(wallClock === asUtc ? second : Math.max(first, second));
   }
 
   /**
