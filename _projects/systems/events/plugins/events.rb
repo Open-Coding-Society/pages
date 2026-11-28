@@ -30,9 +30,11 @@ module Events
   HTTP_OR_HTTPS = %r{\Ahttps?://\S+\z}i.freeze
   REGISTRY_FILE = "_data/projects/events/event_registry.yml".freeze
   CONFIG_FILE = "_config.yml".freeze
+  # The catalog page's address (index.md's permalink).
+  CATALOG = "/events/".freeze
   # The shared page viewer (_includes/page-viewer.html); its label and item come from the registry.
   VIEWER = {
-    "home" => "/events/", "activation_param" => "events_view", "script" => "/assets/js/projects/events/viewer.js"
+    "home" => CATALOG, "activation_param" => "events_view", "script" => "/assets/js/projects/events/viewer.js"
   }.freeze
 
   # Stops the build with "<source>: <message>".
@@ -440,6 +442,19 @@ module Events
     entry
   end
 
+  # Gives the /events/ page the registry's catalog title and intro as its title and description,
+  # so the browser tab and search snippets use the same words as the page.
+  #
+  # @param pages [Array<Jekyll::Page>] the site's pages
+  # @param registry [Hash]
+  def self.title_catalog(pages, registry)
+    words = registry.dig("texts", "catalog")
+    pages.select { |page| page.data["permalink"] == CATALOG }.each do |page|
+      page.data["title"] = words["title"]
+      page.data["description"] = words["intro"]
+    end
+  end
+
   # @return [Hash{String => String}] each category's lowercase key and the first spelling seen, by key
   def self.category_labels(catalog)
     labels = {}
@@ -456,8 +471,9 @@ module Events
     # Checks and prepares every event, and publishes the catalog data for /events/.
     #
     # @param site [Jekyll::Site] whose posts and pages have been read
-    # @note Mutates each event's data (see Events.publish), removes `status: draft` events from
-    #   site.posts.docs and site.pages unless the build uses --unpublished, and sets
+    # @note Mutates each event's data (see Events.publish) and the /events/ page's title and
+    #   description, removes `status: draft` events from site.posts.docs and site.pages unless the
+    #   build uses --unpublished, and sets
     #   site.data["events_catalog"] (listed events by day, start time, then title),
     #   ["events_categories"] and ["events_settings"].
     # @raise [Jekyll::Errors::FatalException] naming the file and field to fix
@@ -474,6 +490,7 @@ module Events
         events -= drafts
       end
       registry = Events.registry(site)
+      Events.title_catalog(site.pages, registry)
       settings = Events.settings(site, registry, !events.empty?)
       entries = events.map { |document| Events.publish(document, registry, settings, site) }
       duplicates = entries.map { |entry| entry["url"] }.tally.select { |_url, count| count > 1 }.keys

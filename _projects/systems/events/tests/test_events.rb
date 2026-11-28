@@ -394,6 +394,22 @@ class EventsGeneratorTest < Minitest::Test
     assert_build_fails(site([event({ "presenters" => [{ "role" => "Host" }] })]), "presenters need a name")
   end
 
+  # The /events/ page's title and description are the registry's catalog words, so a kit that
+  # renames "Upcoming Events" renames the browser tab and search snippet too.
+  def test_the_catalog_page_takes_its_title_and_description_from_the_registry
+    catalog_page = Document.new(data: { "layout" => "opencs", "permalink" => "/events/" }, url: "/events/",
+                                relative_path: "navigation/projects/events/index.md", content: "")
+    other_page = Document.new(data: { "title" => "About", "permalink" => "/about/" }, url: "/about/", relative_path: "about.md", content: "")
+    renamed = site([], pages: [catalog_page, other_page])
+    renamed.data["projects"]["events"]["event_registry"]["texts"]["catalog"].merge!("title" => "Happenings", "intro" => "What is on.")
+    generate(renamed)
+    assert_equal "Happenings", catalog_page.data["title"]
+    assert_equal "What is on.", catalog_page.data["description"]
+    assert_equal({ "title" => "About", "permalink" => "/about/" }, other_page.data)
+    source = File.read(File.join(SYSTEM, "index.md"))
+    refute_match(/^(title|description):/, source[/\A---\n.*?\n---\n/m], "index.md doesn't copy the registry's words")
+  end
+
   def test_duplicate_urls_and_a_blank_title_or_a_bad_date_fail
     assert_build_fails(site([event, event]), "Events must have unique URLs: /events/community-technology-workshop/")
     assert_build_fails(site([event({ "title" => "  " })]), "title must be text that isn't blank")
@@ -498,6 +514,7 @@ class EventsBuildTest < Minitest::Test
       EXTRA.each { |name, text| File.write(File.join(dir, "_posts/events", name), text) }
       FileUtils.cp(File.join(ROOT, "_includes/page-viewer.html"), File.join(dir, "_includes"))
       File.write(File.join(dir, "_layouts/opencs.html"), <<~LIQUID)
+        <title>{{ page.title | escape }}</title><meta name="description" content="{{ page.description | escape }}">
         {% if page.page_viewer %}{% include page-viewer.html viewer=page.page_viewer %}{% endif %}
         {% if page.microblog %}<button id="microblog-toggle-btn">Microblog</button><aside id="microblog-panel"></aside>{% endif %}
         <main>{{ content }}</main>
@@ -522,6 +539,8 @@ class EventsBuildTest < Minitest::Test
   # Plan test 18.
   def test_the_catalog_lists_events_in_card_grid_with_the_page_size
     catalog = html("events")
+    assert_equal REGISTRY.dig("texts", "catalog", "title"), catalog.at_css("title").text
+    assert_equal REGISTRY.dig("texts", "catalog", "intro"), catalog.at_css('meta[name="description"]')["content"]
     links = catalog.css(".ocs__grid--card article[data-event-card] h3 > a").map { |link| link["href"] }
     assert_includes links, "/preview/events/community-technology-workshop/"
     assert_equal "6", catalog.at_css("section[data-event-catalog]")["data-page-size"]
