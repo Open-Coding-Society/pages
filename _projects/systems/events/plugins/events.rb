@@ -33,6 +33,14 @@ module Events
   ZONEINFO = "/usr/share/zoneinfo".freeze
   REGISTRY_FILE = "_data/projects/events/event_registry.yml".freeze
   CONFIG_FILE = "_config.yml".freeze
+  # The registry's parts that the generator, the templates and the scripts read, and the shape each
+  # must have, so a kit that deletes or renames one gets a message instead of a NoMethodError.
+  REGISTRY_PARTS = {
+    "features" => Array, "sections" => Array, "event_types" => Hash, "attachment_types" => Hash, "formats" => Hash,
+    "viewer" => Hash, "discussion" => Hash, "texts" => Hash, "texts.page" => Hash, "texts.catalog" => Hash, "texts.viewer" => Hash
+  }.freeze
+  # The registry's date and time formats (strftime patterns, and the words between the parts).
+  FORMATS = %w[date card_date time between separator].freeze
   # The catalog page's address (index.md's permalink).
   CATALOG = "/events/".freeze
   # The shared page viewer (_includes/page-viewer.html); its label and item come from the registry.
@@ -60,8 +68,8 @@ module Events
     value.is_a?(String) && (value.match?(SITE_PATH) || value.match?(external))
   end
 
-  # Checks the registry: Mort's six lifecycle stages in his order, each with a word, a description
-  # (the pill's title) and a tone.
+  # Checks the registry: every part the system reads, in its shape, and Mort's six lifecycle stages
+  # in his order, each with a word, a description (the pill's title) and a tone.
   #
   # @param site [Jekyll::Site]
   # @return [Hash] the registry
@@ -69,6 +77,7 @@ module Events
   def self.registry(site)
     registry = site.data.dig("projects", "events", "event_registry")
     fail!(REGISTRY_FILE, "is missing; it is published from _projects/systems/events/data") unless registry.is_a?(Hash)
+    check_registry_parts(registry)
     lifecycle = registry["lifecycle"]
     keys = lifecycle.is_a?(Array) ? lifecycle.map { |stage| stage.is_a?(Hash) ? stage["key"] : nil } : []
     fail!(REGISTRY_FILE, "lifecycle must list #{LIFECYCLE.join(', ')}, in that order") unless keys == LIFECYCLE
@@ -78,6 +87,22 @@ module Events
       fail!(REGISTRY_FILE, "lifecycle #{stage['key']} tone must be one of #{TONES.join(', ')}") unless TONES.include?(stage["tone"])
     end
     registry
+  end
+
+  # Checks that each of REGISTRY_PARTS is there in its shape (texts before texts.page), that each
+  # section is a mapping with a key and a label, and that each format is text.
+  #
+  # @param registry [Hash]
+  # @raise [Jekyll::Errors::FatalException] naming the registry file and the part
+  def self.check_registry_parts(registry)
+    REGISTRY_PARTS.each do |name, shape|
+      value = registry.dig(*name.split("."))
+      fail!(REGISTRY_FILE, "#{name} must be #{shape == Array ? 'a list' : 'a mapping'}") unless value.is_a?(shape)
+    end
+    unless registry["sections"].all? { |section| section.is_a?(Hash) && text?(section["key"]) && text?(section["label"]) }
+      fail!(REGISTRY_FILE, "sections must each be a mapping with a key and a label")
+    end
+    FORMATS.each { |key| fail!(REGISTRY_FILE, "formats.#{key} must be text") unless registry["formats"][key].is_a?(String) }
   end
 
   # Reads the site's `events:` settings. timezone and page_size are needed once there are events;

@@ -301,6 +301,33 @@ class EventsGeneratorTest < Minitest::Test
     assert_build_fails(undescribed, "_data/projects/events/event_registry.yml", "lifecycle published needs a description")
   end
 
+  # A kit that deletes or renames a part of the registry gets a message naming the file and the
+  # part, not a NoMethodError from deep in the generator.
+  def test_a_missing_or_misshapen_registry_part_fails_naming_the_registry
+    parts = { "features" => "a list", "sections" => "a list", "event_types" => "a mapping", "attachment_types" => "a mapping",
+              "formats" => "a mapping", "viewer" => "a mapping", "discussion" => "a mapping", "texts" => "a mapping",
+              "texts.page" => "a mapping", "texts.catalog" => "a mapping", "texts.viewer" => "a mapping" }
+    parts.each do |name, shape|
+      *path, key = name.split(".")
+      [:delete, :rename, :text].each do |change|
+        broken = site([event])
+        holder = path.reduce(broken.data["projects"]["events"]["event_registry"]) { |part, step| part[step] }
+        case change
+        when :delete then holder.delete(key)
+        when :rename then holder["#{key}_list"] = holder.delete(key)
+        when :text then holder[key] = "oops"
+        end
+        assert_build_fails(broken, "_data/projects/events/event_registry.yml: #{name} must be #{shape}")
+      end
+    end
+    { ["sections", 0] => "sections must each be a mapping with a key and a label", ["formats", "card_date"] => "formats.card_date must be text" }.each do |(part, key), message|
+      broken = site([event])
+      registry = broken.data["projects"]["events"]["event_registry"]
+      part == "sections" ? registry[part][key] = "description" : registry[part].delete(key)
+      assert_build_fails(broken, "_data/projects/events/event_registry.yml: #{message}")
+    end
+  end
+
   # Plan test 13.
   def test_settings_come_from_events_and_a_missing_timezone_fails_only_when_events_exist
     workshop = event
