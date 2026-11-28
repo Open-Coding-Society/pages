@@ -36,3 +36,40 @@ export function browserTexts(registry, page = null) {
 
 /** Mort's six lifecycle keys, in his order, from the registry. */
 export const orderOf = (registry) => registry.lifecycle.map((stage) => stage.key);
+
+/** A registry word wrapped the way markedRegistry wraps it. */
+export const mark = (text) => `⟦${text}⟧`;
+
+/** What is left of a text once every wrapped (registry) word is taken out. */
+export const unmarked = (text) => String(text).replace(/⟦[^⟧]*⟧/g, '');
+
+/**
+ * A copy of the registry with every word wrapped in ⟦ ⟧ (stage words and descriptions, section
+ * labels, every text and the viewer's words), so a test can tell a word the registry gave from one
+ * a script spells.
+ */
+export function markedRegistry() {
+  const copy = structuredClone(readRegistry());
+  const wrapAll = (words) => Object.fromEntries(Object.entries(words).map(([key, value]) => [key, mark(value)]));
+  copy.lifecycle = copy.lifecycle.map((stage) => ({ ...stage, label: mark(stage.label), description: mark(stage.description) }));
+  copy.sections = copy.sections.map((section) => ({ ...section, label: mark(section.label) }));
+  copy.texts = Object.fromEntries(Object.entries(copy.texts).map(([name, words]) => [name, wrapAll(words)]));
+  copy.viewer = wrapAll(copy.viewer);
+  return copy;
+}
+
+/** The real registry's words a page can show, as written there. */
+export function registryWords(registry = readRegistry()) {
+  return [
+    ...registry.lifecycle.flatMap((stage) => [stage.label, stage.description]),
+    ...registry.sections.map((section) => section.label),
+    ...Object.values(registry.texts).flatMap((words) => Object.values(words)),
+    registry.viewer.label,
+  ];
+}
+
+/** The registry words, unwrapped, that a page's text shows: none when every word came from the registry. */
+export function wordsSpelledBy(text) {
+  const left = unmarked(text);
+  return registryWords().filter((word) => left.includes(word));
+}

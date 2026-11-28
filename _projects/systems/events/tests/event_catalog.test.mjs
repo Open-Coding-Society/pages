@@ -8,7 +8,7 @@ import test from 'node:test';
 import { fakeEvent, installFakeDom } from '../../messages/tests/fake-dom.mjs';
 import { EventCatalog } from '../js/event-catalog.js';
 import { EventPager } from '../js/event-pager.js';
-import { browserTexts, needsRuby, readRegistry } from './helpers.mjs';
+import { browserTexts, mark, markedRegistry, needsRuby, readRegistry, wordsSpelledBy } from './helpers.mjs';
 
 const LA = 'America/Los_Angeles';
 const ORIGIN = 'https://example.test';
@@ -22,7 +22,7 @@ function el(document, tag, attributes = {}, ...children) {
 }
 
 // One card the way _includes/event-card.html writes it.
-function card(document, { slug, title = slug, day, start = '', end = '', stage = 'published', categories = [], zone = LA }) {
+function card(document, { slug, title = slug, day, start = '', end = '', stage = 'published', categories = [], zone = LA, pill = 'Published' }) {
   return el(document, 'article', {
     class: 'ocs__grid-cell', 'data-event-card': '', 'data-event-url': `/events/${slug}/`, 'data-event-day': day,
     'data-event-start': start, 'data-event-end': end, 'data-event-zone': zone, 'data-event-stage': stage,
@@ -30,7 +30,7 @@ function card(document, { slug, title = slug, day, start = '', end = '', stage =
   },
   el(document, 'time', { class: 'ocs__badge', datetime: day }, day),
   el(document, 'h3', {}, el(document, 'a', { href: `/events/${slug}/`, 'data-event-link': '' }, title)),
-  el(document, 'div', {}, el(document, 'b', { class: 'ocs__status-pill ocs__status-pill--good', 'data-event-pill': '' }, 'Published')));
+  el(document, 'div', {}, el(document, 'b', { class: 'ocs__status-pill ocs__status-pill--good', 'data-event-pill': '' }, pill)));
 }
 
 // Each link sits in a plain wrapper that takes [hidden] at an end with nowhere to go: an
@@ -62,11 +62,11 @@ function catalog(document, texts, cards, categories = []) {
 }
 
 // A page at url with a fake clock, history and session storage; pushState moves the location.
-function setup(url, { cards: cardSpecs, categories = [], now = NOW, storage, pageSize = 6 } = {}) {
+function setup(url, { cards: cardSpecs, categories = [], now = NOW, storage, pageSize = 6, registry = readRegistry() } = {}) {
   const { document, window } = installFakeDom();
-  const registry = readRegistry();
   const texts = browserTexts(registry);
-  const root = catalog(document, texts.catalog, cardSpecs.map((spec) => card(document, spec)), categories);
+  const pill = registry.lifecycle.find((stage) => stage.key === 'published').label;
+  const root = catalog(document, texts.catalog, cardSpecs.map((spec) => card(document, { pill, ...spec })), categories);
   const location = new URL(url, ORIGIN);
   const pushes = [];
   const history = { pushState(_state, _title, next) { pushes.push(String(next)); location.href = new URL(next, location.href).href; } };
@@ -317,4 +317,28 @@ test('the Past grid pages with ?past= on its own', needsRuby, () => {
   assert.deepEqual(titlesIn(root, 'past'), ['Past 3', 'Past 2', 'Past 1']);
   assertGone(root, 'past', 'later');
   assert.deepEqual(titlesIn(root, 'upcoming'), ['Event 1', 'Event 2'], 'the upcoming grid stays where it was');
+});
+
+test('every word the catalog shows comes from the registry (a copy with every word marked)', needsRuby, () => {
+  const marked = markedRegistry();
+  const stages = Object.fromEntries(marked.lifecycle.map((stage) => [stage.key, stage]));
+  // In Jekyll's order: the one happening now first.
+  const cards = [{ slug: 'now', title: 'Now', day: '2027-03-15', start: '13:00', end: '16:00', categories: ['workshop'] }, ...many(13, { categories: ['workshop'] })];
+  const { root } = setup('/events/', { registry: marked, cards, categories: [['meeting', 'Meeting'], ['workshop', 'Workshop']] });
+  assert.equal(status(root), `${mark('Showing 14 upcoming events.')} ${mark('Page 1 of 3')}`);
+  const pills = root.querySelectorAll('[data-event-pill]');
+  assert.deepEqual([pills[0].textContent, pills[0].getAttribute('title')], [stages.active.label, stages.active.description], 'happening now');
+  assert.deepEqual([pills[1].textContent, pills[1].getAttribute('title')], [stages.published.label, stages.published.description]);
+
+  button(root, 'meeting').dispatchEvent(fakeEvent('click'));
+  assert.equal(status(root), mark('No upcoming events in Meeting.'));
+  const one = setup('/events/?category=workshop', { registry: marked, cards: [cards[0]], categories: [['workshop', 'Workshop']] });
+  assert.equal(status(one.root), mark('Showing 1 upcoming event in Workshop.'));
+  button(one.root, '').dispatchEvent(fakeEvent('click'));
+  assert.equal(status(one.root), mark('Showing 1 upcoming event.'));
+
+  for (const view of [root, one.root]) {
+    const titles = view.querySelectorAll('[title]').map((node) => node.getAttribute('title'));
+    assert.deepEqual(wordsSpelledBy([view.textContent, ...titles].join('\n')), [], 'no word the registry didn\'t give');
+  }
 });

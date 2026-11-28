@@ -8,11 +8,11 @@ import { installFakeDom } from '../../messages/tests/fake-dom.mjs';
 import * as toolbar from '../../../../assets/js/pages/viewer/toolbar.js';
 import { EventViewer } from '../js/event-viewer.js';
 import { startViewer } from '../js/viewer.js';
-import { browserTexts, needsRuby, pageWords, readRegistry } from './helpers.mjs';
+import { browserTexts, mark, markedRegistry, needsRuby, pageWords, readRegistry, wordsSpelledBy } from './helpers.mjs';
 
 const ORIGIN = 'https://example.test';
 
-function setup(url, snapshot) {
+function setup(url, snapshot, registry = readRegistry()) {
   const { document, window } = installFakeDom();
   window.location = new URL(url, ORIGIN);
   const values = new Map(snapshot ? [['events-viewer', JSON.stringify(snapshot)]] : []);
@@ -41,7 +41,6 @@ function setup(url, snapshot) {
   const slot = make('div', { 'data-viewer-actions': '' });
   bar.append(back, previous, next, status, slot);
   const microblog = make('button', { id: 'microblog-toggle-btn', class: 'ocs__btn accent fill pill microblog-fab microblog-fab-top' }, 'Microblog');
-  const registry = readRegistry();
   const texts = make('script', { type: 'application/json', 'data-event-texts': '' }, JSON.stringify(browserTexts(registry, pageWords(registry))));
   document.body.append(bar, microblog, texts);
   return { document, window, bar, back, previous, next, status, slot, microblog, registry, values };
@@ -120,4 +119,17 @@ test('the Microblog button moves into the bar without its floating classes', nee
   assert.equal(view.microblog.parentNode, view.slot);
   for (const name of ['microblog-fab', 'microblog-fab-top', 'fill', 'pill']) assert.equal(view.microblog.classList.contains(name), false, name);
   assert.equal(view.microblog.classList.contains('small'), true);
+});
+
+test('the bar\'s own words come from the registry (a copy with every word marked)', needsRuby, () => {
+  const marked = markedRegistry();
+  const view = setup('/events/b/?events_view=1&events_category=workshop&events_page=1', snapshotOf('workshop', 1, ['a', 'b', 'c']), marked);
+  startViewer(view.bar, toolbar);
+  assert.equal(view.previous.getAttribute('aria-label'), mark('Previous event: A'));
+  assert.equal(view.next.getAttribute('aria-label'), mark('Next event: C'));
+  const lost = setup('/events/b/?events_view=1', null, marked);
+  startViewer(lost.bar, toolbar);
+  assert.equal(lost.status.textContent, mark('Previous and next events are unavailable. Return to Events to restore them.'));
+  const said = [view.previous, view.next].map((link) => link.getAttribute('aria-label'));
+  assert.deepEqual(wordsSpelledBy([...said, lost.status.textContent].join('\n')), []);
 });

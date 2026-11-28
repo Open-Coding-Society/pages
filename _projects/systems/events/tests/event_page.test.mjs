@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { fakeEvent, installFakeDom, settle } from '../../messages/tests/fake-dom.mjs';
 import { EventPage } from '../js/event-page.js';
-import { browserTexts, needsRuby, pageWords, readRegistry } from './helpers.mjs';
+import { browserTexts, markedRegistry, needsRuby, pageWords, readRegistry, wordsSpelledBy } from './helpers.mjs';
 
 const LA = 'America/Los_Angeles';
 
@@ -44,8 +44,7 @@ function page({ microblog = true, toggle = true, zone = LA, sample = false } = {
   return { document, root, discuss, opened: () => opened };
 }
 
-function start(view, now, extra = {}) {
-  const registry = readRegistry();
+function start(view, now, { registry = readRegistry(), ...extra } = {}) {
   const reads = [];
   const warnings = [];
   const topic = { latest: async (options) => { reads.push(options); return { posts: [], missing: true }; } };
@@ -114,4 +113,15 @@ test('the latest questions load from the page\'s topic, and not at all when the 
   const quiet = start(off, new Date('2027-03-01T00:00:00Z'));
   await settle();
   assert.deepEqual(quiet.reads, [], 'nothing reads the topic');
+});
+
+test('the pill\'s words come from the registry (a copy with every word marked)', needsRuby, () => {
+  const marked = markedRegistry();
+  const stages = Object.fromEntries(marked.lifecycle.map((stage) => [stage.key, stage]));
+  for (const [now, key] of [['2027-03-15T16:59:00Z', 'published'], ['2027-03-15T17:30:00Z', 'active'], ['2027-03-15T20:00:00Z', 'completed']]) {
+    const view = page({ microblog: false });
+    start(view, new Date(now), { registry: marked });
+    assert.deepEqual([pill(view.root).textContent, pill(view.root).getAttribute('title')], [stages[key].label, stages[key].description], now);
+    assert.deepEqual(wordsSpelledBy(`${pill(view.root).textContent}\n${pill(view.root).getAttribute('title')}`), [], now);
+  }
 });

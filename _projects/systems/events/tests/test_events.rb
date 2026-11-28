@@ -63,6 +63,28 @@ module EventsTestSupport
     site
   end
 
+  # A copy of the registry with every word wrapped in ⟦ ⟧ (stage words and descriptions, section
+  # labels, every text, the viewer's words, the type names and the date and time formats), so a
+  # test can tell a word the registry gave from one a template or script spells.
+  def self.marked(registry)
+    copy = Marshal.load(Marshal.dump(registry))
+    mark = ->(text) { "⟦#{text}⟧" }
+    copy["lifecycle"].each { |stage| %w[label description].each { |key| stage[key] = mark.call(stage[key]) } }
+    copy["sections"].each { |section| section["label"] = mark.call(section["label"]) }
+    copy["texts"].each_value { |words| words.transform_values!(&mark) }
+    [copy["viewer"], copy["formats"], copy["event_types"], copy["attachment_types"]].each { |words| words.transform_values!(&mark) }
+    copy
+  end
+
+  # The registry's own words a page can show, as written there (the type names are left out: no
+  # page shows them, and "Workshop" is also a category in the fixture). The viewer's item, "event",
+  # is too short to look for in a page, so the marked build checks it where the bar uses it.
+  def self.registry_words(registry)
+    [*registry["lifecycle"].flat_map { |stage| stage.values_at("label", "description") },
+     *registry["sections"].map { |section| section["label"] },
+     *registry["texts"].values.flat_map(&:values), registry.dig("viewer", "label")]
+  end
+
   def assert_build_fails(site, *parts)
     error = assert_raises(Jekyll::Errors::FatalException) { generate(site) }
     parts.each { |part| assert_includes error.message, part }
@@ -596,6 +618,11 @@ class EventsBuildTest < Minitest::Test
       presenters:
         - name: Ada Lovelace
           role: Host
+      schedule:
+        - time: "10:00"
+          title: Welcome
+          detail: Doors open
+      presentation: /ui-builder/view/?page=speakers
       location:
         name: Poway Library
         address: Poway, California
@@ -608,12 +635,16 @@ class EventsBuildTest < Minitest::Test
     "2027-01-10-not-ready.md" => "---\nlayout: event\ntitle: Not ready\ndate: 2027-01-10\nstatus: draft\npermalink: /events/not-ready/\n---\n"
   }.freeze
 
-  def self.build
-    @build ||= begin
+  def self.build = (@build ||= build_site)
+
+  # Builds the temporary site; registry replaces the published registry (a marked copy, below).
+  def self.build_site(registry: nil)
+    begin
       # The real path: macOS temp folders sit behind a symlink, and Jekyll compares the two.
       dir = File.realpath(Dir.mktmpdir("events-site"))
       Minitest.after_run { FileUtils.rm_rf(dir) }
       ProjectPublisher.run("publish", SYSTEM, dir)
+      File.write(File.join(dir, "_data/projects/events/event_registry.yml"), registry.to_yaml) if registry
       FileUtils.mkdir_p(File.join(dir, "_posts/events"))
       FileUtils.cp(SAMPLE, File.join(dir, "_posts/events"))
       FileUtils.cp(FIXTURE, File.join(dir, "_posts/events/2027-03-15-community-technology-workshop-fixture.md"))
@@ -797,5 +828,104 @@ class EventsBuildTest < Minitest::Test
     assert_equal "https://maps.example.org/poway-library", place["href"]
     assert_equal "Poway Library, Poway, California", place.text
     assert_nil html("events/community-technology-workshop").at_css(".ocs__keypoint a"), "no url, no link"
+  end
+end
+
+# Every visible word on the Events pages comes from the registry: the same temporary site, built
+# with a copy of the registry whose every word is wrapped in ⟦ ⟧, shows the wrapped words, and
+# none of the registry's words appears unwrapped (as a template that spelled it would print it).
+class EventsMarkedBuildTest < Minitest::Test
+  include EventsTestSupport
+
+  PAGES = %w[events events/community-technology-workshop events/community-technology-workshop-fixture events/quiet-meeting
+             events/speakers-night events/robots].freeze
+  # The registry's formats, as the real registry writes Mort's example: none may appear unwrapped.
+  FORMATTED = ["March 15, 2027", "March 15", "10:00 AM", "1:00 PM"].freeze
+
+  def self.build = (@build ||= EventsBuildTest.build_site(registry: EventsTestSupport.marked(REGISTRY)))
+
+  def html(path) = Nokogiri::HTML(File.read(File.join(self.class.build[:site], path, "index.html")))
+  def mark(text) = "⟦#{text}⟧"
+  def unmarked(text) = text.to_s.gsub(/⟦[^⟧]*⟧/, "")
+  def catalog_words = REGISTRY.dig("texts", "catalog")
+  def page_words = REGISTRY.dig("texts", "page")
+
+  # What the Events parts of a page show: their words and the attributes people read (titles,
+  # labels, alt text), the head's title and description, and the shared viewer bar's label.
+  def shown(document)
+    parts = document.css("title, article[data-event-page], section[data-event-catalog], nav[data-page-viewer]").to_a
+    texts = parts.flat_map { |part| part.xpath(".//text()[not(ancestor::script)]").map(&:text) }
+    nodes = parts + parts.flat_map { |part| part.css("*").to_a }
+    attributes = nodes.flat_map { |node| node.attributes.values_at("title", "aria-label", "alt").compact.map(&:value) }
+    texts + attributes + document.css('meta[name="description"]').map { |meta| meta["content"] }
+  end
+
+  def test_no_events_page_shows_a_registry_word_the_registry_did_not_give
+    originals = EventsTestSupport.registry_words(REGISTRY) + FORMATTED
+    PAGES.each do |path|
+      left = shown(html(path)).map { |text| unmarked(text) }.join("\n")
+      originals.each { |word| refute_includes left, word, "#{path} spells #{word.inspect} itself" }
+    end
+  end
+
+  def test_the_catalog_shows_the_registry_words
+    catalog = html("events")
+    assert_equal mark(catalog_words["title"]), catalog.at_css("title").text
+    assert_equal mark(catalog_words["intro"]), catalog.at_css('meta[name="description"]')["content"]
+    assert_equal mark(catalog_words["title"]), catalog.at_css("h2#events-title").text
+    assert_equal mark(catalog_words["intro"]), catalog.at_css("section[data-event-catalog] > p.ocs__lead").text
+    assert_equal mark(catalog_words["join"]), catalog.at_css("a.ocs__btn.large").text.strip
+    assert_equal mark(catalog_words["filter_label"]), catalog.at_css('div[role="group"]')["aria-label"]
+    assert_equal mark(catalog_words["all"]), catalog.at_css('button[data-event-category=""]').text
+    assert_equal [mark(catalog_words["pages_label"])] * 2, catalog.css("nav.ocs__pager").map { |nav| nav["aria-label"] }
+    assert_equal [mark(catalog_words["earlier"])] * 2, catalog.css("[data-event-earlier] > a").map(&:text)
+    assert_equal [mark(catalog_words["later"])] * 2, catalog.css("[data-event-later] > a").map(&:text)
+    assert_equal mark(catalog_words["empty"]), catalog.at_css("[data-event-empty] > p.ocs__callout").text
+    assert_equal mark(catalog_words["past_title"]), catalog.at_css("[data-event-past] > h2").text
+    card = catalog.css("article[data-event-card]").find { |each| each["data-event-url"].end_with?("/events/community-technology-workshop/") }
+    assert_equal mark("March 15"), card.at_css("time.ocs__badge").text
+    pill = card.at_css("b[data-event-pill]")
+    assert_equal [mark("Published"), mark("Details are out")], [pill.text, pill["title"]]
+    assert_equal [mark("Published"), mark(catalog_words["sample"])], card.css("b.ocs__status-pill").map(&:text)
+  end
+
+  def test_the_event_page_shows_the_registry_words
+    sample = html("events/community-technology-workshop")
+    assert_equal mark(page_words["sample_note"]), sample.at_css("article > div.ocs__callout").text.strip
+    pill = sample.at_css("b[data-event-pill]")
+    assert_equal [mark("Published"), mark("Details are out")], [pill.text, pill["title"]]
+    assert_equal mark(catalog_words["sample"]), sample.at_css("b.ocs__status-pill--neutral").text
+    assert_equal [mark("March 15, 2027"), mark(" · "), mark("10:00 AM"), mark(" – "), mark("1:00 PM")].join, sample.at_css("article > p > time").text
+    assert_equal mark(page_words["sections_title"]), sample.at_css("article > h2.ocs__section-title").text
+    assert_equal mark(page_words["sections_title"]), sample.at_css("article > nav.ocs__nav-grid")["aria-label"]
+    assert_equal %w[Description Schedule Presenters].map { |label| mark(label) }, sample.css("a.ocs__nav-card .ocs__nav-card-title").map(&:text)
+    assert_equal %w[Description Schedule Presenters].map { |label| mark(label) }, sample.css("section.ocs__card > h2.ocs__section-title").map(&:text).first(3)
+    assert_equal mark(page_words["organizer"]), sample.at_css("#event-presenters em").text
+    discussion = sample.at_css("#event-discussion")
+    assert_equal mark(page_words["discussion_title"]), discussion.at_css("h2").text
+    assert_equal mark(page_words["discussion_button"]), discussion.at_css("button").text.strip
+    assert_equal mark(page_words["discussion_kicker"]), discussion.at_css("p > em").text
+    assert_includes discussion.css("p").map(&:text), mark(page_words["discussion_text"])
+    bar = sample.at_css("nav[data-page-viewer]")
+    assert_equal "← #{mark('Events')}", bar.at_css("[data-viewer-home]").text
+    assert_equal "Previous #{mark('event')}", bar.at_css("[data-viewer-previous]")["aria-label"]
+
+    speakers = html("events/speakers-night")
+    assert_equal %w[Time Session Details].map { |word| mark(page_words.fetch("schedule_#{{ 'Time' => 'time', 'Session' => 'item', 'Details' => 'detail' }[word]}")) },
+                 speakers.css("#event-schedule th").map(&:text)
+    assert_equal mark("10:00 AM"), speakers.at_css("#event-schedule td > time").text
+    assert_equal mark(page_words["presentation"]), speakers.at_css("#event-description a.ocs__btn").text
+    assert_equal "Speakers", speakers.at_css("#event-presenters > h2").text, "the event's own label wins"
+  end
+
+  # The words the scripts show come in the page's JSON, every one wrapped.
+  def test_the_scripts_get_only_registry_words
+    { "events" => nil, "events/community-technology-workshop" => {} }.each do |path, _|
+      words = JSON.parse(html(path).at_css("script[data-event-texts]").text)
+      leaves = [*words["lifecycle"].flat_map { |stage| stage.values_at("label", "description") }, *words["catalog"].values,
+                *words["viewer"].values, *(words["page"] || {}).values]
+      refute_empty leaves
+      leaves.each { |leaf| assert_match(/\A⟦.*⟧\z/m, leaf, "#{path}: #{leaf}") }
+    end
   end
 end

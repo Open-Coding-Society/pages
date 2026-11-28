@@ -6,7 +6,7 @@ import test from 'node:test';
 import { installFakeDom, settle } from '../../messages/tests/fake-dom.mjs';
 import { MicroblogTopic } from '../../microblog/js/microblog-topic.js';
 import { EventDiscussion } from '../js/event-discussion.js';
-import { needsRuby, pageWords, readRegistry } from './helpers.mjs';
+import { mark, markedRegistry, needsRuby, pageWords, readRegistry, wordsSpelledBy } from './helpers.mjs';
 
 const PYTHON = 'http://localhost:8587';
 const TOPIC = '/events/community-technology-workshop/';
@@ -15,9 +15,8 @@ const FETCH_OPTIONS = { method: 'GET', mode: 'cors', credentials: 'include', hea
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
-async function show(answer, topic = MicroblogTopic) {
+async function show(answer, topic = MicroblogTopic, registry = readRegistry()) {
   const { document } = installFakeDom();
-  const registry = readRegistry();
   const words = pageWords(registry);
   const list = document.createElement('div');
   list.setAttribute('data-event-discussion-list', '');
@@ -80,4 +79,15 @@ test('names and times follow the Microblog\'s own rules, handed in with its topi
   const { list } = await show(json({ microblogs: [post('Ada Lovelace', 'Hi')] }), OtherRules);
   assert.equal(list.querySelector('strong').textContent, 'First');
   assert.equal(list.querySelector('time').textContent, 'when');
+});
+
+test('the list\'s own words come from the registry (a copy with every word marked)', needsRuby, async () => {
+  const marked = markedRegistry();
+  const none = await show(json({ message: 'Page topic not found' }, 404), MicroblogTopic, marked);
+  assert.equal(none.list.textContent, mark('No questions yet. Ask the first one.'));
+  const failed = await show(json({ message: 'Error' }, 500), MicroblogTopic, marked);
+  assert.equal(failed.list.textContent, mark('Questions couldn\'t load. Refresh to try again.'));
+  const nameless = await show(json({ microblogs: [post('', 'Is there parking?')] }), MicroblogTopic, marked);
+  assert.equal(nameless.list.querySelector('strong').textContent, mark('Someone'));
+  for (const { list } of [none, failed, nameless]) assert.deepEqual(wordsSpelledBy(list.textContent), []);
 });
