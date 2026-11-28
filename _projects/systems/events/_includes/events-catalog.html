@@ -3,7 +3,8 @@
   Us, the category buttons, the upcoming cards with Earlier and Later under them, and Past Events.
   plugins/events.rb lists every listed event in date order; js/event-catalog.js moves the ones
   that have ended under Past Events, filters by ?category= and shows a page of each grid at a time.
-  Parts that hide are plain wrappers, because an ocs__ element's display beats [hidden].
+  Parts that hide are plain wrappers, because an ocs__ element's display beats [hidden]: that is
+  why each Earlier and Later link has its own div, which hides at an end with nowhere to go.
 {%- endcomment -%}
 {%- assign catalog_words = site.data.projects.events.event_registry.texts.catalog -%}
 {%- assign events_settings = site.data.events_settings -%}
@@ -32,8 +33,8 @@
     </div>
     <div data-event-pager="upcoming" hidden>
       <nav class="ocs__pager" aria-label="{{ catalog_words.pages_label | escape }}">
-        <a class="ocs__pager-link" data-event-earlier>{{ catalog_words.earlier | escape }}</a>
-        <a class="ocs__pager-link next" data-event-later>{{ catalog_words.later | escape }}</a>
+        <div data-event-earlier><a class="ocs__pager-link">{{ catalog_words.earlier | escape }}</a></div>
+        <div data-event-later><a class="ocs__pager-link next">{{ catalog_words.later | escape }}</a></div>
       </nav>
     </div>
     <div data-event-empty hidden>
@@ -44,8 +45,8 @@
       <div class="ocs__grid ocs__grid--card cols-3" data-event-grid="past"></div>
       <div data-event-pager="past" hidden>
         <nav class="ocs__pager" aria-label="{{ catalog_words.pages_label | escape }}">
-          <a class="ocs__pager-link" data-event-earlier>{{ catalog_words.earlier | escape }}</a>
-          <a class="ocs__pager-link next" data-event-later>{{ catalog_words.later | escape }}</a>
+          <div data-event-earlier><a class="ocs__pager-link">{{ catalog_words.earlier | escape }}</a></div>
+          <div data-event-later><a class="ocs__pager-link next">{{ catalog_words.later | escape }}</a></div>
         </nav>
       </div>
     </div>

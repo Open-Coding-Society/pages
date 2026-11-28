@@ -533,6 +533,14 @@ class EventsBuildTest < Minitest::Test
     # The grammar's default size (44 px), not small (28 px), so each is a full touch target on a phone.
     assert buttons.all? { |button| button["class"].split == (button["data-event-category"].empty? ? %w[ocs__btn accent fill] : %w[ocs__btn accent]) }
     assert_includes page("events"), "/preview/assets/js/projects/events/event-catalog.js"
+    # Each pager link sits in a plain wrapper, the part that takes [hidden] at an end with nowhere
+    # to go (an ocs__pager-link's display beats [hidden]); no link is a dimmed aria-disabled one.
+    %w[upcoming past].each do |grid|
+      nav = catalog.at_css(%(div[data-event-pager="#{grid}"][hidden] > nav.ocs__pager))
+      assert nav.at_css("> div[data-event-earlier] > a.ocs__pager-link:not(.next)"), grid
+      assert nav.at_css("> div[data-event-later] > a.ocs__pager-link.next"), grid
+    end
+    assert_empty catalog.css("[aria-disabled]")
   end
 
   # Plan test 18.

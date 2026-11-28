@@ -42,7 +42,8 @@ export class EventCatalog {
     this.buttons.forEach((button) => button.addEventListener('click', () => this.choose(button.getAttribute('data-event-category'))));
     for (const name of ['upcoming', 'past']) {
       const pager = this.root.querySelector(`[data-event-pager="${name}"]`);
-      for (const link of [pager.querySelector('[data-event-earlier]'), pager.querySelector('[data-event-later]')]) {
+      for (const end of [pager.querySelector('[data-event-earlier]'), pager.querySelector('[data-event-later]')]) {
+        const link = end.querySelector('a');
         link.addEventListener('click', (event) => this.turn(event, link));
       }
     }
@@ -136,18 +137,17 @@ export class EventCatalog {
   }
 
   /**
-   * Points a pager link at a page of this catalog, or turns it off, like img3's grey arrow at an end.
-   * @param {HTMLElement} link
+   * Points one end of a pager (Earlier or Later) at a page of this catalog, or hides it when there
+   * is nowhere to go. The end's plain wrapper takes [hidden], since an ocs__pager-link's display
+   * beats it.
+   * @param {HTMLElement} end - the div[data-event-earlier] or div[data-event-later] around the link
    * @param {string|null} search - the page's query, or null when there is nowhere to go
    */
-  point(link, search) {
-    if (search === null) {
-      link.removeAttribute('href');
-      link.setAttribute('aria-disabled', 'true');
-    } else {
-      link.setAttribute('href', `${this.location.pathname}${search}`);
-      link.removeAttribute('aria-disabled');
-    }
+  point(end, search) {
+    const link = end.querySelector('a');
+    end.hidden = search === null;
+    if (search === null) link.removeAttribute('href');
+    else link.setAttribute('href', `${this.location.pathname}${search}`);
   }
 
   /**

@@ -33,11 +33,13 @@ function card(document, { slug, title = slug, day, start = '', end = '', stage =
   el(document, 'div', {}, el(document, 'b', { class: 'ocs__status-pill ocs__status-pill--good', 'data-event-pill': '' }, 'Published')));
 }
 
+// Each link sits in a plain wrapper that takes [hidden] at an end with nowhere to go: an
+// ocs__pager-link's display beats [hidden], so the link itself can't.
 function pager(document, name, texts) {
   return el(document, 'div', { 'data-event-pager': name, hidden: '' },
     el(document, 'nav', { class: 'ocs__pager', 'aria-label': texts.pages_label },
-      el(document, 'a', { class: 'ocs__pager-link', 'data-event-earlier': '' }, texts.earlier),
-      el(document, 'a', { class: 'ocs__pager-link next', 'data-event-later': '' }, texts.later)));
+      el(document, 'div', { 'data-event-earlier': '' }, el(document, 'a', { class: 'ocs__pager-link' }, texts.earlier)),
+      el(document, 'div', { 'data-event-later': '' }, el(document, 'a', { class: 'ocs__pager-link next' }, texts.later))));
 }
 
 // The catalog the way _includes/events-catalog.html writes it.
@@ -81,7 +83,14 @@ function setup(url, { cards: cardSpecs, categories = [], now = NOW, storage, pag
 
 const titlesIn = (root, grid) => root.querySelector(`[data-event-grid="${grid}"]`).querySelectorAll('[data-event-link]').map((link) => link.textContent);
 const status = (root) => root.querySelector('[data-event-status]').textContent;
-const link = (root, grid, which) => root.querySelector(`[data-event-pager="${grid}"]`).querySelector(`[data-event-${which}]`);
+const end = (root, grid, which) => root.querySelector(`[data-event-pager="${grid}"]`).querySelector(`[data-event-${which}]`);
+const link = (root, grid, which) => end(root, grid, which).querySelector('a');
+// An end with nowhere to go is gone, not a dimmed link that still looks pressable.
+function assertGone(root, grid, which) {
+  assert.equal(end(root, grid, which).hidden, true, `${which} is hidden`);
+  assert.equal(link(root, grid, which).getAttribute('href'), null, `${which} has no address`);
+  assert.equal(link(root, grid, which).getAttribute('aria-disabled'), null, `${which} isn't a disabled link`);
+}
 const button = (root, key) => root.querySelectorAll('[data-event-category]').find((node) => node.getAttribute('data-event-category') === key);
 const days = (count, from = 1) => Array.from({ length: count }, (_, index) => `2027-04-${String(from + index).padStart(2, '0')}`);
 const many = (count, extra = {}) => days(count).map((day, index) => ({ slug: `e${index + 1}`, title: `Event ${index + 1}`, day, start: '10:00', ...extra }));
@@ -225,10 +234,9 @@ test('fourteen upcoming events show six at a time, and Earlier and Later step th
   const { root, location, pushes, texts } = setup('/events/', { cards: many(14) });
   assert.deepEqual(titlesIn(root, 'upcoming'), ['Event 1', 'Event 2', 'Event 3', 'Event 4', 'Event 5', 'Event 6']);
   assert.equal(root.querySelector('[data-event-pager="upcoming"]').hidden, false);
-  assert.equal(link(root, 'upcoming', 'earlier').getAttribute('href'), null, 'nowhere earlier to go');
-  assert.equal(link(root, 'upcoming', 'earlier').getAttribute('aria-disabled'), 'true');
+  assertGone(root, 'upcoming', 'earlier');
+  assert.equal(end(root, 'upcoming', 'later').hidden, false);
   assert.equal(link(root, 'upcoming', 'later').getAttribute('href'), '/events/?page=2');
-  assert.equal(link(root, 'upcoming', 'later').getAttribute('aria-disabled'), null);
   assert.ok(status(root).endsWith(texts.catalog.page_of.replace('{page}', '1').replace('{pages}', '3')));
 
   const press = fakeEvent('click');
@@ -238,11 +246,13 @@ test('fourteen upcoming events show six at a time, and Earlier and Later step th
   assert.deepEqual(titlesIn(root, 'upcoming'), ['Event 7', 'Event 8', 'Event 9', 'Event 10', 'Event 11', 'Event 12']);
   assert.equal(status(root), `${texts.catalog.showing.replace('{count}', '14')} ${texts.catalog.page_of.replace('{page}', '2').replace('{pages}', '3')}`);
   assert.equal(link(root, 'upcoming', 'earlier').getAttribute('href'), '/events/');
+  assert.equal(end(root, 'upcoming', 'earlier').hidden, false, 'page 2 has both');
+  assert.equal(end(root, 'upcoming', 'later').hidden, false);
 
   link(root, 'upcoming', 'later').dispatchEvent(fakeEvent('click'));
   assert.deepEqual(titlesIn(root, 'upcoming'), ['Event 13', 'Event 14']);
-  assert.equal(link(root, 'upcoming', 'later').getAttribute('href'), null);
-  assert.equal(link(root, 'upcoming', 'later').getAttribute('aria-disabled'), 'true');
+  assertGone(root, 'upcoming', 'later');
+  assert.equal(end(root, 'upcoming', 'earlier').hidden, false);
   assert.equal(location.search, '?page=3');
 });
 
@@ -252,7 +262,7 @@ test('the browser\'s Back redraws the page it returns to', needsRuby, () => {
   location.href = `${ORIGIN}/events/`;
   window.dispatchEvent(fakeEvent('popstate'));
   assert.deepEqual(titlesIn(root, 'upcoming').at(0), 'Event 1');
-  assert.equal(link(root, 'upcoming', 'earlier').getAttribute('aria-disabled'), 'true');
+  assertGone(root, 'upcoming', 'earlier');
 });
 
 test('paging keeps ?category=, and choosing a category goes back to page 1', needsRuby, () => {
@@ -298,8 +308,10 @@ test('the Past grid pages with ?past= on its own', needsRuby, () => {
   assert.deepEqual(titlesIn(root, 'past'), ['Past 9', 'Past 8', 'Past 7', 'Past 6', 'Past 5', 'Past 4']);
   assert.equal(root.querySelector('[data-event-pager="upcoming"]').hidden, true);
   assert.equal(link(root, 'past', 'later').getAttribute('href'), '/events/?past=2');
+  assertGone(root, 'past', 'earlier');
   link(root, 'past', 'later').dispatchEvent(fakeEvent('click'));
   assert.deepEqual(pushes, ['/events/?past=2']);
   assert.deepEqual(titlesIn(root, 'past'), ['Past 3', 'Past 2', 'Past 1']);
+  assertGone(root, 'past', 'later');
   assert.deepEqual(titlesIn(root, 'upcoming'), ['Event 1', 'Event 2'], 'the upcoming grid stays where it was');
 });
