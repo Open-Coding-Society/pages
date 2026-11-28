@@ -11,13 +11,13 @@ show_reading_time: false
 
 Events has two views, both static pages that Jekyll builds from front matter:
 
-- An event page (`layout: event`), Mort's Example Event Viewer: the photo and its credit, the
+- An event page (`layout: event`): the photo and its credit, the
   stage pill, the title, the date line, the description, the place, the Event Sections cards and
   Questions and Discussion.
-- `/events/`, Mort's Upcoming Events: a tinted band with Join Us, a category filter, the cards
+- `/events/`, the Upcoming Events catalog: a tinted band with Join Us, a category filter, the cards
   three across with Earlier and Later six at a time, and Past Events.
 
-Each event is a post in `_posts/events/` with Mort's front matter and an explicit
+Each event is a post in `_posts/events/` with the event front matter and an explicit
 `permalink: /events/<slug>/`. The words and choices come from the registry,
 `data/event_registry.yml`, and the site defaults from the `events:` block in `_config.yml`.
 

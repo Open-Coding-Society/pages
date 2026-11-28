@@ -1,4 +1,4 @@
-// EventPage runs one event page (layout: event, img2). The static page never claims a live
+// EventPage runs one event page (layout: event). The static page never claims a live
 // state: the browser moves the stage pill from Published to Active to Completed by the clock,
 // never touches the Sample pill, shows "Ask a question" only when the Microblog panel is on the
 // page, and starts the latest-questions list only when the event turned the Microblog on.

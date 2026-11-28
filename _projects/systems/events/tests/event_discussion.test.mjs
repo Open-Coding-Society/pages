@@ -1,4 +1,4 @@
-// EventDiscussion lists an event's latest questions on the page itself (img2's "Questions and
+// EventDiscussion lists an event's latest questions on the page itself ("Questions and
 // Discussion"), read from the Microblog's own storage through Flask's public route, so signed-out
 // visitors see them too. Posting still happens in the Microblog panel, which needs a sign-in.
 import assert from 'node:assert/strict';

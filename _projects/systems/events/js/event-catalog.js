@@ -1,4 +1,4 @@
-// The /events/ catalog (img3). Jekyll lists every listed event in date order; the site rebuilds
+// The /events/ catalog. Jekyll lists every listed event in date order; the site rebuilds
 // only on a push, so the browser updates each card's pill by the clock, moves the events that
 // have ended under Past Events (newest first), filters both grids by ?category=, and shows a page
 // of each grid at a time (?page= and ?past=), moving only when Earlier or Later is pressed.

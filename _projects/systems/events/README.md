@@ -1,9 +1,9 @@
 # Events
 
 Events is the Jekyll part of the Event Management System Mort described on
-[pages#2089](https://github.com/Open-Coding-Society/pages/pull/2089): an event page for each
-event (`layout: event`, his "Example Event Viewer") and the `/events/` catalog (his "Upcoming
-Events"). Every event comes from front matter, and each event's discussion is its Microblog topic.
+[pages#2089](https://github.com/Open-Coding-Society/pages/pull/2089): a page for each event
+(`layout: event`) and the `/events/` catalog of upcoming events. Every event comes from front
+matter, and each event's discussion is its Microblog topic.
 The sources live here, and `make` copies them to the paths the rest of the site loads them from.
 
 See [Events architecture](docs/ARCHITECTURE.md) for how the pages, the generator and the scripts
@@ -11,8 +11,8 @@ fit together.
 
 ## An event is a post
 
-An event is a post in `_posts/events/<YYYY-MM-DD>-<slug>.md` with Mort's front matter and an
-explicit `permalink: /events/<slug>/`. The permalink keeps the address stable, and the
+An event is a post in `_posts/events/<YYYY-MM-DD>-<slug>.md` with the event front matter below
+and an explicit `permalink: /events/<slug>/`. The permalink keeps the address stable, and the
 Microblog topic is the permalink.
 
 **Never commit a `status: draft` file.** The repo is public on GitHub, so drafts stay in the
@@ -78,8 +78,8 @@ as Published, so a page never says Registration Open without a way to register.
 
 The `events:` block in `_config.yml` holds the site defaults:
 
-- `timezone`: the zone `start_time` and `end_time` are in. Keep it the same as `default_timezone`
-  in Flask's `model/dataconfigs/event_rules.json`.
+- `timezone`: the zone `start_time` and `end_time` are in. Keep it the same as Flask's Event
+  Service default time zone.
 - `join_url`: where the catalog's Join Us button goes (`/signup` here). Leave it out for no button.
 - `page_size`: how many cards `/events/` shows at a time, a whole number from 1 to 48.
 - `features`: what an event turns on when its own `features` block leaves a key out. Here only
@@ -112,8 +112,8 @@ calls Spring.
 |---|---|---|
 | `index.md` | `navigation/projects/events/index.md` | `/events/` |
 | `layouts/event.html` | `_layouts/event.html` | `layout: event`: only the include below |
-| `_includes/event-body.html` | `_includes/projects/events/` | the event page (img2) |
-| `_includes/events-catalog.html`, `event-card.html` | `_includes/projects/events/` | the catalog (img3) and one card |
+| `_includes/event-body.html` | `_includes/projects/events/` | the event page: photo, pills, title, date, place, section cards and discussion |
+| `_includes/events-catalog.html`, `event-card.html` | `_includes/projects/events/` | the catalog and one card |
 | `_includes/event-texts-json.html` | `_includes/projects/events/` | the registry's words for the scripts |
 | `data/event_registry.yml` | `_data/projects/events/` | every visible word and choice |
 | `plugins/events.rb` | `_plugins/projects/events/` | the generator (`Events`) |

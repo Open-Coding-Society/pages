@@ -37,11 +37,11 @@ google_client_id: "65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleuserc
 spring: true
 
 # Events (_projects/systems/events/README.md): site defaults that each event's front matter can
-# override. start_time and end_time are wall-clock times in timezone; keep it the same as
-# default_timezone in Flask's model/dataconfigs/event_rules.json. features is what an event
-# turns on when its own features block leaves a key out. page_size is how many cards /events/
-# shows at a time (img3: three across, two down). join_url is where the Join Us button goes;
-# leave it out for no button.
+# override. start_time and end_time are wall-clock times in timezone; keep it the same as Flask's
+# Event Service default time zone (the build checks it against the tz database). features is what
+# an event turns on when its own features block leaves a key out. page_size is how many cards
+# /events/ shows at a time (6 fills two rows of three). join_url is where the Join Us button
+# goes; leave it out for no button.
 events:
   timezone: America/Los_Angeles
   join_url: /signup

@@ -1,6 +1,6 @@
 # Words and choices for the Events system. Published to _data/projects/events/event_registry.yml.
 # An organization renames a label here; no template or script spells one.
-lifecycle:            # Mort's order (img1). listed: shown in the /events/ catalog
+lifecycle:            # Mort's order. listed: shown in the /events/ catalog
   - {key: draft,        label: Draft,             description: Being written,        tone: neutral, listed: false}
   - {key: published,    label: Published,         description: Details are out,      tone: good,    listed: true}
   - {key: registration, label: Registration Open, description: Taking RSVPs,         tone: good,    listed: true}
@@ -10,11 +10,11 @@ lifecycle:            # Mort's order (img1). listed: shown in the /events/ catal
 event_types: {workshop: Workshop, showcase: Showcase, fundraiser: Fundraiser, outreach: Outreach, meeting: Meeting}
 attachment_types: {gallery: Gallery, document: Document}
 features: [microblog, registration, attendance, gallery]
-sections:             # img2's cards, in order; a card shows only when its section has content
+sections:             # the event page's cards, in order; a card shows only when its section has content
   - {key: description, label: Description, icon: fa-file-lines}
   - {key: schedule,    label: Schedule,    icon: fa-calendar}
   - {key: presenters,  label: Presenters,  icon: fa-users}
-  - {key: gallery,     label: Gallery,     icon: fa-images}   # filled by PR 3 when photos exist
+  - {key: gallery,     label: Gallery,     icon: fa-images}   # filled later, once the Event Service has photos
 formats: {date: "%B %-d, %Y", card_date: "%B %-d", time: "%-l:%M %p", between: " – ", separator: " · "}
 viewer: {label: Events, item: event}
 discussion: {shown: 5}  # how many of the topic's latest posts the page lists

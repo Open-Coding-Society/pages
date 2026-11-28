@@ -1,4 +1,4 @@
-// "Questions and Discussion" on an event page (img2): the event's latest Microblog posts, read
+// "Questions and Discussion" on an event page: the event's latest Microblog posts, read
 // from the Microblog's own storage through Flask's public page-topic route, so signed-out
 // visitors see them too. The topic is the page's permalink, the same one the Microblog panel
 // posts to; asking a question happens in that panel, which needs a sign-in.

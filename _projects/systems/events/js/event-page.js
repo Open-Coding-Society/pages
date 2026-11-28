@@ -1,4 +1,4 @@
-// One event page (layout: event, img2). The static page never claims a live state: the site
+// One event page (layout: event). The static page never claims a live state: the site
 // rebuilds only on a push, so the browser moves the stage pill from Published to Active to
 // Completed by the clock. The Sample pill is never touched. "Ask a question" opens the
 // Microblog panel, and the latest questions show on the page when the event turned the

@@ -1,4 +1,4 @@
-// EventCatalog runs /events/ (img3). Jekyll lists every listed event in date order; in the
+// EventCatalog runs /events/. Jekyll lists every listed event in date order; in the
 // visitor's browser the class updates each card's pill by the clock, moves the events that have
 // ended under Past Events (newest first), filters by ?category=, and shows six cards at a time
 // with Earlier and Later links that move only when pressed. Cards are moved, never hidden, because

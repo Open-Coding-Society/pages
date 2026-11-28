@@ -711,7 +711,7 @@ class EventsBuildTest < Minitest::Test
   end
 
   # Plan test 18.
-  def test_the_sample_page_follows_img2_from_the_include
+  def test_the_sample_page_is_drawn_by_the_include
     sample = html("events/community-technology-workshop")
     pill = sample.at_css("b.ocs__status-pill.ocs__status-pill--good[data-event-pill]")
     assert_equal "Published", pill.text

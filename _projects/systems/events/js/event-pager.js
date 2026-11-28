@@ -1,5 +1,5 @@
-// Paging for the /events/ grids: the grammar's ocs__pager (Earlier and Later) in place of img3's
-// round arrows. The page lives in the address (?page= for upcoming events, ?past= for past
+// Paging for the /events/ grids, with the grammar's ocs__pager (Earlier and Later), a few cards
+// at a time. The page lives in the address (?page= for upcoming events, ?past= for past
 // ones), so a link can open it and the browser's Back steps through it.
 
 /** Page numbers for a list of cards shown a few at a time. */

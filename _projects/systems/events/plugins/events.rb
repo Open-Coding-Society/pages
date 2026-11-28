@@ -4,11 +4,12 @@ require "json"
 # Builds the Events system's pages and catalog from front matter during the Jekyll build.
 #
 # Every document with `layout: event` is one event. On this site each is a post in _posts/events/
-# with Mort's front matter (pages#2089) and an explicit `permalink: /events/<slug>/`. This module
-# checks each event against the registry (_data/projects/events/event_registry.yml) and the site's
-# `events:` settings in _config.yml, stops the build naming the file when a value is wrong, and
-# prepares what the Liquid templates read: page.event_entry on each event, and
-# site.data["events_catalog"], ["events_categories"] and ["events_settings"] for /events/.
+# with the event front matter (the README lists its fields) and an explicit
+# `permalink: /events/<slug>/`. This module checks each event against the registry
+# (_data/projects/events/event_registry.yml) and the site's `events:` settings in _config.yml,
+# stops the build naming the file when a value is wrong, and prepares what the Liquid templates
+# read: page.event_entry on each event, and site.data["events_catalog"], ["events_categories"],
+# ["events_settings"] and ["events_texts_json"] for /events/.
 #
 # It does not handle clicks or the clock. The site rebuilds only on a push, so js/event-page.js and
 # js/event-catalog.js move a published event to Active and Completed in the visitor's browser.
@@ -16,7 +17,7 @@ require "json"
 # Methods declared with `self.` belong to the module (like Java static methods). String-keyed Ruby
 # hashes below are the named fields Liquid reads.
 module Events
-  # Mort's lifecycle, in his order (img1). The registry must list exactly these.
+  # Mort's lifecycle, in his order. The registry must list exactly these.
   LIFECYCLE = %w[draft published registration active completed archived].freeze
   # The ocs__status-pill tones a lifecycle stage may use.
   TONES = %w[good warn bad neutral].freeze
@@ -203,7 +204,7 @@ module Events
       fail!(source, "event_type must be one of #{registry['event_types'].keys.join(', ')}")
     end
     event_categories = categories(source, data["categories"])
-    stage = status == "registration" ? "published" : status # Registration Open needs the Event Service (PR 3).
+    stage = status == "registration" ? "published" : status # Registration Open waits for the Event Service.
     pill = registry["lifecycle"].find { |each| each["key"] == stage }
     {
       "title" => data["title"].strip, "description" => text?(data["description"]) ? data["description"].strip : nil,
@@ -333,7 +334,7 @@ module Events
     value
   end
 
-  # The people img2's Presenters card lists, the organizer first, each with initials for an
+  # The people the Presenters card lists, the organizer first, each with initials for an
   # ocs__avatar (the avatar grammar shows initials, not photos).
   #
   # @return [Array<Hash>] name, role and initials
@@ -368,7 +369,7 @@ module Events
   end
 
   # Checks registration: {enabled: true|false, capacity: a whole number of 1 or more}. The Event
-  # Service (PR 3) takes the RSVPs; this page shows no seats until it does.
+  # Service will take the RSVPs; this page shows no seats until it does.
   def self.check_registration(source, value)
     return if value.nil?
     fail!(source, "registration must be a mapping with enabled and capacity") unless value.is_a?(Hash)
@@ -379,7 +380,7 @@ module Events
   end
 
   # Checks attachments: each {type: a registry attachment type, id: a lowercase slug used once}.
-  # Their files come from the Event Service (PR 3).
+  # Their files will come from the Event Service.
   def self.check_attachments(source, value, registry)
     return if value.nil?
     fail!(source, "attachments must be a list of {type, id}") unless value.is_a?(Array) && value.all? { |item| item.is_a?(Hash) }
@@ -395,7 +396,7 @@ module Events
   end
 
   # Checks the hero: image (a site path or an http(s) link), its required alt text, and an optional
-  # credit (img2's chip).
+  # credit, the chip under the photo.
   #
   # @return [Hash] image, image_alt and image_credit
   def self.image(source, data)
@@ -424,8 +425,8 @@ module Events
     registry["features"].to_h { |key| [key, own.key?(key) ? own[key] : settings["features"].fetch(key, false)] }
   end
 
-  # img2's section cards, in the registry's order, each only when its section has content. The
-  # gallery has none until the Event Service has photos (PR 3).
+  # The event page's section cards, in the registry's order, each only when its section has
+  # content. The gallery has none until the Event Service has photos.
   #
   # @return [Array<Hash>] key, label and icon
   def self.sections(document, registry, words, presenters, presentation)
