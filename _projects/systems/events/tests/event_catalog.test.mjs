@@ -33,8 +33,8 @@ function card(document, { slug, title = slug, day, start = '', end = '', stage =
   el(document, 'div', {}, el(document, 'b', { class: 'ocs__status-pill ocs__status-pill--good', 'data-event-pill': '' }, pill)));
 }
 
-// Each link sits in a plain wrapper that takes [hidden] at an end with nowhere to go: an
-// ocs__pager-link's display beats [hidden], so the link itself can't.
+// Each link sits in a plain wrapper, the pager grid's cell. At an end with nowhere to go the link
+// leaves its cell and the empty cell stays, so Later keeps the right column, as other pagers do.
 function pager(document, name, texts) {
   return el(document, 'div', { 'data-event-pager': name, hidden: '' },
     el(document, 'nav', { class: 'ocs__pager', 'aria-label': texts.pages_label },
@@ -85,11 +85,11 @@ const titlesIn = (root, grid) => root.querySelector(`[data-event-grid="${grid}"]
 const status = (root) => root.querySelector('[data-event-status]').textContent;
 const end = (root, grid, which) => root.querySelector(`[data-event-pager="${grid}"]`).querySelector(`[data-event-${which}]`);
 const link = (root, grid, which) => end(root, grid, which).querySelector('a');
-// An end with nowhere to go is gone, not a dimmed link that still looks pressable.
+// An end with nowhere to go is gone, not a dimmed link that still looks pressable. Its empty cell
+// stays, so on page 1 Later sits in the right column.
 function assertGone(root, grid, which) {
-  assert.equal(end(root, grid, which).hidden, true, `${which} is hidden`);
-  assert.equal(link(root, grid, which).getAttribute('href'), null, `${which} has no address`);
-  assert.equal(link(root, grid, which).getAttribute('aria-disabled'), null, `${which} isn't a disabled link`);
+  assert.equal(end(root, grid, which).hidden, false, `${which}'s cell stays`);
+  assert.equal(link(root, grid, which), null, `${which} has no link`);
 }
 const button = (root, key) => root.querySelectorAll('[data-event-category]').find((node) => node.getAttribute('data-event-category') === key);
 const days = (count, from = 1) => Array.from({ length: count }, (_, index) => `2027-04-${String(from + index).padStart(2, '0')}`);

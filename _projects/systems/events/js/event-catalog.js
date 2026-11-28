@@ -37,6 +37,7 @@ export class EventCatalog {
    */
   start() {
     this.waiting = this.root.ownerDocument.createDocumentFragment();
+    this.pagerLinks = new Map(); // each pager end's link, kept while it is out of its cell
     this.buttons = [...this.root.querySelectorAll('button[data-event-category]')];
     this.lists = this.sortByClock([...this.root.querySelectorAll('[data-event-card]')]);
     this.buttons.forEach((button) => button.addEventListener('click', () => this.choose(button.getAttribute('data-event-category'))));
@@ -137,17 +138,22 @@ export class EventCatalog {
   }
 
   /**
-   * Points one end of a pager (Earlier or Later) at a page of this catalog, or hides it when there
-   * is nowhere to go. The end's plain wrapper takes [hidden], since an ocs__pager-link's display
-   * beats it.
+   * Points one end of a pager (Earlier or Later) at a page of this catalog, or takes its link out
+   * when there is nowhere to go. The empty wrapper keeps its grid cell, so Later stays in the
+   * right column as in the other pagers, and an ocs__pager-link's display would beat [hidden].
    * @param {HTMLElement} end - the div[data-event-earlier] or div[data-event-later] around the link
    * @param {string|null} search - the page's query, or null when there is nowhere to go
    */
   point(end, search) {
-    const link = end.querySelector('a');
-    end.hidden = search === null;
-    if (search === null) link.removeAttribute('href');
-    else link.setAttribute('href', `${this.location.pathname}${search}`);
+    if (!this.pagerLinks.has(end)) this.pagerLinks.set(end, end.querySelector('a'));
+    const link = this.pagerLinks.get(end);
+    if (search === null) {
+      link.removeAttribute('href');
+      link.remove();
+    } else {
+      link.setAttribute('href', `${this.location.pathname}${search}`);
+      if (!link.isConnected) end.append(link);
+    }
   }
 
   /**
