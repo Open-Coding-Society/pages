@@ -150,6 +150,10 @@ class EventsGeneratorTest < Minitest::Test
       { "permalink" => "/events/Workshop_2027/" } => "permalink must look like /events/<slug>/",
       { "image" => "images/x.png" } => "image must be a site path starting with / or an http(s) link",
       { "image" => "//evil.test/x.png" } => "image must be a site path starting with / or an http(s) link",
+      # Browsers read "/\\" as "//", another site.
+      { "image" => "/\\evil.test/x.png" } => "image must be a site path starting with / or an http(s) link",
+      { "presentation" => "/\\evil.test" } => "presentation must be a site path or an https link",
+      { "image_credit" => { "name" => "OCS", "url" => "/images\\x.png" } } => "image_credit.url must be a site path or an https link",
       { "image_alt" => nil } => "image_alt is needed with image",
       { "presentation" => "javascript:alert(1)" } => "presentation must be a site path or an https link",
       { "location" => { "name" => "Community Center", "url" => "javascript:alert(1)" } } => "location.url must be an https link",

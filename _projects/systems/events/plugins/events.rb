@@ -24,8 +24,9 @@ module Events
   SLUG = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/.freeze
   CLOCK = /\A(?:[01]\d|2[0-3]):[0-5]\d\z/.freeze
   ZONE = %r{\A(?:UTC|[A-Za-z]+(?:/[A-Za-z0-9_+-]+)+)\z}.freeze
-  # A path on this site: one leading slash, never two (//host is another site), and no spaces.
-  SITE_PATH = %r{\A/(?!/)\S*\z}.freeze
+  # A path on this site: one leading slash, never two (//host is another site), and no spaces or
+  # backslashes (browsers read /\host as //host).
+  SITE_PATH = %r{\A/(?![/\\])[^\s\\]*\z}.freeze
   HTTPS = %r{\Ahttps://\S+\z}i.freeze
   HTTP_OR_HTTPS = %r{\Ahttps?://\S+\z}i.freeze
   REGISTRY_FILE = "_data/projects/events/event_registry.yml".freeze
